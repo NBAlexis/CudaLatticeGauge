@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CLGLib.h" />
+    <ClInclude Include="CLGLib_Private.h" />
+    <ClInclude Include="Core\CLGDefine.h" />
+    <ClInclude Include="Core\CLGLibManager.h" />
+    <ClInclude Include="Core\CLGSetup.h" />
+    <ClInclude Include="Core\CudaHelper.h" />
+    <ClInclude Include="Core\CudaHelperFunctions.h" />
+    <ClInclude Include="Data\Action\CAction.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
+    <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
+    <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h" />
+    <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
+    <ClInclude Include="Data\CCommonData.h" />
+    <ClInclude Include="Data\Field\CField.h" />
+    <ClInclude Include="Data\Field\CFieldBoson.h" />
+    <ClInclude Include="Data\Field\CFieldFermion.h" />
+    <ClInclude Include="Data\Field\CFieldGauge.h" />
+    <ClInclude Include="Data\Field\CFieldGaugeSU3.h" />
+    <ClInclude Include="Data\Field\CFieldGaugeZ2.h" />
+    <ClInclude Include="Data\Field\CFieldSpin.h" />
+    <ClInclude Include="Data\Lattice\CIndex.h" />
+    <ClInclude Include="Data\Lattice\CIndexSquare.h" />
+    <ClInclude Include="Data\Lattice\CLatticeData.h" />
+    <ClInclude Include="Platform\PlatformIncs.h" />
+    <ClInclude Include="Platform\WinDefine.h" />
+    <ClInclude Include="Platform\WinFunction.h" />
+    <ClInclude Include="Tools\CYAMLParser.h" />
+    <ClInclude Include="Tools\Math\SU3.h" />
+    <ClInclude Include="Tools\Tracer.h" />
+    <ClInclude Include="Tools\Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CLGLib_Private.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Core\CLGLibManager.cpp" />
+    <ClCompile Include="Core\CudaHelper.cpp" />
+    <ClCompile Include="Data\CCommonData.cpp" />
+    <ClCompile Include="Data\Field\CFieldGaugeSU3.cpp" />
+    <ClCompile Include="Data\Lattice\CLatticeData.cpp" />
+    <ClCompile Include="Platform\WinFunction.cpp" />
+    <ClCompile Include="Tools\CYAMLParser.cpp" />
+    <ClCompile Include="Tools\Tracer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="FileTemplate.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Core\CudaCommon.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="Core\CudaHelper_Test.cu">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cu" />
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu" />
+    <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu" />
+    <CudaCompile Include="Data\Lattice\CIndexSquare.cu" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{B7501840-96AB-471E-BA14-9E825D0C63C8}</ProjectGuid>
+    <RootNamespace>CudaLatticeGauge</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.0.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)CLGLib\;$(SolutionDir)..\Dependency\Cuda10\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)CLGLib\;$(SolutionDir)..\Dependency\Cuda10\include;$(ProjectDir);$(SolutionDir)Z2VulkanGo\;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)..\Dependency\wxWidgets\include;$(SolutionDir)..\Dependency\wxWidgets\include\msvc;$(ProjectDir);$(SolutionDir)Z2VulkanGo\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <CudaCompile>
+      <Include>./</Include>
+    </CudaCompile>
+    <CudaCompile>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+    </CudaCompile>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <Defines>WIN32</Defines>
+      <Runtime>MDd</Runtime>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <CudaCompile>
+      <Include>./</Include>
+    </CudaCompile>
+    <CudaCompile>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+    </CudaCompile>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <CodeGeneration>compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <Defines>WIN32</Defines>
+      <Runtime>MDd</Runtime>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+    </CudaCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>_UNICODE=1;UNICODE=1;%(PreprocessorDefinitions);DEBUG=1;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;_WINDLL;</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Z2InterfacePch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
+      <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 10.0.targets" />
+  </ImportGroup>
+</Project>

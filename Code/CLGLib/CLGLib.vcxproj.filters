@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{6ae707c9-db0c-469e-a1f4-809ff3b8fe42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Math">
+      <UniqueIdentifier>{d459a53a-7846-4952-8d28-aa1579b4d6db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{37e4dae5-8041-4dfb-8f2b-e29eae5af890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{d101ef83-734e-479e-acdc-e5ceed58a835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{b21f22e0-ff7a-48a6-bf8e-b6edbb21420e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Field">
+      <UniqueIdentifier>{d0136d33-fc41-4022-a4bd-005677db03ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Lattice">
+      <UniqueIdentifier>{ffcd1287-b6cc-44d8-b83a-bebdeac2ed6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Action">
+      <UniqueIdentifier>{e214c2b1-004d-4909-857a-c249e22d73be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Boundary">
+      <UniqueIdentifier>{4daf0000-6eb6-4033-8f98-78c06508ba9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Update">
+      <UniqueIdentifier>{9a6f1bb7-c9c4-44ad-8d83-26e907f4e875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Update\Continous">
+      <UniqueIdentifier>{ccb15a0d-9999-4827-bb14-92a5eb1b7a21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Update\Discrete">
+      <UniqueIdentifier>{c9972f2a-c80f-4f91-bf03-99f73dcf2a7c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Platform\WinFunction.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\WinDefine.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Timer.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="CLGLib.h" />
+    <ClInclude Include="CLGLib_Private.h" />
+    <ClInclude Include="Core\CLGDefine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Tracer.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CLGSetup.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\PlatformIncs.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CLGLibManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CudaHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CudaHelperFunctions.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\CYAMLParser.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\CCommonData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CField.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldBoson.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermion.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGauge.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGaugeSU3.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGaugeZ2.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldSpin.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Lattice\CIndex.h">
+      <Filter>Data\Lattice</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Lattice\CLatticeData.h">
+      <Filter>Data\Lattice</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CAction.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Boundary\CBoundaryCondition.h">
+      <Filter>Data\Boundary</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h">
+      <Filter>Data\Boundary</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\SU3.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Lattice\CIndexSquare.h">
+      <Filter>Data\Lattice</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h">
+      <Filter>Data\Boundary</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquette.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CLGLib_Private.cpp" />
+    <ClCompile Include="Tools\Tracer.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\WinFunction.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CLGLibManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CudaHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\CYAMLParser.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\CFieldGaugeSU3.cpp">
+      <Filter>Data\Field</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Lattice\CLatticeData.cpp">
+      <Filter>Data\Lattice</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\CCommonData.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="FileTemplate.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Core\CudaHelper_Test.cu">
+      <Filter>Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Core\CudaCommon.cu">
+      <Filter>Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Lattice\CIndexSquare.cu">
+      <Filter>Data\Lattice</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu">
+      <Filter>Data\Boundary</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

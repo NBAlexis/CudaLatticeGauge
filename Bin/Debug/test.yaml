@@ -1,0 +1,126 @@
+# this is a sample parameter file
+
+Test_Spectrum:
+  ## gauge_config_status = {Continue,Cold_start,Hot_start}
+  gauge_config_status      : Continue
+  ## gauge_config_type = {Text,Binary,Binary_Parallel,Fortran_JLQCD,Fortran_ILDG,ILDG,ILDG_Parallel}
+  gauge_config_type_input  : Text
+  config_filename_input    : ./conf_04040408.txt
+  ## random_number_type = {Mseries,MT19937,SFMT} NB. SFMT is an extra library
+  random_number_type       : Mseries
+  seed_for_random_number   : 1234567UL
+  number_of_valence_quarks : 2
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level            : General
+  expected_result          : 81.2796854325709
+
+Corr2pt_4spinor:
+  ## filename_output = {stdout, or "filename"}
+  filename_output : stdout
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level   : General
+
+Quark_1:
+  temporary_filename_base : prop_1
+
+  Fopr:
+    ## fermion_type = {Clover,CloverGeneral,Clover_Isochemical,Clover_SF,
+    ##                 Wilson,WilsonGeneral,Wilson_Isochemical,Wilson_SF}
+    ## NB. Domainwall,Overlap,Staggered need special treatments
+    fermion_type       : Clover
+    ## gamma_matrix_type = {Chiral,Dirac}
+    gamma_matrix_type  : Dirac
+    hopping_parameter  : 0.12
+    clover_coefficient : 1.0
+    boundary_condition : [1,1,1,-1]
+    ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+    verbose_level      : General
+
+  Source:
+    ## source_type = {Local,Exponential,MomentumWall,Wall}
+    source_type     : Exponential
+    ## source_position = [x,y,z,t], x = {0,...,Lx-1}
+    source_position : [0,0,0,0]
+    ## additional parameters for Exponential, exp(- slope * r^(power))
+    slope           : 0.25
+    power           : 2.0
+    ## additional parameters for MomentumWall, source_momentum = [nx,ny,nz,nt], p = (2 \pi / L) n
+    source_momentum : [1,1,1, 0]
+    ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+    verbose_level   : General
+
+Quark_2:
+  temporary_filename_base : prop_2
+
+  Fopr:
+    ## fermion_type = {Clover,CloverGeneral,Clover_Isochemical,Clover_SF,
+    ##                 Wilson,WilsonGeneral,Wilson_Isochemical,Wilson_SF}
+    ## NB. Domainwall,Overlap,Staggered need special treatments
+    fermion_type       : Clover
+    ## gamma_matrix_type = {Chiral,Dirac}
+    gamma_matrix_type  : Dirac
+    hopping_parameter  : 0.115
+    clover_coefficient : 1.0
+    boundary_condition : [1,1,1,-1]
+    ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+    verbose_level      : General
+
+  Source:
+    ## source_type = {Local,Exponential,MomentumWall,Wall}
+    source_type     : Exponential
+    ## source_position = [x,y,z,t], x = {0,...,Lx-1}
+    source_position : [0,0,0,0]
+    ## additional parameters for Exponential, exp(- slope * r^(power))
+    slope           : 0.50
+    power           : 2.0
+    ## additional parameters for MomentumWall, source_momentum = [nx,ny,nz,nt], p = (2 \pi / L) n
+    source_momentum : [1,1,1, 0]
+    ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+    verbose_level   : General
+
+Projection:
+  ## projection_type = {Maximum_SU_N,Stout_SU3}
+  projection_type : Stout_SU3
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level   : General
+
+Smear:
+  ## smear_type = {APE,HYP}
+  smear_type    : APE
+  rho_uniform   : 0.1
+  #smear_type    : HYP
+  #alpha1        : 0.95
+  #alpha2        : 0.76
+  #alpha3        : 0.38
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level : General
+
+Director_Smear:
+  number_of_smearing  : 0
+#  number_of_smearing : 1
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level       : General
+
+GaugeFixing:
+  ## gauge_fixing_type = {Coulomb,Landau,None}
+  gauge_fixing_type             : Coulomb
+  maximum_number_of_iteration   : 5000
+  number_of_naive_iteration     : 50
+  interval_of_measurement       : 10
+  iteration_to_reset            : 1000
+  convergence_criterion_squared : 1.0e-24
+  overrelaxation_parameter      : 1.6
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level                 : General
+
+Solver:
+  ## solver_type = {CGNE,CGNR,BiCGStab_Cmplx,BiCGStab_L_Cmplx,BiCGStab_DS_L_Cmplx,BiCGStab_IDS_L_Cmplx,GMRES_m_Cmplx}
+  solver_type                         : BiCGStab_Cmplx
+  maximum_number_of_iteration         : 100
+  maximum_number_of_restart           : 40
+  convergence_criterion_squared       : 1.0e-28
+  ## additional parameters for each solver
+  number_of_orthonormal_vectors       : 2
+  tolerance_for_DynamicSelection_of_L : 0.1
+  ## verbose_level = {Crucial,General,Detailed,Paranoiac}
+  verbose_level                       : General
