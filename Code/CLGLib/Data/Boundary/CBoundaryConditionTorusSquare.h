@@ -17,9 +17,9 @@ class CLGAPI CBoundaryConditionTorusSquare : public CBoundaryCondition
 {
 public:
 
-    CBoundaryConditionTorusSquare(class CIndex * pOwner) : CBoundaryCondition(pOwner) { ; }
+    __device__ CBoundaryConditionTorusSquare(class CIndex * pOwner) : CBoundaryCondition(pOwner) { ; }
 
-    virtual __device__ uint2 GetMappedIndex(const int4 &site, const int4 &fromsite, const UINT* length, const UINT* mult);
+    __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
 };
 
 __END_NAMESPACE

@@ -53,6 +53,30 @@
 #include "Core/CudaHelperFunctions.h"
 #include "Core/CudaHelper.h"
 
+//====================================
+//define some common function before decompose threads
+#define preparethread \
+CLatticeData* pLattice = CLatticeData::GetInstance(); \
+dim3 block(pLattice->m_uiLatticeDecompose[0], pLattice->m_uiLatticeDecompose[1], pLattice->m_uiLatticeDecompose[2]); \
+dim3 threads(pLattice->m_uiLatticeDecompose[3], pLattice->m_uiLatticeDecompose[4], pLattice->m_uiLatticeDecompose[5]);
+
+
+#define preparethreadsimple \
+dim3 block(pLattice->m_uiLatticeDecompose[0], pLattice->m_uiLatticeDecompose[1], pLattice->m_uiLatticeDecompose[2]); \
+dim3 threads(pLattice->m_uiLatticeDecompose[3], pLattice->m_uiLatticeDecompose[4], pLattice->m_uiLatticeDecompose[5]);
+
+
+#define intokernal \
+UINT coord[4]; \
+coord[0] = threadIdx.x + blockIdx.x * blockDim.x; \
+coord[1] = threadIdx.y + blockIdx.y * blockDim.y; \
+coord[2] = threadIdx.z + blockIdx.z * blockDim.z; \
+UINT uiTLength = pLattice->m_uiTLength; \
+UINT uiDir = pLattice->m_uiDir;
+
+
+#include "Tools/Math/CudaComplexFunction.h"
+#include "Tools/Math/Random.h"
 #include "Tools/Math/SU3.h"
 
 #include "Data/CCommonData.h"

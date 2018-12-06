@@ -25,6 +25,7 @@ class CLGAPI CCommonData
 public:
     enum { kLatticeDecompose = 3, kMaxDim = 4, kMaxFieldCount = 8, };
 
+    static UINT m_uiSeed;
     static UINT m_uiDim;
     static UINT m_uiDir;
     static UINT m_uiLatticeLength[CCommonData::kMaxDim];
@@ -37,6 +38,7 @@ public:
 
     static void InitialWithDefault()
     {
+        m_uiSeed = 1234567UL;
         m_uiDim = 4;
         m_uiDir = 4;
         m_uiLatticeLength[0] = 8;
@@ -47,6 +49,11 @@ public:
         m_fG = 1.0f;
         m_eGaugeType = EFT_GaugeSU3;
     }
+
+private:
+
+    CCommonData() { ; }
+    CCommonData(const CCommonData&) { ; }
 };
 
 __END_NAMESPACE

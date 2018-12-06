@@ -14,30 +14,10 @@
 __BEGIN_NAMESPACE
 
 /**
-*
-*/
-__device__ static __inline__ int4 GetXYZTSquare(UINT siteIndex, const UINT* mult)
-{
-    int4 xyzt;
-    xyzt.x = siteIndex / mult[0];
-    xyzt.y = (siteIndex % mult[0]) / mult[1];
-    xyzt.z = (siteIndex % mult[1]) / mult[2];
-    xyzt.w = (siteIndex % mult[2]) / mult[3];
-    return xyzt;
-}
-
-/**
-*
-*/
-__device__ static __inline__ int4 GetXYZTSquare(UINT linkIndex, UINT dirCount, const UINT* mult)
-{
-    return GetXYZTSquare(linkIndex / dirCount, mult);
-}
-
-/**
 * manipulate site
 */
-__device__ static __inline__ int4 MoveSquareSite(const int4 &in, INT dir)
+__device__ __inline__ static
+int4 _deviceMoveSquareSite(const int4 &in, INT dir)
 {
     int4 ret = in;
     UBOOL bReverse = dir < 0;
@@ -91,11 +71,9 @@ __device__ static __inline__ int4 MoveSquareSite(const int4 &in, INT dir)
 
 class CLGAPI CIndexSquare : public CIndex
 {
-
 public:
-
-    CIndexSquare(class CLatticeData * pOwner) : CIndex(pOwner) { ; }
-    virtual __device__ int2* GetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiDim, UINT uiLinkIndex, const UINT* length, const UINT* mult, UINT st = kSpaceTime);
+    __device__ CIndexSquare(class CDeviceLattice * pOwner) : CIndex(pOwner) { ; }
+    __device__ virtual int2* _deviceGetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
 
 };
 

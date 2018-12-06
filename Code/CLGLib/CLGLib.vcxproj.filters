@@ -125,6 +125,12 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\Random.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\CudaComplexFunction.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -146,11 +152,17 @@
     <ClCompile Include="Data\Field\CFieldGaugeSU3.cpp">
       <Filter>Data\Field</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Lattice\CLatticeData.cpp">
-      <Filter>Data\Lattice</Filter>
-    </ClCompile>
     <ClCompile Include="Data\CCommonData.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Math\Random.cu">
+      <Filter>Tools\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Lattice\CLatticeData.cu">
+      <Filter>Data\Lattice</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
+      <Filter>Data\Boundary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +186,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu">
       <Filter>Data\Boundary</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CField.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

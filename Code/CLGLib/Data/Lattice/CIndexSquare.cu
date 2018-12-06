@@ -41,8 +41,15 @@ __BEGIN_NAMESPACE
 *  + [site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
 *  The return, int2(x = linkIndex; |y| - 1 = fieldIndex, 0 if it is not boundary, sign of y is for inverse)  
 */
-__device__ int2* CIndexSquare::GetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiDim, UINT uiLinkIndex, const UINT* length, const UINT* mult, UINT st)
+__device__ int2* CIndexSquare::_deviceGetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st) const
 {
+    UINT uiDim = m_pOwner->m_uiDim;
+    //UINT* length = pLattice->m_uiLatticeLength;
+    //UINT* mult = pLattice->m_uiLatticeMultipy;
+
+    //for square, dir should equal to dim
+    assert(uiDim == m_pOwner->m_uiDir);
+
     int2* retV;
     count = 2 * (uiDim - 1);
     plaqutteLength = 4; //for square
@@ -65,55 +72,55 @@ __device__ int2* CIndexSquare::GetPlaquttesAtLink(UINT& count, UINT& plaqutteLen
 
     //uiLinkIndex is bdir
     //i is pdir
-    UINT elementCount = mult[4]; //for example, for SU3 it is 9
     UINT iListIndex = 0;
     for (int i = uiMinDim; i < uiMaxDim; ++i)
     {
         if (i != uiLinkDir)
         {
-            int4 xyzt = GetXYZTSquare(uiSiteIndex, mult);
+            int4 xyzt = __deviceSiteIndexToInt4(m_pOwner, uiSiteIndex);
 
             //=============================================
             //add forward
             //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
-            retV[iListIndex].x = uiSiteIndex + i * elementCount;
+            retV[iListIndex].x = uiSiteIndex + i;
             retV[iListIndex].y = 1;
             ++iListIndex;
 
-            int4 fsite3 = MoveSquareSite(xyzt, i + 1);
-            uint2 fsiteIndex3 = m_pBoundaryCondition->GetMappedIndex(fsite3, xyzt, length, mult);
-            retV[iListIndex].x = fsiteIndex3.x + uiLinkDir * elementCount;
+            int4 fsite3 = _deviceMoveSquareSite(xyzt, i + 1);
+            uint2 fsiteIndex3 = m_pBoundaryCondition->_devcieGetMappedIndex(fsite3, xyzt);
+            retV[iListIndex].x = fsiteIndex3.x + uiLinkDir;
             retV[iListIndex].y = (fsiteIndex3.y + 1);
             ++iListIndex;
 
-            int4 fsite2 = MoveSquareSite(xyzt, uiLinkDir + 1);
-            uint2 fsiteIndex2 = m_pBoundaryCondition->GetMappedIndex(fsite2, xyzt, length, mult);
-            retV[iListIndex].x = fsiteIndex2.x + i * elementCount;
+            int4 fsite2 = _deviceMoveSquareSite(xyzt, uiLinkDir + 1);
+            uint2 fsiteIndex2 = m_pBoundaryCondition->_devcieGetMappedIndex(fsite2, xyzt);
+            retV[iListIndex].x = fsiteIndex2.x + i;
             retV[iListIndex].y = -(fsiteIndex2.y + 1);
             ++iListIndex;
 
             //=============================================
             //add backward
             //[site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
-            int4 bsite2 = MoveSquareSite(xyzt, -(i + 1));
-            uint2 bsiteIndex2 = m_pBoundaryCondition->GetMappedIndex(bsite2, xyzt, length, mult);
-            retV[iListIndex].x = bsiteIndex2.x + i * elementCount;
+            int4 bsite2 = _deviceMoveSquareSite(xyzt, -(i + 1));
+            uint2 bsiteIndex2 = m_pBoundaryCondition->_devcieGetMappedIndex(bsite2, xyzt);
+            retV[iListIndex].x = bsiteIndex2.x + i;
             retV[iListIndex].y = -(bsiteIndex2.y + 1);
             ++iListIndex;
 
-            retV[iListIndex].x = bsiteIndex2.x + uiLinkDir * elementCount;
+            retV[iListIndex].x = bsiteIndex2.x + uiLinkDir;
             retV[iListIndex].y = bsiteIndex2.y + 1;
             ++iListIndex;
 
-            int4 bsite4 = MoveSquareSite(bsite2, uiLinkDir + 1);
-            uint2 bsiteIndex4 = m_pBoundaryCondition->GetMappedIndex(bsite4, bsite2, length, mult);
-            retV[iListIndex].x = bsiteIndex4.x + i * elementCount;
+            int4 bsite4 = _deviceMoveSquareSite(bsite2, uiLinkDir + 1);
+            uint2 bsiteIndex4 = m_pBoundaryCondition->_devcieGetMappedIndex(bsite4, bsite2);
+            retV[iListIndex].x = bsiteIndex4.x + i;
             retV[iListIndex].y = bsiteIndex2.y + 1;
             ++iListIndex;
         }
     }
     return retV;
 }
+
 
 __END_NAMESPACE
 

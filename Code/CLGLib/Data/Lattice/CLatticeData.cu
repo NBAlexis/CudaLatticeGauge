@@ -11,12 +11,41 @@
 
 __BEGIN_NAMESPACE
 
+CLatticeData* CLatticeData::m_pInstance = NULL;
+
+__global__ 
+void _kernelPrepareDeviceData(CDeviceLattice *& deviceLattice, CLatticeData* pLattice)
+{
+    deviceLattice = new CDeviceLattice();
+    memcpy(deviceLattice->m_uiLatticeLength, pLattice->m_uiLatticeLength, sizeof(UINT) * CCommonData::kMaxDim);
+    memcpy(deviceLattice->m_uiLatticeDecompose, pLattice->m_uiLatticeDecompose, sizeof(UINT) * (CCommonData::kLatticeDecompose * 2));
+    memcpy(deviceLattice->m_uiLatticeMultipy, pLattice->m_uiLatticeMultipy, sizeof(UINT) * (CCommonData::kMaxDim - 1));
+
+    deviceLattice->m_uiVolumn = pLattice->m_uiVolumn;
+    deviceLattice->m_uiDim = pLattice->m_uiDim;
+    deviceLattice->m_uiDir = pLattice->m_uiDir;
+    deviceLattice->m_uiTLength = pLattice->m_uiTLength;
+
+    //create index
+    deviceLattice->m_pIndex = new CIndexSquare(deviceLattice);
+}
+
+__global__ 
+void _kernelReleaseDeviceData(CDeviceLattice *& deviceLattice, CRandomSchrage *& random)
+{
+    delete random;
+    random = NULL;
+
+    delete deviceLattice;
+    deviceLattice = NULL;
+}
+
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
 * m_uiLatticeDecompose[3,4,5] is the threads in blocks
 */
 CLatticeData::CLatticeData()
-    : m_pIndex(NULL)
+    : m_pDeviceInstance(NULL)
 {
     m_uiDim = CCommonData::m_uiDim;
     m_uiDir = CCommonData::m_uiDir;
@@ -25,8 +54,6 @@ CLatticeData::CLatticeData()
     m_uiLatticeMultipy[0] = m_uiLatticeLength[1] * m_uiLatticeLength[2] * m_uiLatticeLength[3];
     m_uiLatticeMultipy[1] = m_uiLatticeLength[2] * m_uiLatticeLength[3];
     m_uiLatticeMultipy[2] = m_uiLatticeLength[3];
-    m_uiLatticeMultipy[3] = 1;
-    m_uiLatticeMultipy[4] = 1;
 
     if (m_uiLatticeLength[0] * m_uiLatticeLength[1] * m_uiLatticeLength[2] <= CCommonData::m_uiMaxThread)
     {
@@ -69,6 +96,15 @@ CLatticeData::CLatticeData()
         m_uiLatticeDecompose[4] = 1;
         m_uiLatticeDecompose[5] = 1;
     }
+
+    #pragma region Create Index and Boundary
+
+    //for now we only support square
+    _kernelPrepareDeviceData << <1, 1 >> > (m_pDeviceInstance, this);
+
+    #pragma endregion Create Index and Boundary
+
+    m_pDeviceInstance->m_pDeviceRandom = new CRandomSchrage(CCommonData::m_uiSeed, m_pDeviceInstance);
 }
 
 __END_NAMESPACE

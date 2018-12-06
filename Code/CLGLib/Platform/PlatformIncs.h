@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <assert.h>
 
 #ifdef _CLG_UNICODE
 

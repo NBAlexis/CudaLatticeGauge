@@ -46,6 +46,8 @@
     <ClInclude Include="Platform\WinDefine.h" />
     <ClInclude Include="Platform\WinFunction.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
+    <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
+    <ClInclude Include="Tools\Math\Random.h" />
     <ClInclude Include="Tools\Math\SU3.h" />
     <ClInclude Include="Tools\Tracer.h" />
     <ClInclude Include="Tools\Timer.h" />
@@ -57,11 +59,18 @@
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
     <ClCompile Include="Core\CudaHelper.cpp" />
+    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp" />
     <ClCompile Include="Data\CCommonData.cpp" />
     <ClCompile Include="Data\Field\CFieldGaugeSU3.cpp" />
-    <ClCompile Include="Data\Lattice\CLatticeData.cpp" />
+    <CudaCompile Include="Data\Field\CField.cu" />
+    <CudaCompile Include="Data\Lattice\CLatticeData.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClCompile Include="Platform\WinFunction.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
+    <CudaCompile Include="Tools\Math\Random.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClCompile Include="Tools\Tracer.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,27 +1,24 @@
 //=============================================================================
-// FILENAME : CCommonData.cpp
+// FILENAME : CBoundaryCondition.cpp
 // 
 // DESCRIPTION:
-// This is the class for the common data
+// This is the class for boundary conditions
+// Note that, the boundary conditions should only make sense together with lattice!!
 //
 // REVISION:
-//  [12/4/2018 nbale]
+//  [12/7/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
 
 __BEGIN_NAMESPACE
 
-
-UINT CCommonData::m_uiSeed = 1234567UL;
-UINT CCommonData::m_uiDim = 4;
-UINT CCommonData::m_uiDir = 4;
-UINT CCommonData::m_uiLatticeLength[CCommonData::kMaxDim];
-UINT CCommonData::m_uiMaxThread = 1024;
-EFieldType CCommonData::m_eGaugeType;
-
-//related with a
-//related with beta
-FLOAT CCommonData::m_fG = 1.0f;
+__device__ 
+CBoundaryCondition::CBoundaryCondition(class CIndex * pOwner)
+    : m_pOwner(pOwner)
+    , m_pLattice(pOwner->GetOwner())
+{
+    ;
+}
 
 __END_NAMESPACE
 

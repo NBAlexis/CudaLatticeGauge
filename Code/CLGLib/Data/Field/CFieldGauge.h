@@ -19,11 +19,7 @@ class CLGAPI CFieldGauge : public CField
 public:
     CFieldGauge(CLatticeData* pLattice) : CField(pLattice) 
     { 
-        for (int i = 0; i < CCommonData::kMaxDim; ++i)
-        {
-            //dir links for every set
-            m_uiLatticeMultipy[i] *= m_uiDir;
-        }
+        ;
     }
 
 #pragma region HMC update
