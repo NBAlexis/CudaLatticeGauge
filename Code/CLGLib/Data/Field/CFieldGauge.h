@@ -27,12 +27,9 @@ public:
     /**
     * Before many other steps
     */
-    virtual void CalculateStaple(void) = 0;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const cuComplex& minusBetaOverN) const = 0;
 
-    /**
-    * U(x)=U(x)+P(x)U(x) t
-    */
-    //virtual void ApplyForce(CFieldGauge * p, FLOAT t) = 0;
+    virtual void MakeRandomGenerator() = 0;
 
 #pragma endregion HMC update
 

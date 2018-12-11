@@ -45,7 +45,7 @@
 
 #if _CLG_WIN
 # define __DLL_IMPORT			__declspec(dllimport)
-# define Z2PRIVATE
+# define CLGAPIPRIVATE
 # define __DLL_EXPORT			__declspec(dllexport)
 # define __IMPORT_LIB(libname)	comment(lib, libname)
 # undef FORCEINLINE

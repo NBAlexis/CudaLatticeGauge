@@ -1,0 +1,71 @@
+\documentclass[3pt]{ctexart}
+\usepackage{geometry}
+
+\newcommand{\citeu}[1]{$^{\mbox{\protect \scriptsize \cite{#1}}}$}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{epsf}
+\usepackage{ifxetex}
+\usepackage[numbers,sort&compress]{natbib}% 此命令要放在设置hyperref的命令之前
+\usepackage{graphicx}  % needed for figures
+\usepackage{float}
+\usepackage{dcolumn}   % needed for some tables
+\usepackage{bm}        % for math
+\usepackage{amssymb}   % for math
+\usepackage{slashed}   % for Dirac Slash
+\usepackage{amsmath}   % for mutiline eqn
+\usepackage{simplewick} % for contraction
+\usepackage{verbatim}  % for multi-line comment
+\usepackage{color} % for textcolor
+\usepackage{appendix} % for appendix
+\usepackage{subfig}
+\usepackage{makeidx}
+\usepackage{mathrsfs}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{ctex}  %就是在这里引入了ctex宏包，下面就可以直接输入中文编译之后就可以正常输出啦
+
+\hyphenation{ALPGEN}
+\hyphenation{EVTGEN}
+\hyphenation{PYTHIA}
+
+\usepackage[bookmarks=true,colorlinks=true,linkcolor=blue,unicode=true]{hyperref}
+
+\zihao{4}
+\title{Cuda Lattice Gauge Document}
+%\author{杨冀翀}
+\date{}
+
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\section{\label{data}Data}
+
+\input "data/index.tex"
+
+\section{\label{update}Update scheme}
+
+\input "update/hmc.tex"
+
+\printindex
+
+\bibliography{detail}
+\bibliographystyle{hunsrt}
+
+\end{document}
+%
+% ****** End of file template.aps ******

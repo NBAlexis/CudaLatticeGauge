@@ -52,7 +52,7 @@ __device__ static __inline__ cuComplex cuCexpf(const cuComplex& c)
 /**
 * sqrt(c)
 */
-__device__ static __inline__ cuComplex cuCsqrt(const cuComplex& c)
+__device__ static __inline__ cuComplex cuCsqrtf(const cuComplex& c)
 {
     FLOAT fRadius = cuCabsf(c);
     FLOAT fCosA = c.x / cuCabsf(c);

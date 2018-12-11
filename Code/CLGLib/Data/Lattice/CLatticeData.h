@@ -24,6 +24,7 @@ struct CLGAPI CDeviceLattice
     UINT m_uiDim;
     UINT m_uiDir;
     UINT m_uiTLength;
+    FLOAT m_fBeta;
     UINT m_uiLatticeLength[CCommonData::kMaxDim];
     UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
     UINT m_uiLatticeMultipy[CCommonData::kMaxDim - 1];
@@ -36,7 +37,6 @@ class CLGAPI CLatticeData
 {
     static CLatticeData* m_pInstance;
     CDeviceLattice* m_pDeviceInstance;
-    
 
 public:
     static void Create() { if (NULL == m_pInstance) { m_pInstance = new CLatticeData(); } }
@@ -56,6 +56,7 @@ public:
     UINT m_uiLatticeLength[CCommonData::kMaxDim];
     UINT m_uiTLength; //this is special because T dir is not decomposed to thread blocks
     UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
+    FLOAT m_fBeta;
 
     /*
     * SU3(x=(x,y,z,t))_{n=a*3+b}=
@@ -76,6 +77,11 @@ public:
     STRING m_sFields[CCommonData::kMaxFieldCount];
     class CField* m_pFields[CCommonData::kMaxFieldCount];
 
+    class CFieldGauge* m_pGaugeField;
+    class CFieldGauge* m_pGaugeFieldStaple;
+    class CFieldGauge* m_pGaugeFieldMomentum;
+    class CFieldGauge* m_pGaugeFieldForce;
+
 private:
 
     /**
@@ -85,10 +91,18 @@ private:
     ~CLatticeData();
 };
 
+#pragma region Index Calculation
+
 __device__ __inline__ 
 static UINT _deviceGetSiteIndex(const CDeviceLattice * pLattice, const UINT* coord)
 {
     return coord[0] * pLattice->m_uiLatticeMultipy[0] + coord[1] * pLattice->m_uiLatticeMultipy[1] + coord[2] * pLattice->m_uiLatticeMultipy[2];
+}
+
+__device__ __inline__ 
+static UINT _deviceGetLinkIndex(const class CDeviceLattice * pLattice, UINT siteIndex, UINT dir)
+{
+    return siteIndex * pLattice->m_uiDir + dir;
 }
 
 __device__ __inline__ 
@@ -125,6 +139,8 @@ static int4 __deviceFatIndexToInt4(const CDeviceLattice * pLattice, UINT fatInde
 {
     return __deviceSiteIndexToInt4(pLattice, fatIndex / (pLattice->m_uiDir + 1));
 }
+
+#pragma endregion Index Calculation
 
 __END_NAMESPACE
 

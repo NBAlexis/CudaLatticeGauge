@@ -46,6 +46,15 @@
 #include "Platform/WinFunction.h"
 #endif
 
+#include "Tools/Data/CLinkedList.h"
+#include "Tools/Data/TemplateFunctions.h"
+#include "Tools/Data/MemStack.h"
+#include "Tools/Data/CBitFlag.h"
+//using these class to avoid warnings by STL...
+#include "Tools/Data/TArray.h"
+#include "Tools/Data/CCString.h"
+#include "Tools/Data/THashMap.h"
+
 #include "Tools/Tracer.h"
 #include "Tools/Timer.h"
 #include "Tools/CYAMLParser.h"
@@ -78,6 +87,8 @@ UINT uiDir = pLattice->m_uiDir;
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
 #include "Tools/Math/SU3.h"
+#include "Tools/Math/cuComplexI.h"
+#include "Tools/Math/GammaMatrix.h"
 
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"
@@ -96,6 +107,15 @@ UINT uiDir = pLattice->m_uiDir;
 #include "Data/Field/CFieldSpin.h"
 
 #include "Data/Field/CFieldFermion.h"
+
+#include "Data/Action/CAction.h"
+#include "Data/Action/CActionGaugePlaquette.h"
+
+#include "Update/CUpdator.h"
+#include "Update/Continous/CIntegrator.h"
+#include "Update/Continous/CIntegratorLeapFrog.h"
+#include "Update/Continous/CIntegratorOmelyan.h"
+#include "Update/Continous/CHMC.h"
 
 #include "Core/CLGLibManager.h"
 

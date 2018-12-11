@@ -11,37 +11,58 @@
 #ifndef _CFIELDGAUGE_SU3_H_
 #define _CFIELDGAUGE_SU3_H_
 
+#define gaugeSU3KernelFuncionStart \
+    intokernal; \
+    for (UINT it = 0; it < uiTLength; ++it) \
+    { \
+        coord[3] = it; \
+        for (UINT idir = 0; idir < uiDir; ++idir) \
+        { 
+            
+
+
+#define gaugeSU3KernelFuncionEnd \
+        } \
+    } 
+
+
+
 __BEGIN_NAMESPACE
 
 class CLGAPI CFieldGaugeSU3 : public CFieldGauge
 {
 public:
 
-    CFieldGaugeSU3(CLatticeData* pLattice, UBOOL bHot = FALSE);
-    ~CFieldGaugeSU3();
+    CFieldGaugeSU3(CLatticeData* pLattice, EFieldInitialType eInitialType = EFIT_Identity);
+    ~CFieldGaugeSU3()
+    {
+        checkCudaErrors(cudaFree(m_pDeviceData));
+    }
 
     virtual EFieldType GetFieldType() const { return EFT_GaugeSU3; }
-    virtual void CalculateStaple(void);
-    //virtual void axpy(FLOAT a, const CField *x) { axpy(make_cuComplex(a, 0.0f), x); }
-    //virtual void axpy(const cuComplex& a, const CField *x);
+
+#pragma region HMC
+
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const cuComplex& minusBetaOverN) const;
+    virtual void ExpMult(const cuComplex& a, UINT uiPrecision, CField* U) const;
+    virtual void CopyTo(CField* U) const;
+    virtual void MakeRandomGenerator();
+
+#pragma endregion HMC
+
+#pragma region BLAS
+
+    virtual void Zero();
+    virtual void Indentity();
+    virtual void Axpy(const CField* x);
+    virtual void Axpy(FLOAT a, const CField* x);
+    virtual void Axpy(const cuComplex& a, const CField* x);
+
+#pragma endregion BLAS
 
 protected:
 
-    /**
-    * SU3(x=(x,y,z,t))_{n=a*3+b}=
-    * m_pData[( 
-        (x*m_uiDim[1]*m_uiDim[2]*m_uiDim[3] + y*m_uiDim[2]*m_uiDim[3] + z*m_uiDim[3] + t)
-            * m_uiDir + dir) * 9 + n]
-    */
     deviceSU3* m_pDeviceData;
-    deviceSU3* m_pDeviceStaple;
-
-    /**
-    * For each dir, there exist a plaquette start from that link of that site
-    * To calculate that, one need a action to index the plaquettes
-    * Also, one need a boundary condition mapping
-    */
-    FLOAT* m_pDevicePlaquetteEnergy;
 };
 
 __END_NAMESPACE

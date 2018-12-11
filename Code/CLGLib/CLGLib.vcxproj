@@ -46,11 +46,25 @@
     <ClInclude Include="Platform\WinDefine.h" />
     <ClInclude Include="Platform\WinFunction.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
+    <ClInclude Include="Tools\Data\CBitFlag.h" />
+    <ClInclude Include="Tools\Data\CCString.h" />
+    <ClInclude Include="Tools\Data\CLinkedList.h" />
+    <ClInclude Include="Tools\Data\TArray.h" />
+    <ClInclude Include="Tools\Data\TemplateFunctions.h" />
+    <ClInclude Include="Tools\Data\THashMap.h" />
+    <ClInclude Include="Tools\Data\MemStack.h" />
+    <ClInclude Include="Tools\Math\GammaMatrix.h" />
+    <ClInclude Include="Tools\Math\cuComplexI.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
     <ClInclude Include="Tools\Math\SU3.h" />
     <ClInclude Include="Tools\Tracer.h" />
     <ClInclude Include="Tools\Timer.h" />
+    <ClInclude Include="Update\Continous\CHMC.h" />
+    <ClInclude Include="Update\Continous\CIntegrator.h" />
+    <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
+    <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
+    <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp">
@@ -71,7 +85,10 @@
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Tools\Data\CCString.cpp" />
     <ClCompile Include="Tools\Tracer.cpp" />
+    <CudaCompile Include="Update\Continous\CHMC.cu" />
+    <CudaCompile Include="Update\Continous\CIntegrator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

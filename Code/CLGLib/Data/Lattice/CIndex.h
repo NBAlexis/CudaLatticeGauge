@@ -38,6 +38,7 @@ __BEGIN_NAMESPACE
 // implement after CLatticeData is known
 
 __device__ __inline__ static UINT _deviceGetSiteIndex(const class CDeviceLattice * pLattice, const UINT* coord);
+__device__ __inline__ static UINT _deviceGetLinkIndex(const class CDeviceLattice * pLattice, UINT siteIndex, UINT dir);
 __device__ __inline__ static UINT _deviceGetLinkIndex(const class CDeviceLattice * pLattice, const UINT* coord, UINT dir);
 
 /**

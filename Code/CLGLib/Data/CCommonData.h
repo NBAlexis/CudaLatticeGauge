@@ -32,9 +32,8 @@ public:
     static UINT m_uiMaxThread;
     static EFieldType m_eGaugeType;
 
-    //related with a
-    //related with beta
-    static FLOAT m_fG;
+    //related with a, g, T
+    static FLOAT m_fBeta;
 
     static void InitialWithDefault()
     {
@@ -46,7 +45,7 @@ public:
         m_uiLatticeLength[2] = 8;
         m_uiLatticeLength[3] = 16;
         m_uiMaxThread = 1024;
-        m_fG = 1.0f;
+        m_fBeta = 0.1f;
         m_eGaugeType = EFT_GaugeSU3;
     }
 

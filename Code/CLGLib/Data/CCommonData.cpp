@@ -18,10 +18,7 @@ UINT CCommonData::m_uiDir = 4;
 UINT CCommonData::m_uiLatticeLength[CCommonData::kMaxDim];
 UINT CCommonData::m_uiMaxThread = 1024;
 EFieldType CCommonData::m_eGaugeType;
-
-//related with a
-//related with beta
-FLOAT CCommonData::m_fG = 1.0f;
+FLOAT CCommonData::m_fBeta = 0.1f;
 
 __END_NAMESPACE
 

@@ -1,35 +1,30 @@
 //=============================================================================
-// FILENAME : CCommonData.h
+// FILENAME : CHMC.h
 // 
 // DESCRIPTION:
-// This is the class for the common data
+// This is the class for hibrid Monte Carlo
 //
 // REVISION:
-//  [12/3/2018 nbale]
+//  [12/7/2018 nbale]
 //=============================================================================
 
-#ifndef _CCOMMONDATA_H_
-#define _CCOMMONDATA_H_
+#ifndef _CHMC_H_
+#define _CHMC_H_
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CCommonData
+class CLGAPI CHMC : public CUpdator
 {
 public:
 
-    static UINT m_iDim;
-    static UINT m_iDir;
-    static STRING m_sGauge;
-    static STRING m_sFermion;
-
-    //related with a
-    //related with beta
-    static FLOAT m_fG;
+    CHMC(CLatticeData* pOwner, CDeviceLattice* pLattice) : CUpdator(pOwner, pLattice) { ; }
+    virtual void Update() { ; }
+    virtual FLOAT CalculateEnergy() { return 0.0f; }
 };
 
 __END_NAMESPACE
 
-#endif //#ifndef _CCOMMONDATA_H_
+#endif //#ifndef _CHMC_H_
 
 //=============================================================================
 // END OF FILE

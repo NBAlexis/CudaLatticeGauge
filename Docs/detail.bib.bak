@@ -1,0 +1,881 @@
+
+%book 2017
+@article{latticeqcdbook1,
+      author         = "Francesco Knechtli, Michael G$\rm\ddot{u}$nther and Michael Peardon",
+      title          = "{Lattice Quantum Chromodynamics Practical Essentials}",
+      year           = "2017",
+      publisher      = "Springer Nature",
+      doi            = "10.1007/978-94-024-0999-4",
+}
+
+@article{latticebooka,
+      author         = "C. Gattringer and C.B. Lang",
+      title          = "{Quantum Chromodynamics on the Lattice}",
+      year           = "2010",
+      publisher      = "Springer",
+      doi            = "10.1007/978-3-642-01850-3",
+}
+
+%Classical
+@article{Z2GaugeStart,
+      author         = "Franz J. Wegner",
+      title          = "{Duality in Generalized Ising Models and Phase Transitions without Local Order Parameters}",
+      journal        = "Journal of Mathematical Physics",
+      volume         = "12",
+      year           = "1971",
+      pages          = "2259-2272",
+      doi            = "10.1063/1.1665530",
+}
+
+@article{Z2GaugeReview1,
+      author         = "John B. Kogut",
+      title          = "{An introduction to lattice gauge theory and spin systems}",
+      journal        = "Reviews of Modern Physics",
+      volume         = "51",
+      year           = "1979",
+      pages          = "659-713",
+      doi            = "10.1103/RevModPhys.51.659",
+}
+
+@article{Z2GaugeReview2,
+      author         = "S. Sachdev",
+      title          = "{Topological order and Fermi surface reconstruction}",
+      doi            = "10.1088/1361-6633/aae110",
+      eprint         = "1801.01125",
+}
+
+@article{qc1,
+      title          = "{本源量子计算云服务平台}",
+      url            = "http://www.qubitonline.cn/",
+}
+
+@article{qc2,
+      title          = "{阿里云量子计算云平台}",
+      url            = "http://quantumcomputer.ac.cn/index.html",
+}
+
+@article{prog1,
+      title          = "{SkyrmionGPUSimulation}",
+      url            = "https://github.com/NBAlexis/SkyrmionGPUSimulation",
+}
+
+@article{prog2,
+      title          = "{DiscreteLatticeGaugeGPU}",
+      url            = "https://github.com/NBAlexis/DiscreteLatticeGaugeGPU",
+}
+
+@article{mypaper1,
+      author         = "Ji-Chong Yang and Mao-Zhi Yang",
+      title          = "{Factorization of radiative leptonic decays of $B^-$ and $D^-$ Mesons}",
+      journal        = "Nucl. Phys. B",
+      volume         = "889",
+      year           = "2014",
+      pages          = "778-800",
+      doi            = "10.1016/j.nuclphysb.2014.10.027",
+      eprint         = "1409.0358",
+}
+
+@article{mypaper2,
+      author         = "Ji-Chong Yang and Mao-Zhi Yang",
+      title          = "{Factorization of radiative leptonic decays of $B^-$ and $D^-$ Mesons including the soft photon region}",
+      journal        = "Nucl. Phys. B",
+      volume         = "914",
+      year           = "2016",
+      pages          = "301-345",
+      doi            = "10.1016/j.nuclphysb.2016.11.012",
+      eprint         = "1604.08300",
+}
+
+@article{mypaper3,
+      author         = "Ji-Chong Yang and Yu Shi",
+      title          = "{Susceptibilities of the Amplitude Mode in 2D dilute Boson gas using in $O(2)$ model up to 2-loop order}",
+      eprint         = "1804.10158",
+}
+
+@article{mypaper4,
+      author         = "Ji-Chong Yang and Yu Shi",
+      title          = "{Effective field theoretical Study of the Susceptibilities of the Amplitude Mode in 2D dilute Boson gas}",
+      eprint         = "1804.10342",
+}
+
+@article{mypaper5,
+      author         = "Ji-Chong Yang, Qing-Qing Mao and Yu Shi",
+      title          = "{Generation of magnetic skyrmions through pinning effect}",
+      eprint         = "1809.07149",
+}
+
+@article{Tsvelikbook1,
+      author         = "Alexander O. Gogolin et. al.",
+      title          = "{Bosonization and strongly correlated systems}",
+      year           = "1998",
+      publisher      = "Cambridge University Press",
+}
+
+@article{loyd,
+      author         = "S. Lloyd",
+      title          = "{Universal Quantum Simulators}",
+      journal        = "Science",
+      volume         = "273",
+      year           = "1995",
+      pages          = "5278",
+      doi            = "10.1126/science.273.5278.1073",
+}
+
+@article{qsim,
+      author         = "Tim Byrnes and Yoshihisa Yamamoto",
+      title          = "{Simulating lattice gauge theories on a quantum computer}",
+      journal        = "Phys. Rev. A",
+      volume         = "73",
+      year           = "2006",
+      pages          = "022328",
+      doi            = "10.1103/PhysRevA.73.022328",
+      eprint         = "quant-ph/0510027",
+}
+
+@article{qsim1,
+      author         = "Christine Muschik et. al.",
+      title          = "{U(1) Wilson lattice gauge theories in digital quantum simulators}",
+      doi            = "10.1088/1367-2630/aa89ab",
+      eprint         = "1612.08653",
+}
+
+@article{qsim2,
+      author         = "Erez Zohar et. al.",
+      title          = "{Digital quantum simulation of $\mathbb{Z}_2$ lattice gauge theories with dynamical fermionic matter}",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "118",
+      year           = "2017",
+      pages          = "070501",
+      doi            = "10.1103/PhysRevLett.118.070501",
+      eprint         = "1607.03656",
+}
+
+@article{qsim3,
+      author         = "Erez Zohar et. al.",
+      title          = "{Digital lattice gauge theories}",
+      journal        = "Phys. Rev. A",
+      volume         = "95",
+      year           = "2017",
+      pages          = "023604",
+      doi            = "10.1103/PhysRevA.95.023604",
+      eprint         = "1607.08121",
+}
+
+@article{qsim4,
+      author         = "Julian Bender et. al.",
+      title          = "{Digital quantum simulation of lattice gauge theories in three spatial dimensions}",
+      year           = "2018",
+      doi            = "10.1088/1367-2630/aadb71",
+      eprint         = "1804.02082",
+}
+
+@article{coldatom1,
+      author         = "U.-J. Wiese",
+      title          = "{Ultracold quantum gases and lattice systems: quantum simulation of lattice gauge theories}",
+      year           = "2013",
+      journal        = "Annalen der Physik",
+      volume         = "525",
+      pages          = "777",
+      doi            = "10.1002/andp.201300104",
+}
+
+@article{coldatom2,
+      author         = "Erez Zohar and Benni Reznik",
+      title          = "{Confinement and Lattice Quantum-Electrodynamic Electric Flux Tubes Simulated with Ultracold Atoms}",
+      year           = "2011",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "107",
+      pages          = "275301",
+      doi            = "10.1103/PhysRevLett.107.275301",
+}
+
+@article{coldatom3,
+      author         = "Erez Zohar, J. Ignacio Cirac and Benni Reznik",
+      title          = "{Cold-Atom Quantum Simulator for SU(2) Yang-Mills Lattice Gauge Theory}",
+      year           = "2013",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "110",
+      pages          = "125304",
+      doi            = "10.1103/PhysRevLett.110.125304",
+}
+
+@article{toriccodestart,
+      author         = "Alexei Yu. Kitaev",
+      title          = "{Fault-tolerant quantum computation by anyons}",
+      year           = "2003",
+      journal        = "Annals Phys.",
+      volume         = "303",
+      pages          = "2-30",
+      doi            = "10.1016/S0003-4916(02)00018-0",
+      eprint         = "quant-ph/9707021",
+}
+
+@article{toriccodereview,
+      author         = "Alexei Yu. Kitaev and Chris Laumann",
+      title          = "{Topological phases and quantum computation}",
+      eprint         = "0904.2771",
+}
+
+@article{toriccodeboundary,
+      author         = "S. B. Bravyi and Alexei Yu. Kitaev",
+      title          = "{Quantum codes on a lattice with boundary}",
+      eprint         = "quant-ph/9811052",
+}
+
+@article{toriccodeboundarysuperconducting,
+      author         = "David P. DiVincenzo",
+      title          = "{Fault tolerant architectures for superconducting qubits}",
+      doi            = "10.1088/0031-8949/2009/T137/014020",
+      eprint         = "0905.4839",
+}
+
+@article{toriccodereview2,
+      author         = "Austin G. Fowler et. al.",
+      title          = "{Surface codes: Towards practical large-scale quantum computation}",
+      year           = "2012",
+      journal        = "Phys. Rev. A",
+      volume         = "86",
+      pages          = "032324",
+      doi            = "10.1103/PhysRevA.86.032324",
+      eprint         = "1208.0928",
+}
+
+@article{toriccodereview3,
+      author         = "Eric Dennis et. al.",
+      title          = "{Topological quantum memory}",
+      year           = "2002",
+      journal        = "J. Math. Phys.",
+      volume         = "43",
+      pages          = "4452-4505",
+      doi            = "10.1063/1.1499754",
+      eprint         = "quant-ph/0110143",
+}
+
+@article{toriccodemodel,
+      author         = "Alexei Yu. Kitaev",
+      title          = "{Anyons in an exactly solved model and beyond}",
+      year           = "2006",
+      journal        = "Annals of Physics",
+      volume         = "321",
+      pages          = "2-111",
+      doi            = "10.1016/j.aop.2005.10.005",
+      eprint         = "cond-mat/0506438",
+}
+
+@article{toriccodeimpli,
+      author         = "Robert Raussendorf and Jim Harrington",
+      title          = "{Fault-Tolerant Quantum Computation with High Threshold in Two Dimensions}",
+      year           = "2007",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "98",
+      pages          = "190504",
+      doi            = "10.1103/physrevlett.98.190504",
+}
+
+@article{algorithm,
+      author         = "Gyan Bhanot, Christian B. Lang and Claudio Rebbi",
+      title          = "{A fast algorithm for Monte Carlo simulations of 4-d lattice gauge theories with finite groups}",
+      year           = "1982",
+      journal        = "Computer Physics Communications",
+      volume         = "25",
+      pages          = "275-287",
+      doi            = "10.1016/0010-4655(82)90023-6",
+}
+
+@article{ordsimres,
+      author         = "Michael Creutz, Laurence Jacobs and Claudio Rebbi",
+      title          = "{Monte Carlo study of Abelian lattice gauge theories}",
+      year           = "1979",
+      journal        = "Phys. Rev. D",
+      volume         = "20",
+      pages          = "1915",
+      doi            = "10.1103/PhysRevD.20.1915",
+}
+
+@article{ordsimres2,
+      author         = "Claudio Rebbi",
+      title          = "{Phase structure of non-Abelian lattice gauge theories}",
+      year           = "1980",
+      journal        = "Phys. Rev. D",
+      volume         = "21",
+      pages          = "3350",
+      doi            = "10.1103/PhysRevD.21.3350",
+}
+
+@article{ordsimres3,
+      author         = "Michael Creutz, Laurence Jacobs and Claudio Rebbi",
+      title          = "{Monte Carlo computations in lattice gauge theories}",
+      year           = "1983",
+      journal        = "Phys. Rept.",
+      volume         = "95",
+      pages          = "201-282",
+      doi            = "10.1016/0370-1573(83)90016-9",
+}
+
+@article{latticeres,
+      author         = "Sinya Aoki et. al.",
+      title          = "{Review of lattice results concerning low energy particle physics}",
+      institution    = "FLAG",
+      doi            = "1310.8555",
+}
+
+@article{latticeres2,
+      author         = "C. T. H. Davies et. al.",
+      title          = "{High-Precision Lattice QCD Confronts Experiment}",
+      year           = "2004",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "92",
+      pages          = "022001",
+      doi            = "10.1103/PhysRevLett.92.022001",
+}
+
+@article{latticeqcd,
+      author         = "Kenneth G. Wilson",
+      title          = "{Confinement of quarks}",
+      year           = "1974",
+      journal        = "Phys. Rev. D",
+      volume         = "10",
+      pages          = "2445-2459",
+      doi            = "10.1103/PhysRevD.10.2445",
+}
+
+@article{latticeqcdbook2,
+      author         = "C. Gattringer, C. B. Lang",
+      title          = "{Quantum Chromodynamics on the Lattice: An Introductory Presentation, Lect. Notes Phys. 788}",
+      year           = "2010",
+      publisher      = "Springer, Berlin Heidelberg",
+      doi            = "10.1007/978-3-642-01850-3",
+}
+
+@article{latticeqcdreview,
+      author         = "A. Bazavov et. al.",
+      title          = "{Full nonperturbative QCD simulations with 2+1 flavors of improved staggered quarks}",
+      year           = "2010",
+      journal        = "Rev. Mod. Phys.",
+      volume         = "82",
+      pages          = "1349-1417",
+      doi            = "10.1103/RevModPhys.82.1349",
+      eprint         = "0903.3598",
+}
+
+@article{latticeqgp,
+      author         = "P. Petreczky",
+      title          = "{Lattice QCD at non-zero temperature}",
+      year           = "2012",
+      doi            = "10.1088/0954-3899/39/9/093002",
+      eprint         = "1203.5320",
+}
+
+@article{qcdtopo,
+      author         = "Ariel R. Zhitnitsky",
+      title          = "{QCD as a topologically ordered system}",
+      year           = "2013",
+      journal        = "Annals of Physics",
+      volume         = "336",
+      pages          = "462-481",
+      doi            = "10.1016/j.aop.2013.05.020",
+      eprint         = "1301.7072",
+}
+
+@article{singordon,
+      author         = "Sidney Coleman",
+      title          = "{Quantum sine-Gordon equation as the massive Thirring model}",
+      year           = "1975",
+      journal        = "Phys. Rev. D",
+      volume         = "11",
+      pages          = "2088-2097",
+      doi            = "10.1103/PhysRevD.11.2088",
+}
+
+@article{villain,
+      author         = "J. Villain",
+      title          = "{Theory of one- and two-dimensional magnets with an easy magnetization plane. II. The planar, classical, two-dimensional magnet}",
+      year           = "1975",
+      journal        = "Journal de Physique",
+      volume         = "36",
+      pages          = "581-590",
+      doi            = "10.1051/jphys:01975003606058100",
+}
+
+@article{JKKN,
+      author         = "Jorge V. Jos$\rm\acute{e}$ et. al.",
+      title          = "{Theory of one- and two-dimensional magnets with an easy magnetization plane. II. The planar, classical, two-dimensional magnet}",
+      year           = "1977",
+      journal        = "Phys. Rev. B",
+      volume         = "16",
+      pages          = "1217-1241",
+      doi            = "10.1103/PhysRevB.16.1217",
+}
+
+@article{peskinDuel,
+      author         = "Michael E. Peskin",
+      title          = "{Mandelstam-'t Hooft duality in abelian lattice models}",
+      year           = "1978",
+      journal        = "Annals of Physics",
+      volume         = "113",
+      pages          = "121",
+      doi            = "10.1016/0003-4916(78)90252-X",
+}
+
+@article{kt1,
+      author         = "J. M. Kosterlitz and D. J. Thouless",
+      title          = "{Ordering, metastability and phase transitions in two-dimensional systems}",
+      year           = "1973",
+      journal        = "Journal of Physics C",
+      volume         = "6",
+      pages          = "1181",
+      doi            = "10.1088/0022-3719/6/7/010",
+}
+
+@article{kt2,
+      author         = "J. .M Kosterlitz",
+      title          = "{The critical properties of the two-dimensional xy model}",
+      year           = "1974",
+      journal        = "Journal of Physics C",
+      volume         = "7",
+      pages          = "1046",
+      doi            = "10.1088/0022-3719/7/6/005",
+}
+
+@article{dopingantiferromagnet,
+      author         = "Subir Sachdev and Matthias Vojta",
+      title          = "{Translational symmetry breaking in two-dimensional antiferromagnets and superconductors}",
+      year           = "2000",
+      journal        = "J. Phys. Soc. Jpn",
+      volume         = "69",
+      eprint         = "cond-mat/9910231",
+}
+
+@article{fractionalization,
+      author         = "T. Senthil and Matthew P. A. Fisher",
+      title          = "{Z2 gauge theory of electron fractionalization in strongly correlated systems}",
+      year           = "2000",
+      journal        = "Phys. Rev. B",
+      volume         = "62",
+      pages          = "7850",
+      doi            = "10.1103/PhysRevB.62.7850",
+      eprint         = "cond-mat/9910224",
+}
+
+@article{antiferromagnet,
+      author         = "Subir Sachdev and Matthias Vojta",
+      title          = "{Deconfined Quantum Critical Points}",
+      year           = "2004",
+      journal        = "Science",
+      volume         = "303",
+      pages          = "1940",
+      number         = "1494",
+      doi            = "10.1126/science.1091806",
+      eprint         = "cond-mat/0311326",
+}
+
+@article{dualityrecent,
+      author         = "Inti Sodemann et. al.",
+      title          = "{Composite fermion duality for half-filled multicomponent Landau levels}",
+      year           = "2017",
+      journal        = "Phys. Rev. B",
+      volume         = "95",
+      pages          = "085135",
+      doi            = "10.1103/PhysRevB.95.085135",
+}
+
+@article{duelsuperconductor,
+      author         = "C. Dasgupta and B. I. Halperin",
+      title          = "{Phase Transition in a Lattice Model of Superconductivity}",
+      year           = "1981",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "44",
+      pages          = "1556",
+      doi            = "10.1103/physrevlett.47.1556",
+}
+
+@article{vrb,
+      author         = "N. Read and B. Chakraborty",
+      title          = "{Statistics of the excitations of the resonating-valence-bond state}",
+      year           = "1989",
+      journal        = "Phys. Rev. B",
+      volume         = "40",
+      pages          = "7133-7140",
+      doi            = "10.1103/PhysRevB.40.7133",
+}
+
+@article{Josephsonjunction,
+      author         = "O. I. Motrunich and T. Senthil",
+      title          = "{Exotic order in simple models of bosonic systems}",
+      year           = "2002",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "89",
+      pages          = "277004",
+      doi            = "10.1103/PhysRevLett.89.277004",
+      eprint         = "cond-mat/0205170",
+}
+
+@article{frustratedantiferro,
+      author         = "Rodolfo A. Jalabert and Subir Sachdev",
+      title          = "{Spontaneous alignment of frustrated bonds in an anisotropic, three-dimensional Ising model}",
+      year           = "1991",
+      journal        = "Phys. Rev. B",
+      volume         = "44",
+      pages          = "686-690",
+      doi            = "10.1103/PhysRevB.44.686",
+}
+
+@article{frustratedantiferro2,
+      author         = "N. Read and Subir Sachdev",
+      title          = "{Large-N expansion for frustrated quantum antiferromagnets}",
+      year           = "1991",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "13",
+      pages          = "1773-1776",
+      doi            = "10.1103/PhysRevLett.66.1773",
+}
+
+@article{spinliquid,
+      author         = "X. G. Wen",
+      title          = "{Mean-field theory of spin-liquid states with finite energy gap and topological orders}",
+      year           = "1991",
+      journal        = "Phys. Rev. B",
+      volume         = "44",
+      pages          = "2664-2672",
+      doi            = "10.1103/PhysRevB.44.2664",
+}
+
+@article{spinliquid2,
+      author         = "Yejin Huh, Matthias Punk and Subir Sachdev",
+      title          = "{Vison states and confinement transitions of $\mathbb{Z}_2$ spin liquids on the kagome lattice}",
+      year           = "1991",
+      journal        = "Phys. Rev. B",
+      volume         = "84",
+      pages          = "094419",
+      doi            = "10.1103/PhysRevB.84.094419",
+}
+
+@article{spinliquid3,
+      author         = "Andrew M. Essin and Michael Hermele",
+      title          = "{Classifying fractionalization: Symmetry classification of gapped $\mathbb{Z}_2$ spin liquids in two dimensions}",
+      year           = "2013",
+      journal        = "Phys. Rev. B",
+      volume         = "87",
+      pages          = "104406",
+      doi            = "10.1103/PhysRevB.87.104406",
+      eprint         = "1212.0593",
+}
+
+@article{spinliquid4,
+      author         = "Seth Whitsitt and Subir Sachdev",
+      title          = "{Transition from the $\mathbb{Z}_2$ spin liquid to antiferromagnetic order: spectrum on the torus}",
+      year           = "2016",
+      journal        = "Phys. Rev. B",
+      volume         = "94",
+      pages          = "085134",
+      doi            = "10.1103/PhysRevB.94.085134",
+      eprint         = "1603.05652",
+}
+
+@article{earlymontecarlo,
+      author         = "T. A. DeGrand and Doug Toussaint",
+      title          = "{Topological excitations and Monte Carlo simulation of Abelian gauge theory}",
+      year           = "1980",
+      journal        = "Phys. Rev. D",
+      volume         = "22",
+      pages          = "2478",
+      doi            = "10.1103/PhysRevD.22.2478",
+}
+
+@article{earlymontecarlo2,
+      author         = "Michael Creutz",
+      title          = "{Confinement and the Critical Dimensionality of Space-Time}",
+      year           = "1979",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "22",
+      pages          = "553-556",
+      doi            = "10.1103/PhysRevLett.43.553",
+}
+
+@article{earlymontecarlo3,
+      author         = "Michael Creutz",
+      title          = "{Monte Carlo study of quantized SU(2) gauge theory}",
+      year           = "1980",
+      journal        = "Phys. Rev. D",
+      volume         = "8",
+      pages          = "2308-2315",
+      doi            = "10.1103/PhysRevD.21.2308",
+}
+
+@article{earlymontecarlo4,
+      author         = "Larry D. McLerran and Benjamin Svetitsky",
+      title          = "{A Monte Carlo study of SU(2) Yang-Mills theory at finite temperature}",
+      year           = "1980",
+      journal        = "Phys. Lett. B",
+      volume         = "98",
+      pages          = "195-198",
+      doi            = "10.1016/0370-2693(81)90986-2",
+}
+
+@article{earlymontecarlo5,
+      author         = "J. Kuti, J. Pol$\acute{o}$nyi and K. Szlach$\acute{a}$nyi",
+      title          = "{Monte Carlo study of quantized SU(2) gauge theory}",
+      year           = "1981",
+      journal        = "Phys. Lett. B",
+      volume         = "98",
+      pages          = "119-204",
+      doi            = "10.1016/0370-2693(81)90987-4",
+}
+
+@article{earlymontecarlo6,
+      author         = "B. Berg, A. Billoire and C. Rebbi",
+      title          = "{Monte Carlo estimates of the SU(2) mass gap}",
+      year           = "1982",
+      journal        = "Annals of Physics",
+      volume         = "142",
+      pages          = "185-215",
+      doi            = "10.1016/0003-4916(82)90232-9",
+}
+
+@article{earlymontecarlo7,
+      author         = "K. Ishikawa, M. Teper and G. Schierholz",
+      title          = "{SU(3) lattice Monte Carlo calculation of the glueball mass spectrum}",
+      year           = "1982",
+      journal        = "Phys. Lett. B",
+      volume         = "116",
+      pages          = "429-433",
+      doi            = "10.1016/0370-2693(82)90161-7",
+}
+
+@article{montecarloexample1,
+      author         = "T. Senthil and O. Motrunich",
+      title          = "{Microscopic models for fractionalized phases in strongly correlated systems}",
+      year           = "2002",
+      journal        = "Phys. Rev. B",
+      volume         = "66",
+      pages          = "205104",
+      doi            = "10.1103/PhysRevB.66.205104",
+      eprint         = "cond-mat/0201320"
+}
+
+@article{qmc1,
+      author         = "W. M. C. Foulkes et. al.",
+      title          = "{Quantum Monte Carlo simulations of solids}",
+      year           = "2002",
+      journal        = "Rev. Mod. Phys.",
+      volume         = "73",
+      pages          = "33-83",
+      doi            = "10.1103/revmodphys.73.33",
+}
+
+@article{qmc2,
+      author         = "Snir Gazit, Mohit Randeria and Ashvin Vishwanath",
+      title          = "{Charged fermions coupled to Z2 gauge fields: Superfluidity, confinement and emergent Dirac fermions}",
+      year           = "2017",
+      journal        = "Nature Phys.",
+      doi            = "10.1038/nphys4028",
+      eprint         = "1607.03892"
+}
+
+@article{qmc3,
+      author         = "Raimundo R. dos Santos",
+      title          = "{Introduction to quantum Monte Carlo simulations for fermionic systems}",
+      year           = "2003",
+      journal        = "Brazilian Journal of Physics",
+      volume         = "33",
+      pages          = "36-54",
+      doi            = "10.1590/S0103-97332003000100003",
+}
+
+@article{toriccodesim,
+      author         = "I. S. Tupitsyn et. al.",
+      title          = "{Topological multicritical point in the Toric Code and 3D gauge Higgs Models}",
+      year           = "2003",
+      journal        = "Phys. Rev. B",
+      volume         = "82",
+      pages          = "085114",
+      doi            = "10.1103/PhysRevB.82.085114",
+      eprint         = "0804.3175"
+}
+
+@article{simag,
+      author         = "Robert W. Johnson",
+      title          = "{General heatbath algorithm for pure lattice gauge theory}",
+      year           = "2003",
+      journal        = "Phys. Rev. D",
+      volume         = "82",
+      pages          = "114508",
+      doi            = "10.1103/PhysRevD.82.114508",
+      eprint         = "1003.3219"
+}
+
+@article{simskyrmion,
+      author         = "J. Chen et. al.",
+      title          = "{Helical and skyrmion lattice phases in three-dimensional chiral magnets: Effect of anisotropic interactions}",
+      year           = "2017",
+      journal        = "Sci Rep",
+      volume         = "7",
+      number         = "7392",
+      doi            = "10.1038/s41598-017-07907-0",
+}
+
+@article{scet1,
+      author         = "Christian W. Bauer, S. Fleming and M. Luke",
+      title          = "{Summing Sudakov logarithms in $B\to X_s+\gamma$ in effective field theory}",
+      year           = "2000",
+      journal        = "Phys. Rev. D",
+      volume         = "63",
+      pages          = "014006",
+      doi            = "10.1103/PhysRevD.63.014006",
+      eprint         = "hep-ph/0005275"
+}
+
+@article{scet2,
+      author         = "Christian W. Bauer et. al.",
+      title          = "{An effective field theory for collinear and soft gluons: heavy to light decays}",
+      year           = "2001",
+      journal        = "Phys. Rev. D",
+      volume         = "63",
+      pages          = "114020",
+      doi            = "10.1103/PhysRevD.63.114020",
+      eprint         = "hep-ph/0011336"
+}
+
+@article{hqet,
+      author         = "Christian W. Bauer et. al.",
+      title          = "{An Effective Field Theory for the Calculation of Matrix Elements Involving Heavy Quarks}",
+      year           = "1990",
+      journal        = "Phys. Lett. B",
+      volume         = "234",
+      pages          = "551",
+      doi            = "10.1016/0370-2693(90)92049-O",
+}
+
+@article{prog3,
+      title          = "{The company does no longer exist, however the infromation can be found at}",
+      url            = "https://www.crunchbase.com/organization/steamy-rice-entertainment\#section-mobile-app-metrics-by-apptopia",
+}
+
+@article{jordan2d,
+      author         = "E. Fradkin",
+      title          = "{Jordan-Wigner transformation for quantum-spin systems in two dimensions and fractional statistics}",
+      year           = "1989",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "63",
+      pages          = "322-325",
+      doi            = "10.1103/PhysRevLett.63.322",
+}
+
+@article{jordan3d,
+      author         = "L. Huerta and J. Zanelli",
+      title          = "{Bose-Fermi transformation in three-dimensional space}",
+      year           = "1993",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "71",
+      pages          = "3622",
+      doi            = "10.1103/PhysRevLett.71.3622",
+}
+
+@article{rvbgauge,
+      author         = "G. Baskaran and P. W. Anderson",
+      title          = "{Gauge theory of high-temperature superconductors and strongly correlated Fermi systems}",
+      year           = "1988",
+      journal        = "Phys. Rev. B",
+      volume         = "37",
+      pages          = "580(R)",
+      doi            = "10.1103/PhysRevB.37.580",
+}
+
+@article{bridge,
+      author         = "S. Ueda et. al.",
+      title          = "{Development of an object oriented lattice QCD code "Bridge++"}",
+      year           = "1988",
+      journal        = "Journal of Physics: Conference Series",
+      volume         = "523",
+      pages          = "012046",
+      doi            = "10.1088/1742-6596/523/1/012046",
+}
+
+@article{bosonsignproblem1,
+      author         = "K.B. Efetov, C. Pepin and H. Meier",
+      title          = "{Exact bosonization for an interacting Fermi gas in arbitrary dimensions}",
+      year           = "2009",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "103",
+      pages          = "186403",
+      doi            = "10.1103/PhysRevLett.103.186403",
+      eprint         = "0907.3243",
+}
+
+@article{bosonsignproblem2,
+      author         = "D. Galanakis et. al.",
+      title          = "{Comment on "Exact bosonization for an interacting fermi gas in arbitrary dimensions"}",
+      year           = "2010",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "105",
+      pages          = "159701;author reply 159702",
+      doi            = "10.1103/PhysRevLett.105.159701",
+      eprint         = "0911.5155",
+}
+
+@article{wenbook,
+      author         = "Xiao-Gang Wen",
+      title          = "{Quantum field theory of many-body systems from the origin of sound to an origin of light and electrons}",
+      year           = "2004",
+      publisher      = "Oxford University Press",
+}
+
+@article{Tsvelikbook2,
+      author         = "Alexei M. Tsvelik",
+      title          = "{Quantum Field Theory in Condensed Matter Physics}",
+      year           = "2003",
+      publisher      = "Cambridge University Press",
+}
+
+@article{Majoranapositivity,
+      author         = "Tomoya Hayata and Arata Yamamoto",
+      title          = "{Classification of sign-problem-free relativistic fermions on the basis of the Majorana positivity}",
+      year           = "2017",
+      eprint         = "1701.07182",
+}
+
+@article{curvedlattice,
+      author         = "Richard C. Brower et. al.",
+      title          = "{Lattice Dirac fermions on a simplicial Riemannian manifold}",
+      year           = "2017",
+      journal        = "Phys. Rev. D",
+      volume         = "95",
+      pages          = "114510",
+      doi            = "10.1103/PhysRevD.95.114510",
+}
+
+@article{bosonvortexskyrmion,
+      author         = "D. H. Lee and C. L. Kane",
+      title          = "{Boson-vortex-Skyrmion duality, spin-singlet fractional quantum Hall effect, and spin-1/2 anyon superconductivity}",
+      year           = "1990",
+      journal        = "Phys. Rev. Lett.",
+      volume         = "64",
+      pages          = "1313-1317",
+      doi            = "10.1103/PhysRevLett.64.1313",
+}
+
+@article{topoQCD,
+      author         = "A. M. Polyakov",
+      title          = "{Quark confinement and topology of gauge theories}",
+      year           = "1977",
+      journal        = "Nucl. Phys. B",
+      volume         = "120",
+      pages          = "429",
+      doi            = "10.1016/0550-3213(77)90086-4",
+}
+
+@article{finitedensity1,
+      author         = "Philippe de Forcrand",
+      title          = "{Simulating QCD at finite density}",
+      year           = "2010",
+      journal        = "PoS LAT",
+      volume         = "010",
+      eprint         = "1005.0539"
+}
+
+@article{finitedensity2,
+      author         = "A. Nakamura et. al.",
+      title          = "{Beating the sign problem in finite density lattice QCD}",
+      year           = "2016",
+      doi            = "10.22323/1.251.0208"
+}

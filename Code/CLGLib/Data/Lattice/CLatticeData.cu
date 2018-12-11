@@ -25,6 +25,7 @@ void _kernelPrepareDeviceData(CDeviceLattice *& deviceLattice, CLatticeData* pLa
     deviceLattice->m_uiDim = pLattice->m_uiDim;
     deviceLattice->m_uiDir = pLattice->m_uiDir;
     deviceLattice->m_uiTLength = pLattice->m_uiTLength;
+    deviceLattice->m_fBeta = pLattice->m_fBeta;
 
     //create index
     deviceLattice->m_pIndex = new CIndexSquare(deviceLattice);
@@ -49,7 +50,9 @@ CLatticeData::CLatticeData()
 {
     m_uiDim = CCommonData::m_uiDim;
     m_uiDir = CCommonData::m_uiDir;
+    m_fBeta = CCommonData::m_fBeta;
     memcpy(m_uiLatticeLength, CCommonData::m_uiLatticeLength, sizeof(UINT) * CCommonData::kMaxDim);
+    m_uiVolumn = m_uiLatticeLength[0] * m_uiLatticeLength[1] * m_uiLatticeLength[2] * m_uiLatticeLength[3];
 
     m_uiLatticeMultipy[0] = m_uiLatticeLength[1] * m_uiLatticeLength[2] * m_uiLatticeLength[3];
     m_uiLatticeMultipy[1] = m_uiLatticeLength[2] * m_uiLatticeLength[3];
@@ -105,6 +108,13 @@ CLatticeData::CLatticeData()
     #pragma endregion Create Index and Boundary
 
     m_pDeviceInstance->m_pDeviceRandom = new CRandomSchrage(CCommonData::m_uiSeed, m_pDeviceInstance);
+
+#pragma region Create Fields
+
+    //Always create a gauge field
+    //m_pDeviceInstance->m_pGaugeField = new CFieldGaugeSU3(this);
+
+#pragma endregion Create Fields
 }
 
 __END_NAMESPACE

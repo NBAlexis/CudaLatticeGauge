@@ -37,6 +37,9 @@
     <Filter Include="Update\Discrete">
       <UniqueIdentifier>{c9972f2a-c80f-4f91-bf03-99f73dcf2a7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tools\Data">
+      <UniqueIdentifier>{3260bc8d-cb77-4e01-9aba-2c24c996540a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Platform\WinFunction.h">
@@ -131,6 +134,48 @@
     <ClInclude Include="Tools\Math\CudaComplexFunction.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Update\Continous\CHMC.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\cuComplexI.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\GammaMatrix.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegrator.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorOmelyan.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\CUpdator.h">
+      <Filter>Update</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\CBitFlag.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\CCString.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\TemplateFunctions.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\CLinkedList.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\TArray.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\THashMap.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\MemStack.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -155,14 +200,11 @@
     <ClCompile Include="Data\CCommonData.cpp">
       <Filter>Data</Filter>
     </ClCompile>
-    <ClCompile Include="Tools\Math\Random.cu">
-      <Filter>Tools\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Lattice\CLatticeData.cu">
-      <Filter>Data\Lattice</Filter>
-    </ClCompile>
     <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
       <Filter>Data\Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Data\CCString.cpp">
+      <Filter>Tools\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +231,14 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CField.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Lattice\CLatticeData.cu" />
+    <CudaCompile Include="Tools\Math\Random.cu" />
+    <CudaCompile Include="Update\Continous\CHMC.cu">
+      <Filter>Update\Continous</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Update\Continous\CIntegrator.cpp">
+      <Filter>Update\Continous</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

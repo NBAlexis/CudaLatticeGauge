@@ -13,6 +13,14 @@
 
 __BEGIN_NAMESPACE
 
+enum EFieldInitialType
+{
+    EFIT_Zero,
+    EFIT_Identity,
+    EFIT_Random,
+    EFIT_RandomGenerator,
+};
+
 class CLGAPI CField
 {
 public:
@@ -24,10 +32,26 @@ public:
 #pragma region BLAS
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
 
-    //virtual void axpy(FLOAT a, const CField *x) = 0;
-    //virtual void axpy(const cuComplex& a, const CField *x) = 0;
+    virtual void Zero() = 0;
+    virtual void Indentity() = 0;
+
+    //This is Axpy(1.0f, x)
+    virtual void Axpy(const CField* x) = 0;
+    virtual void Axpy(FLOAT a, const CField* x) = 0;
+    virtual void Axpy(const cuComplex& a, const CField* x) = 0;
 
 #pragma endregion BLAS
+
+#pragma region HMC
+
+    /**
+    * U = exp(a this)U
+    */
+    virtual void ExpMult(const cuComplex& a, UINT uiPrecision, CField* U) const = 0;
+
+    virtual void CopyTo(CField* U) const = 0;
+
+#pragma endregion HMC
 
 protected:
 

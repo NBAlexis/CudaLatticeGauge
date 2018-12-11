@@ -11,9 +11,14 @@
 #ifndef _WINFUNCTION_H_
 #define _WINFUNCTION_H_
 
-#ifdef _MSC_VER
+//aligned alloca
+extern "C" void* __cdecl _alloca(SIZE_T);
+#define appAlloca(size) ((0 == size) ? 0 : _alloca((size+7)&~7))
+
+#define appInterlockedIncrement(n)	InterlockedIncrement((LONG*)(n))
+#define appInterlockedDecrement(n)	InterlockedDecrement((LONG*)(n))
+
 #pragma region String functions
-#endif
 
 #   define appStrstr	_tcsstr
 #   define appStrcpy	_tcscpy_s
@@ -36,21 +41,27 @@
 #   define appStoi		_tstoi
 #   define appStof		_tstof
 
-#ifdef _MSC_VER
+
+#ifdef UNICODE
+#define TCHAR_TO_ANSI(str) winToANSI((ANSICHAR*)appAlloca(winGetSizeANSI(str)),str,winGetSizeANSI(str))
+#define ANSI_TO_TCHAR(str) winToUNICODE((TCHAR*)appAlloca(sizeof(UNICHAR)*winGetSizeUNICODE(str)),str,winGetSizeUNICODE(str))
+#else
+#define TCHAR_TO_ANSI(str) str
+#define ANSI_TO_TCHAR(str) str
+#endif
+
 #pragma endregion String functions
-#endif
 
-#ifdef _MSC_VER
 #pragma region Math functions
-#endif
 
-#ifdef _MSC_VER
+
+
 #pragma endregion Math functions
-#endif
 
-#ifdef _MSC_VER
+
+
 #pragma region Trace and Debug
-#endif
+
 
 __BEGIN_NAMESPACE
 
@@ -91,13 +102,10 @@ __END_NAMESPACE
 #endif
 
 
-#ifdef _MSC_VER
 #pragma endregion Trace and Debug
-#endif
 
-#ifdef _MSC_VER
+
 #pragma region Time functions
-#endif
 
 __BEGIN_NAMESPACE
 
@@ -115,12 +123,8 @@ FORCEINLINE FLOAT appGetTime() { return static_cast<FLOAT>(appGetCycles()) * 0.0
 __END_NAMESPACE
 
 #define appGetSystemTime()		::GetTickCount()
-#define appInterlockedIncrement(n)	InterlockedIncrement(CAST(LONG*,(n)))
-#define appInterlockedDecrement(n)	InterlockedDecrement(CAST(LONG*,(n)))
 
-#ifdef _MSC_VER
 #pragma endregion Time functions
-#endif
 
 #endif //#ifndef _WINFUNCTION_H_
 
