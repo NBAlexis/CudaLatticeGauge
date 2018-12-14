@@ -87,38 +87,38 @@ public:
     // Accessing elements
     inline const TYPE& GetAt(INT nIndex) const
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
     inline TYPE& GetAt(INT nIndex)
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
     inline const TYPE& ElementAt(INT nIndex) const
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
     inline TYPE& ElementAt(INT nIndex)
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
     // overloaded operator helpers
     inline const TYPE& operator[](INT nIndex) const
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
     inline TYPE& operator[](INT nIndex)
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         return m_pData[nIndex]; 
     }
 
@@ -157,13 +157,13 @@ public:
 
     inline void SetAt(INT nIndex, ARG_TYPE newElement)
     {
-        appAssert(nIndex >= 0 && nIndex < m_nSize);
+        assert(nIndex >= 0 && nIndex < m_nSize);
         m_pData[nIndex] = newElement; 
     }
 
     inline void SetSize(INT nNewSize, INT nGrowBy = -1)
     {
-        appAssert(nNewSize >= 0);
+        assert(nNewSize >= 0);
 
         if (nGrowBy >= 0)
             m_nGrowBy = nGrowBy;  // set new size
@@ -232,7 +232,7 @@ public:
             else
                 nNewMax = nNewSize;  // no slush
 
-            appAssert(nNewMax >= m_nMaxSize);  // no wrap around
+            assert(nNewMax >= m_nMaxSize);  // no wrap around
 
             TYPE* pNewData = (TYPE*)(new BYTE[(SIZE_T)(nNewMax) * sizeof(TYPE)]);
 
@@ -240,7 +240,7 @@ public:
             memcpy(pNewData, m_pData, (SIZE_T)(m_nSize) * sizeof(TYPE));
 
             // construct remaining elements
-            appAssert(nNewSize > m_nSize);
+            assert(nNewSize > m_nSize);
             memset((void*)(pNewData + m_nSize), 0, (SIZE_T)(nNewSize-m_nSize) * sizeof(TYPE));
             for( INT i = 0; i < nNewSize-m_nSize; ++i )
             {
@@ -298,7 +298,7 @@ public:
     // Potentially growing the array
     inline void SetAtGrow(INT nIndex, ARG_TYPE newElement)
     {
-        appAssert(nIndex >= 0);
+        assert(nIndex >= 0);
         if (nIndex >= m_nSize)
             SetSize(nIndex + 1, -1);
         m_pData[nIndex] = newElement;
@@ -345,7 +345,7 @@ public:
 
     inline INT Append(const TArray& src)
     {
-        //appAssert(this != &src);   // cannot append to itself (but why?)
+        //assert(this != &src);   // cannot append to itself (but why?)
         INT nOldSize = m_nSize;
         SetSize(m_nSize + src.m_nSize);
         appCopyElements<TYPE>(m_pData + nOldSize, src.m_pData, src.m_nSize);
@@ -354,7 +354,7 @@ public:
 
     inline void Copy(const TArray& src)
     {
-        //appAssert(this != &src);   // cannot append to itself (but why?)
+        //assert(this != &src);   // cannot append to itself (but why?)
         if(this != &src)
         {
             SetSize(src.m_nSize);
@@ -365,8 +365,8 @@ public:
     // Operations that move elements around
     inline void InsertAt(INT nIndex, ARG_TYPE newElement, INT nCount = 1)
     {
-        appAssert(nIndex >= 0);    // will expand to meet need
-        appAssert(nCount > 0);     // zero or negative size not allowed
+        assert(nIndex >= 0);    // will expand to meet need
+        assert(nCount > 0);     // zero or negative size not allowed
 
         if (nIndex >= m_nSize)
         {
@@ -394,16 +394,16 @@ public:
         }
 
         // insert new value in the gap
-        appAssert(nIndex + nCount <= m_nSize);
+        assert(nIndex + nCount <= m_nSize);
         while (nCount--)
             m_pData[nIndex++] = newElement;
     }
 
     inline void RemoveAt(INT nIndex, INT nCount = 1)
     {
-        appAssert(nIndex >= 0);
-        appAssert(nCount >= 0);
-        appAssert(nIndex + nCount <= m_nSize);
+        assert(nIndex >= 0);
+        assert(nCount >= 0);
+        assert(nIndex + nCount <= m_nSize);
 
         // just remove a range
         INT nMoveCount = m_nSize - (nIndex + nCount);
@@ -417,8 +417,8 @@ public:
 
     inline void InsertAt(INT nStartIndex, TArray* pNewArray)
     {
-        appAssert(pNewArray != NULL);
-        appAssert(nStartIndex >= 0);
+        assert(pNewArray != NULL);
+        assert(nStartIndex >= 0);
 
         if (pNewArray->GetSize() > 0)
         {
@@ -443,8 +443,8 @@ public:
 
     inline TYPE Pop(void)
     {
-        appAssert(m_nSize > 0);
-        appAssert(m_nMaxSize >= m_nSize);
+        assert(m_nSize > 0);
+        assert(m_nMaxSize >= m_nSize);
         TYPE Result = ((TYPE*)m_pData)[m_nSize - 1];
         RemoveAt( m_nSize - 1 );
         return Result;

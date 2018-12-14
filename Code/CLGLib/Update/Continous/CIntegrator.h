@@ -13,6 +13,14 @@
 
 __BEGIN_NAMESPACE
 
+__DEFINE_ENUM(EIntegratorType,
+    EIT_LeapFrog,
+    EIT_Omelyan,
+    EIT_Max,
+
+    EIT_ForceDWORD = 0x7fffffff,
+    )
+
 class CLGAPI CIntegrator
 {
 public:

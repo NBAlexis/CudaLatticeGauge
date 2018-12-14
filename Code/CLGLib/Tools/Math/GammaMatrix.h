@@ -15,8 +15,9 @@
 
 __BEGIN_NAMESPACE
 
-struct CLGAPI gammaMatrix
+class CLGAPI gammaMatrix
 {
+public:
     __device__ gammaMatrix()
     {
         for (INT i = 0; i < 4; ++i)
@@ -112,8 +113,9 @@ private:
     }
 };
 
-struct CLGAPI gammaMatrixSet
+class CLGAPI gammaMatrixSet
 {
+public:
     enum EGammaMatrix
     {
         ZERO,

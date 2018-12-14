@@ -29,16 +29,17 @@
 
 __BEGIN_NAMESPACE
 
+enum { _constMaxPlaqIndexLength = 256, };
+
 class CLGAPI CFieldGaugeSU3 : public CFieldGauge
 {
+    __CLGDECLARE_CLASS(CFieldGaugeSU3)
+
 public:
+    CFieldGaugeSU3();
+    ~CFieldGaugeSU3();
 
-    CFieldGaugeSU3(CLatticeData* pLattice, EFieldInitialType eInitialType = EFIT_Identity);
-    ~CFieldGaugeSU3()
-    {
-        checkCudaErrors(cudaFree(m_pDeviceData));
-    }
-
+    virtual void InitialField(EFieldInitialType eInitialType);
     virtual EFieldType GetFieldType() const { return EFT_GaugeSU3; }
 
 #pragma region HMC
@@ -63,6 +64,7 @@ public:
 protected:
 
     deviceSU3* m_pDeviceData;
+    int2* m_pDeviceStapleIndex;
 };
 
 __END_NAMESPACE

@@ -11,6 +11,35 @@
 #ifndef _YAMLPARSER_H_
 #define _YAMLPARSER_H_
 
+#define _FetchFunction(typen) UBOOL FetchValue##typen(const CCString& key, typen& value) const \
+{ \
+    CCString v; \
+    if (!FetchStringValue(key, v)) \
+    { \
+        return FALSE; \
+    } \
+    value = appStrTo##typen(v); \
+    return TRUE; \
+}
+
+
+#define _FetchFunctionArray(typen) UBOOL FetchValueArray##typen(const CCString& key, TArray<typen>& value) const \
+{ \
+    value.RemoveAll();   \
+    TArray<CCString> vs; \
+    if (!FetchStringVectorValue(key, vs)) \
+    { \
+        return FALSE; \
+    } \
+    for (INT i = 0; i < vs.Num(); ++i) \
+    { \
+        value.AddItem(appStrTo##typen(vs[i])); \
+    } \
+    return TRUE; \
+}
+
+
+
 __BEGIN_NAMESPACE
 
 //! Parameter manager with YAML parser.
@@ -29,98 +58,118 @@ class CLGAPI CParameters
 public:
 
     CParameters() {;}
+    CParameters(const CParameters& other) 
+    { 
+        m_pStrings = other.m_pStrings;
+        m_pStringVector = other.m_pStringVector;
+        m_pParameters = other.m_pParameters;
+    }
+
     ~CParameters() {;}
 
-    void SetStringVaule(const STRING& key, const STRING& value)
+    void SetStringVaule(const CCString& key, const CCString& value)
     {
-        m_pStrings.insert_or_assign(key, value);
+        m_pStrings[key] = value;
     }
 
-    void SetStringVectorVaule(const STRING& key, std::vector<STRING>& value)
+    void SetStringVectorVaule(const CCString& key, const TArray<CCString>& value)
     {
-        m_pStringVector.insert_or_assign(key, value);
+        m_pStringVector[key] = value;
     }
 
-    void SetParameterVaule(const STRING& key, const CParameters& value)
+    void SetParameterVaule(const CCString& key, const CParameters& value)
     {
-        m_pParameters.insert_or_assign(key, value);
+        m_pParameters[key] = value;
     }
 
-    CParameters& GetParameter(const STRING& key)
+    CParameters& GetParameter(const CCString& key)
     {
-        std::map<STRING, CParameters>::iterator p = m_pParameters.find(key);
-        if (p != m_pParameters.end())
+        if (m_pParameters.Exist(key))
         {
-            return p->second;
+            return m_pParameters[key];
         }
 
-        appCrucial("key '%s' not found.\n", key.c_str());
+        appCrucial(_T("key '%s' not found.\n"), key.c_str());
         return *this;
     }
 
-    BOOL FetchStringValue(const STRING& key, STRING& value) const
+    _FetchFunction(INT)
+
+    _FetchFunction(FLOAT)
+
+    UBOOL FetchStringValue(const CCString& key, CCString& value) const
     {
-        std::map<STRING, STRING>::const_iterator p = m_pStrings.find(key);
-        if (p != m_pStrings.end())
+        if (m_pStrings.Lookup(key, value))
         {
-            value = p->second;
             return TRUE;
         }
 
         return FALSE;
     }
 
-    BOOL FetchStringVectorValue(const STRING& key, std::vector<STRING>& value) const
+    _FetchFunctionArray(INT)
+
+    _FetchFunctionArray(FLOAT)
+
+    UBOOL FetchStringVectorValue(const CCString& key, TArray<CCString>& value) const
     {
-        std::map<STRING, std::vector<STRING>>::const_iterator p = m_pStringVector.find(key);
-        if (p != m_pStringVector.end())
-        {
-            value = p->second;
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-
-    BOOL FetchParameterValue(const STRING& key, CParameters& value) const
-    {
-        std::map<STRING, CParameters>::const_iterator p = m_pParameters.find(key);
-        if (p != m_pParameters.end())
-        {
-            value = p->second;
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-
-    BOOL Exist(const STRING& key) const
-    {
-        if (m_pStrings.find(key) != m_pStrings.end())
-        {
-            return TRUE;
-        }
-        if (m_pStringVector.find(key) != m_pStringVector.end())
-        {
-            return TRUE;
-        }
-        if (m_pParameters.find(key) != m_pParameters.end())
+        if (m_pStringVector.Lookup(key, value))
         {
             return TRUE;
         }
         return FALSE;
     }
 
-    void Dump(const STRING& indent = "") const;
+    UBOOL FetchParameterValue(const CCString& key, CParameters& value) const
+    {
+        if (m_pParameters.Lookup(key, value))
+        {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    UBOOL Exist(const CCString& key) const
+    {
+        if (m_pStrings.Exist(key))
+        {
+            return TRUE;
+        }
+        if (m_pStringVector.Exist(key))
+        {
+            return TRUE;
+        }
+        if (m_pParameters.Exist(key))
+        {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    void Dump(const CCString& indent = "") const;
+
+    inline void Copy(const CParameters& other)
+    {
+        m_pStrings = other.m_pStrings;
+        m_pStringVector = other.m_pStringVector;
+        m_pParameters = other.m_pParameters;
+    }
+
+    inline CParameters& operator=(const CParameters& other)
+    {
+        Copy(other);
+        return *this;
+    }
 
 private:
 
     // scalar
-    std::map<STRING, STRING>                m_pStrings;
+    THashMap<CCString, CCString>               m_pStrings;
     // array
-    std::map<STRING, std::vector<STRING>>   m_pStringVector;
+    THashMap<CCString, TArray<CCString>>       m_pStringVector;
     // map
-    std::map<STRING, CParameters>           m_pParameters;
+    THashMap<CCString, CParameters>            m_pParameters;
 };
 
 class CLGAPI CYAMLParser
@@ -129,7 +178,7 @@ public:
     CYAMLParser() {}
 
     //! read parameters from file.
-    static void ParseFile(const STRING& params_file, CParameters& params);
+    static void ParseFile(const CCString& params_file, CParameters& params);
 
     //These are functions for parse
     static void Parse(ISTREAM& iss, CParameters& params)
@@ -138,14 +187,14 @@ public:
 
         if (result != EXIT_SUCCESS) 
         {
-            appCrucial("YAML: parse failed.\n");
+            appCrucial(_T("YAML: parse failed.\n"));
             exit(EXIT_FAILURE);
         }
     }
 
     static INT ParseStream(ISTREAM& iss, CParameters& params);
-    static INT ParseLine(TCHAR *buf, STRING& key, STRING& value);
-    static INT ParseVector(TCHAR *buf, std::vector<STRING>& vec);
+    static INT ParseLine(TCHAR *buf, CCString& key, CCString& value);
+    static INT ParseVector(TCHAR *buf, TArray<CCString>& vec);
 };
 
 __END_NAMESPACE

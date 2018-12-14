@@ -61,53 +61,13 @@ template< class T > FORCEINLINE T appLerp( T& A, T& B, FLOAT Alpha )
 }
 
 //-----------------------------------------------------------------------
-//type hash
-FORCEINLINE DWORD appGetTypeHash( const BYTE A )
-{
-    return A;
-}
-FORCEINLINE DWORD appGetTypeHash( const SBYTE A )
-{
-    return A;
-}
-FORCEINLINE DWORD GetTypeHash( const WORD A )
-{
-    return A;
-}
-FORCEINLINE DWORD appGetTypeHash( const SWORD A )
-{
-    return A;
-}
-FORCEINLINE DWORD appGetTypeHash( const INT A )
-{
-    return A;
-}
-FORCEINLINE DWORD appGetTypeHash( const DWORD A )
-{
-    return A;
-}
-FORCEINLINE DWORD appGetTypeHash( const QWORD A )
-{
-    return (DWORD)A+((DWORD)(A>>32) * 23);
-}
-FORCEINLINE DWORD appGetTypeHash( const SQWORD A )
-{
-    return (DWORD)A+((DWORD)(A>>32) * 23);
-}
-FORCEINLINE DWORD appGetTypeHash( const TCHAR* S )
-{
-    return 0;
-    //return appStrihash(S);
-}
-
-//-----------------------------------------------------------------------
 //define
 #define appExchangeB(A,B) {UBOOL T=A; A=B; B=T;}
 
 template<typename TYPE>
 FORCEINLINE void appCopyElements(TYPE* pDest, const TYPE* pSrc, INT nCount)
 {
-    appAssert(nCount>=0);
+    assert(nCount>=0);
     // default is element-copy using assignment
     while (nCount--)
         *pDest++ = *pSrc++;

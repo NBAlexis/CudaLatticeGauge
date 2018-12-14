@@ -16,6 +16,7 @@
 #define _appStrrev		_tcsrev
 #define _appStrtol		_tcstol
 #define _appStrtod		_tcstod
+#define _appStrtof		_tcstof
 #define _appStrnicmp	_tcsnicmp
 
 __BEGIN_NAMESPACE
@@ -26,7 +27,7 @@ FORCEINLINE void appStrTrimLeft(TCHAR* &InStr)
         ++InStr;
 }
 
-FORCEINLINE INT appStrToInt(const TCHAR* s)
+FORCEINLINE INT appStrToINT(const TCHAR* s)
 {
     INT base;
     TCHAR* p = (TCHAR*)(s);
@@ -36,6 +37,25 @@ FORCEINLINE INT appStrToInt(const TCHAR* s)
     else
         base = 10;
     return _appStrtol(p, &p, base);
+}
+
+FORCEINLINE FLOAT appStrToFLOAT(const TCHAR* s)
+{
+    TCHAR *ending;
+    
+#if UNICODE
+    std::wstring str_val(s);
+#else
+    std::string str_val(s);
+#endif
+
+    FLOAT converted_value = _appStrtof(str_val.c_str(), &ending);
+    if (*ending != 0)
+    {
+        printf(_T("String to float failed! string: %s"), s);
+        return 0.0f;
+    }
+    return converted_value;
 }
 
 //=====================================================
@@ -73,7 +93,7 @@ public:
 
     CCStringData* GetData() const
     {
-        appAssert(m_pchData != NULL); 
+        assert(m_pchData != NULL); 
         //skip myself
         return (CCStringData*)(m_pchData) - 1;
     }
@@ -95,8 +115,8 @@ protected:
     */
     void AllocBuffer(INT nLen)
     {
-        appAssert(nLen >= 0);
-        appAssert(nLen <= INT_MAX - 1);    // max size (enough room for 1 extra)
+        assert(nLen >= 0);
+        assert(nLen <= INT_MAX - 1);    // max size (enough room for 1 extra)
 
         if (nLen == 0)
             Init();
@@ -118,7 +138,7 @@ protected:
             Release();
             AllocBuffer(nLen);
         }
-        appAssert(GetData()->m_nRefs <= 1);
+        assert(GetData()->m_nRefs <= 1);
     }
     /**
     * will clone the data attached to this string
@@ -155,7 +175,7 @@ protected:
             AllocBuffer(pData->m_nDataLength);
             memcpy(m_pchData, pData->Data(), (pData->m_nDataLength + 1) * sizeof(TCHAR));
         }
-        appAssert(GetData()->m_nRefs <= 1);
+        assert(GetData()->m_nRefs <= 1);
     }
     /**
     * -- master concatenation routine
@@ -188,7 +208,7 @@ protected:
             // we have to grow the buffer, use the ConcatCopy routine
             CCStringData* pOldData = GetData();
             ConcatCopy(GetData()->m_nDataLength, m_pchData, nSrcLen, lpszSrcData);
-            appAssert(pOldData != NULL);
+            assert(pOldData != NULL);
             CCString::Release(pOldData);
         }
         else
@@ -196,7 +216,7 @@ protected:
             // fast concatenation when buffer big enough
             memcpy(m_pchData+GetData()->m_nDataLength, lpszSrcData, nSrcLen*sizeof(TCHAR));
             GetData()->m_nDataLength += nSrcLen;
-            appAssert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
+            assert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
             m_pchData[GetData()->m_nDataLength] = _T('\0');
         }
     }
@@ -211,13 +231,15 @@ public:
 
     TCHAR GetAt(INT nIndex) const
     {
-        appAssert(nIndex >= 0); 
-        appAssert(nIndex < GetData()->m_nDataLength); 
+        assert(nIndex >= 0); 
+        assert(nIndex < GetData()->m_nDataLength); 
         return m_pchData[nIndex]; 
     }
 
     TCHAR operator[](INT nIndex) const { return GetAt(nIndex); }
     operator const TCHAR*() const { return m_pchData; }
+
+    const TCHAR* c_str() const { return m_pchData; }
 
 #if UNICODE
     //attention here!
@@ -227,15 +249,15 @@ public:
         INT buf_len = GetLength() * 2+1;
         ANSICHAR* new_data = (ANSICHAR*)(appMalloc(buf_len)); 
         INT ret_len = appUnicodeToAnsi(new_data, (UNICHAR*)m_pchData/*with terminator*/, buf_len/*out buffer bytes*/);
-        appAssert(ret_len <= buf_len);
+        assert(ret_len <= buf_len);
         return (const ANSICHAR*)new_data;
     }
 #endif
 
     void SetAt(INT nIndex, TCHAR ch)
     { 
-        appAssert(nIndex >= 0);
-        appAssert(nIndex < GetData()->m_nDataLength);
+        assert(nIndex >= 0);
+        assert(nIndex < GetData()->m_nDataLength);
         CopyBeforeWrite();
         m_pchData[nIndex] = ch;
     }
@@ -294,8 +316,8 @@ public:
         if (nFirst > GetData()->m_nDataLength)
             nCount = 0;
 
-        appAssert(nFirst >= 0);
-        appAssert(nFirst + nCount <= GetData()->m_nDataLength);
+        assert(nFirst >= 0);
+        assert(nFirst + nCount <= GetData()->m_nDataLength);
 
         // optimize case of returning entire string
         if (nFirst == 0 && nFirst + nCount == GetData()->m_nDataLength)
@@ -765,11 +787,11 @@ inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
         if (0 == nWidth)
         {
             // width indicated by
-            nWidth = appStrToInt(lpsz);
+            nWidth = appStrToINT(lpsz);
             for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
                 ;
         }
-        appAssert(nWidth >= 0);
+        assert(nWidth >= 0);
 
         INT nPrecision = 0;
         if (*lpsz == _T('.'))
@@ -785,11 +807,11 @@ inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
             }
             else
             {
-                nPrecision = appStrToInt(lpsz);
+                nPrecision = appStrToINT(lpsz);
                 for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
                     ;
             }
-            appAssert(nPrecision >= 0);
+            assert(nPrecision >= 0);
         }
 
         // now should be on specifier
@@ -869,7 +891,7 @@ inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
                 break;
 
             default:
-                appAssert(FALSE);  // unknown formatting option
+                assert(FALSE);  // unknown formatting option
             }
         }
 
@@ -1061,6 +1083,7 @@ __END_NAMESPACE
 #undef _appStrrev
 #undef _appStrtol
 #undef _appStrtod
+#undef _appStrtof
 #undef _appStrnicmp
 
 #endif //#ifndef _CCSTRING_H_

@@ -1,0 +1,87 @@
+##Main:
+
+## Verbose will always show in stdout
+## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+VerboseLevel : GENERAL
+VerboseOutput : timestamp
+ShowDeviceInformation : 1
+ShowParameterContent : 1
+
+## dim = {2, 3, 4}
+Dim : 4
+  
+## For square lattice, Dir = Dim
+Dir : 4
+  
+## Lattice Length = [x, y, z, t], NOTE, for 3D Lattice Length = [1, y, z, t], for 2D Lattice Length = [1, 1, z, t]
+LatticeLength : [8, 8, 8, 8]
+
+## LatticeIndex { CIndexSquare }
+LatticeIndex : CIndexSquare
+## LatticeBoundary = { CBoundaryConditionTorusSquare }
+LatticeBoundary : CBoundaryConditionTorusSquare
+
+## Threads decompose
+## Note: ThreadAutoDecompose = 1, will decompose using MaxThread of GPU, or else ThreadAutoDecompose = 0 will use decomposex,y,z
+## Note: LatticeLength.xyz | ThreadDecomposeXYZ (divisible)
+## Note: ThreadDecomposeX*ThreadDecomposeY*ThreadDecomposeZ <= max thread of your GPU
+ThreadAutoDecompose : 1
+ThreadDecompose : [8, 8, 8]
+
+## Random Type = {ER_Schrage}
+RandomType : ER_Schrage
+RandomSeed : 1234567
+
+## Some global settings
+ExponentialPrecision : 4
+
+Updator:
+
+  ## UpdatorType = { EUT_HMC }
+  UpdatorType : EUT_HMC
+
+  ## Will only read this when updator is HMC IntegratorType = { EIT_LeapFrog, EIT_Omelyan }
+  IntegratorType : EIT_LeapFrog
+  IntegratorStep : 50
+
+Gauge:
+	
+  ## FieldType = {CFieldGaugeSU3}
+  FieldName : CFieldGaugeSU3
+
+  ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+  FieldInitialType : EFIT_Random
+		
+Tests:
+
+  
+  TestRandom:
+
+    TestPi:
+
+      Count : 100000000
+      ExpectResult : 0.001
+
+      ## The Accuracy to pass the test, Usually, a ~ 1/sqrt(Count)
+      Accuracy : 1E-4
+
+    TestExp:
+
+      Count : 100000000
+      ExpectResult : 0.001
+
+      ## The Accuracy to pass the test, Usually, a ~ 1/sqrt(Count)
+      Accuracy : 1E-4
+
+  TestWilsonLoop:
+
+    TestLeapFrog:
+
+      ExpectResult : 0.001
+      Accuracy : 1E-4
+
+    TestOmelyan:
+
+      ExpectResult : 0.001
+      Accuracy : 1E-4

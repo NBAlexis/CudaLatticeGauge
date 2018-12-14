@@ -20,9 +20,7 @@
 
 #pragma endregion Warnings
 
-#ifdef _MSC_VER
 #pragma region Type definations
-#endif
 
 #undef FALSE
 #undef TRUE
@@ -128,9 +126,7 @@ typedef ANSICHARU TCHARU;
 
 #endif
 
-#ifdef _MSC_VER
 #pragma endregion Type definations
-#endif
 
 #define __REMINDER_STR(s)		#s
 #define __REMINDER_STRINT(s)    __REMINDER_STR(s)

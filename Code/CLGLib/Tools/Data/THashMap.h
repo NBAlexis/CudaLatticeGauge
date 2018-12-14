@@ -33,8 +33,26 @@ template<class ARG_KEY>
 inline UINT TMapHashKey(ARG_KEY key)
 {
     // default identity hash - works for most primitive values
-    return (UINT)((  (DWORD) (key)   ) >> 4 );
+    return (UINT)((DWORD)(key) >> 4 );
 }
+template<>
+inline UINT TMapHashKey<const CCString&>(const CCString& key)
+{
+    const TCHAR* name = key;
+    DWORD hash = 0;
+    while (*name)
+    {
+        TCHAR Ch = (TCHAR)appToUpper(*name++);
+        BYTE  B = (BYTE)Ch;
+        hash = ((hash << 3) + B) ^ (hash);
+#ifdef UNICODE
+        B = Ch >> 8;
+        hash = ((hash << 3) + B) ^ (hash);
+#endif
+    }
+    return hash & (kTMapDefaultHashTableSize - 1);
+}
+
 template<class TYPE, class ARG_TYPE>
 inline UBOOL TMapCompareElements(const TYPE* pElement1, const ARG_TYPE* pElement2)
 {
@@ -69,19 +87,42 @@ protected:
 
 public:
 
+    typedef UINT(*_pfHash)(ARG_KEY key);
+    typedef UBOOL(*_pfCompare)(ARG_KEY key1, ARG_KEY key2);
+
+    _pfHash m_pHashFunction;
+    _pfCompare m_pCompareFunction;
+
     //----------------------------------------------------------------------------------------------------------
     // Construction and Destruction
-    THashMap(INT HashTableSize = kTMapDefaultHashTableSize)
+    THashMap(_pfHash pfHash = NULL, _pfCompare pfCompare = NULL, INT HashTableSize = kTMapDefaultHashTableSize)
+        : m_pHashTable(NULL)
+        , m_nHashTableSize(HashTableSize)
+        , m_nCount(0)
+        , m_pHashFunction(pfHash)
+        , m_pCompareFunction(pfCompare)
     {
-        m_pHashTable = NULL;
-        m_nHashTableSize = HashTableSize;
-        m_nCount = 0;
         ResetHashTable(m_nHashTableSize);
+    }
+    THashMap(const THashMap& other, _pfHash pfHash = NULL, _pfCompare pfCompare = NULL, INT HashTableSize = kTMapDefaultHashTableSize)
+        : m_pHashTable(NULL)
+        , m_nHashTableSize(HashTableSize)
+        , m_nCount(0)
+        , m_pHashFunction(pfHash)
+        , m_pCompareFunction(pfCompare)
+    {
+        ResetHashTable(m_nHashTableSize);
+
+        TArray<KEY> keys = other.GetAllKeys();
+        for (INT i = 0; i < keys.Num(); ++i)
+        {
+            SetAt(keys[i], other.GetAt(keys[i]));
+        }
     }
     ~THashMap()
     {
         RemoveAll();
-        appAssert(0 == m_nCount);
+        assert(0 == m_nCount);
     }
     void RemoveAll()
     {
@@ -112,7 +153,10 @@ public:
             m_pHashTable = NULL;
         }
         if (bAllocNow)
-            m_pHashTable = new (eZeroMemoryNew) TAssoc* [nHashSize];
+        {
+            m_pHashTable = new TAssoc*[nHashSize];
+            memset(m_pHashTable, 0, sizeof(TAssoc*) * nHashSize);
+        }
         m_nHashTableSize = nHashSize;
     }
 
@@ -126,6 +170,13 @@ public:
 
     //------------------------------------------------------------------------------------------------------
     // Lookup
+    UBOOL Exist(ARG_KEY key) const
+    {
+        UINT nHashBucket, nHashValue;
+        TAssoc* pAssoc = GetAssocAt(key, nHashBucket, nHashValue);
+        if (pAssoc == NULL) return FALSE;  // not in map
+        return TRUE;
+    }
     UBOOL Lookup(ARG_KEY key, VALUE& rValue) const
     {
         UINT nHashBucket, nHashValue;
@@ -170,6 +221,27 @@ public:
         }
         return pAssoc->m_Value;  // return new reference
     }
+
+    inline void Copy(const THashMap& src)
+    {
+        if (this != &src)
+        {
+            RemoveAll();
+            m_nHashTableSize = kTMapDefaultHashTableSize;
+            ResetHashTable(m_nHashTableSize);
+
+            TArray<KEY> keys = src.GetAllKeys();
+            for (INT i = 0; i < keys.Num(); ++i)
+            {
+                SetAt(keys[i], src.GetAt(keys[i]));
+            }
+        }
+    }
+    inline THashMap& operator=(const THashMap& other)
+    {
+        Copy(other);
+        return *this;
+    }
     // removing existing (key, ?) pair
     UBOOL RemoveKey(ARG_KEY key)
     {
@@ -197,8 +269,35 @@ public:
     // add a new (key, value) pair
     void SetAt(ARG_KEY key, ARG_VALUE newValue) { (*this)[key] = newValue; }
     // get a value
-    VALUE GetAt(ARG_KEY key) const { VALUE rValue = (*this)[key]; return rValue; }
+    VALUE GetAt(ARG_KEY key) const 
+    { 
+        UINT nHashBucket, nHashValue;
+        TAssoc* pAssoc = GetAssocAt(key, nHashBucket, nHashValue);
+        if (NULL == pAssoc)
+        {
+            return VALUE();
+        }
+        return pAssoc->m_Value;
+    }
 
+    //----------------------------------------
+    //Interface for loop
+    TArray<KEY> GetAllKeys() const
+    {
+        TArray<KEY> ret;
+        if (m_pHashTable != NULL)
+        {
+            for (UINT nHash = 0; nHash < m_nHashTableSize; ++nHash)
+            {
+                TAssoc* pAssoc;
+                for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->m_pNext)
+                {
+                    ret.AddItem(pAssoc->m_Key);
+                }
+            }
+        }
+        return ret;
+    }
     //-----------------------------------------------------------------------------------------------------------------------------------
     //some interface like sort
     //     virtual const TPair *PGetFirstAssoc() const  { return NULL; }
@@ -220,7 +319,10 @@ protected:
     //Implement Helpers
     TAssoc* NewAssoc(ARG_KEY key)
     {
-        TAssoc* pAssoc = new (m_MemStack) TAssoc(key);
+        BYTE* p = m_MemStack.PushBytes((INT)sizeof(TAssoc));
+        memset(p, 0, sizeof(TAssoc));
+        TAssoc* pAssoc = (TAssoc*)p;
+        pAssoc->TAssoc::TAssoc(key);
         ++m_nCount;
         return pAssoc;
     }
@@ -228,7 +330,7 @@ protected:
     {
         pAssoc->TAssoc::~TAssoc();
         --m_nCount;
-        appAssert(m_nCount >= 0);  // make sure we don't underflow
+        assert(m_nCount >= 0);  // make sure we don't underflow
         // if no more elements, cleanup completely
         if (m_nCount == 0) RemoveAll();
     }
@@ -245,6 +347,8 @@ protected:
         return NULL;
     }
 };
+
+
 
 __END_NAMESPACE
 

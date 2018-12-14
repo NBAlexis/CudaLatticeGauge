@@ -17,16 +17,46 @@ class CLGAPI CCLGLibManager
 {
 public:
     CCLGLibManager()
+        : m_pCudaHelper(NULL)
+        , m_pLatticeData(NULL)
     {
-        appInitCriticalSection();
+        //appInitCriticalSection();
+        appInitialTracer(GENERAL);
     }
     ~CCLGLibManager()
     {
-        appUninitCriticalSection();
+        //appUninitCriticalSection();
     }
+
+    void InitialWithParameter(class CParameters& params);
+
+    /**
+    * Free all data
+    */
+    void Quit();
+
+    class CCudaHelper* m_pCudaHelper;
+    class CLatticeData* m_pLatticeData;
+
 };
 
 extern CLGAPI CCLGLibManager GCLGManager;
+
+extern void CLGAPI appInitialCLG(const TCHAR* paramFileName);
+
+extern void CLGAPI appInitialCLG(class CParameters& params);
+
+extern void CLGAPI appQuitCLG();
+
+inline class CCudaHelper* appGetCudaHelper()
+{
+    return GCLGManager.m_pCudaHelper;
+}
+
+inline class CLatticeData* appGetLattice()
+{
+    return GCLGManager.m_pLatticeData;
+}
 
 __END_NAMESPACE
 

@@ -3,6 +3,8 @@
 // 
 // DESCRIPTION:
 // This is the class for update the field
+// It can be continous for U(1), SU(2), SU(3) gauge, using hybrid Monte Carlo
+// It can also be descrete for Z2, Zn, tetrahydraul, octahydraul, icosahydraul, using Heatbath
 //
 // REVISION:
 //  [12/8/2018 nbale]
@@ -12,6 +14,13 @@
 #define _CUPDATOR_H_
 
 __BEGIN_NAMESPACE
+
+__DEFINE_ENUM(EUpdatorType,
+    EUT_HMC,
+    EUT_Max,
+
+    EUT_ForceDWORD,
+)
 
 class CLGAPI CUpdator
 {

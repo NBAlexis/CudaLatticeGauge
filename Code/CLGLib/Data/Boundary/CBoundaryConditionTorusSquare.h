@@ -15,9 +15,11 @@ __BEGIN_NAMESPACE
 
 class CLGAPI CBoundaryConditionTorusSquare : public CBoundaryCondition
 {
+    __CLGDECLARE_CLASS(CBoundaryConditionTorusSquare)
+
 public:
 
-    __device__ CBoundaryConditionTorusSquare(class CIndex * pOwner) : CBoundaryCondition(pOwner) { ; }
+    CBoundaryConditionTorusSquare() : CBoundaryCondition() { ; }
 
     __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
 };

@@ -10,6 +10,13 @@
 
 #include "CLGLib_Private.h"
 
+//There are some global objects, decleared but not have a cpp file to implement
+__BEGIN_NAMESPACE
+
+CLGAPI CClassGather GClassGather;
+
+__END_NAMESPACE
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

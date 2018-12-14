@@ -71,10 +71,11 @@ int4 _deviceMoveSquareSite(const int4 &in, INT dir)
 
 class CLGAPI CIndexSquare : public CIndex
 {
-public:
-    __device__ CIndexSquare(class CDeviceLattice * pOwner) : CIndex(pOwner) { ; }
-    __device__ virtual int2* _deviceGetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
+    __CLGDECLARE_CLASS(CIndexSquare)
 
+public:
+    CIndexSquare() : CIndex() { ; }
+    __device__ virtual void _deviceGetPlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
 };
 
 __END_NAMESPACE

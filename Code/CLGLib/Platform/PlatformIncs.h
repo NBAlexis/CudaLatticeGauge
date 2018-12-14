@@ -31,10 +31,10 @@
 #include <vector>
 #include <sstream>
 #include <assert.h>
+#include <time.h>
 
 #ifdef _CLG_UNICODE
 
-using STRING = std::wstring;
 using ISTREAM = std::wistream;
 using OSTREAM = std::wostream;
 using OFSTREAM = std::wofstream;
@@ -45,7 +45,6 @@ using ISTRINGSTREAM = std::wistringstream;
 
 #else
 
-using STRING = std::string;
 using ISTREAM = std::istream;
 using OSTREAM = std::ostream;
 using OFSTREAM = std::ofstream;

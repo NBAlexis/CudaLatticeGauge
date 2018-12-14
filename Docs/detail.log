@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  12 DEC 2018 01:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  12 DEC 2018 02:06
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1312,10 +1312,13 @@ Package rerunfilecheck Warning: File `detail.out' has changed.
 
 Package rerunfilecheck Info: Checksums for `detail.out':
 (rerunfilecheck)             Before: 073CBCD9E40D89649697705B70010FA0;1080
-(rerunfilecheck)             After:  8E3D440090C47A7E08C418277F06803C;849.
+(rerunfilecheck)             After:  DEF6A05E27193313817550B8CBA73250;849.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 69.
  ) 
@@ -1343,9 +1346,9 @@ e1/public/amsfonts/cm/cmsl10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm
 /cmsy10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><D:/CTEX/M
 iKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/MiKTeX/fonts/type1/publ
 ic/amsfonts/euler/eufm10.pfb>
-Output written on detail.pdf (8 pages, 244815 bytes).
+Output written on detail.pdf (8 pages, 245803 bytes).
 PDF statistics:
- 268 PDF objects out of 1000 (max. 8388607)
+ 269 PDF objects out of 1000 (max. 8388607)
  59 named destinations out of 1000 (max. 500000)
  89 words of extra memory for PDF output out of 10000 (max. 10000000)
 

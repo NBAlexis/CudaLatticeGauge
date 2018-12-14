@@ -14,22 +14,27 @@
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CBoundaryCondition
+__DEFINE_ENUM(EBoundaryCondition,
+    EBC_TorusSquare,
+    EBC_Max,
+    EBC_ForceDWORD = 0x7fffffff,
+    )
+
+class CLGAPI CBoundaryCondition : public CBase
 {
 public:
 
-    __device__ CBoundaryCondition(class CIndex * pOwner);
-    __device__ class CIndex * GetOwner() const { return m_pOwner; }
+    CBoundaryCondition() : m_pOwner(NULL)
+    {
+        ;
+    }
 
     /**
     * The first index is the site index, the second index is index of field, it is 0 if it is not on boundary
     */
     __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const = 0;
 
-protected:
-
-    class CIndex* m_pOwner;
-    class CDeviceLattice* m_pLattice;
+    class CLatticeData* m_pOwner;
 };
 
 __END_NAMESPACE

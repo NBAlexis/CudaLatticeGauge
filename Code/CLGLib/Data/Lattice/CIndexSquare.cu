@@ -11,6 +11,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLGIMPLEMENT_CLASS(CIndexSquare)
+
 /**
 * For square lattice, we assume dimenssion = direction
 * bdir, mu: bond direction, or link direction
@@ -41,19 +43,17 @@ __BEGIN_NAMESPACE
 *  + [site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
 *  The return, int2(x = linkIndex; |y| - 1 = fieldIndex, 0 if it is not boundary, sign of y is for inverse)  
 */
-__device__ int2* CIndexSquare::_deviceGetPlaquttesAtLink(UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st) const
+__device__ void CIndexSquare::_deviceGetPlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st) const
 {
-    UINT uiDim = m_pOwner->m_uiDim;
+    UINT uiDim = _DC_Dim;
     //UINT* length = pLattice->m_uiLatticeLength;
     //UINT* mult = pLattice->m_uiLatticeMultipy;
 
     //for square, dir should equal to dim
-    assert(uiDim == m_pOwner->m_uiDir);
+    assert(uiDim == _DC_Dir);
 
-    int2* retV;
     count = 2 * (uiDim - 1);
     plaqutteLength = 4; //for square
-    cudaMalloc((void **)&retV, sizeof(int2) * count * (plaqutteLength - 1));
 
     //For square lattice, we assume dimenssion = number of direction
     UINT uiSiteIndex = uiLinkIndex / uiDim;
@@ -77,7 +77,7 @@ __device__ int2* CIndexSquare::_deviceGetPlaquttesAtLink(UINT& count, UINT& plaq
     {
         if (i != uiLinkDir)
         {
-            int4 xyzt = __deviceSiteIndexToInt4(m_pOwner, uiSiteIndex);
+            int4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
 
             //=============================================
             //add forward
@@ -118,7 +118,6 @@ __device__ int2* CIndexSquare::_deviceGetPlaquttesAtLink(UINT& count, UINT& plaq
             ++iListIndex;
         }
     }
-    return retV;
 }
 
 

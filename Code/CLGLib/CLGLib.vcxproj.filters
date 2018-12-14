@@ -176,6 +176,12 @@
     <ClInclude Include="Tools\Data\MemStack.h">
       <Filter>Tools\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\EnumGather.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -188,23 +194,17 @@
     <ClCompile Include="Core\CLGLibManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\CudaHelper.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Tools\CYAMLParser.cpp">
       <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\Field\CFieldGaugeSU3.cpp">
-      <Filter>Data\Field</Filter>
-    </ClCompile>
-    <ClCompile Include="Data\CCommonData.cpp">
-      <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
       <Filter>Data\Boundary</Filter>
     </ClCompile>
     <ClCompile Include="Tools\Data\CCString.cpp">
       <Filter>Tools\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Lattice\CLatticeData.cpp">
+      <Filter>Data\Lattice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -232,13 +232,17 @@
     <CudaCompile Include="Data\Field\CField.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Lattice\CLatticeData.cu" />
-    <CudaCompile Include="Tools\Math\Random.cu" />
     <CudaCompile Include="Update\Continous\CHMC.cu">
       <Filter>Update\Continous</Filter>
     </CudaCompile>
     <CudaCompile Include="Update\Continous\CIntegrator.cpp">
       <Filter>Update\Continous</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Tools\Math\Random.cu">
+      <Filter>Tools\Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Core\CudaHelper.cu">
+      <Filter>Core</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

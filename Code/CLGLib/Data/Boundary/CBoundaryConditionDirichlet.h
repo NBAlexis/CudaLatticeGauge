@@ -37,7 +37,7 @@ public:
 
     UINT GetLatticeLength(UINT dim) const
     {
-        appAssert(dim < m_uiDim);
+        assert(dim < m_uiDim);
         return m_uiLattice[dim];
     }
 

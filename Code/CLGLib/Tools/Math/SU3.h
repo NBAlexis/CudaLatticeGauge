@@ -79,18 +79,18 @@ struct CLGAPI deviceSU3
     * can be called only after CLatticeData is created
     * ret = random
     */
-    __device__ __inline__ static deviceSU3 makeSU3Random(CRandomSchrage* randomGenerator, UINT fatIndex)
+    __device__ __inline__ static deviceSU3 makeSU3Random(UINT fatIndex)
     {
         deviceSU3 ret;
-        ret.m_me[0] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[1] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[2] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[3] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[4] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[5] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[6] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[7] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[8] = make_cuComplex(randomGenerator->_deviceRandomF(fatIndex) - 0.5f, randomGenerator->_deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[0] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[1] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[2] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[3] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[4] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[5] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[6] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[7] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[8] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
         ret.Norm();
         return ret;
     }
@@ -105,16 +105,16 @@ struct CLGAPI deviceSU3
     *     r4+ir5           r6+ir7      -2r8/sqrt3
     *
     */
-    __device__ __inline__ static deviceSU3 makeSU3RandomGenerator(CRandomSchrage* randomGenerator, UINT fatIndex)
+    __device__ __inline__ static deviceSU3 makeSU3RandomGenerator(UINT fatIndex)
     {
-        FLOAT r1 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r2 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r3 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r4 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r5 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r6 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r7 = randomGenerator->_deviceRandomGaussF(fatIndex);
-        FLOAT r8 = randomGenerator->_deviceRandomGaussF(fatIndex);
+        FLOAT r1 = _deviceRandomGaussF(fatIndex);
+        FLOAT r2 = _deviceRandomGaussF(fatIndex);
+        FLOAT r3 = _deviceRandomGaussF(fatIndex);
+        FLOAT r4 = _deviceRandomGaussF(fatIndex);
+        FLOAT r5 = _deviceRandomGaussF(fatIndex);
+        FLOAT r6 = _deviceRandomGaussF(fatIndex);
+        FLOAT r7 = _deviceRandomGaussF(fatIndex);
+        FLOAT r8 = _deviceRandomGaussF(fatIndex);
 
         deviceSU3 ret;
         ret.m_me[0] = make_cuComplex(0.0f, r3 + r8 * InvSqrt3);
@@ -365,7 +365,7 @@ struct CLGAPI deviceSU3
         * ...
         * loopN: tmp = 1+aU (1 + aU/2 (1+...))
         */
-        for (int i = 0; i < uiPrecision; ++i)
+        for (UINT i = 0; i < uiPrecision; ++i)
         {
             FLOAT exp_factor = 1.0f / (uiPrecision - i);
             cuComplex alpha = cuCmulf(a, exp_factor);

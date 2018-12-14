@@ -13,15 +13,16 @@
 
 __BEGIN_NAMESPACE
 
-enum EVerboseLevel
-{
+__DEFINE_ENUM( EVerboseLevel,
+
     CRUCIAL,
     GENERAL,
     DETAILED,
     PARANOIAC,
 
     ForceDWORD = 0x7fffffff,
-};
+
+    )
 
 enum 
 {
@@ -33,6 +34,7 @@ class CLGAPI CTracer
 public:
     CTracer(void)
         : m_eLevel(CRUCIAL)
+        , m_pStdStream(NULL)
         , m_pStream(NULL)
     {
 
@@ -40,24 +42,83 @@ public:
 
     ~CTracer(void)
     {
+        if (NULL != m_pStream)
+        {
+            m_pStream->flush();
+        }
         appSafeDelete(m_pStream);
     }
 
-    inline void Initial(EVerboseLevel eLevel, const STRING& filename = _T("stdout"))
+    inline void SetVerboseLevel(EVerboseLevel eLevel) { m_eLevel = eLevel; }
+
+    inline void SetOutStream(const CCString& filename = _T("stdout"))
     {
-        m_eLevel = eLevel;
+        appSafeDelete(m_pStdStream);
+        if (NULL != m_pStream)
+        {
+            m_pStream->flush();
+            appSafeDelete(m_pStream);
+        }
+
+        m_pStdStream = new OSTREAM(COUT.rdbuf());
+        UBOOL bShowHasFile = FALSE;
         if (filename == _T("stdout"))
         {
-            m_pStream = new OSTREAM(COUT.rdbuf());
+            m_pStream = NULL;
+        }
+        else if (filename == _T("timestamp"))
+        {
+            CCString sRealFile;
+            sRealFile.Format(_T("%d.log"), appGetTimeStamp());
+            m_pStream = new OFSTREAM(sRealFile);
+            bShowHasFile = TRUE;
         }
         else
         {
-            m_pStream = new OFSTREAM(filename.c_str());
+            m_pStream = new OFSTREAM(filename);
+            bShowHasFile = TRUE;
         }
 
-        if (!m_pStream)
+        if (NULL == m_pStdStream || (bShowHasFile && NULL == m_pStream))
         {
-            appFailMessage(_T("ERROR: CTracer: no output stream."));
+            printf(_T("ERROR: CTracer: no output stream."));
+            if (NULL != m_pStream)
+            {
+                m_pStream->flush();
+            }
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    inline void Initial(EVerboseLevel eLevel, const CCString& filename = _T("stdout"))
+    {
+        m_eLevel = eLevel;
+        m_pStdStream = new OSTREAM(COUT.rdbuf());
+        UBOOL bShowHasFile = FALSE;
+        if (filename == _T("stdout"))
+        {
+            m_pStream = NULL;
+        }
+        else if (filename == _T("timestamp"))
+        {
+            CCString sRealFile;
+            sRealFile.Format(_T("%d.log"), appGetTimeStamp());
+            m_pStream = new OFSTREAM(sRealFile);
+            bShowHasFile = TRUE;
+        }
+        else
+        {
+            m_pStream = new OFSTREAM(filename);
+            bShowHasFile = TRUE;
+        }
+
+        if (NULL == m_pStdStream || (bShowHasFile && NULL == m_pStream))
+        {
+            printf(_T("ERROR: CTracer: no output stream."));
+            if (NULL != m_pStream)
+            {
+                m_pStream->flush();
+            }
             exit(EXIT_FAILURE);
         }
     }
@@ -66,27 +127,26 @@ public:
     {
         if ((level <= m_eLevel))
         {
-            if (!m_pStream) 
-            {
-                appFailMessage(_T("ERROR: CTracer: no output stream."));
-                exit(EXIT_FAILURE);
-            }
-
-            appEnterCriticalSection();
+            assert(NULL != m_pStdStream);
 
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
 
-            *m_pStream << m_cBuff;
-#ifdef _CLG_DEBUG
-            *m_pStream << std::flush;
-#endif
-
-            appLeaveCriticalSection();
-            if (!m_pStream->good()) 
+            *m_pStdStream << m_cBuff;
+            if (NULL != m_pStream)
             {
-                appFailMessage(_T("CTracer: output failed."));
-                exit(EXIT_FAILURE);
+                *m_pStream << m_cBuff;
+#ifdef _CLG_DEBUG
+                *m_pStream << std::flush;
+#endif
             }
+        }
+    }
+
+    inline void Flush()
+    {
+        if (NULL != m_pStream)
+        {
+            m_pStream->flush();
         }
     }
 
@@ -94,10 +154,11 @@ private:
 
     EVerboseLevel m_eLevel;
     OSTREAM * m_pStream;
+    OSTREAM * m_pStdStream;
     TCHAR m_cBuff[_kTraceBuffSize];
 };
 
-extern CLGAPI void appInitialTracer(EVerboseLevel eLevel, const STRING& filename = _T("stdout"));
+extern CLGAPI void appInitialTracer(EVerboseLevel eLevel, const CCString& filename = _T("stdout"));
 extern CLGAPI void appVOut(EVerboseLevel eLevel, const TCHAR *format, ...);
 extern CLGAPI void _appCrucial(const TCHAR *format, ...);
 extern CLGAPI void appGeneral(const TCHAR *format, ...);
@@ -105,12 +166,18 @@ extern CLGAPI void appDetailed(const TCHAR *format, ...);
 extern CLGAPI void appParanoiac(const TCHAR *format, ...);
 
 #ifdef _CLG_DEBUG
-#   define appCrucial(...) {char ___msg[1024];appSprintf(___msg, sizeof(___msg), __VA_ARGS__);appTrace(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, ___msg);_appCrucial(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, ___msg);}
+#   define appCrucial(...) {char ___msg[1024];appSprintf(___msg, sizeof(___msg), __VA_ARGS__);_appCrucial(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, ___msg);}
 #else
 #   define appCrucial(...) {_appCrucial(__VA_ARGS__);}
 #endif
 
 extern CLGAPI CTracer GTracer;
+
+inline void appSetTracer(EVerboseLevel eLevel, const CCString& filename)
+{
+    GTracer.SetVerboseLevel(eLevel);
+    GTracer.SetOutStream(filename);
+}
 
 __END_NAMESPACE
 

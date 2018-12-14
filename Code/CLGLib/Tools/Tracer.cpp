@@ -18,7 +18,7 @@ CLGAPI CTracer GTracer;
 *
 *
 */
-CLGAPI void appInitialTracer(EVerboseLevel eLevel, const STRING& filename)
+CLGAPI void appInitialTracer(EVerboseLevel eLevel, const CCString& filename)
 {
     GTracer.Initial(eLevel, filename);
 }
@@ -47,6 +47,7 @@ CLGAPI void _appCrucial(const TCHAR *format, ...)
     {
         va_start(arg, format);
         GTracer.Print(CRUCIAL, format, arg);
+        GTracer.Flush();
         va_end(arg);
     }
 }

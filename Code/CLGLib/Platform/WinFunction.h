@@ -60,51 +60,6 @@ extern "C" void* __cdecl _alloca(SIZE_T);
 
 
 
-#pragma region Trace and Debug
-
-
-__BEGIN_NAMESPACE
-
-CLGAPI void appInitCriticalSection();
-CLGAPI void appUninitCriticalSection();
-CLGAPI void appEnterCriticalSection();
-CLGAPI void appLeaveCriticalSection();
-
-//This trace is for simple debug usage, for release, use tracer instead.
-CLGAPI void CDECL appTraceA(const ANSICHAR* fmt, ...);
-CLGAPI void CDECL appTraceW(const UNICHAR* fmt, ...);
-
-__END_NAMESPACE
-
-#if _CLG_DEBUG
-#   ifdef _CLG_UNICODE
-#       define appTrace	appTraceW
-#   else
-#       define appTrace	appTraceA
-#   endif
-#else
-#   define appTrace {}
-#endif
-
-#define appBreak()				DebugBreak()
-#if defined _CLG_DEBUG
-#   define appAssert(exp) {if(!(exp)){appTrace(_T("%s(%d): Assert failed: %s\n"), _T(__FILE__), __LINE__, _T(#exp)); appBreak();}}
-#   define appVerify(exp) appAssert(exp)
-#else
-#   define appAssert(exp) { (void)(exp); }
-#   define appVerify(exp) { (void)(exp); }
-#endif
-
-#ifdef _CLG_DEBUG
-#	define appFailMessage(msg) {appTrace(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, (msg)); appBreak();}
-#else
-#	define appFailMessage(msg) {}
-#endif
-
-
-#pragma endregion Trace and Debug
-
-
 #pragma region Time functions
 
 __BEGIN_NAMESPACE
@@ -119,6 +74,11 @@ FORCEINLINE DWORD appGetCycles()
 FORCEINLINE void appStartTimer(DWORD& timer) { timer -= appGetCycles(); }
 FORCEINLINE void appEndTimer(DWORD& timer) { timer += appGetCycles(); }
 FORCEINLINE FLOAT appGetTime() { return static_cast<FLOAT>(appGetCycles()) * 0.001f; }
+
+FORCEINLINE UINT appGetTimeStamp(void)
+{
+    return static_cast<UINT>(time(0));
+}
 
 __END_NAMESPACE
 

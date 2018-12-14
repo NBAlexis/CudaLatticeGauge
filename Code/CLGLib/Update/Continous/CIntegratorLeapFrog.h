@@ -2,7 +2,7 @@
 // FILENAME : CIntegratorLeapFrog.h
 // 
 // DESCRIPTION:
-// This is the class for hibrid Monte Carlo
+// This is the Leap frog integrator for HMC
 //
 // REVISION:
 //  [12/11/2018 nbale]

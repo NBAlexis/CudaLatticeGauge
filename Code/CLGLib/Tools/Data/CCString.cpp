@@ -31,10 +31,10 @@ CLGAPI const TCHAR* __GEmptyString = (const TCHAR*)((BYTE*)&_NullString+sizeof(C
 */
 CCString::CCString(const CCString& stringSrc)
 {
-    appAssert(stringSrc.GetData()->m_nRefs != 0);
+    assert(stringSrc.GetData()->m_nRefs != 0);
     if (stringSrc.GetData()->m_nRefs >= 0)
     {
-        appAssert(stringSrc.GetData() != _EmptyStringData);
+        assert(stringSrc.GetData() != _EmptyStringData);
         m_pchData = stringSrc.m_pchData;
         appInterlockedIncrement(&GetData()->m_nRefs);
     }
@@ -110,7 +110,7 @@ void CCString::Release()
 {
     if (GetData() != _EmptyStringData)
     {
-        appAssert(GetData()->m_nRefs != 0);
+        assert(GetData()->m_nRefs != 0);
         if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
             FreeData(GetData());
         Init();
@@ -125,7 +125,7 @@ void CCString::Release(CCStringData* pData)
 {
     if (pData != _EmptyStringData)
     {
-        appAssert(pData->m_nRefs != 0);
+        assert(pData->m_nRefs != 0);
         if (appInterlockedDecrement(&pData->m_nRefs) <= 0)
             FreeData(pData);
     }
@@ -143,8 +143,8 @@ void CCString::Empty()
         Release();
     else
         *this = &_NullChar;
-    appAssert(GetData()->m_nDataLength == 0);
-    appAssert(GetData()->m_nRefs < 0 || GetData()->m_nAllocLength == 0);
+    assert(GetData()->m_nDataLength == 0);
+    assert(GetData()->m_nRefs < 0 || GetData()->m_nAllocLength == 0);
 }
 
 /**
@@ -165,7 +165,7 @@ const CCString& CCString::operator=(const CCString& stringSrc)
         {
             // can just copy references around
             Release();
-            appAssert(stringSrc.GetData() != _EmptyStringData);
+            assert(stringSrc.GetData() != _EmptyStringData);
             m_pchData = stringSrc.m_pchData;
             appInterlockedIncrement(&GetData()->m_nRefs);
         }
@@ -249,14 +249,14 @@ CCString CLGAPI operator+(TCHAR ch, const CCString& string)
 */
 TCHAR* CCString::GetBuffer(INT nMinBufLength)
 {
-    appAssert(nMinBufLength >= 0);
+    assert(nMinBufLength >= 0);
 
     if (GetData()->m_nRefs > 1 || nMinBufLength > GetData()->m_nAllocLength)
     {
 #ifdef _DEBUG
         // give a warning in case locked string becomes unlocked
         if (GetData() != _EmptyStringData && GetData()->m_nRefs < 0)
-            appTrace(_T("Warning: GetBuffer on locked FString creates unlocked FString!\n"));
+            appGeneral(_T("Warning: GetBuffer on locked FString creates unlocked FString!\n"));
 #endif
         // we have to grow the buffer
         CCStringData* pOldData = GetData();
@@ -268,10 +268,10 @@ TCHAR* CCString::GetBuffer(INT nMinBufLength)
         GetData()->m_nDataLength = nOldLen;
         CCString::Release(pOldData);
     }
-    appAssert(GetData()->m_nRefs <= 1);
+    assert(GetData()->m_nRefs <= 1);
 
     // return a pointer to the character storage for this string
-    appAssert(m_pchData != NULL);
+    assert(m_pchData != NULL);
     return m_pchData;
 }
 
@@ -286,7 +286,7 @@ void CCString::ReleaseBuffer(INT nNewLength)
     if (nNewLength == -1)
         nNewLength = (INT)appStrlen(m_pchData); // zero terminated
 
-    appAssert(nNewLength <= GetData()->m_nAllocLength);
+    assert(nNewLength <= GetData()->m_nAllocLength);
     GetData()->m_nDataLength = nNewLength;
     m_pchData[nNewLength] = _T('\0');
 }
@@ -297,7 +297,7 @@ void CCString::ReleaseBuffer(INT nNewLength)
 */
 TCHAR* CCString::GetBufferSetLength(INT nNewLength)
 {
-    appAssert(nNewLength >= 0);
+    assert(nNewLength >= 0);
 
     GetBuffer(nNewLength);
     GetData()->m_nDataLength = nNewLength;
@@ -311,16 +311,16 @@ TCHAR* CCString::GetBufferSetLength(INT nNewLength)
 */
 void CCString::FreeExtra()
 {
-    appAssert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
+    assert(GetData()->m_nDataLength <= GetData()->m_nAllocLength);
     if (GetData()->m_nDataLength != GetData()->m_nAllocLength)
     {
         CCStringData* pOldData = GetData();
         AllocBuffer(GetData()->m_nDataLength);
         memcpy(m_pchData, pOldData->Data(), pOldData->m_nDataLength * sizeof(TCHAR));
-        appAssert(_T('\0') == m_pchData[GetData()->m_nDataLength]);
+        assert(_T('\0') == m_pchData[GetData()->m_nDataLength]);
         CCString::Release(pOldData);
     }
-    appAssert(GetData() != NULL);
+    assert(GetData() != NULL);
 }
 
 /**
@@ -329,7 +329,7 @@ void CCString::FreeExtra()
 */
 void CCString::UnlockBuffer()
 {
-    appAssert(GetData()->m_nRefs == -1);
+    assert(GetData()->m_nRefs == -1);
     if (GetData() != _EmptyStringData)
         GetData()->m_nRefs = 1;
 }
@@ -431,7 +431,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
             for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
                 ;
         }
-        appAssert(nWidth >= 0);
+        assert(nWidth >= 0);
 
         INT nPrecision = 0;
         if (*lpsz == _T('.'))
@@ -451,7 +451,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                 for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
                     ;
             }
-            appAssert(nPrecision >= 0);
+            assert(nPrecision >= 0);
         }
 
         // now should be on specifier
@@ -542,7 +542,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                 break;
 
             default:
-                appAssert(FALSE);  // unknown formatting option
+                assert(FALSE);  // unknown formatting option
             }
         }
 
@@ -748,7 +748,7 @@ INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
             }
             lpszStart += lstrlen(lpszStart) + 1; //appStrlen different from lstrlen?
         }
-        appAssert(m_pchData[nNewLength] == _T('\0'));
+        assert(m_pchData[nNewLength] == _T('\0'));
         GetData()->m_nDataLength = nNewLength;
     }
 

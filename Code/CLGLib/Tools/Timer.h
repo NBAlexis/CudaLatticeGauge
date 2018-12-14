@@ -16,7 +16,7 @@ __BEGIN_NAMESPACE
 class CLGAPI CTimer
 {
 public:
-    CTimer(const STRING& sId = _T(""), const bool bReport = false)
+    CTimer(const CCString& sId = _T(""), const bool bReport = false)
         : m_bStarted(FALSE)
         , m_fStart(0.0F)
         , m_fElapsed(0.0F)
@@ -79,7 +79,7 @@ private:
     FLOAT m_fStart;
     FLOAT m_fElapsed;
     DWORD m_dwCounter;
-    STRING m_sId;
+    CCString m_sId;
     BOOL m_bReportOnExit;
 };
 

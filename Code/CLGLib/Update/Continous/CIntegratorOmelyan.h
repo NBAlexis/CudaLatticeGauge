@@ -2,7 +2,7 @@
 // FILENAME : CIntegratorOmelyan.h
 // 
 // DESCRIPTION:
-// This is the class for hibrid Monte Carlo
+// This is the Omelyan integrator for HMC
 //
 // REVISION:
 //  [12/12/2018 nbale]

@@ -13,49 +13,54 @@ __BEGIN_NAMESPACE
 
 #pragma region CParameters
 
-void CParameters::Dump(const STRING& indent) const
+void CParameters::Dump(const CCString& indent) const
 {
-    appGeneral("%sScalar<string>:\n", indent.c_str());
-    if (m_pStrings.size() == 0)
+    appGeneral(_T("%sScalar<string>:\n"), indent.c_str());
+    TArray<CCString> allKeys = m_pStrings.GetAllKeys();
+    if (m_pStrings.GetCount() == 0)
     {
-        appGeneral("%s  (none)\n", indent.c_str());
+        appGeneral(_T("%s  (none)\n"), indent.c_str());
     }
     else 
     {
-        for (std::map<STRING, STRING>::const_iterator p = m_pStrings.begin(); p != m_pStrings.end(); ++p)
+        for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral("%s  key = %s\tvalue = %s\n", indent.c_str(), p->first.c_str(), p->second.c_str());
+            appGeneral(_T("%s  key = %s\tvalue = %s\n"), indent.c_str(), allKeys[i].c_str(), m_pStrings.GetAt(allKeys[i]).c_str());
         }
     }
 
-    appGeneral("%sVector<string>:\n", indent.c_str());
-    if (m_pStringVector.size() == 0)
+    appGeneral(_T("%sVector<string>:\n"), indent.c_str());
+    allKeys = m_pStringVector.GetAllKeys();
+    if (allKeys.Num() == 0)
     {
-        appGeneral("%s  (none)\n", indent.c_str());
+        appGeneral(_T("%s  (none)\n"), indent.c_str());
     }
     else 
     {
-        for (std::map<STRING, std::vector<STRING> >::const_iterator p = m_pStringVector.begin(); p != m_pStringVector.end(); ++p)
+        for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral("%s  key = %s\tvalue = [ ", indent.c_str(), p->first.c_str());
-            for (size_t i = 0; i < p->second.size(); ++i) 
+            appGeneral(_T("%s  key = %s\tvalue = [ "), indent, allKeys[i]);
+            TArray<CCString> thevalues = m_pStringVector.GetAt(allKeys[i]);
+            for (INT j = 0; j < thevalues.Num(); ++j)
             {
-                appGeneral("%s, ", p->second[i].c_str());
+                appGeneral(_T("%s, "), thevalues[j]);
             }
-            appGeneral("]\n");
+            appGeneral(_T("]\n"));
         }
     }
 
-    appGeneral("%sParameters:\n", indent.c_str());
-    if (m_pParameters.size() == 0)
+    appGeneral(_T("%sParameters:\n"), indent);
+    allKeys = m_pParameters.GetAllKeys();
+    if (allKeys.Num() == 0)
     {
-        appGeneral("%s  (none)\n", indent.c_str());
+        appGeneral(_T("%s  (none)\n"), indent);
     }
-    else {
-        for (std::map<STRING, CParameters>::const_iterator p = m_pParameters.begin(); p != m_pParameters.end(); ++p)
+    else 
+    {
+        for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral("%s  key = %s, value:\n", indent.c_str(), p->first.c_str());
-            p->second.Dump(indent + "    ");
+            appGeneral(_T("%s  key = %s, value:\n"), indent, allKeys[i]);
+            m_pParameters.GetAt(allKeys[i]).Dump(indent + _T("    "));
         }
     }
 }
@@ -71,7 +76,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
     const size_t buf_size = 1024;
     TCHAR buf[buf_size];
 
-    typedef std::pair<STRING, CParameters*> env_t;
+    typedef std::pair<CCString, CParameters*> env_t;
     typedef std::pair<INT, env_t> level_t;
     typedef std::stack<level_t> stack_t;
 
@@ -84,7 +89,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
 
     while (iss.getline(buf, buf_size))
     {
-        STRING key, value;
+        CCString key, value;
 
         INT indent = ParseLine(buf, key, value);
 
@@ -118,10 +123,10 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
                 level_t lv = levels.top();
                 levels.pop();
 
-                STRING     key_s = lv.second.first;
+                CCString     key_s = lv.second.first;
                 CParameters *stored_params = lv.second.second;
 
-                stored_params->SetStringVaule(key_s, STRING()); //NULL STRING
+                stored_params->SetStringVaule(key_s, CCString()); //NULL STRING
                 current_params = stored_params;
                 current_indent = lv.first;
 
@@ -135,7 +140,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
                     level_t lv = levels.top();
                     levels.pop();
 
-                    STRING     key_s = lv.second.first;
+                    CCString     key_s = lv.second.first;
                     CParameters *stored_params = lv.second.second;
                     
                     stored_params->SetParameterVaule(key_s, *current_params);
@@ -153,21 +158,21 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
         }
 
         // store key-value
-        if (value.length() > 0) 
+        if (value.GetLength() > 0) 
         {
-            if (value[0] == '[') 
+            if (value[0] == _T('['))
             {
-                memset(buf, '\0', buf_size);
-                appStrcpy(buf, buf_size, value.c_str());
+                memset(buf, _T('\0'), buf_size);
+                appStrcpy(buf, buf_size, value);
                 //value.copy(buf, buf_size);  // reuse buffer
 
-                std::vector<STRING> v;
+                TArray<CCString> v;
 
                 INT nvalues = ParseVector(buf, v);
 
                 if (nvalues < 0) 
                 {
-                    appGeneral("YAMLParser: ERROR: parse_vector failed.\n");
+                    appGeneral(_T("YAMLParser: ERROR: parse_vector failed.\n"));
                     continue;
                 }
 
@@ -195,7 +200,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
         level_t lv = levels.top();
         levels.pop();
 
-        STRING     key = lv.second.first;
+        CCString     key = lv.second.first;
         CParameters *stored_params = lv.second.second;
 
         stored_params->SetParameterVaule(key, *current_params);
@@ -209,7 +214,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
     return retv;
 }
 
-INT CYAMLParser::ParseLine(TCHAR *buf, STRING& key, STRING& value)
+INT CYAMLParser::ParseLine(TCHAR *buf, CCString& key, CCString& value)
 {
     // N.B. buf modified on exit.
 
@@ -240,8 +245,8 @@ INT CYAMLParser::ParseLine(TCHAR *buf, STRING& key, STRING& value)
 
     if (!q) 
     {
-        key = STRING();
-        value = STRING();
+        key = _T("");
+        value = _T("");
 
         return -1;
     }
@@ -256,7 +261,7 @@ INT CYAMLParser::ParseLine(TCHAR *buf, STRING& key, STRING& value)
         *r-- = _T('\0');
     }
 
-    key = STRING(p);
+    key = CCString(p);
 
     // find value
     ++q;
@@ -265,13 +270,13 @@ INT CYAMLParser::ParseLine(TCHAR *buf, STRING& key, STRING& value)
         ++q;
     }
 
-    value = STRING(q);
+    value = CCString(q);
 
     // return indent
     return indent;
 }
 
-INT CYAMLParser::ParseVector(TCHAR *buf, std::vector<STRING>& vec)
+INT CYAMLParser::ParseVector(TCHAR *buf, TArray<CCString>& vec)
 {
     // N.B. buf modified on exit.
     const TCHAR sep = _T(',');
@@ -309,7 +314,7 @@ INT CYAMLParser::ParseVector(TCHAR *buf, std::vector<STRING>& vec)
                 *r-- = _T('\0');
             }
 
-            vec.push_back(STRING(p));
+            vec.AddItem(CCString(p));
             ++count;
 
             // go to next item
@@ -327,7 +332,7 @@ INT CYAMLParser::ParseVector(TCHAR *buf, std::vector<STRING>& vec)
             }
 
             if (appStrlen(p) > 0) {
-                vec.push_back(STRING(p));
+                vec.AddItem(CCString(p));
                 ++count;
             }
             else 
@@ -342,15 +347,15 @@ INT CYAMLParser::ParseVector(TCHAR *buf, std::vector<STRING>& vec)
     return count;
 }
 
-void CYAMLParser::ParseFile(const STRING& params_file, CParameters& params)
+void CYAMLParser::ParseFile(const CCString& params_file, CParameters& params)
 {
     INT  filesize = 0;
     TCHAR *buf = 0;
 
-    IFSTREAM fin(params_file.c_str());
+    IFSTREAM fin(params_file);
     if (!fin) 
     {
-        appCrucial("Error at YAML: unable to read parameter file: %s.\n", params_file.c_str());
+        appCrucial(_T("Error at YAML: unable to read parameter file: %s.\n"), params_file.c_str());
     }
 
     fin.seekg(0, std::ios::end);
@@ -359,7 +364,7 @@ void CYAMLParser::ParseFile(const STRING& params_file, CParameters& params)
 
     INT padding = 8 - (filesize % 8);
 
-    appParanoiac("YAML::read_params: filesize = %d, padding = %d\n", filesize, padding);
+    appParanoiac(_T("YAML::read_params: filesize = %d, padding = %d\n"), filesize, padding);
 
     filesize += padding;
 

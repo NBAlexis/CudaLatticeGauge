@@ -17,7 +17,7 @@ __BEGIN_NAMESPACE
 class CLGAPI CFieldGauge : public CField
 {
 public:
-    CFieldGauge(CLatticeData* pLattice) : CField(pLattice) 
+    CFieldGauge() : CField()
     { 
         ;
     }

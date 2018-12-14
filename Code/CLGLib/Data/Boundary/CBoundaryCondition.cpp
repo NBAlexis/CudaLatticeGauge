@@ -12,13 +12,6 @@
 
 __BEGIN_NAMESPACE
 
-__device__ 
-CBoundaryCondition::CBoundaryCondition(class CIndex * pOwner)
-    : m_pOwner(pOwner)
-    , m_pLattice(pOwner->GetOwner())
-{
-    ;
-}
 
 __END_NAMESPACE
 

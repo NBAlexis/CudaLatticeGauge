@@ -43,9 +43,9 @@ __device__ static __inline__ cuComplexI cuCmulI(const cuComplexI& a, const cuCom
 __device__ static __inline__ cuComplex cuCmulI(const cuComplex& a, const cuComplexI& b) { return make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
 __device__ static __inline__ cuComplex cuCmulI(const cuComplexI& a, const cuComplex& b) { return make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
 
-__device__ static __inline__ FLOAT cuCabsI(const cuComplexI& x) { return sqrt(x.x * x.x + x.y * x.y); }
+__device__ static __inline__ FLOAT cuCabsI(const cuComplexI& x) { return sqrtf((FLOAT)(x.x * x.x + x.y * x.y)); }
 
-__device__ static __inline__ cuComplex cuCItoF(const cuComplexI& x) { return make_cuComplex(x.x, x.y); }
+__device__ static __inline__ cuComplex cuCItoF(const cuComplexI& x) { return make_cuComplex((FLOAT)x.x, (FLOAT)x.y); }
 
 __END_NAMESPACE
 

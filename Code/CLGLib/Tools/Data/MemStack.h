@@ -53,9 +53,9 @@ public:
             Align = m_iDefaultAlignment;
 
         // Debug checks.
-        appAssert(AllocSize>=0);
-        appAssert((Align&(Align-1))==0);
-        appAssert(m_pTop<=m_pEnd);
+        assert(AllocSize>=0);
+        assert((Align&(Align-1))==0);
+        assert(m_pTop<=m_pEnd);
 
         // Try to get memory from the current chunk.
         BYTE* pResult = (BYTE *)(((PTRINT)(m_pTop)+(Align-1))&~(Align-1));

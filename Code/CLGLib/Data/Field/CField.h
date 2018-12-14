@@ -13,21 +13,26 @@
 
 __BEGIN_NAMESPACE
 
-enum EFieldInitialType
-{
+__DEFINE_ENUM(EFieldInitialType,
+
     EFIT_Zero,
     EFIT_Identity,
     EFIT_Random,
     EFIT_RandomGenerator,
-};
+    EFIT_ReadFromFile,
 
-class CLGAPI CField
+    EFIT_ForceDWORD = 0x7fffffff,
+    )
+
+
+class CLGAPI CField : public CBase
 {
 public:
 
-    CField(CLatticeData* pLattice);
+    CField() : CBase(), m_pOwner(NULL) { ; }
 
     virtual EFieldType GetFieldType() const = 0;
+    virtual void InitialField(EFieldInitialType eInitialType) = 0;
 
 #pragma region BLAS
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
@@ -53,10 +58,7 @@ public:
 
 #pragma endregion HMC
 
-protected:
-
-    CLatticeData* m_pOwner;
-    CDeviceLattice* m_pLattice;
+    class CLatticeData* m_pOwner;
 };
 
 __END_NAMESPACE

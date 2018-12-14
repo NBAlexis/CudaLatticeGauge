@@ -12,29 +12,41 @@
 __BEGIN_NAMESPACE
 
 __global__ 
-void _kernalAllocateSeedTable(UINT uiSeed, CDeviceLattice* pLattice, CRandomSchrage* pRandom)
+void _kernalAllocateSeedTable(UINT* pDevicePtr)
 {
     intokernal;
+
+    UINT uiSeed = _DC_Seed;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
         coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
+        for (UINT idir = 0; idir < uiDir + 1; ++idir)
         {
-            UINT fatIndex = _deviceGetFatIndex(pLattice, coord, idir + 1);
+            UINT fatIndex = _deviceGetFatIndex(coord, idir);
 
-            pRandom->_deviceAsignSeeds(uiSeed, fatIndex);
+            CRandomSchrage::_deviceAsignSeeds(pDevicePtr, uiSeed, fatIndex);
         }
     }
 }
 
-CRandomSchrage::CRandomSchrage(UINT uiSeed, CDeviceLattice* pDeviceLattice)
-    : m_pOwner(pDeviceLattice)
-{
-    preparethread;
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * pLattice->m_uiVolumn * (pLattice->m_uiDir + 1)));
+extern "C" {
+    void _callKernelInitialRandomTable(UINT* devicePtr)
+    {
+        preparethread;
+        _kernalAllocateSeedTable << <block, threads >> > (devicePtr);
+    }
+}
 
-    _kernalAllocateSeedTable << <block, threads>> > (uiSeed, pDeviceLattice, this);
+CRandomSchrage::CRandomSchrage(UINT uiSeed)
+{
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
+    _callKernelInitialRandomTable(m_pDeviceSeedTable);
+}
+
+CRandomSchrage::~CRandomSchrage()
+{
+    checkCudaErrors(cudaFree(m_pDeviceSeedTable));
 }
 
 __END_NAMESPACE

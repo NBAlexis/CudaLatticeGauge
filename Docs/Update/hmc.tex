@@ -1,6 +1,6 @@
-\subsection{\label{hmc}\index{hmc}hmc}
+\subsection{\label{hmc}\index{hmc}HMC}
 
-HMC is short for hybrid Monte Carlo.
+HMC is abbreviation for hybrid Monte Carlo.
 
 \subsubsection{\label{hmc_scheme}Basic idea}
 
@@ -125,7 +125,7 @@ for (int i = 1; i < steps + 1; ++i)
 
 \subsubsection{\label{Omelyan}\index{Omelyan}Omelyan integrator}
 
-The Omelyan integrator can be simply written as
+The Omelyan integrator can be simply written as (c.f. Eq.~(2.80) of Ref.~\cite{latticeqcdbook2017})
 \begin{equation}
 \begin{split}
 &P_{\lambda\epsilon}\circ U_{\frac{1}{2}\epsilon}\circ P_{(1-2\lambda)\epsilon}\circ U_{\frac{1}{2}\epsilon}\circ P_{\lambda\epsilon}\left(P_0,U_0\right)
