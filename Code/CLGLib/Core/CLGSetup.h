@@ -23,6 +23,10 @@
 //Ignore _MSC_VER, which is just for Visual Studio IDE specific, and should be harmless
 #define _CLG_WIN 1
 
+//_CLG_DOUBLEFLOAT = 0 or 1. 
+//Note that single float is rarely the problem for accuracy, but much much faster
+#define _CLG_DOUBLEFLOAT 0
+
 #endif //#ifndef _CLGSETUP_H_
 
 //=============================================================================

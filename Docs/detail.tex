@@ -53,13 +53,48 @@
 
 \clearpage
 
+\lstset{
+    numbers=left,
+    numberstyle= \tiny,
+    keywordstyle= \color{ blue!70},
+    commentstyle= \color{red!50!green!50!blue!50},
+    frame=single,
+    rulesepcolor= \color{ red!20!green!20!blue!20} ,
+    escapeinside=``,
+    xleftmargin=2em,xrightmargin=2em, aboveskip=1em,
+    framexleftmargin=2em,
+    language=c++,
+    breaklines=true,
+    columns=fullflexible,
+    captionpos=b,
+    basicstyle=\footnotesize\ttfamily,
+}
+
 \section{\label{data}Data}
 
 \input "data/index.tex"
 
+\input "data/parameters.tex"
+
+\clearpage
+
 \section{\label{update}Update scheme}
 
 \input "update/hmc.tex"
+
+\clearpage
+
+\section{\label{Programming}Programming}
+
+\input "programming/cuda.tex"
+
+\clearpage
+
+\section{\label{Testing}Testing}
+
+\input "tests/testRandom.tex"
+
+\clearpage
 
 \printindex
 

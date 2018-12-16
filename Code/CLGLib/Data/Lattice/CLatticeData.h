@@ -24,7 +24,7 @@ __BEGIN_NAMESPACE
 //    //UINT m_uiDim;
 //    //UINT m_uiDir;
 //    //UINT m_uiTLength;
-//    //FLOAT m_fBeta;
+//    //Real m_fBeta;
 //    //UINT m_uiLatticeLength[CCommonData::kMaxDim];
 //    //UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
 //    //UINT m_uiLatticeMultipy[CCommonData::kMaxDim - 1];
@@ -63,7 +63,7 @@ public:
     //UINT m_uiLatticeLength[CCommonData::kMaxDim];
     //UINT m_uiTLength; //this is special because T dir is not decomposed to thread blocks
     //UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
-    //FLOAT m_fBeta;
+    //Real m_fBeta;
 
     /*
     * SU3(x=(x,y,z,t))_{n=a*3+b}=
@@ -85,10 +85,12 @@ public:
     //class CField* m_pFields[CCommonData::kMaxFieldCount];
     class CRandom* m_pRandom;
     class CRandomSchrage* m_pRandomSchrage;
-    class CIndex* m_pIndex;
 
     class CFieldGauge* m_pGaugeField;
     class CFieldGauge* m_pGaugeFieldStaple;
+
+    TArray<class CAction*> m_pActionList;
+    class CUpdator* m_pUpdator;
 
     //this is a device copy
     //see:
@@ -99,6 +101,10 @@ public:
 
     class CFieldGauge* m_pDeviceGaugeField;
     class CFieldGauge* m_pDeviceGaugeFieldStaple;
+
+    //same as CAction* m_pDeviceActionList[]
+    //class CAction** m_pDeviceActionList;
+    
 };
 
 

@@ -28,6 +28,9 @@
   <ItemGroup>
     <ClInclude Include="CudaHelper.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="oldcode.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B4269890-49D2-4BE5-BA4F-B8635EA9795D}</ProjectGuid>

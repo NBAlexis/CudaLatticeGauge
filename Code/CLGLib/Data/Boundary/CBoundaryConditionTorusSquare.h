@@ -13,13 +13,12 @@
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CBoundaryConditionTorusSquare : public CBoundaryCondition
+class CLGAPI CBoundaryConditionTorusSquare : public deviceBoundaryCondition
 {
-    __CLGDECLARE_CLASS(CBoundaryConditionTorusSquare)
 
 public:
 
-    CBoundaryConditionTorusSquare() : CBoundaryCondition() { ; }
+    __device__ CBoundaryConditionTorusSquare() : deviceBoundaryCondition() { ; }
 
     __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
 };

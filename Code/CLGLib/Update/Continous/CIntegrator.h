@@ -21,20 +21,38 @@ __DEFINE_ENUM(EIntegratorType,
     EIT_ForceDWORD = 0x7fffffff,
     )
 
-class CLGAPI CIntegrator
+class CLGAPI CIntegrator : public CBase
 {
 public:
-    CIntegrator(class CHMC* pOwner);
-    virtual void Evaluate() = 0;
+    CIntegrator() 
+        : m_uiStepCount(1)
+        , m_fEStep(0)
+        , m_pOwner(NULL)
+        , m_pLattice(NULL)
+        , m_pGaugeField(NULL)
+        , m_pForceField(NULL)
+        , m_pMomentumField(NULL)
+        , m_pStapleField(NULL)
+        , m_bPCached(FALSE)
+    { ; }
 
-    //std::vector<CAction*>
+    ~CIntegrator();
+
+    virtual void Evaluate() = 0;
+    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    void Accept();
+    void Prepare(UBOOL bLastAccepted);
+    void UpdateP(Real fStep);
+    void UpdateU(Real fStep);
+    virtual Real GetEnergy();
 
 protected:
 
     UBOOL m_bPCached;
-    UINT m_uiExpPrecision;
-    FLOAT m_fEStep;
+    Real m_fEStep;
     UINT m_uiStepCount;
+
+    Real m_fUpdateResultEnery;
 
     CFieldGauge* m_pGaugeField;
     CFieldGauge* m_pForceField;
@@ -43,13 +61,7 @@ protected:
 
     class CHMC* m_pOwner;
     CLatticeData* m_pLattice;
-    CDeviceLattice* m_pDeviceLattice;
     TArray<class CAction*> m_lstActions;
-
-    virtual void Initial(const TArray<class CAction*>& actionList, UINT uiStepCount, UINT uiExpPrecision);
-    void Prepare();
-    void UpdateP(FLOAT fStep);
-    void UpdateU(FLOAT fStep);
 };
 
 __END_NAMESPACE

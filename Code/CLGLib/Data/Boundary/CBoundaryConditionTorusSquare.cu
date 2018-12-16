@@ -12,8 +12,6 @@
 
 __BEGIN_NAMESPACE
 
-__CLGIMPLEMENT_CLASS(CBoundaryConditionTorusSquare)
-
 __device__ 
 uint2 CBoundaryConditionTorusSquare::_devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const
 {

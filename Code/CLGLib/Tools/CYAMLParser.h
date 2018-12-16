@@ -95,7 +95,7 @@ public:
 
     _FetchFunction(INT)
 
-    _FetchFunction(FLOAT)
+    _FetchFunction(Real)
 
     UBOOL FetchStringValue(const CCString& key, CCString& value) const
     {
@@ -109,7 +109,7 @@ public:
 
     _FetchFunctionArray(INT)
 
-    _FetchFunctionArray(FLOAT)
+    _FetchFunctionArray(Real)
 
     UBOOL FetchStringVectorValue(const CCString& key, TArray<CCString>& value) const
     {

@@ -64,25 +64,12 @@ extern "C" void* __cdecl _alloca(SIZE_T);
 
 __BEGIN_NAMESPACE
 
-FORCEINLINE DWORD appGetCycles() 
-{
-    LARGE_INTEGER ret;
-    QueryPerformanceFrequency(&ret); 
-    return ret.LowPart;
-}
-
-FORCEINLINE void appStartTimer(DWORD& timer) { timer -= appGetCycles(); }
-FORCEINLINE void appEndTimer(DWORD& timer) { timer += appGetCycles(); }
-FORCEINLINE FLOAT appGetTime() { return static_cast<FLOAT>(appGetCycles()) * 0.001f; }
-
 FORCEINLINE UINT appGetTimeStamp(void)
 {
     return static_cast<UINT>(time(0));
 }
 
 __END_NAMESPACE
-
-#define appGetSystemTime()		::GetTickCount()
 
 #pragma endregion Time functions
 

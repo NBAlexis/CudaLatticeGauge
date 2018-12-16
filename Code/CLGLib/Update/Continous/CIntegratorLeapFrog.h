@@ -15,6 +15,7 @@ __BEGIN_NAMESPACE
 
 class CLGAPI CIntegratorLeapFrog : public CIntegrator
 {
+    __CLGDECLARE_CLASS(CIntegratorLeapFrog)
 public:
 
     /**
@@ -23,7 +24,7 @@ public:
     */
     virtual void Evaluate()
     {
-        FLOAT fHalfPstep = 0.5f * m_fEStep;
+        Real fHalfPstep = 0.5f * m_fEStep;
 
         if (m_uiStepCount > 0)
         {

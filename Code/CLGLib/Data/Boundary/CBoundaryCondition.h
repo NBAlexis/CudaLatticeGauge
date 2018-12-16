@@ -20,11 +20,16 @@ __DEFINE_ENUM(EBoundaryCondition,
     EBC_ForceDWORD = 0x7fffffff,
     )
 
-class CLGAPI CBoundaryCondition : public CBase
+
+extern "C" { extern void _cCreateBC(void** devicePtr, UINT* size, EBoundaryCondition eBC); }
+
+//Device virtual function must be create on device
+//NOTE: For thoes class which has to create on device, NOT support factory yet.
+class CLGAPI deviceBoundaryCondition
 {
 public:
 
-    CBoundaryCondition() : m_pOwner(NULL)
+    __device__ deviceBoundaryCondition()
     {
         ;
     }
@@ -34,7 +39,6 @@ public:
     */
     __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const = 0;
 
-    class CLatticeData* m_pOwner;
 };
 
 __END_NAMESPACE

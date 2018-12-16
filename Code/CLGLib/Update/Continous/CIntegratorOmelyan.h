@@ -11,12 +11,13 @@
 #ifndef _CINTEGRATOROMELYAN_H_
 #define _CINTEGRATOROMELYAN_H_
 
-#define OmelyanLambda (0.19318332750378364f)
+#define OmelyanLambda ((Real)0.19318332750378364)
 
 __BEGIN_NAMESPACE
 
 class CLGAPI CIntegratorOmelyan : public CIntegrator
 {
+    __CLGDECLARE_CLASS(CIntegratorOmelyan)
 public:
 
     /**
@@ -25,7 +26,7 @@ public:
     */
     virtual void Evaluate()
     {
-        FLOAT fHalfEstep = 0.5f * m_fEStep;
+        Real fHalfEstep = 0.5f * m_fEStep;
         appGeneral("  Omelyan sub step 0\n");
         UpdateP(OmelyanLambda * m_fEStep);
 

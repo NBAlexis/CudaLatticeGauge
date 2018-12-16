@@ -58,14 +58,15 @@
 #define _HC_Seed (appGetCudaHelper()->m_ConstIntegers[ECI_RandomSeed])
 #define _DC_ExpPrecision (_constIntegers[ECI_ExponentPrecision])
 #define _HC_ExpPrecision (appGetCudaHelper()->m_ConstIntegers[ECI_ExponentPrecision])
-#define _DC_IntegratorStep (_constIntegers[ECI_IntegratorStepCount])
-#define _HC_IntegratorStep (appGetCudaHelper()->m_ConstIntegers[ECI_IntegratorStepCount])
+
+#define _DC_ActionListL (_constIntegers[ECI_ActionListLength])
+#define _HC_ActionListL (appGetCudaHelper()->m_ConstIntegers[ECI_ActionListLength])
 
 #pragma endregion
 
 __BEGIN_NAMESPACE
 
-//enum { kLatticeDecompose = 3, kMaxDim = 4, kMaxFieldCount = 8, };
+enum { kMaxFieldCount = 8, kMaxActionCount = 8 };
 
 __DEFINE_ENUM(EFieldType,
 

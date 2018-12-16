@@ -40,11 +40,15 @@
 #	define CLGAPI  
 #endif
 
+
 #if _CLG_WIN
 #include "Platform/PlatformIncs.h"
 #include "Platform/WinDefine.h"
 #include "Platform/WinFunction.h"
 #endif
+
+#include "Core/CudaHelperFunctions.h"
+#include "Core/CLGFloat.h"
 
 #include "Tools/Data/CLinkedList.h"
 #include "Tools/Data/TemplateFunctions.h"
@@ -61,7 +65,6 @@
 #include "Tools/CYAMLParser.h"
 
 #include "Core/CBase.h"
-#include "Core/CudaHelperFunctions.h"
 #include "Core/CudaHelper.h"
 
 

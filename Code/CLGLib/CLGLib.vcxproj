@@ -23,6 +23,7 @@
     <ClInclude Include="CLGLib_Private.h" />
     <ClInclude Include="Core\CBase.h" />
     <ClInclude Include="Core\CLGDefine.h" />
+    <ClInclude Include="Core\CLGFloat.h" />
     <ClInclude Include="Core\CLGLibManager.h" />
     <ClInclude Include="Core\CLGSetup.h" />
     <ClInclude Include="Core\CudaHelper.h" />
@@ -77,19 +78,22 @@
     <CudaCompile Include="Core\CudaHelper.cu">
       <FileType>Document</FileType>
     </CudaCompile>
-    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp" />
-    <CudaCompile Include="Data\Field\CField.cu" />
-    <ClCompile Include="Data\Lattice\CLatticeData.cpp">
+    <CudaCompile Include="Data\Boundary\CBoundaryCondition.cu">
       <FileType>Document</FileType>
-    </ClCompile>
+    </CudaCompile>
+    <ClCompile Include="Data\Field\CField.cpp" />
+    <CudaCompile Include="Data\Lattice\CLatticeData.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClCompile Include="Platform\WinFunction.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
+    <CudaCompile Include="Data\Lattice\CIndex.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Tools\Data\CCString.cpp" />
     <ClCompile Include="Tools\Tracer.cpp" />
-    <CudaCompile Include="Update\Continous\CHMC.cu" />
+    <ClCompile Include="Update\Continous\CHMC.cpp" />
     <CudaCompile Include="Update\Continous\CIntegrator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -105,7 +109,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cu" />
+    <ClCompile Include="Data\Action\CActionGaugePlaquette.cpp">
+      <FileType>Document</FileType>
+    </ClCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu" />
     <CudaCompile Include="Data\Lattice\CIndexSquare.cu" />
@@ -206,7 +212,7 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
       <Defines>WIN32</Defines>
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
@@ -243,7 +249,7 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_35,sm_35;compute_37,sm_37;compute_50,sm_50;compute_52,sm_52;compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
       <Defines>WIN32</Defines>
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>

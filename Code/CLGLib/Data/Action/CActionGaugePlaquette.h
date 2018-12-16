@@ -15,19 +15,20 @@ __BEGIN_NAMESPACE
 
 class CLGAPI CActionGaugePlaquette : public CAction
 {
+    __CLGDECLARE_CLASS(CActionGaugePlaquette)
 public:
     /**
     * Make sure this is called after lattice and fields are created.
     */
     CActionGaugePlaquette();
 
-    virtual FLOAT Energy() { return 0.0f; }
-    virtual void Prepare() { ; }
+    virtual Real Energy(class CFieldGauge* pGauge) const;
+    virtual void Initial(class CLatticeData* pOwner, const CParameters& param);
     virtual void CalculateForceOnGauge(class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
 
 protected:
 
-    cuComplex m_cMinusBetaOverN;
+    _Complex m_cMinusBetaOverN;
 };
 
 __END_NAMESPACE

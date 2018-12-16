@@ -35,7 +35,7 @@
 #undef WORD
 #undef DWORD
 #undef INT
-#undef FLOAT
+#undef Real
 #undef VOID
 
 #define VOID    void

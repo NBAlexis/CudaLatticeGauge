@@ -39,6 +39,28 @@ FORCEINLINE INT appStrToINT(const TCHAR* s)
     return _appStrtol(p, &p, base);
 }
 
+FORCEINLINE Real appStrToReal(const TCHAR* s)
+{
+    TCHAR *ending;
+
+#if UNICODE
+    std::wstring str_val(s);
+#else
+    std::string str_val(s);
+#endif
+#if _CLG_DOUBLEFLOAT
+    Real converted_value = _appStrtod(str_val.c_str(), &ending);
+#else
+    Real converted_value = _appStrtof(str_val.c_str(), &ending);
+#endif
+    if (*ending != 0)
+    {
+        printf(_T("String to float failed! string: %s"), s);
+        return 0.0f;
+    }
+    return converted_value;
+}
+
 FORCEINLINE FLOAT appStrToFLOAT(const TCHAR* s)
 {
     TCHAR *ending;
@@ -722,13 +744,13 @@ inline CCString appIntToString(QWORD inInta)
 /**
 *
 */
-inline CCString appFloatToString(FLOAT inFloata, INT inPrecesion = 4)
+inline CCString appFloatToString(Real inFloata, INT inPrecesion = 4)
 {
     if (inPrecesion < 1)
         inPrecesion = 8;
 
     INT inUp = (INT)(inFloata);
-    FLOAT infDown = (inFloata -   (FLOAT)(inUp));
+    Real infDown = (inFloata -   (Real)(inUp));
     infDown = infDown < 0.0f ? (infDown * -1.f) : infDown;
     for (INT i = 0; i < inPrecesion; ++i)
         infDown *= 10.f;
@@ -845,7 +867,7 @@ inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
         // adjust nItemLen for strings
         if (!bString)
         {
-            FLOAT f = 0.0f;
+            Real f = 0.0f;
             DOUBLE df = 0.0;
             void * p = NULL;
             PTRINT ipoint = 0;
@@ -867,14 +889,14 @@ inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
             case _T('e'):
             case _T('g'):
             case _T('G'):
-                df = va_arg(argList, FLOAT);
-                f = (FLOAT)(df);
+                df = va_arg(argList, Real);
+                f = (Real)(df);
                 outString += appFloatToString( f, nPrecision );
                 //todo:: nWidth and precision
                 break;
 
             case _T('f'):
-                f = va_arg(argList, FLOAT);
+                f = va_arg(argList, Real);
                 outString += appFloatToString( f, nPrecision );
                 break;
 

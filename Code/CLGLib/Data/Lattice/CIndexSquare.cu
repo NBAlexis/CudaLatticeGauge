@@ -11,8 +11,6 @@
 
 __BEGIN_NAMESPACE
 
-__CLGIMPLEMENT_CLASS(CIndexSquare)
-
 /**
 * For square lattice, we assume dimenssion = direction
 * bdir, mu: bond direction, or link direction

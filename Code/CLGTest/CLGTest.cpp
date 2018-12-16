@@ -11,8 +11,14 @@
 
 int main(int argc, char * argv[])
 {
+    CTimer timer;
+    timer.Start();
+
     appInitialCLG(_T("TestSuit.yaml"));
 
+    timer.Stop();
+    appGeneral(_T("\n =========== CLG Lib Initialed, cost: %f(ms)\n\n"), timer.Elapsed());
+    timer.Reset();
     
 
     //CCommonData::InitialWithDefault();
@@ -59,6 +65,19 @@ int main(int argc, char * argv[])
 
     //appSafeDelete(field);
     //CLatticeData::Release();
+
+    //appGetLattice()->m_pGaugeField->DebugPrintMe();
+
+    UINT iErrors = 0;
+    timer.Start();
+    iErrors += TestRandom();
+
+    
+    //test update
+    appGetLattice()->m_pUpdator->Update(10);
+
+    timer.Stop();
+    appGeneral(_T("\n =========== CLG Test Finished, errors: %d, cost: %f(ms)\n"), iErrors, timer.Elapsed());
 
     appGeneral(_T("\nPress any key to quit\n"));
     CIN.get();

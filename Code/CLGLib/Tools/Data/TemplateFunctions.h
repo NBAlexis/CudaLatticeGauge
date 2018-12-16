@@ -55,7 +55,7 @@ template< class T > FORCEINLINE void appExchange( T& A, T& B )
     A = B;
     B = Temp;
 }
-template< class T > FORCEINLINE T appLerp( T& A, T& B, FLOAT Alpha )
+template< class T > FORCEINLINE T appLerp( T& A, T& B, Real Alpha )
 {
     return (T)(A + Alpha * (B-A));
 }

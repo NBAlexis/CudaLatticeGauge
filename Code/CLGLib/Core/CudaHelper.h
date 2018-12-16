@@ -17,14 +17,16 @@ extern "C" bool runCudaTest(const int argc, const char **argv,
     char *data, int2 *data_int2, unsigned int len);
 
 
+enum { kSharedLength = 1024, };
+
 enum { kContentLength = 1024,};
 
 extern __constant__ UINT _constIntegers[kContentLength];
-extern __constant__ FLOAT _constFloats[kContentLength];
+extern __constant__ Real _constFloats[kContentLength];
 
 extern __constant__ class CRandom* __r;
 extern __constant__ class CRandomSchrage* __rs;
-
+extern __constant__ class CIndex* __idx;
 
 enum EConstIntId
 {
@@ -46,8 +48,8 @@ enum EConstIntId
     ECI_DecompLz,
     ECI_RandomSeed,
     ECI_ExponentPrecision,
-    ECI_IntegratorStepCount,
     ECI_UsingSchrageRandom,
+    ECI_ActionListLength,
 
     ECI_ForceDWORD = 0x7fffffff,
 };
@@ -63,18 +65,19 @@ public:
     CCudaHelper()
     {
         memset(m_ConstIntegers, 0, sizeof(UINT) * kContentLength);
-        memset(m_ConstFloats, 0, sizeof(FLOAT) * kContentLength);
+        memset(m_ConstFloats, 0, sizeof(Real) * kContentLength);
     }
 
     static void DeviceQuery();
     void CopyConstants() const;
-    void CopyRandomPointer(const class CRandom* r, const class CRandomSchrage* rs);
+    void CopyRandomPointer(const class CRandom* r, const class CRandomSchrage* rs) const;
+    void SetDeviceIndex(class CIndex** ppIdx) const;
     /**ret[0] = max thread count, ret[1,2,3] = max thread for x,y,z per block*/
     static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
 
 
     UINT m_ConstIntegers[kContentLength];
-    FLOAT m_ConstFloats[kContentLength];
+    Real m_ConstFloats[kContentLength];
 };
 
 __END_NAMESPACE

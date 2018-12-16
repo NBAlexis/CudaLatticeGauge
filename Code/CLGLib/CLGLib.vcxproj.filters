@@ -182,6 +182,9 @@
     <ClInclude Include="Core\CBase.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\CLGFloat.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -197,13 +200,13 @@
     <ClCompile Include="Tools\CYAMLParser.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
-      <Filter>Data\Boundary</Filter>
-    </ClCompile>
     <ClCompile Include="Tools\Data\CCString.cpp">
       <Filter>Tools\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Lattice\CLatticeData.cpp">
+    <ClCompile Include="Data\Boundary\CBoundaryCondition.cu">
+      <Filter>Data\Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Lattice\CLatticeData.cu">
       <Filter>Data\Lattice</Filter>
     </ClCompile>
   </ItemGroup>
@@ -220,20 +223,11 @@
     <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cu">
-      <Filter>Data\Action</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Lattice\CIndexSquare.cu">
       <Filter>Data\Lattice</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu">
       <Filter>Data\Boundary</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CField.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Update\Continous\CHMC.cu">
-      <Filter>Update\Continous</Filter>
     </CudaCompile>
     <CudaCompile Include="Update\Continous\CIntegrator.cpp">
       <Filter>Update\Continous</Filter>
@@ -243,6 +237,18 @@
     </CudaCompile>
     <CudaCompile Include="Core\CudaHelper.cu">
       <Filter>Core</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Update\Continous\CHMC.cpp">
+      <Filter>Update\Continous</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cpp">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Lattice\CIndex.cu">
+      <Filter>Data\Lattice</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CField.cpp">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

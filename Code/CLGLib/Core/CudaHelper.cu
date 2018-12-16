@@ -12,9 +12,11 @@
 __BEGIN_NAMESPACE
 
 __constant__ UINT _constIntegers[kContentLength];
-__constant__ FLOAT _constFloats[kContentLength];
+__constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
 __constant__ CRandomSchrage* __rs;
+__constant__ CIndex* __idx;
+
 
 void CCudaHelper::DeviceQuery()
 {
@@ -295,13 +297,18 @@ void CCudaHelper::DeviceQuery()
 void CCudaHelper::CopyConstants() const
 {
     checkCudaErrors(cudaMemcpyToSymbol(_constIntegers, m_ConstIntegers, sizeof(UINT) * kContentLength));
-    checkCudaErrors(cudaMemcpyToSymbol(_constFloats, m_ConstFloats, sizeof(FLOAT) * kContentLength));
+    checkCudaErrors(cudaMemcpyToSymbol(_constFloats, m_ConstFloats, sizeof(Real) * kContentLength));
 }
 
-void CCudaHelper::CopyRandomPointer(const CRandom* r, const CRandomSchrage* rs)
+void CCudaHelper::CopyRandomPointer(const CRandom* r, const CRandomSchrage* rs) const
 {
     checkCudaErrors(cudaMemcpyToSymbol(__r, &r, sizeof(CRandom*)));
     checkCudaErrors(cudaMemcpyToSymbol(__rs, &rs, sizeof(CRandomSchrage*)));
+}
+
+void CCudaHelper::SetDeviceIndex(class CIndex** ppIdx) const
+{
+    checkCudaErrors(cudaMemcpyToSymbol(__idx, ppIdx, sizeof(CIndex*)));
 }
 
 TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
@@ -329,7 +336,8 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     cudaDeviceProp deviceProp;
     cudaGetDeviceProperties(&deviceProp, 0);
 
-    ret.AddItem(deviceProp.maxThreadsPerBlock);
+    //We need to constrain it further for shared memeory per block
+    ret.AddItem(deviceProp.maxThreadsPerBlock > kSharedLength ? kSharedLength : deviceProp.maxThreadsPerBlock);
     ret.AddItem(deviceProp.maxThreadsDim[0]);
     ret.AddItem(deviceProp.maxThreadsDim[1]);
     ret.AddItem(deviceProp.maxThreadsDim[2]);

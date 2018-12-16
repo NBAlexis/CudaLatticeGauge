@@ -20,6 +20,12 @@
 #include "math.h"
 #include "cuComplex.h"
 
+
+#include <thrust/transform_reduce.h>
+#include <thrust/functional.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+
 #pragma endregion Includes
 
 

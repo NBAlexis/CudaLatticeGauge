@@ -29,10 +29,12 @@ class CLGAPI CField : public CBase
 {
 public:
 
-    CField() : CBase(), m_pOwner(NULL) { ; }
+    CField();
 
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
+    
+    virtual void DebugPrintMe() const = 0;
 
 #pragma region BLAS
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
@@ -42,9 +44,9 @@ public:
 
     //This is Axpy(1.0f, x)
     virtual void Axpy(const CField* x) = 0;
-    virtual void Axpy(FLOAT a, const CField* x) = 0;
-    virtual void Axpy(const cuComplex& a, const CField* x) = 0;
-
+    virtual void Axpy(Real a, const CField* x) = 0;
+    virtual void Axpy(const _Complex& a, const CField* x) = 0;
+    
 #pragma endregion BLAS
 
 #pragma region HMC
@@ -52,13 +54,14 @@ public:
     /**
     * U = exp(a this)U
     */
-    virtual void ExpMult(const cuComplex& a, UINT uiPrecision, CField* U) const = 0;
+    virtual void ExpMult(const _Complex& a, CField* U) const = 0;
 
     virtual void CopyTo(CField* U) const = 0;
 
 #pragma endregion HMC
 
     class CLatticeData* m_pOwner;
+    UINT m_uiThreadCount;
 };
 
 __END_NAMESPACE

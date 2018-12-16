@@ -13,34 +13,33 @@
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CAction
+class CLGAPI CAction : public CBase
 {
 public:
-    CAction()
-        : m_pOwner(NULL)
-        , m_pDeviceLattce(NULL){ ; }
+    CAction() : m_pOwner(NULL) { ; }
 
     /**
     * This is called langevin in Bridge++
     * This is S for specific configuration using for exp(-S)/exp(-S0) update
     * Because of the presence of Fermions, we can no longer just calculate a local(ultral-local) change os S
     */
-    virtual FLOAT Energy() = 0;
+    virtual Real Energy(class CFieldGauge* pGauge) const = 0;
 
     /**
     * Obtain the pointer of the fields
     */
-    virtual void Prepare() = 0;
+    virtual void Initial(class CLatticeData* pOwner, const CParameters& param) = 0;
 
     /**
     * Calculate the force on gauge fields to update the fields
+    * Note that, gauge field will be changed, the change will be accepte or rejected.
+    * So the "pGauge" must be a copy of real gauge field, not the orignal one!
     */
     virtual void CalculateForceOnGauge(class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
 
 protected:
 
     class CLatticeData* m_pOwner;
-    class CDeviceLattice* m_pDeviceLattce;
 };
 
 __END_NAMESPACE

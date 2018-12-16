@@ -1,0 +1,211 @@
+\subsection{\label{cuda}cuda}
+
+\subsubsection{\label{threads}threads}
+
+\subsubsection{\label{device member function}device member function}
+
+According to \href{https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i}{https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i}
+
+To call device member function, the content of the class should be on device.
+
+\begin{itemize}
+  \item First, new a instance of the class.
+  \item Then, create a device memory using cudaMalloc.
+  \item Copy the content to the device memory
+\end{itemize}
+
+In other words, it will work as
+
+\begin{lstlisting}
+__global__ void _kInitialArray(int* thearray)
+{
+    int iX = threadIdx.x + blockDim.x * blockIdx.x;
+    int iY = threadIdx.y + blockDim.y * blockIdx.y;
+    int iZ = threadIdx.z + blockDim.z * blockIdx.z;
+    thearray[iX * 16 + iY * 4 + iZ] = iX * 16 + iY * 4 + iZ;
+}
+
+extern "C" {
+    void _cInitialArray(int* thearray)
+    {
+        dim3 block(1, 1, 1);
+        dim3 th(4, 4, 4);
+
+        _kInitialArray << <block, th >> > (thearray);
+        checkCudaErrors(cudaGetLastError());
+    }
+}
+
+class B
+{
+public:
+    B()
+    {
+        checkCudaErrors(cudaMalloc((void**)&m_pDevicePtr, sizeof(int) * 64));
+        _cInitialArray(m_pDevicePtr);
+    }
+    ~B()
+    {
+        cudaFree(m_pDevicePtr);
+    }
+    __device__ int GetNumber(int index)
+    {
+        m_pDevicePtr[index] = m_pDevicePtr[index] + 1;
+        return m_pDevicePtr[index];
+    }
+    int* m_pDevicePtr;
+};
+
+__global__ void _kAddArray(int* thearray1, B* pB)
+{
+    int iX = threadIdx.x + blockDim.x * blockIdx.x;
+    int iY = threadIdx.y + blockDim.y * blockIdx.y;
+    int iZ = threadIdx.z + blockDim.z * blockIdx.z;
+    thearray1[iX * 16 + iY * 4 + iZ] = thearray1[iX * 16 + iY * 4 + iZ] + pB->GetNumber(iX * 16 + iY * 4 + iZ);
+}
+
+extern "C" {
+    void _cAddArray(int* thearray1, B* pB)
+    {
+        dim3 block(1, 1, 1);
+        dim3 th(4, 4, 4);
+        _kAddArray << <block, th >> > (thearray1, pB);
+        checkCudaErrors(cudaGetLastError());
+    }
+}
+
+class A
+{
+public:
+    A()
+    {
+        checkCudaErrors(cudaMalloc((void**)&m_pDevicePtr, sizeof(int) * 64));
+        _cInitialArray(m_pDevicePtr);
+    }
+    ~A()
+    {
+        checkCudaErrors(cudaFree(m_pDevicePtr));
+    }
+    void Add(B* toAdd/*this should be a device ptr(new on device function or created by cudaMalloc)*/)
+    {
+        _cAddArray(m_pDevicePtr, toAdd);
+    }
+    int* m_pDevicePtr;
+};
+
+
+
+int main(int argc, char * argv[])
+{
+    B* pB = new B();
+    A* pA = new A();
+    B* pDeviceB;
+    checkCudaErrors(cudaMalloc((void**)&pDeviceB, sizeof(B)));
+    checkCudaErrors(cudaMemcpy(pDeviceB, pB, sizeof(B), cudaMemcpyHostToDevice));
+    pA->Add(pDeviceB);
+    int* res = (int*)malloc(sizeof(int) * 64);
+    checkCudaErrors(cudaMemcpy(res, pA->m_pDevicePtr, sizeof(int) * 64, cudaMemcpyDeviceToHost));
+    printf("----------- A=");
+    for (int i = 0; i < 8; ++i)
+    {
+        printf("\n");
+        for (int j = 0; j < 8; ++j)
+            printf("res %d=%d  ", i * 8 + j, res[i * 8 + j]);
+    }
+    printf("\n");
+    //NOTE: We are getting data from pB, not pDeviceB, this is OK, ONLY because m_pDevicePtr is a pointer
+    checkCudaErrors(cudaMemcpy(res, pB->m_pDevicePtr, sizeof(int) * 64, cudaMemcpyDeviceToHost));
+    printf("----------- B=");
+    for (int i = 0; i < 8; ++i)
+    {
+        printf("\n");
+        for (int j = 0; j < 8; ++j)
+            printf("res %d=%d  ", i * 8 + j, res[i * 8 + j]);
+    }
+    printf("\n");
+    delete pA;
+    delete pB;
+    return 0;
+}
+\end{lstlisting}
+
+\textcolor[rgb]{1,0,0}{Note: this is a copy of the original instance! It is ONLY OK to change the content of $pDevicePtr->m\_pOtherPtr$, NOT $pDevicePtr->somevalue$}
+
+\subsubsection{\label{device virtual member function}device virtual member function}
+
+According to \href{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions}{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions} 
+
+To call a device virtual member function, unlike Sec.~\ref{device member function}, the pointer to the virtual function table should also be on device, 
+
+\begin{itemize}
+  \item First, cudaMalloc a sizeof(void*), for the device pointer.
+  \item Then, use a kernel function to new the instance on device, and assign it to the device pointer created by cudaMalloc.
+  \item One can copy the pointer, by using cudaMemcpy(void**, void**, sizeof(void*), devicetodevice).
+  \item When copy it to elsewhere, one need to copy it back to host, then copy it again to device. The example shows how to copy it to constant.
+\end{itemize}
+
+in other words, it will work as
+\begin{lstlisting}
+
+class CA
+{
+public:
+    __device__ CA() { ; }
+    __device__ ~CA() { ; }
+    __device__ virtual void CallMe() { printf("A"); }
+};
+
+class CB : public CA
+{
+public:
+    __device__ CB() : CA() { ; }
+    __device__ ~CB() { ; }
+    __device__ virtual void CallMe() { printf("B"); }
+};
+
+__global__ void _kernelCreateInstance(CA** ptr)
+{
+    (*ptr) = new CB();
+}
+
+__global__ void _kernelDeleteInstance(CA** ptr)
+{
+    delete (*ptr);
+}
+
+__global__ void _kernelCallFuncion(CA** ptr)
+{
+    (*ptr)->CallMe();
+}
+
+extern "C" {
+    void _kCreateInstance(CA** ptr)
+    {
+        _kernelCreateInstance << <1, 1 >> >(ptr);
+    }
+
+    void _kCallFunc(CA** ptr)
+    {
+        //NOTE that, only (*ptr) on device get the correct pointer.
+        //_kernelCallFuncion(CA* ptr) will not work
+        _kernelCallFuncion << <1, 1 >> >(ptr);
+    }
+
+    void _kDeleteInstance(CA** ptr)
+    {
+        _kernelDeleteInstance<<<1,1>>>(ptr);
+    }
+}
+
+int main()
+{
+    CA** ptr;
+    cudaMalloc((void**)&ptr, sizeof(CA*));
+    _kCreateInstance(ptr);
+    _kCallFunc(ptr);
+    _kDeleteInstance(ptr);
+    cudaFree(ptr);
+    return 0;
+}
+
+\end{lstlisting} 

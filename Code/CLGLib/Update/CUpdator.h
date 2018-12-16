@@ -22,18 +22,18 @@ __DEFINE_ENUM(EUpdatorType,
     EUT_ForceDWORD,
 )
 
-class CLGAPI CUpdator
+class CLGAPI CUpdator : public CBase
 {
 public:
 
-    CUpdator(class CLatticeData* pOwner, class CDeviceLattice* pLattice) : m_pOwner(pOwner), m_pLattice(pLattice) { ; }
-    virtual void Update() = 0;
-    virtual FLOAT CalculateEnergy() = 0;
+    CUpdator() : m_pOwner(NULL) { ; }
+    virtual void Update(UINT iSteps) = 0;
+    virtual Real CalculateEnergy() = 0;
 
-protected:
+    virtual EUpdatorType GetUpdatorType() const { return EUT_Max; }
+    virtual void Initial(class CLatticeData* pOwner, const CParameters& params) = 0;
 
     class CLatticeData* m_pOwner;
-    class CDeviceLattice* m_pLattice;
 };
 
 __END_NAMESPACE

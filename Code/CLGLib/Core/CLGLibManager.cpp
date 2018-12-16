@@ -131,7 +131,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 #pragma endregion
 
     UINT constIntegers[kContentLength];
-    FLOAT constFloats[kContentLength];
+    Real constFloats[kContentLength];
 
     INT iVaules = 0;
 
@@ -260,13 +260,10 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     __FetchIntWithDefault(_T("ExponentialPrecision"), 4);
     constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
-    const CParameters subparam_updator = params.GetParameter(_T("Updator"));
-    if (!subparam_updator.FetchValueINT(_T("IntegratorStep"), iVaules))
-    { 
-        iVaules = 50; 
-    }
-    constIntegers[ECI_IntegratorStepCount] = static_cast<UINT>(iVaules);
+    __FetchIntWithDefault(_T("ActionListLength"), 1);
+    constIntegers[ECI_ActionListLength] = static_cast<UINT>(iVaules);
 
+    const CParameters subparam_updator = params.GetParameter(_T("Updator"));
     CCString sValues;
 
     __FetchStringWithDefault(_T("RandomType"), _T("ER_Schrage"));
@@ -281,12 +278,12 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         constIntegers[ECI_UsingSchrageRandom] = 0;
     }
 
-#pragma endregion
-
     m_pCudaHelper = new CCudaHelper();
     memcpy(m_pCudaHelper->m_ConstIntegers, constIntegers, sizeof(UINT) * kContentLength);
-    memcpy(m_pCudaHelper->m_ConstFloats, constFloats, sizeof(FLOAT) * kContentLength);
+    memcpy(m_pCudaHelper->m_ConstFloats, constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
+
+#pragma endregion
 
 #pragma region Create Random
 
@@ -301,7 +298,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         m_pLatticeData->m_pRandomSchrage = new CRandomSchrage(constIntegers[ECI_RandomSeed]);
         checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceRandomSchrage), sizeof(CRandomSchrage)));
         checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceRandomSchrage, m_pLatticeData->m_pRandomSchrage, sizeof(CRandomSchrage), cudaMemcpyHostToDevice));
-        appGeneral(_T("Create the Schrage random with seed:%d\n", constIntegers[ECI_RandomSeed]));
+        appGeneral(_T("Create the Schrage random with seed:%d\n"), constIntegers[ECI_RandomSeed]);
     }
     m_pCudaHelper->CopyRandomPointer(m_pLatticeData->m_pDeviceRandom, m_pLatticeData->m_pDeviceRandomSchrage);
 
@@ -323,7 +320,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     CFieldGauge* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldGauge*>(pGaugeField)) : NULL;
     if (NULL == pGauge)
     {
-        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName);
+        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
     }
 
     if (EFIT_ReadFromFile != eGaugeInitial)
@@ -331,11 +328,11 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         pGauge->m_pOwner = m_pLatticeData;
         pGauge->InitialField(eGaugeInitial);
     }
-
+    
     m_pLatticeData->m_pGaugeField = pGauge;
     checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceGaugeField), pGauge->GetClass()->GetSize()));
     checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceGaugeField, m_pLatticeData->m_pGaugeField, pGauge->GetClass()->GetSize(), cudaMemcpyHostToDevice));
-    
+
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 
 #pragma endregion
@@ -344,42 +341,125 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 
 #pragma region Create Index and Boundary
 
-    __FetchStringWithDefault(_T("LatticeBoundary"), _T("CBoundaryConditionTorusSquare"));
+    __FetchStringWithDefault(_T("LatticeBoundary"), _T("EBC_TorusSquare"));
 
-    CBoundaryCondition* pBoundary = dynamic_cast<CBoundaryCondition*>(appCreate(sValues));
-    if (NULL == pBoundary)
+    UINT sizeBufferHost[1];
+    sizeBufferHost[0] = 0;
+    UINT* sizeBuffer;
+    checkCudaErrors(cudaMalloc((void**)&sizeBuffer, sizeof(UINT)));
+    checkCudaErrors(cudaMemcpy(sizeBuffer, sizeBufferHost, sizeof(UINT), cudaMemcpyHostToDevice));
+
+    EBoundaryCondition eBC = __STRING_TO_ENUM(EBoundaryCondition, sValues);
+    deviceBoundaryCondition ** devicePtrBC;
+    checkCudaErrors(cudaMalloc((void**)&devicePtrBC, sizeof(deviceBoundaryCondition *)));
+
+    _cCreateBC((void**)devicePtrBC, sizeBuffer, eBC);
+    checkCudaErrors(cudaMemcpy(sizeBufferHost, sizeBuffer, sizeof(UINT), cudaMemcpyDeviceToHost));
+    UINT iBoundaryClassSize = sizeBufferHost[0];
+
+    if (0 == iBoundaryClassSize)
     {
-        appCrucial(_T("Cannot create boundary with name: %s"), sValues.c_str());
+        appCrucial(_T("Create Boundary Condition failed! %s"), sValues.c_str());
         exit(EXIT_FAILURE);
     }
-    pBoundary->m_pOwner = m_pLatticeData;
 
-    appGeneral(_T("Create the boundary %s\n"), sValues.c_str());
+    __FetchStringWithDefault(_T("LatticeIndex"), _T("EIndexType_Square"));
+    EIndexType eIT = __STRING_TO_ENUM(EIndexType, sValues);
+    
+    CIndex ** devicePtrIndex;
+    checkCudaErrors(cudaMalloc((void**)&devicePtrIndex, sizeof(CIndex *)));
+    sizeBufferHost[0] = 0;
+    checkCudaErrors(cudaMemcpy(sizeBuffer, sizeBufferHost, sizeof(UINT), cudaMemcpyHostToDevice));
+    _cCreateIndex((void**)devicePtrIndex, devicePtrBC, sizeBuffer, eIT);
+    checkCudaErrors(cudaMemcpy(sizeBufferHost, sizeBuffer, sizeof(UINT), cudaMemcpyDeviceToHost));
+    UINT indexClassSize = sizeBufferHost[0];
 
-    __FetchStringWithDefault(_T("LatticeIndex"), _T("CIndexSquare"));
-
-    CIndex* pIndex = dynamic_cast<CIndex*>(appCreate(sValues));
-    if (NULL == pIndex)
+    if (0 == indexClassSize)
     {
-        appCrucial(_T("Cannot create index with name: %s"), sValues.c_str());
+        appCrucial(_T("Create Index Failed!!!: %s"), sValues.c_str());
         exit(EXIT_FAILURE);
     }
-    pIndex->m_pOwner = m_pLatticeData;
-    pIndex->m_pBoundaryCondition = pBoundary;
-    checkCudaErrors(cudaMalloc((void**)&(pIndex->m_pDeviceBoundaryCondition), pBoundary->GetClass()->GetSize()));
-    checkCudaErrors(cudaMemcpy(pIndex->m_pDeviceBoundaryCondition, pIndex->m_pBoundaryCondition, pBoundary->GetClass()->GetSize(), cudaMemcpyHostToDevice));
 
-    m_pLatticeData->m_pIndex = pIndex;
+    //Now, we need to copy the content of ptr to lattice
+    CIndex* ppIndexHost[1];
+    checkCudaErrors(cudaMemcpy(ppIndexHost, devicePtrIndex, sizeof(CIndex**), cudaMemcpyDeviceToHost));
+    m_pLatticeData->m_pDeviceIndex = ppIndexHost[0];
+    m_pCudaHelper->SetDeviceIndex(devicePtrIndex);
 
-    checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceIndex), pIndex->GetClass()->GetSize()));
-    checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceIndex, m_pLatticeData->m_pIndex, pIndex->GetClass()->GetSize(), cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaFree(sizeBuffer));
+    checkCudaErrors(cudaFree(devicePtrBC));
+    checkCudaErrors(cudaFree(devicePtrIndex));
 
     appGeneral(_T("Create the index %s\n"), sValues.c_str());
 
+#pragma endregion
+
+#pragma region Craete Actions
+
+    CCString sActionNameList;
+    TArray<CAction*> actions;
+    for (UINT i = 0; i < constIntegers[ECI_ActionListLength]; ++i)
+    {
+        CCString sActionParamName;
+        sActionParamName.Format(_T("Action%d"), i + 1);
+        const CParameters subparam_action = params.GetParameter(sActionParamName);
+        CCString sActionName;
+        CAction* pAction = NULL;
+        if (subparam_action.FetchStringValue(_T("ActionName"), sActionName))
+        {
+            pAction = dynamic_cast<CAction*>(appCreate(sActionName));
+            if (NULL != pAction)
+            {
+                pAction->Initial(m_pLatticeData, subparam_action);
+                actions.AddItem(pAction);
+
+                sActionNameList += (CCString(_T(" ")) + pAction->GetClass()->GetName() + _T(" "));
+            }
+            else
+            {
+                //We have already set the constant ECI_ActionListLength
+                //So, NULL is not allowed!
+                appCrucial(_T("Create Action Failed: %s\n"), sActionName);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }    
+    m_pLatticeData->m_pActionList = actions;
+
+    appGeneral(_T("Create the action list, with %d actions: %s\n"), actions.Num(), sActionNameList.c_str());
 
 #pragma endregion
 
 #pragma region Create Updator
+
+    __FetchStringWithDefaultSub(subparam_updator, _T("UpdatorType"), _T("CHMC"));
+    CUpdator* updator = dynamic_cast<CUpdator*>(appCreate(sValues));
+    CCString sUpdatorInfo = sValues;
+    if (NULL != updator && EUT_HMC == updator->GetUpdatorType())
+    {
+        CHMC* pHMC = dynamic_cast<CHMC*>(updator);
+        __FetchStringWithDefaultSub(subparam_updator, _T("IntegratorType"), _T("CIntegratorLeapFrog"));
+        CIntegrator * integrator = dynamic_cast<CIntegrator *>(appCreate(sValues));
+
+        if (NULL == pHMC || NULL == integrator)
+        {
+            appCrucial(_T("HMC need a integrator!, but s = %s"), sValues);
+            exit(EXIT_FAILURE);
+        }
+
+        sUpdatorInfo += (" Integrator:" + sValues);
+        integrator->Initial(pHMC, m_pLatticeData, subparam_updator);
+        pHMC->Initial(m_pLatticeData, subparam_updator);
+        pHMC->m_pIntegrator = integrator;
+        m_pLatticeData->m_pUpdator = pHMC;
+    }
+    else
+    {
+        appCrucial(_T("Failed to create Updator! s = %s"), sValues);
+        exit(EXIT_FAILURE);
+    }
+    
+    appGeneral(_T("Create Updator %s\n"), sUpdatorInfo);
 
 #pragma endregion
 

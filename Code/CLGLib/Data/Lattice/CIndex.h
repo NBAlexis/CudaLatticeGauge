@@ -39,7 +39,7 @@ __BEGIN_NAMESPACE
 
 __device__ __inline__ static UINT _deviceGetSiteIndex(const UINT* coord)
 {
-    return coord[0] * _DC_MultX + coord[1] * _DC_MultY + coord[2] * _DC_MultZ;
+    return coord[0] * _DC_MultX + coord[1] * _DC_MultY + coord[2] * _DC_MultZ + coord[3];
 }
 __device__ __inline__ static UINT _deviceGetLinkIndex(UINT siteIndex, UINT dir)
 {
@@ -82,25 +82,32 @@ __device__ __inline__ static int4 __deviceFatIndexToInt4(UINT fatIndex)
 
 #pragma endregion
 
-class CLGAPI CIndex : public CBase
+//plaqutteCount x (plaqutteLength - 1) <= 32
+//For 4D cubic, this is 12
+#define kMaxPlaqutteCache (32)
+
+//EIT been used with Enum Integrator Type
+
+__DEFINE_ENUM(EIndexType,
+
+    EIndexType_Square,
+    EIndexType_Max,
+    EIndexType_ForceDWORD = 0x7fffffff,
+    )
+
+
+extern "C" { extern void _cCreateIndex(void** devicePtr, deviceBoundaryCondition ** pBC, UINT* size, EIndexType eIT); }
+
+class CLGAPI CIndex
 {
 public:
     enum { kSpace = 0x01, kTime = 0x10, kSpaceTime = 0x11, };
 
-    CIndex() : m_pOwner(NULL), m_pBoundaryCondition(NULL), m_pDeviceBoundaryCondition(NULL) { ; }
-    ~CIndex()
+    __device__ CIndex(class deviceBoundaryCondition * devicePtr) : m_pBoundaryCondition(devicePtr) { ; }
+    __device__ ~CIndex()
     {
-        if (NULL != m_pDeviceBoundaryCondition)
-        {
-            checkCudaErrors(cudaFree(m_pDeviceBoundaryCondition));
-            m_pDeviceBoundaryCondition = NULL;
-        }
         appSafeDelete(m_pBoundaryCondition);
     }
-
-    class CLatticeData* m_pOwner;
-
-    __device__ class CBoundaryCondition * GetBoundaryCondition() const { return m_pDeviceBoundaryCondition; }
 
     /**
     * WOW, we can use virtual device functions!
@@ -109,8 +116,7 @@ public:
     */
     __device__ virtual void _deviceGetPlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const = 0;
 
-    class CBoundaryCondition * m_pDeviceBoundaryCondition;
-    class CBoundaryCondition * m_pBoundaryCondition;
+    class deviceBoundaryCondition * m_pBoundaryCondition;
 };
 
 __END_NAMESPACE

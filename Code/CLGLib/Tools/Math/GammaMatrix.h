@@ -36,6 +36,10 @@ public:
     UINT m_uiIndex[4];
     cuComplexI m_me[4];
 
+    /*
+    * We are on device. Do not use thie function...
+    * this is on device, so use print
+    */
     __device__ __inline__ void Print()
     {
         for (int row = 0; row < 4; ++row) 

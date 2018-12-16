@@ -17,10 +17,10 @@
 #ifndef _SU3_H_
 #define _SU3_H_
 
-#define __LINE_MUL(a, b, c, d, ee, ff) cuCaddf(cuCaddf(cuCmulf(m_me[a], right.m_me[d]), cuCmulf(m_me[b], right.m_me[ee])), cuCmulf(m_me[c], right.m_me[ff]))
-// 1.0f / sqrt(3)
+#define __LINE_MUL(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], right.m_me[d]), _cuCmulf(m_me[b], right.m_me[ee])), _cuCmulf(m_me[c], right.m_me[ff]))
+// 1.0f / _sqrt(3)
 #define InvSqrt3 (0.5773502691896258f)
-// 2.0f / sqrt(3)
+// 2.0f / _sqrt(3)
 #define InvSqrt3_2 (1.1547005383792517f)
 
 __BEGIN_NAMESPACE
@@ -34,7 +34,7 @@ struct CLGAPI deviceSU3
 
     __device__ deviceSU3(const deviceSU3& other)
     {
-        memcpy(m_me, other.m_me, sizeof(cuComplex) * 9);
+        memcpy(m_me, other.m_me, sizeof(_Complex) * 9);
     }
 
     #pragma region create
@@ -45,15 +45,15 @@ struct CLGAPI deviceSU3
     __device__ __inline__ static deviceSU3 makeSU3Zero()
     {
         deviceSU3 ret;
-        ret.m_me[0] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[1] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[2] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[3] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[4] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[5] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[6] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[7] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[8] = make_cuComplex(0.0f, 0.0f);
+        ret.m_me[0] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[1] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[2] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[3] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[4] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[5] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[6] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[7] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[8] = _make_cuComplex(0.0f, 0.0f);
         return ret;
     }
 
@@ -63,15 +63,15 @@ struct CLGAPI deviceSU3
     __device__ __inline__ static deviceSU3 makeSU3Id()
     {
         deviceSU3 ret;
-        ret.m_me[0] = make_cuComplex(1.0f, 0.0f);
-        ret.m_me[1] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[2] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[3] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[4] = make_cuComplex(1.0f, 0.0f);
-        ret.m_me[5] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[6] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[7] = make_cuComplex(0.0f, 0.0f);
-        ret.m_me[8] = make_cuComplex(1.0f, 0.0f);
+        ret.m_me[0] = _make_cuComplex(1.0f, 0.0f);
+        ret.m_me[1] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[2] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[3] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[4] = _make_cuComplex(1.0f, 0.0f);
+        ret.m_me[5] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[6] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[7] = _make_cuComplex(0.0f, 0.0f);
+        ret.m_me[8] = _make_cuComplex(1.0f, 0.0f);
         return ret;
     }
 
@@ -82,15 +82,15 @@ struct CLGAPI deviceSU3
     __device__ __inline__ static deviceSU3 makeSU3Random(UINT fatIndex)
     {
         deviceSU3 ret;
-        ret.m_me[0] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[1] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[2] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[3] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[4] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[5] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[6] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[7] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
-        ret.m_me[8] = make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[0] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[1] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[2] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[3] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[4] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[5] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[6] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[7] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
+        ret.m_me[8] = _make_cuComplex(_deviceRandomF(fatIndex) - 0.5f, _deviceRandomF(fatIndex) - 0.5f);
         ret.Norm();
         return ret;
     }
@@ -107,25 +107,25 @@ struct CLGAPI deviceSU3
     */
     __device__ __inline__ static deviceSU3 makeSU3RandomGenerator(UINT fatIndex)
     {
-        FLOAT r1 = _deviceRandomGaussF(fatIndex);
-        FLOAT r2 = _deviceRandomGaussF(fatIndex);
-        FLOAT r3 = _deviceRandomGaussF(fatIndex);
-        FLOAT r4 = _deviceRandomGaussF(fatIndex);
-        FLOAT r5 = _deviceRandomGaussF(fatIndex);
-        FLOAT r6 = _deviceRandomGaussF(fatIndex);
-        FLOAT r7 = _deviceRandomGaussF(fatIndex);
-        FLOAT r8 = _deviceRandomGaussF(fatIndex);
+        Real r1 = _deviceRandomGaussF(fatIndex);
+        Real r2 = _deviceRandomGaussF(fatIndex);
+        Real r3 = _deviceRandomGaussF(fatIndex);
+        Real r4 = _deviceRandomGaussF(fatIndex);
+        Real r5 = _deviceRandomGaussF(fatIndex);
+        Real r6 = _deviceRandomGaussF(fatIndex);
+        Real r7 = _deviceRandomGaussF(fatIndex);
+        Real r8 = _deviceRandomGaussF(fatIndex);
 
         deviceSU3 ret;
-        ret.m_me[0] = make_cuComplex(0.0f, r3 + r8 * InvSqrt3);
-        ret.m_me[1] = make_cuComplex(r2, r1);
-        ret.m_me[2] = make_cuComplex(r5, r4);
-        ret.m_me[3] = make_cuComplex(-r2, r1);
-        ret.m_me[4] = make_cuComplex(0.0f, -r3 + r8 * InvSqrt3);
-        ret.m_me[5] = make_cuComplex(r7, r6);
-        ret.m_me[6] = make_cuComplex(-r5, r4);
-        ret.m_me[7] = make_cuComplex(-r7, r6);
-        ret.m_me[8] = make_cuComplex(0.0f, - r8 * InvSqrt3_2);
+        ret.m_me[0] = _make_cuComplex(0, r3 + r8 * InvSqrt3);
+        ret.m_me[1] = _make_cuComplex(r2, r1);
+        ret.m_me[2] = _make_cuComplex(r5, r4);
+        ret.m_me[3] = _make_cuComplex(-r2, r1);
+        ret.m_me[4] = _make_cuComplex(0, -r3 + r8 * InvSqrt3);
+        ret.m_me[5] = _make_cuComplex(r7, r6);
+        ret.m_me[6] = _make_cuComplex(-r5, r4);
+        ret.m_me[7] = _make_cuComplex(-r7, r6);
+        ret.m_me[8] = _make_cuComplex(0, - r8 * InvSqrt3_2);
         return ret;
     }
 
@@ -135,42 +135,42 @@ struct CLGAPI deviceSU3
 
     __device__ __inline__ void Add(const deviceSU3& right)
     {
-        m_me[0] = cuCaddf(m_me[0], right.m_me[0]);
-        m_me[1] = cuCaddf(m_me[1], right.m_me[1]);
-        m_me[2] = cuCaddf(m_me[2], right.m_me[2]);
-        m_me[3] = cuCaddf(m_me[3], right.m_me[3]);
-        m_me[4] = cuCaddf(m_me[4], right.m_me[4]);
-        m_me[5] = cuCaddf(m_me[5], right.m_me[5]);
-        m_me[6] = cuCaddf(m_me[6], right.m_me[6]);
-        m_me[7] = cuCaddf(m_me[7], right.m_me[7]);
-        m_me[8] = cuCaddf(m_me[8], right.m_me[8]);
+        m_me[0] = _cuCaddf(m_me[0], right.m_me[0]);
+        m_me[1] = _cuCaddf(m_me[1], right.m_me[1]);
+        m_me[2] = _cuCaddf(m_me[2], right.m_me[2]);
+        m_me[3] = _cuCaddf(m_me[3], right.m_me[3]);
+        m_me[4] = _cuCaddf(m_me[4], right.m_me[4]);
+        m_me[5] = _cuCaddf(m_me[5], right.m_me[5]);
+        m_me[6] = _cuCaddf(m_me[6], right.m_me[6]);
+        m_me[7] = _cuCaddf(m_me[7], right.m_me[7]);
+        m_me[8] = _cuCaddf(m_me[8], right.m_me[8]);
     }
 
     __device__ __inline__ void Sub(const deviceSU3& right)
     {
-        m_me[0] = cuCsubf(m_me[0], right.m_me[0]);
-        m_me[1] = cuCsubf(m_me[1], right.m_me[1]);
-        m_me[2] = cuCsubf(m_me[2], right.m_me[2]);
-        m_me[3] = cuCsubf(m_me[3], right.m_me[3]);
-        m_me[4] = cuCsubf(m_me[4], right.m_me[4]);
-        m_me[5] = cuCsubf(m_me[5], right.m_me[5]);
-        m_me[6] = cuCsubf(m_me[6], right.m_me[6]);
-        m_me[7] = cuCsubf(m_me[7], right.m_me[7]);
-        m_me[8] = cuCsubf(m_me[8], right.m_me[8]);
+        m_me[0] = _cuCsubf(m_me[0], right.m_me[0]);
+        m_me[1] = _cuCsubf(m_me[1], right.m_me[1]);
+        m_me[2] = _cuCsubf(m_me[2], right.m_me[2]);
+        m_me[3] = _cuCsubf(m_me[3], right.m_me[3]);
+        m_me[4] = _cuCsubf(m_me[4], right.m_me[4]);
+        m_me[5] = _cuCsubf(m_me[5], right.m_me[5]);
+        m_me[6] = _cuCsubf(m_me[6], right.m_me[6]);
+        m_me[7] = _cuCsubf(m_me[7], right.m_me[7]);
+        m_me[8] = _cuCsubf(m_me[8], right.m_me[8]);
     }
 
-    __device__ __inline__ void Add(const cuComplex& right)
+    __device__ __inline__ void Add(const _Complex& right)
     {
-        m_me[0] = cuCaddf(m_me[0], right);
-        m_me[4] = cuCaddf(m_me[4], right);
-        m_me[8] = cuCaddf(m_me[8], right);
+        m_me[0] = _cuCaddf(m_me[0], right);
+        m_me[4] = _cuCaddf(m_me[4], right);
+        m_me[8] = _cuCaddf(m_me[8], right);
     }
 
-    __device__ __inline__ void Sub(const cuComplex& right)
+    __device__ __inline__ void Sub(const _Complex& right)
     {
-        m_me[0] = cuCsubf(m_me[0], right);
-        m_me[4] = cuCsubf(m_me[4], right);
-        m_me[8] = cuCsubf(m_me[8], right);
+        m_me[0] = _cuCsubf(m_me[0], right);
+        m_me[4] = _cuCsubf(m_me[4], right);
+        m_me[8] = _cuCsubf(m_me[8], right);
     }
 
     /**
@@ -178,7 +178,7 @@ struct CLGAPI deviceSU3
     */
     __device__ __inline__ void Mul(const deviceSU3& right)
     {
-        cuComplex res[9];
+        _Complex res[9];
         res[0] = __LINE_MUL(0, 1, 2, 0, 3, 6);
         res[1] = __LINE_MUL(0, 1, 2, 1, 4, 7);
         res[2] = __LINE_MUL(0, 1, 2, 2, 5, 8);
@@ -190,45 +190,45 @@ struct CLGAPI deviceSU3
         res[6] = __LINE_MUL(6, 7, 8, 0, 3, 6);
         res[7] = __LINE_MUL(6, 7, 8, 1, 4, 7);
         res[8] = __LINE_MUL(6, 7, 8, 2, 5, 8);
-        memcpy(m_me, res, sizeof(cuComplex) * 9);
+        memcpy(m_me, res, sizeof(_Complex) * 9);
     }
 
-    __device__ __inline void Mul(const cuComplex& right)
+    __device__ __inline void Mul(const _Complex& right)
     {
-        m_me[0] = cuCmulf(m_me[0], right);
-        m_me[1] = cuCmulf(m_me[1], right);
-        m_me[2] = cuCmulf(m_me[2], right);
-        m_me[3] = cuCmulf(m_me[3], right);
-        m_me[4] = cuCmulf(m_me[4], right);
-        m_me[5] = cuCmulf(m_me[5], right);
-        m_me[6] = cuCmulf(m_me[6], right);
-        m_me[7] = cuCmulf(m_me[7], right);
-        m_me[8] = cuCmulf(m_me[8], right);
+        m_me[0] = _cuCmulf(m_me[0], right);
+        m_me[1] = _cuCmulf(m_me[1], right);
+        m_me[2] = _cuCmulf(m_me[2], right);
+        m_me[3] = _cuCmulf(m_me[3], right);
+        m_me[4] = _cuCmulf(m_me[4], right);
+        m_me[5] = _cuCmulf(m_me[5], right);
+        m_me[6] = _cuCmulf(m_me[6], right);
+        m_me[7] = _cuCmulf(m_me[7], right);
+        m_me[8] = _cuCmulf(m_me[8], right);
     }
 
     /**
     * left = left * right
     */
-    __device__ __inline__ void Scale(const cuComplex& right)
+    __device__ __inline__ void Scale(const _Complex& right)
     {
-        m_me[0] = cuCmulf(m_me[0], right);
-        m_me[1] = cuCmulf(m_me[1], right);
-        m_me[2] = cuCmulf(m_me[2], right);
-        m_me[3] = cuCmulf(m_me[3], right);
-        m_me[4] = cuCmulf(m_me[4], right);
-        m_me[5] = cuCmulf(m_me[5], right);
-        m_me[6] = cuCmulf(m_me[6], right);
-        m_me[7] = cuCmulf(m_me[7], right);
-        m_me[8] = cuCmulf(m_me[8], right);
+        m_me[0] = _cuCmulf(m_me[0], right);
+        m_me[1] = _cuCmulf(m_me[1], right);
+        m_me[2] = _cuCmulf(m_me[2], right);
+        m_me[3] = _cuCmulf(m_me[3], right);
+        m_me[4] = _cuCmulf(m_me[4], right);
+        m_me[5] = _cuCmulf(m_me[5], right);
+        m_me[6] = _cuCmulf(m_me[6], right);
+        m_me[7] = _cuCmulf(m_me[7], right);
+        m_me[8] = _cuCmulf(m_me[8], right);
     }
 
     __device__ __inline__ deviceSU3 Addc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Add(right); return ret; }
     __device__ __inline__ deviceSU3 Subc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
-    __device__ __inline__ deviceSU3 Addc(const cuComplex& right) const  { deviceSU3 ret(*this); ret.Add(right); return ret; }
-    __device__ __inline__ deviceSU3 Subc(const cuComplex& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
+    __device__ __inline__ deviceSU3 Addc(const _Complex& right) const  { deviceSU3 ret(*this); ret.Add(right); return ret; }
+    __device__ __inline__ deviceSU3 Subc(const _Complex& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
     __device__ __inline__ deviceSU3 Mulc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Mul(right); return ret; }
-    __device__ __inline__ deviceSU3 Mulc(const cuComplex& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
-    __device__ __inline__ deviceSU3 Scalec(const cuComplex& right) const  { deviceSU3 ret(*this); ret.Scale(right); return ret; }
+    __device__ __inline__ deviceSU3 Mulc(const _Complex& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
+    __device__ __inline__ deviceSU3 Scalec(const _Complex& right) const  { deviceSU3 ret(*this); ret.Scale(right); return ret; }
 
     #pragma endregion operators
 
@@ -238,22 +238,22 @@ struct CLGAPI deviceSU3
     * ret = ||U||, where U is a d=3 matrix
     * we do NOT need ||SU3|| because ||SU3||=1
     */
-    __device__ static __inline__ cuComplex _deviceD3MatrixDeterminent(const cuComplex* u)
+    __device__ static __inline__ _Complex _deviceD3MatrixDeterminent(const _Complex* u)
     {
-        return cuCsubf(
-            cuCaddf(
-                cuCaddf(
-                    cuCmulf(cuCmulf(u[0], u[4]), u[8]),
-                    cuCmulf(cuCmulf(u[1], u[5]), u[6])
+        return _cuCsubf(
+            _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuCmulf(u[0], u[4]), u[8]),
+                    _cuCmulf(_cuCmulf(u[1], u[5]), u[6])
                 ),
-                cuCmulf(cuCmulf(u[3], u[7]), u[2])
+                _cuCmulf(_cuCmulf(u[3], u[7]), u[2])
             ),
-            cuCaddf(
-                cuCaddf(
-                    cuCmulf(cuCmulf(u[2], u[4]), u[6]),
-                    cuCmulf(cuCmulf(u[1], u[3]), u[8])
+            _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuCmulf(u[2], u[4]), u[6]),
+                    _cuCmulf(_cuCmulf(u[1], u[3]), u[8])
                 ),
-                cuCmulf(cuCmulf(u[0], u[5]), u[7])
+                _cuCmulf(_cuCmulf(u[0], u[5]), u[7])
             )
         );
     }
@@ -261,7 +261,7 @@ struct CLGAPI deviceSU3
     /**
     * Re[Tr[U]]
     */
-    __device__ __inline__ FLOAT ReTr()
+    __device__ __inline__ Real ReTr()
     {
         return m_me[0].x + m_me[4].x + m_me[8].x;
     }
@@ -271,20 +271,20 @@ struct CLGAPI deviceSU3
     */
     __device__ __inline__ void Dagger()
     {
-        cuComplex res[9];
-        res[0] = cuConjf(m_me[0]);
-        res[1] = cuConjf(m_me[3]);
-        res[2] = cuConjf(m_me[6]);
+        _Complex res[9];
+        res[0] = _cuConjf(m_me[0]);
+        res[1] = _cuConjf(m_me[3]);
+        res[2] = _cuConjf(m_me[6]);
 
-        res[3] = cuConjf(m_me[1]);
-        res[4] = cuConjf(m_me[4]);
-        res[5] = cuConjf(m_me[7]);
+        res[3] = _cuConjf(m_me[1]);
+        res[4] = _cuConjf(m_me[4]);
+        res[5] = _cuConjf(m_me[7]);
 
-        res[6] = cuConjf(m_me[2]);
-        res[7] = cuConjf(m_me[5]);
-        res[8] = cuConjf(m_me[8]);
+        res[6] = _cuConjf(m_me[2]);
+        res[7] = _cuConjf(m_me[5]);
+        res[8] = _cuConjf(m_me[8]);
 
-        memcpy(m_me, res, sizeof(cuComplex) * 9);
+        memcpy(m_me, res, sizeof(_Complex) * 9);
     }
 
     /**
@@ -295,26 +295,26 @@ struct CLGAPI deviceSU3
     {
         //new [0], [4], [8] = 2img I / 2
         //we DO NOT calculate it here
-        //m_me[0] = make_cuComplex(0.0f, cuCimagf(m_me[0]));
-        //m_me[4] = make_cuComplex(0.0f, cuCimagf(m_me[4]));
-        //m_me[8] = make_cuComplex(0.0f, cuCimagf(m_me[8]));
+        //m_me[0] = _make_cuComplex(0.0f, _cuCimagf(m_me[0]));
+        //m_me[4] = _make_cuComplex(0.0f, _cuCimagf(m_me[4]));
+        //m_me[8] = _make_cuComplex(0.0f, _cuCimagf(m_me[8]));
 
         //new [1] = [1] - conj([3])
         //new [3] = [3] - conj([1]) = -conj(new [1])
-        cuComplex new1 = cuCsubf(m_me[1], cuConjf(m_me[3]));
-        cuComplex new2 = cuCsubf(m_me[2], cuConjf(m_me[6]));
-        cuComplex new5 = cuCsubf(m_me[5], cuConjf(m_me[7]));
-        m_me[1] = make_cuComplex(0.5f * cuCrealf(new1), 0.5f * cuCimagf(new1));
-        m_me[3] = make_cuComplex(-cuCrealf(m_me[1]), cuCimagf(m_me[1]));
-        m_me[2] = make_cuComplex(0.5f * cuCrealf(new2), 0.5f * cuCimagf(new2));
-        m_me[6] = make_cuComplex(-cuCrealf(m_me[2]), cuCimagf(m_me[2]));
-        m_me[5] = make_cuComplex(0.5f * cuCrealf(new5), 0.5f * cuCimagf(new5));
-        m_me[7] = make_cuComplex(-cuCrealf(m_me[5]), cuCimagf(m_me[5]));
+        _Complex new1 = _cuCsubf(m_me[1], _cuConjf(m_me[3]));
+        _Complex new2 = _cuCsubf(m_me[2], _cuConjf(m_me[6]));
+        _Complex new5 = _cuCsubf(m_me[5], _cuConjf(m_me[7]));
+        m_me[1] = _make_cuComplex(0.5f * _cuCrealf(new1), 0.5f * _cuCimagf(new1));
+        m_me[3] = _make_cuComplex(-_cuCrealf(m_me[1]), _cuCimagf(m_me[1]));
+        m_me[2] = _make_cuComplex(0.5f * _cuCrealf(new2), 0.5f * _cuCimagf(new2));
+        m_me[6] = _make_cuComplex(-_cuCrealf(m_me[2]), _cuCimagf(m_me[2]));
+        m_me[5] = _make_cuComplex(0.5f * _cuCrealf(new5), 0.5f * _cuCimagf(new5));
+        m_me[7] = _make_cuComplex(-_cuCrealf(m_me[5]), _cuCimagf(m_me[5]));
 
-        FLOAT fImgTr = (m_me[0].y + m_me[4].y + m_me[8].y) / 3.0f;
-        m_me[0] = make_cuComplex(0.0f, m_me[0].y - fImgTr);
-        m_me[4] = make_cuComplex(0.0f, m_me[4].y - fImgTr);
-        m_me[8] = make_cuComplex(0.0f, m_me[8].y - fImgTr);
+        Real fImgTr = (m_me[0].y + m_me[4].y + m_me[8].y) / 3.0f;
+        m_me[0] = _make_cuComplex(0.0f, m_me[0].y - fImgTr);
+        m_me[4] = _make_cuComplex(0.0f, m_me[4].y - fImgTr);
+        m_me[8] = _make_cuComplex(0.0f, m_me[8].y - fImgTr);
     }
 
     /**
@@ -322,40 +322,40 @@ struct CLGAPI deviceSU3
     */
     __device__ __inline__ void Norm()
     {
-        FLOAT fDiv1 = 1.0f / sqrtf(cuCabsSqf(m_me[0]) + cuCabsSqf(m_me[1]) + cuCabsSqf(m_me[2]));
-        m_me[0] = cuCmulf(m_me[0], fDiv1);
-        m_me[1] = cuCmulf(m_me[1], fDiv1);
-        m_me[2] = cuCmulf(m_me[2], fDiv1);
+        Real fDiv1 = 1.0f / _sqrt(cuCabsSqf(m_me[0]) + cuCabsSqf(m_me[1]) + cuCabsSqf(m_me[2]));
+        m_me[0] = _cuCmulf(m_me[0], fDiv1);
+        m_me[1] = _cuCmulf(m_me[1], fDiv1);
+        m_me[2] = _cuCmulf(m_me[2], fDiv1);
 
         //it is the name in Bridge++
-        cuComplex sp1 = cuConjf(
-            cuCaddf(cuCaddf(
-                cuCmulf(m_me[0], cuConjf(m_me[3]))
-                , cuCmulf(m_me[1], cuConjf(m_me[4])))
-                , cuCmulf(m_me[2], cuConjf(m_me[5])))
+        _Complex sp1 = _cuConjf(
+            _cuCaddf(_cuCaddf(
+                _cuCmulf(m_me[0], _cuConjf(m_me[3]))
+                , _cuCmulf(m_me[1], _cuConjf(m_me[4])))
+                , _cuCmulf(m_me[2], _cuConjf(m_me[5])))
         );
 
-        m_me[3] = cuCsubf(m_me[3], cuCmulf(sp1, m_me[0]));
-        m_me[4] = cuCsubf(m_me[4], cuCmulf(sp1, m_me[1]));
-        m_me[5] = cuCsubf(m_me[5], cuCmulf(sp1, m_me[2]));
-        FLOAT fDiv2 = 1.0f / sqrtf(cuCabsSqf(m_me[3]) + cuCabsSqf(m_me[4]) + cuCabsSqf(m_me[5]));
-        m_me[3] = cuCmulf(m_me[3], fDiv2);
-        m_me[4] = cuCmulf(m_me[4], fDiv2);
-        m_me[5] = cuCmulf(m_me[5], fDiv2);
+        m_me[3] = _cuCsubf(m_me[3], _cuCmulf(sp1, m_me[0]));
+        m_me[4] = _cuCsubf(m_me[4], _cuCmulf(sp1, m_me[1]));
+        m_me[5] = _cuCsubf(m_me[5], _cuCmulf(sp1, m_me[2]));
+        Real fDiv2 = 1.0f / _sqrt(cuCabsSqf(m_me[3]) + cuCabsSqf(m_me[4]) + cuCabsSqf(m_me[5]));
+        m_me[3] = _cuCmulf(m_me[3], fDiv2);
+        m_me[4] = _cuCmulf(m_me[4], fDiv2);
+        m_me[5] = _cuCmulf(m_me[5], fDiv2);
 
-        m_me[6] = cuConjf(cuCsubf(cuCmulf(m_me[1], m_me[5]), cuCmulf(m_me[2], m_me[4])));
-        m_me[7] = cuConjf(cuCsubf(cuCmulf(m_me[2], m_me[3]), cuCmulf(m_me[0], m_me[5])));
-        m_me[8] = cuConjf(cuCsubf(cuCmulf(m_me[0], m_me[4]), cuCmulf(m_me[1], m_me[3])));
+        m_me[6] = _cuConjf(_cuCsubf(_cuCmulf(m_me[1], m_me[5]), _cuCmulf(m_me[2], m_me[4])));
+        m_me[7] = _cuConjf(_cuCsubf(_cuCmulf(m_me[2], m_me[3]), _cuCmulf(m_me[0], m_me[5])));
+        m_me[8] = _cuConjf(_cuCsubf(_cuCmulf(m_me[0], m_me[4]), _cuCmulf(m_me[1], m_me[3])));
     }
 
     /**
     * U' = exp(aU) = (1 + a U + a^2 U^2/2 +  ... + a^N U^N/N!)
     *    = 1 + a U (1 + a U /2 (1 + a U/3 ...))
     */
-    __device__ __inline__ deviceSU3 Exp(const cuComplex& a, UINT uiPrecision) const
+    __device__ __inline__ deviceSU3 Exp(const _Complex& a, UINT uiPrecision) const
     {
         deviceSU3 identity = makeSU3Id();
-        deviceSU3 tmp(*this);
+        deviceSU3 tmp;
 
         /**
         * tmp = U
@@ -367,9 +367,18 @@ struct CLGAPI deviceSU3
         */
         for (UINT i = 0; i < uiPrecision; ++i)
         {
-            FLOAT exp_factor = 1.0f / (uiPrecision - i);
-            cuComplex alpha = cuCmulf(a, exp_factor);
-            tmp.Mul(alpha);
+            Real exp_factor = 1.0f / (uiPrecision - i);
+            _Complex alpha = _cuCmulf(a, exp_factor);
+            //aU/(N-i) = this x alpha
+            deviceSU3 aUoN = Mulc(alpha);
+            if (0 == i)
+            {
+                tmp = aUoN;
+            }
+            else
+            {
+                tmp.Mul(aUoN);
+            }
             tmp = identity.Addc(tmp);
         }
         tmp.Norm();
@@ -378,7 +387,7 @@ struct CLGAPI deviceSU3
 
     #pragma endregion useful functions
 
-    cuComplex m_me[9];
+    _Complex m_me[9];
 };
 
 

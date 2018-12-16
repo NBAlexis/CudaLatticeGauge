@@ -17,24 +17,24 @@ __BEGIN_NAMESPACE
 class CLGAPI CFieldGauge : public CField
 {
 public:
-    CFieldGauge() : CField()
-    { 
-        ;
-    }
+    CFieldGauge();
 
 #pragma region HMC update
 
     /**
     * Before many other steps
     */
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const cuComplex& minusBetaOverN) const = 0;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const _Complex& minusBetaOverN) const = 0;
 
     virtual void MakeRandomGenerator() = 0;
+
+    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) = 0;
 
 #pragma endregion HMC update
 
 protected:
 
+    UINT m_uiLinkeCount;
 };
 
 __END_NAMESPACE

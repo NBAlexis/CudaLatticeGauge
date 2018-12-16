@@ -71,10 +71,8 @@ int4 _deviceMoveSquareSite(const int4 &in, INT dir)
 
 class CLGAPI CIndexSquare : public CIndex
 {
-    __CLGDECLARE_CLASS(CIndexSquare)
-
 public:
-    CIndexSquare() : CIndex() { ; }
+    __device__ CIndexSquare(class deviceBoundaryCondition * devicePtr) : CIndex(devicePtr) { ; }
     __device__ virtual void _deviceGetPlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
 };
 

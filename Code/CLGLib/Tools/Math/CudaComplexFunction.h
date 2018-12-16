@@ -2,7 +2,7 @@
 // FILENAME : CudaComplexFunction.h
 // 
 // DESCRIPTION:
-// Add some function to cuComplex where it does not have yet
+// Add some function to _Complex where it does not have yet
 //
 //
 // REVISION:
@@ -17,15 +17,15 @@ __BEGIN_NAMESPACE
 /**
 * arg(c)
 */
-__device__ static __inline__ FLOAT cuCargf(const cuComplex& c)
+__device__ static __inline__ Real cuCargf(const _Complex& c)
 {
-    return atan2f(cuCimagf(c), cuCrealf(c));
+    return atan2f(_cuCimagf(c), _cuCrealf(c));
 }
 
 /**
 * |c|^2
 */
-__device__ static __inline__ FLOAT cuCabsSqf(const cuComplex& c)
+__device__ static __inline__ Real cuCabsSqf(const _Complex& c)
 {
     return c.x * c.x + c.y * c.y;
 }
@@ -33,32 +33,32 @@ __device__ static __inline__ FLOAT cuCabsSqf(const cuComplex& c)
 /**
 * c^p
 */
-__device__ static __inline__ cuComplex cuCpowerf(const cuComplex& c, FLOAT p)
+__device__ static __inline__ _Complex cuCpowerf(const _Complex& c, Real p)
 {
-    FLOAT fArg = cuCargf(c) * p;
-    FLOAT fAbs = powf(cuCabsf(c), p);
-    return make_cuComplex(cosf(fArg) * fAbs, sinf(fArg) * fAbs);
+    Real fArg = cuCargf(c) * p;
+    Real fAbs = _pow(_cuCabsf(c), p);
+    return _make_cuComplex(_cos(fArg) * fAbs, _sin(fArg) * fAbs);
 }
 
 /**
 * exp(c)
 */
-__device__ static __inline__ cuComplex cuCexpf(const cuComplex& c)
+__device__ static __inline__ _Complex cuCexpf(const _Complex& c)
 {
-    FLOAT factor = exp(c.x);
-    return make_cuComplex(factor * cosf(c.y), factor * sinf(c.y));
+    Real factor = _exp(c.x);
+    return _make_cuComplex(factor * _cos(c.y), factor * _sin(c.y));
 }
 
 /**
-* sqrt(c)
+* _sqrt(c)
 */
-__device__ static __inline__ cuComplex cuCsqrtf(const cuComplex& c)
+__device__ static __inline__ _Complex cuCsqrtf(const _Complex& c)
 {
-    FLOAT fRadius = cuCabsf(c);
-    FLOAT fCosA = c.x / cuCabsf(c);
-    cuComplex out;
-    out.x = sqrtf(fRadius * (fCosA + 1.0f) / 2.0f);
-    out.y = sqrtf(fRadius * (1.0f - fCosA) / 2.0f);
+    Real fRadius = _cuCabsf(c);
+    Real fCosA = c.x / _cuCabsf(c);
+    _Complex out;
+    out.x = _sqrt(fRadius * (fCosA + 1.0f) / 2.0f);
+    out.y = _sqrt(fRadius * (1.0f - fCosA) / 2.0f);
     // signbit should be false if x.y is negative
     if (signbit(c.y))
         out.y *= -1.0f;
@@ -66,21 +66,21 @@ __device__ static __inline__ cuComplex cuCsqrtf(const cuComplex& c)
     return out;
 }
 
-__device__ static __inline__ cuComplex cuCaddf(const cuComplex& x, FLOAT y)
+__device__ static __inline__ _Complex _cuCaddf(const _Complex& x, Real y)
 {
-    return make_cuComplex(cuCrealf(x) + y, cuCimagf(x));
+    return _make_cuComplex(_cuCrealf(x) + y, _cuCimagf(x));
 }
-__device__ static __inline__ cuComplex cuCdivf(const cuComplex& x, FLOAT y)
+__device__ static __inline__ _Complex cuCdivf(const _Complex& x, Real y)
 {
-    return make_cuComplex(cuCrealf(x) / y, cuCimagf(x) / y);
+    return _make_cuComplex(_cuCrealf(x) / y, _cuCimagf(x) / y);
 }
-__device__ static __inline__ cuComplex cuCmulf(const cuComplex& x, FLOAT y)
+__device__ static __inline__ _Complex _cuCmulf(const _Complex& x, Real y)
 {
-    return make_cuComplex(cuCrealf(x) * y, cuCimagf(x) * y);
+    return _make_cuComplex(_cuCrealf(x) * y, _cuCimagf(x) * y);
 }
-__device__ static __inline__ cuComplex cuCsubf(const cuComplex& x, FLOAT y)
+__device__ static __inline__ _Complex _cuCsubf(const _Complex& x, Real y)
 {
-    return make_cuComplex(cuCrealf(x) - y, cuCimagf(x));
+    return _make_cuComplex(_cuCrealf(x) - y, _cuCimagf(x));
 }
 
 __END_NAMESPACE

@@ -29,8 +29,6 @@
 
 __BEGIN_NAMESPACE
 
-enum { _constMaxPlaqIndexLength = 256, };
-
 class CLGAPI CFieldGaugeSU3 : public CFieldGauge
 {
     __CLGDECLARE_CLASS(CFieldGaugeSU3)
@@ -41,13 +39,15 @@ public:
 
     virtual void InitialField(EFieldInitialType eInitialType);
     virtual EFieldType GetFieldType() const { return EFT_GaugeSU3; }
+    virtual void DebugPrintMe() const;
 
 #pragma region HMC
 
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const cuComplex& minusBetaOverN) const;
-    virtual void ExpMult(const cuComplex& a, UINT uiPrecision, CField* U) const;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const _Complex& minusBetaOverN) const;
+    virtual void ExpMult(const _Complex& a, CField* U) const;
     virtual void CopyTo(CField* U) const;
     virtual void MakeRandomGenerator();
+    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN);
 
 #pragma endregion HMC
 
@@ -56,15 +56,15 @@ public:
     virtual void Zero();
     virtual void Indentity();
     virtual void Axpy(const CField* x);
-    virtual void Axpy(FLOAT a, const CField* x);
-    virtual void Axpy(const cuComplex& a, const CField* x);
+    virtual void Axpy(Real a, const CField* x);
+    virtual void Axpy(const _Complex& a, const CField* x);
 
 #pragma endregion BLAS
 
 protected:
 
     deviceSU3* m_pDeviceData;
-    int2* m_pDeviceStapleIndex;
+    Real* m_pDeviceTmpResPtr;
 };
 
 __END_NAMESPACE
