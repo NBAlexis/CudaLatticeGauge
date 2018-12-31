@@ -59,6 +59,11 @@ __device__ __inline__ static UINT _deviceGetFatIndex(const UINT* coord, UINT dir
     return _deviceGetSiteIndex(coord) * (_DC_Dir + 1) + dir_plus_one;
 }
 
+__device__ __inline__ static UINT _deviceGetFatIndex(UINT uiSiteIndex, UINT dir_plus_one)
+{
+    return uiSiteIndex * (_DC_Dir + 1) + dir_plus_one;
+}
+
 /**
 * int4.xyzw = x, y, z, t
 */
@@ -110,11 +115,19 @@ public:
     }
 
     /**
-    * WOW, we can use virtual device functions!
     * This function to get the plaquttes indexes.
     * one can specify to get only spatial plaquttes or spacetime
     */
-    __device__ virtual void _deviceGetPlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const = 0;
+    __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const = 0;
+
+    //__device__ virtual void _deviceGetUniquePlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex) const = 0;
+
+#pragma region Index Walking
+
+    __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const = 0;
+    __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, INT uiWalkDir) const = 0;
+
+#pragma endregion
 
     class deviceBoundaryCondition * m_pBoundaryCondition;
 };

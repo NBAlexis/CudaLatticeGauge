@@ -188,3 +188,84 @@ int main(int argc, char * argv[])
 }
 
 //============================================================================================
+test kernel excute order
+
+__global__ void _kernelInitial(int* output, int lyz, int lz)
+{
+    int ix = threadIdx.x + blockDim.x * blockIdx.x;
+    int iy = threadIdx.y + blockDim.y * blockIdx.y;
+    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+
+    output[ix * lyz + iy * lz + iz] = 1;
+}
+
+
+__global__ void _kernelPluseOne(int* output, int lyz, int lz)
+{
+    int ix = threadIdx.x + blockDim.x * blockIdx.x;
+    int iy = threadIdx.y + blockDim.y * blockIdx.y;
+    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+
+    output[ix * lyz + iy * lz + iz] += 1;
+}
+
+__global__ void _kernelMultiplyTwo(int* output, int lyz, int lz)
+{
+    int ix = threadIdx.x + blockDim.x * blockIdx.x;
+    int iy = threadIdx.y + blockDim.y * blockIdx.y;
+    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+
+    output[ix * lyz + iy * lz + iz] *= 2;
+}
+
+
+extern "C" {
+    void _cKernelInitial(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelInitial << <dblock, dthread >> > (output, 16, 1);
+    }
+
+    void _cKernelPlusOne(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelPluseOne << <dblock, dthread >> > (output, 16, 1);
+    }
+
+    void _cKernelMultiplyTwo(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelMultiplyTwo << <dblock, dthread >> > (output, 16, 1);
+    }
+}
+
+int main()
+{
+    int * pTable;
+    cudaMalloc((void**)&pTable, sizeof(int) * 256);
+    _cKernelInitial(pTable);
+    _cKernelPlusOne(pTable);
+    _cKernelMultiplyTwo(pTable);
+    _cKernelPlusOne(pTable);
+    _cKernelMultiplyTwo(pTable);
+
+    int outData[256];
+    cudaMemcpy(outData, pTable, sizeof(int) * 256, cudaMemcpyDeviceToHost);
+    
+    printf("res=\n");
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 16; ++j)
+        {
+            printf("%d ", outData[i * 16 + j]);
+        }
+        printf("\n");
+    }
+
+    cudaFree(pTable);
+    return 0;
+}
+

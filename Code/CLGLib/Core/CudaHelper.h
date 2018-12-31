@@ -28,6 +28,11 @@ extern __constant__ class CRandom* __r;
 extern __constant__ class CRandomSchrage* __rs;
 extern __constant__ class CIndex* __idx;
 
+extern __constant__ class gammaMatrixSet* __diracGamma;
+extern __constant__ class gammaMatrixSet* __chiralGamma;
+
+extern __constant__ class deviceSU3* __SU3Generators[8];
+
 enum EConstIntId
 {
     ECI_Dim,
@@ -72,6 +77,9 @@ public:
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r, const class CRandomSchrage* rs) const;
     void SetDeviceIndex(class CIndex** ppIdx) const;
+    //we never need gamma matrix on host, so this is purely hiden in device
+    void CreateGammaMatrix() const;
+
     /**ret[0] = max thread count, ret[1,2,3] = max thread for x,y,z per block*/
     static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
 

@@ -1,1 +1,42 @@
-\subsection{2018-12-04}
+\subsection{\label{index}Index of lattice}
+
+Generally, in CLG, we have three kinds of indexes:
+
+\begin{itemize}
+\item \index{site index}{\bf site index}
+\item \index{link index}{\bf link index}
+\item \index{fat index}{\bf fat index}
+\end{itemize}
+
+Let the lattice have $V = L_x\times L_y\times L_z\times L_t$ sites.
+
+\textcolor[rgb]{1,0,0}{\bf Note: for $D=3$, we assume $L_x=1$, $L_{y,z,t}>1$; for $D=2$, we assume $L_x=L_y=1$, $L_{z,t}>1$. }
+
+For a site at $(x,y,z,t)$
+\begin{equation}
+\begin{split}
+&siteIndex=x\times L_y\times L_z\times L_t+y\times L_z\times L_t+z\times L_t+t\\
+\end{split}
+\end{equation}
+
+For a link at direction $dir$, link with site at $(x,y,z,t)$, and on a lattice with number of directions of links is $dirCount$,
+\begin{equation}
+\begin{split}
+&linkIndex=siteIndex\times dirCount+dir\\
+\end{split}
+\end{equation}
+
+\textcolor[rgb]{1,0,0}{\bf Note: we do NOT assume dimension equal number of links. For example for $D=2$ triangle lattice, number of directions of links is $6$, for $D=2$ hexagon number of directions of links is $3$. Only for square lattice, number of links equal dimension.}
+
+For a link at direction $dir$, link with site at $(x,y,z,t)$, and on a lattice with number of directions of links is $dirCount$,
+\begin{equation}
+\begin{split}
+&fatIndex=\left\{\begin{array}{cc}siteIndex\times (dirCount+1);&for\;site.\\ siteIndex\times (dirCount+1)+(dir+1);&for\;link\end{array}\right.\\
+\end{split}
+\end{equation}
+
+\subsection{\label{index}Index and boundary condition}
+
+
+\subsection{\label{index}Index walking}
+

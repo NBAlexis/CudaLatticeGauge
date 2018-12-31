@@ -129,6 +129,105 @@ struct CLGAPI deviceSU3
         return ret;
     }
 
+    __device__ __inline__ static deviceSU3* makeSU3Generator(UINT uiGenerator)
+    {
+        deviceSU3* ret = new deviceSU3();
+        ret->makeSU3Zero();
+        switch (uiGenerator)
+        {
+        case 0:
+            {
+            /**
+            *     0     1     0
+            * =   1     0     0
+            *     0     0     0
+            */
+            ret->m_me[1] = _make_cuComplex(1, 0);
+            ret->m_me[3] = _make_cuComplex(1, 0);
+            }
+            break;
+        case 1:
+            {
+            /**
+            *     0     -I     0
+            * =   I     0     0
+            *     0     0     0
+            */
+            ret->m_me[1] = _make_cuComplex(0, -1);
+            ret->m_me[3] = _make_cuComplex(0, 1);
+            }
+            break;
+        case 2:
+            {
+            /**
+            *     1     0     0
+            * =   0    -1     0
+            *     0     0     0
+            */
+            ret->m_me[0] = _make_cuComplex(1, 0);
+            ret->m_me[4] = _make_cuComplex(-1, 0);
+            }
+            break;
+        case 3:
+            {
+            /**
+            *     0     0     1
+            * =   0     0     0
+            *     1     0     0
+            */
+            ret->m_me[2] = _make_cuComplex(1, 0);
+            ret->m_me[6] = _make_cuComplex(1, 0);
+            }
+            break;
+        case 4:
+            {
+            /**
+            *     0     0    -i
+            * =   0     0     0
+            *     i     0     0
+            */
+            ret->m_me[2] = _make_cuComplex(0, -1);
+            ret->m_me[6] = _make_cuComplex(0, 1);
+            }
+            break;
+        case 5:
+            {
+            /**
+            *     0     0     0
+            * =   0     0     1
+            *     0     1     0
+            */
+            ret->m_me[5] = _make_cuComplex(1, 0);
+            ret->m_me[7] = _make_cuComplex(1, 0);
+            }
+            break;
+        case 6:
+            {
+            /**
+            *     0     0     0
+            * =   0     0    -i
+            *     0     i     0
+            */
+            ret->m_me[5] = _make_cuComplex(0, -1);
+            ret->m_me[7] = _make_cuComplex(0, 1);
+            }
+            break;
+        case 7:
+            {
+            /**
+            *     1     0     0
+            * =   0     1     0
+            *     0     0     -2
+            */
+            ret->m_me[0] = _make_cuComplex((Real)InvSqrt3, 0);
+            ret->m_me[4] = _make_cuComplex((Real)InvSqrt3, 0);
+            ret->m_me[8] = _make_cuComplex(-(Real)InvSqrt3_2, 0);
+            }
+            break;
+        }
+        return ret;
+    }
+
     #pragma endregion create
 
     #pragma region operators
@@ -193,7 +292,7 @@ struct CLGAPI deviceSU3
         memcpy(m_me, res, sizeof(_Complex) * 9);
     }
 
-    __device__ __inline void Mul(const _Complex& right)
+    __device__ __inline__ void Mul(const _Complex& right)
     {
         m_me[0] = _cuCmulf(m_me[0], right);
         m_me[1] = _cuCmulf(m_me[1], right);
@@ -204,6 +303,15 @@ struct CLGAPI deviceSU3
         m_me[6] = _cuCmulf(m_me[6], right);
         m_me[7] = _cuCmulf(m_me[7], right);
         m_me[8] = _cuCmulf(m_me[8], right);
+    }
+
+    __device__ __inline__ deviceSU3Vector Mul(const deviceSU3Vector& v) const
+    {
+        deviceSU3Vector ret;
+        ret.m_ve[0] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[0], v.m_ve[0]), _cuCmulf(m_me[1], v.m_ve[1])), _cuCmulf(m_me[2], v.m_ve[2]));
+        ret.m_ve[1] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[3], v.m_ve[0]), _cuCmulf(m_me[4], v.m_ve[1])), _cuCmulf(m_me[5], v.m_ve[2]));
+        ret.m_ve[2] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[6], v.m_ve[0]), _cuCmulf(m_me[7], v.m_ve[1])), _cuCmulf(m_me[8], v.m_ve[2]));
+        return ret;
     }
 
     /**

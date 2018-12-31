@@ -71,10 +71,52 @@ enum { kMaxFieldCount = 8, kMaxActionCount = 8 };
 __DEFINE_ENUM(EFieldType,
 
     EFT_GaugeSU3,
+    EFT_FermionWilsonSquareSU3,
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,
 
     )
+
+
+
+//====================================================
+// Some common structures
+//====================================================
+
+struct CLGAPI SIndex
+{
+    enum
+    {
+        kDagger = 0x01,
+    };
+
+    __device__ SIndex()
+        : m_uiSiteIndex(0)
+        , m_byDir(0)
+        , m_byTag(0)
+        , m_byBoundaryFieldId(0)
+    {
+
+    }
+
+    __device__ SIndex(UINT uiIndex, BYTE dir = 0, BYTE indexTag = 0, BYTE bcField = 0)
+        : m_uiSiteIndex(uiIndex)
+        , m_byDir(dir)
+        , m_byTag(indexTag)
+        , m_byBoundaryFieldId(bcField)
+    {
+
+    }
+
+    __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (kDagger & m_byTag); }
+    __device__ __inline__ UBOOL NeedBoundaryField() const { return 0 != m_byBoundaryFieldId; }
+
+    UINT m_uiSiteIndex;
+    BYTE m_byDir;
+    BYTE m_byTag;
+    BYTE m_byBoundaryFieldId;
+};
+
 
 __END_NAMESPACE
 

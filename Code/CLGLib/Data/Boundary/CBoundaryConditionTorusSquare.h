@@ -20,7 +20,9 @@ public:
 
     __device__ CBoundaryConditionTorusSquare() : deviceBoundaryCondition() { ; }
 
-    __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
+    __device__ virtual SIndex _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
+
+    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const int4 &site, const int4 &fromsite) const;
 };
 
 __END_NAMESPACE

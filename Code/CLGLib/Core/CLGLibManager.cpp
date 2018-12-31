@@ -304,6 +304,12 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 
 #pragma endregion
 
+#pragma region Create Gamma matrix set
+
+    m_pCudaHelper->CreateGammaMatrix();
+
+#pragma endregion
+
 #pragma region Create Fields
 
 #pragma region Gauge

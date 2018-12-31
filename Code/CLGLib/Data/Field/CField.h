@@ -19,6 +19,7 @@ __DEFINE_ENUM(EFieldInitialType,
     EFIT_Identity,
     EFIT_Random,
     EFIT_RandomGenerator,
+    EFIT_RandomGaussian,
     EFIT_ReadFromFile,
 
     EFIT_ForceDWORD = 0x7fffffff,
@@ -29,7 +30,7 @@ class CLGAPI CField : public CBase
 {
 public:
 
-    CField();
+    CField() { ; }
 
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
@@ -61,6 +62,7 @@ public:
 #pragma endregion HMC
 
     class CLatticeData* m_pOwner;
+    BYTE m_byFieldId;
     UINT m_uiThreadCount;
 };
 

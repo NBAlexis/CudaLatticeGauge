@@ -37,7 +37,12 @@ public:
     /**
     * The first index is the site index, the second index is index of field, it is 0 if it is not on boundary
     */
-    __device__ virtual uint2 _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const = 0;
+    __device__ virtual SIndex _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const = 0;
+
+    /**
+    * There are multiple fermion fields, thus might have multiple boundary fermion fields, so a field ID is required
+    */
+    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const int4 &site, const int4 &fromsite) const = 0;
 
 };
 

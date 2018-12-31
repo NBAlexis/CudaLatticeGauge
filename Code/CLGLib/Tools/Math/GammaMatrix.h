@@ -33,6 +33,37 @@ public:
         m_me[x] = make_cuComplexI(r, i);
     }
 
+    /**
+    * ret = (Gamma . Spinor)
+    */
+    __device__ __inline__ deviceWilsonVectorSU3 MulC(const deviceWilsonVectorSU3& other) const
+    {
+        deviceWilsonVectorSU3 ret; 
+        ret.m_d[0] = other.m_d[m_uiIndex[0]];
+        ret.m_d[0].Mul(m_me[0]);
+
+        ret.m_d[1] = other.m_d[m_uiIndex[1]];
+        ret.m_d[1].Mul(m_me[1]);
+
+        ret.m_d[2] = other.m_d[m_uiIndex[2]];
+        ret.m_d[2].Mul(m_me[2]);
+
+        ret.m_d[3] = other.m_d[m_uiIndex[3]];
+        ret.m_d[3].Mul(m_me[3]);
+
+        return ret;
+    }
+
+    /**
+    * ret = (Gamma . Spinor)[uiSpinorIndex]
+    */
+    __device__ __inline__ deviceSU3Vector MulC(const deviceWilsonVectorSU3& other, UINT uiSpinorIndex) const
+    {
+        deviceSU3Vector nonZero = other.m_d[m_uiIndex[uiSpinorIndex]];
+        nonZero.Mul(m_me[uiSpinorIndex]);
+        return nonZero;
+    }
+
     UINT m_uiIndex[4];
     cuComplexI m_me[4];
 

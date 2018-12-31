@@ -50,37 +50,81 @@ template <typename T> void check(T result, char const *const func, const char *c
     }
 }
 
-
-__global__ void _kernelTest(double* output, int lyz, int lz)
+__global__ void _kernelInitial(int* output, int lyz, int lz)
 {
     int ix = threadIdx.x + blockDim.x * blockIdx.x;
     int iy = threadIdx.y + blockDim.y * blockIdx.y;
     int iz = threadIdx.z + blockDim.z * blockIdx.z;
 
-    //Imagine that we have many many work to do here, not just assign a 1 to it
-    output[ix * lyz + iy * lz + iz] = 0.001;
+    output[ix * lyz + iy * lz + iz] = 1;
+}
+
+
+__global__ void _kernelPluseOne(int* output, int lyz, int lz)
+{
+    int ix = threadIdx.x + blockDim.x * blockIdx.x;
+    int iy = threadIdx.y + blockDim.y * blockIdx.y;
+    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+
+    output[ix * lyz + iy * lz + iz] += 1;
+}
+
+__global__ void _kernelMultiplyTwo(int* output, int lyz, int lz)
+{
+    int ix = threadIdx.x + blockDim.x * blockIdx.x;
+    int iy = threadIdx.y + blockDim.y * blockIdx.y;
+    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+
+    output[ix * lyz + iy * lz + iz] *= 2;
 }
 
 
 extern "C" {
-    void _cKernelCallConstantFunction(double* output)
+    void _cKernelInitial(int* output)
     {
-        dim3 dblock(2, 2, 2);
-        dim3 dthread(2, 2, 2);
-        _kernelTest << <dblock, dthread >> > (output, 16, 4);
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelInitial << <dblock, dthread >> > (output, 16, 1);
+    }
+
+    void _cKernelPlusOne(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelPluseOne << <dblock, dthread >> > (output, 16, 1);
+    }
+
+    void _cKernelMultiplyTwo(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+        _kernelMultiplyTwo << <dblock, dthread >> > (output, 16, 1);
     }
 }
 
 int main()
 {
-    double * pTable;
-    cudaMalloc((void**)&pTable, sizeof(double) * 64);
-    _cKernelCallConstantFunction(pTable);
-    
-    thrust::device_ptr<double> dp(pTable);
-    thrust::device_vector<double> d_x(dp, dp + 64);
+    int * pTable;
+    cudaMalloc((void**)&pTable, sizeof(int) * 256);
+    _cKernelInitial(pTable);
+    _cKernelPlusOne(pTable);
+    _cKernelMultiplyTwo(pTable);
+    _cKernelPlusOne(pTable);
+    _cKernelMultiplyTwo(pTable);
 
-    double sum = thrust::reduce(d_x.begin(), d_x.end(), 0.0/*This is important! the return type is same as this*/, thrust::plus<double>());
-    printf("result is %f\n", (float)sum);
+    int outData[256];
+    cudaMemcpy(outData, pTable, sizeof(int) * 256, cudaMemcpyDeviceToHost);
+    
+    printf("res=\n");
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 16; ++j)
+        {
+            printf("%d ", outData[i * 16 + j]);
+        }
+        printf("\n");
+    }
+
+    cudaFree(pTable);
     return 0;
 }

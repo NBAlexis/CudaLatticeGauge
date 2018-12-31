@@ -29,6 +29,9 @@
     <ClInclude Include="Core\CudaHelper.h" />
     <ClInclude Include="Core\CudaHelperFunctions.h" />
     <ClInclude Include="Data\Action\CAction.h" />
+    <ClInclude Include="Data\Action\CActionFermion.h" />
+    <ClInclude Include="Data\Action\CActionFermionWilson.h" />
+    <ClInclude Include="Data\Action\CActionGauge.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h" />
@@ -37,6 +40,7 @@
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldBoson.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CFieldGauge.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3.h" />
     <ClInclude Include="Data\Field\CFieldGaugeZ2.h" />
@@ -61,6 +65,7 @@
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
     <ClInclude Include="Tools\Math\SU3.h" />
+    <ClInclude Include="Tools\Math\Vectors.h" />
     <ClInclude Include="Tools\Tracer.h" />
     <ClInclude Include="Tools\Timer.h" />
     <ClInclude Include="Update\Continous\CHMC.h" />
@@ -82,6 +87,7 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Data\Field\CField.cpp" />
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <FileType>Document</FileType>
     </CudaCompile>

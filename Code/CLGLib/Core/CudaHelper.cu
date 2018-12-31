@@ -16,6 +16,30 @@ __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
 __constant__ CRandomSchrage* __rs;
 __constant__ CIndex* __idx;
+__constant__ gammaMatrixSet* __diracGamma;
+__constant__ gammaMatrixSet* __chiralGamma;
+__constant__ deviceSU3* __SU3Generators[8];
+
+/**
+* The construction is on device
+*/
+__global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3** ppGenerator)
+{
+    (*ppPtrDirac) = new gammaMatrixSet(gammaMatrixSet::EGMS_Dirac);
+    (*ppPtrChiral) = new gammaMatrixSet(gammaMatrixSet::EGMS_Chiral);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        ppGenerator[i] = deviceSU3::makeSU3Generator(i);
+    }
+}
+
+extern "C" {
+    void _cCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3** ppGenerator)
+    {
+        _kernelCreateMatrix << <1, 1 >> > (ppPtrDirac, ppPtrChiral, ppGenerator);
+    }
+}
 
 
 void CCudaHelper::DeviceQuery()
@@ -304,6 +328,31 @@ void CCudaHelper::CopyRandomPointer(const CRandom* r, const CRandomSchrage* rs) 
 {
     checkCudaErrors(cudaMemcpyToSymbol(__r, &r, sizeof(CRandom*)));
     checkCudaErrors(cudaMemcpyToSymbol(__rs, &rs, sizeof(CRandomSchrage*)));
+}
+
+void CCudaHelper::CreateGammaMatrix() const
+{
+    gammaMatrixSet** ppDiracGamma;
+    gammaMatrixSet** ppChiralGamma;
+    deviceSU3** ppSU3;
+
+    //create pointer
+    checkCudaErrors(cudaMalloc((void**)&ppDiracGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMalloc((void**)&ppChiralGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMalloc((void**)&ppSU3, sizeof(deviceSU3*) * 8));
+
+    //craete content
+    _cCreateMatrix(ppDiracGamma, ppChiralGamma, ppSU3);
+
+    //copy to constant
+    checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, ppDiracGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMemcpyToSymbol(__chiralGamma, ppChiralGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMemcpyToSymbol(__SU3Generators, ppSU3, sizeof(deviceSU3*) * 8));
+
+    //free pointers (already copy to constant, no need)
+    checkCudaErrors(cudaFree(ppDiracGamma));
+    checkCudaErrors(cudaFree(ppChiralGamma));
+    checkCudaErrors(cudaFree(ppSU3));
 }
 
 void CCudaHelper::SetDeviceIndex(class CIndex** ppIdx) const

@@ -61,9 +61,10 @@ public:
 
 #pragma endregion BLAS
 
+    deviceSU3* m_pDeviceData;
+
 protected:
 
-    deviceSU3* m_pDeviceData;
     Real* m_pDeviceTmpResPtr;
 };
 

@@ -86,9 +86,10 @@ UINT uiDir = _DC_Dir;
 
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
+#include "Tools/Math/Vectors.h" //vectors.h must ealier than gamma matrix
 #include "Tools/Math/SU3.h"
 #include "Tools/Math/cuComplexI.h"
-#include "Tools/Math/GammaMatrix.h"
+#include "Tools/Math/GammaMatrix.h" //gamma matrix must later than cuComplexI
 
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"
@@ -107,6 +108,7 @@ UINT uiDir = _DC_Dir;
 #include "Data/Field/CFieldSpin.h"
 
 #include "Data/Field/CFieldFermion.h"
+#include "Data/Field/CFieldFermionWilsonSquareSU3.h"
 
 #include "Data/Action/CAction.h"
 #include "Data/Action/CActionGaugePlaquette.h"

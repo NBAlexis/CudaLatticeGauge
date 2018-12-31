@@ -185,6 +185,21 @@
     <ClInclude Include="Core\CLGFloat.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionFermion.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionFermionWilson.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGauge.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\Vectors.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -203,11 +218,14 @@
     <ClCompile Include="Tools\Data\CCString.cpp">
       <Filter>Tools\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Boundary\CBoundaryCondition.cu">
-      <Filter>Data\Boundary</Filter>
+    <ClCompile Include="Data\Field\CField.cpp">
+      <Filter>Data\Field</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Lattice\CLatticeData.cu">
-      <Filter>Data\Lattice</Filter>
+    <ClCompile Include="Update\Continous\CHMC.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Action\CActionGaugePlaquette.cpp">
+      <Filter>Data\Action</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,17 +256,17 @@
     <CudaCompile Include="Core\CudaHelper.cu">
       <Filter>Core</Filter>
     </CudaCompile>
-    <CudaCompile Include="Update\Continous\CHMC.cpp">
-      <Filter>Update\Continous</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionGaugePlaquette.cpp">
-      <Filter>Data\Action</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Lattice\CIndex.cu">
       <Filter>Data\Lattice</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CField.cpp">
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Boundary\CBoundaryCondition.cu">
+      <Filter>Data\Boundary</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Lattice\CLatticeData.cu">
+      <Filter>Data\Lattice</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>
