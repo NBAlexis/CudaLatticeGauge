@@ -40,6 +40,9 @@
     <Filter Include="Tools\Data">
       <UniqueIdentifier>{3260bc8d-cb77-4e01-9aba-2c24c996540a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SparseLinearAlgebra">
+      <UniqueIdentifier>{cb0b44bd-8e85-47fa-b891-0a9e41f7d88f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Platform\WinFunction.h">
@@ -200,6 +203,12 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolveBiCGstab.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSLASolve.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -267,6 +276,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <Filter>Data\Lattice</Filter>
+    </CudaCompile>
+    <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cu">
+      <Filter>SparseLinearAlgebra</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

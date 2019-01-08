@@ -19,7 +19,7 @@ __DEFINE_ENUM(EUpdatorType,
     EUT_HMC,
     EUT_Max,
 
-    EUT_ForceDWORD,
+    EUT_ForceDWORD = 0x7fffffff,
 )
 
 class CLGAPI CUpdator : public CBase

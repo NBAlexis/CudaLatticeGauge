@@ -47,6 +47,7 @@ __device__ static __inline__ Real cuCabsI(const cuComplexI& x) { return _sqrt((R
 
 __device__ static __inline__ _Complex cuCItoF(const cuComplexI& x) { return _make_cuComplex((Real)x.x, (Real)x.y); }
 
+
 __END_NAMESPACE
 
 #endif //#ifndef _CUCOMPLEXI_H_

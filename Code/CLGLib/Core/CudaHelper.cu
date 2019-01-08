@@ -41,6 +41,15 @@ extern "C" {
     }
 }
 
+struct complex_plus_for_thrust
+{
+    __host__ __device__ _Complex operator()(const _Complex &lhs, const _Complex &rhs) const { return _cuCaddf(lhs, rhs); }
+};
+
+CCudaHelper::~CCudaHelper()
+{
+    ReleaseTemeraryBuffers();
+}
 
 void CCudaHelper::DeviceQuery()
 {
@@ -394,6 +403,19 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     return ret;
 }
 
+_Complex CCudaHelper::ThreadBufferSum(_Complex * pDeviceBuffer)
+{
+    thrust::device_ptr<_Complex> dp(pDeviceBuffer);
+    thrust::device_vector<_Complex> d_x(dp, dp + m_uiThreadCount);
+    return thrust::reduce(d_x.begin(), d_x.end(), _make_cuComplex(0, 0), complex_plus_for_thrust());
+}
+
+Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
+{
+    thrust::device_ptr<Real> dp(pDeviceBuffer);
+    thrust::device_vector<Real> d_x(dp, dp + m_uiThreadCount);
+    return thrust::reduce(d_x.begin(), d_x.end(), (Real)0, thrust::plus<Real>());
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // export C interface

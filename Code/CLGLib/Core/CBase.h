@@ -33,6 +33,28 @@ virtual const CClass* GetClass() const \
 protected:
 
 
+//=================================================================
+//========= To declare field, we force the copy function ==========
+
+#define __CLGDECLARE_FIELD(class_name) \
+__CLGDECLARE_CLASS(class_name) \
+public: \
+virtual void CopyTo(CField* U) const; \
+virtual CField* GetCopy() const \
+{ \
+    class_name* ret = new class_name(); \
+    CopyTo(ret); \
+    return ret; \
+} \
+virtual CField* GetZero() const \
+{ \
+    class_name* ret = new class_name(); \
+    ret->InitialField(EFIT_Zero); \
+    return ret; \
+} \
+protected:
+
+
 #define __CLGIMPLEMENT_CLASS(class_name) \
     __DLL_EXPORT class_name::class##class_name class_name::m_StaticClass;
 

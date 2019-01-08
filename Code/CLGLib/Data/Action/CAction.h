@@ -23,7 +23,7 @@ public:
     * This is S for specific configuration using for exp(-S)/exp(-S0) update
     * Because of the presence of Fermions, we can no longer just calculate a local(ultral-local) change os S
     */
-    virtual Real Energy(class CFieldGauge* pGauge) const = 0;
+    virtual Real Energy(const class CFieldGauge* pGauge) const = 0;
 
     /**
     * Obtain the pointer of the fields

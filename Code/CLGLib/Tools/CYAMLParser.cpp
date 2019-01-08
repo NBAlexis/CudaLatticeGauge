@@ -39,7 +39,7 @@ void CParameters::Dump(const CCString& indent) const
     {
         for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral(_T("%s  key = %s\tvalue = [ "), indent, allKeys[i]);
+            appGeneral(_T("%s  key = %s\tvalue = [ "), indent.c_str(), allKeys[i].c_str());
             TArray<CCString> thevalues = m_pStringVector.GetAt(allKeys[i]);
             for (INT j = 0; j < thevalues.Num(); ++j)
             {

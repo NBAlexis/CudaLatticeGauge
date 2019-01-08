@@ -1,6 +1,6 @@
 
 %book 2017
-@article{latticeqcdbook1,
+@article{latticeqcdbook2017,
       author         = "Francesco Knechtli, Michael G$\rm\ddot{u}$nther and Michael Peardon",
       title          = "{Lattice Quantum Chromodynamics Practical Essentials}",
       year           = "2017",
@@ -8,12 +8,19 @@
       doi            = "10.1007/978-94-024-0999-4",
 }
 
-@article{latticebooka,
+@article{latticeqcdbook2010,
       author         = "C. Gattringer and C.B. Lang",
       title          = "{Quantum Chromodynamics on the Lattice}",
       year           = "2010",
       publisher      = "Springer",
       doi            = "10.1007/978-3-642-01850-3",
+}
+
+@article{condensedmatterbookAltland,
+      author         = "A. Nakamura et. al.",
+      title          = "{Beating the sign problem in finite density lattice QCD}",
+      year           = "2016",
+      doi            = "10.22323/1.251.0208"
 }
 
 %Classical

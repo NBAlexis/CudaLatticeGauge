@@ -22,7 +22,7 @@ public:
     */
     CActionGaugePlaquette();
 
-    virtual Real Energy(class CFieldGauge* pGauge) const;
+    virtual Real Energy(const class CFieldGauge* pGauge) const;
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param);
     virtual void CalculateForceOnGauge(class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
 

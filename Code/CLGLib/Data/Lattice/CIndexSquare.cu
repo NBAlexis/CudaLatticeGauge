@@ -117,7 +117,7 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, UINT& coun
 /**
 * virtual, cannot inline
 */
-__device__ SIndex CIndexSquare::_deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir)
+__device__ SIndex CIndexSquare::_deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const
 {
     int4 fromSite = __deviceSiteIndexToInt4(uiSiteIndex);
     int4 siteInt4 = _deviceMoveSquareSite(fromSite, uiWalkDir);

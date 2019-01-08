@@ -26,11 +26,22 @@ __DEFINE_ENUM(EFieldInitialType,
     )
 
 
+
+__DEFINE_ENUM(EFieldOperator,
+
+    EFO_F_D,
+    EFO_F_Ddagger,
+    EFO_F_DDdagger,
+    EFO_F_InverseDDdagger,
+
+    EFO_ForceDWORD = 0x7fffffff,
+    )
+
 class CLGAPI CField : public CBase
 {
 public:
 
-    CField() { ; }
+    CField();
 
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
@@ -44,13 +55,27 @@ public:
     virtual void Indentity() = 0;
 
     //This is Axpy(1.0f, x)
-    virtual void Axpy(const CField* x) = 0;
+    virtual void AxpyPlus(const CField* x) = 0;
+    //This is Axpy(1.0f, x)
+    virtual void AxpyMinus(const CField* x) = 0;
+
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const _Complex& a, const CField* x) = 0;
+
+    //This is a * me
+    virtual void ScalarMultply(const _Complex& a) = 0;
+    virtual void ScalarMultply(Real a) = 0;
     
 #pragma endregion BLAS
 
-#pragma region HMC
+#pragma region Other useful operators
+
+    /**
+    * pDeviceBuffer is a Real array, with length of [thread count]
+    * Using pDeviceBuffer, we make sure Dot function is a constant function as it should be.
+    * The final result of dot, should be sum of pDeviceBuffer
+    */
+    virtual _Complex Dot(const CField* other) const = 0;
 
     /**
     * U = exp(a this)U
@@ -58,12 +83,15 @@ public:
     virtual void ExpMult(const _Complex& a, CField* U) const = 0;
 
     virtual void CopyTo(CField* U) const = 0;
+    virtual CField* GetCopy() const = 0;
+    virtual CField* GetZero() const = 0;
+
+    virtual void ApplyOperator(EFieldOperator op, const CField* otherfield) = 0;
 
 #pragma endregion HMC
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
-    UINT m_uiThreadCount;
 };
 
 __END_NAMESPACE

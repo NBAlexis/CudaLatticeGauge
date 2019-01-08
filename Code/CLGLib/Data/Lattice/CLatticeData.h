@@ -44,6 +44,8 @@ public:
     CLatticeData();
     ~CLatticeData();
 
+    void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
+
     //static void Create() { if (NULL == m_pInstance) { m_pInstance = new CLatticeData(); } }
     //static void Release() { appSafeDelete(m_pInstance); }
     //~CLatticeData() { ; }
@@ -104,9 +106,11 @@ public:
 
     //same as CAction* m_pDeviceActionList[]
     //class CAction** m_pDeviceActionList;
+    class CSLASolver* m_pFermionSolver;
     
 };
 
+inline class CSLASolver* appGetFermionSolver();
 
 __END_NAMESPACE
 

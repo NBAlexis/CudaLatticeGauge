@@ -18,7 +18,7 @@ __BEGIN_NAMESPACE
 
 class CLGAPI CFieldFermionWilsonSquareSU3 : public CFieldFermion
 {
-    __CLGDECLARE_CLASS(CFieldFermionWilsonSquareSU3)
+    __CLGDECLARE_FIELD(CFieldFermionWilsonSquareSU3)
 
 public:
 
@@ -37,13 +37,22 @@ public:
     virtual void Indentity() { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
 
     //This is Axpy(1.0f, x)
-    virtual void Axpy(const CField* x) { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
-    virtual void Axpy(Real a, const CField* x) { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
-    virtual void Axpy(const _Complex& a, const CField* x) { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
+    virtual void AxpyPlus(const CField* x);
+    virtual void AxpyMinus(const CField* x);
+    virtual void Axpy(Real a, const CField* x);
+    virtual void Axpy(const _Complex& a, const CField* x);
+    virtual void ScalarMultply(const _Complex& a);
+    virtual void ScalarMultply(Real a);
 
-    virtual void ExpMult(const _Complex& a, CField* U) const { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
+    virtual _Complex Dot(const CField* other) const;
 
-    virtual void CopyTo(CField* U) const;
+    virtual void ExpMult(const _Complex& a, CField* U) const { UN_USE(a); UN_USE(U); appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
+
+    //pGauge must be gauge SU3
+    virtual void D(const CField* pGauge);
+    virtual void Ddagger(const CField* pGauge);
+    virtual void DDdagger(const CField* pGauge);
+    virtual void InverseDDdagger(const CField* pGauge);
 
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
@@ -53,8 +62,6 @@ protected:
 
     Real m_fKai;
 
-    //D phi
-    void D();
 
     deviceWilsonVectorSU3* m_pDeviceData;
     //When calculating D phi etc, the neigbour will change, so we need to copy it before calculate

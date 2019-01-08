@@ -84,11 +84,11 @@ UINT uiTLength = _DC_Lt; \
 UINT uiDir = _DC_Dir;
 
 
+#include "Tools/Math/cuComplexI.h"
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
 #include "Tools/Math/Vectors.h" //vectors.h must ealier than gamma matrix
 #include "Tools/Math/SU3.h"
-#include "Tools/Math/cuComplexI.h"
 #include "Tools/Math/GammaMatrix.h" //gamma matrix must later than cuComplexI
 
 #include "Data/CCommonData.h"
@@ -112,6 +112,9 @@ UINT uiDir = _DC_Dir;
 
 #include "Data/Action/CAction.h"
 #include "Data/Action/CActionGaugePlaquette.h"
+
+#include "SparseLinearAlgebra/CSLASolve.h"
+#include "SparseLinearAlgebra/CSolveBiCGstab.h"
 
 #include "Update/CUpdator.h"
 #include "Update/Continous/CIntegrator.h"

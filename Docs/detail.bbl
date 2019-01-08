@@ -6,6 +6,17 @@ Michael~G$\rm\ddot{u}$nther Francesco~Knechtli and Michael Peardon.
   Chromodynamics Practical Essentials}}.
 \newblock 2017.
 
+\bibitem{condensedmatterbookAltland}
+Alexander Altland and Ben Simons.
+\newblock {Condensed Matter Field Theory 2nd edition}.
+\newblock 2010.
+
+\bibitem{weingarten1981}
+D.~H. Weingarten and D.~N. Petcher.
+\newblock \href{http://dx.doi.org/10.1016/0370-2693(81)90112-x}{{Monte Carlo
+  integration for lattice gauge theories with fermions.}}
+\newblock {\em Phys. Lett. B}, 99(4):333¨C338, 1981.
+
 \bibitem{latticeqcdbook2010}
 C.~Gattringer and C.B. Lang.
 \newblock \href{http://dx.doi.org/10.1007/978-3-642-01850-3}{{Quantum

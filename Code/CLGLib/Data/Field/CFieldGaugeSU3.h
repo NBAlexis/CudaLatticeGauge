@@ -31,7 +31,7 @@ __BEGIN_NAMESPACE
 
 class CLGAPI CFieldGaugeSU3 : public CFieldGauge
 {
-    __CLGDECLARE_CLASS(CFieldGaugeSU3)
+    __CLGDECLARE_FIELD(CFieldGaugeSU3)
 
 public:
     CFieldGaugeSU3();
@@ -44,10 +44,9 @@ public:
 #pragma region HMC
 
     virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const _Complex& minusBetaOverN) const;
-    virtual void ExpMult(const _Complex& a, CField* U) const;
-    virtual void CopyTo(CField* U) const;
     virtual void MakeRandomGenerator();
-    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN);
+    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) const;
+    virtual Real CalculateKinematicEnergy() const;
 
 #pragma endregion HMC
 
@@ -55,17 +54,19 @@ public:
 
     virtual void Zero();
     virtual void Indentity();
-    virtual void Axpy(const CField* x);
+
+    virtual void AxpyPlus(const CField* x);
+    virtual void AxpyMinus(const CField* x);
     virtual void Axpy(Real a, const CField* x);
     virtual void Axpy(const _Complex& a, const CField* x);
+    virtual void ScalarMultply(const _Complex& a);
+    virtual void ScalarMultply(Real a);
 
 #pragma endregion BLAS
 
+    virtual void ExpMult(const _Complex& a, CField* U) const;
+
     deviceSU3* m_pDeviceData;
-
-protected:
-
-    Real* m_pDeviceTmpResPtr;
 };
 
 __END_NAMESPACE

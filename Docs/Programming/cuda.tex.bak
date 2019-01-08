@@ -152,7 +152,7 @@ class CA
 public:
     __device__ CA() { ; }
     __device__ ~CA() { ; }
-    __device__ virtual void CallMe() { printf("A"); }
+    __device__ virtual void CallMe() { printf("This is A\n"); }
 };
 
 class CB : public CA
@@ -160,51 +160,63 @@ class CB : public CA
 public:
     __device__ CB() : CA() { ; }
     __device__ ~CB() { ; }
-    __device__ virtual void CallMe() { printf("B"); }
+    __device__ virtual void CallMe() { printf("This is B\n"); }
 };
 
-__global__ void _kernelCreateInstance(CA** ptr)
+__global__ void _kernelCreateInstance(CA** pptr)
 {
-    (*ptr) = new CB();
+    (*pptr) = new CB();
 }
 
-__global__ void _kernelDeleteInstance(CA** ptr)
+__global__ void _kernelDeleteInstance(CA** pptr)
 {
-    delete (*ptr);
-}
-
-__global__ void _kernelCallFuncion(CA** ptr)
-{
-    (*ptr)->CallMe();
+    delete (*pptr);
 }
 
 extern "C" {
-    void _kCreateInstance(CA** ptr)
+    void _kCreateInstance(CA** pptr)
     {
-        _kernelCreateInstance << <1, 1 >> >(ptr);
+        _kernelCreateInstance << <1, 1 >> >(pptr);
     }
 
-    void _kCallFunc(CA** ptr)
+    void _kDeleteInstance(CA** pptr)
     {
-        //NOTE that, only (*ptr) on device get the correct pointer.
-        //_kernelCallFuncion(CA* ptr) will not work
-        _kernelCallFuncion << <1, 1 >> >(ptr);
+        _kernelDeleteInstance << <1, 1 >> >(pptr);
     }
+}
 
-    void _kDeleteInstance(CA** ptr)
+__constant__ CA* m_pA;
+
+__global__ void _kernelCallConstantFunction()
+{
+    m_pA->CallMe();
+}
+
+
+extern "C" {
+    void _cKernelCallConstantFunction()
     {
-        _kernelDeleteInstance<<<1,1>>>(ptr);
+        _kernelCallConstantFunction << <1, 1 >> > ();
     }
 }
 
 int main()
 {
-    CA** ptr;
-    cudaMalloc((void**)&ptr, sizeof(CA*));
-    _kCreateInstance(ptr);
-    _kCallFunc(ptr);
-    _kDeleteInstance(ptr);
-    cudaFree(ptr);
+    CA** pptr;
+    cudaMalloc((void**)&pptr, sizeof(CA*));
+    _kCreateInstance(pptr);
+
+    //I can NOT use a kernel to set m_pA = (*pptr), because it is constant.
+    //I can NOT use cudaMemcpyToSymbol(m_pA, (*pptr)), because * operator on host is incorrect when pptr is a device ptr.
+    //I can NOT use cudaMemcpyToSymbol(m_pA, (*pptr)) in kernel, because cudaMemcpyToSymbol is a __host__ function
+    //I have to at first copy it back to host, then copy it back back again to constant
+    CA* pptrHost[1];
+    cudaMemcpy(pptrHost, pptr, sizeof(CA**), cudaMemcpyDeviceToHost);
+    cudaMemcpyToSymbol(m_pA, pptrHost, sizeof(CA*));
+    _cKernelCallConstantFunction();
+
+    _kDeleteInstance(pptr);
+    cudaFree(pptr);
     return 0;
 }
 

@@ -71,7 +71,7 @@
 # define __PACK_POP				
 #endif
 
-#pragma endregion Function call
+#pragma endregion
 
 #pragma region Helpers
 
@@ -81,7 +81,9 @@
 #define appSafeDelete(p)		{if(p){delete p; p=NULL;}}
 #define appSafeDeleteArray(p)	{if(p){delete[] p; p=NULL;}}
 
-#pragma endregion Helpers
+#define UN_USE(a) (void)a
+
+#pragma endregion
 
 #endif //#ifndef _CLGDEFINE_H_
 

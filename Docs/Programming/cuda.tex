@@ -1,6 +1,6 @@
 \subsection{\label{cuda}cuda}
 
-\subsubsection{\label{threads}threads}
+\subsubsection{\label{cudathreads}blocks and threads}
 
 \subsubsection{\label{device member function}device member function}
 
@@ -133,9 +133,9 @@ int main(int argc, char * argv[])
 
 \subsubsection{\label{device virtual member function}device virtual member function}
 
-According to \href{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions}{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions} 
+According to \href{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions}{https://stackoverflow.com/questions/26812913/how-to-implement-device-side-cuda-virtual-functions}
 
-To call a device virtual member function, unlike Sec.~\ref{device member function}, the pointer to the virtual function table should also be on device, 
+To call a device virtual member function, unlike Sec.~\ref{device member function}, the pointer to the virtual function table should also be on device,
 
 \begin{itemize}
   \item First, cudaMalloc a sizeof(void*), for the device pointer.
@@ -220,4 +220,4 @@ int main()
     return 0;
 }
 
-\end{lstlisting} 
+\end{lstlisting}

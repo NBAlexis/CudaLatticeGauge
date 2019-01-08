@@ -58,6 +58,11 @@ inline class CLatticeData* appGetLattice()
     return GCLGManager.m_pLatticeData;
 }
 
+inline class CSLASolver* appGetFermionSolver()
+{
+    return appGetLattice()->m_pFermionSolver;
+}
+
 __END_NAMESPACE
 
 #endif //#ifndef _CLGLIBMANAGER_H_

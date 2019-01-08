@@ -43,6 +43,8 @@ CLatticeData::CLatticeData()
     , m_pDeviceGaugeField(NULL)
     , m_pDeviceGaugeFieldStaple(NULL)
     , m_pDeviceIndex(NULL)
+
+    , m_pFermionSolver(NULL)
     //, m_pDeviceActionList(NULL)
 {
     
@@ -84,6 +86,19 @@ CLatticeData::~CLatticeData()
     appSafeDelete(m_pGaugeField);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pRandomSchrage);
+    appSafeDelete(m_pFermionSolver);
+}
+
+void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField)
+{
+    CBase* pSolver = appCreate(sSolver);
+    m_pFermionSolver = dynamic_cast<CSLASolver*>(pSolver);
+    if (NULL == m_pFermionSolver)
+    {
+        appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
+    }
+    m_pFermionSolver->Configurate(param);
+    m_pFermionSolver->AllocateBuffers(pFermionField);
 }
 
 __END_NAMESPACE

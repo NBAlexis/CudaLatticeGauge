@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  16 DEC 2018 21:12
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  9 JAN 2019 04:17
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1056,7 +1056,20 @@ File: extended.chr 2015/04/18 4.8.4
 LaTeX Warning: Unused global option(s):
     [3pt].
 
-(detail.aux)
+(detail.aux
+
+LaTeX Warning: Label `index' multiply defined.
+
+
+LaTeX Warning: Label `index' multiply defined.
+
+
+LaTeX Warning: Label `index' multiply defined.
+
+
+LaTeX Warning: Label `hmc_scheme' multiply defined.
+
+)
 \openout1 = `detail.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 46.
@@ -1278,52 +1291,53 @@ File: lstlang1.sty 2018/09/02 1.7 listings language file
 (D:\CTEX\MiKTeX\tex\latex\listings\lstmisc.sty
 File: lstmisc.sty 2018/09/02 1.7 (Carsten Heinz)
 ) (data/index.tex
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 6.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 8.
 
 (D:\CTEX\MiKTeX\tex\latex\base\omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.53937> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 6.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 8.
 ) (data/parameters.tex) [3
 
+] [4]
+(update/hmc.tex [5
+
 ]
-(update/hmc.tex
-LaTeX Font Info:    Try loading font information for U+euf on input line 7.
+LaTeX Font Info:    Try loading font information for U+euf on input line 77.
  (D:\CTEX\MiKTeX\tex\latex\amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
-) [4
-
-] [5]) [6]
-(programming/cuda.tex
+) [6] [7]
+[8] [9] [10] [11] [12]) (update/solver.tex) [13] (programming/cuda.tex
 Overfull \hbox (2.43213pt too wide) in paragraph at lines 7--8
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/53
 781421/cuda-the-member-field-with-
  []
 
-[7
+[14
 
-] [8]
+] [15]
 Overfull \hbox (11.53699pt too wide) in paragraph at lines 136--137
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/26
 812913/how-to-implement-device-side-
  []
 
-[9] [10] [11]) [12] (tests/testRandom.tex) [13
+[16] [17] [18]) [19] (tests/testRandom.tex) [20
 
-] (detail.ind<<c1956.cmap>><<c1961.cmap>> [14
+] (detail.ind<<c1956.cmap>><<c1961.cmap>> [21
 
 
 
-]) (detail.bbl<<c1937.cmap>><<c1947.cmap>><<c1958.cmap>><<c1959.cmap>>)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 104.
- [15
+]) (detail.bbl<<c1937.cmap>><<c1947.cmap>><<c1958.cmap>><<c1959.cmap>><<c1929.c
+map>>)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 106.
+ [22
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 104.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 106.
  (detail.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 104.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 104.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 106.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 106.
 
 
 Package rerunfilecheck Warning: File `detail.out' has changed.
@@ -1331,44 +1345,46 @@ Package rerunfilecheck Warning: File `detail.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `detail.out':
-(rerunfilecheck)             Before: A24AE15F32BBCE91A8886767BB15E1E6;2392
-(rerunfilecheck)             After:  3EB3194FCF1FE51E38B0ACF7D442F0DE;1864.
+(rerunfilecheck)             Before: 1BB2EA715A1001C9FF258D5E85DECE30;5091
+(rerunfilecheck)             After:  209B0A4D10FA8A27E05F291A3508F179;3885.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 104.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 106.
  ) 
 Here is how much of TeX's memory you used:
- 27436 strings out of 492976
- 457031 string characters out of 3141819
- 940838 words of memory out of 3000000
- 30633 multiletter control sequences out of 15000+200000
- 553750 words of font info for 104 fonts, out of 3000000 for 9000
+ 27679 strings out of 492976
+ 460502 string characters out of 3141819
+ 949320 words of memory out of 3000000
+ 30734 multiletter control sequences out of 15000+200000
+ 554392 words of font info for 106 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
- 44i,20n,63p,497b,1993s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/s
-imhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS
+ 44i,20n,63p,576b,1997s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/s
+imhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS
 /Fonts/simsun.ttc><C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Fonts/simsun.ttc><C:
-/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei
-.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Font
-s/simsun.ttc><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><D:/CTEX
-/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/CTEX/MiKTeX/fonts/type1/p
-ublic/amsfonts/cm/cmex10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmm
-i10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><D:/CTEX/MiKTe
-X/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmr17.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><D
-:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><D:/CTEX/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmsl10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm
-/cmsy10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><D:/CTEX/M
-iKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/MiKTeX/fonts/type1/publ
-ic/amsfonts/euler/eufm10.pfb>
-Output written on detail.pdf (15 pages, 301488 bytes).
+/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei
+.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Font
+s/simsun.ttc><C:/WINDOWS/Fonts/simsun.ttc><D:/CTEX/MiKTeX/fonts/type1/public/am
+sfonts/cm/cmbx10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+<D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><D:/CTEX/MiKTeX/fonts
+/type1/public/amsfonts/cm/cmmi10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi5.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><D:/CTE
+X/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/CTEX/MiKTeX/fonts/type1/p
+ublic/amsfonts/cm/cmr17.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5
+.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><D:/CTEX/MiKTeX/fo
+nts/type1/public/amsfonts/cm/cmsl10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmsy10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><D:
+/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/ty
+pe1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/eu
+ler/eufm10.pfb>
+Output written on detail.pdf (22 pages, 386511 bytes).
 PDF statistics:
- 570 PDF objects out of 1000 (max. 8388607)
- 259 named destinations out of 1000 (max. 500000)
- 153 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 823 PDF objects out of 1000 (max. 8388607)
+ 395 named destinations out of 1000 (max. 500000)
+ 229 words of extra memory for PDF output out of 10000 (max. 10000000)
 

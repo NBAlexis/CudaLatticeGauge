@@ -13,7 +13,7 @@ __BEGIN_NAMESPACE
 
 CField::CField() : CBase(), m_pOwner(NULL)
 {
-    m_uiThreadCount = _HC_DecompLx * _HC_DecompLy * _HC_DecompLz;
+    
 }
 
 CFieldGauge::CFieldGauge() : CField()

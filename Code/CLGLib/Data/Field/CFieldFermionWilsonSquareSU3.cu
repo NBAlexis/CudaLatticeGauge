@@ -20,7 +20,7 @@ __CLGIMPLEMENT_CLASS(CFieldFermionWilsonSquareSU3)
 
 __global__ void _kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pData)
 {
-    intokernal;
+    intokernal_fermion;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -48,10 +48,93 @@ __global__ void _kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 *
     }
 }
 
+__global__ void _kernelAxpyPlusFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther)
+{
+    intokernal_fermion;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Add(pOther[siteIndex]);
+    }
+}
+
+__global__ void _kernelAxpyMinusFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther)
+{
+    intokernal_fermion;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Sub(pOther[siteIndex]);
+    }
+}
+
+__global__ void _kernelAxpyComplexFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex a)
+{
+    intokernal_fermion;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Add(pOther[siteIndex].MulC(a));
+    }
+}
+
+__global__ void _kernelAxpyRealFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
+{
+    intokernal_fermion;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Add(pOther[siteIndex].MulC(a));
+    }
+}
+
+__global__ void _kernelDotFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex * result)
+{
+    intokernal_fermion;
+    _Complex res = _make_cuComplex(0, 0);
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        res = _cuCaddf(res, pMe[siteIndex].ConjugateDotC(pOther[siteIndex]));
+    }
+    result[threadIdx.x * blockDim.y * blockDim.z + threadIdx.y * blockDim.z + threadIdx.z] = res;
+}
+
+__global__ void _kernelScalarMultiplyComplex(deviceWilsonVectorSU3 * pMe, _Complex a)
+{
+    intokernal_fermion;
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Mul(a);
+    }
+}
+
+__global__ void _kernelScalarMultiplyReal(deviceWilsonVectorSU3 * pMe, Real a)
+{
+    intokernal_fermion;
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        pMe[siteIndex].Mul(a);
+    }
+}
+
 /**
 * phi dagger, phi
 */
-__global__ void _kernelDotFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pLeft,
+__global__ void _kernel_This_IsNot_Dot_FermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pLeft,
                                            const deviceWilsonVectorSU3 * __restrict__ pRight,
                                            deviceSU3* result)
 {
@@ -81,7 +164,7 @@ __global__ void _kernelDotFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * _
 */
 __global__ void _kernelInitialFermionWilsonSquareSU3(deviceWilsonVectorSU3 *pDevicePtr, EFieldInitialType eInitialType)
 {
-    intokernal;
+    intokernal_fermion;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -329,6 +412,48 @@ extern "C"
         _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (pDevicePtr, eInitialType);
     }
 
+    void _cAxpyPlusFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther)
+    {
+        preparethread;
+        _kernelAxpyPlusFermionWilsonSquareSU3 << <block, threads >> > (pMe, pOther);
+    }
+
+    void _cAxpyMinusFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther)
+    {
+        preparethread;
+        _kernelAxpyMinusFermionWilsonSquareSU3 << <block, threads >> > (pMe, pOther);
+    }
+
+    void _cAxpyFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, const _Complex& a)
+    {
+        preparethread;
+        _kernelAxpyComplexFermionWilsonSquareSU3 << <block, threads >> > (pMe, pOther, a);
+    }
+
+    void _cAxpyRealFermionWilsonSquareSU3(deviceWilsonVectorSU3 * pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
+    {
+        preparethread;
+        _kernelAxpyRealFermionWilsonSquareSU3 << <block, threads >> > (pMe, pOther, a);
+    }
+
+    void _cScalarMultiplyComplex(deviceWilsonVectorSU3 * pMe, const _Complex& a)
+    {
+        preparethread;
+        _kernelScalarMultiplyComplex<<<block, threads >>>(pMe, a);
+    }
+
+    void _cScalarMultiplyReal(deviceWilsonVectorSU3 * pMe, Real a)
+    {
+        preparethread;
+        _kernelScalarMultiplyReal << <block, threads >> >(pMe, a);
+    }
+
+    void _cDotFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pMe, const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex * result)
+    {
+        preparethread;
+        _kernelDotFermionWilsonSquareSU3 << <block, threads >> > (pMe, pOther, result);
+    }
+
     void _cDFermionWilsonSquareSU3(const deviceWilsonVectorSU3* __restrict__ pDeviceData,
                       const deviceSU3* __restrict__ pGauge,
                       deviceWilsonVectorSU3* pResultData,
@@ -351,16 +476,7 @@ extern "C"
                      UBOOL bPartialOmega)
     {
         preparethread;
-        _kernelDWilsonMuSU3 << <block, threads >> > (pDeviceData, pGauge, pResultDataArray, kai, byFieldId, bDiracChiralGamma, bDiracChiralGamma, bDDagger, bPartialOmega);
-    }
-
-
-    void _cDotFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pLeft,
-                  const deviceWilsonVectorSU3 * __restrict__ pRight,
-                  _Complex* result)
-    {
-        preparethread;
-        _kernelDotFermionWilsonSquareSU3 << <block, threads >> > (pLeft, pRight, result);
+        _kernelDWilsonMuSU3 << <block, threads >> > (pDeviceData, pGauge, pResultDataArray, kai, byFieldId, bDiracChiralGamma, bDDagger, bPartialOmega);
     }
 
     void _cPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pData)
@@ -415,6 +531,72 @@ void CFieldFermionWilsonSquareSU3::CopyTo(CField* U) const
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 }
 
+void CFieldFermionWilsonSquareSU3::AxpyPlus(const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+    _cAxpyPlusFermionWilsonSquareSU3(m_pDeviceData, pField->m_pDeviceData);
+}
+
+void CFieldFermionWilsonSquareSU3::AxpyMinus(const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+    _cAxpyMinusFermionWilsonSquareSU3(m_pDeviceData, pField->m_pDeviceData);
+}
+
+void CFieldFermionWilsonSquareSU3::Axpy(Real a, const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+    _cAxpyRealFermionWilsonSquareSU3(m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::Axpy(const _Complex& a, const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+    _cAxpyFermionWilsonSquareSU3(m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+_Complex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return _make_cuComplex(0,0);
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+    _cDotFermionWilsonSquareSU3(m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
+    return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+}
+
+void CFieldFermionWilsonSquareSU3::ScalarMultply(const _Complex& a)
+{
+    _cScalarMultiplyComplex(m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::ScalarMultply(Real a)
+{
+    _cScalarMultiplyReal(m_pDeviceData, a);
+}
+
 /**
 * generate phi by gaussian random.
 * phi = D phi
@@ -430,6 +612,60 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
 
     _cInitialFermionWilsonSquareSU3(m_pDeviceDataCopy, EFIT_RandomGaussian);
     _cDFermionWilsonSquareSU3(m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE);
+}
+
+
+void CFieldFermionWilsonSquareSU3::D(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    checkCudaErrors(cudaMemcpy(m_pDeviceDataCopy, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    _cDFermionWilsonSquareSU3(m_pDeviceData, pFieldSU3->m_pDeviceData, m_pDeviceDataCopy, m_fKai, m_byFieldId, TRUE, FALSE);
+}
+
+
+void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    checkCudaErrors(cudaMemcpy(m_pDeviceDataCopy, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    _cDFermionWilsonSquareSU3(m_pDeviceData, pFieldSU3->m_pDeviceData, m_pDeviceDataCopy, m_fKai, m_byFieldId, TRUE, TRUE);
+}
+
+void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    _cDFermionWilsonSquareSU3(m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE);
+    _cDFermionWilsonSquareSU3(m_pDeviceData, pFieldSU3->m_pDeviceData, m_pDeviceDataCopy, m_fKai, m_byFieldId, TRUE, FALSE);
+}
+
+void CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    //Find a solver to solve me.
+    appGetFermionSolver()->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
 }
 
 void CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce)

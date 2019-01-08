@@ -53,6 +53,8 @@
 #define _HC_DecompLy (appGetCudaHelper()->m_ConstIntegers[ECI_DecompLy])
 #define _DC_DecompLz (_constIntegers[ECI_DecompLz])
 #define _HC_DecompLz (appGetCudaHelper()->m_ConstIntegers[ECI_DecompLz])
+#define _DC_ThreadCount (_constIntegers[ECI_ThreadCount])
+#define _HC_ThreadCount (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCount])
 
 #define _DC_Seed (_constIntegers[ECI_RandomSeed])
 #define _HC_Seed (appGetCudaHelper()->m_ConstIntegers[ECI_RandomSeed])
@@ -61,6 +63,9 @@
 
 #define _DC_ActionListL (_constIntegers[ECI_ActionListLength])
 #define _HC_ActionListL (appGetCudaHelper()->m_ConstIntegers[ECI_ActionListLength])
+
+#define _D_ComplexThreadBuffer (appGetCudaHelper()->m_pComplexBufferThreadCount)
+#define _D_RealThreadBuffer (appGetCudaHelper()->m_pRealBufferThreadCount)
 
 #pragma endregion
 

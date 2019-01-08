@@ -28,9 +28,25 @@ public:
 
     virtual void MakeRandomGenerator() = 0;
 
-    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) = 0;
+    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) const = 0;
+
+    virtual Real CalculateKinematicEnergy() const = 0;
 
 #pragma endregion HMC update
+
+    virtual _Complex Dot(const CField* other) const
+    {
+        UN_USE(other);
+        appCrucial("CFieldGauge: Do NOT know how to DOT SU3");
+        return _make_cuComplex(0, 0);
+    }
+
+    virtual void ApplyOperator(EFieldOperator op, const CField* otherfield)
+    {
+        UN_USE(op);
+        UN_USE(otherfield);
+        appCrucial("CFieldGauge: Do Operator implimented yet");
+    }
 
 protected:
 

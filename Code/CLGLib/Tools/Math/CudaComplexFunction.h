@@ -70,17 +70,32 @@ __device__ static __inline__ _Complex _cuCaddf(const _Complex& x, Real y)
 {
     return _make_cuComplex(_cuCrealf(x) + y, _cuCimagf(x));
 }
+__device__ static __inline__ _Complex _cuCaddf(Real y, const _Complex& x)
+{
+    return _make_cuComplex(_cuCrealf(x) + y, _cuCimagf(x));
+}
+
 __device__ static __inline__ _Complex cuCdivf(const _Complex& x, Real y)
 {
     return _make_cuComplex(_cuCrealf(x) / y, _cuCimagf(x) / y);
 }
+
 __device__ static __inline__ _Complex _cuCmulf(const _Complex& x, Real y)
 {
     return _make_cuComplex(_cuCrealf(x) * y, _cuCimagf(x) * y);
 }
+__device__ static __inline__ _Complex _cuCmulf(Real y, const _Complex& x)
+{
+    return _make_cuComplex(_cuCrealf(x) * y, _cuCimagf(x) * y);
+}
+
 __device__ static __inline__ _Complex _cuCsubf(const _Complex& x, Real y)
 {
     return _make_cuComplex(_cuCrealf(x) - y, _cuCimagf(x));
+}
+__device__ static __inline__ _Complex _cuCsubf(Real y, const _Complex& x)
+{
+    return _make_cuComplex(y - _cuCrealf(x), -_cuCimagf(x));
 }
 
 __END_NAMESPACE

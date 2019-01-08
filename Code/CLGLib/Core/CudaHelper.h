@@ -31,7 +31,7 @@ extern __constant__ class CIndex* __idx;
 extern __constant__ class gammaMatrixSet* __diracGamma;
 extern __constant__ class gammaMatrixSet* __chiralGamma;
 
-extern __constant__ class deviceSU3* __SU3Generators[8];
+extern __constant__ struct deviceSU3* __SU3Generators[8];
 
 enum EConstIntId
 {
@@ -51,6 +51,7 @@ enum EConstIntId
     ECI_DecompLx, //threads per block
     ECI_DecompLy,
     ECI_DecompLz,
+    ECI_ThreadCount,
     ECI_RandomSeed,
     ECI_ExponentPrecision,
     ECI_UsingSchrageRandom,
@@ -72,6 +73,7 @@ public:
         memset(m_ConstIntegers, 0, sizeof(UINT) * kContentLength);
         memset(m_ConstFloats, 0, sizeof(Real) * kContentLength);
     }
+    ~CCudaHelper();
 
     static void DeviceQuery();
     void CopyConstants() const;
@@ -86,6 +88,31 @@ public:
 
     UINT m_ConstIntegers[kContentLength];
     Real m_ConstFloats[kContentLength];
+
+    #pragma region global temperary buffers
+
+    //make sure this is called after thread is partioned
+    void AllocateTemeraryBuffers(UINT uiThreadCount)
+    {
+        m_uiThreadCount = uiThreadCount;
+        checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
+        checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(_Complex)* uiThreadCount));
+    }
+
+    void ReleaseTemeraryBuffers()
+    {
+        checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
+        checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
+    }
+
+    _Complex ThreadBufferSum(_Complex * pDeviceBuffer);
+    Real ThreadBufferSum(Real * pDeviceBuffer);
+
+    _Complex * m_pComplexBufferThreadCount;
+    Real * m_pRealBufferThreadCount;
+    UINT m_uiThreadCount;
+
+    #pragma endregion
 };
 
 __END_NAMESPACE

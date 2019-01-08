@@ -258,11 +258,25 @@ struct CLGAPI deviceSU3
         m_me[8] = _cuCsubf(m_me[8], right.m_me[8]);
     }
 
+    __device__ __inline__ void Add(const Real& right)
+    {
+        m_me[0] = _cuCaddf(m_me[0], right);
+        m_me[4] = _cuCaddf(m_me[4], right);
+        m_me[8] = _cuCaddf(m_me[8], right);
+    }
+
     __device__ __inline__ void Add(const _Complex& right)
     {
         m_me[0] = _cuCaddf(m_me[0], right);
         m_me[4] = _cuCaddf(m_me[4], right);
         m_me[8] = _cuCaddf(m_me[8], right);
+    }
+
+    __device__ __inline__ void Sub(const Real& right)
+    {
+        m_me[0] = _cuCsubf(m_me[0], right);
+        m_me[4] = _cuCsubf(m_me[4], right);
+        m_me[8] = _cuCsubf(m_me[8], right);
     }
 
     __device__ __inline__ void Sub(const _Complex& right)
@@ -292,6 +306,19 @@ struct CLGAPI deviceSU3
         memcpy(m_me, res, sizeof(_Complex) * 9);
     }
 
+    __device__ __inline__ void Mul(Real right)
+    {
+        m_me[0] = _cuCmulf(m_me[0], right);
+        m_me[1] = _cuCmulf(m_me[1], right);
+        m_me[2] = _cuCmulf(m_me[2], right);
+        m_me[3] = _cuCmulf(m_me[3], right);
+        m_me[4] = _cuCmulf(m_me[4], right);
+        m_me[5] = _cuCmulf(m_me[5], right);
+        m_me[6] = _cuCmulf(m_me[6], right);
+        m_me[7] = _cuCmulf(m_me[7], right);
+        m_me[8] = _cuCmulf(m_me[8], right);
+    }
+
     __device__ __inline__ void Mul(const _Complex& right)
     {
         m_me[0] = _cuCmulf(m_me[0], right);
@@ -314,29 +341,17 @@ struct CLGAPI deviceSU3
         return ret;
     }
 
-    /**
-    * left = left * right
-    */
-    __device__ __inline__ void Scale(const _Complex& right)
-    {
-        m_me[0] = _cuCmulf(m_me[0], right);
-        m_me[1] = _cuCmulf(m_me[1], right);
-        m_me[2] = _cuCmulf(m_me[2], right);
-        m_me[3] = _cuCmulf(m_me[3], right);
-        m_me[4] = _cuCmulf(m_me[4], right);
-        m_me[5] = _cuCmulf(m_me[5], right);
-        m_me[6] = _cuCmulf(m_me[6], right);
-        m_me[7] = _cuCmulf(m_me[7], right);
-        m_me[8] = _cuCmulf(m_me[8], right);
-    }
-
     __device__ __inline__ deviceSU3 Addc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Add(right); return ret; }
-    __device__ __inline__ deviceSU3 Subc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
     __device__ __inline__ deviceSU3 Addc(const _Complex& right) const  { deviceSU3 ret(*this); ret.Add(right); return ret; }
+    __device__ __inline__ deviceSU3 Addc(const Real& right) const { deviceSU3 ret(*this); ret.Add(right); return ret; }
+
+    __device__ __inline__ deviceSU3 Subc(const deviceSU3& right) const { deviceSU3 ret(*this); ret.Sub(right); return ret; }
     __device__ __inline__ deviceSU3 Subc(const _Complex& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
+    __device__ __inline__ deviceSU3 Subc(const Real& right) const { deviceSU3 ret(*this); ret.Sub(right); return ret; }
+
     __device__ __inline__ deviceSU3 Mulc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Mul(right); return ret; }
     __device__ __inline__ deviceSU3 Mulc(const _Complex& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
-    __device__ __inline__ deviceSU3 Scalec(const _Complex& right) const  { deviceSU3 ret(*this); ret.Scale(right); return ret; }
+    __device__ __inline__ deviceSU3 Mulc(const Real& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
 
     #pragma endregion operators
 
@@ -393,6 +408,23 @@ struct CLGAPI deviceSU3
         res[8] = _cuConjf(m_me[8]);
 
         memcpy(m_me, res, sizeof(_Complex) * 9);
+    }
+
+    __device__ __inline__ deviceSU3 Daggerc() const
+    {
+        deviceSU3 tmp;
+        tmp.m_me[0] = _cuConjf(m_me[0]);
+        tmp.m_me[1] = _cuConjf(m_me[3]);
+        tmp.m_me[2] = _cuConjf(m_me[6]);
+
+        tmp.m_me[3] = _cuConjf(m_me[1]);
+        tmp.m_me[4] = _cuConjf(m_me[4]);
+        tmp.m_me[5] = _cuConjf(m_me[7]);
+
+        tmp.m_me[6] = _cuConjf(m_me[2]);
+        tmp.m_me[7] = _cuConjf(m_me[5]);
+        tmp.m_me[8] = _cuConjf(m_me[8]);
+        return tmp;
     }
 
     /**

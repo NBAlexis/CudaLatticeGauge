@@ -32,6 +32,7 @@
 #include <sstream>
 #include <assert.h>
 #include <time.h>
+//#include <tuple> std::ignored will not work on Cuda, because it will be called from devices
 
 #ifdef _CLG_UNICODE
 

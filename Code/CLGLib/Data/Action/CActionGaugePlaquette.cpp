@@ -40,7 +40,7 @@ void CActionGaugePlaquette::CalculateForceOnGauge(class CFieldGauge * pGauge, cl
 /**
 * The implementation depends on the type of gauge field
 */
-Real CActionGaugePlaquette::Energy(class CFieldGauge* pGauge) const
+Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge) const
 {
     return pGauge->CalculatePlaqutteEnergy(m_cMinusBetaOverN);
     checkCudaErrors(cudaDeviceSynchronize());

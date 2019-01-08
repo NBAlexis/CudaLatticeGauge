@@ -76,13 +76,25 @@
 
 \input "data/parameters.tex"
 
+\clearpage
+
 \section{\label{update}Update scheme}
 
 \input "update/hmc.tex"
 
+\clearpage
+
 \section{\label{Programming}Programming}
 
 \input "programming/cuda.tex"
+
+\clearpage
+
+\section{\label{Testing}Testing}
+
+\input "tests/testRandom.tex"
+
+\clearpage
 
 \printindex
 

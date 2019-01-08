@@ -219,6 +219,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
             constIntegers[ECI_DecompX] = constIntegers[ECI_Lx] / constIntegers[ECI_DecompLx];
             constIntegers[ECI_DecompY] = constIntegers[ECI_Ly] / constIntegers[ECI_DecompLy];
             constIntegers[ECI_DecompZ] = constIntegers[ECI_Lz] / constIntegers[ECI_DecompLz];
+            constIntegers[ECI_ThreadCount] = intValues[0] * intValues[1] * intValues[2];
         }
     }
 
@@ -236,6 +237,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         constIntegers[ECI_DecompLx] = decomp[3];
         constIntegers[ECI_DecompLy] = decomp[4];
         constIntegers[ECI_DecompLz] = decomp[5];
+        constIntegers[ECI_ThreadCount] = decomp[3] * decomp[4] * decomp[5];
     }
     appGeneral(_T("\n will run on lattice (%d,%d,%d,%d) with (%d x %d x %d) blocks and (%d x %d x %d) threads per block\n")
         , constIntegers[ECI_Lx]
@@ -282,6 +284,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     memcpy(m_pCudaHelper->m_ConstIntegers, constIntegers, sizeof(UINT) * kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
+    m_pCudaHelper->AllocateTemeraryBuffers(_HC_ThreadCount);
 
 #pragma endregion
 
@@ -425,7 +428,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
             {
                 //We have already set the constant ECI_ActionListLength
                 //So, NULL is not allowed!
-                appCrucial(_T("Create Action Failed: %s\n"), sActionName);
+                appCrucial(_T("Create Action Failed: %s\n"), sActionName.c_str());
                 exit(EXIT_FAILURE);
             }
         }
@@ -449,7 +452,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 
         if (NULL == pHMC || NULL == integrator)
         {
-            appCrucial(_T("HMC need a integrator!, but s = %s"), sValues);
+            appCrucial(_T("HMC need a integrator!, but s = %s"), sValues.c_str());
             exit(EXIT_FAILURE);
         }
 

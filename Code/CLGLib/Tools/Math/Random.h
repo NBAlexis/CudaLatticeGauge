@@ -39,7 +39,7 @@ __DEFINE_ENUM (ERandom,
 class CLGAPI CRandom
 {
 public:
-    CRandom(UINT uiSeed) {}
+    CRandom(UINT uiSeed) { UN_USE(uiSeed); }
     virtual __device__ Real _deviceRandomF(UINT fatIndex) = 0;
     __device__ __inline__ Real _deviceRandomGaussF(UINT fatIndex)
     {

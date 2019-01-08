@@ -24,15 +24,7 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU3)
 
-#pragma region BLAS
-
-#pragma region BLAS device
-
-
-
-#pragma endregion BLAS device
-
-#pragma region BLAS kernel
+#pragma region Kernels
 
 /**
 * Initial SU3 Field with a value
@@ -47,31 +39,31 @@ void _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialTy
 
         switch (eInitialType)
         {
-            case EFIT_Zero:
-                {
-                    pDevicePtr[_deviceGetLinkIndex(coord, idir)] = zero;
-                }
-                break;
-            case EFIT_Identity:
-                {
-                    pDevicePtr[_deviceGetLinkIndex(coord, idir)] = id;
-                }
-                break;
-            case EFIT_Random:
-                {
-                    pDevicePtr[_deviceGetLinkIndex(coord, idir)] = deviceSU3::makeSU3Random(_deviceGetFatIndex(coord, idir + 1));
-                }
-                break;
-            case EFIT_RandomGenerator:
-                {
-                    pDevicePtr[_deviceGetLinkIndex(coord, idir)] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(coord, idir + 1));
-                }
-                break;
-            default:
-                {
-                    printf("SU3 Field cannot be initialized with this type!");
-                }
-                break;
+        case EFIT_Zero:
+        {
+            pDevicePtr[_deviceGetLinkIndex(coord, idir)] = zero;
+        }
+        break;
+        case EFIT_Identity:
+        {
+            pDevicePtr[_deviceGetLinkIndex(coord, idir)] = id;
+        }
+        break;
+        case EFIT_Random:
+        {
+            pDevicePtr[_deviceGetLinkIndex(coord, idir)] = deviceSU3::makeSU3Random(_deviceGetFatIndex(coord, idir + 1));
+        }
+        break;
+        case EFIT_RandomGenerator:
+        {
+            pDevicePtr[_deviceGetLinkIndex(coord, idir)] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(coord, idir + 1));
+        }
+        break;
+        default:
+        {
+            printf("SU3 Field cannot be initialized with this type!");
+        }
+        break;
         }
 
     gaugeSU3KernelFuncionEnd
@@ -82,77 +74,66 @@ void _kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Co
 {
     gaugeSU3KernelFuncionStart
 
-        UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
-        pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].Scalec(a));
+    UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
+    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].Mulc(a));
 
     gaugeSU3KernelFuncionEnd
 }
 
 __global__
-void _kernelAxpySU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
+void _kernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, Real a)
 {
     gaugeSU3KernelFuncionStart
 
         UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
-        pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex]);
+    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].Mulc(a));
 
     gaugeSU3KernelFuncionEnd
 }
 
-extern "C" {
-    void _callKernelAxpySU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
-    {
-        preparethread;
-        _kernelAxpySU3 << <block, threads >> > (pDevicePtr, x);
-    }
-
-    void _callKernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, const _Complex& a)
-    {
-        preparethread;
-        _kernelAxpySU3A << <block, threads >> > (pDevicePtr, x, a);
-    }
-}
-
-#pragma endregion BLAS kernel
-
-#pragma region BLAS member function
-
-void CFieldGaugeSU3::Axpy(const CField* x)
+__global__
+void _kernelAxpyPlusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
 {
-    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
-    {
-        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
-        return;
-    }
+    gaugeSU3KernelFuncionStart
 
-    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
-    _callKernelAxpySU3(m_pDeviceData, pSU3x->m_pDeviceData);
+    UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
+    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex]);
 
+    gaugeSU3KernelFuncionEnd
 }
 
-void CFieldGaugeSU3::Axpy(Real a, const CField* x)
+__global__
+void _kernelAxpyMinusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
 {
-    Axpy(_make_cuComplex(a, 0.0f), x);
+    gaugeSU3KernelFuncionStart
+
+    UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
+    pDevicePtr[uiLinkIndex].Sub(x[uiLinkIndex]);
+
+    gaugeSU3KernelFuncionEnd
 }
 
-void CFieldGaugeSU3::Axpy(const _Complex& a, const CField* x)
+__global__
+void _kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
 {
-    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
-    {
-        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
-        return;
-    }
+    gaugeSU3KernelFuncionStart
 
-    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
-    _callKernelAxpySU3A(m_pDeviceData, pSU3x->m_pDeviceData, a);
+    UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
+    pDevicePtr[uiLinkIndex].Mul(a);
+
+    gaugeSU3KernelFuncionEnd
 }
 
-#pragma endregion BLAS member function
+__global__
+void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
+{
+    gaugeSU3KernelFuncionStart
 
-#pragma endregion BLAS
+    UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir);
+    pDevicePtr[uiLinkIndex].Mul(a);
 
-
-#pragma region kernels
+    gaugeSU3KernelFuncionEnd
+}
 
 /**
 * debug kernel
@@ -186,17 +167,17 @@ __global__ void _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
 /**
 * calculate Staple and Force At Site
 */
-__global__ 
+__global__
 void _kernelStapleAtSiteSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     deviceSU3 *pStapleData, //can be NULL
-    deviceSU3 *pForceData, 
+    deviceSU3 *pForceData,
     _Complex minusBetaOverN)
 {
     intokernal;
 
     minusBetaOverN.x = minusBetaOverN.x * (Real)0.5;
-    int2 plaquttes[kMaxPlaqutteCache];
+    SIndex plaquttes[kMaxPlaqutteCache];
     for (UINT it = 0; it < uiTLength; ++it)
     {
         coord[3] = it;
@@ -215,24 +196,18 @@ void _kernelStapleAtSiteSU3(
 
             for (int i = 0; i < uiPlaqutteCount; ++i)
             {
-                int2 first = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1)];
-                UBOOL bReverse = first.y < 0;
-                UINT fieldId = bReverse ? (-first.y - 1) : (first.y - 1);
-
-                deviceSU3 toAdd(pDeviceData[first.x]);
-                if (bReverse)
+                SIndex first = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1)];
+                deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+                if (first.NeedToDagger())
                 {
                     toAdd.Dagger();
                 }
 
                 for (int j = 1; j < uiPlaqutteLength - 1; ++j)
                 {
-                    int2 nextlink = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1) + j];
-                    UBOOL bNextReverse = nextlink.y < 0;
-                    UINT uiNextfieldId = bNextReverse ? (-nextlink.y - 1) : (nextlink.y - 1);
-
-                    deviceSU3 toMul(pDeviceData[first.x]);
-                    if (bNextReverse)
+                    SIndex nextlink = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1) + j];
+                    deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                    if (nextlink.NeedToDagger())
                     {
                         toMul.Dagger();
                     }
@@ -244,7 +219,7 @@ void _kernelStapleAtSiteSU3(
             {
                 pStapleData[linkIndex] = res;
             }
-            
+
             res.Dagger();
             //staple calculated
             deviceSU3 force(pDeviceData[linkIndex]);
@@ -270,7 +245,7 @@ void _kernelPlaqutteEnergySU3(
     intokernal;
 
     Real resThisThread = 0;
-    int2 plaquttes[kMaxPlaqutteCache];
+    SIndex plaquttes[kMaxPlaqutteCache];
     for (UINT it = 0; it < uiTLength; ++it)
     {
         coord[3] = it;
@@ -289,24 +264,19 @@ void _kernelPlaqutteEnergySU3(
 
             for (int i = 0; i < uiPlaqutteCount; ++i)
             {
-                int2 first = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1)];
-                UBOOL bReverse = first.y < 0;
-                UINT fieldId = bReverse ? (-first.y - 1) : (first.y - 1);
+                SIndex first = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1)];
 
-                deviceSU3 toAdd(pDeviceData[first.x]);
-                if (bReverse)
+                deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+                if (first.NeedToDagger())
                 {
                     toAdd.Dagger();
                 }
 
                 for (int j = 1; j < uiPlaqutteLength - 1; ++j)
                 {
-                    int2 nextlink = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1) + j];
-                    UBOOL bNextReverse = nextlink.y < 0;
-                    UINT uiNextfieldId = bNextReverse ? (-nextlink.y - 1) : (nextlink.y - 1);
-
-                    deviceSU3 toMul(pDeviceData[first.x]);
-                    if (bNextReverse)
+                    SIndex nextlink = plaquttes[uiPlaqutteCount * (uiPlaqutteLength - 1) + j];
+                    deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                    if (nextlink.NeedToDagger())
                     {
                         toMul.Dagger();
                     }
@@ -314,14 +284,14 @@ void _kernelPlaqutteEnergySU3(
                 }
                 res.Add(toAdd);
             }
-            
+
             res.Dagger();
             deviceSU3 gaugeOnLink(pDeviceData[linkIndex]);
             gaugeOnLink.Mul(res);
             resThisThread += (3 - gaugeOnLink.ReTr()); //Re[Tr(1-U)] = 3 - Re[Tr(U)]
         }
     }
-    
+
     results[threadIdx.x * blockDim.y * blockDim.z + threadIdx.y * blockDim.z + threadIdx.z] = resThisThread * minusBetaOverN;
 }
 
@@ -351,11 +321,71 @@ void _kernelExpMultSU3(
     }
 }
 
+
+/**
+* Trace (P^2)
+*/
+__global__ 
+void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pMyDeviceData, Real* results)
+{
+    intokernal;
+
+    Real resThisThread = 0;
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir; ++idir)
+        {
+            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
+            resThisThread += pMyDeviceData[linkIndex].Daggerc().Mulc(pMyDeviceData[linkIndex]).ReTr();
+        }
+    }
+
+    results[threadIdx.x * blockDim.y * blockDim.z + threadIdx.y * blockDim.z + threadIdx.z] = resThisThread;
+}
+
 #pragma endregion
 
-#pragma region Call Kernel
+#pragma region CFunctions
 
 extern "C" {
+
+    void _callKernelAxpySU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, UBOOL bAdd)
+    {
+        preparethread;
+        if (bAdd)
+        {
+            _kernelAxpyPlusSU3 << <block, threads >> > (pDevicePtr, x);
+        }
+        else 
+        {
+            _kernelAxpyMinusSU3 << <block, threads >> > (pDevicePtr, x);
+        }
+    }
+
+    void _callKernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, const _Complex& a)
+    {
+        preparethread;
+        _kernelAxpySU3A << <block, threads >> > (pDevicePtr, x, a);
+    }
+
+    void _callKernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, Real a)
+    {
+        preparethread;
+        _kernelAxpySU3Real << <block, threads >> > (pDevicePtr, x, a);
+    }
+
+    void _callKernelScalarMultiplyComplex(deviceSU3 *pDevicePtr, const _Complex& a)
+    {
+        preparethread;
+        _kernelScalarMultiplySU3Complex << <block, threads >> > (pDevicePtr, a);
+    }
+
+    void _callKernelScalarMultiplyReal(deviceSU3 *pDevicePtr, Real a)
+    {
+        preparethread;
+        _kernelScalarMultiplySU3Real << <block, threads >> > (pDevicePtr, a);
+    }
 
     void _callKernelPrint(const deviceSU3 * __restrict__ pDeviceData)
     {
@@ -369,7 +399,7 @@ extern "C" {
         deviceSU3 *pU)
     {
         preparethread;
-        _kernelExpMultSU3 <<< block, threads >> > (pMyDeviceData, a, pU);
+        _kernelExpMultSU3 << < block, threads >> > (pMyDeviceData, a, pU);
     }
 
     void _callKernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
@@ -396,15 +426,86 @@ extern "C" {
     )
     {
         preparethread;
-        _kernelPlaqutteEnergySU3 << <block, threads>> > (pDeviceData, -minusBetaOverN.x, output);
+        _kernelPlaqutteEnergySU3 << <block, threads >> > (pDeviceData, -minusBetaOverN.x, output);
 
         //Now the results are in output.
         thrust::device_ptr<Real> dp(output);
         thrust::device_vector<Real> d_x(dp, dp + uiDataSize);
         return thrust::reduce(d_x.begin(), d_x.end(), (Real)0, thrust::plus<Real>());
     }
+
+    Real _callKernelKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, Real* output, UINT uiDataSize)
+    {
+        preparethread;
+        _kernelCalculateKinematicEnergySU3 << <block, threads >> > (pDeviceData, output);
+        thrust::device_ptr<Real> dp(output);
+        thrust::device_vector<Real> d_x(dp, dp + uiDataSize);
+        return thrust::reduce(d_x.begin(), d_x.end(), (Real)0, thrust::plus<Real>());
+    }
 }
+
 #pragma endregion
+
+void CFieldGaugeSU3::AxpyPlus(const CField* x)
+{
+    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
+        return;
+    }
+
+    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
+    _callKernelAxpySU3(m_pDeviceData, pSU3x->m_pDeviceData, TRUE);
+
+}
+
+void CFieldGaugeSU3::AxpyMinus(const CField* x)
+{
+    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
+        return;
+    }
+
+    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
+    _callKernelAxpySU3(m_pDeviceData, pSU3x->m_pDeviceData, FALSE);
+
+}
+
+void CFieldGaugeSU3::ScalarMultply(const _Complex& a)
+{
+    _callKernelScalarMultiplyComplex(m_pDeviceData, a);
+}
+
+void CFieldGaugeSU3::ScalarMultply(Real a)
+{
+    _callKernelScalarMultiplyReal(m_pDeviceData, a);
+}
+
+void CFieldGaugeSU3::Axpy(Real a, const CField* x)
+{
+    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
+        return;
+    }
+
+    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
+    _callKernelAxpySU3Real(m_pDeviceData, pSU3x->m_pDeviceData, a);
+}
+
+void CFieldGaugeSU3::Axpy(const _Complex& a, const CField* x)
+{
+    if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
+        return;
+    }
+
+    const CFieldGaugeSU3* pSU3x = dynamic_cast<const CFieldGaugeSU3*>(x);
+    _callKernelAxpySU3A(m_pDeviceData, pSU3x->m_pDeviceData, a);
+}
+
 
 void CFieldGaugeSU3::Zero()
 {
@@ -453,22 +554,24 @@ void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* p
     _callKernelStapleAtSiteSU3(m_pDeviceData, NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData, pForceSU3->m_pDeviceData, minusBetaOverN);
 }
 
-Real CFieldGaugeSU3::CalculatePlaqutteEnergy(const _Complex& minusBetaOverN)
+Real CFieldGaugeSU3::CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) const
 {
-    return _callKernelPlaqutteEneregySU3(m_pDeviceData, minusBetaOverN, m_uiThreadCount, m_pDeviceTmpResPtr) / m_uiLinkeCount;
+    return _callKernelPlaqutteEneregySU3(m_pDeviceData, minusBetaOverN, _HC_ThreadCount, _D_RealThreadBuffer) / m_uiLinkeCount;
+}
+
+Real CFieldGaugeSU3::CalculateKinematicEnergy() const
+{
+    return _callKernelKinematicEnergySU3(m_pDeviceData, _D_RealThreadBuffer, _HC_ThreadCount);
 }
 
 CFieldGaugeSU3::CFieldGaugeSU3()
 {
-   
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceTmpResPtr, sizeof(Real) * m_uiThreadCount));
 }
 
 CFieldGaugeSU3::~CFieldGaugeSU3()
 {
     checkCudaErrors(cudaFree(m_pDeviceData));
-    checkCudaErrors(cudaFree(m_pDeviceTmpResPtr));
 }
 
 void CFieldGaugeSU3::ExpMult(const _Complex& a, CField* U) const
