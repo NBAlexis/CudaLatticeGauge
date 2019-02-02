@@ -29,6 +29,7 @@
 #define _cuCrealf cuCreal
 #define _cuCimagf cuCimag
 #define _cuCabsf cuCimag
+#define F(v) v
 
 #else
 
@@ -47,6 +48,7 @@
 #define _cuCrealf cuCrealf
 #define _cuCimagf cuCimagf
 #define _cuCabsf cuCabsf
+#define F(v) v##f
 
 #endif
 

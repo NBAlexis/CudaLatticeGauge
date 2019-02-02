@@ -43,6 +43,9 @@
     <Filter Include="SparseLinearAlgebra">
       <UniqueIdentifier>{cb0b44bd-8e85-47fa-b891-0a9e41f7d88f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Measurement">
+      <UniqueIdentifier>{919429bf-7879-4919-bc24-e4edef2b91a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Platform\WinFunction.h">
@@ -209,6 +212,18 @@
     <ClInclude Include="SparseLinearAlgebra\CSLASolve.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasurementManager.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasure.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\CFile.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLGLib_Private.cpp" />
@@ -235,6 +250,15 @@
     </ClCompile>
     <ClCompile Include="Data\Action\CActionGaugePlaquette.cpp">
       <Filter>Data\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="Measurement\CMeasurePlaqutteEnergy.cpp">
+      <Filter>Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="Measurement\CMeasurementManager.cpp">
+      <Filter>Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\CFileWin.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

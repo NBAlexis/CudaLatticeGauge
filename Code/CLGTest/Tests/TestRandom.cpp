@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CLGTest.cpp
+// FILENAME : TestRandom.cpp
 // 
 // DESCRIPTION:
 //
@@ -9,47 +9,59 @@
 
 #include "CLGTest.h"
 
-UINT TestRandom()
+UINT TestRandom(CParameters& sParam)
 {
-    //In Bridge++, it use 20 seeds, each for 10 000 000 samples.
-    //We are not easy to change the seeds, so we use only 1 seed for 200 000 000 samples
-    //1000 blocks, 1024 threads each block, and 200 loops each thread 204 800 000 samples
-    TArray<UINT> decomp;
-    decomp.AddItem(10);
-    decomp.AddItem(10);
-    decomp.AddItem(10);
+    //Test Host Random
+    Real hostRandom = F(0.0);
+    INT hostSampleCount = 1000;
+    sParam.FetchValueINT(_T("HostSample"), hostSampleCount);
+    for (INT i = 0; i < hostSampleCount; ++i)
+    {
+        hostRandom = hostRandom + GetRandomReal();
+    }
+    appGeneral(_T("------- Host random result:%f\n"), hostRandom / hostSampleCount);
 
-    //fat index is 0 - 20479
-    //so we can use a 1024 (max)
-    decomp.AddItem(16);
-    decomp.AddItem(16);
-    decomp.AddItem(4);
+    UINT uiError = 0;
+    Real accuracy = F(0.001);
+    TArray<UINT> decompPi;
+    TArray<UINT> decompGaussian; 
 
-    decomp.AddItem(200);
+    sParam.FetchValueArrayUINT(_T("PiDecomp"), decompPi);
+    sParam.FetchValueArrayUINT(_T("GaussianDecomp"), decompGaussian);
+    sParam.FetchValueReal(_T("TestAccuracy"), accuracy);
 
-    Real piv = CalculatePi(decomp);
+    Real piv = CalculatePi(decompPi);
     appGeneral(_T("------- PI result:%f\n"), piv);
 
-    //In bridge++, 1 000 000 samples
-    //We use       1 228 800 samples
-    decomp.RemoveAll();
-    decomp.AddItem(3);
-    decomp.AddItem(2);
-    decomp.AddItem(2);
-
-    //fat index is 0 - 20479
-    //so we can use a 1024 (max)
-    decomp.AddItem(16);
-    decomp.AddItem(16);
-    decomp.AddItem(4);
-
-    decomp.AddItem(100);
-
-    Real ev = CalculateE(decomp);
+    Real ev = CalculateE(decompGaussian);
     appGeneral(_T("------- 1/_sqrt(2) (should be 0.707) result:%f\n"), ev);
 
-    return 0;
+    if (appAbs(hostRandom / hostSampleCount - F(0.5)) > accuracy * F(50.0))
+    {
+        ++uiError;
+    }
+    if (appAbs(piv - PI) > accuracy)
+    {
+        ++uiError;
+    }
+    if (appAbs(ev - InvSqrt2) > accuracy)
+    {
+        ++uiError;
+    }
+    return uiError;
 }
+
+__REGIST_TEST(TestRandom, Random, TestRandomSchrage);
+
+__REGIST_TEST(TestRandom, Random, TestRandomXORWOW);
+
+__REGIST_TEST(TestRandom, Random, TestRandomMRG32K3A);
+
+__REGIST_TEST(TestRandom, Random, TestRandomPhilox);
+
+__REGIST_TEST(TestRandom, Random, TestRandomSOBOL32);
+
+__REGIST_TEST(TestRandom, Random, TestRandomScrambledSOBOL32);
 
 //=============================================================================
 // END OF FILE

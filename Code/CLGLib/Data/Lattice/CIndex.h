@@ -87,8 +87,7 @@ __device__ __inline__ static int4 __deviceFatIndexToInt4(UINT fatIndex)
 
 #pragma endregion
 
-//plaqutteCount x (plaqutteLength - 1) <= 32
-//For 4D cubic, this is 12
+//For 4D cubic, this is 18
 #define kMaxPlaqutteCache (32)
 
 //EIT been used with Enum Integrator Type
@@ -120,7 +119,11 @@ public:
     */
     __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const = 0;
 
-    //__device__ virtual void _deviceGetUniquePlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex) const = 0;
+    /**
+    * Different from _deviceGetPlaquttesAtLink which return all plaquttes related to the link (For D dimension, square lattice, there are 2(D-1))
+    * This function get all plaquttes related to the site (For D dimension, square lattice, there are D(D-1)/2 for each site, thus is (D-1)/2 per link which is 1/4 of above because each plaqutte has 4 edges)
+    */
+    __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st = kSpaceTime) const = 0;
 
 #pragma region Index Walking
 

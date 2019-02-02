@@ -242,15 +242,34 @@ extern "C" {
     }
 }
 
+class CA
+{
+public:
+    void TestMemberFunction(int* output)
+    {
+        dim3 dblock(2, 2, 1);
+        dim3 dthread(8, 8, 1);
+
+        _kernelInitial << <dblock, dthread >> > (output, 16, 1);
+        _kernelPluseOne << <dblock, dthread >> > (output, 16, 1);
+        _kernelMultiplyTwo << <dblock, dthread >> > (output, 16, 1);
+        _kernelPluseOne << <dblock, dthread >> > (output, 16, 1);
+        _kernelMultiplyTwo << <dblock, dthread >> > (output, 16, 1);
+    }
+};
+
 int main()
 {
     int * pTable;
     cudaMalloc((void**)&pTable, sizeof(int) * 256);
-    _cKernelInitial(pTable);
-    _cKernelPlusOne(pTable);
-    _cKernelMultiplyTwo(pTable);
-    _cKernelPlusOne(pTable);
-    _cKernelMultiplyTwo(pTable);
+    //_cKernelInitial(pTable);
+    //_cKernelPlusOne(pTable);
+    //_cKernelMultiplyTwo(pTable);
+    //_cKernelPlusOne(pTable);
+    //_cKernelMultiplyTwo(pTable);
+
+    CA calc;
+    calc.TestMemberFunction(pTable);
 
     int outData[256];
     cudaMemcpy(outData, pTable, sizeof(int) * 256, cudaMemcpyDeviceToHost);
@@ -269,3 +288,113 @@ int main()
     return 0;
 }
 
+//===========================================================================
+//test union
+struct TestStructure
+{
+    __device__ TestStructure()
+    {
+        memberf[0] = memberf[2] = memberf[4] = 1.0f;
+        memberf[1] = memberf[3] = memberf[5] = 0.0f;
+    }
+
+    void __device__ debugPrint()
+    {
+        printf("c1=%f+%fi, c2=%f+%fi, c3=%f+%fi\n", memberC[0].x, memberC[0].y, memberC[1].x, memberC[1].y, memberC[2].x, memberC[2].y);
+    }
+
+    union
+    {
+        cuComplex memberC[3];
+        float memberf[6];
+    };
+    
+};
+
+struct TableTest
+{
+    __device__ TableTest()
+    {
+
+    }
+
+    void __device__ Initial()
+    {
+        for (int i = 0; i < 10; ++i)
+        {
+            memberS[i] = TestStructure();
+        }
+    }
+
+    void __device__ Print()
+    {
+        for (int i = 0; i < 10; ++i)
+        {
+            printf("r:%f,%f,%f,%f,%f,%f\nc:%f,%f,%f,%f,%f,%f\n",
+                memberf[6 * i + 0],
+                memberf[6 * i + 1],
+                memberf[6 * i + 2],
+                memberf[6 * i + 3],
+                memberf[6 * i + 4],
+                memberf[6 * i + 5],
+                memberC[3 * i + 0].x,
+                memberC[3 * i + 0].y,
+                memberC[3 * i + 1].x,
+                memberC[3 * i + 1].y,
+                memberC[3 * i + 2].x,
+                memberC[3 * i + 2].y);
+
+            memberS[i].debugPrint();
+        }
+    }
+
+    union
+    {
+        TestStructure memberS[10];
+        cuComplex memberC[30];
+        float memberf[60];
+    };
+};
+
+void __global__ CreateA(void* devicePtr)
+{
+    ((TableTest*)devicePtr)->Initial();
+    ((TableTest*)devicePtr)->Print();
+
+    printf("\n");
+}
+
+void __global__ CreateB()
+{
+    TableTest* devicePtr2 = new TableTest();
+    devicePtr2->Initial();
+    devicePtr2->Print();
+    delete devicePtr2;
+
+    printf("\n");
+}
+
+int main()
+{
+    float* buffer1;
+    cuComplex* buffer2;
+    TestStructure* buffer3;
+    TableTest* buffer4;
+
+    cudaMalloc((void**)&buffer1, sizeof(float) * 60);
+    cudaMalloc((void**)&buffer2, sizeof(cuComplex) * 30);
+    cudaMalloc((void**)&buffer3, sizeof(TestStructure) * 10);
+    cudaMalloc((void**)&buffer4, sizeof(TableTest) * 1);
+
+    CreateA << <1, 1 >> > ((void*)buffer1);
+    CreateA << <1, 1 >> > ((void*)buffer2);
+    CreateA << <1, 1 >> > ((void*)buffer3);
+    CreateA << <1, 1 >> > ((void*)buffer4);
+
+    CreateB << <1, 1 >> >();
+
+    cudaFree(buffer1);
+    cudaFree(buffer2);
+    cudaFree(buffer3);
+    cudaFree(buffer4);
+}

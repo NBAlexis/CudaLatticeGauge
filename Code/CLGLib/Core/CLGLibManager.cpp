@@ -100,13 +100,8 @@ inline TArray<UINT> _getDecompose(const TArray<UINT>& contraints, const TArray<U
 
 CLGAPI CCLGLibManager GCLGManager;
 
-void CCLGLibManager::InitialWithParameter(CParameters &params)
+void CCLGLibManager::SetupLog(CParameters &params)
 {
-    //GClassGather.TraceAllClass();
-    checkCudaErrors(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1 << 30));
-
-#pragma region Verbose
-
     //Setup outputs
     CCString verboselevel;
     EVerboseLevel eVerbLevel = CRUCIAL;
@@ -127,23 +122,22 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     __CheckTag(_T("ShowDeviceInformation"), CCudaHelper::DeviceQuery());
 
     appGeneral(_T("============================== Log Start =============================\n\n"));
+}
 
-#pragma endregion
-
-    UINT constIntegers[kContentLength];
-    Real constFloats[kContentLength];
-
+void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
+{
     INT iVaules = 0;
+    CCString sValues;
 
 #pragma region Lattice Size and Threads
 
     __FetchIntWithDefault(_T("Dim"), 4);
     assert(iVaules > 1 && iVaules < 5);
-    constIntegers[ECI_Dim] = static_cast<UINT>(iVaules);
+    m_InitialCache.constIntegers[ECI_Dim] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("Dir"), 4);
     assert(iVaules > 1);
-    constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
+    m_InitialCache.constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
 
     TArray<INT> intValues;
     if (!params.FetchValueArrayINT(_T("LatticeLength"), intValues))
@@ -156,9 +150,9 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         intValues.AddItem(8);
     }
     else if (intValues[0] < 1
-          || intValues[1] < 1
-          || intValues[2] < 1
-          || intValues[3] < 1)
+        || intValues[1] < 1
+        || intValues[2] < 1
+        || intValues[3] < 1)
     {
         appCrucial(_T("Lattice length is invalid, will use 8x8x8x8"));
         intValues.RemoveAll();
@@ -168,15 +162,20 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         intValues.AddItem(8);
     }
 
-    constIntegers[ECI_Lx] = static_cast<UINT>(intValues[0]);
-    constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);
-    constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
-    constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
-    constIntegers[ECI_Volumn] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
-    constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
-    constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
-    constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);
+    m_InitialCache.constIntegers[ECI_Lx] = static_cast<UINT>(intValues[0]);
+    m_InitialCache.constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);
+    m_InitialCache.constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
+    m_InitialCache.constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
+    m_InitialCache.constIntegers[ECI_Volumn] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);
 
+    m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
+    m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir];
+
+    m_InitialCache.constFloats[ECF_InverseSqrtLink16] = 1 / _sqrt(16 * m_InitialCache.constIntegers[ECI_LinkCount]);
+    appGeneral(_T("ECF_InverseSqrtLink16:%f"), m_InitialCache.constFloats[ECF_InverseSqrtLink16]);
     UBOOL bAutoDecompose = TRUE;
     __FetchIntWithDefault(_T("ThreadAutoDecompose"), 0);
 
@@ -195,16 +194,16 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
             appCrucial(_T("ThreadAutoDecompose = 0 but not ThreadDecompose is invalid, will use auto decompose"));
             bAutoDecompose = TRUE;
         }
-        else if (intValues[0] < 1 
-              || intValues[1] < 1 
-              || intValues[2] < 1
-              || deviceConstraints[1] < (UINT)intValues[0]
-              || deviceConstraints[2] < (UINT)intValues[1]
-              || deviceConstraints[3] < (UINT)intValues[2]
-              || deviceConstraints[0] < (UINT)(intValues[0] * intValues[1] * intValues[2])
-              || !__Divisible(constIntegers[ECI_Lx], (UINT)intValues[0])
-              || !__Divisible(constIntegers[ECI_Ly], (UINT)intValues[1])
-              || !__Divisible(constIntegers[ECI_Lz], (UINT)intValues[2])
+        else if (intValues[0] < 1
+            || intValues[1] < 1
+            || intValues[2] < 1
+            || deviceConstraints[1] < (UINT)intValues[0]
+            || deviceConstraints[2] < (UINT)intValues[1]
+            || deviceConstraints[3] < (UINT)intValues[2]
+            || deviceConstraints[0] < (UINT)(intValues[0] * intValues[1] * intValues[2])
+            || !__Divisible(m_InitialCache.constIntegers[ECI_Lx], (UINT)intValues[0])
+            || !__Divisible(m_InitialCache.constIntegers[ECI_Ly], (UINT)intValues[1])
+            || !__Divisible(m_InitialCache.constIntegers[ECI_Lz], (UINT)intValues[2])
             )
         {
             appCrucial(_T("ThreadAutoDecompose = 0 but not ThreadDecompose is invalid (should >= 1, should be divisible by lattice length, should < max thread constraints), will use auto decompose"));
@@ -213,43 +212,45 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         else
         {
             //use the decompose in param
-            constIntegers[ECI_DecompLx] = static_cast<UINT>(intValues[0]);
-            constIntegers[ECI_DecompLy] = static_cast<UINT>(intValues[1]);
-            constIntegers[ECI_DecompLz] = static_cast<UINT>(intValues[2]);
-            constIntegers[ECI_DecompX] = constIntegers[ECI_Lx] / constIntegers[ECI_DecompLx];
-            constIntegers[ECI_DecompY] = constIntegers[ECI_Ly] / constIntegers[ECI_DecompLy];
-            constIntegers[ECI_DecompZ] = constIntegers[ECI_Lz] / constIntegers[ECI_DecompLz];
-            constIntegers[ECI_ThreadCount] = intValues[0] * intValues[1] * intValues[2];
+            m_InitialCache.constIntegers[ECI_DecompLx] = static_cast<UINT>(intValues[0]);
+            m_InitialCache.constIntegers[ECI_DecompLy] = static_cast<UINT>(intValues[1]);
+            m_InitialCache.constIntegers[ECI_DecompLz] = static_cast<UINT>(intValues[2]);
+            m_InitialCache.constIntegers[ECI_DecompX] = m_InitialCache.constIntegers[ECI_Lx] / m_InitialCache.constIntegers[ECI_DecompLx];
+            m_InitialCache.constIntegers[ECI_DecompY] = m_InitialCache.constIntegers[ECI_Ly] / m_InitialCache.constIntegers[ECI_DecompLy];
+            m_InitialCache.constIntegers[ECI_DecompZ] = m_InitialCache.constIntegers[ECI_Lz] / m_InitialCache.constIntegers[ECI_DecompLz];
+            m_InitialCache.constIntegers[ECI_ThreadCount] = m_InitialCache.constIntegers[ECI_Lx] * m_InitialCache.constIntegers[ECI_Ly] * m_InitialCache.constIntegers[ECI_Lz];
+            m_InitialCache.constIntegers[ECI_ThreadCountPerBlock] = intValues[0] * intValues[1] * intValues[2];
         }
     }
 
     if (bAutoDecompose)
     {
         TArray <UINT> latticeSize;
-        latticeSize.AddItem(constIntegers[ECI_Lx]);
-        latticeSize.AddItem(constIntegers[ECI_Ly]);
-        latticeSize.AddItem(constIntegers[ECI_Lz]);
+        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Lx]);
+        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Ly]);
+        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Lz]);
         TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeSize);
 
-        constIntegers[ECI_DecompX] = decomp[0];
-        constIntegers[ECI_DecompY] = decomp[1];
-        constIntegers[ECI_DecompZ] = decomp[2];
-        constIntegers[ECI_DecompLx] = decomp[3];
-        constIntegers[ECI_DecompLy] = decomp[4];
-        constIntegers[ECI_DecompLz] = decomp[5];
-        constIntegers[ECI_ThreadCount] = decomp[3] * decomp[4] * decomp[5];
+        m_InitialCache.constIntegers[ECI_DecompX] = decomp[0];
+        m_InitialCache.constIntegers[ECI_DecompY] = decomp[1];
+        m_InitialCache.constIntegers[ECI_DecompZ] = decomp[2];
+        m_InitialCache.constIntegers[ECI_DecompLx] = decomp[3];
+        m_InitialCache.constIntegers[ECI_DecompLy] = decomp[4];
+        m_InitialCache.constIntegers[ECI_DecompLz] = decomp[5];
+        m_InitialCache.constIntegers[ECI_ThreadCountPerBlock] = decomp[3] * decomp[4] * decomp[5];
+        m_InitialCache.constIntegers[ECI_ThreadCount] = decomp[0] * decomp[1] * decomp[2] * decomp[3] * decomp[4] * decomp[5];
     }
     appGeneral(_T("\n will run on lattice (%d,%d,%d,%d) with (%d x %d x %d) blocks and (%d x %d x %d) threads per block\n")
-        , constIntegers[ECI_Lx]
-        , constIntegers[ECI_Ly]
-        , constIntegers[ECI_Lz]
-        , constIntegers[ECI_Lt]
-        , constIntegers[ECI_DecompX]
-        , constIntegers[ECI_DecompY]
-        , constIntegers[ECI_DecompZ]
-        , constIntegers[ECI_DecompLx]
-        , constIntegers[ECI_DecompLy]
-        , constIntegers[ECI_DecompLz]
+        , m_InitialCache.constIntegers[ECI_Lx]
+        , m_InitialCache.constIntegers[ECI_Ly]
+        , m_InitialCache.constIntegers[ECI_Lz]
+        , m_InitialCache.constIntegers[ECI_Lt]
+        , m_InitialCache.constIntegers[ECI_DecompX]
+        , m_InitialCache.constIntegers[ECI_DecompY]
+        , m_InitialCache.constIntegers[ECI_DecompZ]
+        , m_InitialCache.constIntegers[ECI_DecompLx]
+        , m_InitialCache.constIntegers[ECI_DecompLy]
+        , m_InitialCache.constIntegers[ECI_DecompLz]
     );
 
 #pragma endregion
@@ -257,72 +258,67 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 #pragma region Fill constant table
 
     __FetchIntWithDefault(_T("RandomSeed"), 1234567);
-    constIntegers[ECI_RandomSeed] = static_cast<UINT>(iVaules);
+    m_InitialCache.constIntegers[ECI_RandomSeed] = static_cast<UINT>(iVaules);
 
-    __FetchIntWithDefault(_T("ExponentialPrecision"), 4);
-    constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
+    __FetchIntWithDefault(_T("ExponentialPrecision"), 8);
+    m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
-    __FetchIntWithDefault(_T("ActionListLength"), 1);
-    constIntegers[ECI_ActionListLength] = static_cast<UINT>(iVaules);
-
-    const CParameters subparam_updator = params.GetParameter(_T("Updator"));
-    CCString sValues;
+    __FetchIntWithDefault(_T("ActionListLength"), 0);
+    m_InitialCache.constIntegers[ECI_ActionListLength] = static_cast<UINT>(iVaules);
 
     __FetchStringWithDefault(_T("RandomType"), _T("ER_Schrage"));
-    ERandom eR = __STRING_TO_ENUM(ERandom, sValues);
+    m_InitialCache.eR = __STRING_TO_ENUM(ERandom, sValues);
 
-    if (eR == ER_Schrage)
+    __FetchIntWithDefault(_T("MeasureListLength"), 0);
+    m_InitialCache.constIntegers[ECI_MeasureListLength] = static_cast<UINT>(iVaules);
+
+    m_InitialCache.constIntegers[ECI_SUN] = 1;
+    if (params.Exist(_T("Gauge")))
     {
-        constIntegers[ECI_UsingSchrageRandom] = 1;
-    }
-    else 
-    {
-        constIntegers[ECI_UsingSchrageRandom] = 0;
+        CParameters gauge = params.GetParameter(_T("Gauge"));
+        if (gauge.Exist(_T("FieldName")))
+        {
+            CCString sFieldName;
+            gauge.FetchStringValue(_T("FieldName"), sFieldName);
+            if (sFieldName == _T("CFieldGaugeSU3"))
+            {
+                m_InitialCache.constIntegers[ECI_SUN] = 3;
+            }
+        }
     }
 
-    m_pCudaHelper = new CCudaHelper();
-    memcpy(m_pCudaHelper->m_ConstIntegers, constIntegers, sizeof(UINT) * kContentLength);
-    memcpy(m_pCudaHelper->m_ConstFloats, constFloats, sizeof(Real) * kContentLength);
+    memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
+    memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
     m_pCudaHelper->AllocateTemeraryBuffers(_HC_ThreadCount);
 
 #pragma endregion
 
-#pragma region Create Random
-
-    m_pLatticeData = new CLatticeData();
-    //appGeneral("are we here?");
-    if (eR != ER_Schrage)
-    {
-        //create another random
-    }
-    else 
-    {
-        m_pLatticeData->m_pRandomSchrage = new CRandomSchrage(constIntegers[ECI_RandomSeed]);
-        checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceRandomSchrage), sizeof(CRandomSchrage)));
-        checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceRandomSchrage, m_pLatticeData->m_pRandomSchrage, sizeof(CRandomSchrage), cudaMemcpyHostToDevice));
-        appGeneral(_T("Create the Schrage random with seed:%d\n"), constIntegers[ECI_RandomSeed]);
-    }
-    m_pCudaHelper->CopyRandomPointer(m_pLatticeData->m_pDeviceRandom, m_pLatticeData->m_pDeviceRandomSchrage);
-
-#pragma endregion
-
-#pragma region Create Gamma matrix set
-
     m_pCudaHelper->CreateGammaMatrix();
+}
 
-#pragma endregion
+void CCLGLibManager::InitialRandom(CParameters &)
+{
+    //INT iVaules = 0;
+    //CCString sValues;
 
-#pragma region Create Fields
+    m_pLatticeData->m_pRandom = new CRandom(m_InitialCache.constIntegers[ECI_RandomSeed], m_InitialCache.eR);
+    checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceRandom), sizeof(CRandom)));
+    checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceRandom, m_pLatticeData->m_pRandom, sizeof(CRandom), cudaMemcpyHostToDevice));
+    appGeneral(_T("Create the %s random with seed:%d\n"), __ENUM_TO_STRING(ERandom, m_InitialCache.eR).c_str(), m_InitialCache.constIntegers[ECI_RandomSeed]);
 
-#pragma region Gauge
+    m_pCudaHelper->CopyRandomPointer(m_pLatticeData->m_pDeviceRandom);
+}
 
-    CParameters gauge = params.GetParameter(_T("Gauge"));
+void CCLGLibManager::CreateGaugeField(class CParameters& params)
+{
+    INT iVaules = 0;
+    CCString sValues;
 
     CCString sGaugeClassName;
-    __FetchStringWithDefaultSub(gauge, _T("FieldName"), _T("CFieldGaugeSU3"));
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldGaugeSU3"));
     sGaugeClassName = sValues;
-    __FetchStringWithDefaultSub(gauge, _T("FieldInitialType"), _T("EFIT_Random"));
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
     EFieldInitialType eGaugeInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
 
     CBase* pGaugeField = appCreate(sGaugeClassName);
@@ -331,24 +327,43 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
     }
-
+    pGauge->m_byFieldId = 1;
     if (EFIT_ReadFromFile != eGaugeInitial)
     {
         pGauge->m_pOwner = m_pLatticeData;
         pGauge->InitialField(eGaugeInitial);
     }
-    
+    else
+    {
+        CCString sFileType, sFileName;
+        if (!params.FetchStringValue(_T("GaugeFileType"), sFileType)
+         || !params.FetchStringValue(_T("GaugeFileName"), sFileName))
+        {
+            appCrucial(_T("Gauge initial type is EFIT_ReadFromFile, but cannot find GaugeFileType or GaugeFileName!\n"));
+            exit(EXIT_FAILURE);
+        }
+        EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
+        pGauge->m_pOwner = m_pLatticeData;
+        pGauge->InitialFieldWithFile(sFileName, eFileType);
+    }
+
     m_pLatticeData->m_pGaugeField = pGauge;
-    checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceGaugeField), pGauge->GetClass()->GetSize()));
-    checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceGaugeField, m_pLatticeData->m_pGaugeField, pGauge->GetClass()->GetSize(), cudaMemcpyHostToDevice));
+    m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
+    //checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceGaugeField), pGauge->GetClass()->GetSize()));
+    //checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceGaugeField, m_pLatticeData->m_pGaugeField, pGauge->GetClass()->GetSize(), cudaMemcpyHostToDevice));
 
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
+}
 
-#pragma endregion
+void CCLGLibManager::CreateOtherFields(class CParameters& params)
+{
 
-#pragma endregion
+}
 
-#pragma region Create Index and Boundary
+void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
+{
+    INT iVaules = 0;
+    CCString sValues;
 
     __FetchStringWithDefault(_T("LatticeBoundary"), _T("EBC_TorusSquare"));
 
@@ -374,7 +389,7 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
 
     __FetchStringWithDefault(_T("LatticeIndex"), _T("EIndexType_Square"));
     EIndexType eIT = __STRING_TO_ENUM(EIndexType, sValues);
-    
+
     CIndex ** devicePtrIndex;
     checkCudaErrors(cudaMalloc((void**)&devicePtrIndex, sizeof(CIndex *)));
     sizeBufferHost[0] = 0;
@@ -400,14 +415,13 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
     checkCudaErrors(cudaFree(devicePtrIndex));
 
     appGeneral(_T("Create the index %s\n"), sValues.c_str());
+}
 
-#pragma endregion
-
-#pragma region Craete Actions
-
+void CCLGLibManager::CreateActionList(class CParameters& params)
+{
     CCString sActionNameList;
     TArray<CAction*> actions;
-    for (UINT i = 0; i < constIntegers[ECI_ActionListLength]; ++i)
+    for (UINT i = 0; i < m_InitialCache.constIntegers[ECI_ActionListLength]; ++i)
     {
         CCString sActionParamName;
         sActionParamName.Format(_T("Action%d"), i + 1);
@@ -419,9 +433,9 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
             pAction = dynamic_cast<CAction*>(appCreate(sActionName));
             if (NULL != pAction)
             {
-                pAction->Initial(m_pLatticeData, subparam_action);
+                pAction->Initial(m_pLatticeData, subparam_action, i + 1);
                 actions.AddItem(pAction);
-
+                m_pLatticeData->m_pActionMap.SetAt(i + 1, pAction);
                 sActionNameList += (CCString(_T(" ")) + pAction->GetClass()->GetName() + _T(" "));
             }
             else
@@ -432,22 +446,23 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
                 exit(EXIT_FAILURE);
             }
         }
-    }    
+    }
     m_pLatticeData->m_pActionList = actions;
 
     appGeneral(_T("Create the action list, with %d actions: %s\n"), actions.Num(), sActionNameList.c_str());
+}
 
-#pragma endregion
+void CCLGLibManager::CreateUpdator(class CParameters& params)
+{
+    CCString sValues;
 
-#pragma region Create Updator
-
-    __FetchStringWithDefaultSub(subparam_updator, _T("UpdatorType"), _T("CHMC"));
+    __FetchStringWithDefault( _T("UpdatorType"), _T("CHMC"));
     CUpdator* updator = dynamic_cast<CUpdator*>(appCreate(sValues));
     CCString sUpdatorInfo = sValues;
     if (NULL != updator && EUT_HMC == updator->GetUpdatorType())
     {
         CHMC* pHMC = dynamic_cast<CHMC*>(updator);
-        __FetchStringWithDefaultSub(subparam_updator, _T("IntegratorType"), _T("CIntegratorLeapFrog"));
+        __FetchStringWithDefault(_T("IntegratorType"), _T("CIntegratorLeapFrog"));
         CIntegrator * integrator = dynamic_cast<CIntegrator *>(appCreate(sValues));
 
         if (NULL == pHMC || NULL == integrator)
@@ -457,40 +472,134 @@ void CCLGLibManager::InitialWithParameter(CParameters &params)
         }
 
         sUpdatorInfo += (" Integrator:" + sValues);
-        integrator->Initial(pHMC, m_pLatticeData, subparam_updator);
-        pHMC->Initial(m_pLatticeData, subparam_updator);
+        integrator->Initial(pHMC, m_pLatticeData, params);
+        pHMC->Initial(m_pLatticeData, params);
         pHMC->m_pIntegrator = integrator;
         m_pLatticeData->m_pUpdator = pHMC;
     }
     else
     {
-        appCrucial(_T("Failed to create Updator! s = %s"), sValues);
+        appCrucial(_T("Failed to create Updator! s = %s"), sValues.c_str());
         exit(EXIT_FAILURE);
     }
-    
-    appGeneral(_T("Create Updator %s\n"), sUpdatorInfo);
 
-#pragma endregion
+    appGeneral(_T("Create Updator %s\n"), sUpdatorInfo.c_str());
+}
+
+void CCLGLibManager::CreateMeasurement(class CParameters& params)
+{
+    CCString sMeasureNameList;
+    CMeasurementManager* pMeasurements = new CMeasurementManager(m_pLatticeData);
+    for (UINT i = 0; i < m_InitialCache.constIntegers[ECI_MeasureListLength]; ++i)
+    {
+        CCString sMeasureParamName;
+        sMeasureParamName.Format(_T("Measure%d"), i + 1);
+
+        const CParameters subparam_measure = params.GetParameter(sMeasureParamName);
+        CCString sMeasureName;
+        CMeasure* pMeasure = NULL;
+        if (subparam_measure.FetchStringValue(_T("MeasureName"), sMeasureName))
+        {
+            pMeasure = dynamic_cast<CMeasure*>(appCreate(sMeasureName));
+            if (NULL != pMeasure)
+            {
+                pMeasure->Initial(pMeasurements, m_pLatticeData, subparam_measure, i + 1);
+                pMeasurements->m_lstAllMeasures.AddItem(pMeasure);
+                pMeasurements->m_mapMeasures.SetAt(i + 1, pMeasure);
+                sMeasureNameList += (CCString(_T(" ")) + pMeasure->GetClass()->GetName() + _T(" "));
+            }
+            else
+            {
+                //We have already set the constant ECI_ActionListLength
+                //So, NULL is not allowed!
+                appCrucial(_T("Create Measure Failed: %s\n"), sMeasureName.c_str());
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    m_pLatticeData->m_pMeasurements = pMeasurements;
+
+    appGeneral(_T("Create the measure list, with %d measures: %s\n"), pMeasurements->m_lstAllMeasures.Num(), sMeasureNameList.c_str());
+}
+
+void CCLGLibManager::CreateSolver(class CParameters& params)
+{
+
+}
+
+UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
+{
+    checkCudaErrors(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1 << 30));
+
+    m_pCudaHelper = new CCudaHelper();
+    m_pLatticeData = new CLatticeData();
+    m_pFileSystem = new CFileSystem();
+
+    InitialLatticeAndConstant(params);
+    InitialRandom(params);
+
+    if (params.Exist(_T("Gauge")))
+    {
+        CParameters gauge = params.GetParameter(_T("Gauge"));
+        CreateGaugeField(gauge);
+    }
+
+    if (params.Exist(_T("LatticeIndex")))
+    {
+        CreateIndexAndBoundary(params);
+    }
+
+    if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)
+    {
+        CreateActionList(params);
+    }
+
+    if (params.Exist(_T("Updator")))
+    {
+        CParameters updator = params.GetParameter(_T("Updator"));
+        CreateUpdator(updator);
+    }
+
+    if (m_InitialCache.constIntegers[ECI_MeasureListLength] > 0)
+    {
+        CreateMeasurement(params);
+    }
 
     checkCudaErrors(cudaDeviceSynchronize());
+    cudaError_t cudaEr = cudaGetLastError();
+    if (cudaEr != cudaSuccess)
+    {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 void CCLGLibManager::Quit()
 {
     appSafeDelete(m_pLatticeData);
     appSafeDelete(m_pCudaHelper);
+    appSafeDelete(m_pFileSystem);
+
+    INT devCount;
+    cudaGetDeviceCount(&devCount);
+    for (INT i = 0; i < devCount; ++i)
+    {
+        cudaSetDevice(i);
+        cudaDeviceReset();
+    }
 }
 
-void CLGAPI appInitialCLG(const TCHAR* paramFileName) 
+UBOOL CLGAPI appInitialCLG(const TCHAR* paramFileName)
 { 
     CParameters params;
     CYAMLParser::ParseFile(paramFileName, params);
-    GCLGManager.InitialWithParameter(params);
+    return GCLGManager.InitialWithParameter(params);
 }
 
-void CLGAPI appInitialCLG(CParameters& params)
+UBOOL CLGAPI appInitialCLG(CParameters& params)
 {
-    GCLGManager.InitialWithParameter(params);
+    return GCLGManager.InitialWithParameter(params);
 }
 
 void CLGAPI appQuitCLG() 

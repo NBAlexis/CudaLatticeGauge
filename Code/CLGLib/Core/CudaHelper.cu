@@ -14,7 +14,6 @@ __BEGIN_NAMESPACE
 __constant__ UINT _constIntegers[kContentLength];
 __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
-__constant__ CRandomSchrage* __rs;
 __constant__ CIndex* __idx;
 __constant__ gammaMatrixSet* __diracGamma;
 __constant__ gammaMatrixSet* __chiralGamma;
@@ -31,13 +30,6 @@ __global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet*
     for (int i = 0; i < 8; ++i)
     {
         ppGenerator[i] = deviceSU3::makeSU3Generator(i);
-    }
-}
-
-extern "C" {
-    void _cCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3** ppGenerator)
-    {
-        _kernelCreateMatrix << <1, 1 >> > (ppPtrDirac, ppPtrChiral, ppGenerator);
     }
 }
 
@@ -327,16 +319,23 @@ void CCudaHelper::DeviceQuery()
 
 }
 
+void CCudaHelper::MemoryQuery()
+{
+    size_t availableMemory, totalMemory, usedMemory;
+    cudaMemGetInfo(&availableMemory, &totalMemory);
+    usedMemory = totalMemory - availableMemory;
+    appGeneral(_T("Device Memory: used %llu, available %llu, total %llu\n"), usedMemory, availableMemory, totalMemory);
+}
+
 void CCudaHelper::CopyConstants() const
 {
     checkCudaErrors(cudaMemcpyToSymbol(_constIntegers, m_ConstIntegers, sizeof(UINT) * kContentLength));
     checkCudaErrors(cudaMemcpyToSymbol(_constFloats, m_ConstFloats, sizeof(Real) * kContentLength));
 }
 
-void CCudaHelper::CopyRandomPointer(const CRandom* r, const CRandomSchrage* rs) const
+void CCudaHelper::CopyRandomPointer(const CRandom* r) const
 {
     checkCudaErrors(cudaMemcpyToSymbol(__r, &r, sizeof(CRandom*)));
-    checkCudaErrors(cudaMemcpyToSymbol(__rs, &rs, sizeof(CRandomSchrage*)));
 }
 
 void CCudaHelper::CreateGammaMatrix() const
@@ -351,7 +350,7 @@ void CCudaHelper::CreateGammaMatrix() const
     checkCudaErrors(cudaMalloc((void**)&ppSU3, sizeof(deviceSU3*) * 8));
 
     //craete content
-    _cCreateMatrix(ppDiracGamma, ppChiralGamma, ppSU3);
+    _kernelCreateMatrix << <1, 1 >> > (ppDiracGamma, ppChiralGamma, ppSU3);
 
     //copy to constant
     checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, ppDiracGamma, sizeof(gammaMatrixSet*)));
@@ -403,8 +402,13 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     return ret;
 }
 
+/**
+* When block is not (1,1,1), some times, this will be excuted when only few block is finished.
+* Must wait until all blocks finished.
+*/
 _Complex CCudaHelper::ThreadBufferSum(_Complex * pDeviceBuffer)
 {
+    //checkCudaErrors(cudaDeviceSynchronize());
     thrust::device_ptr<_Complex> dp(pDeviceBuffer);
     thrust::device_vector<_Complex> d_x(dp, dp + m_uiThreadCount);
     return thrust::reduce(d_x.begin(), d_x.end(), _make_cuComplex(0, 0), complex_plus_for_thrust());
@@ -412,6 +416,7 @@ _Complex CCudaHelper::ThreadBufferSum(_Complex * pDeviceBuffer)
 
 Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
 {
+    //checkCudaErrors(cudaDeviceSynchronize());
     thrust::device_ptr<Real> dp(pDeviceBuffer);
     thrust::device_vector<Real> d_x(dp, dp + m_uiThreadCount);
     return thrust::reduce(d_x.begin(), d_x.end(), (Real)0, thrust::plus<Real>());

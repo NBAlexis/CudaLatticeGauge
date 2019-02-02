@@ -43,23 +43,23 @@ void CParameters::Dump(const CCString& indent) const
             TArray<CCString> thevalues = m_pStringVector.GetAt(allKeys[i]);
             for (INT j = 0; j < thevalues.Num(); ++j)
             {
-                appGeneral(_T("%s, "), thevalues[j]);
+                appGeneral(_T("%s, "), thevalues[j].c_str());
             }
             appGeneral(_T("]\n"));
         }
     }
 
-    appGeneral(_T("%sParameters:\n"), indent);
+    appGeneral(_T("%sParameters:\n"), indent.c_str());
     allKeys = m_pParameters.GetAllKeys();
     if (allKeys.Num() == 0)
     {
-        appGeneral(_T("%s  (none)\n"), indent);
+        appGeneral(_T("%s  (none)\n"), indent.c_str());
     }
     else 
     {
         for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral(_T("%s  key = %s, value:\n"), indent, allKeys[i]);
+            appGeneral(_T("%s  key = %s, value:\n"), indent, allKeys[i].c_str());
             m_pParameters.GetAt(allKeys[i]).Dump(indent + _T("    "));
         }
     }

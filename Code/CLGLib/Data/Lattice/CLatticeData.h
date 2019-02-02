@@ -45,69 +45,35 @@ public:
     ~CLatticeData();
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
+    void OnUpdatorConfigurationAccepted();
+    void OnUpdatorFinished();
 
-    //static void Create() { if (NULL == m_pInstance) { m_pInstance = new CLatticeData(); } }
-    //static void Release() { appSafeDelete(m_pInstance); }
-    //~CLatticeData() { ; }
-
-    //static __host__ CLatticeData* GetInstance() { Create(); return m_pInstance; }
-    //__device__ __inline__ CDeviceLattice* GetDeviceInstance() const  { return m_pDeviceInstance; }
-
-    /**
-    * One thread deal with only data[x / m_pLatticeDecompose[0], y / m_pLatticeDecompose[1], z / m_pLatticeDecompose[2]]
-    * with m_pLatticeDecompose[3] * m_pLatticeDecompose[4] * m_pLatticeDecompose[5] blocks
-    * For 1D, m_pLatticeDecompose[1] = m_pLatticeDecompose[2] = 1
-    * For 2D, m_pLatticeDecompose[2] = 1
-    */
-    //UINT m_uiVolumn;
-    //UINT m_uiDim;
-    //UINT m_uiDir;
-    //UINT m_uiLatticeLength[CCommonData::kMaxDim];
-    //UINT m_uiTLength; //this is special because T dir is not decomposed to thread blocks
-    //UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
-    //Real m_fBeta;
-
-    /*
-    * SU3(x=(x,y,z,t))_{n=a*3+b}=
-    * m_pData[(
-        (x*m_uiLatticeLength[1]*m_uiLatticeLength[2]*m_uiLatticeLength[3] 
-       + y*m_uiLatticeLength[2]*m_uiLatticeLength[3] 
-       + z*m_uiLatticeLength[3] 
-       + t)
-       * m_uiDir + dir) * elementCount + n]
-    *
-    * m_uiLatticeMultipy[0] = m_uiLatticeLength[1]*m_uiLatticeLength[2]*m_uiLatticeLength[3]
-    * m_uiLatticeMultipy[1] = m_uiLatticeLength[2]*m_uiLatticeLength[3]
-    * m_uiLatticeMultipy[2] = m_uiLatticeLength[3]
-    * for field on set, dir = 1
-    */
-    //UINT m_uiLatticeMultipy[CCommonData::kMaxDim - 1];
-
-    //CCString m_sFields[CCommonData::kMaxFieldCount];
-    //class CField* m_pFields[CCommonData::kMaxFieldCount];
     class CRandom* m_pRandom;
-    class CRandomSchrage* m_pRandomSchrage;
 
     class CFieldGauge* m_pGaugeField;
     class CFieldGauge* m_pGaugeFieldStaple;
+    THashMap<BYTE, class CField*> m_pFieldMap;
 
     TArray<class CAction*> m_pActionList;
+    THashMap<BYTE, class CAction*> m_pActionMap;
+
     class CUpdator* m_pUpdator;
+    class CMeasurementManager* m_pMeasurements;
 
     //this is a device copy
     //see:
     //https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i
     class CRandom* m_pDeviceRandom;
-    class CRandomSchrage* m_pDeviceRandomSchrage;
     class CIndex* m_pDeviceIndex;
 
     class CFieldGauge* m_pDeviceGaugeField;
     class CFieldGauge* m_pDeviceGaugeFieldStaple;
 
-    //same as CAction* m_pDeviceActionList[]
-    //class CAction** m_pDeviceActionList;
     class CSLASolver* m_pFermionSolver;
     
+
+    class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.GetAt(byId); }
+    class CAction* GetActionById(BYTE byId) const { return m_pActionMap.GetAt(byId); }
 };
 
 inline class CSLASolver* appGetFermionSolver();

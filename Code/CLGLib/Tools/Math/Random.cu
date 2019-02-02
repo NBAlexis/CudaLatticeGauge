@@ -9,6 +9,11 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
+///* include MTGP host helper functions */
+//#include <curand_mtgp32_host.h>
+///* include MTGP pre-computed parameter sets */
+//#include <curand_mtgp32dc_p_11213.h>
+
 __BEGIN_NAMESPACE
 
 __global__ 
@@ -24,37 +29,228 @@ void _kernalAllocateSeedTable(UINT* pDevicePtr)
         for (UINT idir = 0; idir < uiDir + 1; ++idir)
         {
             UINT fatIndex = _deviceGetFatIndex(coord, idir);
-
-            CRandomSchrage::_deviceAsignSeeds(pDevicePtr, uiSeed, fatIndex);
+            CRandom::_deviceAsignSeeds(pDevicePtr, uiSeed, fatIndex);
         }
     }
 }
 
-extern "C" {
-    void _callKernelInitialRandomTable(UINT* devicePtr)
+__global__
+void _kernalInitialXORWOW(curandState * states)
+{
+    intokernal;
+
+    UINT uiSeed = _DC_Seed;
+
+    for (UINT it = 0; it < uiTLength; ++it)
     {
-        preparethread;
-        _kernalAllocateSeedTable << <block, threads >> > (devicePtr);
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir + 1; ++idir)
+        {
+            UINT fatIndex = _deviceGetFatIndex(coord, idir);
+            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
+        }
     }
 }
 
-CRandomSchrage::CRandomSchrage(UINT uiSeed)
+__global__
+void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 {
-    m_uiHostSeed = uiSeed;
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
-    _callKernelInitialRandomTable(m_pDeviceSeedTable);
+    intokernal;
+
+    UINT uiSeed = _DC_Seed;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir + 1; ++idir)
+        {
+            UINT fatIndex = _deviceGetFatIndex(coord, idir);
+            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
+        }
+    }
 }
 
-CRandomSchrage::~CRandomSchrage()
+__global__
+void _kernalInitialMRG(curandStateMRG32k3a  * states)
 {
-    checkCudaErrors(cudaFree(m_pDeviceSeedTable));
+    intokernal;
+
+    UINT uiSeed = _DC_Seed;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir + 1; ++idir)
+        {
+            UINT fatIndex = _deviceGetFatIndex(coord, idir);
+            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
+        }
+    }
+}
+
+__global__
+void _kernalInitialSobel32(curandStateSobol32* states, curandDirectionVectors32_t* dirs)
+{
+    intokernal;
+
+    UINT uiSeed = _DC_Seed;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        curand_init(dirs[siteIndex], uiSeed % 16, &states[siteIndex]);
+    }
+}
+
+__global__
+void _kernalInitialScrambledSobel32(curandStateScrambledSobol32* states, UINT* consts, curandDirectionVectors32_t* dirs)
+{
+    intokernal;
+
+    UINT uiSeed = _DC_Seed;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+        curand_init(dirs[siteIndex], consts[siteIndex], uiSeed % __SOBEL_OFFSET_MAX, &states[siteIndex]);
+    }
+}
+
+CRandom::~CRandom()
+{
+
+    switch (m_eRandomType)
+    {
+    case ER_Schrage:
+        {
+            checkCudaErrors(cudaFree(m_pDeviceSeedTable));
+        }
+        break;
+    case ER_MRG32K3A:
+        {
+            CURAND_CALL(curandDestroyGenerator(m_HGen));
+            checkCudaErrors(cudaFree(m_deviceBuffer));
+            checkCudaErrors(cudaFree(m_pDeviceRandStatesMRG));
+        }
+        break;
+    case ER_PHILOX4_32_10:
+        {
+            CURAND_CALL(curandDestroyGenerator(m_HGen));
+            checkCudaErrors(cudaFree(m_deviceBuffer));
+            checkCudaErrors(cudaFree(m_pDeviceRandStatesPhilox));
+        }
+        break;
+    case ER_QUASI_SOBOL32:
+        {
+            CURAND_CALL(curandDestroyGenerator(m_HGen));
+            checkCudaErrors(cudaFree(m_deviceBuffer));
+            checkCudaErrors(cudaFree(m_pDeviceRandStatesSobol32));
+            checkCudaErrors(cudaFree(m_pDeviceSobolDirVec));
+        }
+        break;
+    case ER_SCRAMBLED_SOBOL32:
+        {
+            CURAND_CALL(curandDestroyGenerator(m_HGen));
+            checkCudaErrors(cudaFree(m_deviceBuffer));
+            checkCudaErrors(cudaFree(m_pDeviceRandStatesScrambledSobol32));
+            checkCudaErrors(cudaFree(m_pDeviceSobolDirVec));
+            checkCudaErrors(cudaFree(m_pDeviceSobelConsts));
+        }
+        break;
+    case ER_XORWOW:
+        default:
+        {
+            CURAND_CALL(curandDestroyGenerator(m_HGen));
+            checkCudaErrors(cudaFree(m_deviceBuffer));
+            checkCudaErrors(cudaFree(m_pDeviceRandStatesXORWOW));
+        }
+        break;
+    }
+}
+
+void CRandom::InitialStatesXORWOW(UINT )
+{
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volumn * (_HC_Dir + 1)));
+    preparethread;
+    _kernalInitialXORWOW << <block, threads >> > (m_pDeviceRandStatesXORWOW);
+}
+
+void CRandom::InitialStatesPhilox(UINT )
+{
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volumn * (_HC_Dir + 1)));
+    preparethread;
+    _kernalInitialPhilox << <block, threads >> > (m_pDeviceRandStatesPhilox);
+}
+
+void CRandom::InitialStatesMRG(UINT )
+{
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volumn * (_HC_Dir + 1)));
+    preparethread;
+    _kernalInitialMRG << <block, threads >> > (m_pDeviceRandStatesMRG);
+}
+
+void CRandom::InitialStatesSobol32(UINT )
+{
+    //support only 20000 dimensions, so using _HC_Volumn instead
+    m_uiFatIdDivide = _HC_Dir + 1;
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesSobol32, 
+        sizeof(curandStateSobol32) * _HC_Volumn));
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobolDirVec, 
+        sizeof(curandDirectionVectors32_t) * _HC_Volumn));
+
+    //int[32]
+    curandDirectionVectors32_t *hostVectors32;
+    CURAND_CALL(curandGetDirectionVectors32(&hostVectors32, CURAND_DIRECTION_VECTORS_32_JOEKUO6));
+    checkCudaErrors(cudaMemcpy(m_pDeviceSobolDirVec, hostVectors32, 
+        _HC_Volumn * sizeof(curandDirectionVectors32_t),
+        cudaMemcpyHostToDevice));
+
+    preparethread;
+    _kernalInitialSobel32 << <block, threads >> > (m_pDeviceRandStatesSobol32, m_pDeviceSobolDirVec);
+}
+
+void CRandom::InitialStatesScrambledSobol32(UINT uiSeed)
+{
+    m_uiFatIdDivide = _HC_Dir + 1;
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesScrambledSobol32, 
+        sizeof(curandStateScrambledSobol32) * _HC_Volumn));
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobolDirVec, 
+        sizeof(curandDirectionVectors32_t) * _HC_Volumn));
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobelConsts, 
+        sizeof(UINT) * _HC_Volumn));
+
+    curandDirectionVectors32_t *hostVectors32;
+    CURAND_CALL(curandGetDirectionVectors32(&hostVectors32, CURAND_SCRAMBLED_DIRECTION_VECTORS_32_JOEKUO6));
+    checkCudaErrors(cudaMemcpy(
+        m_pDeviceSobolDirVec, 
+        hostVectors32, 
+        _HC_Volumn * sizeof(curandDirectionVectors32_t),
+        cudaMemcpyHostToDevice));
+
+    UINT * hostScrambleConstants32;
+    CURAND_CALL(curandGetScrambleConstants32(&hostScrambleConstants32));
+    checkCudaErrors(cudaMemcpy(
+        m_pDeviceSobelConsts, 
+        hostScrambleConstants32, 
+        _HC_Volumn * sizeof(UINT), 
+        cudaMemcpyHostToDevice));
+
+    preparethread;
+    _kernalInitialScrambledSobel32 << <block, threads >> > (m_pDeviceRandStatesScrambledSobol32, m_pDeviceSobelConsts, m_pDeviceSobolDirVec);
+}
+
+void CRandom::InitialTableSchrage(UINT uiSeed)
+{
+    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
+    preparethread;
+    _kernalAllocateSeedTable << <block, threads >> > (m_pDeviceSeedTable);
 }
 
 Real GetRandomReal()
 {
-    return (1 == appGetCudaHelper()->m_ConstIntegers[ECI_UsingSchrageRandom])
-        ? appGetLattice()->m_pRandomSchrage->GetRandomF()
-        : appGetLattice()->m_pRandom->GetRandomF();
+    return appGetLattice()->m_pRandom->GetRandomF();
 }
 
 #pragma region Test

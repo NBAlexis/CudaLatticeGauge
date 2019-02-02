@@ -5,6 +5,15 @@
     <ClCompile Include="Tests\TestRandom.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestUpdator.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestSU3Generator.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestConfigurationFileIO.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
@@ -13,5 +22,8 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{186a5d87-9702-43d4-b9ed-f9c57b98a1f7}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Bin\Debug\TestSuit.yaml" />
   </ItemGroup>
 </Project>

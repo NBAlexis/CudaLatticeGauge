@@ -44,7 +44,7 @@ public:
     void Prepare(UBOOL bLastAccepted);
     void UpdateP(Real fStep);
     void UpdateU(Real fStep);
-    virtual Real GetEnergy();
+    virtual Real GetEnergy() const;
 
 protected:
 

@@ -27,13 +27,21 @@ class CLGAPI CUpdator : public CBase
 public:
 
     CUpdator() : m_pOwner(NULL) { ; }
-    virtual void Update(UINT iSteps) = 0;
+    virtual UINT Update(UINT iSteps, UBOOL bMeasure) = 0;
     virtual Real CalculateEnergy() = 0;
 
     virtual EUpdatorType GetUpdatorType() const { return EUT_Max; }
     virtual void Initial(class CLatticeData* pOwner, const CParameters& params) = 0;
 
     class CLatticeData* m_pOwner;
+
+    void SetConfigurationCount(UINT uiCount) { m_iAcceptedConfigurationCount = uiCount; }
+    UINT GetConfigurationCount() const { return m_iAcceptedConfigurationCount; }
+    void OnConfigurationAccepted();
+
+protected:
+
+    UINT m_iAcceptedConfigurationCount;
 };
 
 __END_NAMESPACE

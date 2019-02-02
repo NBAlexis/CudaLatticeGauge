@@ -21,13 +21,14 @@ public:
 
     CHMC() : CUpdator(), m_pIntegrator(NULL) { ; }
     ~CHMC();
-    virtual void Update(UINT iSteps);
+    virtual UINT Update(UINT iSteps, UBOOL bMeasure);
     virtual Real CalculateEnergy() { return 0.0f; }
     virtual EUpdatorType GetUpdatorType() const { return EUT_HMC; }
 
     class CIntegrator* m_pIntegrator;
 
     virtual void Initial(class CLatticeData* pOwner, const CParameters& params);
+
 };
 
 __END_NAMESPACE

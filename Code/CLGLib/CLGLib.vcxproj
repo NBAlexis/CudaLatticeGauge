@@ -48,6 +48,10 @@
     <ClInclude Include="Data\Lattice\CIndex.h" />
     <ClInclude Include="Data\Lattice\CIndexSquare.h" />
     <ClInclude Include="Data\Lattice\CLatticeData.h" />
+    <ClInclude Include="Measurement\CMeasure.h" />
+    <ClInclude Include="Measurement\CMeasurementManager.h" />
+    <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
+    <ClInclude Include="Platform\CFile.h" />
     <ClInclude Include="Platform\PlatformIncs.h" />
     <ClInclude Include="Platform\WinDefine.h" />
     <ClInclude Include="Platform\WinFunction.h" />
@@ -93,6 +97,9 @@
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Measurement\CMeasurementManager.cpp" />
+    <ClCompile Include="Measurement\CMeasurePlaqutteEnergy.cpp" />
+    <ClCompile Include="Platform\CFileWin.cpp" />
     <ClCompile Include="Platform\WinFunction.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <CudaCompile Include="Data\Lattice\CIndex.cu" />
@@ -209,7 +216,7 @@
     <Link>
       <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>curand.lib;cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
@@ -247,7 +254,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>curand.lib;cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <CudaCompile>

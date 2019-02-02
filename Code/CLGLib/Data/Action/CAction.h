@@ -16,7 +16,7 @@ __BEGIN_NAMESPACE
 class CLGAPI CAction : public CBase
 {
 public:
-    CAction() : m_pOwner(NULL) { ; }
+    CAction() : m_pOwner(NULL), m_byActionId(0) { ; }
 
     /**
     * This is called langevin in Bridge++
@@ -28,18 +28,21 @@ public:
     /**
     * Obtain the pointer of the fields
     */
-    virtual void Initial(class CLatticeData* pOwner, const CParameters& param) = 0;
+    virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) = 0;
 
     /**
     * Calculate the force on gauge fields to update the fields
     * Note that, gauge field will be changed, the change will be accepte or rejected.
     * So the "pGauge" must be a copy of real gauge field, not the orignal one!
     */
-    virtual void CalculateForceOnGauge(class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
+    virtual void CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
+
+    BYTE GetActionId() const { return m_byActionId; }
 
 protected:
 
     class CLatticeData* m_pOwner;
+    BYTE m_byActionId;
 };
 
 __END_NAMESPACE

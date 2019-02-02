@@ -60,6 +60,8 @@
 #include "Tools/Data/THashMap.h"
 #include "Tools/EnumGather.h"
 
+#include "Platform/CFile.h"
+
 #include "Tools/Tracer.h"
 #include "Tools/Timer.h"
 #include "Tools/CYAMLParser.h"
@@ -115,6 +117,10 @@ UINT uiDir = _DC_Dir;
 
 #include "SparseLinearAlgebra/CSLASolve.h"
 #include "SparseLinearAlgebra/CSolveBiCGstab.h"
+
+#include "Measurement/CMeasure.h"
+#include "Measurement/CMeasurePlaqutteEnergy.h"
+#include "Measurement/CMeasurementManager.h"
 
 #include "Update/CUpdator.h"
 #include "Update/Continous/CIntegrator.h"

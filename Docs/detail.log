@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  9 JAN 2019 04:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  31 JAN 2019 10:32
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1308,36 +1308,38 @@ LaTeX Font Info:    Try loading font information for U+euf on input line 77.
  (D:\CTEX\MiKTeX\tex\latex\amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 ) [6] [7]
-[8] [9] [10] [11] [12]) (update/solver.tex) [13] (programming/cuda.tex
+[8] [9] [10] [11] [12]) (update/solver.tex) [13] [14
+
+] (programming/cuda.tex
 Overfull \hbox (2.43213pt too wide) in paragraph at lines 7--8
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/53
 781421/cuda-the-member-field-with-
  []
 
-[14
+[15
 
-] [15]
+] [16]
 Overfull \hbox (11.53699pt too wide) in paragraph at lines 136--137
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/26
 812913/how-to-implement-device-side-
  []
 
-[16] [17] [18]) [19] (tests/testRandom.tex) [20
+[17] [18] [19]) [20] (tests/testRandom.tex) [21
 
-] (detail.ind<<c1956.cmap>><<c1961.cmap>> [21
+] (detail.ind<<c1956.cmap>><<c1961.cmap>> [22
 
 
 
 ]) (detail.bbl<<c1937.cmap>><<c1947.cmap>><<c1958.cmap>><<c1959.cmap>><<c1929.c
 map>>)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 106.
- [22
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 110.
+ [23
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 106.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 110.
  (detail.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 106.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 106.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 110.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 110.
 
 
 Package rerunfilecheck Warning: File `detail.out' has changed.
@@ -1345,8 +1347,8 @@ Package rerunfilecheck Warning: File `detail.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `detail.out':
-(rerunfilecheck)             Before: 1BB2EA715A1001C9FF258D5E85DECE30;5091
-(rerunfilecheck)             After:  209B0A4D10FA8A27E05F291A3508F179;3885.
+(rerunfilecheck)             Before: 8BC4419BAC3DE53AB69F9874F2AC0FCE;5224
+(rerunfilecheck)             After:  166597984A2162FB07F51ED885608EA6;3985.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
@@ -1354,16 +1356,16 @@ LaTeX Font Warning: Size substitutions with differences
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 106.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 110.
  ) 
 Here is how much of TeX's memory you used:
- 27679 strings out of 492976
- 460502 string characters out of 3141819
- 949320 words of memory out of 3000000
- 30734 multiletter control sequences out of 15000+200000
+ 27684 strings out of 492976
+ 460551 string characters out of 3141819
+ 965355 words of memory out of 3000000
+ 30736 multiletter control sequences out of 15000+200000
  554392 words of font info for 106 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
- 44i,20n,63p,576b,1997s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 44i,20n,63p,576b,1991s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/s
 imhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS/Fonts/simhei.ttf><C:/WINDOWS
 /Fonts/simsun.ttc><C:/WINDOWS/Fonts/simsun.ttc><C:/WINDOWS/Fonts/simsun.ttc><C:
@@ -1382,9 +1384,9 @@ onts/cm/cmsy10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><D:
 /CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/eu
 ler/eufm10.pfb>
-Output written on detail.pdf (22 pages, 386511 bytes).
+Output written on detail.pdf (23 pages, 396109 bytes).
 PDF statistics:
- 823 PDF objects out of 1000 (max. 8388607)
- 395 named destinations out of 1000 (max. 500000)
- 229 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 840 PDF objects out of 1000 (max. 8388607)
+ 398 named destinations out of 1000 (max. 500000)
+ 237 words of extra memory for PDF output out of 10000 (max. 10000000)
 

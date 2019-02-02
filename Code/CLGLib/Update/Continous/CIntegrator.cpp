@@ -28,9 +28,9 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pLattice = pLattice;
     m_lstActions = pLattice->m_pActionList;
 
-    INT iStepCount = 10;
+    INT iStepCount = 50;
     params.FetchValueINT(_T("IntegratorStep"), iStepCount);
-    Real fStepLength = (Real)0.01;
+    Real fStepLength = F(1.0);
     params.FetchValueReal(_T("IntegratorStepLength"), fStepLength);
     m_uiStepCount = (UINT)iStepCount;
     m_fEStep = fStepLength / m_uiStepCount;
@@ -74,7 +74,8 @@ void CIntegrator::Accept()
 
 void CIntegrator::UpdateU(Real fStep)
 {
-    m_pMomentumField->ExpMult(_make_cuComplex(fStep, 0.0f), m_pGaugeField);
+    //U(k) = exp (i e P) U(k-1)
+    m_pMomentumField->ExpMult(_make_cuComplex(F(0.0), fStep), m_pGaugeField);
     checkCudaErrors(cudaDeviceSynchronize());
     //m_pGaugeField->DebugPrintMe();
 }
@@ -83,6 +84,7 @@ void CIntegrator::UpdateP(Real fStep)
 {
     // recalc force
     m_pForceField->Zero();
+    checkCudaErrors(cudaDeviceSynchronize());
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
@@ -91,18 +93,40 @@ void CIntegrator::UpdateP(Real fStep)
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
+    //P = P + e F
     m_pMomentumField->Axpy(fStep, m_pForceField);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-Real CIntegrator::GetEnergy()
+Real CIntegrator::GetEnergy() const
 {
-    Real retv = 0;
+#if _CLG_DEBUG
+    CCString sLog = _T("");
+#endif
+
+    //get P energy
+    Real retv = m_pMomentumField->CalculateKinematicEnergy();
+
+#if _CLG_DEBUG
+    sLog.Format(_T("Kin:%f"), retv);
+#endif
+
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
+#if _CLG_DEBUG
+        Real fActionEnergy = m_lstActions[i]->Energy(m_pGaugeField);
+        CCString sThisActionInfo = _T("");
+        sThisActionInfo.Format(_T(" Action%d:%f, "), i + 1, fActionEnergy);
+        sLog += sThisActionInfo;
+        retv += fActionEnergy;
+#else
         retv += m_lstActions[i]->Energy(m_pGaugeField);
+#endif
     }
+#if _CLG_DEBUG
+    appDetailed(_T("H:%s \n"), sLog.c_str());
+#endif
     return retv;
 }
 

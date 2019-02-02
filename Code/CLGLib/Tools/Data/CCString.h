@@ -15,6 +15,7 @@
 #define _appStrinc		_tcsinc
 #define _appStrrev		_tcsrev
 #define _appStrtol		_tcstol
+#define _appStrtoul		_tcstoul
 #define _appStrtod		_tcstod
 #define _appStrtof		_tcstof
 #define _appStrnicmp	_tcsnicmp
@@ -39,6 +40,18 @@ FORCEINLINE INT appStrToINT(const TCHAR* s)
     return _appStrtol(p, &p, base);
 }
 
+FORCEINLINE UINT appStrToUINT(const TCHAR* s)
+{
+    INT base;
+    TCHAR* p = (TCHAR*)(s);
+    appStrTrimLeft(p);
+    if ('0' == p[0] && ('x' == p[1] || 'X' == p[1]))
+        base = 16;
+    else
+        base = 10;
+    return _appStrtoul(p, &p, base);
+}
+
 FORCEINLINE Real appStrToReal(const TCHAR* s)
 {
     TCHAR *ending;
@@ -56,7 +69,7 @@ FORCEINLINE Real appStrToReal(const TCHAR* s)
     if (*ending != 0)
     {
         printf(_T("String to float failed! string: %s"), s);
-        return 0.0f;
+        return F(0.0);
     }
     return converted_value;
 }
@@ -76,6 +89,25 @@ FORCEINLINE FLOAT appStrToFLOAT(const TCHAR* s)
     {
         printf(_T("String to float failed! string: %s"), s);
         return 0.0f;
+    }
+    return converted_value;
+}
+
+FORCEINLINE DOUBLE appStrToDOUBLE(const TCHAR* s)
+{
+    TCHAR *ending;
+
+#if UNICODE
+    std::wstring str_val(s);
+#else
+    std::string str_val(s);
+#endif
+
+    DOUBLE converted_value = _appStrtod(str_val.c_str(), &ending);
+    if (*ending != 0)
+    {
+        printf(_T("String to float failed! string: %s"), s);
+        return 0.0;
     }
     return converted_value;
 }
@@ -1104,6 +1136,7 @@ __END_NAMESPACE
 #undef _appStrinc
 #undef _appStrrev
 #undef _appStrtol
+#undef _appStrtoul
 #undef _appStrtod
 #undef _appStrtof
 #undef _appStrnicmp

@@ -11,6 +11,8 @@
 
 __BEGIN_NAMESPACE
 
+Real CLGAPI CCommonData::m_fBeta = 0;
+Real CLGAPI CCommonData::m_fKai = 0;
 
 __global__ void _kernelDeletePtrs(CIndex * pdeviceIndex)
 {
@@ -20,32 +22,23 @@ __global__ void _kernelDeletePtrs(CIndex * pdeviceIndex)
     }
 }
 
-extern "C" {
-    void _cDeletePtrs(CIndex * pdeviceIndex)
-    {
-        _kernelDeletePtrs << <1, 1 >> > (pdeviceIndex);
-    }
-}
-
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
 * m_uiLatticeDecompose[3,4,5] is the threads in blocks
 */
 CLatticeData::CLatticeData()
     : m_pRandom(NULL)
-    , m_pRandomSchrage(NULL)
     , m_pGaugeField(NULL)
     , m_pGaugeFieldStaple(NULL)
     , m_pUpdator(NULL)
 
     , m_pDeviceRandom(NULL)
-    , m_pDeviceRandomSchrage(NULL)
     , m_pDeviceGaugeField(NULL)
     , m_pDeviceGaugeFieldStaple(NULL)
     , m_pDeviceIndex(NULL)
 
     , m_pFermionSolver(NULL)
-    //, m_pDeviceActionList(NULL)
+    , m_pMeasurements(NULL)
 {
     
 }
@@ -69,23 +62,18 @@ CLatticeData::~CLatticeData()
     }
     if (NULL != m_pDeviceIndex)
     {
-        _cDeletePtrs(m_pDeviceIndex);
+        _kernelDeletePtrs << <1, 1 >> > (m_pDeviceIndex);
         m_pDeviceIndex = NULL;
     }
-    if (NULL != m_pRandom)
+    if (NULL != m_pDeviceRandom)
     {
-        checkCudaErrors(cudaFree(m_pRandom));
-        m_pRandom = NULL;
-    }
-    if (NULL != m_pDeviceRandomSchrage)
-    {
-        checkCudaErrors(cudaFree(m_pDeviceRandomSchrage));
-        m_pDeviceRandomSchrage = NULL;
+        checkCudaErrors(cudaFree(m_pDeviceRandom));
+        m_pDeviceRandom = NULL;
     }
 
     appSafeDelete(m_pGaugeField);
     appSafeDelete(m_pRandom);
-    appSafeDelete(m_pRandomSchrage);
+    appSafeDelete(m_pMeasurements);
     appSafeDelete(m_pFermionSolver);
 }
 
@@ -99,6 +87,22 @@ void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameter
     }
     m_pFermionSolver->Configurate(param);
     m_pFermionSolver->AllocateBuffers(pFermionField);
+}
+
+void CLatticeData::OnUpdatorConfigurationAccepted()
+{
+    if (NULL != m_pMeasurements)
+    {
+        m_pMeasurements->OnConfigurationAccepted();
+    }
+}
+
+void CLatticeData::OnUpdatorFinished()
+{
+    if (NULL != m_pMeasurements)
+    {
+        m_pMeasurements->OnUpdateFinished(FALSE);
+    }
 }
 
 __END_NAMESPACE

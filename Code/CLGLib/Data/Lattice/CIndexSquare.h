@@ -17,9 +17,8 @@ __BEGIN_NAMESPACE
 * manipulate site
 */
 __device__ __inline__ static
-int4 _deviceMoveSquareSite(const int4 &in, INT dir)
+int4 _deviceMoveSquareSite(int4 ret, INT dir)
 {
-    int4 ret = in;
     UBOOL bReverse = dir < 0;
     UINT uDir = bReverse ? ((-dir) - 1) : (dir - 1);
     if (0 == uDir)
@@ -75,11 +74,10 @@ public:
     __device__ CIndexSquare(class deviceBoundaryCondition * devicePtr) : CIndex(devicePtr) { ; }
 
     __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
+    __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st = kSpaceTime) const;
 
     __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const;
     __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, INT uiWalkDir) const;
-
-    //__device__ virtual void _deviceGetUniquePlaquttesAtLink(int2* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex) const;
 };
 
 __END_NAMESPACE

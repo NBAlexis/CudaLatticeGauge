@@ -19,13 +19,21 @@ __DEFINE_ENUM(EFieldInitialType,
     EFIT_Identity,
     EFIT_Random,
     EFIT_RandomGenerator,
+    EFIT_SumGenerator, //for testing use only
     EFIT_RandomGaussian,
+
     EFIT_ReadFromFile,
 
     EFIT_ForceDWORD = 0x7fffffff,
     )
 
 
+__DEFINE_ENUM(EFieldFileType,
+    EFFT_BridgePPTXT,
+    EFFT_BridgePPBin,
+    
+    EFFT_ForceDWORD = 0x7fffffff,
+    )
 
 __DEFINE_ENUM(EFieldOperator,
 
@@ -45,6 +53,7 @@ public:
 
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
+    virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
     
     virtual void DebugPrintMe() const = 0;
 

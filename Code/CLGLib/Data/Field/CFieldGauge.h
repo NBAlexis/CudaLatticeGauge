@@ -24,22 +24,23 @@ public:
     /**
     * Before many other steps
     */
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, const _Complex& minusBetaOverN) const = 0;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real minusBetaOverN) const = 0;
 
     virtual void MakeRandomGenerator() = 0;
 
-    virtual Real CalculatePlaqutteEnergy(const _Complex& minusBetaOverN) const = 0;
+    virtual Real CalculatePlaqutteEnergy(Real minusBetaOverN) const = 0;
+
+    virtual Real CalculatePlaqutteEnergyUsingStable(Real minusBetaOverN, const CFieldGauge *pStable) const = 0;
 
     virtual Real CalculateKinematicEnergy() const = 0;
 
-#pragma endregion HMC update
+    /**
+    * Due to numerical precision, sometimes, the Unitary matrix will diviate from Unitary a little bit.
+    * This is to make the elements Unitary again.
+    */
+    virtual void ElementNormalize() = 0;
 
-    virtual _Complex Dot(const CField* other) const
-    {
-        UN_USE(other);
-        appCrucial("CFieldGauge: Do NOT know how to DOT SU3");
-        return _make_cuComplex(0, 0);
-    }
+#pragma endregion
 
     virtual void ApplyOperator(EFieldOperator op, const CField* otherfield)
     {

@@ -16,6 +16,8 @@
 #include "cuda_runtime.h"
 #include "vector_types.h"
 
+#include "cuComplex.h"
+
 #include <thrust/transform_reduce.h>
 #include <thrust/functional.h>
 #include <thrust/device_vector.h>
@@ -50,81 +52,21 @@ template <typename T> void check(T result, char const *const func, const char *c
     }
 }
 
-__global__ void _kernelInitial(int* output, int lyz, int lz)
-{
-    int ix = threadIdx.x + blockDim.x * blockIdx.x;
-    int iy = threadIdx.y + blockDim.y * blockIdx.y;
-    int iz = threadIdx.z + blockDim.z * blockIdx.z;
+#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
 
-    output[ix * lyz + iy * lz + iz] = 1;
+__global__ void _kernelPrintThreadId()
+{
+    printf("threadId:%d\n", __thread_id);
 }
 
 
-__global__ void _kernelPluseOne(int* output, int lyz, int lz)
+
+int main(int argc, char *argv[])
 {
-    int ix = threadIdx.x + blockDim.x * blockIdx.x;
-    int iy = threadIdx.y + blockDim.y * blockIdx.y;
-    int iz = threadIdx.z + blockDim.z * blockIdx.z;
-
-    output[ix * lyz + iy * lz + iz] += 1;
-}
-
-__global__ void _kernelMultiplyTwo(int* output, int lyz, int lz)
-{
-    int ix = threadIdx.x + blockDim.x * blockIdx.x;
-    int iy = threadIdx.y + blockDim.y * blockIdx.y;
-    int iz = threadIdx.z + blockDim.z * blockIdx.z;
-
-    output[ix * lyz + iy * lz + iz] *= 2;
-}
+    dim3 block(1, 2, 3);
+    dim3 thread(2, 3, 1);
+    _kernelPrintThreadId << <block, thread >> >();
 
 
-extern "C" {
-    void _cKernelInitial(int* output)
-    {
-        dim3 dblock(2, 2, 1);
-        dim3 dthread(8, 8, 1);
-        _kernelInitial << <dblock, dthread >> > (output, 16, 1);
-    }
-
-    void _cKernelPlusOne(int* output)
-    {
-        dim3 dblock(2, 2, 1);
-        dim3 dthread(8, 8, 1);
-        _kernelPluseOne << <dblock, dthread >> > (output, 16, 1);
-    }
-
-    void _cKernelMultiplyTwo(int* output)
-    {
-        dim3 dblock(2, 2, 1);
-        dim3 dthread(8, 8, 1);
-        _kernelMultiplyTwo << <dblock, dthread >> > (output, 16, 1);
-    }
-}
-
-int main()
-{
-    int * pTable;
-    cudaMalloc((void**)&pTable, sizeof(int) * 256);
-    _cKernelInitial(pTable);
-    _cKernelPlusOne(pTable);
-    _cKernelMultiplyTwo(pTable);
-    _cKernelPlusOne(pTable);
-    _cKernelMultiplyTwo(pTable);
-
-    int outData[256];
-    cudaMemcpy(outData, pTable, sizeof(int) * 256, cudaMemcpyDeviceToHost);
-    
-    printf("res=\n");
-    for (int i = 0; i < 16; ++i)
-    {
-        for (int j = 0; j < 16; ++j)
-        {
-            printf("%d ", outData[i * 16 + j]);
-        }
-        printf("\n");
-    }
-
-    cudaFree(pTable);
     return 0;
 }

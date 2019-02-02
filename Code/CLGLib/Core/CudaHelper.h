@@ -16,6 +16,7 @@ __BEGIN_NAMESPACE
 extern "C" bool runCudaTest(const int argc, const char **argv,
     char *data, int2 *data_int2, unsigned int len);
 
+#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
 
 enum { kSharedLength = 1024, };
 
@@ -25,7 +26,6 @@ extern __constant__ UINT _constIntegers[kContentLength];
 extern __constant__ Real _constFloats[kContentLength];
 
 extern __constant__ class CRandom* __r;
-extern __constant__ class CRandomSchrage* __rs;
 extern __constant__ class CIndex* __idx;
 
 extern __constant__ class gammaMatrixSet* __diracGamma;
@@ -42,6 +42,8 @@ enum EConstIntId
     ECI_Lz,
     ECI_Lt,
     ECI_Volumn,
+    ECI_PlaqutteCount,
+    ECI_LinkCount,
     ECI_MultX,
     ECI_MultY,
     ECI_MultZ,
@@ -51,18 +53,20 @@ enum EConstIntId
     ECI_DecompLx, //threads per block
     ECI_DecompLy,
     ECI_DecompLz,
-    ECI_ThreadCount,
+    ECI_ThreadCountPerBlock, //thread per block
+    ECI_ThreadCount, //thread per grid (just lx*ly*lz)
     ECI_RandomSeed,
     ECI_ExponentPrecision,
-    ECI_UsingSchrageRandom,
     ECI_ActionListLength,
+    ECI_MeasureListLength,
+    ECI_SUN,
 
     ECI_ForceDWORD = 0x7fffffff,
 };
 
 enum EConstFloatId
 {
-    ECF_PlaqutteBeta,
+    ECF_InverseSqrtLink16,
 };
 
 class CLGAPI CCudaHelper
@@ -76,8 +80,9 @@ public:
     ~CCudaHelper();
 
     static void DeviceQuery();
+    static void MemoryQuery();
     void CopyConstants() const;
-    void CopyRandomPointer(const class CRandom* r, const class CRandomSchrage* rs) const;
+    void CopyRandomPointer(const class CRandom* r) const;
     void SetDeviceIndex(class CIndex** ppIdx) const;
     //we never need gamma matrix on host, so this is purely hiden in device
     void CreateGammaMatrix() const;

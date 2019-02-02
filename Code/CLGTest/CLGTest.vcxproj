@@ -23,10 +23,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
+    <ClCompile Include="Tests\TestSU3Generator.cpp" />
+    <ClCompile Include="Tests\TestUpdator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Bin\Debug\TestSuit.yaml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -11,7 +11,7 @@
 #ifndef _CINTEGRATOROMELYAN_H_
 #define _CINTEGRATOROMELYAN_H_
 
-#define OmelyanLambda ((Real)0.19318332750378364)
+#define OmelyanLambda (F(0.19318332750378364))
 
 __BEGIN_NAMESPACE
 
@@ -26,27 +26,29 @@ public:
     */
     virtual void Evaluate()
     {
-        Real fHalfEstep = 0.5f * m_fEStep;
-        appGeneral("  Omelyan sub step 0\n");
+        Real fHalfEstep = F(0.5) * m_fEStep;
+        appDetailed("  Omelyan sub step 0\n");
         UpdateP(OmelyanLambda * m_fEStep);
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount; ++uiStep)
         {
-            appGeneral("  Omelyan sub step %d\n", uiStep);
+            appDetailed("  Omelyan sub step %d\n", uiStep);
 
             UpdateU(fHalfEstep);
-            UpdateP(m_fEStep * (1.0f - 2.0f * OmelyanLambda));
+            UpdateP(m_fEStep * (F(1.0) - F(2.0) * OmelyanLambda));
             UpdateU(fHalfEstep);
 
             if (uiStep < m_uiStepCount)
             {
-                UpdateP(m_fEStep * 2.0f * OmelyanLambda);
+                UpdateP(m_fEStep * F(2.0) * OmelyanLambda);
             }
             else
             {
                 UpdateP(OmelyanLambda * m_fEStep);
             }
         }
+
+        m_pGaugeField->ElementNormalize();
     }
 };
 

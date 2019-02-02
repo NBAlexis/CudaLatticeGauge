@@ -69,6 +69,9 @@ FORCEINLINE UINT appGetTimeStamp(void)
     return static_cast<UINT>(time(0));
 }
 
+CLGAPI INT appUnicodeToAnsi(ANSICHAR* mbstr, const UNICHAR* wcstr, INT bufsize);
+CLGAPI INT appAnsiToUnicode(UNICHAR* wcstr, const ANSICHAR* mbstr, INT bufsize);
+
 __END_NAMESPACE
 
 #pragma endregion Time functions

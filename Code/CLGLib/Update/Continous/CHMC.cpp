@@ -22,9 +22,10 @@ CHMC::~CHMC()
 void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
 {
     m_pOwner = pOwner;
+    m_iAcceptedConfigurationCount = 0;
 }
 
-void CHMC::Update(UINT iSteps)
+UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 {
     UBOOL bAccepted = FALSE;
     Real fEnergy = 0.0f;
@@ -37,29 +38,39 @@ void CHMC::Update(UINT iSteps)
         }
         m_pIntegrator->Evaluate();
         Real fEnergyNew = m_pIntegrator->GetEnergy();
-
+        Real fDiff = fEnergy - fEnergyNew;
         //Metropolis
-        appGeneral(_T(" HMC Update: step = %d, energy before update = %f, energy after update = %f"),
-            i + 1, fEnergy, fEnergyNew);
-        Real diff_H = _exp(fEnergy - fEnergyNew);  // Delta H (SA)
+        appGeneral(_T(" HMC: step = %d, H (before, after, diff) = (%f, %f, %f)\n"),
+            i + 1, fEnergy, fEnergyNew, fDiff);
+        Real diff_H = _exp(fDiff);  // Delta H (SA)
         Real rand = GetRandomReal();
-        if (rand <= diff_H)
+        if (TRUE)//rand <= diff_H)
         {
-            appGeneral(_T("  Accepted\n"));
-            m_pIntegrator->Accept();
+            ++m_iAcceptedConfigurationCount;
+            appGeneral(_T("  Accepted (accepted:%d)\n"), m_iAcceptedConfigurationCount);
+            m_pIntegrator->Accept(); //Here we copy the gauge field back
             bAccepted = TRUE;
             fEnergy = fEnergyNew;
         }
         else
         {
-            appGeneral(_T("  Rejected\n"));
+            appGeneral(_T("  Rejected (accepted:%d)\n"), m_iAcceptedConfigurationCount);
             bAccepted = FALSE;
+        }
+
+        //If rejected, just accept the old configuration and trigger the measure
+        if (bMeasure)
+        {
+            m_pOwner->OnUpdatorConfigurationAccepted();
         }
     }
 
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
+
+    m_pOwner->OnUpdatorFinished();
+    return m_iAcceptedConfigurationCount;
 }
 
 __END_NAMESPACE

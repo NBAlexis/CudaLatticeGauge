@@ -39,12 +39,13 @@ where $\eta$ now is a complex Bosonic field, and the normalization
 &\mathcal{D}[\eta] = \prod \frac{d{\rm Re}(\eta _i)d{\rm Im}(\eta _i)}{\pi},\;\;1=\int \mathcal{D}[\eta] \exp (-\eta^{\dagger} \eta)
 \end{split}
 \end{equation}
-is assumed. With condition $\lambda ({\bf M})$ denoted as eigen-values of ${\bf M}$
+is assumed. With the condition such that
 \begin{equation}
 \begin{split}
 &\lambda ({\bf A}+{\bf A}^{\dagger}) > 0.
 \end{split}
 \end{equation}
+where $\lambda ({\bf M})$ denoted as eigen-values of ${\bf M}$.
 
 We now, concentrate on two degenerate fermion flavours. i.e. considering
 \begin{equation}
@@ -53,7 +54,7 @@ We now, concentrate on two degenerate fermion flavours. i.e. considering
 \end{split}
 \end{equation}
 
-Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (It is mentioned in Ref.~\cite{weingarten1981}, however, I have not prove it yet. But for Wilson Fermions or any $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010}
+Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.}), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010}
 \begin{equation}
 \begin{split}
 &\int \mathcal{D}[\bar{\psi}]\mathcal{D}[\psi]\exp\left(-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d\right)=\det (\hat{D}\hat{D}^{\dagger})=\int \mathcal{D}[\phi] \exp (-\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi)
@@ -71,7 +72,7 @@ where $pf$ is short for pseudofermion.
 
 \subsubsection{\label{hmc_scheme}Basic idea, force from gauge field}
 
-The basic idea is to use a \index{molecular dynamics}molecular dynamics simulation. In other words, it is a integration of \index{Langevin equation}Langevin equation.
+The basic idea is to use a \index{molecular dynamics}molecular dynamics simulation, i.e, it is a integration of \index{Langevin equation}Langevin equation.
 
 Treating $SU(N)$ matrix $U$ on links as coordinate, HMC will generate a pair of configurations, $(P,U)$, where $P$ is momentum and $P\in \mathfrak{su}(N)$.
 
@@ -87,9 +88,10 @@ One can:
 \item \index{force}Force
 \end{itemize}
 
-Defined by Newton, $dp/dt$ is a force, so in CLG, $\dot{P}$ is called `force'. See Eqs.~(2.53), (2.56) and (2.57) of Ref.~\cite{latticeqcdbook2017}, for $SU(N)$,
+Defined by Newton, $dp/dt$ is a force, so $\dot{P}$ is called `force'. See Eqs.~(2.53), (2.56) and (2.57) of Ref.~\cite{latticeqcdbook2017}, for $SU(N)$,
 \begin{equation}
 \begin{split}
+&S_G=-\frac{\beta}{N}{\rm Re}{\rm tr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
 &F_{\mu}(x)=\dot{P}_{\mu}(x)=-\frac{\beta}{2N}\{U_{\mu}(x)\Sigma _{\mu}(x)\}_{TA}\\
 &\{W\}_{TA}=\frac{W-W^{\dagger}}{2}-{\rm tr}\left(\frac{W-W^{\dagger}}{2N}\right){\bf I}\\
 \end{split}
@@ -127,7 +129,23 @@ Then we can calculate $P((n+1)\epsilon)$ using Eq.~(\ref{eq.hmc.update_basic}).c
   \item About the randomized $P$
 \end{itemize}
 
-The randomized $P$ is chosen according to normal distribution $\exp \left(-<P,P>/2\right)$. Using $P=\sum \omega _i T^i$, $tr((T^i)\cdot (T^j))=2\delta _{ij}$. It is usually written as distribution $\exp \left(-tr(P^2)\right)$. One can randomize $\omega _i$ using $\exp \left(-\omega_i^*\omega_i\right)$. Then using $P=\sum \omega _i T^i$.
+The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$ (\textbf{Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.}). 
+
+Note that, here $P$ corresponds to $Q$, not $U$, for $U=\exp\left(i \sum q_i T^i\right)$, there are $8$ \textbf{real} variables denoting as $\omega _i$.
+
+Using $P=\sum \omega _i T^i$, $tr((T^i)\cdot (T^j))=\frac{1}{2}\delta _{ij}$. So one have $\frac{1}{2}\sum _i\omega _i^2=tr[P^2]$.
+
+It is usually written as distribution $\exp \left(-tr(P^2)\right)$ (where $P$ is a matrix, and $tr[P^2]=\frac{1}{2}p^2$ where $p=(\omega_1,\omega_2,\ldots ,\omega _8)$). 
+
+Using the property of normal distribution
+\begin{equation}
+\begin{split}
+&if\; \{X\}\sim N(\mu _X, \sigma _X^2),\;\; \{Y\}\sim N(\mu _Y, \sigma _Y^2),\\
+&\{X+Y\}\sim N(\mu _X+\mu _Y, \sigma _X^2+\sigma _Y^2).\\
+\end{split}
+\end{equation}
+
+One can randomize $\omega _i$ using $\exp \left(-\omega_i\omega_i\right)$. Then using $P=\frac{1}{\sqrt{8N}}\sum \omega _i T^i$, where $N$ is the number of links.
 
 \subsubsection{\label{forceOfPseudofermions}Force of pseudofermions}
 
@@ -141,7 +159,7 @@ The second step can be simplified as, generating random complex numbers $\phi$ a
 
 Let $\chi$ be random complex numbers according to $\exp (-\chi ^{\dagger}\chi)$. Let $(D)^{-1}\phi=\chi$, $\phi$ is the random number satisfying distribution we want. And $\phi = D\chi$.
 
-Using the Wilson Fermion action in Eq.~() of Ref.{}.
+Using the Wilson Fermion action \textcolor[rgb]{0,0,1}{(TODO: Add ref here after the section of Wilson Fermion is added.)}.
 \begin{equation}
 \begin{split}
 &\hat{D}=D+1\\
@@ -183,21 +201,146 @@ Note that, it seems we do not need $\phi$ but just $\chi$, because $\phi _1=(\ha
 
 The last part is how to calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$.
 
-\subsubsection{\label{Leap frog}\index{leap frog}Leap frog integrator}
+\subsubsection{\label{Solver_In_HMC}\index{solver}Solver in HMC}
+
+To calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$, we need a solver. The detail of solvers will be introduced in Sec.~\ref{solver}. Here we establish a simple introduction.
+
+Let $M$ be a matrix operating on a vector, for example, $M=(\hat{D}\hat{D}^{\dagger})$, the goal of the solver is to find $x$ such $b=M\cdot x$, and therefor $x=(\hat{D}\hat{D}^{\dagger})^{-1}b$.
+
+We first introduce the CG algorithm for real vector and real matrix, define
+\begin{equation}
+\begin{split}
+&Q({\bf x})=\frac{1}{2}{\bf x}^T \cdot A \cdot {\bf x}-{\bf x}^T {\bf b}.
+\end{split}
+\end{equation}
+so that one can try to find the minimum of $Q$, and at the minimum
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial {\bf x}}Q({\bf x})=0=A\cdot {\bf x}-{\bf b}.
+\end{split}
+\end{equation}
+
+To find the minimum, one can use gradient. Starting from a random point on a curve, calculate the falling speed and move it until it is stable.
+
+For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\cite{latticeqcdbook2010}. It can be described as
+
+\begin{lstlisting}
+
+CField* pX, pR, pRH, pV, pP, pS, pT;
+
+//use it to estimate relative error, a->Dot(b) means a_dagger . b
+Real fBLength = pFieldB->Dot(pFieldB);
+
+//Using b as the guess, (Assuming M is near identity?)
+pFieldB->CopyTo(pX);
+
+//r_0 = b - A x_0
+pFieldB->CopyTo(pR);
+pR->ApplyOperator(uiM, pGaugeFeild); //A x_0, Note D operator need gauge field
+pR->ScalarMultply(-1); //-A x_0
+pR->AxpyPlus(pX); //b - A x_0
+pR->CopyTo(pRh);
+
+Real rho = 0;
+Real last_rho = 0;
+Real alpha = 0;
+Real beta = 0;
+Real omega = 0;
+
+for (UINT i = 0; i < m_uiReTry; ++i)
+{
+    for (UINT j = 0; j < m_uiStepCount * m_uiDevationCheck; ++j)
+    {
+        //One step
+        rho = _cuCabsf(m_pRh->Dot(m_pR));//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
+
+        if (0 == j) //if is the first iteration, p=r(i-1)
+        {
+            pR->CopyTo(pP);
+        }
+        else //if not the first iteration,
+        {
+            //beta = last_alpha * rho /(last_omega * last_rho)
+            beta = alpha * rho / (omega * last_rho);
+            //p(i) = r(i-1)+beta( p(i-1) - last_omega v(i-1) )
+            pV->ScalarMultply(omega);
+            pP->AxpyMinus(pV); //p = p - v
+            pP->ScalarMultply(beta);
+            pP->AxpyPlus(pR);
+        }
+
+        //v(i) = A p(i)
+        pP->CopyTo(pV);
+        pV->ApplyOperator(uiM, pGaugeFeild);
+
+        alpha = rho / (_cuCabsf(pRh->Dot(pV)));//alpha = rho / (rh dot v(i))
+
+        //s=r(i-1) - alpha v(i)
+        pR->CopyTo(pS);
+        pS->Axpy(-alpha, pV);
+
+        //t=As
+        pS->CopyTo(pT);
+        pT->ApplyOperator(uiM, pGaugeFeild);
+
+        omega = _cuCabsf(pT->Dot(pS)) / _cuCabsf(pT->Dot(pT));//omega = ts / tt
+
+        //r(i)=s-omega t
+        pS->CopyTo(pR);
+        if (0 == (j - 1) \% m_uiDevationCheck)
+        {
+            //Normal of S is small, then stop
+            Real fDeviation = _cuCabsf(pS->Dot(pS)) / fBLength;
+            appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:\%d, iteration:\%d, deviation:\%f\n"), i, j, fDeviation);
+            if (fDeviation < m_fAccuracy)
+            {
+                pX->Axpy(alpha, pP);
+                pX->CopyTo(pFieldX);
+                return;
+            }
+        }
+
+        pR->Axpy(-omega, pT);
+
+        //x(i)=x(i-1) + alpha p + omega s
+        pX->Axpy(alpha, pP);
+        pX->Axpy(omega, pS);
+
+        last_rho = rho;//last_rho = rho
+    }
+
+    //we are here, means we do not converge.
+    //we need to restart with a new guess, we use last X
+    pX->CopyTo(pR);
+
+    pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
+    pR->ScalarMultply(-1); //-A x_0
+    pR->AxpyPlus(pX); //b - A x_0
+    pR->CopyTo(pRh);
+}
+
+
+//The solver failed.
+
+\end{lstlisting}
+
 
 \subsubsection{\label{Leap frog}\index{leap frog}Leap frog integrator}
 
 In Sec.~\ref{hmc_scheme}, the basic idea is introduced. However, the implementation is slightly different.
 \begin{subequations}
 \begin{eqnarray}
-&U_{\mu}(0,x)=gauge(x),\;\;P_{\mu}(0,x)=i\sum _{a}r_a(\mu,x)T_a\\
+&U_{\mu}(0,x)=gauge(x),\;\;P_{\mu}(0,x)=\sum _{a}r_a(\mu,x)T_a\\
 &F_{\mu}(n\epsilon,x)=-\frac{\beta}{2N}\{U_{\mu}(n\epsilon,x)\Sigma _{\mu}(n\epsilon,x)\}_{TA}\\
 &P_{\mu}(\frac{1}{2}\epsilon,x)=P_{\mu}(0,x)+\frac{\epsilon}{2}F_{\mu}(0,x)\\
-&U_{\mu}((n+1)\epsilon,x)=\exp \left(\epsilon P_{\mu}((n+\frac{1}{2})\epsilon,x)\right)U_{\mu}(n\epsilon,x)\\
+&U_{\mu}((n+1)\epsilon,x)=\exp \left(i\epsilon P_{\mu}((n+\frac{1}{2})\epsilon,x)\right)U_{\mu}(n\epsilon,x)\\
 &P_{\mu}((n+\frac{1}{2})\epsilon,x)=P_{\mu}((n-\frac{1}{2})\epsilon,x)+\epsilon F_{\mu}(n\epsilon,x)
 \end{eqnarray}
 \label{eq.hmc.update_leapfrog}
 \end{subequations}
+
+\textcolor[rgb]{0,0,1}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,a}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,a}S$.}}
+
 or simply written as
 \begin{equation}
 \begin{split}
@@ -253,16 +396,17 @@ with
 \label{eq.hmc.update_Omelyan2}
 \end{equation}
 
-\subsubsection{\label{summaryOfHMC}HMC with pseudofermions}
+\subsubsection{\label{summaryOfHMC}A summary of HMC with pseudofermions}
 
-We follow from Sec.8.2.3 in Ref.~\cite{latticeqcdbook2010}. The HMC with fermions can be divided into 6 steps.
+Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\cite{latticeqcdbook2010}. The HMC with fermions can be divided into 6 steps.
 
 \begin{enumerate}
   \item Generate a complex Bosonic field with $\chi \sim \exp (-\chi ^{\dagger}\chi)$, and $\phi = \hat{D} \chi$.
   \item Generate a momentum field $P$ by $\exp (-tr(P^2))$.
   \item Calculate $E=tr(P^2)+S_G(U)+S_{pf}(U,\phi)$.
   \item Use $U_0$ to calculate $F$, evaluate $P$ and $U$ using integrator. Here, $\phi$ is treated as a constant field.
-  \item Finally, use $P',U'$ to calculate Calculate $E'=tr({P'}^2)+S_G(U')+S_{pf}(U',\phi)$. Use a Metropolis to accept or reject the result.
+  \item Finally, use $P',U'$ to calculate Calculate $E'=tr({P'}^2)+S_G(U')+S_{pf}(U',\phi)$. Use a Metropolis to accept or reject the result~(configurations) \textbf{Note, by Ref.~\cite{latticeqcdbook2010} (Statement under Eq.~(4.16)), `reject' means add a duplicated old configuration.}.
+  \item Iterate from 1 to 5, until the number of configurations generated is sufficient.
 \end{enumerate}
 
 

@@ -264,6 +264,11 @@ public:
     __device__ __inline__ deviceWilsonVectorSU3 MulC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.Mul(other); return ret; }
     __device__ __inline__ deviceWilsonVectorSU3 MulC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.Mul(other); return ret; }
 
+    //union
+    //{
+    //    deviceSU3Vector m_d[4];
+    //    _Complex m_me[12];
+    //};
     deviceSU3Vector m_d[4];
 };
 

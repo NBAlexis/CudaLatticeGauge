@@ -24,29 +24,31 @@ public:
     */
     virtual void Evaluate()
     {
-        Real fHalfPstep = 0.5f * m_fEStep;
+        Real fHalfPstep = F(0.5) * m_fEStep;
 
         if (m_uiStepCount > 0)
         {
-            appGeneral("  leap frog sub step 0\n");
             UpdateP(fHalfPstep);
+            appDetailed("  leap frog sub step 0\n");
         }
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
         {
-            appGeneral("  leap frog sub step %d\n", uiStep);
-
             UpdateU(m_fEStep);
 
             if (uiStep < m_uiStepCount)
             {
                 UpdateP(m_fEStep);
+                appDetailed("  leap frog sub step %d\n", uiStep);
             }
             else 
             {
                 UpdateP(fHalfPstep);
+                appDetailed("  leap frog last step %d\n", uiStep);
             }
         }
+
+        m_pGaugeField->ElementNormalize();
     }
 };
 

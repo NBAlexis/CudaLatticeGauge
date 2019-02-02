@@ -13,77 +13,145 @@
 #define _RANDOM_H_
 
 //save some constant memory of cuda?
-#define PI ((Real)3.141592653589)
+#define PI (F(3.141592653589))
 // - 1/4294967296UL
-#define AM ((Real)0.00000000023283064365386963)
+#define AM (F(0.00000000023283064365386963))
 // - _sqrt(2)
-#define SQRT2 ((Real)1.4142135623730951)
+#define SQRT2 (F(1.4142135623730951))
 // - 1 / _sqrt(2), or _sqrt(2)/2
-#define InvSqrt2 ((Real)0.7071067811865475)
+#define InvSqrt2 (F(0.7071067811865475))
 // - 2.0f * PI
-#define PI2 ((Real)6.283185307179586)
+#define PI2 (F(6.283185307179586))
+
+#define __SOBEL_OFFSET_MAX (4096)
 
 #define __DefineRandomFuncion(rettype, funcname) __device__ __inline__ static rettype _deviceRandom##funcname(UINT uiFatIndex) \
 { \
-    return (1 == _constIntegers[ECI_UsingSchrageRandom]) ? __rs->_deviceRandom##funcname(uiFatIndex) : __r->_deviceRandom##funcname(uiFatIndex); \
+    return __r->_deviceRandom##funcname(uiFatIndex); \
 }
 
+
+#define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
+    printf("Error at %s:%d\n",__FILE__,__LINE__);\
+    return;}} while(0)
 
 __BEGIN_NAMESPACE
 
 __DEFINE_ENUM (ERandom,
     ER_Schrage,
+
+    ER_XORWOW,
+    ER_MRG32K3A,
+    //ER_MTGP32, //see the document, this has lots of constraints.
+    ER_PHILOX4_32_10,
+    ER_QUASI_SOBOL32,
+    ER_SCRAMBLED_SOBOL32,
+
     ER_ForceDWORD = 0x7fffffff,
     )
 
 class CLGAPI CRandom
 {
 public:
-    CRandom(UINT uiSeed) { UN_USE(uiSeed); }
-    virtual __device__ Real _deviceRandomF(UINT fatIndex) = 0;
-    __device__ __inline__ Real _deviceRandomGaussF(UINT fatIndex)
-    {
-        Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real amplitude = _sqrt(-_log(1.0f - f1) * 2.0f) * InvSqrt2;
-        return cos(f2) * amplitude;
+    /**
+    * There are nine types of random number generators in cuRAND, that fall into two categories. 
+    *  CURAND_RNG_PSEUDO_XORWOW, CURAND_RNG_PSEUDO_MRG32K3A, CURAND_RNG_PSEUDO_MTGP32, CURAND_RNG_PSEUDO_PHILOX4_32_10 and CURAND_RNG_PSEUDO_MT19937 are pseudorandom number generators. 
+    * CURAND_RNG_PSEUDO_XORWOW is implemented using the XORWOW algorithm, a member of the xor-shift family of pseudorandom number generators. 
+    * CURAND_RNG_PSEUDO_MRG32K3A is a member of the Combined Multiple Recursive family of pseudorandom number generators. 
+    *  CURAND_RNG_PSEUDO_MT19937 and CURAND_RNG_PSEUDO_MTGP32 are members of the Mersenne Twister family of pseudorandom number generators. 
+    * CURAND_RNG_PSEUDO_MTGP32 has parameters customized for operation on the GPU. 
+    * CURAND_RNG_PSEUDO_MT19937 has the same parameters as CPU version, but ordering is different. 
+    * CURNAD_RNG_PSEUDO_MT19937 supports only HOST API and can be used only on architecture sm_35 or higher. 
+    * CURAND_RNG_PHILOX4_32_10 is a member of Philox family, which is one of the three non-cryptographic Counter Based Random Number Generators presented on SC11 conference by D E Shaw Research. 
+    *
+    *  There are 4 variants of the basic SOBOL¡¯ quasi random number generator. All of the variants generate sequences in up to 20,000 dimensions. CURAND_RNG_QUASI_SOBOL32, CURAND_RNG_QUASI_SCRAMBLED_SOBOL32, CURAND_RNG_QUASI_SOBOL64, and CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 are quasirandom number generator types. 
+    * CURAND_RNG_QUASI_SOBOL32 is a Sobol¡¯ generator of 32-bit sequences. 
+    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL32 is a scrambled Sobol¡¯ generator of 32-bit sequences. 
+    * CURAND_RNG_QUASI_SOBOL64 is a Sobol¡¯ generator of 64-bit sequences. 
+    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 is a scrambled Sobol¡¯ generator of 64-bit sequences.
+    */
+    CRandom(UINT uiSeed, ERandom er) 
+        : m_eRandomType(er)
+        , m_uiHostSeed(uiSeed)
+        , m_uiFatIdDivide(1)
+    { 
+        switch (er)
+        {
+            case ER_Schrage:
+                {
+                    InitialTableSchrage(uiSeed);
+                }
+                break;
+            case ER_MRG32K3A:
+                {
+                    CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_MRG32K3A));
+                    CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
+                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    InitialStatesMRG(uiSeed);
+                }
+                break;
+            case ER_PHILOX4_32_10:
+                {
+                    CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_PHILOX4_32_10));
+                    CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
+                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    InitialStatesPhilox(uiSeed);
+                }
+                break;
+            case ER_QUASI_SOBOL32:
+                {
+                    //for sobol, on the host, we use XORWOW
+                    CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_QUASI_SOBOL32));
+                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    InitialStatesSobol32(uiSeed);
+                }
+                break;
+            case ER_SCRAMBLED_SOBOL32:
+                {
+                    //for sobol, on the host, we use XORWOW
+                    CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_QUASI_SCRAMBLED_SOBOL32));
+                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    InitialStatesScrambledSobol32(uiSeed);
+                }
+                break;
+            case ER_XORWOW:
+            default:
+                {
+                    CURAND_CALL(curandCreateGenerator(&m_HGen, CURAND_RNG_PSEUDO_XORWOW));
+                    CURAND_CALL(curandSetPseudoRandomGeneratorSeed(m_HGen, uiSeed));
+                    checkCudaErrors(cudaMalloc((void**)&m_deviceBuffer, sizeof(FLOAT)));
+                    InitialStatesXORWOW(uiSeed);
+                }
+                break;
+        }
     }
 
-    __device__ __inline__ _Complex _deviceRandomGaussC(UINT fatIndex)
-    {
-        Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+    ~CRandom();
 
-        Real amplitude = _sqrt(-_log(1.0f - f1) * 2.0f) * InvSqrt2;
-        return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
-    }
-
-    __host__ virtual Real GetRandomF() = 0;
-
-protected:
-
-    virtual __device__ UINT _deviceRandomUI(UINT fatIndex) = 0;
-    virtual __host__ UINT GetRandomUI() = 0;
-};
-
-/**
-* we cannot make it virtual inline
-* so we have a random for testing usage only
-* this random is a special random, the others should inherent from CRandom
-* for real usage, (if that is ok), one do not need a table. The table only ensures, same seed same result.
-*/
-class CLGAPI CRandomSchrage
-{
-public:
-    CRandomSchrage(UINT uiSeed);
-    ~CRandomSchrage();
-
-    UINT* m_pDeviceSeedTable;
-
+    /**
+    * Note that this gives [0, 1), and curand_uniform gives (0, 1]
+    */
     __device__ __inline__ Real _deviceRandomF(UINT fatIndex)
     {
-        return AM * _deviceRandomUI(fatIndex);
+        switch (m_eRandomType)
+        {
+            case ER_Schrage:
+                return AM * _deviceRandomUISchrage(fatIndex);
+            case ER_MRG32K3A:
+                return 1 - curand_uniform(&(m_pDeviceRandStatesMRG[fatIndex]));
+            case ER_PHILOX4_32_10:
+                return 1 - curand_uniform(&(m_pDeviceRandStatesPhilox[fatIndex]));
+            case ER_QUASI_SOBOL32:
+                return 1 - curand_uniform(&(m_pDeviceRandStatesSobol32[(fatIndex / m_uiFatIdDivide)]));
+            case ER_SCRAMBLED_SOBOL32:
+                return 1 - curand_uniform(&(m_pDeviceRandStatesScrambledSobol32[fatIndex / m_uiFatIdDivide]));
+            case ER_XORWOW:
+            default:
+                return 1 - curand_uniform(&(m_pDeviceRandStatesXORWOW[fatIndex]));
+        }
+
+        //return 0;
     }
 
     /**
@@ -95,7 +163,9 @@ public:
         Real f1 = _deviceRandomF(fatIndex);
         Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real amplitude = _sqrt(-_log(1.0f - f1) * 2.0f) * InvSqrt2;
+        Real oneMinusf1 = 1 - f1;
+        Real inSqrt = -_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)) * 2;
+        Real amplitude = _sqrt(inSqrt > 0 ? inSqrt : 0) * InvSqrt2;
         return cos(f2) * amplitude;
     }
 
@@ -104,38 +174,81 @@ public:
         Real f1 = _deviceRandomF(fatIndex);
         Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real amplitude = _sqrt(-_log(1.0f - f1) * 2.0f) * InvSqrt2;
+        Real oneMinusf1 = 1 - f1;
+        Real inSqrt = -_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)) * 2;
+        Real amplitude = _sqrt(inSqrt > 0 ? inSqrt : 0) * InvSqrt2;
         return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
     }
+
+    __host__ __inline__ Real GetRandomF()
+    {
+        if (ER_Schrage == m_eRandomType)
+        {
+            return AM * GetRandomUISchrage();
+        }
+
+        curandGenerateUniform(m_HGen, m_deviceBuffer, 1);
+        checkCudaErrors(cudaMemcpy(m_hostBuffer, m_deviceBuffer, sizeof(FLOAT), cudaMemcpyDeviceToHost));
+        return (Real)m_hostBuffer[0];
+    }
+
+    FLOAT* m_deviceBuffer;
+    FLOAT m_hostBuffer[1];
+    curandGenerator_t m_HGen;
+    ERandom m_eRandomType;
+    UINT m_uiFatIdDivide;
+
+protected:
+
+    void InitialStatesXORWOW(UINT uiSeed);
+    void InitialStatesPhilox(UINT uiSeed);
+    void InitialStatesMRG(UINT uiSeed);
+    void InitialStatesSobol32(UINT uiSeed);
+    void InitialStatesScrambledSobol32(UINT uiSeed);
+
+    curandState* m_pDeviceRandStatesXORWOW;
+    curandStatePhilox4_32_10_t* m_pDeviceRandStatesPhilox;
+    curandStateMRG32k3a* m_pDeviceRandStatesMRG;
+
+    curandStateSobol32* m_pDeviceRandStatesSobol32;
+    curandDirectionVectors32_t* m_pDeviceSobolDirVec;
+    UINT* m_pDeviceSobelConsts;
+    curandStateScrambledSobol32* m_pDeviceRandStatesScrambledSobol32;
+
+#pragma region Schrage
+
+public:
+
+    UINT* m_pDeviceSeedTable;
 
     /**
     * run on device, parally set the table
     */
     __device__ __inline__ static void _deviceAsignSeeds(UINT* devicePtr, UINT uiSeed, UINT uiFatIndex)
     {
-        devicePtr[uiFatIndex] = (1664525UL * (uiFatIndex+uiSeed) + 1013904223UL) & 0xffffffff;
-    }
-
-    __host__ __inline__ Real GetRandomF()
-    {
-        return AM * GetRandomUI();
+        devicePtr[uiFatIndex] = (1664525UL * (uiFatIndex + uiSeed) + 1013904223UL) & 0xffffffff;
     }
 
 protected:
 
-    __device__ __inline__ UINT _deviceRandomUI(UINT fatIndex)
+    void InitialTableSchrage(UINT uiSeed);
+
+    __device__ __inline__ UINT _deviceRandomUISchrage(UINT fatIndex)
     {
         m_pDeviceSeedTable[fatIndex] = ((1664525UL * m_pDeviceSeedTable[fatIndex] + 1013904223UL) & 0xffffffff);
         return m_pDeviceSeedTable[fatIndex];
     }
 
-    __host__ __inline__ UINT GetRandomUI()
+    __host__ __inline__ UINT GetRandomUISchrage()
     {
         m_uiHostSeed = (1664525UL * m_uiHostSeed + 1013904223UL) & 0xffffffff;
         return m_uiHostSeed;
     }
 
     UINT m_uiHostSeed;
+
+#pragma endregion
+
 };
 
 __DefineRandomFuncion(Real, F)

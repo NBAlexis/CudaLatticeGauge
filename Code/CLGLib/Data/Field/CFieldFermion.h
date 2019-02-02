@@ -22,6 +22,11 @@ class CLGAPI CFieldFermion : public CField
 public:
     CFieldFermion();
 
+    virtual void InitialFieldWithFile(const CCString& , EFieldFileType ) 
+    {
+        appCrucial(_T("Not supported for fermions"));
+    }
+
     virtual void PrepareForHMC(const CFieldGauge* pGauge) = 0;
     virtual void CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce) = 0;
 

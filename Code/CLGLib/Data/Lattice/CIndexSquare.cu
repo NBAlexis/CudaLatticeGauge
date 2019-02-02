@@ -44,8 +44,6 @@ __BEGIN_NAMESPACE
 __device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st) const
 {
     UINT uiDim = _DC_Dim;
-    //UINT* length = pLattice->m_uiLatticeLength;
-    //UINT* mult = pLattice->m_uiLatticeMultipy;
 
     //for square, dir should equal to dim
     assert(uiDim == _DC_Dir);
@@ -112,6 +110,51 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, UINT& coun
             ++iListIndex;
         }
     }
+
+    assert(count * 3 == iListIndex);
+}
+
+__device__ void CIndexSquare::_deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st) const
+{
+    UINT uiDim = _DC_Dim;
+
+    //for square, dir should equal to dim
+    assert(uiDim == _DC_Dir);
+
+    count = uiDim * (uiDim - 1) / 2;
+    plaqutteLength = 4; //for square
+
+    UINT uiMaxDim = (0 == (st & CIndex::kTime)) ? 3 : 4;
+    
+    UINT iListIndex = 0;
+    for (UINT uiLink = 0; uiLink < uiMaxDim; ++uiLink)
+    {
+        UINT uiMinDim = (0 == (st & CIndex::kSpace)) ? 3 : uiLink + 1;
+        for (UINT uiPlaq = uiMinDim; uiPlaq < uiMaxDim; ++uiPlaq)
+        {
+            int4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
+
+            retV[iListIndex] = SIndex(uiSiteIndex, uiLink);
+            ++iListIndex;
+
+            int4 fsite1 = _deviceMoveSquareSite(xyzt, uiLink + 1);
+            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite1, xyzt);
+            retV[iListIndex].m_byDir = uiPlaq;
+            ++iListIndex;
+
+            int4 fsite2 = _deviceMoveSquareSite(xyzt, uiPlaq + 1);
+            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite2, xyzt);
+            retV[iListIndex].m_byDir = uiLink;
+            retV[iListIndex].m_byTag = SIndex::kDagger;
+            ++iListIndex;
+
+            retV[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
+            retV[iListIndex].m_byTag = SIndex::kDagger;
+            ++iListIndex;
+        }
+    }
+
+    assert(count * 4 == iListIndex);
 }
 
 /**

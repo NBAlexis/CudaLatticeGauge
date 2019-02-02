@@ -16,24 +16,38 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquette)
 
 CActionGaugePlaquette::CActionGaugePlaquette()
     : CAction()
+    , m_uiPlaqutteCount(0)
 {
 }
 
-void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameters& param)
+void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
     m_pOwner = pOwner;
+    m_byActionId = byId;
     Real fBeta = 0.1f;
     param.FetchValueReal(_T("Beta"), fBeta);
+    CCommonData::m_fBeta = fBeta;
     if (NULL != pOwner->m_pGaugeField && EFT_GaugeSU3 == pOwner->m_pGaugeField->GetFieldType())
     {
-        fBeta = fBeta / 3;
+        fBeta = fBeta / F(3.0);
     }
-    m_cMinusBetaOverN = _make_cuComplex(-fBeta, 0);
+    m_fMinusBetaOverN = -fBeta;
+    m_uiPlaqutteCount = _HC_Volumn * (_HC_Dir - 1) * (_HC_Dir - 2);
 }
 
-void CActionGaugePlaquette::CalculateForceOnGauge(class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const
+void CActionGaugePlaquette::SetBeta(Real fBeta)
 {
-    pGauge->CalculateForceAndStaple(pGauge, pStaple, m_cMinusBetaOverN);
+    CCommonData::m_fBeta = fBeta;
+    if (NULL != m_pOwner->m_pGaugeField && EFT_GaugeSU3 == m_pOwner->m_pGaugeField->GetFieldType())
+    {
+        fBeta = fBeta / F(3.0);
+    }
+    m_fMinusBetaOverN = -fBeta;
+}
+
+void CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const
+{
+    pGauge->CalculateForceAndStaple(pForce, pStaple, m_fMinusBetaOverN);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -42,8 +56,12 @@ void CActionGaugePlaquette::CalculateForceOnGauge(class CFieldGauge * pGauge, cl
 */
 Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge) const
 {
-    return pGauge->CalculatePlaqutteEnergy(m_cMinusBetaOverN);
-    checkCudaErrors(cudaDeviceSynchronize());
+    return pGauge->CalculatePlaqutteEnergy(m_fMinusBetaOverN);
+}
+
+Real CActionGaugePlaquette::GetEnergyPerPlaqutte() const
+{
+    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fMinusBetaOverN) / m_uiPlaqutteCount;
 }
 
 __END_NAMESPACE

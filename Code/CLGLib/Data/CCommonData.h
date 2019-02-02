@@ -53,8 +53,14 @@
 #define _HC_DecompLy (appGetCudaHelper()->m_ConstIntegers[ECI_DecompLy])
 #define _DC_DecompLz (_constIntegers[ECI_DecompLz])
 #define _HC_DecompLz (appGetCudaHelper()->m_ConstIntegers[ECI_DecompLz])
+#define _DC_ThreadCountPerBlock (_constIntegers[ECI_ThreadCountPerBlock])
+#define _HC_ThreadCountPerBlock (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCountPerBlock])
 #define _DC_ThreadCount (_constIntegers[ECI_ThreadCount])
 #define _HC_ThreadCount (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCount])
+
+#define _HC_SUN (appGetCudaHelper()->m_ConstIntegers[ECI_SUN])
+#define _HC_PlaqutteCount (appGetCudaHelper()->m_ConstIntegers[ECI_PlaqutteCount])
+#define _HC_LinkCount (appGetCudaHelper()->m_ConstIntegers[ECI_LinkCount])
 
 #define _DC_Seed (_constIntegers[ECI_RandomSeed])
 #define _HC_Seed (appGetCudaHelper()->m_ConstIntegers[ECI_RandomSeed])
@@ -66,6 +72,9 @@
 
 #define _D_ComplexThreadBuffer (appGetCudaHelper()->m_pComplexBufferThreadCount)
 #define _D_RealThreadBuffer (appGetCudaHelper()->m_pRealBufferThreadCount)
+
+
+#define _DC_InverseSqrtLink16 (_constFloats[ECF_InverseSqrtLink16])
 
 #pragma endregion
 
@@ -122,6 +131,14 @@ struct CLGAPI SIndex
     BYTE m_byBoundaryFieldId;
 };
 
+//Those are not constants, but commonly used parameters
+class CLGAPI CCommonData
+{
+public:
+
+    static Real m_fBeta;
+    static Real m_fKai;
+};
 
 __END_NAMESPACE
 

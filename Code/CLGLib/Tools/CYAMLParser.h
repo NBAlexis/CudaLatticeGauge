@@ -109,6 +109,8 @@ public:
 
     _FetchFunctionArray(INT)
 
+    _FetchFunctionArray(UINT)
+
     _FetchFunctionArray(Real)
 
     UBOOL FetchStringVectorValue(const CCString& key, TArray<CCString>& value) const

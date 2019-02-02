@@ -1,95 +1,337 @@
-##Main:
-
+## Log options
 ## Verbose will always show in stdout
 ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
 ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
-VerboseLevel : GENERAL
+VerboseLevel : PARANOIAC
 VerboseOutput : timestamp
 ShowDeviceInformation : 1
 ShowParameterContent : 1
 
+
 ## dim = {2, 3, 4}
-Dim : 4
-  
+## Dim : 4
+
 ## For square lattice, Dir = Dim
-Dir : 4
-  
+## Dir : 4
+
 ## Lattice Length = [x, y, z, t], NOTE, for 3D Lattice Length = [1, y, z, t], for 2D Lattice Length = [1, 1, z, t]
-LatticeLength : [8, 8, 8, 8]
+## LatticeLength : [8, 8, 8, 8]
 
 ## LatticeIndex { EIndexType_Square }
-LatticeIndex : EIndexType_Square
+## LatticeIndex : EIndexType_Square
 ## LatticeBoundary = { EBC_TorusSquare }
-LatticeBoundary : EBC_TorusSquare
+## LatticeBoundary : EBC_TorusSquare
 
 ## Threads decompose
 ## Note: ThreadAutoDecompose = 1, will decompose using MaxThread of GPU, or else ThreadAutoDecompose = 0 will use decomposex,y,z
 ## Note: LatticeLength.xyz | ThreadDecomposeXYZ (divisible)
 ## Note: ThreadDecomposeX*ThreadDecomposeY*ThreadDecomposeZ <= max thread of your GPU
-ThreadAutoDecompose : 1
-ThreadDecompose : [8, 8, 8]
+## ThreadAutoDecompose : 1
+## ThreadDecompose : [8, 8, 8]
 
-## Random Type = {ER_Schrage}
-RandomType : ER_Schrage
-RandomSeed : 1234567
+## Random Type = {ER_Schrage, ER_XORWOW, ER_MRG32K3A, ER_PHILOX4_32_10, ER_QUASI_SOBOL32, ER_SCRAMBLED_SOBOL32}
+## NOTE: ER_MRG32K3A, ER_PHILOX4_32_10 support only 256 threads per block (when initializing... however, we have same thread count when initializing and running)
+## NOTE: For ER_QUASI_SOBOL32 and ER_SCRAMBLED_SOBOL32, the volumn (number of sites) should be less than 20000
+## RandomType : ER_Schrage
+## RandomSeed : 1234567
 
 ## Some global settings
-ExponentialPrecision : 4
+## ExponentialPrecision : 4
 
-ActionListLength : 1
+## ActionListLength : 0
 
-Updator:
+## For each test, initial with a parameter group
+TestRandomSchrage:
 
-  ## UpdatorType = { CHMC }
-  UpdatorType : CHMC
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
 
-  ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-  IntegratorType : CIntegratorLeapFrog
-  IntegratorStepLength : 0.01
-  IntegratorStep : 10
+    ##10x10x10 blocks, each with 16x16x4 threads, each thread loop for 200 times
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
 
-Gauge:
+    TestAccuracy : 1E-3
+
+TestRandomXORWOW:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+    TestAccuracy : 1E-3
+
+TestRandomMRG32K3A:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+
+    ## Note: MRG32K3A support 256 threads
+    ThreadAutoDecompose : 0
+    ThreadDecompose : [8, 8, 4]
+
+    RandomType : ER_MRG32K3A
+    RandomSeed : 1234567
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+    TestAccuracy : 1E-3
+
+TestRandomPhilox:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 0
+    ThreadDecompose : [8, 8, 4]
+    RandomType : ER_PHILOX4_32_10
+    RandomSeed : 1234567
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+    TestAccuracy : 1E-3
+
+TestRandomSOBOL32:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_QUASI_SOBOL32
+    RandomSeed : 1234567
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+    TestAccuracy : 1E-3
+
+TestRandomScrambledSOBOL32:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_SCRAMBLED_SOBOL32
+    RandomSeed : 1234567
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+    TestAccuracy : 1E-3
+
+TestSU3GeneratorSchrage:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.0001
+
+TestSU3GeneratorXORWOW:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.0001
+
+TestSU3GeneratorMRG32K3A:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 0
+    ThreadDecompose : [8, 8, 4]
+    RandomType : ER_MRG32K3A
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.0001
+
+TestSU3GeneratorPhilox:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 0
+    ThreadDecompose : [8, 8, 4]
+    RandomType : ER_PHILOX4_32_10
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.0001
+
+TestSU3GeneratorSOBOL32:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_QUASI_SOBOL32
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.03
+
+TestSU3GeneratorScrambledSOBOL32:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_SCRAMBLED_SOBOL32
+    RandomSeed : 1234567
+    FieldSampleCount : 1000
+    TestAccuracy : 0.03
+
+TestUpdatorLeapFrog:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 8
+    ActionListLength : 1
+    MeasureListLength : 1
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+
+    Gauge:
 	
-  ## FieldType = {CFieldGaugeSU3}
-  FieldName : CFieldGaugeSU3
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
 
-  ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-  FieldInitialType : EFIT_Random
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
 		
-Action1:
+    Action1:
    
-   ActionName : CActionGaugePlaquette
-   Beta : 0.2
+        ActionName : CActionGaugePlaquette
+        Beta : 1
 
-Tests:
+    Measure1:
 
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestWilsonLoopOmelyan:
+
+    ## dim = {2, 3, 4}
+    Dim : 4
   
-  TestRandom:
+    ## For square lattice, Dir = Dim
+    Dir : 4
+  
+    ## Lattice Length = [x, y, z, t], NOTE, for 3D Lattice Length = [1, y, z, t], for 2D Lattice Length = [1, 1, z, t]
+    LatticeLength : [8, 8, 8, 8]
 
-    TestPi:
+    ## LatticeIndex { EIndexType_Square }
+    LatticeIndex : EIndexType_Square
+    ## LatticeBoundary = { EBC_TorusSquare }
+    LatticeBoundary : EBC_TorusSquare
 
-      Count : 100000000
-      ExpectResult : 0.001
+    ## Threads decompose
+    ## Note: ThreadAutoDecompose = 1, will decompose using MaxThread of GPU, or else ThreadAutoDecompose = 0 will use decomposex,y,z
+    ## Note: LatticeLength.xyz | ThreadDecomposeXYZ (divisible)
+    ## Note: ThreadDecomposeX*ThreadDecomposeY*ThreadDecomposeZ <= max thread of your GPU
+    ThreadAutoDecompose : 1
+    ThreadDecompose : [8, 8, 8]
 
-      ## The Accuracy to pass the test, Usually, a ~ 1/sqrt(Count)
-      Accuracy : 1E-4
+    ## Random Type = {ER_Schrage}
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
 
-    TestExp:
+    ## Some global settings
+    ExponentialPrecision : 4
 
-      Count : 100000000
-      ExpectResult : 0.001
+    ActionListLength : 1
 
-      ## The Accuracy to pass the test, Usually, a ~ 1/sqrt(Count)
-      Accuracy : 1E-4
+    Updator:
 
-  TestWilsonLoop:
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
 
-    TestLeapFrog:
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 0.01
+        IntegratorStep : 10
 
-      ExpectResult : 0.001
-      Accuracy : 1E-4
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
 
-    TestOmelyan:
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 0.2
 
-      ExpectResult : 0.001
-      Accuracy : 1E-4
+
+TestFileIOBridgePPText:
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_ReadFromFile
+
+        ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
+        GaugeFileType : EFFT_BridgePPTXT
+
+        GaugeFileName : bridgepp_conf_text.dat
+
+TestFileIOBridgePPBin:
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_ReadFromFile
+
+        ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
+        GaugeFileType : EFFT_BridgePPBin
+
+        GaugeFileName : bridgepp_conf_binary.dat

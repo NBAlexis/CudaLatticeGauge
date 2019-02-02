@@ -9,82 +9,99 @@
 
 #include "CLGTest.h"
 
-int main(int argc, char * argv[])
+TestList* _testSuits;
+
+UINT RunTest(CParameters&params, TestList* pTest)
 {
+    appGeneral("=========== Testing:%s \n", pTest->m_sParamName);
+
+    CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
+
+    //Initial
+    if (!appInitialCLG(paramForTheTest))
+    {
+        return 1;
+    }
+
+    //Do the work
     CTimer timer;
     timer.Start();
-
-    appInitialCLG(_T("TestSuit.yaml"));
-
+    UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
-    appGeneral(_T("\n =========== CLG Lib Initialed, cost: %f(ms)\n\n"), timer.Elapsed());
-    timer.Reset();
-    
+    appGeneral(_T("=========== Finished, errors: %d, cost: %f(ms)\n"), uiErrors, timer.Elapsed());
 
-    //CCommonData::InitialWithDefault();
-    //
-    //CLatticeData* lattice = CLatticeData::GetInstance();
-    //CFieldGaugeSU3* field = new CFieldGaugeSU3(lattice);
-
-    //CParameters params;
-    //CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
-
-    //params.Dump();
-
-    //params.GetParameter(_T("Quark_2")).SetStringVaule(_T("__abc__"), _T("__123__"));
-
-    //params.Dump();
-    //THashMap<CCString, CCString> testhash;
-    //testhash[CCString(_T("123"))] = _T("456");
-    //testhash.SetAt(_T("1231"), _T("4567"));
-    //TArray<CCString> keys = testhash.GetAllKeys();
-    //appGeneral(_T("t1:%d %s->%s\n"), testhash.Exist(keys[0]), keys[0], testhash[keys[0]]);
-    //appGeneral(_T("t2:%d %s->%s"), testhash.Exist(keys[1]), keys[1], testhash[keys[1]]);
-    //THashMap<CCString, INT> testhash = appGetEnumTable(_T("    Ex = 0,\n        Ey,\n        Ec = 0x77, "));
-    //TArray<CCString> keys = testhash.GetAllKeys();
-    //appGeneral(_T("t1:%d %s->\n"), testhash.Exist(keys[0]), keys[0]);
-    //appGeneral(_T("t1:%d %s->%d\n"), testhash.Exist(keys[0]), keys[0], testhash[keys[0]]);
-    //appGeneral(_T("t2:%d %s->\n"), testhash.Exist(keys[1]), keys[1]);
-    //appGeneral(_T("t2:%d %s->%d"), testhash.Exist(keys[1]), keys[1], testhash[keys[1]]);
-
-    //CCString a1 = _T("Ex");
-    //CCString a2 = _T("Ex");
-    //BYTE dwa1 = *((BYTE*)(&a1));
-    //BYTE dwa2 = *((BYTE*)(&a2));
-    //appGeneral(_T("test hash map key %d %d\n"), dwa1, dwa2);
-    //appGeneral(_T("test hash map key %d %d"), TMapHashKey<const CCString&>(a1), TMapHashKey<const CCString&>(a2));
-
-    //appGeneral(_T("\ntest enum %d\n"), appStringToEnumEabc(_T("Ex")));
-    //
-    //appGeneral(_T("\ntest enum %s\n"), __ENUM_TO_STRING(EFieldType, EFT_GaugeSU3).c_str());
-
-    //appGeneral(_T("\ntest enum %d\n"), __STRING_TO_ENUM(EFieldType, _T("EFT_Max")));
-
-    //appGeneral(_T("\nPress any key to continue\n"));
-    //CIN.get();
-
-    //appSafeDelete(field);
-    //CLatticeData::Release();
-
-    //appGetLattice()->m_pGaugeField->DebugPrintMe();
-
-    UINT iErrors = 0;
-    timer.Start();
-    iErrors += TestRandom();
-
-    
-    //test update
-    appGetLattice()->m_pUpdator->Update(10);
-
-    timer.Stop();
-    appGeneral(_T("\n =========== CLG Test Finished, errors: %d, cost: %f(ms)\n"), iErrors, timer.Elapsed());
-
-    appGeneral(_T("\nPress any key to quit\n"));
-    CIN.get();
-
+    //Final
     appQuitCLG();
 
-    return 0;
+    return uiErrors;
+}
+
+void ListAllTests(const TArray<TestList*>& allTests)
+{
+    for (INT i = 0; i <= (allTests.Num() + 1) / 4; ++i)
+    {
+        for (INT j = 0; j < 4; ++j)
+        {
+            INT indexOfTest = i * 4 + j;
+            if (indexOfTest < allTests.Num())
+            {
+                TCHAR names[256];
+                sprintf_s(names, _T("%d - %s    "), indexOfTest + 1, allTests[indexOfTest]->m_sParamName);
+                COUT << names;
+            }
+            else if (indexOfTest == allTests.Num())
+            {
+                COUT << "0 - All";
+            }
+        }
+        COUT << std::endl;
+    }
+}
+
+int main(int argc, char * argv[])
+{
+    //Load settings
+    CParameters params;
+    CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
+    appSetupLog(params);
+    UINT uiTotalError = 0;
+
+    TArray<TestList*> allTests;
+    for (TestList* pTest = _testSuits; NULL != pTest; pTest = pTest->m_pNext)
+    {
+        if (params.Exist(pTest->m_sParamName))
+        {
+            allTests.AddItem(pTest);
+        }
+    }
+
+    UBOOL bCorrectInput = FALSE;
+    INT inputNumber = -1;
+    while (!bCorrectInput)
+    {
+        ListAllTests(allTests);
+        inputNumber = -1;
+        CIN >> inputNumber;
+        if (inputNumber >= 0 && inputNumber < allTests.Num() + 1)
+        {
+            bCorrectInput = TRUE;
+        }
+    }
+
+    UINT uiError = 0;
+    if (0 == inputNumber)
+    {
+        for (INT i = 0; i < allTests.Num(); ++i)
+        {
+            uiError += RunTest(params, allTests[i]);
+        }
+    }
+    else
+    {
+        uiError += RunTest(params, allTests[inputNumber - 1]);
+    }
+
+    return uiError;
 }
 
 //=============================================================================
