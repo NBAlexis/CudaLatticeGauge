@@ -23,28 +23,44 @@ void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
 {
     m_pOwner = pOwner;
     m_iAcceptedConfigurationCount = 0;
+
+    INT iMetro = 0;
+    params.FetchValueINT(_T("Metropolis"), iMetro);
+    m_bMetropolis = (0 != iMetro);
 }
 
 UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 {
     UBOOL bAccepted = FALSE;
-    Real fEnergy = 0.0f;
+    Real fEnergy = F(0.0);
+    Real fEnergyNew = F(0.0);
     for (UINT i = 0; i < iSteps; ++i)
     {
         m_pIntegrator->Prepare(bAccepted);
-        if (0 == i)
+        if (0 == i && m_bMetropolis)
         {
             fEnergy = m_pIntegrator->GetEnergy();
         }
         m_pIntegrator->Evaluate();
-        Real fEnergyNew = m_pIntegrator->GetEnergy();
-        Real fDiff = fEnergy - fEnergyNew;
-        //Metropolis
-        appGeneral(_T(" HMC: step = %d, H (before, after, diff) = (%f, %f, %f)\n"),
-            i + 1, fEnergy, fEnergyNew, fDiff);
-        Real diff_H = _exp(fDiff);  // Delta H (SA)
-        Real rand = GetRandomReal();
-        if (TRUE)//rand <= diff_H)
+        if (m_bMetropolis)
+        {
+            fEnergyNew = m_pIntegrator->GetEnergy();
+        }
+
+        Real diff_H = F(1.0);
+        Real rand = F(0.0);
+
+        if (m_bMetropolis)
+        {
+            Real fDiff = fEnergy - fEnergyNew;
+            //Metropolis
+            appGeneral(_T(" HMC: step = %d, H (before, after, diff) = (%f, %f, %f)\n"),
+                i + 1, fEnergy, fEnergyNew, fDiff);
+            diff_H = _exp(fDiff);  // Delta H (SA)
+            rand = GetRandomReal();
+        }
+
+        if (rand <= diff_H)
         {
             ++m_iAcceptedConfigurationCount;
             appGeneral(_T("  Accepted (accepted:%d)\n"), m_iAcceptedConfigurationCount);

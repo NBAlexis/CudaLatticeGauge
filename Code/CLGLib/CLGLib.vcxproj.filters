@@ -304,5 +304,8 @@
     <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cu">
       <Filter>SparseLinearAlgebra</Filter>
     </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldGauge.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

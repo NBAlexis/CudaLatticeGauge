@@ -19,7 +19,7 @@ class CLGAPI CHMC : public CUpdator
 
 public:
 
-    CHMC() : CUpdator(), m_pIntegrator(NULL) { ; }
+    CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE) { ; }
     ~CHMC();
     virtual UINT Update(UINT iSteps, UBOOL bMeasure);
     virtual Real CalculateEnergy() { return 0.0f; }
@@ -29,6 +29,9 @@ public:
 
     virtual void Initial(class CLatticeData* pOwner, const CParameters& params);
 
+protected:
+
+    UBOOL m_bMetropolis;
 };
 
 __END_NAMESPACE

@@ -173,11 +173,11 @@ void _kernelStapleAtSiteSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     deviceSU3 *pStapleData, //can be NULL
     deviceSU3 *pForceData,
-    Real minusBetaOverN)
+    Real betaOverN)
 {
     intokernal;
 
-    minusBetaOverN = minusBetaOverN * F(0.5);
+    betaOverN = betaOverN * F(0.5);
     SIndex plaquttes[kMaxPlaqutteCache];
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -211,9 +211,13 @@ void _kernelStapleAtSiteSU3(
                     deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
                     if (nextlink.NeedToDagger())
                     {
-                        toMul.Dagger();
+                        toAdd.MulDagger(toMul);
                     }
-                    toAdd.Mul(toMul);
+                    else
+                    {
+                        toAdd.Mul(toMul);
+                    }
+                    
                 }
                 res.Add(toAdd);
             }
@@ -222,12 +226,76 @@ void _kernelStapleAtSiteSU3(
                 pStapleData[linkIndex] = res;
             }
 
-            res.Dagger();
             //staple calculated
             deviceSU3 force(pDeviceData[linkIndex]);
-            force.Mul(res);
+            force.MulDagger(res);
             force.TrTa();
-            force.Mul(minusBetaOverN);
+            force.Mul(betaOverN);
+
+            //force is additive
+            pForceData[linkIndex].Add(force);
+        }
+    }
+}
+
+__global__
+void _kernelStapleAtSiteSU3CacheIndex(
+    const deviceSU3 * __restrict__ pDeviceData,
+    const SIndex * __restrict__ pCachedIndex,
+    UINT plaqLength, UINT plaqCount,
+    deviceSU3 *pStapleData, //can be NULL
+    deviceSU3 *pForceData,
+    Real betaOverN)
+{
+    intokernal;
+
+    betaOverN = betaOverN * F(0.5);
+    UINT plaqLengthm1 = plaqLength - 1;
+    UINT plaqCountAll = plaqCount * plaqLengthm1;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir; ++idir)
+        {
+            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
+            deviceSU3 res = deviceSU3::makeSU3Zero();
+
+            //there are 6 staples, each is sum of two plaquttes
+            for (int i = 0; i < plaqCount; ++i)
+            {
+                SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+                deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+                if (first.NeedToDagger())
+                {
+                    toAdd.Dagger();
+                }
+
+                for (int j = 1; j < plaqLengthm1; ++j)
+                {
+                    SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                    deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                    if (nextlink.NeedToDagger())
+                    {
+                        toAdd.MulDagger(toMul);
+                    }
+                    else
+                    {
+                        toAdd.Mul(toMul);
+                    }
+                }
+                res.Add(toAdd);
+            }
+            if (NULL != pStapleData)
+            {
+                pStapleData[linkIndex] = res;
+            }
+
+            //staple calculated
+            deviceSU3 force(pDeviceData[linkIndex]);
+            force.MulDagger(res);
+            force.TrTa();
+            force.Mul(betaOverN);
 
             //force is additive
             pForceData[linkIndex].Add(force);
@@ -273,7 +341,11 @@ void _kernelPlaqutteEnergySU3(
                 deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
                 if (nextlink.NeedToDagger())
                 {
-                    toMul.Dagger();
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
                 }
                 toAdd.Mul(toMul);
             }
@@ -284,6 +356,62 @@ void _kernelPlaqutteEnergySU3(
             assert(reTr < F(3.00001));
 #endif
             resThisThread += (F(3.0)-toAdd.ReTr());
+        }
+    }
+
+    results[__thread_id] = resThisThread * betaOverN;
+
+    //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
+}
+
+__global__
+void _kernelPlaqutteEnergySU3CacheIndex(
+    const deviceSU3 * __restrict__ pDeviceData,
+    const SIndex * __restrict__ pCachedIndex,
+    UINT plaqLength, UINT plaqCount,
+    Real betaOverN,
+    Real* results)
+{
+    intokernal;
+
+    Real resThisThread = F(0.0);
+    UINT plaqCountAll = plaqCount * plaqLength;
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+
+        UINT siteIndex = _deviceGetSiteIndex(coord);
+
+        for (int i = 0; i < plaqCount; ++i)
+        {
+            SIndex first = pCachedIndex[i * plaqLength + siteIndex * plaqCountAll];
+
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.NeedToDagger())
+            {
+                toAdd.Dagger();
+            }
+
+            for (int j = 1; j < plaqLength; ++j)
+            {
+                SIndex nextlink = pCachedIndex[i * plaqLength + j + siteIndex * plaqCountAll];
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.NeedToDagger())
+                {
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
+                }
+            }
+
+#if _CLG_DEBUG
+            Real reTr = toAdd.ReTr();
+            assert(reTr > -F(1.50001));
+            assert(reTr < F(3.00001));
+#endif
+            resThisThread += (F(3.0) - toAdd.ReTr());
         }
     }
 
@@ -310,7 +438,7 @@ void _kernelPlaqutteEnergyUsingStableSU3(
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
             //For each link, there are 6 staples
-            resThisThread += (F(18.0) - pDeviceData[linkIndex].Mulc(pStableData[linkIndex].Daggerc()).ReTr());
+            resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerc(pStableData[linkIndex]).ReTr());
         }
     }
 
@@ -361,7 +489,7 @@ void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceDa
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread += pDeviceData[linkIndex].Daggerc().Mulc(pDeviceData[linkIndex]).ReTr();
+            resThisThread += pDeviceData[linkIndex].DaggerMulc(pDeviceData[linkIndex]).ReTr();
         }
     }
 
@@ -400,7 +528,7 @@ void _kernelDotSU3(
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].Daggerc().Mulc(pOtherDeviceData[linkIndex]).Tr());
+            resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].DaggerMulc(pOtherDeviceData[linkIndex]).Tr());
         }
     }
 
@@ -604,7 +732,7 @@ void CFieldGaugeSU3::SetByArray(Real* array)
 * (2) calculate force(additive)
 * (3) calculate energy
 */
-void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real minusBetaOverN) const
+void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const
 {
     if (NULL == pForce || EFT_GaugeSU3 != pForce->GetFieldType())
     {
@@ -621,18 +749,54 @@ void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* p
     CFieldGaugeSU3* pStableSU3 = NULL == pStable ? NULL : dynamic_cast<CFieldGaugeSU3*>(pStable);
 
     preparethread;
-    _kernelStapleAtSiteSU3 << <block, threads >> > (m_pDeviceData, NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData, pForceSU3->m_pDeviceData, minusBetaOverN);
+
+    if (!m_bPlaqutteIndexCached)
+    {
+        _kernelStapleAtSiteSU3 << <block, threads >> > (
+            m_pDeviceData, 
+            NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
+            pForceSU3->m_pDeviceData, 
+            betaOverN);
+    }
+    else 
+    {
+        _kernelStapleAtSiteSU3CacheIndex << <block, threads >> > (
+            m_pDeviceData, 
+            m_pPlaquttesPerLink,
+            m_uiPlaqutteLength,
+            m_uiPlaqutteCountPerLink,
+            NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData, 
+            pForceSU3->m_pDeviceData, 
+            betaOverN);
+    }
 }
 
-Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real minusBetaOverN) const
+Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
 {
     preparethread;
-    _kernelPlaqutteEnergySU3 << <block, threads >> > (m_pDeviceData, -minusBetaOverN, _D_RealThreadBuffer);
+    if (!m_bPlaqutteIndexCached)
+    {
+        _kernelPlaqutteEnergySU3 << <block, threads >> > (
+            m_pDeviceData, 
+            betaOverN, 
+            _D_RealThreadBuffer);
+    }
+    else 
+    {
+        _kernelPlaqutteEnergySU3CacheIndex << <block, threads >> > (
+            m_pDeviceData, 
+            m_pPlaquttesPerSite,
+            m_uiPlaqutteLength,
+            m_uiPlaqutteCountPerSite,
+            betaOverN, 
+            _D_RealThreadBuffer);
+    }
+    
 
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real minusBetaOverN, const CFieldGauge *pStable) const
+Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const
 {
     if (NULL == pStable || EFT_GaugeSU3 != pStable->GetFieldType())
     {
@@ -642,7 +806,12 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real minusBetaOverN, con
     const CFieldGaugeSU3* pStableSU3 = dynamic_cast<const CFieldGaugeSU3*>(pStable);
 
     preparethread;
-    _kernelPlaqutteEnergyUsingStableSU3 << <block, threads >> > (m_pDeviceData, pStableSU3->m_pDeviceData, -minusBetaOverN, _D_RealThreadBuffer);
+    _kernelPlaqutteEnergyUsingStableSU3 << <block, threads >> > (
+        m_pDeviceData, 
+        pStableSU3->m_pDeviceData, 
+        betaOverN, 
+        _D_RealThreadBuffer);
+
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 

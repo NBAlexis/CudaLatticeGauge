@@ -16,16 +16,13 @@ CField::CField() : CBase(), m_pOwner(NULL)
     
 }
 
-CFieldGauge::CFieldGauge() : CField()
-{
-    m_uiLinkeCount = _HC_Volumn * _HC_Dir;
-}
-
 CFieldFermion::CFieldFermion() : CField()
 {
     m_uiLinkeCount = _HC_Volumn * _HC_Dir;
     m_uiSiteCount = _HC_Volumn;
 }
+
+
 
 __END_NAMESPACE
 

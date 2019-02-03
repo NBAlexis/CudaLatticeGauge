@@ -18,6 +18,11 @@
 #define _SU3_H_
 
 #define __LINE_MUL(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], right.m_me[d]), _cuCmulf(m_me[b], right.m_me[ee])), _cuCmulf(m_me[c], right.m_me[ff]))
+
+#define __LINE_MULND(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], _cuConjf(right.m_me[d])), _cuCmulf(m_me[b], _cuConjf(right.m_me[ee]))), _cuCmulf(m_me[c], _cuConjf(right.m_me[ff])))
+
+#define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), _cuConjf(right.m_me[ff]))
+
 // 1.0f / _sqrt(3)
 #define InvSqrt3 (F(0.5773502691896258))
 // 2.0f / _sqrt(3)
@@ -364,6 +369,23 @@ struct CLGAPI deviceSU3
         memcpy(m_me, res, sizeof(_Complex) * 9);
     }
 
+    __device__ __inline__ deviceSU3 Mulc(const deviceSU3& right) const
+    {
+        deviceSU3 ret;
+        ret.m_me[0] = __LINE_MUL(0, 1, 2, 0, 3, 6);
+        ret.m_me[1] = __LINE_MUL(0, 1, 2, 1, 4, 7);
+        ret.m_me[2] = __LINE_MUL(0, 1, 2, 2, 5, 8);
+
+        ret.m_me[3] = __LINE_MUL(3, 4, 5, 0, 3, 6);
+        ret.m_me[4] = __LINE_MUL(3, 4, 5, 1, 4, 7);
+        ret.m_me[5] = __LINE_MUL(3, 4, 5, 2, 5, 8);
+
+        ret.m_me[6] = __LINE_MUL(6, 7, 8, 0, 3, 6);
+        ret.m_me[7] = __LINE_MUL(6, 7, 8, 1, 4, 7);
+        ret.m_me[8] = __LINE_MUL(6, 7, 8, 2, 5, 8);
+        return ret;
+    }
+
     __device__ __inline__ void Mul(Real right)
     {
         m_me[0] = _cuCmulf(m_me[0], right);
@@ -390,6 +412,74 @@ struct CLGAPI deviceSU3
         m_me[8] = _cuCmulf(m_me[8], right);
     }
 
+    __device__ __inline__ void MulDagger(const deviceSU3& right)
+    {
+        _Complex res[9];
+        res[0] = __LINE_MULND(0, 1, 2, 0, 1, 2);
+        res[1] = __LINE_MULND(0, 1, 2, 3, 4, 5);
+        res[2] = __LINE_MULND(0, 1, 2, 6, 7, 8);
+
+        res[3] = __LINE_MULND(3, 4, 5, 0, 1, 2);
+        res[4] = __LINE_MULND(3, 4, 5, 3, 4, 5);
+        res[5] = __LINE_MULND(3, 4, 5, 6, 7, 8);
+
+        res[6] = __LINE_MULND(6, 7, 8, 0, 1, 2);
+        res[7] = __LINE_MULND(6, 7, 8, 3, 4, 5);
+        res[8] = __LINE_MULND(6, 7, 8, 6, 7, 8);
+        memcpy(m_me, res, sizeof(_Complex) * 9);
+    }
+
+    __device__ __inline__ deviceSU3 MulDaggerc(const deviceSU3& right) const
+    {
+        deviceSU3 ret;
+        ret.m_me[0] = __LINE_MULND(0, 1, 2, 0, 1, 2);
+        ret.m_me[1] = __LINE_MULND(0, 1, 2, 3, 4, 5);
+        ret.m_me[2] = __LINE_MULND(0, 1, 2, 6, 7, 8);
+
+        ret.m_me[3] = __LINE_MULND(3, 4, 5, 0, 1, 2);
+        ret.m_me[4] = __LINE_MULND(3, 4, 5, 3, 4, 5);
+        ret.m_me[5] = __LINE_MULND(3, 4, 5, 6, 7, 8);
+
+        ret.m_me[6] = __LINE_MULND(6, 7, 8, 0, 1, 2);
+        ret.m_me[7] = __LINE_MULND(6, 7, 8, 3, 4, 5);
+        ret.m_me[8] = __LINE_MULND(6, 7, 8, 6, 7, 8);
+        return ret;
+    }
+
+    __device__ __inline__ void DaggerMul(const deviceSU3& right)
+    {
+        _Complex res[9];
+        res[0] = __LINE_MULND(0, 3, 6, 0, 3, 6);
+        res[1] = __LINE_MULND(0, 3, 6, 1, 4, 7);
+        res[2] = __LINE_MULND(0, 3, 6, 2, 5, 8);
+
+        res[3] = __LINE_MULND(1, 4, 7, 0, 3, 6);
+        res[4] = __LINE_MULND(1, 4, 7, 1, 4, 7);
+        res[5] = __LINE_MULND(1, 4, 7, 2, 5, 8);
+
+        res[6] = __LINE_MULND(2, 5, 8, 0, 3, 6);
+        res[7] = __LINE_MULND(2, 5, 8, 1, 4, 7);
+        res[8] = __LINE_MULND(2, 5, 8, 2, 5, 8);
+        memcpy(m_me, res, sizeof(_Complex) * 9);
+    }
+
+    __device__ __inline__ deviceSU3 DaggerMulc(const deviceSU3& right) const
+    {
+        deviceSU3 ret;
+        ret.m_me[0] = __LINE_MULND(0, 3, 6, 0, 3, 6);
+        ret.m_me[1] = __LINE_MULND(0, 3, 6, 1, 4, 7);
+        ret.m_me[2] = __LINE_MULND(0, 3, 6, 2, 5, 8);
+
+        ret.m_me[3] = __LINE_MULND(1, 4, 7, 0, 3, 6);
+        ret.m_me[4] = __LINE_MULND(1, 4, 7, 1, 4, 7);
+        ret.m_me[5] = __LINE_MULND(1, 4, 7, 2, 5, 8);
+
+        ret.m_me[6] = __LINE_MULND(2, 5, 8, 0, 3, 6);
+        ret.m_me[7] = __LINE_MULND(2, 5, 8, 1, 4, 7);
+        ret.m_me[8] = __LINE_MULND(2, 5, 8, 2, 5, 8);
+        return ret;
+    }
+
     __device__ __inline__ deviceSU3Vector Mul(const deviceSU3Vector& v) const
     {
         deviceSU3Vector ret;
@@ -407,7 +497,6 @@ struct CLGAPI deviceSU3
     __device__ __inline__ deviceSU3 Subc(const _Complex& right) const  { deviceSU3 ret(*this); ret.Sub(right); return ret; }
     __device__ __inline__ deviceSU3 Subc(const Real& right) const { deviceSU3 ret(*this); ret.Sub(right); return ret; }
 
-    __device__ __inline__ deviceSU3 Mulc(const deviceSU3& right) const  { deviceSU3 ret(*this); ret.Mul(right); return ret; }
     __device__ __inline__ deviceSU3 Mulc(const _Complex& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
     __device__ __inline__ deviceSU3 Mulc(const Real& right) const { deviceSU3 ret(*this); ret.Mul(right); return ret; }
 

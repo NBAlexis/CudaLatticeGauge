@@ -22,6 +22,16 @@ __global__ void _kernelDeletePtrs(CIndex * pdeviceIndex)
     }
 }
 
+__global__ void _kernelGetPlaqLengthCount(UINT* deviceData)
+{
+    UINT length, countPersite, countPerLink;
+    __idx->_deviceGetPlaqutteCountLength(length, countPersite, countPerLink);
+
+    deviceData[0] = length;
+    deviceData[1] = countPersite;
+    deviceData[2] = countPerLink;
+}
+
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
 * m_uiLatticeDecompose[3,4,5] is the threads in blocks
@@ -103,6 +113,23 @@ void CLatticeData::OnUpdatorFinished()
     {
         m_pMeasurements->OnUpdateFinished(FALSE);
     }
+}
+
+void CLatticeData::GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink)
+{
+    UINT * deviceData;
+    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(UINT) * 3));
+
+    _kernelGetPlaqLengthCount << <1, 1 >> > (deviceData);
+
+    UINT hostData[3];
+
+    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(UINT) * 3, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaFree(deviceData));
+
+    plaqLength = hostData[0];
+    countPerSite = hostData[1];
+    countPerLink = hostData[2];
 }
 
 __END_NAMESPACE

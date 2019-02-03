@@ -349,6 +349,10 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
 
     m_pLatticeData->m_pGaugeField = pGauge;
     m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
+    if (NULL != m_pLatticeData->m_pDeviceIndex)
+    {
+        pGauge->CachePlaqutteIndexes();
+    }
     //checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceGaugeField), pGauge->GetClass()->GetSize()));
     //checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceGaugeField, m_pLatticeData->m_pGaugeField, pGauge->GetClass()->GetSize(), cudaMemcpyHostToDevice));
 
@@ -539,15 +543,15 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     InitialLatticeAndConstant(params);
     InitialRandom(params);
 
+    if (params.Exist(_T("LatticeIndex")))
+    {
+        CreateIndexAndBoundary(params);
+    }
+
     if (params.Exist(_T("Gauge")))
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
         CreateGaugeField(gauge);
-    }
-
-    if (params.Exist(_T("LatticeIndex")))
-    {
-        CreateIndexAndBoundary(params);
     }
 
     if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)

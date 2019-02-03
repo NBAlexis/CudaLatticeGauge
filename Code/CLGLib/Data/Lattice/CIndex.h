@@ -125,6 +125,11 @@ public:
     */
     __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st = kSpaceTime) const = 0;
 
+    /**
+    * Use for cache
+    */
+    __device__ virtual void _deviceGetPlaqutteCountLength(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink) = 0;
+
 #pragma region Index Walking
 
     __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const = 0;

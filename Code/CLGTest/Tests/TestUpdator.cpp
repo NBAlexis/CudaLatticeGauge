@@ -11,6 +11,9 @@
 
 UINT TestUpdator(CParameters& sParam)
 {
+    Real fExpected = F(0.2064);
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+
     //we calculate staple energy from beta = 1 - 6
     CActionGaugePlaquette * pAction = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
     if (NULL == pAction)
@@ -23,32 +26,30 @@ UINT TestUpdator(CParameters& sParam)
         return 1;
     }
 
-    pAction->SetBeta(10.0f);
-    appGetLattice()->m_pUpdator->Update(10, TRUE);
-    //TArray<Real> allRes;
-    //for (INT i = 0; i < 14; ++i)
-    //{
-    //    //update 10 steps for equilibrate
-    //    Real fBeta = F(1.0) + i * F(0.5);
-    //    pAction->SetBeta(fBeta);
+    //pAction->SetBeta(F(3.0));
 
-    //    appGetLattice()->m_pUpdator->Update(20, FALSE);
-    //    pMeasure->Reset();
-    //    appGetLattice()->m_pUpdator->Update(50, TRUE);
-    //    pMeasure->Report();
-    //    allRes.AddItem(fBeta);
-    //    allRes.AddItem(pMeasure->m_fLastRealResult);
-    //}
-    //
-    //for (UINT i = 0; i < allRes.Num(); i+=2)
-    //{
-    //    appGeneral(_T("Final Res: (beta, <S>) = (%f, %f)\n"), allRes[i], allRes[i + 1]);
-    //}
+    //Equilibration
+    appGetLattice()->m_pUpdator->Update(10, FALSE);
+
+    //Measure
+    pMeasure->Reset();
+    appGetLattice()->m_pUpdator->Update(20, TRUE);
+    pMeasure->Report();
+
+    Real fRes = pMeasure->m_fLastRealResult;
+    appGeneral(_T("res : expected=0.2064 res=%f"), fRes);
+
+    if (appAbs(fRes - F(0.2064)) > F(0.005))
+    {
+        return 1;
+    }
 
     return 0;
 }
 
 __REGIST_TEST(TestUpdator, Updator, TestUpdatorLeapFrog);
+
+__REGIST_TEST(TestUpdator, Updator, TestUpdatorOmelyan);
 
 //__REGIST_TEST(TestUpdator, Updator, TestRandomXORWOW);
 

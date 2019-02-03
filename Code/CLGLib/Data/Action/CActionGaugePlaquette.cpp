@@ -31,7 +31,7 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
     {
         fBeta = fBeta / F(3.0);
     }
-    m_fMinusBetaOverN = -fBeta;
+    m_fBetaOverN = fBeta;
     m_uiPlaqutteCount = _HC_Volumn * (_HC_Dir - 1) * (_HC_Dir - 2);
 }
 
@@ -42,12 +42,12 @@ void CActionGaugePlaquette::SetBeta(Real fBeta)
     {
         fBeta = fBeta / F(3.0);
     }
-    m_fMinusBetaOverN = -fBeta;
+    m_fBetaOverN = fBeta;
 }
 
 void CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const
 {
-    pGauge->CalculateForceAndStaple(pForce, pStaple, m_fMinusBetaOverN);
+    pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -56,12 +56,17 @@ void CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, cl
 */
 Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge) const
 {
-    return pGauge->CalculatePlaqutteEnergy(m_fMinusBetaOverN);
+    return pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+}
+
+Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge, const class CFieldGauge* pStable) const
+{
+    return pGauge->CalculatePlaqutteEnergyUsingStable(m_fBetaOverN, pStable);
 }
 
 Real CActionGaugePlaquette::GetEnergyPerPlaqutte() const
 {
-    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fMinusBetaOverN) / m_uiPlaqutteCount;
+    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 }
 
 __END_NAMESPACE

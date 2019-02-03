@@ -54,7 +54,7 @@ We now, concentrate on two degenerate fermion flavours. i.e. considering
 \end{split}
 \end{equation}
 
-Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.}), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010}
+Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.} See also Ref.~\cite{weingarten1981}.), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010}
 \begin{equation}
 \begin{split}
 &\int \mathcal{D}[\bar{\psi}]\mathcal{D}[\psi]\exp\left(-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d\right)=\det (\hat{D}\hat{D}^{\dagger})=\int \mathcal{D}[\phi] \exp (-\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi)
@@ -91,13 +91,41 @@ One can:
 Defined by Newton, $dp/dt$ is a force, so $\dot{P}$ is called `force'. See Eqs.~(2.53), (2.56) and (2.57) of Ref.~\cite{latticeqcdbook2017}, for $SU(N)$,
 \begin{equation}
 \begin{split}
-&S_G=-\frac{\beta}{N}{\rm Re}{\rm tr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
-&F_{\mu}(x)=\dot{P}_{\mu}(x)=-\frac{\beta}{2N}\{U_{\mu}(x)\Sigma _{\mu}(x)\}_{TA}\\
-&\{W\}_{TA}=\frac{W-W^{\dagger}}{2}-{\rm tr}\left(\frac{W-W^{\dagger}}{2N}\right){\bf I}\\
+&S_G[U_{\mu}(n)]=-\frac{\beta}{N}{\rm Re}{\rm tr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
+\end{split}
+\label{eq.hmc.staple}
+\end{equation}
+\textbf{Note that $S_G\neq \sum _{\mu,n} S_G[U_{\mu}(n)]$. $S_G[U_{\mu}(n)]$ is convenient for derivate which collecting all terms related to the specified bond. For plaquettes with 4 edges, $S_G=\frac{1}{4} \sum _{\mu,n} S_G[U_{\mu}(n)]$. } \textcolor[rgb]{0,0,1}{TODO: Add information for plaquette energy.}
+
+Is the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'. The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
+\begin{equation}
+\begin{split}
+&U=\exp \left(i \sum _a\omega _a(\mu,n) T_a\right)
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&\frac{\partial}{\partial \omega _a (\mu,n)}S_G=-\frac{\beta}{2N}{\rm Re}{\rm tr}\left[\frac{\partial}{\partial \omega _a}U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]=-\frac{\beta}{2N}{\rm tr}\left[\frac{\partial}{\partial \omega _a}\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)+\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
+&=-i\frac{\beta}{2N}{\rm tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)T^{\dagger}_aU^{\dagger}_{\mu}(n)\right]=-i\frac{\beta}{2N}{\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
+\end{split}
+\end{equation}
+Using \textcolor[rgb]{0,0,1}{(Checked by Mathematica that Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} is incompatable with our notation, but replacing the $UA-A^{\dagger}U^{\dagger}$ of Eq.~(8.42) with $\{UA\}_{TA}$ is correct. Also, Eq.~(2.58) of Ref.~\cite{latticeqcdbook2017} is different from ours, in our formulism, it is correct by replacing $2T_a{\rm Re}[tr[T_a\cdot W]]$ of Eq.~(2.58) with $2iT_a{\rm Im}[tr[T_a\cdot W]]$)}
+\begin{equation}
+\begin{split}
+&\sum _a {\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]T_a=\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
+&\{W\}_{TA}=\frac{W-W^{\dagger}}{2}-{\rm tr}\left(\frac{W-W^{\dagger}}{2N}\right)\mathbb{I}\\
+\end{split}
+\end{equation}
+where $\mathbb{I}$ is identity matrix. Therefor
+\begin{equation}
+\begin{split}
+&F_{\mu}(x)=\dot{P}_{\mu}(x)=\sum \dot{\omega}_a T_a=-\frac{\partial}{\partial \omega _a (\mu,n)}S_G T_a=i\frac{\beta}{2N}\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
 \end{split}
 \label{eq.hmc.force}
 \end{equation}
-where ${\bf I}$ is identity matrix, $\Sigma$ is the `Staple'.
+
+Eq.~(\ref{eq.hmc.force}) has a different sign with Eqs.~(2.55) and (2.67) of Ref.~\cite{latticeqcdbook2017}, but the sign is same as Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010}. But in Eq.~(8,42), the $\{\ldots\}_{TA}$ is different.
 
 \begin{itemize}
 \item \index{Integrator}Integrator
@@ -129,13 +157,13 @@ Then we can calculate $P((n+1)\epsilon)$ using Eq.~(\ref{eq.hmc.update_basic}).c
   \item About the randomized $P$
 \end{itemize}
 
-The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$ (\textbf{Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.}). 
+The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$ 
 
 Note that, here $P$ corresponds to $Q$, not $U$, for $U=\exp\left(i \sum q_i T^i\right)$, there are $8$ \textbf{real} variables denoting as $\omega _i$.
 
 Using $P=\sum \omega _i T^i$, $tr((T^i)\cdot (T^j))=\frac{1}{2}\delta _{ij}$. So one have $\frac{1}{2}\sum _i\omega _i^2=tr[P^2]$.
 
-It is usually written as distribution $\exp \left(-tr(P^2)\right)$ (where $P$ is a matrix, and $tr[P^2]=\frac{1}{2}p^2$ where $p=(\omega_1,\omega_2,\ldots ,\omega _8)$). 
+It is usually written as distribution $\exp \left(-tr(P^2)\right)$ (where $P$ is a matrix, and $tr[P^2]=\frac{1}{2}p^2$ where $p=(\omega_1,\omega_2,\ldots ,\omega _8)$).
 
 Using the property of normal distribution
 \begin{equation}
@@ -146,6 +174,14 @@ Using the property of normal distribution
 \end{equation}
 
 One can randomize $\omega _i$ using $\exp \left(-\omega_i\omega_i\right)$. Then using $P=\frac{1}{\sqrt{8N}}\sum \omega _i T^i$, where $N$ is the number of links.
+
+\textcolor[rgb]{0,0,1}{\textbf{Note: Here is a difference between Refs.~\cite{latticeqcdbook2010} and \cite{latticeqcdbook2017} and Bridge++~\cite{bridge}}}
+
+Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.
+
+However, in Bridge++, it uses distribution $\exp \left(-tr(P^2)/DOF\right)$, where `DOF' is the degrees of freedom.
+
+We use the distribution same as in Bridge++. Imagining that for a very small (hot) $\beta \to 0$, the force is also almost $0$ so momentum is unchanged when evolution. Considering a very large lattice such that the momentum is very small when using distribution $\exp \left(-tr(P^2)\right)$, the gauge field will stay near the initial value rather then becoming hot (randomized). So we think it should be $\exp \left(-tr(P^2)/DOF\right)$.
 
 \subsubsection{\label{forceOfPseudofermions}Force of pseudofermions}
 
@@ -197,7 +233,7 @@ We can simplify it further by $\left(\hat{D}^{\dagger}(\hat{D}\hat{D}^{\dagger})
 
 So we can calculate $\phi _1$ first, then $\phi _2 = \hat{D}^{\dagger}\phi _1$. Then contract the spinor and color space with $\partial D / \partial \omega$.
 
-Note that, it seems we do not need $\phi$ but just $\chi$, because $\phi _1=(\hat{D}^{\dagger})^{-1}\hat{D}^{-1}\phi=(\hat{D}^{\dagger})^{-1}\chi$ and $\phi _2=\chi$. However, this is \textcolor[rgb]{1,0,0}{\textbf{incorrect}} because $D$ is changing when integrating the Langevin equation.
+Note that, $D$ is changing when integrating the Langevin equation.
 
 The last part is how to calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$.
 
@@ -339,7 +375,7 @@ In Sec.~\ref{hmc_scheme}, the basic idea is introduced. However, the implementat
 \label{eq.hmc.update_leapfrog}
 \end{subequations}
 
-\textcolor[rgb]{0,0,1}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,a}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,a}S$.}}
+\textcolor[rgb]{0,0,1}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,n}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,n}S$.}}
 
 or simply written as
 \begin{equation}

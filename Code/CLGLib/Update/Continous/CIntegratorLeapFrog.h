@@ -28,7 +28,7 @@ public:
 
         if (m_uiStepCount > 0)
         {
-            UpdateP(fHalfPstep);
+            UpdateP(fHalfPstep, FALSE);
             appDetailed("  leap frog sub step 0\n");
         }
 
@@ -38,12 +38,12 @@ public:
 
             if (uiStep < m_uiStepCount)
             {
-                UpdateP(m_fEStep);
+                UpdateP(m_fEStep, FALSE);
                 appDetailed("  leap frog sub step %d\n", uiStep);
             }
             else 
             {
-                UpdateP(fHalfPstep);
+                UpdateP(fHalfPstep, TRUE);
                 appDetailed("  leap frog last step %d\n", uiStep);
             }
         }

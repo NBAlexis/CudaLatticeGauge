@@ -6,9 +6,10 @@
 \indexentry{molecular dynamics|hyperpage}{6}
 \indexentry{Langevin equation|hyperpage}{6}
 \indexentry{force|hyperpage}{6}
+\indexentry{staple|hyperpage}{7}
 \indexentry{Integrator|hyperpage}{7}
-\indexentry{solver|hyperpage}{9}
-\indexentry{BiCGStab|hyperpage}{9}
-\indexentry{leap frog|hyperpage}{12}
-\indexentry{Omelyan|hyperpage}{13}
-\indexentry{solver|hyperpage}{13}
+\indexentry{solver|hyperpage}{10}
+\indexentry{BiCGStab|hyperpage}{10}
+\indexentry{leap frog|hyperpage}{13}
+\indexentry{Omelyan|hyperpage}{14}
+\indexentry{solver|hyperpage}{14}

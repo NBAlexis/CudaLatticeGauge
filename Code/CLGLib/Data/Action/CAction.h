@@ -26,6 +26,17 @@ public:
     virtual Real Energy(const class CFieldGauge* pGauge) const = 0;
 
     /**
+    * \brief Special version of Energy using pre-calculated stables (so this action must be gauge action)
+    *
+    * The default implementation is just call Energy. For those support calculate using stable, override this function
+    */
+    virtual Real Energy(const class CFieldGauge* pGauge, const class CFieldGauge* pStable) const
+    {
+        //The default implementation is just call Energy. For those support calculate using stable, override this function
+        return Energy(pGauge);
+    }
+
+    /**
     * Obtain the pointer of the fields
     */
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) = 0;

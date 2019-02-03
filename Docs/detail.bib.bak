@@ -1,5 +1,5 @@
 
-%book 2017
+%books
 @article{latticeqcdbook2017,
       author         = "Francesco Knechtli, Michael G$\rm\ddot{u}$nther and Michael Peardon",
       title          = "{Lattice Quantum Chromodynamics Practical Essentials}",
@@ -16,11 +16,30 @@
       doi            = "10.1007/978-3-642-01850-3",
 }
 
+@article{bridge,
+      author         = "S. Ueda et. al.",
+      title          = "{Development of an object oriented lattice QCD code "Bridge++" on accelerators}",
+      year           = "2014",
+      journal        = "Journal of Physics: Conference Series",
+      volume         = "523",
+      pages          = "012046",
+      doi            = "10.1088/1742-6596/523/1/012046",
+}
+
 @article{condensedmatterbookAltland,
-      author         = "A. Nakamura et. al.",
-      title          = "{Beating the sign problem in finite density lattice QCD}",
-      year           = "2016",
-      doi            = "10.22323/1.251.0208"
+      author         = "Alexander Altland and Ben Simons",
+      title          = "{Condensed Matter Field Theory 2nd edition}",
+      year           = "2010",
+}
+
+@article{weingarten1981,
+      author         = "D. H. Weingarten and D. N. Petcher",
+      title          = "{Monte Carlo integration for lattice gauge theories with fermions.}",
+      journal        = "Phys. Lett. B",
+      volume         = "99(4)",
+      year           = "1981",
+      pages          = "333¨C338",
+      doi            = "10.1016/0370-2693(81)90112-x",
 }
 
 %Classical

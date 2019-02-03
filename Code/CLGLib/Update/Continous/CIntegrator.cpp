@@ -27,6 +27,7 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pOwner = pOwner;
     m_pLattice = pLattice;
     m_lstActions = pLattice->m_pActionList;
+    m_bStapleCached = FALSE;
 
     INT iStepCount = 50;
     params.FetchValueINT(_T("IntegratorStep"), iStepCount);
@@ -38,6 +39,7 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pGaugeField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
     m_pGaugeField->m_pOwner = pLattice;
     m_pGaugeField->InitialField(EFIT_Zero);
+    m_pGaugeField->CachePlaqutteIndexes();
 
     m_pForceField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
     m_pForceField->m_pOwner = pLattice;
@@ -58,6 +60,7 @@ void CIntegrator::Prepare(UBOOL bLastAccepted)
     if (!bLastAccepted)
     {
         m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField);
+        m_bStapleCached = FALSE;
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
@@ -80,7 +83,7 @@ void CIntegrator::UpdateU(Real fStep)
     //m_pGaugeField->DebugPrintMe();
 }
 
-void CIntegrator::UpdateP(Real fStep)
+void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
 {
     // recalc force
     m_pForceField->Zero();
@@ -89,12 +92,13 @@ void CIntegrator::UpdateP(Real fStep)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, m_pStapleField);
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
     //P = P + e F
-    m_pMomentumField->Axpy(fStep, m_pForceField);
+    m_bStapleCached = bCacheStaple;
+    m_pMomentumField->Axpy(_make_cuComplex(F(0.0), fStep), m_pForceField);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -115,13 +119,13 @@ Real CIntegrator::GetEnergy() const
     {
         //this is accumulate
 #if _CLG_DEBUG
-        Real fActionEnergy = m_lstActions[i]->Energy(m_pGaugeField);
+        Real fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
         CCString sThisActionInfo = _T("");
         sThisActionInfo.Format(_T(" Action%d:%f, "), i + 1, fActionEnergy);
         sLog += sThisActionInfo;
         retv += fActionEnergy;
 #else
-        retv += m_lstActions[i]->Energy(m_pGaugeField);
+        retv += m_bStapleCached ? m_lstActions[i]->Energy(m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
 #endif
     }
 #if _CLG_DEBUG

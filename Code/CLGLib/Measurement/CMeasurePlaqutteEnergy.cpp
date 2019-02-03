@@ -16,10 +16,11 @@ __CLGIMPLEMENT_CLASS(CMeasurePlaqutteEnergy)
 
 void CMeasurePlaqutteEnergy::OnConfigurationAccepted()
 {
-    Real plaqutteEneregy = m_pLatticeData->m_pGaugeField->CalculatePlaqutteEnergy(-F(1.0) / _HC_SUN);
+    Real plaqutteEneregy = m_pLatticeData->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / _HC_SUN);
     plaqutteEneregy = plaqutteEneregy / _HC_PlaqutteCount;
-    m_lstData.AddItem(plaqutteEneregy);
-    appParanoiac(_T(" === Plaqutte Energy Measured === energy = %f\n"), plaqutteEneregy);
+    Real plaqEnergy = F(1.0) - plaqutteEneregy;
+    m_lstData.AddItem(plaqEnergy);
+    appParanoiac(_T(" === Plaqutte Energy Measured === energy = %f\n"), plaqEnergy);
 }
 
 void CMeasurePlaqutteEnergy::Average(UINT )

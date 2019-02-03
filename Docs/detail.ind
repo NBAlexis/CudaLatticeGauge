@@ -1,6 +1,6 @@
 \begin{theindex}
 
-  \item BiCGStab, \hyperpage{9}
+  \item BiCGStab, \hyperpage{10}
 
   \indexspace
 
@@ -13,12 +13,12 @@
 
   \indexspace
 
-  \item Integrator, \hyperpage{6}
+  \item Integrator, \hyperpage{7}
 
   \indexspace
 
   \item Langevin equation, \hyperpage{6}
-  \item leap frog, \hyperpage{11}
+  \item leap frog, \hyperpage{13}
   \item link index, \hyperpage{3}
 
   \indexspace
@@ -27,7 +27,7 @@
 
   \indexspace
 
-  \item Omelyan, \hyperpage{12}
+  \item Omelyan, \hyperpage{14}
 
   \indexspace
 
@@ -36,6 +36,7 @@
   \indexspace
 
   \item site index, \hyperpage{3}
-  \item solver, \hyperpage{8}, \hyperpage{13}
+  \item solver, \hyperpage{10}, \hyperpage{14}
+  \item staple, \hyperpage{7}
 
 \end{theindex}

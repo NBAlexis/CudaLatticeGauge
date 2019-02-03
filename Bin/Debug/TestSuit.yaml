@@ -205,19 +205,22 @@ TestUpdatorLeapFrog:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 8
+    ExponentialPrecision : 4
     ActionListLength : 1
     MeasureListLength : 1
+    ExpectedRes : 0.2064
 
     Updator:
 
         ## UpdatorType = { CHMC }
         UpdatorType : CHMC
 
+        Metropolis : 0
+        
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorLeapFrog
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 40
 
     Gauge:
 	
@@ -230,53 +233,38 @@ TestUpdatorLeapFrog:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 1
+        Beta : 3
 
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-TestWilsonLoopOmelyan:
+TestUpdatorOmelyan:
 
-    ## dim = {2, 3, 4}
     Dim : 4
-  
-    ## For square lattice, Dir = Dim
     Dir : 4
-  
-    ## Lattice Length = [x, y, z, t], NOTE, for 3D Lattice Length = [1, y, z, t], for 2D Lattice Length = [1, 1, z, t]
-    LatticeLength : [8, 8, 8, 8]
-
-    ## LatticeIndex { EIndexType_Square }
+    LatticeLength : [4, 4, 4, 8]
     LatticeIndex : EIndexType_Square
-    ## LatticeBoundary = { EBC_TorusSquare }
     LatticeBoundary : EBC_TorusSquare
-
-    ## Threads decompose
-    ## Note: ThreadAutoDecompose = 1, will decompose using MaxThread of GPU, or else ThreadAutoDecompose = 0 will use decomposex,y,z
-    ## Note: LatticeLength.xyz | ThreadDecomposeXYZ (divisible)
-    ## Note: ThreadDecomposeX*ThreadDecomposeY*ThreadDecomposeZ <= max thread of your GPU
     ThreadAutoDecompose : 1
-    ThreadDecompose : [8, 8, 8]
-
-    ## Random Type = {ER_Schrage}
     RandomType : ER_Schrage
     RandomSeed : 1234567
-
-    ## Some global settings
     ExponentialPrecision : 4
-
     ActionListLength : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
 
     Updator:
 
         ## UpdatorType = { CHMC }
         UpdatorType : CHMC
 
+        Metropolis : 0
+
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 0.01
-        IntegratorStep : 10
+        IntegratorStepLength : 1
+        IntegratorStep : 40
 
     Gauge:
 	
@@ -289,8 +277,11 @@ TestWilsonLoopOmelyan:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 0.2
+        Beta : 3
 
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
 
 TestFileIOBridgePPText:
     Dim : 4
@@ -301,6 +292,8 @@ TestFileIOBridgePPText:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+    ExpectedRes : 0.625129946974942
+
     Gauge:
 	
         ## FieldType = {CFieldGaugeSU3}
@@ -323,6 +316,8 @@ TestFileIOBridgePPBin:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+    ExpectedRes : 0.625129946974942
+
     Gauge:
 	
         ## FieldType = {CFieldGaugeSU3}

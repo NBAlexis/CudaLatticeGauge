@@ -23,4 +23,10 @@ C.~Gattringer and C.B. Lang.
   Chromodynamics on the Lattice}}.
 \newblock 2010.
 
+\bibitem{bridge}
+S.~Ueda et. al.
+\newblock \href{http://dx.doi.org/10.1088/1742-6596/523/1/012046}{{Development
+  of an object oriented lattice QCD code "Bridge++" on accelerators}}.
+\newblock {\em Journal of Physics: Conference Series}, 523:012046, 2014.
+
 \end{thebibliography}

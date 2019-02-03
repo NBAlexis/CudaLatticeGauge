@@ -47,6 +47,7 @@ public:
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
     void OnUpdatorConfigurationAccepted();
     void OnUpdatorFinished();
+    void GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink);
 
     class CRandom* m_pRandom;
 
@@ -54,6 +55,9 @@ public:
     class CFieldGauge* m_pGaugeFieldStaple;
     THashMap<BYTE, class CField*> m_pFieldMap;
 
+    /**
+    * \note we assume the first action is gauge action
+    */
     TArray<class CAction*> m_pActionList;
     THashMap<BYTE, class CAction*> m_pActionMap;
 

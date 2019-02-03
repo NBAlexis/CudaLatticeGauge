@@ -33,7 +33,7 @@ public:
         , m_pForceField(NULL)
         , m_pMomentumField(NULL)
         , m_pStapleField(NULL)
-        , m_bPCached(FALSE)
+        , m_bStapleCached(FALSE)
     { ; }
 
     ~CIntegrator();
@@ -42,13 +42,13 @@ public:
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
     void Accept();
     void Prepare(UBOOL bLastAccepted);
-    void UpdateP(Real fStep);
+    void UpdateP(Real fStep, UBOOL bCacheStaple);
     void UpdateU(Real fStep);
     virtual Real GetEnergy() const;
 
 protected:
 
-    UBOOL m_bPCached;
+    UBOOL m_bStapleCached;
     Real m_fEStep;
     UINT m_uiStepCount;
 

@@ -18,19 +18,20 @@ class CLGAPI CFieldGauge : public CField
 {
 public:
     CFieldGauge();
+    ~CFieldGauge();
 
 #pragma region HMC update
 
     /**
     * Before many other steps
     */
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real minusBetaOverN) const = 0;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const = 0;
 
     virtual void MakeRandomGenerator() = 0;
 
-    virtual Real CalculatePlaqutteEnergy(Real minusBetaOverN) const = 0;
+    virtual Real CalculatePlaqutteEnergy(Real betaOverN) const = 0;
 
-    virtual Real CalculatePlaqutteEnergyUsingStable(Real minusBetaOverN, const CFieldGauge *pStable) const = 0;
+    virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const = 0;
 
     virtual Real CalculateKinematicEnergy() const = 0;
 
@@ -39,6 +40,11 @@ public:
     * This is to make the elements Unitary again.
     */
     virtual void ElementNormalize() = 0;
+
+    /**
+    * Optimize
+    */
+    void CachePlaqutteIndexes();
 
 #pragma endregion
 
@@ -52,6 +58,14 @@ public:
 protected:
 
     UINT m_uiLinkeCount;
+
+    UBOOL m_bPlaqutteIndexCached;
+    UINT m_uiPlaqutteLength;
+    UINT m_uiPlaqutteCountPerSite;
+    UINT m_uiPlaqutteCountPerLink;
+
+    SIndex* m_pPlaquttesPerSite;
+    SIndex* m_pPlaquttesPerLink;
 };
 
 __END_NAMESPACE

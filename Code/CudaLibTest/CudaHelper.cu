@@ -52,21 +52,59 @@ template <typename T> void check(T result, char const *const func, const char *c
     }
 }
 
-#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
-
-__global__ void _kernelPrintThreadId()
+class A1
 {
-    printf("threadId:%d\n", __thread_id);
-}
+public:
+    A1() {}
+    ~A1() { printf("~A1"); }
+};
 
-
-
-int main(int argc, char *argv[])
+class A2
 {
-    dim3 block(1, 2, 3);
-    dim3 thread(2, 3, 1);
-    _kernelPrintThreadId << <block, thread >> >();
+public:
+    A2() {}
+    virtual ~A2() { printf("~A2"); }
+};
 
+class B1 : public A1
+{
+public:
+    B1() {}
+    ~B1() { printf("~B1"); }
+};
 
-    return 0;
+class B2 : public A2
+{
+public:
+    B2() {}
+    ~B2() { printf("~B2"); }
+};
+
+class C1 : public B1
+{
+public:
+    C1() {}
+    ~C1() { printf("~C1"); }
+};
+
+class C2 : public B2
+{
+public:
+    C2() {}
+    ~C2() { printf("~C2"); }
+};
+
+int main()
+{
+    A1 * pB1 = (A1*)new C1();
+    delete pB1;
+
+    A2 * pB2 = (A2*)new C2();
+    delete pB2;
+
+    B1 * pB3 = (B1*)new C1();
+    delete pB3;
+
+    B2 * pB4 = (B2*)new C2();
+    delete pB4;
 }

@@ -75,6 +75,12 @@ public:
 
     __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
     __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st = kSpaceTime) const;
+    __device__ virtual void _deviceGetPlaqutteCountLength(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink)
+    {
+        plaqLength = 4;
+        countPerSite = _DC_Dim * (_DC_Dim - 1) / 2;
+        countPerLink = 2 * (_DC_Dim - 1);
+    }
 
     __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const;
     __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, INT uiWalkDir) const;
