@@ -32,61 +32,6 @@
 
 __BEGIN_NAMESPACE
 
-#pragma region index functions
-
-//========================================
-// implement after CLatticeData is known
-
-__device__ __inline__ static UINT _deviceGetSiteIndex(const UINT* coord)
-{
-    return coord[0] * _DC_MultX + coord[1] * _DC_MultY + coord[2] * _DC_MultZ + coord[3];
-}
-__device__ __inline__ static UINT _deviceGetLinkIndex(UINT siteIndex, UINT dir)
-{
-    return siteIndex * _DC_Dir + dir;
-}
-__device__ __inline__ static UINT _deviceGetLinkIndex(const UINT* coord, UINT dir)
-{
-    return _deviceGetSiteIndex(coord) * _DC_Dir + dir;
-}
-
-/**
-* for site, dir_plus_one = 0
-* for link, dir_plus_one = dir + 1
-*/
-__device__ __inline__ static UINT _deviceGetFatIndex(const UINT* coord, UINT dir_plus_one)
-{
-    return _deviceGetSiteIndex(coord) * (_DC_Dir + 1) + dir_plus_one;
-}
-
-__device__ __inline__ static UINT _deviceGetFatIndex(UINT uiSiteIndex, UINT dir_plus_one)
-{
-    return uiSiteIndex * (_DC_Dir + 1) + dir_plus_one;
-}
-
-/**
-* int4.xyzw = x, y, z, t
-*/
-__device__ __inline__ static int4 __deviceSiteIndexToInt4(UINT siteIndex)
-{
-    int4 xyzt;
-    xyzt.x = siteIndex / _DC_MultX;
-    xyzt.y = (siteIndex % _DC_MultX) / _DC_MultY;
-    xyzt.z = (siteIndex % _DC_MultY) / _DC_MultZ;
-    xyzt.w = (siteIndex % _DC_MultZ);
-    return xyzt;
-}
-__device__ __inline__ static int4 __deviceLinkIndexToInt4(UINT linkIndex)
-{
-    return __deviceSiteIndexToInt4(linkIndex / _DC_Dir);
-}
-__device__ __inline__ static int4 __deviceFatIndexToInt4(UINT fatIndex)
-{
-    return __deviceSiteIndexToInt4(fatIndex / (_DC_Dir + 1));
-}
-
-#pragma endregion
-
 //For 4D cubic, this is 18
 #define kMaxPlaqutteCache (32)
 

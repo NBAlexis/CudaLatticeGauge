@@ -126,7 +126,7 @@
       <Include>./</Include>
     </CudaCompile>
     <CudaCompile>
-      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
@@ -167,7 +167,7 @@
       <Include>./</Include>
     </CudaCompile>
     <CudaCompile>
-      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>

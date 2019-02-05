@@ -59,7 +59,7 @@ void CParameters::Dump(const CCString& indent) const
     {
         for (INT i = 0; i < allKeys.Num(); ++i)
         {
-            appGeneral(_T("%s  key = %s, value:\n"), indent, allKeys[i].c_str());
+            appGeneral(_T("%s  key = %s, value:\n"), indent.c_str(), allKeys[i].c_str());
             m_pParameters.GetAt(allKeys[i]).Dump(indent + _T("    "));
         }
     }

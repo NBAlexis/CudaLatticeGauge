@@ -31,6 +31,7 @@ public:
     }
 
     virtual void InitialField(EFieldInitialType eInitialType);
+    virtual void InitialOtherParameters(CParameters& params);
     virtual void DebugPrintMe() const;
 
     virtual void Zero() { InitialField(EFIT_Zero); }
@@ -52,7 +53,9 @@ public:
     virtual void D(const CField* pGauge);
     virtual void Ddagger(const CField* pGauge);
     virtual void DDdagger(const CField* pGauge);
-    virtual void InverseDDdagger(const CField* pGauge);
+    virtual UBOOL InverseD(const CField* pGauge);
+    virtual UBOOL InverseDdagger(const CField* pGauge);
+    virtual UBOOL InverseDDdagger(const CField* pGauge);
 
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 

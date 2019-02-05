@@ -77,10 +77,9 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
     fclose(fp);
 
     file_data[fileSize] = 0;
-    if (2 == sizeof(TCHAR))
-    {
-        file_data[fileSize + 1] = 0;
-    }
+#if _CLG_UNICODE
+    file_data[fileSize + 1] = 0;
+#endif
 
     BYTE* string_start = NULL;
     INT string_len = 0;
@@ -95,29 +94,32 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
 
     if (0xff == file_data[0] && 0xfe == file_data[1])
     {
-        if (1 == sizeof(TCHAR))
-            unicode_to_ansi = TRUE;
+#if !_CLG_UNICODE
+        unicode_to_ansi = TRUE;
+#endif
+            
         string_start = file_data + 2;
         string_len = (fileSize - 2) / 2;
     }
     else if (0xfe == file_data[0] && 0xff == file_data[1])
     {
-        if (1 == sizeof(TCHAR))
-            unicode_to_ansi = TRUE;
+#if !_CLG_UNICODE
+        unicode_to_ansi = TRUE;
+#endif
         string_start = file_data + 2;
         string_len = (fileSize - 2) / 2;
         change_byte_order = TRUE;
     }
-    else if (2 == sizeof(TCHAR))
+    else
     {
+#if _CLG_UNICODE
         ansi_to_unicode = TRUE;
         string_start = file_data;
         string_len = fileSize;
-    }
-    else
-    {
+#else
         string_start = file_data;
         string_len = fileSize;
+#endif
     }
 
     if (change_byte_order)

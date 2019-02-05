@@ -12,7 +12,7 @@
 #define _CFIELDGAUGE_SU3_H_
 
 #define gaugeSU3KernelFuncionStart \
-    intokernal; \
+    intokernaldir; \
     for (UINT it = 0; it < uiTLength; ++it) \
     { \
         coord[3] = it; \

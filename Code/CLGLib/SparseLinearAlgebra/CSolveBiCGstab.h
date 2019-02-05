@@ -25,7 +25,7 @@ public:
     virtual void Configurate(const CParameters& param);
     virtual void AllocateBuffers(const CField* pField);
     virtual void ReleaseBuffers();
-    virtual void Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM);
+    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM);
     
     class CLatticeData* m_pOwner;
 
@@ -43,6 +43,7 @@ protected:
     UINT m_uiReTry;
     UINT m_uiDevationCheck;
     UINT m_uiStepCount;
+    UBOOL m_bAbsoluteAccuracy;
     Real m_fAccuracy;
 };
 

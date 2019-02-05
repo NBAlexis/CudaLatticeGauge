@@ -330,3 +330,54 @@ TestFileIOBridgePPBin:
         GaugeFileType : EFFT_BridgePPBin
 
         GaugeFileName : bridgepp_conf_binary.dat
+
+
+TestSolverBiCGStab:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+	
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1

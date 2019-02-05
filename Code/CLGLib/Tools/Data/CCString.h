@@ -409,12 +409,12 @@ public:
     void MakeUpper()
     {
         CopyBeforeWrite();
-        appStrupr(m_pchData);
+        appStrupr(m_pchData, appStrlen(m_pchData));
     }
     void MakeLower()
     {
         CopyBeforeWrite();
-        appStrlwr(m_pchData);
+        appStrlwr(m_pchData, appStrlen(m_pchData));
     }
     void MakeReverse()
     {

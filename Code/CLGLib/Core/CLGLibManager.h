@@ -59,7 +59,7 @@ protected:
 
     //Optional
     void CreateGaugeField(class CParameters& params);
-    void CreateOtherFields(class CParameters& params);
+    void CreateFermionFields(class CParameters& params);
     void CreateIndexAndBoundary(class CParameters& params);
     void CreateActionList(class CParameters& params);
     void CreateUpdator(class CParameters& params);

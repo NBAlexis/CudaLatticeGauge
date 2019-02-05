@@ -30,7 +30,7 @@ public:
     *
     * The default implementation is just call Energy. For those support calculate using stable, override this function
     */
-    virtual Real Energy(const class CFieldGauge* pGauge, const class CFieldGauge* pStable) const
+    virtual Real Energy(const class CFieldGauge* pGauge, const class CFieldGauge* ) const
     {
         //The default implementation is just call Energy. For those support calculate using stable, override this function
         return Energy(pGauge);

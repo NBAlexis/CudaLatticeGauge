@@ -160,20 +160,20 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtSite(SIndex* retV, UINT& coun
 /**
 * virtual, cannot inline
 */
-__device__ SIndex CIndexSquare::_deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const
+__device__ SIndex CIndexSquare::_deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT iWalkDir) const
 {
     int4 fromSite = __deviceSiteIndexToInt4(uiSiteIndex);
-    int4 siteInt4 = _deviceMoveSquareSite(fromSite, uiWalkDir);
+    int4 siteInt4 = _deviceMoveSquareSite(fromSite, iWalkDir);
     return m_pBoundaryCondition->_devcieGetFermionMappedIndex(uiFieldId, siteInt4, fromSite);
 }
 
 /**
 * virtual, cannot inline
 */
-__device__ SIndex CIndexSquare::_deviceGaugeIndexWalk(UINT uiSiteIndex, INT uiWalkDir) const
+__device__ SIndex CIndexSquare::_deviceGaugeIndexWalk(UINT uiSiteIndex, INT iWalkDir) const
 {
     int4 fromSite = __deviceSiteIndexToInt4(uiSiteIndex);
-    int4 siteInt4 = _deviceMoveSquareSite(fromSite, uiWalkDir);
+    int4 siteInt4 = _deviceMoveSquareSite(fromSite, iWalkDir);
     return m_pBoundaryCondition->_devcieGetMappedIndex(siteInt4, fromSite);
 }
 

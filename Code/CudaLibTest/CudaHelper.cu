@@ -52,59 +52,36 @@ template <typename T> void check(T result, char const *const func, const char *c
     }
 }
 
-class A1
+class ClassABC
 {
 public:
-    A1() {}
-    ~A1() { printf("~A1"); }
+    __host__ __device__ ClassABC() { ;  }
+    int m_iValue;
 };
 
-class A2
+class ClassDEF
 {
 public:
-    A2() {}
-    virtual ~A2() { printf("~A2"); }
+    __host__ __device__ ClassDEF() { ; }
+
+    //Witout warning
+    //union 
+    //{
+    //    ClassABC m_abc[1];
+    //    int m_values[1];
+    //};
+
+    //With warning
+    ClassABC m_abc[1];
 };
 
-class B1 : public A1
+__global__ void TestFunc()
 {
-public:
-    B1() {}
-    ~B1() { printf("~B1"); }
-};
-
-class B2 : public A2
-{
-public:
-    B2() {}
-    ~B2() { printf("~B2"); }
-};
-
-class C1 : public B1
-{
-public:
-    C1() {}
-    ~C1() { printf("~C1"); }
-};
-
-class C2 : public B2
-{
-public:
-    C2() {}
-    ~C2() { printf("~C2"); }
-};
+    ClassDEF def[1];
+}
 
 int main()
 {
-    A1 * pB1 = (A1*)new C1();
-    delete pB1;
-
-    A2 * pB2 = (A2*)new C2();
-    delete pB2;
-
-    B1 * pB3 = (B1*)new C1();
-    delete pB3;
-
-    B2 * pB4 = (B2*)new C2();
-    delete pB4;
+    TestFunc << <1, 1 >> > ();
+    return 0;
 }

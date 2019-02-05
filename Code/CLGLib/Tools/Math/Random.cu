@@ -19,7 +19,7 @@ __BEGIN_NAMESPACE
 __global__ 
 void _kernalAllocateSeedTable(UINT* pDevicePtr)
 {
-    intokernal;
+    intokernaldir;
 
     UINT uiSeed = _DC_Seed;
 
@@ -37,7 +37,7 @@ void _kernalAllocateSeedTable(UINT* pDevicePtr)
 __global__
 void _kernalInitialXORWOW(curandState * states)
 {
-    intokernal;
+    intokernaldir;
 
     UINT uiSeed = _DC_Seed;
 
@@ -55,7 +55,7 @@ void _kernalInitialXORWOW(curandState * states)
 __global__
 void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 {
-    intokernal;
+    intokernaldir;
 
     UINT uiSeed = _DC_Seed;
 
@@ -73,7 +73,7 @@ void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 __global__
 void _kernalInitialMRG(curandStateMRG32k3a  * states)
 {
-    intokernal;
+    intokernaldir;
 
     UINT uiSeed = _DC_Seed;
 
@@ -211,7 +211,7 @@ void CRandom::InitialStatesSobol32(UINT )
     _kernalInitialSobel32 << <block, threads >> > (m_pDeviceRandStatesSobol32, m_pDeviceSobolDirVec);
 }
 
-void CRandom::InitialStatesScrambledSobol32(UINT uiSeed)
+void CRandom::InitialStatesScrambledSobol32(UINT )
 {
     m_uiFatIdDivide = _HC_Dir + 1;
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesScrambledSobol32, 
@@ -241,7 +241,7 @@ void CRandom::InitialStatesScrambledSobol32(UINT uiSeed)
     _kernalInitialScrambledSobel32 << <block, threads >> > (m_pDeviceRandStatesScrambledSobol32, m_pDeviceSobelConsts, m_pDeviceSobolDirVec);
 }
 
-void CRandom::InitialTableSchrage(UINT uiSeed)
+void CRandom::InitialTableSchrage(UINT )
 {
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
     preparethread;

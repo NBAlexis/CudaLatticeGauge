@@ -25,6 +25,7 @@
     </ClCompile>
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
+    <ClCompile Include="Tests\TestSolver.cpp" />
     <ClCompile Include="Tests\TestSU3Generator.cpp" />
     <ClCompile Include="Tests\TestUpdator.cpp" />
   </ItemGroup>

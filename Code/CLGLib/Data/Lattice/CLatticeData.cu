@@ -39,12 +39,9 @@ __global__ void _kernelGetPlaqLengthCount(UINT* deviceData)
 CLatticeData::CLatticeData()
     : m_pRandom(NULL)
     , m_pGaugeField(NULL)
-    , m_pGaugeFieldStaple(NULL)
     , m_pUpdator(NULL)
 
     , m_pDeviceRandom(NULL)
-    , m_pDeviceGaugeField(NULL)
-    , m_pDeviceGaugeFieldStaple(NULL)
     , m_pDeviceIndex(NULL)
 
     , m_pFermionSolver(NULL)
@@ -65,11 +62,6 @@ CLatticeData::~CLatticeData()
         appSafeDelete(m_pActionList[i]);
     }
 
-    if (NULL != m_pDeviceGaugeField)
-    {
-        checkCudaErrors(cudaFree(m_pDeviceGaugeField));
-        m_pDeviceGaugeField = NULL;
-    }
     if (NULL != m_pDeviceIndex)
     {
         _kernelDeletePtrs << <1, 1 >> > (m_pDeviceIndex);
@@ -79,6 +71,11 @@ CLatticeData::~CLatticeData()
     {
         checkCudaErrors(cudaFree(m_pDeviceRandom));
         m_pDeviceRandom = NULL;
+    }
+
+    for (INT i = 0; i < m_pOtherFields.Num(); ++i)
+    {
+        appSafeDelete(m_pOtherFields[i]);
     }
 
     appSafeDelete(m_pGaugeField);
@@ -94,9 +91,12 @@ void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameter
     if (NULL == m_pFermionSolver)
     {
         appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
+        exit(EXIT_FAILURE);
     }
     m_pFermionSolver->Configurate(param);
     m_pFermionSolver->AllocateBuffers(pFermionField);
+
+    appGeneral(_T("Create sparse linear algebra solver: %s \n"), sSolver.c_str());
 }
 
 void CLatticeData::OnUpdatorConfigurationAccepted()

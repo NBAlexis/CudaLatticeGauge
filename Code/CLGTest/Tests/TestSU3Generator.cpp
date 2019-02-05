@@ -29,8 +29,8 @@ UINT TestSU3Generator(CParameters& sParam)
 
     _Complex average = _make_cuComplex(0,0);
     Real sigma = 0;
-    size_t freeMemory;
-    size_t totalMemory;
+    //size_t freeMemory;
+    //size_t totalMemory;
     for (INT i = 0; i < fieldSampleCount; ++i)
     {
         pGauge->InitialField(EFIT_RandomGenerator);

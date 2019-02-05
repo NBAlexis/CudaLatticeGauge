@@ -33,6 +33,16 @@ __global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet*
     }
 }
 
+__global__ void _kernelDebugFunction()
+{
+    deviceSU3 a1 = deviceSU3::makeSU3Random(0);
+    deviceSU3Vector v1 = deviceSU3Vector::makeZeroSU3Vector();
+
+    deviceWilsonVectorSU3 v2;
+    //v2.DebugPrint();
+    //a1.DebugPrint();
+}
+
 struct complex_plus_for_thrust
 {
     __host__ __device__ _Complex operator()(const _Complex &lhs, const _Complex &rhs) const { return _cuCaddf(lhs, rhs); }
@@ -327,6 +337,11 @@ void CCudaHelper::MemoryQuery()
     appGeneral(_T("Device Memory: used %llu, available %llu, total %llu\n"), usedMemory, availableMemory, totalMemory);
 }
 
+void CCudaHelper::DebugFunction()
+{
+    _kernelDebugFunction << <1,1 >> > ();
+}
+
 void CCudaHelper::CopyConstants() const
 {
     checkCudaErrors(cudaMemcpyToSymbol(_constIntegers, m_ConstIntegers, sizeof(UINT) * kContentLength));
@@ -400,6 +415,14 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     ret.AddItem(deviceProp.maxThreadsDim[2]);
 
     return ret;
+}
+
+void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
+{
+    m_uiThreadCount = uiThreadCount;
+    checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
+    checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(_Complex)* uiThreadCount));
+    checkCudaErrors(cudaMalloc((void**)&m_pIndexBuffer, sizeof(SIndex)* kMaxPlaqutteCache));
 }
 
 /**

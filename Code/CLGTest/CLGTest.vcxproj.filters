@@ -14,6 +14,9 @@
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestSolver.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />

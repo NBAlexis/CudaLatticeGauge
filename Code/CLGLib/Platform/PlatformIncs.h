@@ -34,7 +34,7 @@
 #include <time.h>
 //#include <tuple> std::ignored will not work on Cuda, because it will be called from devices
 
-#ifdef _CLG_UNICODE
+#if _CLG_UNICODE
 
 using ISTREAM = std::wistream;
 using OSTREAM = std::wostream;

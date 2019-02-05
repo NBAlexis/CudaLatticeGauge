@@ -52,7 +52,7 @@ public:
     class CRandom* m_pRandom;
 
     class CFieldGauge* m_pGaugeField;
-    class CFieldGauge* m_pGaugeFieldStaple;
+    TArray<class CField*> m_pOtherFields; //for delete
     THashMap<BYTE, class CField*> m_pFieldMap;
 
     /**
@@ -69,9 +69,6 @@ public:
     //https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i
     class CRandom* m_pDeviceRandom;
     class CIndex* m_pDeviceIndex;
-
-    class CFieldGauge* m_pDeviceGaugeField;
-    class CFieldGauge* m_pDeviceGaugeFieldStaple;
 
     class CSLASolver* m_pFermionSolver;
     

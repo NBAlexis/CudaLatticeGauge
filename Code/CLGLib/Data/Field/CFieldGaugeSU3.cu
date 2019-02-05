@@ -51,8 +51,6 @@ void _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialTy
         break;
         case EFIT_Random:
         {
-            //pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(coord, idir + 1));
-            //pDevicePtr[uiLinkIndex] = pDevicePtr[uiLinkIndex].Exp(_make_cuComplex(F(0.0), PI2), _DC_ExpPrecision);
             pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(coord, idir + 1));
         }
         break;
@@ -81,7 +79,7 @@ void _kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Co
 {
     gaugeSU3KernelFuncionStart
 
-    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].Mulc(a));
+    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].MulCompC(a));
 
     gaugeSU3KernelFuncionEnd
 }
@@ -91,7 +89,7 @@ void _kernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, 
 {
     gaugeSU3KernelFuncionStart
 
-    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].Mulc(a));
+    pDevicePtr[uiLinkIndex].Add(x[uiLinkIndex].MulRealC(a));
 
     gaugeSU3KernelFuncionEnd
 }
@@ -121,7 +119,7 @@ void _kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
 {
     gaugeSU3KernelFuncionStart
 
-    pDevicePtr[uiLinkIndex].Mul(a);
+    pDevicePtr[uiLinkIndex].MulComp(a);
 
     gaugeSU3KernelFuncionEnd
 }
@@ -131,7 +129,7 @@ void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
 {
     gaugeSU3KernelFuncionStart
 
-    pDevicePtr[uiLinkIndex].Mul(a);
+    pDevicePtr[uiLinkIndex].MulReal(a);
 
     gaugeSU3KernelFuncionEnd
 }
@@ -141,7 +139,7 @@ void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
 */
 __global__ void _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
 {
-    intokernal;
+    intokernaldir;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -175,7 +173,7 @@ void _kernelStapleAtSiteSU3(
     deviceSU3 *pForceData,
     Real betaOverN)
 {
-    intokernal;
+    intokernaldir;
 
     betaOverN = betaOverN * F(0.5);
     SIndex plaquttes[kMaxPlaqutteCache];
@@ -229,8 +227,8 @@ void _kernelStapleAtSiteSU3(
             //staple calculated
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(res);
-            force.TrTa();
-            force.Mul(betaOverN);
+            force.Ta();
+            force.MulReal(betaOverN);
 
             //force is additive
             pForceData[linkIndex].Add(force);
@@ -247,7 +245,7 @@ void _kernelStapleAtSiteSU3CacheIndex(
     deviceSU3 *pForceData,
     Real betaOverN)
 {
-    intokernal;
+    intokernaldir;
 
     betaOverN = betaOverN * F(0.5);
     UINT plaqLengthm1 = plaqLength - 1;
@@ -294,8 +292,8 @@ void _kernelStapleAtSiteSU3CacheIndex(
             //staple calculated
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(res);
-            force.TrTa();
-            force.Mul(betaOverN);
+            force.Ta();
+            force.MulReal(betaOverN);
 
             //force is additive
             pForceData[linkIndex].Add(force);
@@ -427,7 +425,7 @@ void _kernelPlaqutteEnergyUsingStableSU3(
     Real betaOverN,
     Real* results)
 {
-    intokernal;
+    intokernaldir;
 
     Real resThisThread = F(0.0);
     SIndex plaquttes[kMaxPlaqutteCache];
@@ -456,7 +454,7 @@ void _kernelExpMultSU3(
     _Complex a,
     deviceSU3 *pU)
 {
-    intokernal;
+    intokernaldir;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -480,7 +478,7 @@ void _kernelExpMultSU3(
 __global__ 
 void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, Real* results)
 {
-    intokernal;
+    intokernaldir;
 
     Real resThisThread = 0;
     for (UINT it = 0; it < uiTLength; ++it)
@@ -500,7 +498,7 @@ void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceDa
 __global__
 void _kernelNormalizeSU3(deviceSU3 * pMyDeviceData)
 {
-    intokernal;
+    intokernaldir;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -519,7 +517,7 @@ void _kernelDotSU3(
     const deviceSU3 * __restrict__ pOtherDeviceData,
     _Complex* result)
 {
-    intokernal;
+    intokernaldir;
 
     _Complex resThisThread = _make_cuComplex(0,0);
     for (UINT it = 0; it < uiTLength; ++it)
@@ -669,7 +667,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         seps.AddItem(_T('\n'));
         seps.AddItem(_T('\r'));
         TArray<CCString> sStringlist = appGetStringList(sContent, seps, 0x7fffffff);
-        assert(sStringlist.Num() == _HC_LinkCount * 18);
+        assert(static_cast<UINT>(sStringlist.Num()) == _HC_LinkCount * 18);
 
         Real* pData = (Real*)malloc(sizeof(Real) * sStringlist.Num());
         for (INT i = 0; i < sStringlist.Num(); ++i)
@@ -686,7 +684,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         BYTE* allBytes = appGetFileSystem()->ReadAllBytes(sFileName, uiSize);
         assert(uiSize == 8 * 18 * _HC_LinkCount);
         Real* pData = (Real*)malloc(sizeof(Real) * 18 * _HC_LinkCount);
-        for (INT i = 0; i < 18 * _HC_LinkCount; ++i)
+        for (UINT i = 0; i < 18 * _HC_LinkCount; ++i)
         {
             BYTE data[8];
             for (INT j = 0; j < 8; ++j)

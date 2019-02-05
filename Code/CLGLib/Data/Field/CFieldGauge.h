@@ -48,11 +48,10 @@ public:
 
 #pragma endregion
 
-    virtual void ApplyOperator(EFieldOperator op, const CField* otherfield)
+    virtual UBOOL ApplyOperator(EFieldOperator , const CField* )
     {
-        UN_USE(op);
-        UN_USE(otherfield);
         appCrucial("CFieldGauge: Do Operator implimented yet");
+        return FALSE;
     }
 
 protected:

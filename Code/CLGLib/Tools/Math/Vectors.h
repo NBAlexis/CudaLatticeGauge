@@ -12,266 +12,347 @@
 #ifndef _VECTORS_H_
 #define _VECTORS_H_
 
+#if _CLG_DOUBLEFLOAT
+#define __SU3VECTOR_ALIGN 48
+#define __WILSONVECTOR_ALIGN 256
+#else
+#define __SU3VECTOR_ALIGN 24
+#define __WILSONVECTOR_ALIGN 128
+#endif
+
 __BEGIN_NAMESPACE
 
-struct CLGAPI deviceSU3Vector
-{
-public:
-    __device__ deviceSU3Vector() 
-    { 
-        m_ve[0] = _make_cuComplex(0, 0);
-        m_ve[1] = _make_cuComplex(0, 0);
-        m_ve[2] = _make_cuComplex(0, 0);
-    }
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
 
-    __device__ deviceSU3Vector(const deviceSU3Vector& other)
+    //NOTE!!! DO NOT ALIGN ME!!! THIS WILL BREAK UNION!!!
+    struct deviceSU3Vector
     {
-        m_ve[0] = other.m_ve[0];
-        m_ve[1] = other.m_ve[1];
-        m_ve[2] = other.m_ve[2];
-    }
+    public:
+        __device__ deviceSU3Vector()
+        {
 
-    __device__ __inline__ void MakeRandomGaussian(UINT fatIndex)
+        }
+
+        __device__ deviceSU3Vector(const deviceSU3Vector& other)
+        {
+            m_ve[0] = other.m_ve[0];
+            m_ve[1] = other.m_ve[1];
+            m_ve[2] = other.m_ve[2];
+        }
+
+        __device__ __inline__ void DebugPrint() const
+        {
+            printf("%2.3f %s %2.3f i, %2.3f %s %2.3f i, %2.3f %s %2.3f i\n",
+                m_ve[0].x,
+                m_ve[0].y < 0 ? "" : "+",
+                m_ve[0].y,
+
+                m_ve[1].x,
+                m_ve[1].y < 0 ? "" : "+",
+                m_ve[1].y,
+
+                m_ve[2].x,
+                m_ve[2].y < 0 ? "" : "+",
+                m_ve[2].y
+            );
+        }
+
+        __device__ __inline__ static deviceSU3Vector makeRandomGaussian(UINT fatIndex)
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _deviceRandomGaussC(fatIndex);
+            ret.m_ve[1] = _deviceRandomGaussC(fatIndex);
+            ret.m_ve[2] = _deviceRandomGaussC(fatIndex);
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU3Vector makeZeroSU3Vector()
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _make_cuComplex(F(0.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(F(0.0), F(0.0));
+            ret.m_ve[2] = _make_cuComplex(F(0.0), F(0.0));
+            return ret;
+        }
+
+        __device__ __inline__ _Complex ConjugateDotC(const deviceSU3Vector& other) const
+        {
+            _Complex ret = _make_cuComplex(F(0.0), F(0.0));
+            ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]));
+            ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]));
+            ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[2]), other.m_ve[2]));
+            return ret;
+        }
+
+        __device__ __inline__ void Sub(const deviceSU3Vector& other)
+        {
+            m_ve[0] = _cuCsubf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCsubf(m_ve[1], other.m_ve[1]);
+            m_ve[2] = _cuCsubf(m_ve[2], other.m_ve[2]);
+        }
+
+        __device__ __inline__ void SubComp(const _Complex& other)
+        {
+            m_ve[0] = _cuCsubf(m_ve[0], other);
+            m_ve[1] = _cuCsubf(m_ve[1], other);
+            m_ve[2] = _cuCsubf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void SubReal(Real other)
+        {
+            m_ve[0] = _cuCsubf(m_ve[0], other);
+            m_ve[1] = _cuCsubf(m_ve[1], other);
+            m_ve[2] = _cuCsubf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void Add(const deviceSU3Vector& other)
+        {
+            m_ve[0] = _cuCaddf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCaddf(m_ve[1], other.m_ve[1]);
+            m_ve[2] = _cuCaddf(m_ve[2], other.m_ve[2]);
+        }
+
+        __device__ __inline__ void AddComp(const _Complex& other)
+        {
+            m_ve[0] = _cuCaddf(m_ve[0], other);
+            m_ve[1] = _cuCaddf(m_ve[1], other);
+            m_ve[2] = _cuCaddf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void AddReal(Real other)
+        {
+            m_ve[0] = _cuCaddf(m_ve[0], other);
+            m_ve[1] = _cuCaddf(m_ve[1], other);
+            m_ve[2] = _cuCaddf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void MulReal(Real other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], other);
+            m_ve[1] = _cuCmulf(m_ve[1], other);
+            m_ve[2] = _cuCmulf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void MulComp(const _Complex& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], other);
+            m_ve[1] = _cuCmulf(m_ve[1], other);
+            m_ve[2] = _cuCmulf(m_ve[2], other);
+        }
+
+        __device__ __inline__ void MulCompI(const cuComplexI& other)
+        {
+            m_ve[0] = cuCFmulI(m_ve[0], other);
+            m_ve[1] = cuCFmulI(m_ve[1], other);
+            m_ve[2] = cuCFmulI(m_ve[2], other);
+        }
+
+        __device__ __inline__ deviceSU3Vector SubRealC(Real other) const { deviceSU3Vector ret(*this); ret.SubReal(other); return ret; }
+        __device__ __inline__ deviceSU3Vector SubCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.SubComp(other); return ret; }
+        __device__ __inline__ deviceSU3Vector SubC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
+
+        __device__ __inline__ deviceSU3Vector AddRealC(const Real& other) const { deviceSU3Vector ret(*this); ret.AddReal(other); return ret; }
+        __device__ __inline__ deviceSU3Vector AddCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.AddComp(other); return ret; }
+        __device__ __inline__ deviceSU3Vector AddC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Add(other); return ret; }
+
+        __device__ __inline__ deviceSU3Vector MulRealC(Real other) const { deviceSU3Vector ret(*this); ret.MulReal(other); return ret; }
+        __device__ __inline__ deviceSU3Vector MulCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.MulComp(other); return ret; }
+        __device__ __inline__ deviceSU3Vector MulCompIC(const cuComplexI& other) const { deviceSU3Vector ret(*this); ret.MulCompI(other); return ret; }
+
+        _Complex m_ve[3];
+    };
+
+    struct alignas(__WILSONVECTOR_ALIGN) deviceWilsonVectorSU3
     {
-        m_ve[0] = _deviceRandomGaussC(fatIndex);
-        m_ve[1] = _deviceRandomGaussC(fatIndex);
-        m_ve[2] = _deviceRandomGaussC(fatIndex);
-    }
+    public:
+        __device__ deviceWilsonVectorSU3() { ; }
 
-    __device__ __inline__ void MakeZero()
-    {
-        m_ve[0] = _make_cuComplex(0, 0);
-        m_ve[1] = _make_cuComplex(0, 0);
-        m_ve[2] = _make_cuComplex(0, 0);
-    }
+        __device__ deviceWilsonVectorSU3(const deviceWilsonVectorSU3& other)
+        {
+            m_d[0] = deviceSU3Vector(other.m_d[0]);
+            m_d[1] = deviceSU3Vector(other.m_d[1]);
+            m_d[2] = deviceSU3Vector(other.m_d[2]);
+            m_d[3] = deviceSU3Vector(other.m_d[3]);
+        }
 
-    __device__ __inline__ _Complex ConjugateDotC(const deviceSU3Vector& other) const
-    {
-        _Complex ret = _make_cuComplex(0, 0);
-        ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]));
-        ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]));
-        ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[2]), other.m_ve[2]));
-        return ret;
-    }
+        __device__ __inline__ void DebugPrint() const
+        {
+            printf("=d0: %2.2f %2.2fi, %2.2f %2.2fi, %2.2f %2.2fi\n d1: %2.2f %2.2fi, %2.2f %2.2fi, %2.2f %2.2fi\n d2: %2.2f %2.2fi, %2.2f %2.2fi, %2.2f %2.2fi\n d3: %2.2f %2.2fi, %2.2f %2.2fi, %2.2f %2.2fi\n",
 
-    __device__ __inline__ void Sub(const deviceSU3Vector& other)
-    {
-        m_ve[0] = _cuCsubf(m_ve[0], other.m_ve[0]);
-        m_ve[1] = _cuCsubf(m_ve[1], other.m_ve[1]);
-        m_ve[2] = _cuCsubf(m_ve[2], other.m_ve[2]);
-    }
+                m_d[0].m_ve[0].x,
+                m_d[0].m_ve[0].y,
 
-    __device__ __inline__ void Sub(const _Complex& other)
-    {
-        m_ve[0] = _cuCsubf(m_ve[0], other);
-        m_ve[1] = _cuCsubf(m_ve[1], other);
-        m_ve[2] = _cuCsubf(m_ve[2], other);
-    }
+                m_d[0].m_ve[1].x,
+                m_d[0].m_ve[1].y,
 
-    __device__ __inline__ void Sub(Real other)
-    {
-        m_ve[0] = _cuCsubf(m_ve[0], other);
-        m_ve[1] = _cuCsubf(m_ve[1], other);
-        m_ve[2] = _cuCsubf(m_ve[2], other);
-    }
+                m_d[0].m_ve[2].x,
+                m_d[0].m_ve[2].y,
 
-    __device__ __inline__ void Add(const deviceSU3Vector& other)
-    {
-        m_ve[0] = _cuCaddf(m_ve[0], other.m_ve[0]);
-        m_ve[1] = _cuCaddf(m_ve[1], other.m_ve[1]);
-        m_ve[2] = _cuCaddf(m_ve[2], other.m_ve[2]);
-    }
+                m_d[1].m_ve[0].x,
+                m_d[1].m_ve[0].y,
 
-    __device__ __inline__ void Add(const _Complex& other)
-    {
-        m_ve[0] = _cuCaddf(m_ve[0], other);
-        m_ve[1] = _cuCaddf(m_ve[1], other);
-        m_ve[2] = _cuCaddf(m_ve[2], other);
-    }
+                m_d[1].m_ve[1].x,
+                m_d[1].m_ve[1].y,
 
-    __device__ __inline__ void Add(Real other)
-    {
-        m_ve[0] = _cuCaddf(m_ve[0], other);
-        m_ve[1] = _cuCaddf(m_ve[1], other);
-        m_ve[2] = _cuCaddf(m_ve[2], other);
-    }
+                m_d[1].m_ve[2].x,
+                m_d[1].m_ve[2].y,
 
-    __device__ __inline__ void Mul(Real other)
-    {
-        m_ve[0] = _cuCmulf(m_ve[0], other);
-        m_ve[1] = _cuCmulf(m_ve[1], other);
-        m_ve[2] = _cuCmulf(m_ve[2], other);
-    }
+                m_d[2].m_ve[0].x,
+                m_d[2].m_ve[0].y,
 
-    __device__ __inline__ void Mul(const _Complex& other)
-    {
-        m_ve[0] = _cuCmulf(m_ve[0], other);
-        m_ve[1] = _cuCmulf(m_ve[1], other);
-        m_ve[2] = _cuCmulf(m_ve[2], other);
-    }
+                m_d[2].m_ve[1].x,
+                m_d[2].m_ve[1].y,
 
-    __device__ __inline__ void Mul(const cuComplexI& other)
-    {
-        m_ve[0] = cuCmulI(m_ve[0], other);
-        m_ve[1] = cuCmulI(m_ve[1], other);
-        m_ve[2] = cuCmulI(m_ve[2], other);
-    }
+                m_d[2].m_ve[2].x,
+                m_d[2].m_ve[2].y,
 
-    __device__ __inline__ deviceSU3Vector SubC(Real other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
-    __device__ __inline__ deviceSU3Vector SubC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
-    __device__ __inline__ deviceSU3Vector SubC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
+                m_d[3].m_ve[0].x,
+                m_d[3].m_ve[0].y,
 
-    __device__ __inline__ deviceSU3Vector AddC(const Real& other) const { deviceSU3Vector ret(*this); ret.Add(other); return ret; }
-    __device__ __inline__ deviceSU3Vector AddC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.Add(other); return ret; }
-    __device__ __inline__ deviceSU3Vector AddC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Add(other); return ret; }
+                m_d[3].m_ve[1].x,
+                m_d[3].m_ve[1].y,
 
-    __device__ __inline__ deviceSU3Vector MulC(Real other) const { deviceSU3Vector ret(*this); ret.Mul(other); return ret; }
-    __device__ __inline__ deviceSU3Vector MulC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.Mul(other); return ret; }
-    __device__ __inline__ deviceSU3Vector MulC(const cuComplexI& other) const { deviceSU3Vector ret(*this); ret.Mul(other); return ret; }
+                m_d[3].m_ve[2].x,
+                m_d[3].m_ve[2].y
+            );
+        }
 
-    _Complex m_ve[3];
-};
+        __device__ __inline__ static deviceWilsonVectorSU3 makeRandomGaussian(UINT fatIndex)
+        {
+            deviceWilsonVectorSU3 ret;
+            ret.m_d[0] = deviceSU3Vector::makeRandomGaussian(fatIndex);
+            ret.m_d[1] = deviceSU3Vector::makeRandomGaussian(fatIndex);
+            ret.m_d[2] = deviceSU3Vector::makeRandomGaussian(fatIndex);
+            ret.m_d[3] = deviceSU3Vector::makeRandomGaussian(fatIndex);
+            return ret;
+        }
 
-struct CLGAPI deviceWilsonVectorSU3
-{
-public:
-    __device__ deviceWilsonVectorSU3() { ; }
+        __device__ __inline__ static deviceWilsonVectorSU3 makeZeroWilsonVectorSU3()
+        {
+            deviceWilsonVectorSU3 ret;
+            ret.m_d[0] = deviceSU3Vector::makeZeroSU3Vector();
+            ret.m_d[1] = deviceSU3Vector::makeZeroSU3Vector();
+            ret.m_d[2] = deviceSU3Vector::makeZeroSU3Vector();
+            ret.m_d[3] = deviceSU3Vector::makeZeroSU3Vector();
+            return ret;
+        }
 
-    __device__ deviceWilsonVectorSU3(const deviceWilsonVectorSU3& other) 
-    { 
-        m_d[0] = other.m_d[0];
-        m_d[1] = other.m_d[1];
-        m_d[2] = other.m_d[2];
-        m_d[3] = other.m_d[3];
-    }
+        __device__ __inline__ _Complex ConjugateDotC(const deviceWilsonVectorSU3& other) const
+        {
+            _Complex ret = _make_cuComplex(F(0.0), F(0.0));
+            ret = _cuCaddf(ret, m_d[0].ConjugateDotC(other.m_d[0]));
+            ret = _cuCaddf(ret, m_d[1].ConjugateDotC(other.m_d[1]));
+            ret = _cuCaddf(ret, m_d[2].ConjugateDotC(other.m_d[2]));
+            ret = _cuCaddf(ret, m_d[3].ConjugateDotC(other.m_d[3]));
+            return ret;
+        }
 
-    __device__ __inline__ void MakeRandomGaussian(UINT fatIndex)
-    { 
-        m_d[0].MakeRandomGaussian(fatIndex);
-        m_d[1].MakeRandomGaussian(fatIndex);
-        m_d[2].MakeRandomGaussian(fatIndex);
-        m_d[3].MakeRandomGaussian(fatIndex);
-    }
+        __device__ __inline__ void Add(const deviceWilsonVectorSU3& other)
+        {
+            m_d[0].Add(other.m_d[0]);
+            m_d[1].Add(other.m_d[1]);
+            m_d[2].Add(other.m_d[2]);
+            m_d[3].Add(other.m_d[3]);
+        }
 
-    __device__ __inline__ void MakeZero()
-    {
-        m_d[0].MakeZero();
-        m_d[1].MakeZero();
-        m_d[2].MakeZero();
-        m_d[3].MakeZero();
-    }
+        __device__ __inline__ void AddVector(const deviceSU3Vector& other)
+        {
+            m_d[0].Add(other);
+            m_d[1].Add(other);
+            m_d[2].Add(other);
+            m_d[3].Add(other);
+        }
 
-    __device__ __inline__ _Complex ConjugateDotC(const deviceWilsonVectorSU3& other) const
-    {
-        _Complex ret = _make_cuComplex(0, 0);
-        ret = _cuCaddf(ret, m_d[0].ConjugateDotC(other.m_d[0]));
-        ret = _cuCaddf(ret, m_d[1].ConjugateDotC(other.m_d[1]));
-        ret = _cuCaddf(ret, m_d[2].ConjugateDotC(other.m_d[2]));
-        ret = _cuCaddf(ret, m_d[3].ConjugateDotC(other.m_d[3]));
-        return ret;
-    }
+        __device__ __inline__ void AddComp(const _Complex& other)
+        {
+            m_d[0].AddComp(other);
+            m_d[1].AddComp(other);
+            m_d[2].AddComp(other);
+            m_d[3].AddComp(other);
+        }
 
-    __device__ __inline__ void Add(const deviceWilsonVectorSU3& other)
-    {
-        m_d[0].Add(other.m_d[0]);
-        m_d[1].Add(other.m_d[1]);
-        m_d[2].Add(other.m_d[2]);
-        m_d[3].Add(other.m_d[3]);
-    }
+        __device__ __inline__ void AddReal(Real other)
+        {
+            m_d[0].AddReal(other);
+            m_d[1].AddReal(other);
+            m_d[2].AddReal(other);
+            m_d[3].AddReal(other);
+        }
 
-    __device__ __inline__ void Add(const deviceSU3Vector& other)
-    {
-        m_d[0].Add(other);
-        m_d[1].Add(other);
-        m_d[2].Add(other);
-        m_d[3].Add(other);
-    }
+        __device__ __inline__ void Sub(const deviceWilsonVectorSU3& other)
+        {
+            m_d[0].Sub(other.m_d[0]);
+            m_d[1].Sub(other.m_d[1]);
+            m_d[2].Sub(other.m_d[2]);
+            m_d[3].Sub(other.m_d[3]);
+        }
 
-    __device__ __inline__ void Add(const _Complex& other)
-    {
-        m_d[0].Add(other);
-        m_d[1].Add(other);
-        m_d[2].Add(other);
-        m_d[3].Add(other);
-    }
+        __device__ __inline__ void SubVector(const deviceSU3Vector& other)
+        {
+            m_d[0].Sub(other);
+            m_d[1].Sub(other);
+            m_d[2].Sub(other);
+            m_d[3].Sub(other);
+        }
 
-    __device__ __inline__ void Add(Real other)
-    {
-        m_d[0].Add(other);
-        m_d[1].Add(other);
-        m_d[2].Add(other);
-        m_d[3].Add(other);
-    }
+        __device__ __inline__ void SubComp(const _Complex& other)
+        {
+            m_d[0].SubComp(other);
+            m_d[1].SubComp(other);
+            m_d[2].SubComp(other);
+            m_d[3].SubComp(other);
+        }
 
-    __device__ __inline__ void Sub(const deviceWilsonVectorSU3& other)
-    {
-        m_d[0].Sub(other.m_d[0]);
-        m_d[1].Sub(other.m_d[1]);
-        m_d[2].Sub(other.m_d[2]);
-        m_d[3].Sub(other.m_d[3]);
-    }
+        __device__ __inline__ void SubReal(Real other)
+        {
+            m_d[0].SubReal(other);
+            m_d[1].SubReal(other);
+            m_d[2].SubReal(other);
+            m_d[3].SubReal(other);
+        }
 
-    __device__ __inline__ void Sub(const deviceSU3Vector& other)
-    {
-        m_d[0].Sub(other);
-        m_d[1].Sub(other);
-        m_d[2].Sub(other);
-        m_d[3].Sub(other);
-    }
+        __device__ __inline__ void MulReal(Real other)
+        {
+            m_d[0].MulReal(other);
+            m_d[1].MulReal(other);
+            m_d[2].MulReal(other);
+            m_d[3].MulReal(other);
+        }
 
-    __device__ __inline__ void Sub(const _Complex& other)
-    {
-        m_d[0].Sub(other);
-        m_d[1].Sub(other);
-        m_d[2].Sub(other);
-        m_d[3].Sub(other);
-    }
+        __device__ __inline__ void MulComp(const _Complex& other)
+        {
+            m_d[0].MulComp(other);
+            m_d[1].MulComp(other);
+            m_d[2].MulComp(other);
+            m_d[3].MulComp(other);
+        }
 
-    __device__ __inline__ void Sub(Real other)
-    {
-        m_d[0].Sub(other);
-        m_d[1].Sub(other);
-        m_d[2].Sub(other);
-        m_d[3].Sub(other);
-    }
+        __device__ __inline__ deviceWilsonVectorSU3 AddRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.AddReal(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 AddCompC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.AddComp(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 AddVectorC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.AddVector(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 AddC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Add(other); return ret; }
 
-    __device__ __inline__ void Mul(Real other)
-    {
-        m_d[0].Mul(other);
-        m_d[1].Mul(other);
-        m_d[2].Mul(other);
-        m_d[3].Mul(other);
-    }
+        __device__ __inline__ deviceWilsonVectorSU3 SubRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.SubReal(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 SubCompC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.SubComp(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 SubVectorC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.SubVector(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 SubC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
 
-    __device__ __inline__ void Mul(const _Complex& other)
-    {
-        m_d[0].Mul(other);
-        m_d[1].Mul(other);
-        m_d[2].Mul(other);
-        m_d[3].Mul(other);
-    }
+        __device__ __inline__ deviceWilsonVectorSU3 MulRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.MulReal(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 MulCompC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.MulComp(other); return ret; }
 
-    __device__ __inline__ deviceWilsonVectorSU3 AddC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.Add(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 AddC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.Add(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 AddC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.Add(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 AddC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Add(other); return ret; }
+        union
+        {
+            deviceSU3Vector m_d[4];
+            _Complex m_me[12];
+        };
+        //deviceSU3Vector m_d[4];
+    };
 
-    __device__ __inline__ deviceWilsonVectorSU3 SubC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 SubC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 SubC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 SubC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
-
-    __device__ __inline__ deviceWilsonVectorSU3 MulC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.Mul(other); return ret; }
-    __device__ __inline__ deviceWilsonVectorSU3 MulC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.Mul(other); return ret; }
-
-    //union
-    //{
-    //    deviceSU3Vector m_d[4];
-    //    _Complex m_me[12];
-    //};
-    deviceSU3Vector m_d[4];
-};
-
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
 
 __END_NAMESPACE
 

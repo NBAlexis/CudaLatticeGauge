@@ -15,7 +15,20 @@ __CLGIMPLEMENT_CLASS(CSLASolverBiCGStab)
 
 CSLASolverBiCGStab::CSLASolverBiCGStab() 
     : m_pOwner(NULL) 
-{ 
+    , m_pS(NULL)
+    , m_pT(NULL)
+    , m_pR(NULL)
+    , m_pX(NULL)
+    , m_pRh(NULL)
+    , m_pP(NULL)
+    , m_pV(NULL)
+    , m_uiReTry(1)
+    , m_uiDevationCheck(10)
+    , m_uiStepCount(20)
+    , m_fAccuracy(F(0.000001))
+    , m_bAbsoluteAccuracy(FALSE)
+{
+
 }
 
 CSLASolverBiCGStab::~CSLASolverBiCGStab()
@@ -25,7 +38,28 @@ CSLASolverBiCGStab::~CSLASolverBiCGStab()
 
 void CSLASolverBiCGStab::Configurate(const CParameters& param)
 {
-
+    INT iValue;
+    Real fValue;
+    if (param.FetchValueINT(_T("DiviationStep"), iValue))
+    {
+        m_uiDevationCheck = static_cast<UINT>(iValue);
+    }
+    if (param.FetchValueINT(_T("MaxStep"), iValue))
+    {
+        m_uiStepCount = static_cast<UINT>(iValue);
+    }
+    if (param.FetchValueINT(_T("Restart"), iValue))
+    {
+        m_uiReTry = static_cast<UINT>(iValue);
+    }
+    if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
+    {
+        m_bAbsoluteAccuracy = (0 != iValue);
+    }
+    if (param.FetchValueReal(_T("Accuracy"), fValue))
+    {
+        m_fAccuracy = fValue;
+    }
 }
 
 void CSLASolverBiCGStab::AllocateBuffers(const CField* pField)
@@ -51,10 +85,14 @@ void CSLASolverBiCGStab::ReleaseBuffers()
     appSafeDelete(m_pV);
 }
 
-void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM)
+UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM)
 {
     //use it to estimate relative error
-    Real fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
+    Real fBLength = F(1.0);
+    if (!m_bAbsoluteAccuracy)
+    {
+        fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
+    }
 
     appParanoiac(_T("-- CSLASolverBiCGStab::Solve start --\n"));
 
@@ -64,7 +102,8 @@ void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFi
     //r_0 = b - A x_0
     pFieldB->CopyTo(m_pR); 
     m_pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
-    m_pR->ScalarMultply(-1); //-A x_0
+    //appGeneral(_T("==================== kai = %f ==================\n"), m_pR->m_)
+    m_pR->ScalarMultply(F(-1.0)); //-A x_0
     m_pR->AxpyPlus(m_pX); //b - A x_0
     m_pR->CopyTo(m_pRh);
 
@@ -78,8 +117,13 @@ void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFi
     {
         for (UINT j = 0; j < m_uiStepCount * m_uiDevationCheck; ++j)
         {
+            //==========
             //One step
             rho = _cuCabsf(m_pRh->Dot(m_pR));//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
+            if (appAbs(rho) < F(0.00000001))
+            {
+                break;
+            }
 
             if (0 == j) //if is the first iteration, p=r(i-1)
             {
@@ -106,6 +150,19 @@ void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFi
             m_pR->CopyTo(m_pS);
             m_pS->Axpy(-alpha, m_pV);
 
+            if (0 == (j - 1) % m_uiDevationCheck)
+            {
+                //Normal of S is small, then stop
+                Real fDeviation = _cuCabsf(m_pS->Dot(m_pS)) / fBLength;
+                appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:%d, iteration:%d, deviation:%8.18f\n"), i, j, fDeviation);
+                if (fDeviation < m_fAccuracy)
+                {
+                    //m_pX->Axpy(alpha, m_pP);
+                    m_pX->CopyTo(pFieldX);
+                    return TRUE;
+                }
+            }
+
             //t=As
             m_pS->CopyTo(m_pT);
             m_pT->ApplyOperator(uiM, pGaugeFeild);
@@ -114,19 +171,6 @@ void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFi
 
             //r(i)=s-omega t
             m_pS->CopyTo(m_pR);
-            if (0 == (j - 1) % m_uiDevationCheck)
-            {
-                //Normal of S is small, then stop
-                Real fDeviation = _cuCabsf(m_pS->Dot(m_pS)) / fBLength;
-                appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:%d, iteration:%d, deviation:%f\n"), i, j, fDeviation);
-                if (fDeviation < m_fAccuracy)
-                {
-                    m_pX->Axpy(alpha, m_pP);
-                    m_pX->CopyTo(pFieldX);
-                    return;
-                }
-            }
-
             m_pR->Axpy(-omega, m_pT);
 
             //x(i)=x(i-1) + alpha p + omega s
@@ -146,10 +190,9 @@ void CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFi
         m_pR->CopyTo(m_pRh);
     }
 
-
     //The solver failed.
-
     appCrucial(_T("CSLASolverBiCGStab fail to solve!"));
+    return FALSE;
 }
 
 

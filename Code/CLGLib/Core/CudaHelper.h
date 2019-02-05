@@ -58,6 +58,7 @@ enum EConstIntId
     ECI_RandomSeed,
     ECI_ExponentPrecision,
     ECI_ActionListLength,
+    ECI_FermionFieldLength,
     ECI_MeasureListLength,
     ECI_SUN,
 
@@ -66,7 +67,7 @@ enum EConstIntId
 
 enum EConstFloatId
 {
-    ECF_InverseSqrtLink16,
+    ECF_InverseSqrtLink16, //This is not using... remember to remove it
 };
 
 class CLGAPI CCudaHelper
@@ -81,6 +82,9 @@ public:
 
     static void DeviceQuery();
     static void MemoryQuery();
+
+    static void DebugFunction();
+
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
     void SetDeviceIndex(class CIndex** ppIdx) const;
@@ -97,22 +101,19 @@ public:
     #pragma region global temperary buffers
 
     //make sure this is called after thread is partioned
-    void AllocateTemeraryBuffers(UINT uiThreadCount)
-    {
-        m_uiThreadCount = uiThreadCount;
-        checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
-        checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(_Complex)* uiThreadCount));
-    }
+    void AllocateTemeraryBuffers(UINT uiThreadCount);
 
     void ReleaseTemeraryBuffers()
     {
         checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
         checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
+        checkCudaErrors(cudaFree(m_pIndexBuffer));
     }
 
     _Complex ThreadBufferSum(_Complex * pDeviceBuffer);
     Real ThreadBufferSum(Real * pDeviceBuffer);
 
+    struct SIndex* m_pIndexBuffer;
     _Complex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
     UINT m_uiThreadCount;

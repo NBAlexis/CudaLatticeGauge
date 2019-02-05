@@ -81,7 +81,7 @@ public:
 
     inline INT Num() const
     { 
-        return m_nSize; 
+        return m_nSize;
     }
 
     // Accessing elements

@@ -14,9 +14,8 @@
 #pragma region Warnings
 
 //No using when compile with nvcc...
-#pragma warning(disable : 4996) /* Something wrong with the code from bridge++ */
-#pragma warning(disable : 4251) /* needs to have dll-interface to be used by clients of class (When using STL) */
 #pragma warning(disable : 4819) /* The file contains a character that cannot be represented in the current code page (936) (In Cuda XML file)*/
+#pragma warning(disable : 4324) /* 'struct_name' : structure was padded due to __declspec(align())*/
 
 #pragma endregion Warnings
 
@@ -93,7 +92,7 @@ enum { MAXINT = 0x7fffffff };
 enum { INDEX_NONE = -1 };
 enum { UNICODE_BOM = 0xfeff };
 
-#ifdef _CLG_UNICODE
+#if _CLG_UNICODE
 
 #ifndef _TCHAR_DEFINED
 typedef UNICHAR  TCHAR;

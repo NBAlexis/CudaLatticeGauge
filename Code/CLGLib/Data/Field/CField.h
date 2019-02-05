@@ -40,6 +40,8 @@ __DEFINE_ENUM(EFieldOperator,
     EFO_F_D,
     EFO_F_Ddagger,
     EFO_F_DDdagger,
+    EFO_F_InverseD,
+    EFO_F_InverseDdagger,
     EFO_F_InverseDDdagger,
 
     EFO_ForceDWORD = 0x7fffffff,
@@ -54,7 +56,8 @@ public:
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
     virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
-    
+    virtual void InitialOtherParameters(CParameters& ) {}
+
     virtual void DebugPrintMe() const = 0;
 
 #pragma region BLAS
@@ -95,7 +98,7 @@ public:
     virtual CField* GetCopy() const = 0;
     virtual CField* GetZero() const = 0;
 
-    virtual void ApplyOperator(EFieldOperator op, const CField* otherfield) = 0;
+    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield) = 0;
 
 #pragma endregion HMC
 

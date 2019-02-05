@@ -82,6 +82,13 @@ UINT coord[4]; \
 coord[0] = threadIdx.x + blockIdx.x * blockDim.x; \
 coord[1] = threadIdx.y + blockIdx.y * blockDim.y; \
 coord[2] = threadIdx.z + blockIdx.z * blockDim.z; \
+UINT uiTLength = _DC_Lt; 
+
+#define intokernaldir \
+UINT coord[4]; \
+coord[0] = threadIdx.x + blockIdx.x * blockDim.x; \
+coord[1] = threadIdx.y + blockIdx.y * blockDim.y; \
+coord[2] = threadIdx.z + blockIdx.z * blockDim.z; \
 UINT uiTLength = _DC_Lt; \
 UINT uiDir = _DC_Dir;
 

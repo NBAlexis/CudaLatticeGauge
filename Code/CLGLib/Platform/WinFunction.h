@@ -27,8 +27,8 @@ extern "C" void* __cdecl _alloca(SIZE_T);
 #   define appStrcmp	_tcscmp
 #   define appStricmp	_tcsicmp
 #   define appStrncmp   _tcsncmp
-#   define appStrupr	_tcsupr
-#   define appStrlwr	_tcslwr
+#   define appStrupr	_tcsupr_s
+#   define appStrlwr	_tcslwr_s
 #   define appStrchr	_tcschr
 #   define appStrrchr	_tcsrchr
 #   define appSprintf	_stprintf_s

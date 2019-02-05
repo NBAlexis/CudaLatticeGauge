@@ -39,7 +39,7 @@ public:
     * where M is a enum index of operator on x
     * NOTE: pFieldX can be pFieldB, so pFieldB is not guaranteed constant!
     */
-    virtual void Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM) = 0;
+    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM) = 0;
 
     class CLatticeData* m_pOwner;
 

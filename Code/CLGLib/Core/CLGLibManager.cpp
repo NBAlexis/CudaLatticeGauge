@@ -174,8 +174,8 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
     m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir];
 
-    m_InitialCache.constFloats[ECF_InverseSqrtLink16] = 1 / _sqrt(16 * m_InitialCache.constIntegers[ECI_LinkCount]);
-    appGeneral(_T("ECF_InverseSqrtLink16:%f"), m_InitialCache.constFloats[ECF_InverseSqrtLink16]);
+    m_InitialCache.constFloats[ECF_InverseSqrtLink16] = F(1.0) / _sqrt(F(16.0) * m_InitialCache.constIntegers[ECI_LinkCount]);
+    
     UBOOL bAutoDecompose = TRUE;
     __FetchIntWithDefault(_T("ThreadAutoDecompose"), 0);
 
@@ -266,6 +266,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("ActionListLength"), 0);
     m_InitialCache.constIntegers[ECI_ActionListLength] = static_cast<UINT>(iVaules);
 
+    __FetchIntWithDefault(_T("FermionFieldCount"), 0);
+    m_InitialCache.constIntegers[ECI_FermionFieldLength] = static_cast<UINT>(iVaules);
+
     __FetchStringWithDefault(_T("RandomType"), _T("ER_Schrage"));
     m_InitialCache.eR = __STRING_TO_ENUM(ERandom, sValues);
 
@@ -312,7 +315,7 @@ void CCLGLibManager::InitialRandom(CParameters &)
 
 void CCLGLibManager::CreateGaugeField(class CParameters& params)
 {
-    INT iVaules = 0;
+    //INT iVaules = 0;
     CCString sValues;
 
     CCString sGaugeClassName;
@@ -346,6 +349,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
         pGauge->m_pOwner = m_pLatticeData;
         pGauge->InitialFieldWithFile(sFileName, eFileType);
     }
+    pGauge->InitialOtherParameters(params);
 
     m_pLatticeData->m_pGaugeField = pGauge;
     m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
@@ -353,20 +357,51 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
     {
         pGauge->CachePlaqutteIndexes();
     }
-    //checkCudaErrors(cudaMalloc((void**)&(m_pLatticeData->m_pDeviceGaugeField), pGauge->GetClass()->GetSize()));
-    //checkCudaErrors(cudaMemcpy(m_pLatticeData->m_pDeviceGaugeField, m_pLatticeData->m_pGaugeField, pGauge->GetClass()->GetSize(), cudaMemcpyHostToDevice));
 
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 }
 
-void CCLGLibManager::CreateOtherFields(class CParameters& params)
+void CCLGLibManager::CreateFermionFields(class CParameters& params)
 {
+    INT iVaules = 0;
+    CCString sValues;
 
+    CCString sFermionClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldFermionWilsonSquareSU3"));
+    sFermionClassName = sValues;
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
+    EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+
+    CBase* pFermionField = appCreate(sFermionClassName);
+    CFieldFermion* pFermion = (NULL != pFermionField) ? (dynamic_cast<CFieldFermion*>(pFermionField)) : NULL;
+    if (NULL == pFermion)
+    {
+        appCrucial(_T("Unable to create the fermion field! with name %s!"), sFermionClassName.c_str());
+        return;
+    }
+
+    __FetchIntWithDefault(_T("FieldId"), -1);
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
+
+    if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
+    {
+        appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d!"), sFermionClassName.c_str(), byFieldId);
+        return;
+    }
+
+    pFermion->m_byFieldId = byFieldId;
+    pFermion->m_pOwner = m_pLatticeData;
+    pFermion->InitialField(eFieldInitial);
+    pFermion->InitialOtherParameters(params);
+    m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
+    m_pLatticeData->m_pOtherFields.AddItem(pFermion);
+
+    appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
 }
 
 void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
 {
-    INT iVaules = 0;
+    //INT iVaules = 0;
     CCString sValues;
 
     __FetchStringWithDefault(_T("LatticeBoundary"), _T("EBC_TorusSquare"));
@@ -437,9 +472,10 @@ void CCLGLibManager::CreateActionList(class CParameters& params)
             pAction = dynamic_cast<CAction*>(appCreate(sActionName));
             if (NULL != pAction)
             {
-                pAction->Initial(m_pLatticeData, subparam_action, i + 1);
+                BYTE byId = static_cast<BYTE>(i + 1);
+                pAction->Initial(m_pLatticeData, subparam_action, byId);
                 actions.AddItem(pAction);
-                m_pLatticeData->m_pActionMap.SetAt(i + 1, pAction);
+                m_pLatticeData->m_pActionMap.SetAt(byId, pAction);
                 sActionNameList += (CCString(_T(" ")) + pAction->GetClass()->GetName() + _T(" "));
             }
             else
@@ -507,9 +543,10 @@ void CCLGLibManager::CreateMeasurement(class CParameters& params)
             pMeasure = dynamic_cast<CMeasure*>(appCreate(sMeasureName));
             if (NULL != pMeasure)
             {
-                pMeasure->Initial(pMeasurements, m_pLatticeData, subparam_measure, i + 1);
+                BYTE byId = static_cast<BYTE>(i + 1);
+                pMeasure->Initial(pMeasurements, m_pLatticeData, subparam_measure, byId);
                 pMeasurements->m_lstAllMeasures.AddItem(pMeasure);
-                pMeasurements->m_mapMeasures.SetAt(i + 1, pMeasure);
+                pMeasurements->m_mapMeasures.SetAt(byId, pMeasure);
                 sMeasureNameList += (CCString(_T(" ")) + pMeasure->GetClass()->GetName() + _T(" "));
             }
             else
@@ -529,13 +566,21 @@ void CCLGLibManager::CreateMeasurement(class CParameters& params)
 
 void CCLGLibManager::CreateSolver(class CParameters& params)
 {
-
+    CCString sSolverName = _T("CSLASolverBiCGStab");
+    params.FetchStringValue(_T("SolverName"), sSolverName);
+    INT byFieldId = 2;
+    params.FetchValueINT(_T("SolverForFieldId"), byFieldId);
+    CField * pField = m_pLatticeData->GetFieldById(static_cast<BYTE>(byFieldId));
+    if (NULL == pField)
+    {
+        appCrucial(_T("Solver must be created for a specified field!\n"));
+        exit(EXIT_FAILURE);
+    }
+    m_pLatticeData->CreateFermionSolver(sSolverName, params, pField);
 }
 
 UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 {
-    checkCudaErrors(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1 << 30));
-
     m_pCudaHelper = new CCudaHelper();
     m_pLatticeData = new CLatticeData();
     m_pFileSystem = new CFileSystem();
@@ -554,9 +599,29 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         CreateGaugeField(gauge);
     }
 
+    if (m_InitialCache.constIntegers[ECI_FermionFieldLength] > 0)
+    {
+        for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_FermionFieldLength]; ++i)
+        {
+            CCString sFermionSubParamName;
+            sFermionSubParamName.Format(_T("FermionField%d"), i);
+            if (params.Exist(sFermionSubParamName))
+            {
+                CParameters fermionField = params.GetParameter(sFermionSubParamName);
+                CreateFermionFields(fermionField);
+            }
+        }
+    }
+
     if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)
     {
         CreateActionList(params);
+    }
+
+    if (params.Exist(_T("Solver")))
+    {
+        CParameters solver = params.GetParameter(_T("Solver"));
+        CreateSolver(solver);
     }
 
     if (params.Exist(_T("Updator")))

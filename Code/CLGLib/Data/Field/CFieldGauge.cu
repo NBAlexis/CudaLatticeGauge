@@ -18,11 +18,9 @@ __BEGIN_NAMESPACE
 * Initial SU3 Field with a value
 */
 __global__
-void _kernelCachePlaqIndex(SIndex *pDevicePlaqPerSite, SIndex *pDevicePlaqPerLink)
+void _kernelCachePlaqIndex(SIndex *pDevicePlaqPerSite, SIndex *pDevicePlaqPerLink, SIndex* plaquttes)
 {
-    intokernal;
-
-    SIndex plaquttes[kMaxPlaqutteCache];
+    intokernaldir;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -85,7 +83,7 @@ void CFieldGauge::CachePlaqutteIndexes()
     checkCudaErrors(cudaMalloc((void**)&m_pPlaquttesPerLink, _HC_Volumn * _HC_Dir * sizeof(SIndex) * (m_uiPlaqutteLength - 1) * m_uiPlaqutteCountPerLink));
 
     preparethread;
-    _kernelCachePlaqIndex << <block, threads >> > (m_pPlaquttesPerSite, m_pPlaquttesPerLink);
+    _kernelCachePlaqIndex << <block, threads >> > (m_pPlaquttesPerSite, m_pPlaquttesPerLink, _D_IndexBuffer);
 
     
     m_bPlaqutteIndexCached = TRUE;
