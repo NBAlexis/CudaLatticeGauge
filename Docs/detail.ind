@@ -1,42 +1,52 @@
 \begin{theindex}
 
-  \item BiCGStab, \hyperpage{10}
+  \item BiCGStab, \hyperpage{12}
 
   \indexspace
 
-  \item fat index, \hyperpage{3}
-  \item force, \hyperpage{6}
+  \item correlator, \hyperpage{17}
 
   \indexspace
 
-  \item hmc, \hyperpage{5}
+  \item equilibrium, \hyperpage{16}
 
   \indexspace
 
-  \item Integrator, \hyperpage{7}
+  \item fat index, \hyperpage{4}
+  \item force, \hyperpage{7}
 
   \indexspace
 
-  \item Langevin equation, \hyperpage{6}
-  \item leap frog, \hyperpage{13}
-  \item link index, \hyperpage{3}
+  \item hmc, \hyperpage{6}
 
   \indexspace
 
-  \item molecular dynamics, \hyperpage{6}
+  \item Integrator, \hyperpage{8}
 
   \indexspace
 
-  \item Omelyan, \hyperpage{14}
+  \item Langevin equation, \hyperpage{7}
+  \item leap frog, \hyperpage{14}
+  \item link index, \hyperpage{4}
 
   \indexspace
 
-  \item pseudofermions, \hyperpage{5}
+  \item meson, \hyperpage{17}
+  \item molecular dynamics, \hyperpage{7}
 
   \indexspace
 
-  \item site index, \hyperpage{3}
-  \item solver, \hyperpage{10}, \hyperpage{14}
-  \item staple, \hyperpage{7}
+  \item Omelyan, \hyperpage{15}
+
+  \indexspace
+
+  \item plaquette energy, \hyperpage{17}
+  \item pseudofermions, \hyperpage{6}
+
+  \indexspace
+
+  \item site index, \hyperpage{4}
+  \item solver, \hyperpage{11}, \hyperpage{16}
+  \item staple, \hyperpage{8}
 
 \end{theindex}

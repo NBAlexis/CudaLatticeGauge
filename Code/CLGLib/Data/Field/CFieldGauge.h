@@ -54,6 +54,8 @@ public:
         return FALSE;
     }
 
+    virtual void CopyTo(CField* U) const;
+
 protected:
 
     UINT m_uiLinkeCount;

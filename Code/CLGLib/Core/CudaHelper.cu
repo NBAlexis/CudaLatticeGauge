@@ -17,19 +17,19 @@ __constant__ CRandom* __r;
 __constant__ CIndex* __idx;
 __constant__ gammaMatrixSet* __diracGamma;
 __constant__ gammaMatrixSet* __chiralGamma;
-__constant__ deviceSU3* __SU3Generators[8];
+__constant__ deviceSU3 __SU3Generators[9];
 
 /**
 * The construction is on device
 */
-__global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3** ppGenerator)
+__global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3* pGenerator)
 {
-    (*ppPtrDirac) = new gammaMatrixSet(gammaMatrixSet::EGMS_Dirac);
-    (*ppPtrChiral) = new gammaMatrixSet(gammaMatrixSet::EGMS_Chiral);
+    (*ppPtrDirac) = new gammaMatrixSet(EGMS_Dirac);
+    (*ppPtrChiral) = new gammaMatrixSet(EGMS_Chiral);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < 9; ++i)
     {
-        ppGenerator[i] = deviceSU3::makeSU3Generator(i);
+        pGenerator[i] = deviceSU3::makeSU3Generator(i);
     }
 }
 
@@ -41,6 +41,25 @@ __global__ void _kernelDebugFunction()
     deviceWilsonVectorSU3 v2;
     //v2.DebugPrint();
     //a1.DebugPrint();
+    printf("deviceSu3: %d, deviceSU3Vector: %d, deviceWilsonVectorSU3: %d\n", 
+        sizeof(deviceSU3), 
+        sizeof(deviceSU3Vector), 
+        sizeof(deviceWilsonVectorSU3));
+
+    printf("deviceSU3Vector: %d, deviceWilsonVectorSU3: %d\n",
+        sizeof(deviceSU3Vector),
+        sizeof(deviceWilsonVectorSU3));
+
+    printf("deviceWilsonVectorSU3: %d\n",
+        sizeof(deviceWilsonVectorSU3));
+
+    printf("SIndex: %d\n",
+        sizeof(SIndex));
+
+    for (UINT i = 0; i < 9; ++i)
+    {
+        __SU3Generators[i].DebugPrint();
+    }
 }
 
 struct complex_plus_for_thrust
@@ -357,25 +376,25 @@ void CCudaHelper::CreateGammaMatrix() const
 {
     gammaMatrixSet** ppDiracGamma;
     gammaMatrixSet** ppChiralGamma;
-    deviceSU3** ppSU3;
+    deviceSU3* pSU3;
 
     //create pointer
     checkCudaErrors(cudaMalloc((void**)&ppDiracGamma, sizeof(gammaMatrixSet*)));
     checkCudaErrors(cudaMalloc((void**)&ppChiralGamma, sizeof(gammaMatrixSet*)));
-    checkCudaErrors(cudaMalloc((void**)&ppSU3, sizeof(deviceSU3*) * 8));
+    checkCudaErrors(cudaMalloc((void**)&pSU3, sizeof(deviceSU3) * 9));
 
     //craete content
-    _kernelCreateMatrix << <1, 1 >> > (ppDiracGamma, ppChiralGamma, ppSU3);
+    _kernelCreateMatrix << <1, 1 >> > (ppDiracGamma, ppChiralGamma, pSU3);
 
     //copy to constant
     checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, ppDiracGamma, sizeof(gammaMatrixSet*)));
     checkCudaErrors(cudaMemcpyToSymbol(__chiralGamma, ppChiralGamma, sizeof(gammaMatrixSet*)));
-    checkCudaErrors(cudaMemcpyToSymbol(__SU3Generators, ppSU3, sizeof(deviceSU3*) * 8));
+    checkCudaErrors(cudaMemcpyToSymbol(__SU3Generators, pSU3, sizeof(deviceSU3) * 9));
 
     //free pointers (already copy to constant, no need)
     checkCudaErrors(cudaFree(ppDiracGamma));
     checkCudaErrors(cudaFree(ppChiralGamma));
-    checkCudaErrors(cudaFree(ppSU3));
+    checkCudaErrors(cudaFree(pSU3));
 }
 
 void CCudaHelper::SetDeviceIndex(class CIndex** ppIdx) const
@@ -422,7 +441,7 @@ void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
     m_uiThreadCount = uiThreadCount;
     checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
     checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(_Complex)* uiThreadCount));
-    checkCudaErrors(cudaMalloc((void**)&m_pIndexBuffer, sizeof(SIndex)* kMaxPlaqutteCache));
+    //checkCudaErrors(cudaMalloc((void**)&m_pIndexBuffer, sizeof(SIndex)* kMaxPlaqutteCache));
 }
 
 /**

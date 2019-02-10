@@ -77,10 +77,12 @@ extern "C" {
             return ret;
         }
 
+        /**
+        * This is sum _3 (v^* v)
+        */
         __device__ __inline__ _Complex ConjugateDotC(const deviceSU3Vector& other) const
         {
-            _Complex ret = _make_cuComplex(F(0.0), F(0.0));
-            ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]));
+            _Complex ret = _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]);
             ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]));
             ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[2]), other.m_ve[2]));
             return ret;
@@ -239,10 +241,13 @@ extern "C" {
             return ret;
         }
 
+        /**
+        * This is sum of all elements
+        * ret = sum _12 (w^* w)
+        */
         __device__ __inline__ _Complex ConjugateDotC(const deviceWilsonVectorSU3& other) const
         {
-            _Complex ret = _make_cuComplex(F(0.0), F(0.0));
-            ret = _cuCaddf(ret, m_d[0].ConjugateDotC(other.m_d[0]));
+            _Complex ret = m_d[0].ConjugateDotC(other.m_d[0]);
             ret = _cuCaddf(ret, m_d[1].ConjugateDotC(other.m_d[1]));
             ret = _cuCaddf(ret, m_d[2].ConjugateDotC(other.m_d[2]));
             ret = _cuCaddf(ret, m_d[3].ConjugateDotC(other.m_d[3]));

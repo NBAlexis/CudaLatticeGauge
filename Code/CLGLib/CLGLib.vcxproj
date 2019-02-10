@@ -30,7 +30,7 @@
     <ClInclude Include="Core\CudaHelperFunctions.h" />
     <ClInclude Include="Data\Action\CAction.h" />
     <ClInclude Include="Data\Action\CActionFermion.h" />
-    <ClInclude Include="Data\Action\CActionFermionWilson.h" />
+    <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
     <ClInclude Include="Data\Action\CActionGauge.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
@@ -89,6 +89,7 @@
     <CudaCompile Include="Core\CudaHelper.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp" />
     <CudaCompile Include="Data\Boundary\CBoundaryCondition.cu">
       <FileType>Document</FileType>
     </CudaCompile>

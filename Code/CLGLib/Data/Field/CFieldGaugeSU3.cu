@@ -345,7 +345,6 @@ void _kernelPlaqutteEnergySU3(
                 {
                     toAdd.Mul(toMul);
                 }
-                toAdd.Mul(toMul);
             }
 
 #if _CLG_DEBUG
@@ -383,7 +382,6 @@ void _kernelPlaqutteEnergySU3CacheIndex(
         for (int i = 0; i < plaqCount; ++i)
         {
             SIndex first = pCachedIndex[i * plaqLength + siteIndex * plaqCountAll];
-
             deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
             if (first.NeedToDagger())
             {
@@ -436,7 +434,7 @@ void _kernelPlaqutteEnergyUsingStableSU3(
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
             //For each link, there are 6 staples
-            resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerc(pStableData[linkIndex]).ReTr());
+            resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
         }
     }
 
@@ -487,7 +485,7 @@ void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceDa
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread += pDeviceData[linkIndex].DaggerMulc(pDeviceData[linkIndex]).ReTr();
+            resThisThread += pDeviceData[linkIndex].DaggerMulC(pDeviceData[linkIndex]).ReTr();
         }
     }
 
@@ -526,7 +524,7 @@ void _kernelDotSU3(
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].DaggerMulc(pOtherDeviceData[linkIndex]).Tr());
+            resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].DaggerMulC(pOtherDeviceData[linkIndex]).Tr());
         }
     }
 
@@ -558,6 +556,7 @@ void _kernelSetConfigurationSU3(
     pDeviceData[uiLinkIndex].m_me[7] = _make_cuComplex(pRealData[18 * uiBridgeLinkIndex + 14], pRealData[18 * uiBridgeLinkIndex + 15]);
     pDeviceData[uiLinkIndex].m_me[8] = _make_cuComplex(pRealData[18 * uiBridgeLinkIndex + 16], pRealData[18 * uiBridgeLinkIndex + 17]);
 
+    //pDeviceData[uiLinkIndex].DebugPrint();
     gaugeSU3KernelFuncionEnd
 }
 
@@ -709,7 +708,8 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
 void CFieldGaugeSU3::SetByArray(Real* array)
 {
     assert(NULL != array);
-    assert(sizeof(deviceSU3) == 18 * sizeof(Real));
+    //we algin the su3 now
+    //assert(sizeof(deviceSU3) == 32 * sizeof(Real));
 
     //checkCudaErrors(cudaMemcpy(m_pDeviceData, array, sizeof(Real) * _HC_LinkCount * 18, cudaMemcpyHostToDevice));
     
@@ -872,6 +872,9 @@ void CFieldGaugeSU3::CopyTo(CField* pTarget) const
         appCrucial("CFieldGaugeSU3: target field is not SU3");
         return;
     }
+
+    CFieldGauge::CopyTo(pTarget);
+
     CFieldGaugeSU3* pTargetField = dynamic_cast<CFieldGaugeSU3*>(pTarget);
     checkCudaErrors(cudaMemcpy(pTargetField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToDevice));
 }

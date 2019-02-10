@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  4 FEB 2019 01:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  9 FEB 2019 03:55
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1282,7 +1282,7 @@ LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <10.53937> not available
 
  [2
 
-] (D:\CTEX\MiKTeX\tex\latex\listings\lstlang1.sty
+] [3] (D:\CTEX\MiKTeX\tex\latex\listings\lstlang1.sty
 File: lstlang1.sty 2018/09/02 1.7 listings language file
 )
 (D:\CTEX\MiKTeX\tex\latex\listings\lstlang1.sty
@@ -1298,49 +1298,55 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.53937> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 8.
-) (data/parameters.tex) [3
+) (data/parameters.tex) [4
 
-] [4]
-(update/hmc.tex [5
+] [5]
+(update/hmc.tex [6
 
 ]
-LaTeX Font Info:    Try loading font information for U+euf on input line 77.
+LaTeX Font Info:    Try loading font information for U+euf on input line 78.
  (D:\CTEX\MiKTeX\tex\latex\amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
-) [6] [7]
-[8] [9] [10] [11] [12] [13]) (update/solver.tex) [14] [15
+) [7] [8]
+[9]
+Overfull \hbox (4.67477pt too wide) detected at line 216
+[]
+ []
 
-]
-(programming/cuda.tex
+[10] [11] [12] [13] [14] [15]) (update/solver.tex) [16]
+(Measurement/PlatqutteEnergy.tex) (Measurement/MesonCorrelator.tex [17
+
+])
+[18] (programming/cuda.tex
 Overfull \hbox (2.43213pt too wide) in paragraph at lines 7--8
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/53
 781421/cuda-the-member-field-with-
  []
 
-[16
+[19
 
-] [17]
+] [20]
 Overfull \hbox (11.53699pt too wide) in paragraph at lines 136--137
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/26
 812913/how-to-implement-device-side-
  []
 
-[18] [19] [20]) [21] (tests/testRandom.tex) [22
+[21] [22] [23]) [24] (tests/testRandom.tex) [25
 
-] (detail.ind<<c1956.cmap>><<c1961.cmap>> [23
+] (detail.ind<<c1956.cmap>><<c1961.cmap>> [26
 
 
 
 ]) (detail.bbl<<c1937.cmap>><<c1947.cmap>><<c1958.cmap>><<c1959.cmap>><<c1929.c
 map>>)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 110.
- [24
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 114.
+ [27
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 110.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 114.
  (detail.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 110.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 110.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 114.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 114.
 
 
 Package rerunfilecheck Warning: File `detail.out' has changed.
@@ -1348,8 +1354,8 @@ Package rerunfilecheck Warning: File `detail.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `detail.out':
-(rerunfilecheck)             Before: 8BC4419BAC3DE53AB69F9874F2AC0FCE;5224
-(rerunfilecheck)             After:  166597984A2162FB07F51ED885608EA6;3985.
+(rerunfilecheck)             Before: 56C5D1228258A60B917DBFB7803FB501;6293
+(rerunfilecheck)             After:  E827AADCD2B95FFE7324F457CEC0B883;4802.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
@@ -1357,13 +1363,13 @@ LaTeX Font Warning: Size substitutions with differences
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 110.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 114.
  ) 
 Here is how much of TeX's memory you used:
- 27694 strings out of 492976
- 460678 string characters out of 3141819
- 957433 words of memory out of 3000000
- 30740 multiletter control sequences out of 15000+200000
+ 27734 strings out of 492976
+ 461544 string characters out of 3141819
+ 949724 words of memory out of 3000000
+ 30753 multiletter control sequences out of 15000+200000
  554392 words of font info for 106 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
  44i,20n,63p,578b,1997s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1385,9 +1391,9 @@ onts/cm/cmsy10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><D:
 /CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/eu
 ler/eufm10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (24 pages, 408459 bytes).
+Output written on detail.pdf (27 pages, 430614 bytes).
 PDF statistics:
- 867 PDF objects out of 1000 (max. 8388607)
- 404 named destinations out of 1000 (max. 500000)
- 237 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 927 PDF objects out of 1000 (max. 8388607)
+ 423 named destinations out of 1000 (max. 500000)
+ 277 words of extra memory for PDF output out of 10000 (max. 10000000)
 

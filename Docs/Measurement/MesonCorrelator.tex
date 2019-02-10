@@ -1,0 +1,73 @@
+\subsection{\label{MesonCorrelator}\index{meson}\index{correlator}Meson Correlator}
+
+\subsubsection{\label{MesonWaveFunction}Meson Wave Function}
+
+We need at first construct an observable which is a bound state of two fermions and \textbf{has the same quantum number} as mesons. In short, we want to know
+\begin{equation}
+\begin{split}
+&O(x)=\bar{\psi}(x)\Gamma \psi (x)\\
+\end{split}
+\end{equation}
+where $\Gamma$ is a (product of) gamma matrix.
+
+\subsubsection{\label{MesonCorrelatorSub}Meson Correlator}
+
+The correlator is defined as
+\begin{equation}
+\begin{split}
+&C(x,y)=\langle \bar{O}(x)O(y)\rangle
+\end{split}
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+&\langle W \rangle = \frac{1}{Z}\int \mathcal{D}[U,\bar{\psi},\psi] W \exp \left(-S\right)\\
+&Z=\int \mathcal{D}[U,\bar{\psi},\psi] \exp \left(-S\right),\;\;S=S_G+S_{pf}\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item iso-triplet
+\end{itemize}
+
+Denote the variables as $C_T$ and $O_T$.
+
+We need to calculate (green variables are constant)
+\begin{equation}
+\begin{split}
+&C_T(n,m)=\langle \bar{\psi} ^{f_1} (n)\textcolor[rgb]{0,0.5,0}{\Gamma}\psi ^{f_2} (n)\bar{\psi} ^{f_2} (m)\textcolor[rgb]{0,0.5,0}{\Gamma}\psi ^{f_1}(m)\rangle \\
+&=\sum _{{a,b,c}_i}\textcolor[rgb]{0,0.5,0}{\Gamma _{a_1,b_1}}\textcolor[rgb]{0,0.5,0}{\Gamma _{a_2,b_2}}\langle \bar{\psi} ^{f_1} _{a_1,c_1} (n)\psi ^{f_2} _{b_1,c_1} (n)\bar{\psi} ^{f_2} _{a_2,c_2}(m)\psi ^{f_1}_{b_2,c_2}(m)\rangle\\
+\end{split}
+\end{equation}
+
+Note that, they are all Grassman numbers (exchange three times will introduce a minus sign), and they can be averaged according to different fields, so
+\begin{equation}
+\begin{split}
+&C_T(n,m)=-\sum _{{a,b,c}_i}\textcolor[rgb]{0,0.5,0}{\Gamma _{a_1,b_1}}\textcolor[rgb]{0,0.5,0}{\Gamma _{a_2,b_2}}\langle \psi ^{f_2} _{b_1,c_1} (n)\bar{\psi} ^{f_2} _{a_2,c_2}(m)\rangle _{f_1}\langle \psi ^{f_1}_{b_2,c_2}(m)\bar{\psi} ^{f_1} _{a_1,c_1} (n)\rangle _{f_2}\\
+\end{split}
+\end{equation}
+
+Using the Wick theorem for Grassman numbers ($f$ is flavour index, $c$ is color index, $a,b$ are spinor index).
+\begin{equation}
+\begin{split}
+&\langle \psi^f (n)_{a,c_1}\bar{\psi}^f_{b,c_2}(m)\rangle = -D_{f,a,b,c_1,c_2}^{-1}(n,m).\\
+\end{split}
+\end{equation}
+Then we can multiply gamma matrix back
+\begin{equation}
+\begin{split}
+&C_T(n,m)=-{\rm tr}_{c,s} \left[\Gamma D^{-1}_{f_1}(n,m)\Gamma D^{-1}_{f_2}(m,n)\right]
+\end{split}
+\end{equation}
+
+The trace is for both color and spinor space.
+
+\begin{itemize}
+  \item iso-singlet
+\end{itemize}
+
+Denote the variables as $C_S$ and $O_S$.
+
+\subsubsection{\label{MonteCarloInMonteCarlo}Monte Carlo in Monte Carlo}
+
+Trace estimator.

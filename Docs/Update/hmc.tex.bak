@@ -9,15 +9,16 @@ Cooperating with HMC, the fermion is usually the \index{pseudofermions}'Pseudofe
 We begin with Eq.~(1.85) and Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}.
 \begin{equation}
 \begin{split}
-&Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\exp \left(-S_G[U]+\sum _{f=1}^{N_f}\bar{\psi} _f\left(\hat{D}_f\right)\psi _f\right)
+&Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\exp \left(-S_G[U]\textcolor[rgb]{1,0,0}{-}\sum _{f=1}^{N_f}\bar{\psi} _f\left(\hat{D}_f\right)\psi _f\right)
 \end{split}
 \end{equation}
-where $\hat{D}_f=D+m_f$.
+where $\hat{D}_f=D+m_f$. (Note that, different from Eq.~(1.85), we have $S_F=\textcolor[rgb]{1,0,0}{+}\bar{\psi}D\psi$ which is same as Eq.~(5.39) of Ref.~\cite{latticeqcdbook2010} and Eq.~(7.6) of Ref.~\cite{latticeqcdbook1998}. I think there might be a typo in Eq.~(1.85))
 
-It can be evaluated as Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}~(or Eq.~(4.19) of Ref.~\cite{condensedmatterbookAltland})
+It can be evaluated as Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}~(or Eq.~(4.19) of Ref.~\cite{condensedmatterbookAltland}) (Note, there is another minus sign in Eq.~(5.28) of Ref.~\cite{latticeqcdbook2010})
 \begin{equation}
 \begin{split}
-&Z=\prod _{f=1}^{N_f} \det \left(\hat{D}_f\right)\int \mathcal{D}[U] \exp \left(-S_G[U]\right)
+&\int \mathcal{D}{\bar{\psi}}\psi \exp \left(\textcolor[rgb]{1,0,0}{-}\bar{\psi}A\psi\right)=\det \left(A\right),\\
+&Z=\prod _{f=1}^{N_f} \det \left(\hat{D}_f\right)\int \mathcal{D}[U] \exp \left(-S_G[U]\right).\\
 \end{split}
 \end{equation}
 
@@ -50,7 +51,7 @@ where $\lambda ({\bf M})$ denoted as eigen-values of ${\bf M}$.
 We now, concentrate on two degenerate fermion flavours. i.e. considering
 \begin{equation}
 \begin{split}
-&S_F=-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d.
+&S_F=\bar{\psi}_u \hat{D} \psi _u+\bar{\psi}_d \hat{D} \psi _d.
 \end{split}
 \end{equation}
 
@@ -65,7 +66,7 @@ where $\phi$ now is a complex Bosnic field.
 So, generally, we are using HMC to evaluate the action with 'Pseudofermions`, or in other words, we are working with an action including only gauge and bosons.
 \begin{equation}
 \begin{split}
-&S=S_G+S_{pf}=S_G-\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi\\
+&S=S_G+S_{pf}=S_G\textcolor[rgb]{1,0,0}{+}\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi\\
 \end{split}
 \end{equation}
 where $pf$ is short for pseudofermion.
@@ -125,7 +126,7 @@ where $\mathbb{I}$ is identity matrix. Therefor
 \label{eq.hmc.force}
 \end{equation}
 
-Eq.~(\ref{eq.hmc.force}) has a different sign with Eqs.~(2.55) and (2.67) of Ref.~\cite{latticeqcdbook2017}, but the sign is same as Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010}. But in Eq.~(8,42), the $\{\ldots\}_{TA}$ is different.
+Eq.~(\ref{eq.hmc.force}) has a different sign with Eqs.~(2.55) and (2.67) of Ref.~\cite{latticeqcdbook2017}, but the sign is same as Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} (Note that in Ref.~\cite{latticeqcdbook2010}, $F\equiv -\dot{P}$ but we define $F\equiv \dot{P}$). But in Eq.~(8,42), the $\{\ldots\}_{TA}$ is different.
 
 \begin{itemize}
 \item \index{Integrator}Integrator
@@ -157,7 +158,7 @@ Then we can calculate $P((n+1)\epsilon)$ using Eq.~(\ref{eq.hmc.update_basic}).c
   \item About the randomized $P$
 \end{itemize}
 
-The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$ 
+The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$
 
 Note that, here $P$ corresponds to $Q$, not $U$, for $U=\exp\left(i \sum q_i T^i\right)$, there are $8$ \textbf{real} variables denoting as $\omega _i$.
 
@@ -175,7 +176,7 @@ Using the property of normal distribution
 
 One can randomize $\omega _i$ using $\exp \left(-\omega_i\omega_i\right)$. Then using $P=\frac{1}{\sqrt{8N}}\sum \omega _i T^i$, where $N$ is the number of links.
 
-\textcolor[rgb]{0,0,1}{\textbf{Note: Here is a difference between Refs.~\cite{latticeqcdbook2010} and \cite{latticeqcdbook2017} and Bridge++~\cite{bridge}}}
+\textcolor[rgb]{1,0,0}{\textbf{Note: Here is a difference between Refs.~\cite{latticeqcdbook2010} and \cite{latticeqcdbook2017} and Bridge++~\cite{bridge}}}
 
 Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.
 
@@ -207,27 +208,30 @@ with $\kappa=1/(2am_f+8)$.
 The force of $\phi$ on $U$ is obtained as $\partial _{U_{\mu}}S_{pf}$. The result for Wilson Fermion action is shown in Eqs.~(8.39), (8.44) and (8.45) of Ref.~\cite{latticeqcdbook2010} as
 \begin{equation}
 \begin{split}
-&F=F_G+\sum _i T^i \nabla ^i \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\nabla ^i \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^i}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^i}}=\frac{\partial D}{\partial {\omega _{\mu}^i}}=-i\kappa \left\{(1-\gamma _{\mu})T^iU_{\mu}(x)\delta _{x,x+\mu}-(1+\gamma _{\mu})U_{\mu}^{-1}(x-\mu)T^i\delta _{x,x-\mu} \right\} \\
-&\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^i} \gamma _5\\
+&F=-\partial _{U_{\mu}(n)}S[U_{\mu}(n)]=F_G-\sum _a T^a \nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
+&\nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
+&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\} \\
+&\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^a} \gamma _5\\
 \end{split}
 \end{equation}
-where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^i$ are $SU(3)$ generators. And
+where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^i$ are $SU(3)$ generators. $x_L,x_R$ are coordinate index of the left and right pseudofermion field. And
 \begin{equation}
 \begin{split}
-&U_{\mu}=\exp (i\sum _i \omega _{\mu}^i T^i),\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^i}=iT^iU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^i}=-iU^{\dagger}_{\mu}T^i,\;\;\left(T^i\right)^{\dagger}=T^i.\\
+&U_{\mu}=\exp (i\sum _a \omega _{\mu}^a T^a),\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
+&\left(T^a\right)^{\dagger}=T^a,\;\;\frac{\partial M^{-1}}{\partial \omega _{\mu}^a}=-M^{-1}\frac{\partial M}{\partial \omega _{\mu}^a}M^{-1}\\
 \end{split}
 \end{equation}
-is used.
+are used.
 
-We can simplify it further by $\left(\hat{D}^{\dagger}(\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}=\left((\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}\hat{D}^{\dagger}$, so
+We can simplify it further by $\left(\hat{D}^{\dagger}(\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}=\left((\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}\hat{D}$, so
 \begin{equation}
 \begin{split}
 &\phi _1=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right),\;\;
- \phi _2=\hat{D}^{\dagger}\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right),\;\;\phi _1^{\dagger}D=\phi _2^{\dagger}\\
-&\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^i}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)\\
-&=\phi _1^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^i} \phi _2+\phi _2^{\dagger} \frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i} \phi _1=2{\rm Re}\left(\phi _1 ^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^i} \phi _2\right)\\
+ \phi _2=\hat{D}^{\dagger}\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=D^{-1}\phi,\;\;\phi _1^{\dagger}D=\phi _2^{\dagger}\\
+&-\nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)\\
+&=\phi _1^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2+\phi _2^{\dagger} \frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a} \phi _1=2{\rm Re}\left(\phi _1 ^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2\right)\\
+&F_{pf}=-\sum _a T^a \nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=2\kappa \sum _a {\rm Im}\left(\phi _1 ^{\dagger} M_a \phi _2\right)T_a,\;\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
+&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\}\\
 \end{split}
 \end{equation}
 
@@ -375,7 +379,7 @@ In Sec.~\ref{hmc_scheme}, the basic idea is introduced. However, the implementat
 \label{eq.hmc.update_leapfrog}
 \end{subequations}
 
-\textcolor[rgb]{0,0,1}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,n}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,n}S$.}}
+\textcolor[rgb]{1,0,0}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,n}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,n}S$.}}
 
 or simply written as
 \begin{equation}
@@ -445,6 +449,8 @@ Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\ci
   \item Iterate from 1 to 5, until the number of configurations generated is sufficient.
 \end{enumerate}
 
+
+More on Metropolis step:
 
 
 

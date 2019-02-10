@@ -11,9 +11,15 @@
 
 __BEGIN_NAMESPACE
 
-CField::CField() : CBase(), m_pOwner(NULL)
+CField::CField() : CBase(), m_pOwner(NULL), m_pPool(NULL)
 {
     
+}
+
+void CField::Return()
+{
+    assert(NULL != m_pPool);
+    m_pPool->Return(this);
 }
 
 CFieldFermion::CFieldFermion() : CField()
@@ -21,8 +27,6 @@ CFieldFermion::CFieldFermion() : CField()
     m_uiLinkeCount = _HC_Volumn * _HC_Dir;
     m_uiSiteCount = _HC_Volumn;
 }
-
-
 
 __END_NAMESPACE
 

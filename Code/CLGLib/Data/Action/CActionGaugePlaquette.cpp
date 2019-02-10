@@ -45,10 +45,11 @@ void CActionGaugePlaquette::SetBeta(Real fBeta)
     m_fBetaOverN = fBeta;
 }
 
-void CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const
+UBOOL CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const
 {
     pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
     checkCudaErrors(cudaDeviceSynchronize());
+    return TRUE;
 }
 
 /**

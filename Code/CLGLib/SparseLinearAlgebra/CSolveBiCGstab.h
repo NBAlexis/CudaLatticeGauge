@@ -30,16 +30,7 @@ public:
     class CLatticeData* m_pOwner;
 
 protected:
-
-    class CField* m_pS;
-    class CField* m_pT;
-
-    class CField* m_pR;
-    class CField* m_pX;
-    class CField* m_pRh;
-    class CField* m_pP;
-    class CField* m_pV;
-    
+   
     UINT m_uiReTry;
     UINT m_uiDevationCheck;
     UINT m_uiStepCount;

@@ -24,6 +24,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
+    <ClCompile Include="Tests\TestFermionUpdator.cpp" />
+    <ClCompile Include="Tests\TestOperators.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
     <ClCompile Include="Tests\TestSU3Generator.cpp" />

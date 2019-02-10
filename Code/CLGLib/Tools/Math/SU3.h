@@ -21,7 +21,7 @@
 
 #define __LINE_MULND(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], _cuConjf(right.m_me[d])), _cuCmulf(m_me[b], _cuConjf(right.m_me[ee]))), _cuCmulf(m_me[c], _cuConjf(right.m_me[ff])))
 
-#define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), _cuConjf(right.m_me[ff]))
+#define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), right.m_me[ff]))
 
 // 1.0f / _sqrt(3)
 #define InvSqrt3 (F(0.5773502691896258))
@@ -54,7 +54,7 @@ extern "C" {
 
         __device__ void DebugPrint() const
         {
-            printf("%2.3f %s %2.3f I, %2.3f %s %2.3f I, %2.3f %s %2.3f I;\n%2.3f %s %2.3f I, %2.3f %s %2.3f I, %2.3f %s %2.3f I;\n%2.3f %s %2.3f I, %2.3f %s %2.3f I, %2.3f %s %2.3f I;\n",
+            printf("=%2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n %2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n %2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n",
                 m_me[0].x,
                 m_me[0].y < 0 ? "" : "+",
                 m_me[0].y,
@@ -201,11 +201,10 @@ extern "C" {
             return ret;
         }
 
-        __device__ __inline__ static deviceSU3* makeSU3Generator(UINT uiGenerator)
+        __device__ __inline__ static deviceSU3 makeSU3Generator(UINT uiGenerator)
         {
-            deviceSU3* ret = new deviceSU3();
-            Real half = F(1.0) / F(0.5);
-            ret->makeSU3Zero();
+            deviceSU3 ret = makeSU3Zero();
+            Real half = F(0.5);
             switch (uiGenerator)
             {
             case 0:
@@ -215,8 +214,8 @@ extern "C" {
                 * =   1     0     0
                 *     0     0     0
                 */
-                ret->m_me[1] = _make_cuComplex(half, F(0.0));
-                ret->m_me[3] = _make_cuComplex(half, F(0.0));
+                ret.m_me[1] = _make_cuComplex(half, F(0.0));
+                ret.m_me[3] = _make_cuComplex(half, F(0.0));
             }
             break;
             case 1:
@@ -226,8 +225,8 @@ extern "C" {
                 * =   I     0     0
                 *     0     0     0
                 */
-                ret->m_me[1] = _make_cuComplex(F(0.0), -half);
-                ret->m_me[3] = _make_cuComplex(F(0.0), half);
+                ret.m_me[1] = _make_cuComplex(F(0.0), -half);
+                ret.m_me[3] = _make_cuComplex(F(0.0), half);
             }
             break;
             case 2:
@@ -237,8 +236,8 @@ extern "C" {
                 * =   0    -1     0
                 *     0     0     0
                 */
-                ret->m_me[0] = _make_cuComplex(half, F(0.0));
-                ret->m_me[4] = _make_cuComplex(-half, F(0.0));
+                ret.m_me[0] = _make_cuComplex(half, F(0.0));
+                ret.m_me[4] = _make_cuComplex(-half, F(0.0));
             }
             break;
             case 3:
@@ -248,8 +247,8 @@ extern "C" {
                 * =   0     0     0
                 *     1     0     0
                 */
-                ret->m_me[2] = _make_cuComplex(half, F(0.0));
-                ret->m_me[6] = _make_cuComplex(half, F(0.0));
+                ret.m_me[2] = _make_cuComplex(half, F(0.0));
+                ret.m_me[6] = _make_cuComplex(half, F(0.0));
             }
             break;
             case 4:
@@ -259,8 +258,8 @@ extern "C" {
                 * =   0     0     0
                 *     i     0     0
                 */
-                ret->m_me[2] = _make_cuComplex(F(0.0), -half);
-                ret->m_me[6] = _make_cuComplex(F(0.0), half);
+                ret.m_me[2] = _make_cuComplex(F(0.0), -half);
+                ret.m_me[6] = _make_cuComplex(F(0.0), half);
             }
             break;
             case 5:
@@ -270,8 +269,8 @@ extern "C" {
                 * =   0     0     1
                 *     0     1     0
                 */
-                ret->m_me[5] = _make_cuComplex(half, F(0.0));
-                ret->m_me[7] = _make_cuComplex(half, F(0.0));
+                ret.m_me[5] = _make_cuComplex(half, F(0.0));
+                ret.m_me[7] = _make_cuComplex(half, F(0.0));
             }
             break;
             case 6:
@@ -281,8 +280,8 @@ extern "C" {
                 * =   0     0    -i
                 *     0     i     0
                 */
-                ret->m_me[5] = _make_cuComplex(F(0.0), -half);
-                ret->m_me[7] = _make_cuComplex(F(0.0), half);
+                ret.m_me[5] = _make_cuComplex(F(0.0), -half);
+                ret.m_me[7] = _make_cuComplex(F(0.0), half);
             }
             break;
             case 7:
@@ -292,12 +291,136 @@ extern "C" {
                 * =   0     1     0
                 *     0     0     -2
                 */
-                ret->m_me[0] = _make_cuComplex(InvSqrt3 * half, F(0.0));
-                ret->m_me[4] = _make_cuComplex(InvSqrt3 * half, F(0.0));
-                ret->m_me[8] = _make_cuComplex(-InvSqrt3_2 * half, F(0.0));
+                ret.m_me[0] = _make_cuComplex(InvSqrt3 * half, F(0.0));
+                ret.m_me[4] = _make_cuComplex(InvSqrt3 * half, F(0.0));
+                ret.m_me[8] = _make_cuComplex(-InvSqrt3_2 * half, F(0.0));
+            }
+            break;
+            default:
+            case 8:
+            {
+                /**
+                *     1     0     0
+                * =   0     1     0
+                *     0     0     -2
+                */
+                ret.m_me[1] = _make_cuComplex(half, -half);
+                ret.m_me[3] = _make_cuComplex(half, half);
+                ret.m_me[0] = _make_cuComplex(InvSqrt3 * half + half, F(0.0));
+                ret.m_me[4] = _make_cuComplex(InvSqrt3 * half - half, F(0.0));
+                ret.m_me[2] = _make_cuComplex(half, -half);
+                ret.m_me[6] = _make_cuComplex(half, half);
+                ret.m_me[5] = _make_cuComplex(half, -half);
+                ret.m_me[7] = _make_cuComplex(half, half);
+                ret.m_me[8] = _make_cuComplex(-InvSqrt3_2 * half, F(0.0));
             }
             break;
             }
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU3 makeSU3Contract(const deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
+        {
+            deviceSU3 ret;
+            ret.m_me[0] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[0])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[0])
+                )
+            );
+
+            ret.m_me[1] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[1])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[1])
+                )
+            );
+
+            ret.m_me[2] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[2])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[2])
+                )
+            );
+
+            ret.m_me[3] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[0])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[0])
+                )
+            );
+
+            ret.m_me[4] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[1])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[1])
+                )
+            );
+
+            ret.m_me[5] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[2])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[2])
+                )
+            );
+
+            ret.m_me[6] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[0])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[0])
+                )
+            );
+
+            ret.m_me[7] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[1])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[1])
+                )
+            );
+
+            ret.m_me[8] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[2])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[2])
+                )
+            );
+
             return ret;
         }
 
@@ -439,7 +562,7 @@ extern "C" {
             memcpy(m_me, res, sizeof(_Complex) * 9);
         }
 
-        __device__ __inline__ deviceSU3 MulDaggerc(const deviceSU3& right) const
+        __device__ __inline__ deviceSU3 MulDaggerC(const deviceSU3& right) const
         {
             deviceSU3 ret;
             ret.m_me[0] = __LINE_MULND(0, 1, 2, 0, 1, 2);
@@ -459,34 +582,34 @@ extern "C" {
         __device__ __inline__ void DaggerMul(const deviceSU3& right)
         {
             _Complex res[9];
-            res[0] = __LINE_MULND(0, 3, 6, 0, 3, 6);
-            res[1] = __LINE_MULND(0, 3, 6, 1, 4, 7);
-            res[2] = __LINE_MULND(0, 3, 6, 2, 5, 8);
+            res[0] = __LINE_MULDN(0, 3, 6, 0, 3, 6);
+            res[1] = __LINE_MULDN(0, 3, 6, 1, 4, 7);
+            res[2] = __LINE_MULDN(0, 3, 6, 2, 5, 8);
 
-            res[3] = __LINE_MULND(1, 4, 7, 0, 3, 6);
-            res[4] = __LINE_MULND(1, 4, 7, 1, 4, 7);
-            res[5] = __LINE_MULND(1, 4, 7, 2, 5, 8);
+            res[3] = __LINE_MULDN(1, 4, 7, 0, 3, 6);
+            res[4] = __LINE_MULDN(1, 4, 7, 1, 4, 7);
+            res[5] = __LINE_MULDN(1, 4, 7, 2, 5, 8);
 
-            res[6] = __LINE_MULND(2, 5, 8, 0, 3, 6);
-            res[7] = __LINE_MULND(2, 5, 8, 1, 4, 7);
-            res[8] = __LINE_MULND(2, 5, 8, 2, 5, 8);
+            res[6] = __LINE_MULDN(2, 5, 8, 0, 3, 6);
+            res[7] = __LINE_MULDN(2, 5, 8, 1, 4, 7);
+            res[8] = __LINE_MULDN(2, 5, 8, 2, 5, 8);
             memcpy(m_me, res, sizeof(_Complex) * 9);
         }
 
-        __device__ __inline__ deviceSU3 DaggerMulc(const deviceSU3& right) const
+        __device__ __inline__ deviceSU3 DaggerMulC(const deviceSU3& right) const
         {
             deviceSU3 ret;
-            ret.m_me[0] = __LINE_MULND(0, 3, 6, 0, 3, 6);
-            ret.m_me[1] = __LINE_MULND(0, 3, 6, 1, 4, 7);
-            ret.m_me[2] = __LINE_MULND(0, 3, 6, 2, 5, 8);
+            ret.m_me[0] = __LINE_MULDN(0, 3, 6, 0, 3, 6);
+            ret.m_me[1] = __LINE_MULDN(0, 3, 6, 1, 4, 7);
+            ret.m_me[2] = __LINE_MULDN(0, 3, 6, 2, 5, 8);
 
-            ret.m_me[3] = __LINE_MULND(1, 4, 7, 0, 3, 6);
-            ret.m_me[4] = __LINE_MULND(1, 4, 7, 1, 4, 7);
-            ret.m_me[5] = __LINE_MULND(1, 4, 7, 2, 5, 8);
+            ret.m_me[3] = __LINE_MULDN(1, 4, 7, 0, 3, 6);
+            ret.m_me[4] = __LINE_MULDN(1, 4, 7, 1, 4, 7);
+            ret.m_me[5] = __LINE_MULDN(1, 4, 7, 2, 5, 8);
 
-            ret.m_me[6] = __LINE_MULND(2, 5, 8, 0, 3, 6);
-            ret.m_me[7] = __LINE_MULND(2, 5, 8, 1, 4, 7);
-            ret.m_me[8] = __LINE_MULND(2, 5, 8, 2, 5, 8);
+            ret.m_me[6] = __LINE_MULDN(2, 5, 8, 0, 3, 6);
+            ret.m_me[7] = __LINE_MULDN(2, 5, 8, 1, 4, 7);
+            ret.m_me[8] = __LINE_MULDN(2, 5, 8, 2, 5, 8);
             return ret;
         }
 
@@ -561,6 +684,36 @@ extern "C" {
             return m_me[0].x + m_me[4].x + m_me[8].x;
         }
 
+        __device__ __inline__ void Re()
+        {
+            m_me[0] = _make_cuComplex(m_me[0].x, F(0.0));
+            m_me[1] = _make_cuComplex(m_me[1].x, F(0.0));
+            m_me[2] = _make_cuComplex(m_me[2].x, F(0.0));
+            m_me[3] = _make_cuComplex(m_me[3].x, F(0.0));
+            m_me[4] = _make_cuComplex(m_me[4].x, F(0.0));
+            m_me[5] = _make_cuComplex(m_me[5].x, F(0.0));
+            m_me[6] = _make_cuComplex(m_me[6].x, F(0.0));
+            m_me[7] = _make_cuComplex(m_me[7].x, F(0.0));
+            m_me[8] = _make_cuComplex(m_me[8].x, F(0.0));
+        }
+
+        __device__ __inline__ deviceSU3 ReC() const { deviceSU3 ret(*this); ret.Re(); return ret; }
+
+        __device__ __inline__ void Im()
+        {
+            m_me[0] = _make_cuComplex(m_me[0].y, F(0.0));
+            m_me[1] = _make_cuComplex(m_me[1].y, F(0.0));
+            m_me[2] = _make_cuComplex(m_me[2].y, F(0.0));
+            m_me[3] = _make_cuComplex(m_me[3].y, F(0.0));
+            m_me[4] = _make_cuComplex(m_me[4].y, F(0.0));
+            m_me[5] = _make_cuComplex(m_me[5].y, F(0.0));
+            m_me[6] = _make_cuComplex(m_me[6].y, F(0.0));
+            m_me[7] = _make_cuComplex(m_me[7].y, F(0.0));
+            m_me[8] = _make_cuComplex(m_me[8].y, F(0.0));
+        }
+
+        __device__ __inline__ deviceSU3 ImC() const { deviceSU3 ret(*this); ret.Im(); return ret; }
+
         /**
         * res = Conjugate[Transpose[U]]
         */
@@ -633,6 +786,35 @@ extern "C" {
         }
 
         /**
+        * return -i(U-U^dagger) = ((-iU)+(-iU)dagger)
+        */
+        __device__ __inline__ deviceSU3 Im2C() const
+        {
+            deviceSU3 ret;
+            //0 1 2
+            //3 4 5
+            //6 7 8
+            // -i(x-y*)=i(y*-x)=i(yr-iyi-xr-ixi)=(yi+xi)+i(yr-xr)
+            // new 1 = -i(1-3*)
+            // new 2 = -i(2-6*)
+            // new 5 = -i(5-7*)
+            // (new 1)*= i(1*-3) = -i(3-1*) = new 3
+            // new 0 = -i(0-0*) = 2Im(0)
+
+            ret.m_me[1] = _make_cuComplex(m_me[1].y + m_me[3].y, m_me[3].x - m_me[1].x);
+            ret.m_me[2] = _make_cuComplex(m_me[2].y + m_me[6].y, m_me[6].x - m_me[2].x);
+            ret.m_me[5] = _make_cuComplex(m_me[5].y + m_me[7].y, m_me[7].x - m_me[5].x);
+            ret.m_me[3] = _cuConjf(ret.m_me[1]);
+            ret.m_me[6] = _cuConjf(ret.m_me[2]);
+            ret.m_me[7] = _cuConjf(ret.m_me[5]);
+
+            ret.m_me[0] = _make_cuComplex(F(2.0) * m_me[0].y, F(0.0));
+            ret.m_me[4] = _make_cuComplex(F(2.0) * m_me[4].y, F(0.0));
+            ret.m_me[8] = _make_cuComplex(F(2.0) * m_me[8].y, F(0.0));
+            return ret;
+        }
+
+        /**
         * make any matrix to SU3
         */
         __device__ __inline__ void Norm()
@@ -702,11 +884,12 @@ extern "C" {
 
 #pragma endregion
 
-        union
-        {
-            deviceSU3Vector m_v[3];
-            _Complex m_me[9];
-        };
+        //union
+        //{
+        //    deviceSU3Vector m_v[3];
+        //    _Complex m_me[9];
+        //};
+        _Complex m_me[16]; //Only the first 9 elememt is using, 16 is for padding and align
     };
 
 #if defined(__cplusplus)

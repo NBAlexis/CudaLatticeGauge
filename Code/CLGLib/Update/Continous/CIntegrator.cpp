@@ -64,6 +64,11 @@ void CIntegrator::Prepare(UBOOL bLastAccepted)
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
+    for (INT i = 0; i < m_lstActions.Num(); ++i)
+    {
+        m_lstActions[i]->PrepareForHMC(m_pGaugeField);
+    }
+
     //generate a random momentum field to start
     m_pMomentumField->MakeRandomGenerator();
     checkCudaErrors(cudaDeviceSynchronize());

@@ -78,6 +78,11 @@ CLatticeData::~CLatticeData()
         appSafeDelete(m_pOtherFields[i]);
     }
 
+    for (INT i = 0; i < m_pFieldPools.Num(); ++i)
+    {
+        appSafeDelete(m_pFieldPools[i]);
+    }
+
     appSafeDelete(m_pGaugeField);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
@@ -97,6 +102,36 @@ void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameter
     m_pFermionSolver->AllocateBuffers(pFermionField);
 
     appGeneral(_T("Create sparse linear algebra solver: %s \n"), sSolver.c_str());
+}
+
+void CLatticeData::CreateFieldPool(BYTE byFieldId, UINT uiCount)
+{
+    if (m_pFieldPoolMap.Exist(byFieldId))
+    {
+        appGeneral(_T("Create field pool, but field id already exist!\n"));
+        return;
+    }
+    CField* pField = GetFieldById(byFieldId);
+    if (NULL == pField)
+    {
+        appCrucial(_T("Create field pool, but field cannot be found!\n"));
+        return;
+    }
+
+    CFieldPool * pFieldPool = new CFieldPool(pField, uiCount);
+    m_pFieldPools.AddItem(pFieldPool);
+    m_pFieldPoolMap.SetAt(byFieldId, pFieldPool);
+}
+
+CField* CLatticeData::GetPooledFieldById(BYTE byId)
+{
+    if (!m_pFieldPoolMap.Exist(byId))
+    {
+        appCrucial(_T("Get Pooled field failed!\n"));
+        return NULL;
+    }
+
+    return m_pFieldPoolMap[byId]->GetOne();
 }
 
 void CLatticeData::OnUpdatorConfigurationAccepted()

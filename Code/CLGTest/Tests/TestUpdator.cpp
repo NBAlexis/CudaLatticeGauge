@@ -51,7 +51,6 @@ __REGIST_TEST(TestUpdator, Updator, TestUpdatorLeapFrog);
 
 __REGIST_TEST(TestUpdator, Updator, TestUpdatorOmelyan);
 
-//__REGIST_TEST(TestUpdator, Updator, TestRandomXORWOW);
 
 //=============================================================================
 // END OF FILE

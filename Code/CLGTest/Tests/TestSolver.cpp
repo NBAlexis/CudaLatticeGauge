@@ -12,18 +12,18 @@
 UINT TestSolver(CParameters& sParam)
 {
     UINT uiError = 0;
-    Real fMaxError = F(0.002); //Why is it sooooo large???
+    Real fMaxError = F(0.000001);
     CField* pField = appGetLattice()->GetFieldById(2);
     CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
-    Real fLength = _cuCabsf(pFermion->Dot(pFermion));
+    //Real fLength = _cuCabsf(pFermion->Dot(pFermion));
 
     CFieldFermionWilsonSquareSU3* pResult1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
     pResult1->D(appGetLattice()->m_pGaugeField);
     pResult1->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
     pResult1->AxpyMinus(pFermion);
-    Real fError1 = _cuCabsf(pResult1->Dot(pResult1)) / fLength;
-    appGeneral(_T("| D^-1 D phi - phi |^2 / |phi|^2=%f\n"), fError1);
+    Real fError1 = _cuCabsf(pResult1->Dot(pResult1));
+    appGeneral(_T("| D^-1 D phi - phi |^2 / |phi|^2=%8.18f\n"), fError1);
     if (appAbs(fError1) > fMaxError)
     {
         ++uiError;
@@ -34,8 +34,8 @@ UINT TestSolver(CParameters& sParam)
     pResult2->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
     pResult2->D(appGetLattice()->m_pGaugeField);
     pResult2->AxpyMinus(pFermion);
-    Real fError2 = _cuCabsf(pResult2->Dot(pResult2)) / fLength;
-    appGeneral(_T("| D D^-1 phi - phi |^2 / |phi|^2=%f\n"), fError2);
+    Real fError2 = _cuCabsf(pResult2->Dot(pResult2));
+    appGeneral(_T("| D D^-1 phi - phi |^2 / |phi|^2=%8.18f\n"), fError2);
     if (appAbs(fError2) > fMaxError)
     {
         ++uiError;
@@ -46,8 +46,8 @@ UINT TestSolver(CParameters& sParam)
     pResult3->Ddagger(appGetLattice()->m_pGaugeField);
     pResult3->ApplyOperator(EFO_F_InverseDdagger, appGetLattice()->m_pGaugeField);
     pResult3->AxpyMinus(pFermion);
-    Real fError3 = _cuCabsf(pResult3->Dot(pResult3)) / fLength;
-    appGeneral(_T("| D+^-1 D+ phi - phi |^2 / |phi|^2=%f\n"), fError3);
+    Real fError3 = _cuCabsf(pResult3->Dot(pResult3));
+    appGeneral(_T("| D+^-1 D+ phi - phi |^2 / |phi|^2=%8.18f\n"), fError3);
     if (appAbs(fError3) > fMaxError)
     {
         ++uiError;
@@ -58,8 +58,8 @@ UINT TestSolver(CParameters& sParam)
     pResult4->ApplyOperator(EFO_F_InverseDdagger, appGetLattice()->m_pGaugeField);
     pResult4->Ddagger(appGetLattice()->m_pGaugeField);
     pResult4->AxpyMinus(pFermion);
-    Real fError4 = _cuCabsf(pResult4->Dot(pResult4)) / fLength;
-    appGeneral(_T("| D+ D+^-1 phi - phi |^2 / |phi|^2=%f\n"), fError4);
+    Real fError4 = _cuCabsf(pResult4->Dot(pResult4));
+    appGeneral(_T("| D+ D+^-1 phi - phi |^2 / |phi|^2=%8.18f\n"), fError4);
     if (appAbs(fError4) > fMaxError)
     {
         ++uiError;
@@ -70,8 +70,8 @@ UINT TestSolver(CParameters& sParam)
     pResult5->DDdagger(appGetLattice()->m_pGaugeField);
     pResult5->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
     pResult5->AxpyMinus(pFermion);
-    Real fError5 = _cuCabsf(pResult5->Dot(pResult5)) / fLength;
-    appGeneral(_T("| (DD+)^-1 (DD+) phi - phi |^2 / |phi|^2=%f\n"), fError5);
+    Real fError5 = _cuCabsf(pResult5->Dot(pResult5));
+    appGeneral(_T("| (DD+)^-1 (DD+) phi - phi |^2 / |phi|^2=%8.18f\n"), fError5);
     if (appAbs(fError5) > fMaxError)
     {
         ++uiError;
@@ -82,8 +82,8 @@ UINT TestSolver(CParameters& sParam)
     pResult6->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
     pResult6->DDdagger(appGetLattice()->m_pGaugeField);
     pResult6->AxpyMinus(pFermion);
-    Real fError6 = _cuCabsf(pResult6->Dot(pResult6)) / fLength;
-    appGeneral(_T("| (DD+) (DD+)^-1 phi - phi |^2 / |phi|^2=%f\n"), fError6);
+    Real fError6 = _cuCabsf(pResult6->Dot(pResult6));
+    appGeneral(_T("| (DD+) (DD+)^-1 phi - phi |^2 / |phi|^2=%8.18f\n"), fError6);
     if (appAbs(fError6) > fMaxError)
     {
         ++uiError;

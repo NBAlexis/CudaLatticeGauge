@@ -398,3 +398,78 @@ int main()
     cudaFree(buffer3);
     cudaFree(buffer4);
 }
+
+
+==============================================================================================
+
+class alignas(8) ClassABC
+{
+public:
+    __host__ __device__ ClassABC():m_iValue(0){ ;  }
+    __device__ void Add(int v)
+    {
+        m_iValue += v;
+        m_bySomeTag = static_cast<byte>(m_iValue & 0x11);
+    }
+    __device__ void DebugPrint() const
+    {
+        printf("%d,%d;", m_iValue, m_bySomeTag);
+    }
+    int m_iValue;
+    byte m_bySomeTag;
+};
+
+class alignas(256) ClassDEF
+{
+public:
+    __host__ __device__ ClassDEF() { ; }
+
+    __device__ void Add(int v)
+    {
+        m_abc[10].Add(v);
+        //m_values[10] += v; also work
+    }
+
+    __device__ void DebugPrint() const
+    {
+        m_abc[10].DebugPrint();
+    }
+    //Witout warning
+    //device: ClassABC 4, ClassDEF 0
+    //host: ClassABC 4, ClassDEF 80
+    union 
+    {
+        ClassABC m_abc[20];
+        int m_values[40];
+    };
+
+    //With warning
+    //Output:
+    //device: ClassABC 4, ClassDEF 0
+    //host: ClassABC 4, ClassDEF 80
+    //ClassABC m_abc[20];
+};
+
+__global__ void TestFunc()
+{
+    ClassDEF def[5];
+    printf("device: ClassABC %d, ClassDEF %d\n", sizeof(ClassABC), sizeof(ClassDEF));
+
+    for (int i = 0; i < 5; ++i)
+    {
+        def[i].Add(i);
+        def[i].DebugPrint();
+    }
+}
+
+int main()
+{
+    printf("host: ClassABC %d, ClassDEF %d\n", sizeof(ClassABC), sizeof(ClassDEF));
+
+    //If use the version with warning, must set stack size, or there will be a stackoverflow.
+    //checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 1 << 16));
+    TestFunc << <1, 1 >> > ();
+    checkCudaErrors(cudaDeviceSynchronize());
+    return 0;
+}
+

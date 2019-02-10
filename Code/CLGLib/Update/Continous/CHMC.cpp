@@ -34,6 +34,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     UBOOL bAccepted = FALSE;
     Real fEnergy = F(0.0);
     Real fEnergyNew = F(0.0);
+
     for (UINT i = 0; i < iSteps; ++i)
     {
         m_pIntegrator->Prepare(bAccepted);

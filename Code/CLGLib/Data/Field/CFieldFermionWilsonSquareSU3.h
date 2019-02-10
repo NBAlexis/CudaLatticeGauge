@@ -56,25 +56,18 @@ public:
     virtual UBOOL InverseD(const CField* pGauge);
     virtual UBOOL InverseDdagger(const CField* pGauge);
     virtual UBOOL InverseDDdagger(const CField* pGauge);
-
+    virtual void ApplyGamma(EGammaMatrix eGamma);
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
-    virtual void CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce);
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce) const;
 
 protected:
 
     Real m_fKai;
 
-
     deviceWilsonVectorSU3* m_pDeviceData;
     //When calculating D phi etc, the neigbour will change, so we need to copy it before calculate
     deviceWilsonVectorSU3* m_pDeviceDataCopy;
-
-    //For SU3, this is 8 x sizeof(m_pDeviceData), where 8 is the number of generators of SU3
-    deviceWilsonVectorSU3* m_pForceRightVector;
-    deviceWilsonVectorSU3* m_pForceRightVectorCopy;
-    deviceWilsonVectorSU3* m_pForceLeftVector;
-    deviceWilsonVectorSU3* m_pForceLeftVectorCopy;
 
 };
 

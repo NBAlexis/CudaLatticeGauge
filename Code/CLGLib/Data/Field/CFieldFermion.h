@@ -24,7 +24,11 @@ public:
     }
 
     virtual void PrepareForHMC(const CFieldGauge* pGauge) = 0;
-    virtual void CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce) = 0;
+
+    /**
+    * Calculate force can fail due to solver
+    */
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce) const = 0;
 
     virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield)
     {
@@ -50,6 +54,7 @@ public:
             return FALSE;
         }
     }
+    virtual void ApplyGamma(EGammaMatrix eGamma) = 0;
 
     virtual void D(const CField* pGauge) = 0;
     virtual void Ddagger(const CField* pGauge) = 0;

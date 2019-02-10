@@ -86,6 +86,12 @@
 
 \clearpage
 
+\section{\label{measure}Measurement}
+
+\input "Measurement/PlatqutteEnergy.tex"
+
+\clearpage
+
 \section{\label{Programming}Programming}
 
 \input "programming/cuda.tex"

@@ -52,36 +52,104 @@ template <typename T> void check(T result, char const *const func, const char *c
     }
 }
 
-class ClassABC
+#define _TESTLENGTH_ (65536)
+#define _ONE_LINE_START_ (12345)
+#define _ONE_LINE_END_ (12360)
+
+struct alignas(8) ClassA
 {
 public:
-    __host__ __device__ ClassABC() { ;  }
+    __device__ ClassA(): m_iValue(0), m_bySomeTag(0) { ; }
+    __device__ ClassA(int v) : m_iValue(v), m_bySomeTag(static_cast<byte>(v & 0x11)) { ; }
+    __device__ void Add(int v)
+    {
+        m_iValue += v;
+        m_bySomeTag = static_cast<byte>(m_iValue & 0x11);
+    }
+    __device__ void DebugPrint() const
+    {
+        printf("v=%d,%d; ", m_iValue, static_cast<int>(m_bySomeTag));
+    }
     int m_iValue;
+    byte m_bySomeTag;
+
+    byte _nouse[3];
 };
 
-class ClassDEF
+class ClassB
 {
 public:
-    __host__ __device__ ClassDEF() { ; }
-
-    //Witout warning
-    //union 
-    //{
-    //    ClassABC m_abc[1];
-    //    int m_values[1];
-    //};
-
-    //With warning
-    ClassABC m_abc[1];
+    __device__ ClassB() { ; }
+    __device__ virtual void InitialArray(ClassA * pArray) = 0;
 };
 
-__global__ void TestFunc()
+class ClassC : public ClassB
 {
-    ClassDEF def[1];
+public:
+    __device__ ClassC() : ClassB() { ; }
+    __device__ virtual void InitialArray(ClassA * pArray)
+    {
+        for (int i = 0; i < _TESTLENGTH_; ++i)
+        {
+            pArray[i] = ClassA(i);
+        }
+    }
+};
+
+__constant__ ClassB* __pWorker;
+
+__global__ void InitialConstant(ClassB** ppWorker)
+{
+    (*ppWorker) = (ClassB*)new ClassC();
+}
+
+__global__ void PrintArray(ClassA * pArray)
+{
+    for (int i = _ONE_LINE_START_; i < _ONE_LINE_END_; ++i)
+    {
+        pArray[i].DebugPrint();
+    }
+    printf("\n");
+}
+
+__global__ void TestA1(ClassA * pArray)
+{
+    __pWorker->InitialArray(pArray);
+}
+
+__global__ void TestA2()
+{
+    ClassA array[_TESTLENGTH_];
+    __pWorker->InitialArray(array);
+    for (int i = _ONE_LINE_START_; i < _ONE_LINE_END_; ++i)
+    {
+        array[i].DebugPrint();
+    }
+    printf("\n");
 }
 
 int main()
 {
-    TestFunc << <1, 1 >> > ();
-    return 0;
+    //=======================
+    //Initial the constant
+    ClassB** ppDeviceWorker;
+    cudaMalloc((void**)&ppDeviceWorker, sizeof(ClassB*));
+    InitialConstant << <1, 1 >> > (ppDeviceWorker);
+    cudaMemcpyToSymbol(__pWorker, ppDeviceWorker, sizeof(ClassB*));
+    cudaFree(ppDeviceWorker);
+
+    //=======================
+    //Test with malloc buffer
+    ClassA* pDeviceBuffer;
+    cudaMalloc((void**)&pDeviceBuffer, sizeof(ClassA) * _TESTLENGTH_);
+    TestA1 << <1, 1 >> > (pDeviceBuffer);
+    PrintArray << <1, 1 >> > (pDeviceBuffer);
+
+    //=======================
+    //Test with device array
+    //TestA2 << <1, 1 >> > ();
+
+    //=======================
+    //Free
+    cudaFree(pDeviceBuffer);
 }

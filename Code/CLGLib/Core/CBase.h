@@ -46,12 +46,6 @@ virtual CField* GetCopy() const \
     CopyTo(ret); \
     return ret; \
 } \
-virtual CField* GetZero() const \
-{ \
-    class_name* ret = new class_name(); \
-    ret->InitialField(EFIT_Zero); \
-    return ret; \
-} \
 protected:
 
 

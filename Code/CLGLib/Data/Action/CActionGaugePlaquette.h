@@ -25,7 +25,8 @@ public:
     virtual Real Energy(const class CFieldGauge* pGauge) const;
     virtual Real Energy(const class CFieldGauge* pGauge, const class CFieldGauge* pStable) const;
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
-    virtual void CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
+
+    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
 
     void SetBeta(Real fBeta);
     Real GetEnergyPerPlaqutte() const;

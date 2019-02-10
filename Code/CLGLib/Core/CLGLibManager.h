@@ -28,12 +28,11 @@ public:
         , m_pLatticeData(NULL)
         , m_pFileSystem(NULL)
     {
-        //appInitCriticalSection();
         appInitialTracer(GENERAL);
     }
     ~CCLGLibManager()
     {
-        //appUninitCriticalSection();
+
     }
 
     UBOOL InitialWithParameter(class CParameters& params);

@@ -45,8 +45,14 @@ public:
     * Calculate the force on gauge fields to update the fields
     * Note that, gauge field will be changed, the change will be accepte or rejected.
     * So the "pGauge" must be a copy of real gauge field, not the orignal one!
+    * Can fail due to solver
     */
-    virtual void CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
+    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
+
+    /**
+    * Generate randoms
+    */
+    virtual void PrepareForHMC(const CFieldGauge* ) { ; }
 
     BYTE GetActionId() const { return m_byActionId; }
 

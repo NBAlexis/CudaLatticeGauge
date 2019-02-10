@@ -121,6 +121,7 @@ UINT uiDir = _DC_Dir;
 
 #include "Data/Action/CAction.h"
 #include "Data/Action/CActionGaugePlaquette.h"
+#include "Data/Action/CActionFermionWilsonNf2.h"
 
 #include "SparseLinearAlgebra/CSLASolve.h"
 #include "SparseLinearAlgebra/CSolveBiCGstab.h"

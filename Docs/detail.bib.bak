@@ -16,6 +16,13 @@
       doi            = "10.1007/978-3-642-01850-3",
 }
 
+@article{latticeqcdbook1998,
+      author         = "Rajan Gupta",
+      title          = "{Introduction to Lattice QCD}",
+      year           = "1998",
+      eprint         = "1801.01125",
+}
+
 @article{bridge,
       author         = "S. Ueda et. al.",
       title          = "{Development of an object oriented lattice QCD code "Bridge++" on accelerators}",
@@ -805,16 +812,6 @@
       volume         = "37",
       pages          = "580(R)",
       doi            = "10.1103/PhysRevB.37.580",
-}
-
-@article{bridge,
-      author         = "S. Ueda et. al.",
-      title          = "{Development of an object oriented lattice QCD code "Bridge++"}",
-      year           = "1988",
-      journal        = "Journal of Physics: Conference Series",
-      volume         = "523",
-      pages          = "012046",
-      doi            = "10.1088/1742-6596/523/1/012046",
 }
 
 @article{bosonsignproblem1,

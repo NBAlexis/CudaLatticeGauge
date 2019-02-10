@@ -89,7 +89,7 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, UINT& coun
             int4 fsite2 = _deviceMoveSquareSite(xyzt, uiLinkDir + 1);
             retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite2, xyzt);
             retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = SIndex::kDagger;
+            retV[iListIndex].m_byTag = _kDagger;
             ++iListIndex;
 
             //=============================================
@@ -98,7 +98,7 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, UINT& coun
             int4 bsite2 = _deviceMoveSquareSite(xyzt, -(i + 1));
             retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(bsite2, xyzt);
             retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = SIndex::kDagger;
+            retV[iListIndex].m_byTag = _kDagger;
             ++iListIndex;
 
             retV[iListIndex] = SIndex(retV[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
@@ -145,11 +145,11 @@ __device__ void CIndexSquare::_deviceGetPlaquttesAtSite(SIndex* retV, UINT& coun
             int4 fsite2 = _deviceMoveSquareSite(xyzt, uiPlaq + 1);
             retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite2, xyzt);
             retV[iListIndex].m_byDir = uiLink;
-            retV[iListIndex].m_byTag = SIndex::kDagger;
+            retV[iListIndex].m_byTag = _kDagger;
             ++iListIndex;
 
             retV[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            retV[iListIndex].m_byTag = SIndex::kDagger;
+            retV[iListIndex].m_byTag = _kDagger;
             ++iListIndex;
         }
     }

@@ -50,7 +50,7 @@ extern "C" { extern void _cCreateIndex(void** devicePtr, deviceBoundaryCondition
 class CLGAPI CIndex
 {
 public:
-    enum { kSpace = 0x01, kTime = 0x10, kSpaceTime = 0x11, };
+    enum { kSpace = 0x01, kTime = 0x02, kSpaceTime = 0x03, };
 
     __device__ CIndex(class deviceBoundaryCondition * devicePtr) : m_pBoundaryCondition(devicePtr) { ; }
     __device__ ~CIndex()

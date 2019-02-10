@@ -15,13 +15,6 @@ __CLGIMPLEMENT_CLASS(CSLASolverBiCGStab)
 
 CSLASolverBiCGStab::CSLASolverBiCGStab() 
     : m_pOwner(NULL) 
-    , m_pS(NULL)
-    , m_pT(NULL)
-    , m_pR(NULL)
-    , m_pX(NULL)
-    , m_pRh(NULL)
-    , m_pP(NULL)
-    , m_pV(NULL)
     , m_uiReTry(1)
     , m_uiDevationCheck(10)
     , m_uiStepCount(20)
@@ -62,31 +55,26 @@ void CSLASolverBiCGStab::Configurate(const CParameters& param)
     }
 }
 
-void CSLASolverBiCGStab::AllocateBuffers(const CField* pField)
+void CSLASolverBiCGStab::AllocateBuffers(const CField* )
 {
-    ReleaseBuffers();
-    m_pS = pField->GetZero();
-    m_pT = pField->GetZero();
-    m_pR = pField->GetZero();
-    m_pX = pField->GetZero();
-    m_pRh = pField->GetZero();
-    m_pP = pField->GetZero();
-    m_pV = pField->GetZero();
+
 }
 
 void CSLASolverBiCGStab::ReleaseBuffers()
 {
-    appSafeDelete(m_pS);
-    appSafeDelete(m_pT);
-    appSafeDelete(m_pR);
-    appSafeDelete(m_pX);
-    appSafeDelete(m_pRh);
-    appSafeDelete(m_pP);
-    appSafeDelete(m_pV);
+
 }
 
 UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM)
 {
+    CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pP = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pV = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pRh = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pS = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pT = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+
     //use it to estimate relative error
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
@@ -97,15 +85,15 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     appParanoiac(_T("-- CSLASolverBiCGStab::Solve start --\n"));
 
     //Using b as the guess, (Assuming M is near identity?)
-    pFieldB->CopyTo(m_pX);
+    pFieldB->CopyTo(pX);
 
     //r_0 = b - A x_0
-    pFieldB->CopyTo(m_pR); 
-    m_pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
+    pFieldB->CopyTo(pR); 
+    pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
     //appGeneral(_T("==================== kai = %f ==================\n"), m_pR->m_)
-    m_pR->ScalarMultply(F(-1.0)); //-A x_0
-    m_pR->AxpyPlus(m_pX); //b - A x_0
-    m_pR->CopyTo(m_pRh);
+    pR->ScalarMultply(F(-1.0)); //-A x_0
+    pR->AxpyPlus(pX); //b - A x_0
+    pR->CopyTo(pRh);
 
     Real rho = 0;
     Real last_rho = 0;
@@ -119,79 +107,96 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
         {
             //==========
             //One step
-            rho = _cuCabsf(m_pRh->Dot(m_pR));//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
-            if (appAbs(rho) < F(0.00000001))
+            rho = _cuCabsf(pRh->Dot(pR));//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
+            if (appAbs(rho) < FLT_MIN)
             {
+                appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.18f\n"), rho);
                 break;
             }
 
             if (0 == j) //if is the first iteration, p=r(i-1)
             {
-                m_pR->CopyTo(m_pP);
+                pR->CopyTo(pP);
             }
             else //if not the first iteration, 
             {
                 //beta = last_alpha * rho /(last_omega * last_rho)
                 beta = alpha * rho / (omega * last_rho);
                 //p(i) = r(i-1)+beta( p(i-1) - last_omega v(i-1) )
-                m_pV->ScalarMultply(omega);
-                m_pP->AxpyMinus(m_pV);
-                m_pP->ScalarMultply(beta);
-                m_pP->AxpyPlus(m_pR);
+                pV->ScalarMultply(omega);
+                pP->AxpyMinus(pV);
+                pP->ScalarMultply(beta);
+                pP->AxpyPlus(pR);
             }
 
             //v(i) = A p(i)
-            m_pP->CopyTo(m_pV);
-            m_pV->ApplyOperator(uiM, pGaugeFeild);
+            pP->CopyTo(pV);
+            pV->ApplyOperator(uiM, pGaugeFeild);
 
-            alpha = rho / (_cuCabsf(m_pRh->Dot(m_pV)));//alpha = rho / (rh dot v(i))
+            alpha = rho / (_cuCabsf(pRh->Dot(pV)));//alpha = rho / (rh dot v(i))
 
             //s=r(i-1) - alpha v(i)
-            m_pR->CopyTo(m_pS);
-            m_pS->Axpy(-alpha, m_pV);
+            pR->CopyTo(pS);
+            pS->Axpy(-alpha, pV);
 
             if (0 == (j - 1) % m_uiDevationCheck)
             {
                 //Normal of S is small, then stop
-                Real fDeviation = _cuCabsf(m_pS->Dot(m_pS)) / fBLength;
+                Real fDeviation = _cuCabsf(pS->Dot(pS)) / fBLength;
                 appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:%d, iteration:%d, deviation:%8.18f\n"), i, j, fDeviation);
                 if (fDeviation < m_fAccuracy)
                 {
-                    //m_pX->Axpy(alpha, m_pP);
-                    m_pX->CopyTo(pFieldX);
+                    //pX->Axpy(alpha, pP); //This is tested a better result not to do the final step
+                    pX->CopyTo(pFieldX);
+
+                    pX->Return();
+                    pP->Return();
+                    pV->Return();
+                    pR->Return();
+                    pRh->Return();
+                    pS->Return();
+                    pT->Return();
                     return TRUE;
                 }
             }
 
             //t=As
-            m_pS->CopyTo(m_pT);
-            m_pT->ApplyOperator(uiM, pGaugeFeild);
+            pS->CopyTo(pT);
+            pT->ApplyOperator(uiM, pGaugeFeild);
 
-            omega = _cuCabsf(m_pT->Dot(m_pS)) / _cuCabsf(m_pT->Dot(m_pT));//omega = ts / tt
+            omega = _cuCabsf(pT->Dot(pS)) / _cuCabsf(pT->Dot(pT));//omega = ts / tt
 
             //r(i)=s-omega t
-            m_pS->CopyTo(m_pR);
-            m_pR->Axpy(-omega, m_pT);
+            pS->CopyTo(pR);
+            pR->Axpy(-omega, pT);
 
             //x(i)=x(i-1) + alpha p + omega s
-            m_pX->Axpy(alpha, m_pP);
-            m_pX->Axpy(omega, m_pS);
+            pX->Axpy(alpha, pP);
+            pX->Axpy(omega, pS);
 
             last_rho = rho;//last_rho = rho
         }
 
         //we are here, means we do not converge.
         //we need to restart with a new guess, we use last X
-        m_pX->CopyTo(m_pR);
+        pX->CopyTo(pR);
 
-        m_pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
-        m_pR->ScalarMultply(-1); //-A x_0
-        m_pR->AxpyPlus(m_pX); //b - A x_0
-        m_pR->CopyTo(m_pRh);
+        pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
+        pR->ScalarMultply(-1); //-A x_0
+        pR->AxpyPlus(pX); //b - A x_0
+        pR->CopyTo(pRh);
     }
 
     //The solver failed.
     appCrucial(_T("CSLASolverBiCGStab fail to solve!"));
+
+    pX->Return();
+    pP->Return();
+    pV->Return();
+    pR->Return();
+    pRh->Return();
+    pS->Return();
+    pT->Return();
     return FALSE;
 }
 

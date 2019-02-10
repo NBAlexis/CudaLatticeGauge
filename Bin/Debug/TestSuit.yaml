@@ -331,7 +331,6 @@ TestFileIOBridgePPBin:
 
         GaugeFileName : bridgepp_conf_binary.dat
 
-
 TestSolverBiCGStab:
 
     Dim : 4
@@ -368,6 +367,8 @@ TestSolverBiCGStab:
 
         FieldId : 2
 
+        PoolNumber : 8
+
     Solver:
 
         SolverName : CSLASolverBiCGStab
@@ -381,3 +382,160 @@ TestSolverBiCGStab:
         Restart : 3
         ## 0 is recommanded
         AbsoluteAccuracy : 1
+
+TestFermionUpdator:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 0.1
+        IntegratorStep : 40
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 10
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.000000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+TestOperators:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 40
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 10
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.000000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

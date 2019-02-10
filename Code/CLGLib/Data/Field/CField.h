@@ -78,7 +78,7 @@ public:
     virtual void ScalarMultply(const _Complex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
     
-#pragma endregion BLAS
+#pragma endregion
 
 #pragma region Other useful operators
 
@@ -94,16 +94,77 @@ public:
     */
     virtual void ExpMult(const _Complex& a, CField* U) const = 0;
 
-    virtual void CopyTo(CField* U) const = 0;
+    virtual void CopyTo(CField* U) const
+    {
+        assert(NULL != U);
+        U->m_pOwner = m_pOwner;
+        U->m_byFieldId = m_byFieldId;
+    }
+
     virtual CField* GetCopy() const = 0;
-    virtual CField* GetZero() const = 0;
 
     virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield) = 0;
 
-#pragma endregion HMC
+#pragma endregion
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
+
+    void Return();
+
+    class CFieldPool* m_pPool;
+};
+
+class CLGAPI CFieldPool
+{
+public:
+    CFieldPool(CField* pOrignal, UINT uiCount)
+        : m_pOrignal(pOrignal)
+    {
+        for (UINT i = 0; i < uiCount; ++i)
+        {
+            m_pPool.AddItem(CreateNew());
+        }
+    }
+
+    virtual ~CFieldPool()
+    {
+        for (INT i = 0; i < m_pPool.Num(); ++i)
+        {
+            appSafeDelete(m_pPool[i]);
+        }
+    }
+
+    CField* GetOne()
+    {
+        if (m_pPool.Num() > 0)
+        {
+            return m_pPool.Pop();
+        }
+        CField* newOne = CreateNew();
+        return newOne;
+    }
+
+    void Return(CField* pField)
+    {
+        assert(NULL != pField 
+            && pField->m_byFieldId == m_pOrignal->m_byFieldId 
+            && pField->m_pPool == this
+            && pField != m_pOrignal);
+        m_pPool.PushBack(pField);
+    }
+
+    CField* m_pOrignal;
+    TArray<CField*> m_pPool;
+
+protected:
+
+    CField * CreateNew()
+    {
+        CField* pNew = m_pOrignal->GetCopy();
+        pNew->m_pPool = this;
+        return pNew;
+    }
 };
 
 __END_NAMESPACE

@@ -31,7 +31,7 @@ extern __constant__ class CIndex* __idx;
 extern __constant__ class gammaMatrixSet* __diracGamma;
 extern __constant__ class gammaMatrixSet* __chiralGamma;
 
-extern __constant__ struct deviceSU3* __SU3Generators[8];
+extern __constant__ struct deviceSU3 __SU3Generators[9];
 
 enum EConstIntId
 {
@@ -107,13 +107,13 @@ public:
     {
         checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
         checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
-        checkCudaErrors(cudaFree(m_pIndexBuffer));
+        //checkCudaErrors(cudaFree(m_pIndexBuffer));
     }
 
     _Complex ThreadBufferSum(_Complex * pDeviceBuffer);
     Real ThreadBufferSum(Real * pDeviceBuffer);
 
-    struct SIndex* m_pIndexBuffer;
+    //struct SIndex* m_pIndexBuffer;
     _Complex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
     UINT m_uiThreadCount;

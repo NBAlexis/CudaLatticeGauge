@@ -44,7 +44,7 @@ extern "C" {
         */
         __device__ __inline__ deviceWilsonVectorSU3 MulWilsonC(const deviceWilsonVectorSU3& other) const
         {
-            deviceWilsonVectorSU3 ret;
+            deviceWilsonVectorSU3 ret = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
             ret.m_d[0] = other.m_d[m_uiIndex[0]];
             ret.m_d[0].MulCompI(m_me[0]);
 
@@ -158,42 +158,42 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
+enum EGammaMatrix
+{
+    ZERO,
+    UNITY,
+    GAMMA1,
+    GAMMA2,
+    GAMMA3,
+    GAMMA4,
+    GAMMA5,
+    GAMMA51,
+    GAMMA52,
+    GAMMA53,
+    GAMMA54,
+    GAMMA15,
+    GAMMA25,
+    GAMMA35,
+    GAMMA45,
+    SIGMA12,
+    SIGMA23,
+    SIGMA31,
+    SIGMA41,
+    SIGMA42,
+    SIGMA43,
+    CHARGECONJG,
+    EGM_MAX,
+};
+
+enum EGammaMatrixSet
+{
+    EGMS_Dirac,
+    EGMS_Chiral,
+};
+
 class gammaMatrixSet
 {
 public:
-    enum EGammaMatrix
-    {
-        ZERO,
-        UNITY,
-        GAMMA1,
-        GAMMA2,
-        GAMMA3,
-        GAMMA4,
-        GAMMA5,
-        GAMMA51,
-        GAMMA52,
-        GAMMA53,
-        GAMMA54,
-        GAMMA15,
-        GAMMA25,
-        GAMMA35,
-        GAMMA45,
-        SIGMA12,
-        SIGMA23,
-        SIGMA31,
-        SIGMA41,
-        SIGMA42,
-        SIGMA43,
-        CHARGECONJG,
-        EGM_MAX,
-    };
-
-    enum EGammaMatrixSet
-    {
-        EGMS_Dirac,
-        EGMS_Chiral,
-    };
-
     __device__ gammaMatrixSet(EGammaMatrixSet eSet)
     {
         m_gm[UNITY].Set(0, 0, 1, 0);

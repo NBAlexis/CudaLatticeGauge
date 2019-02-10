@@ -194,9 +194,6 @@
     <ClInclude Include="Data\Action\CActionFermion.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Action\CActionFermionWilson.h">
-      <Filter>Data\Action</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGauge.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
@@ -223,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="Platform\CFile.h">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h">
+      <Filter>Data\Action</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +306,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldGauge.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionFermionWilsonNf2.cpp">
+      <Filter>Data\Action</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

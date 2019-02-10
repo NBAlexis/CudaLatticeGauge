@@ -72,7 +72,7 @@
 
 #define _D_ComplexThreadBuffer (appGetCudaHelper()->m_pComplexBufferThreadCount)
 #define _D_RealThreadBuffer (appGetCudaHelper()->m_pRealBufferThreadCount)
-#define _D_IndexBuffer (appGetCudaHelper()->m_pIndexBuffer)
+//#define _D_IndexBuffer (appGetCudaHelper()->m_pIndexBuffer)
 
 
 #define _DC_InverseSqrtLink16 (_constFloats[ECF_InverseSqrtLink16])
@@ -152,17 +152,17 @@ __device__ __inline__ static int4 __deviceFatIndexToInt4(UINT fatIndex)
 
 #pragma endregion
 
+enum
+{
+    _kDagger = 0x01,
+};
+
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
 
     struct alignas(8) SIndex
     {
-        enum
-        {
-            kDagger = 0x01,
-        };
-
         __device__ SIndex()
             : m_uiSiteIndex(0)
             , m_byDir(0)
@@ -181,19 +181,29 @@ extern "C" {
 
         }
 
+        __device__ SIndex(const SIndex& other)
+            : m_uiSiteIndex(other.m_uiSiteIndex)
+            , m_byDir(other.m_byDir)
+            , m_byTag(other.m_byTag)
+            , m_byBoundaryFieldId(other.m_byBoundaryFieldId)
+        {
+
+        }
+
         __device__ __inline__ void DebugPrint() const
         {
             int4 xyzt = __deviceSiteIndexToInt4(m_uiSiteIndex);
-            printf("(xyzt:%d,%d,%d,%d)_(%d)%s\n", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
+            printf("(xyzt:%d,%d,%d,%d)_(%x)%s\n", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
         }
 
-        __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (kDagger & m_byTag); }
+        __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (_kDagger & m_byTag); }
         __device__ __inline__ UBOOL NeedBoundaryField() const { return 0 != m_byBoundaryFieldId; }
 
         UINT m_uiSiteIndex;
         BYTE m_byDir;
         BYTE m_byTag;
         BYTE m_byBoundaryFieldId;
+        BYTE m_byUnused;
     };
 
 #if defined(__cplusplus)

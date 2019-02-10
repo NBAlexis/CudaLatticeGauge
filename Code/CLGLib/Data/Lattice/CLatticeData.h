@@ -13,30 +13,8 @@
 
 __BEGIN_NAMESPACE
 
-//class CLGAPI CDeviceLattice
-//{
-//public:
-//    //One can only create a device lattice on device
-//    CDeviceLattice() {}
-//
-//
-//    //UINT m_uiVolumn;
-//    //UINT m_uiDim;
-//    //UINT m_uiDir;
-//    //UINT m_uiTLength;
-//    //Real m_fBeta;
-//    //UINT m_uiLatticeLength[CCommonData::kMaxDim];
-//    //UINT m_uiLatticeDecompose[CCommonData::kLatticeDecompose * 2];
-//    //UINT m_uiLatticeMultipy[CCommonData::kMaxDim - 1];
-//
-//    class CIndex* m_pIndex;
-//};
-
 class CLGAPI CLatticeData
 {
-    //static CLatticeData* m_pInstance;
-    //CDeviceLattice* m_pDeviceInstance;
-
 public:
     /**
     * Initial with CommonData
@@ -48,12 +26,15 @@ public:
     void OnUpdatorConfigurationAccepted();
     void OnUpdatorFinished();
     void GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink);
+    void CreateFieldPool(BYTE byFieldId, UINT uiCount);
 
     class CRandom* m_pRandom;
 
     class CFieldGauge* m_pGaugeField;
     TArray<class CField*> m_pOtherFields; //for delete
     THashMap<BYTE, class CField*> m_pFieldMap;
+    TArray<class CFieldPool*> m_pFieldPools;
+    THashMap<BYTE, class CFieldPool*> m_pFieldPoolMap;
 
     /**
     * \note we assume the first action is gauge action
@@ -75,6 +56,7 @@ public:
 
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.GetAt(byId); }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.GetAt(byId); }
+    class CField* GetPooledFieldById(BYTE byId);
 };
 
 inline class CSLASolver* appGetFermionSolver();

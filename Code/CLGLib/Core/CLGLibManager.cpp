@@ -396,6 +396,12 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
     m_pLatticeData->m_pOtherFields.AddItem(pFermion);
 
+    __FetchIntWithDefault(_T("PoolNumber"), 0);
+    if (iVaules > 0)
+    {
+        m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
+    }
+
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
 }
 
