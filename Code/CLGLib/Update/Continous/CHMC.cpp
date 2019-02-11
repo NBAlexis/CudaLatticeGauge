@@ -32,20 +32,21 @@ void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
 UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 {
     UBOOL bAccepted = FALSE;
+
     Real fEnergy = F(0.0);
     Real fEnergyNew = F(0.0);
 
     for (UINT i = 0; i < iSteps; ++i)
     {
-        m_pIntegrator->Prepare(bAccepted);
-        if (0 == i && m_bMetropolis)
+        m_pIntegrator->Prepare(bAccepted, i);
+        if (m_bMetropolis)
         {
-            fEnergy = m_pIntegrator->GetEnergy();
+            fEnergy = m_pIntegrator->GetEnergy(TRUE);
         }
         m_pIntegrator->Evaluate();
         if (m_bMetropolis)
         {
-            fEnergyNew = m_pIntegrator->GetEnergy();
+            fEnergyNew = m_pIntegrator->GetEnergy(FALSE);
         }
 
         Real diff_H = F(1.0);
@@ -55,8 +56,9 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         {
             Real fDiff = fEnergy - fEnergyNew;
             //Metropolis
-            appGeneral(_T(" HMC: step = %d, H (before, after, diff) = (%f, %f, %f)\n"),
-                i + 1, fEnergy, fEnergyNew, fDiff);
+            appDetailed(_T(" HMC: step = %d, H_dff = %f\n"),
+                i + 1, 
+                fDiff);
             diff_H = _exp(fDiff);  // Delta H (SA)
             rand = GetRandomReal();
         }
@@ -65,15 +67,14 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         {
             ++m_iAcceptedConfigurationCount;
             appGeneral(_T("  Accepted (accepted:%d)\n"), m_iAcceptedConfigurationCount);
-            m_pIntegrator->Accept(); //Here we copy the gauge field back
             bAccepted = TRUE;
-            fEnergy = fEnergyNew;
         }
         else
         {
             appGeneral(_T("  Rejected (accepted:%d)\n"), m_iAcceptedConfigurationCount);
             bAccepted = FALSE;
         }
+        m_pIntegrator->OnFinishTrajectory(bAccepted); //Here we copy the gauge field back
 
         //If rejected, just accept the old configuration and trigger the measure
         if (bMeasure)
@@ -86,7 +87,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 
-    m_pOwner->OnUpdatorFinished();
+    m_pOwner->OnUpdatorFinished(bMeasure);
     return m_iAcceptedConfigurationCount;
 }
 

@@ -17,7 +17,26 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquette)
 CActionGaugePlaquette::CActionGaugePlaquette()
     : CAction()
     , m_uiPlaqutteCount(0)
+    , m_fLastEnergy(F(0.0))
+    , m_fNewEnergy(F(0.0))
+    , m_fBetaOverN(F(0.1))
 {
+}
+
+void CActionGaugePlaquette::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+{
+    if (0 == uiUpdateIterate)
+    {
+        m_fLastEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+    }
+}
+
+void CActionGaugePlaquette::OnFinishTrajectory(UBOOL bAccepted)
+{
+    if (bAccepted)
+    {
+        m_fLastEnergy = m_fNewEnergy;
+    }
 }
 
 void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
@@ -55,14 +74,21 @@ UBOOL CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, c
 /**
 * The implementation depends on the type of gauge field
 */
-Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge) const
+Real CActionGaugePlaquette::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
-    return pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
-}
-
-Real CActionGaugePlaquette::Energy(const class CFieldGauge* pGauge, const class CFieldGauge* pStable) const
-{
-    return pGauge->CalculatePlaqutteEnergyUsingStable(m_fBetaOverN, pStable);
+    if (bBeforeEvolution)
+    {
+        return m_fLastEnergy;
+    }
+    if (NULL == pStable)
+    {
+        m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+    }
+    else
+    {
+        m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUsingStable(m_fBetaOverN, pStable);
+    }
+    return m_fNewEnergy;
 }
 
 Real CActionGaugePlaquette::GetEnergyPerPlaqutte() const

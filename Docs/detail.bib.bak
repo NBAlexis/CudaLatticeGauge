@@ -20,7 +20,14 @@
       author         = "Rajan Gupta",
       title          = "{Introduction to Lattice QCD}",
       year           = "1998",
-      eprint         = "1801.01125",
+      eprint         = "hep-lat/9807028",
+}
+
+@article{latticeqcdreview2009,
+      author         = "Martin L$\rm \"{u}$scher",
+      title          = "{Computational Strategies in Lattice QCD}",
+      year           = "2009",
+      eprint         = "1002.4232",
 }
 
 @article{bridge,

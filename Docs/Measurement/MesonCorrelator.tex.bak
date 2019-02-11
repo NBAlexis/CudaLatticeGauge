@@ -50,6 +50,7 @@ Note that, they are all Grassman numbers (exchange three times will introduce a 
 Using the Wick theorem for Grassman numbers ($f$ is flavour index, $c$ is color index, $a,b$ are spinor index).
 \begin{equation}
 \begin{split}
+&\langle \psi _1 \bar{\psi}_1\ldots \psi _n \bar{\psi}_n\rangle = \frac{1}{Z_f}\int \mathcal{\psi}\exp \left(\textcolor[rgb]{1,0,0}{+}\sum _{n}\bar{\psi}M\psi\right) =(-1)^n \det \left[M^{-1}\right]\\
 &\langle \psi^f (n)_{a,c_1}\bar{\psi}^f_{b,c_2}(m)\rangle = -D_{f,a,b,c_1,c_2}^{-1}(n,m).\\
 \end{split}
 \end{equation}
@@ -70,4 +71,4 @@ Denote the variables as $C_S$ and $O_S$.
 
 \subsubsection{\label{MonteCarloInMonteCarlo}Monte Carlo in Monte Carlo}
 
-\subsubsection{\label{MonteCarloInMonteCarlo}Monte Carlo in Monte Carlo}
+Trace estimator.

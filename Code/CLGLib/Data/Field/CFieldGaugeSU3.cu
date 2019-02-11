@@ -175,7 +175,7 @@ void _kernelStapleAtSiteSU3(
 {
     intokernaldir;
 
-    betaOverN = betaOverN * F(0.5);
+    betaOverN = betaOverN * F(-0.5);
     SIndex plaquttes[kMaxPlaqutteCache];
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -247,7 +247,7 @@ void _kernelStapleAtSiteSU3CacheIndex(
 {
     intokernaldir;
 
-    betaOverN = betaOverN * F(0.5);
+    betaOverN = betaOverN * F(-0.5);
     UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
@@ -463,7 +463,30 @@ void _kernelExpMultSU3(
             deviceSU3 expP = pMyDeviceData[linkIndex].Exp(a, _DC_ExpPrecision);
 
             expP.Mul(pU[linkIndex]);
-            //expP.Norm();
+            expP.Norm();
+            pU[linkIndex] = expP;
+        }
+    }
+}
+
+__global__
+void _kernelExpMultSU3Real(
+    const deviceSU3 * __restrict__ pMyDeviceData,
+    Real a,
+    deviceSU3 *pU)
+{
+    intokernaldir;
+
+    for (UINT it = 0; it < uiTLength; ++it)
+    {
+        coord[3] = it;
+        for (UINT idir = 0; idir < uiDir; ++idir)
+        {
+            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
+            deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
+
+            expP.Mul(pU[linkIndex]);
+            expP.Norm();
             pU[linkIndex] = expP;
         }
     }
@@ -842,6 +865,20 @@ void CFieldGaugeSU3::ExpMult(const _Complex& a, CField* U) const
 
     preparethread;
     _kernelExpMultSU3 << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+}
+
+void CFieldGaugeSU3::ExpMult(Real a, CField* U) const
+{
+    if (NULL == U || EFT_GaugeSU3 != U->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: U field is not SU3");
+        return;
+    }
+
+    CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(U);
+
+    preparethread;
+    _kernelExpMultSU3Real << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
 }
 
 void CFieldGaugeSU3::ElementNormalize()

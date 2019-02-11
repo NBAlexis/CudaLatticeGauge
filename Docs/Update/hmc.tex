@@ -12,7 +12,7 @@ We begin with Eq.~(1.85) and Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}.
 &Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\exp \left(-S_G[U]\textcolor[rgb]{1,0,0}{-}\sum _{f=1}^{N_f}\bar{\psi} _f\left(\hat{D}_f\right)\psi _f\right)
 \end{split}
 \end{equation}
-where $\hat{D}_f=D+m_f$. (Note that, different from Eq.~(1.85), we have $S_F=\textcolor[rgb]{1,0,0}{+}\bar{\psi}D\psi$ which is same as Eq.~(5.39) of Ref.~\cite{latticeqcdbook2010} and Eq.~(7.6) of Ref.~\cite{latticeqcdbook1998}. I think there might be a typo in Eq.~(1.85))
+where $\hat{D}_f=D+m_f$. (Note that, there seems a typo in Eq.~(1.85), we have $S_F=\textcolor[rgb]{1,0,0}{+}\bar{\psi}D\psi$, see also Eq.~(5.39) of Ref.~\cite{latticeqcdbook2010} and Eq.~(7.6) of Ref.~\cite{latticeqcdbook1998}, Eq.~(3.75) of Ref.~\cite{latticeqcdbook2017}, etc.)
 
 It can be evaluated as Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}~(or Eq.~(4.19) of Ref.~\cite{condensedmatterbookAltland}) (Note, there is another minus sign in Eq.~(5.28) of Ref.~\cite{latticeqcdbook2010})
 \begin{equation}
@@ -55,7 +55,7 @@ We now, concentrate on two degenerate fermion flavours. i.e. considering
 \end{split}
 \end{equation}
 
-Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.} See also Ref.~\cite{weingarten1981}.), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010}
+Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.} See also Ref.~\cite{weingarten1981}.), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010} (Eq.~(2.77) of Ref.~\cite{latticeqcdreview2009})
 \begin{equation}
 \begin{split}
 &\int \mathcal{D}[\bar{\psi}]\mathcal{D}[\psi]\exp\left(-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d\right)=\det (\hat{D}\hat{D}^{\dagger})=\int \mathcal{D}[\phi] \exp (-\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi)
@@ -66,7 +66,7 @@ where $\phi$ now is a complex Bosnic field.
 So, generally, we are using HMC to evaluate the action with 'Pseudofermions`, or in other words, we are working with an action including only gauge and bosons.
 \begin{equation}
 \begin{split}
-&S=S_G+S_{pf}=S_G\textcolor[rgb]{1,0,0}{+}\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi\\
+&S=S_G+S_{pf}=S_G+\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi\\
 \end{split}
 \end{equation}
 where $pf$ is short for pseudofermion.
@@ -79,11 +79,41 @@ Treating $SU(N)$ matrix $U$ on links as coordinate, HMC will generate a pair of 
 
 One can:
 
-(1) Create a random $P$.
+\begin{enumerate}
+  \item Create a random $P=i\sum _a\omega _a T_a$, where $\omega _a\in \mathbb{R}$.
+  \item Obtain $\dot{P}$, $\dot{U}$. Note that, dot is $d/d\tau$, where $\tau$ is `Markov time'.
+  \item Numerically evaluate the differential equation, and use a Metropolis accept / reject to update.
+\end{enumerate}
 
-(2) Obtain $\dot{P}$, $\dot{U}$. Note that, dot is $d/d\tau$, where $\tau$ is `Markov time'.
+\begin{itemize}
+  \item About the randomized $P$
+\end{itemize}
 
-(3) Numerically evaluate the differential equation, and use a Metropolis accept / reject to update.
+The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$
+
+Note that, here $P$ corresponds to $Q$, not $U$, for $U=\exp\left(i \sum q_a T^a\right)$, there are $8$ \textbf{real} variables denoting as $\omega _i$.
+
+Using $P=\sum \omega _a T^a$, $tr((T^a)\cdot (T^b))=\frac{1}{2}\delta _{ab}$. So one have $\frac{1}{2}\sum _a\omega _a^2=tr[P^2]$.
+
+It is usually written as distribution $\exp \left(-tr(P^2)\right)$ (where $P$ is a matrix, and $tr[P^2]=\frac{1}{2}p^2$ where $p=(\omega_1,\omega_2,\ldots ,\omega _8)$).
+
+Using the property of normal distribution
+\begin{equation}
+\begin{split}
+&if\; \{X\}\sim N(\mu _X, \sigma _X^2),\;\; \{Y\}\sim N(\mu _Y, \sigma _Y^2),\\
+&\{X+Y\}\sim N(\mu _X+\mu _Y, \sigma _X^2+\sigma _Y^2).\\
+\end{split}
+\end{equation}
+
+One can randomize $\omega _a$ using $\exp \left(-\omega_a\omega_a\right)$. Then using $P=\frac{1}{\sqrt{8N}}\sum \omega _a T^i$, where $N$ is the number of links.
+
+\textcolor[rgb]{1,0,0}{\textbf{Note: Here is a difference between Refs.~\cite{latticeqcdbook2010} and \cite{latticeqcdbook2017} and Bridge++~\cite{bridge}}}
+
+Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.
+
+However, in Bridge++, it uses distribution $\exp \left(-tr(P^2)/DOF\right)$, where `DOF' is the degrees of freedom, i.e., number of links.
+
+We use the distribution same as in Bridge++. Imagining that for a very small (hot) $\beta \to 0$, the force is also almost $0$ so momentum is unchanged when evolution. Considering a very large lattice such that the momentum is very small when using distribution $\exp \left(-tr(P^2)\right)$, the gauge field will stay near the initial value rather then becoming hot (randomized). So we think it should be $\exp \left(-tr(P^2)/DOF\right)$.
 
 \begin{itemize}
 \item \index{force}Force
@@ -93,15 +123,16 @@ Defined by Newton, $dp/dt$ is a force, so $\dot{P}$ is called `force'. See Eqs.~
 \begin{equation}
 \begin{split}
 &S_G[U_{\mu}(n)]=-\frac{\beta}{N}{\rm Re}{\rm tr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
+&\Sigma _{\mu}(n)=\sum _{\mu \textcolor[rgb]{1,0,0}{\neq}\nu}\left(U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)+U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)U_{\nu}(n-a\nu+a\mu)\right)\\
 \end{split}
 \label{eq.hmc.staple}
 \end{equation}
-\textbf{Note that $S_G\neq \sum _{\mu,n} S_G[U_{\mu}(n)]$. $S_G[U_{\mu}(n)]$ is convenient for derivate which collecting all terms related to the specified bond. For plaquettes with 4 edges, $S_G=\frac{1}{4} \sum _{\mu,n} S_G[U_{\mu}(n)]$. } \textcolor[rgb]{0,0,1}{TODO: Add information for plaquette energy.}
+\textbf{Note that $S_G\neq \sum _{\mu,n} S_G[U_{\mu}(n)]$. $S_G[U_{\mu}(n)]$ is convenient for derivate which collecting all terms related to the specified bond. For plaquettes with 4 edges, $S_G=\frac{1}{4} \sum _{\mu,n} S_G[U_{\mu}(n)]$. }
 
-Is the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'. The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
+$S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'. The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
 \begin{equation}
 \begin{split}
-&U=\exp \left(i \sum _a\omega _a(\mu,n) T_a\right)
+&U_{\mu}(n)=\exp \left(i \sum _a\omega _a(\mu,n) T_a\right)U_{\mu}^0(n)
 \end{split}
 \end{equation}
 so
@@ -109,9 +140,12 @@ so
 \begin{split}
 &\frac{\partial}{\partial \omega _a (\mu,n)}S_G=-\frac{\beta}{2N}{\rm Re}{\rm tr}\left[\frac{\partial}{\partial \omega _a}U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]=-\frac{\beta}{2N}{\rm tr}\left[\frac{\partial}{\partial \omega _a}\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)+\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
 &=-i\frac{\beta}{2N}{\rm tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)T^{\dagger}_aU^{\dagger}_{\mu}(n)\right]=-i\frac{\beta}{2N}{\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
+&=-\frac{\beta}{N} i{\rm Im\;tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
 \end{split}
 \end{equation}
-Using \textcolor[rgb]{0,0,1}{(Checked by Mathematica that Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} is incompatable with our notation, but replacing the $UA-A^{\dagger}U^{\dagger}$ of Eq.~(8.42) with $\{UA\}_{TA}$ is correct. Also, Eq.~(2.58) of Ref.~\cite{latticeqcdbook2017} is different from ours, in our formulism, it is correct by replacing $2T_a{\rm Re}[tr[T_a\cdot W]]$ of Eq.~(2.58) with $2iT_a{\rm Im}[tr[T_a\cdot W]]$)}
+This is the Eq.~(8.41) of Ref.~\cite{latticeqcdbook2010}.
+
+Using (Checked by Mathematica that Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} is incompatable with our notation, but replacing the $UA-A^{\dagger}U^{\dagger}$ of Eq.~(8.42) with $\{UA\}_{TA}$ is correct. Also, Eq.~(2.58) of Ref.~\cite{latticeqcdbook2017} is different from ours, in our formulism, it is correct by replacing $2T_a{\rm Re}[tr[T_a\cdot W]]$ of Eq.~(2.58) with $2iT_a{\rm Im}[tr[T_a\cdot W]]$)
 \begin{equation}
 \begin{split}
 &\sum _a {\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]T_a=\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
@@ -121,12 +155,14 @@ Using \textcolor[rgb]{0,0,1}{(Checked by Mathematica that Eq.~(8.42) of Ref.~\ci
 where $\mathbb{I}$ is identity matrix. Therefor
 \begin{equation}
 \begin{split}
-&F_{\mu}(x)=\dot{P}_{\mu}(x)=\sum \dot{\omega}_a T_a=-\frac{\partial}{\partial \omega _a (\mu,n)}S_G T_a=i\frac{\beta}{2N}\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
+&\dot{\omega} _a=-\frac{\partial}{\partial \omega _a (\mu,n)}S_G\\
+&F_{\mu}(x)=\dot{P}_{\mu}(x)=i\sum \dot{\omega}_a T_a=-i\frac{\partial}{\partial \omega _a (\mu,n)}S_G T_a=-\frac{\beta}{2N}\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
 \end{split}
 \label{eq.hmc.force}
 \end{equation}
+Note that, $\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}=-2i\sum _aT_a{\rm Im}[tr[T_a\cdot W]]$, so $\dot{\omega}_a=\frac{\beta}{N}{\rm Im}[tr[T_a\cdot W]]$ is still a \textbf{real} number.
 
-Eq.~(\ref{eq.hmc.force}) has a different sign with Eqs.~(2.55) and (2.67) of Ref.~\cite{latticeqcdbook2017}, but the sign is same as Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} (Note that in Ref.~\cite{latticeqcdbook2010}, $F\equiv -\dot{P}$ but we define $F\equiv \dot{P}$). But in Eq.~(8,42), the $\{\ldots\}_{TA}$ is different.
+Eq.~(\ref{eq.hmc.force}) is same as Eqs.~(2.53), (2.56) and (2.57) of Ref.~\cite{latticeqcdbook2017}.
 
 \begin{itemize}
 \item \index{Integrator}Integrator
@@ -154,70 +190,42 @@ Knowing $U(n\epsilon),P(n\epsilon),F(n\epsilon)$, we can calculate $U((n+1)\epsi
 Then we are able to calculate $F((n+1)\epsilon)$ again using Eq.~(\ref{eq.hmc.force}).
 Then we can calculate $P((n+1)\epsilon)$ using Eq.~(\ref{eq.hmc.update_basic}).c.
 
-\begin{itemize}
-  \item About the randomized $P$
-\end{itemize}
-
-The randomized $P$ is chosen according to normal distribution $\exp \left(-P^2 /2\right)$
-
-Note that, here $P$ corresponds to $Q$, not $U$, for $U=\exp\left(i \sum q_i T^i\right)$, there are $8$ \textbf{real} variables denoting as $\omega _i$.
-
-Using $P=\sum \omega _i T^i$, $tr((T^i)\cdot (T^j))=\frac{1}{2}\delta _{ij}$. So one have $\frac{1}{2}\sum _i\omega _i^2=tr[P^2]$.
-
-It is usually written as distribution $\exp \left(-tr(P^2)\right)$ (where $P$ is a matrix, and $tr[P^2]=\frac{1}{2}p^2$ where $p=(\omega_1,\omega_2,\ldots ,\omega _8)$).
-
-Using the property of normal distribution
-\begin{equation}
-\begin{split}
-&if\; \{X\}\sim N(\mu _X, \sigma _X^2),\;\; \{Y\}\sim N(\mu _Y, \sigma _Y^2),\\
-&\{X+Y\}\sim N(\mu _X+\mu _Y, \sigma _X^2+\sigma _Y^2).\\
-\end{split}
-\end{equation}
-
-One can randomize $\omega _i$ using $\exp \left(-\omega_i\omega_i\right)$. Then using $P=\frac{1}{\sqrt{8N}}\sum \omega _i T^i$, where $N$ is the number of links.
-
-\textcolor[rgb]{1,0,0}{\textbf{Note: Here is a difference between Refs.~\cite{latticeqcdbook2010} and \cite{latticeqcdbook2017} and Bridge++~\cite{bridge}}}
-
-Note, by Eq.~(8.16) of Ref.~\cite{latticeqcdbook2010}, $P^2=\sum _{n\in \Lambda}P^2(n)$, so when the lattice is large, $P$ become very small. See also the definition of $\langle P,P\rangle$ below Eq.~(2.42) of Ref.~\cite{latticeqcdbook2017}.
-
-However, in Bridge++, it uses distribution $\exp \left(-tr(P^2)/DOF\right)$, where `DOF' is the degrees of freedom.
-
-We use the distribution same as in Bridge++. Imagining that for a very small (hot) $\beta \to 0$, the force is also almost $0$ so momentum is unchanged when evolution. Considering a very large lattice such that the momentum is very small when using distribution $\exp \left(-tr(P^2)\right)$, the gauge field will stay near the initial value rather then becoming hot (randomized). So we think it should be $\exp \left(-tr(P^2)/DOF\right)$.
-
 \subsubsection{\label{forceOfPseudofermions}Force of pseudofermions}
 
 For important sampling, one can generate both $U$ and $\phi$ by $e^{-S}$. In molecular dynamics simulation, it can be simplified as:
 
-(1) Evaluate $U$ use force of $U$ and $\phi$ on $U$.
+\begin{enumerate}
+  \item Evaluate $U$ use force of $U$ and $\phi$ on $U$.
+  \item Evaluate $\phi$ use force of $U$ and $\phi$ on $\phi$.
+\end{enumerate}
 
-(1) Evaluate $\phi$ use force of $U$ and $\phi$ on $\phi$.
+The second step can be simplified as, generating random complex numbers $\phi$ according to $\exp (-\phi^{\dagger} \left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi)=\exp (-\phi^{\dagger}(\hat{D}^{\dagger})^{-1} \hat{D}^{-1}\phi)$. $D[U]$ is a function of $U$.
 
-The second step can be simplified as, generating random complex numbers $\phi$ according to $\exp (-\phi^{\dagger} \left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi)=\exp (-\phi^{\dagger}(\hat{D}^{\dagger})^{-1} \hat{D}^{-1}\phi)$. Where $D$ is a function of $U$.
+\textbf{How to get randomized $\phi$?} Let $\chi$ be random \textbf{complex} numbers according to $\exp (-\chi ^{\dagger}\chi)$. Let $\hat{D}^{-1}\phi=\chi$, $\phi$ is the random \textbf{complex} number satisfying distribution we want ($\exp (-\phi^{\dagger}(\hat{D}^{\dagger})^{-1} \hat{D}^{-1}\phi)$). So, first get $\chi$ and then let $\phi = D\chi$.
 
-Let $\chi$ be random complex numbers according to $\exp (-\chi ^{\dagger}\chi)$. Let $(D)^{-1}\phi=\chi$, $\phi$ is the random number satisfying distribution we want. And $\phi = D\chi$.
-
-Using the Wilson Fermion action \textcolor[rgb]{0,0,1}{(TODO: Add ref here after the section of Wilson Fermion is added.)}.
+Using the Wilson Fermion action
 \begin{equation}
 \begin{split}
-&\hat{D}=D+1\\
+&\hat{D}=C(D+1)\\
 &D=-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x)\delta _{x,x+\mu}+(1+\gamma _{\mu})U_{\mu}^{-1}(x-\mu)\delta _{x,x-\mu}\right)\\
 \end{split}
 \end{equation}
-with $\kappa=1/(2am_f+8)$.
+with $C=m_f+\left(4/a\right)$ and $\kappa=1/(2am_f+8)$.
 
-The force of $\phi$ on $U$ is obtained as $\partial _{U_{\mu}}S_{pf}$. The result for Wilson Fermion action is shown in Eqs.~(8.39), (8.44) and (8.45) of Ref.~\cite{latticeqcdbook2010} as
+The force of $\phi$ on $U$ is obtained as $\partial _{\omega_a}S_{pf}$. The result for Wilson Fermion action is shown in Eqs.~(8.39), (8.44) and (8.45) of Ref.~\cite{latticeqcdbook2010} as
 \begin{equation}
 \begin{split}
-&F=-\partial _{U_{\mu}(n)}S[U_{\mu}(n)]=F_G-\sum _a T^a \nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
+&F=i\sum _a\dot{\omega}_aT_a=i\sum _a\left(-\partial _{\omega _a}\left(S_G[U_{\mu}(n)]+S_{pf}[U_{\mu}(n)]\right)\right)T_a=F_G+F_{pf}.\\
+&F_{pf}=i\sum _a\left(-\partial _{\omega _a}S_{pf}[U_{\mu}(n)]\right)T_a=-i\sum_aT^a \frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
+&\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
 &\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\} \\
 &\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^a} \gamma _5\\
 \end{split}
 \end{equation}
-where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^i$ are $SU(3)$ generators. $x_L,x_R$ are coordinate index of the left and right pseudofermion field. And
+where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^a$ are $SU(3)$ generators. $x_L,x_R$ are coordinate index of the left and right pseudofermion field. And
 \begin{equation}
 \begin{split}
-&U_{\mu}=\exp (i\sum _a \omega _{\mu}^a T^a),\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
+&U_{\mu}=\exp (i\sum _a \omega _{\mu}^a T^a)U_0,\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
 &\left(T^a\right)^{\dagger}=T^a,\;\;\frac{\partial M^{-1}}{\partial \omega _{\mu}^a}=-M^{-1}\frac{\partial M}{\partial \omega _{\mu}^a}M^{-1}\\
 \end{split}
 \end{equation}
@@ -227,17 +235,23 @@ We can simplify it further by $\left(\hat{D}^{\dagger}(\hat{D}\hat{D}^{\dagger})
 \begin{equation}
 \begin{split}
 &\phi _1=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right),\;\;
- \phi _2=\hat{D}^{\dagger}\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=D^{-1}\phi,\;\;\phi _1^{\dagger}D=\phi _2^{\dagger}\\
-&-\nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)\\
-&=\phi _1^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2+\phi _2^{\dagger} \frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a} \phi _1=2\left\{\left(\phi _1 ^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2\right)\right\}_{\rm Re}\\
-&F_{pf}=-\sum _a T^a \nabla ^a \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=2\kappa \sum _a \left\{\left(\phi _1 ^{\dagger} M_a \phi _2\right)\right\}_{\rm Im}T_a,\;\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
-&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\}\\
+ \phi _2=\hat{D}^{\dagger}\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=D^{-1}\phi,\;\;\phi _1^{\dagger}D=\phi _2^{\dagger},\\
+&\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)\\
+&=-\left(\phi _1^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2+\phi _2^{\dagger} \frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a} \phi _1\right)=-2{\rm Re}\left[\left(\phi _1 ^{\dagger} \frac{\partial D}{\partial \omega _{\mu}^a} \phi _2\right)\right]\\
 \end{split}
 \end{equation}
-$\{\ldots\}_{\rm Re,Im}$ (Note that, $\ldots$ is a SU(3) matrix) are defined as
+and
 \begin{equation}
 \begin{split}
-&\{W\}_{\rm Re}=\frac{W+W^{\dagger}}{2},\;\;\{W\}_{\rm Im}=-i\frac{W-W^{\dagger}}{2}\\
+&\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
+&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\}\\
+&\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-2\kappa{\rm Im}\left[\left(\phi _1 ^{\dagger} M \phi _2\right)\right]\\
+\end{split}
+\end{equation}
+Again, $\dot{\omega}$ is a \textbf{real} number, and
+\begin{equation}
+\begin{split}
+&F_{pf}=-i\sum _a T^a \frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=2i\kappa \sum _a {\rm Im}\left[\left(\phi _1 ^{\dagger} M_a \phi _2\right)\right] T_a\\
 \end{split}
 \end{equation}
 
@@ -425,6 +439,27 @@ for (int i = 1; i < steps + 1; ++i)
 
 \end{lstlisting}
 
+\subsubsection{\label{summaryOfHMC}A summary of HMC with pseudofermions}
+
+Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\cite{latticeqcdbook2010}. The HMC with fermions can be divided into 6 steps.
+
+\begin{enumerate}
+  \item Generate a complex Bosonic field with $\chi \sim \exp (-\chi ^{\dagger}\chi)$, and $\phi = \hat{D} \chi$.
+  \item Generate a momentum field $P$ by $\exp (-tr(P^2))$.
+  \item Calculate $E=tr(P^2)+S_G(U)+S_{pf}(U,\phi)$.
+  \item Use $U_0$ to calculate $F$, evaluate $P$ and $U$ using integrator. Here, $\phi$ is treated as a constant field.
+  \item Finally, use $P',U'$ to calculate Calculate $E'=tr({P'}^2)+S_G(U')+S_{pf}(U',\phi)$. Use a Metropolis to accept or reject the result~(configurations) \textbf{Note, by Refs.~\cite{latticeqcdbook2010} and ~\cite{latticeqcdreview2009} `reject' means add a duplicated old configuration.}.
+  \item Iterate from 1 to 5, until the number of configurations generated is sufficient.
+\end{enumerate}
+
+\begin{itemize}
+ \item More on Metropolis step:
+\end{itemize}
+
+If the hybrid Monte Carlo can be implemented exactly, then, when \index{equilibrium}equilibrium is reached, $H$ should be unchanged, so, in some implementation, the Metropolis step can be ignored to archive a better accept rate.
+
+\subsection{\index{optimized_hmc}Optimization of HMC}
+
 \subsubsection{\label{Omelyan}\index{Omelyan}Omelyan integrator}
 
 The Omelyan integrator can be simply written as (c.f. Eq.~(2.80) of Ref.~\cite{latticeqcdbook2017})
@@ -442,21 +477,9 @@ with
 \label{eq.hmc.update_Omelyan2}
 \end{equation}
 
-\subsubsection{\label{summaryOfHMC}A summary of HMC with pseudofermions}
+In practical, the $\lambda$ is a tunable parameter, and usually, $2\lambda = 0.3 \sim 0.5$~\cite{latticeqcdreview2009}. The \verb"Omelyan2Lambda" parameter of \verb"Updator" is a input parameter to set $2\lambda$, which if left blank is set to be $0.38636665500756728$ by default.
 
-Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\cite{latticeqcdbook2010}. The HMC with fermions can be divided into 6 steps.
+Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one trajectory, it is $1.5$ time faster~\cite{latticeqcdreview2009}, implying the number of sub-step needed is about $1/3$ of leap-frog.
 
-\begin{enumerate}
-  \item Generate a complex Bosonic field with $\chi \sim \exp (-\chi ^{\dagger}\chi)$, and $\phi = \hat{D} \chi$.
-  \item Generate a momentum field $P$ by $\exp (-tr(P^2))$.
-  \item Calculate $E=tr(P^2)+S_G(U)+S_{pf}(U,\phi)$.
-  \item Use $U_0$ to calculate $F$, evaluate $P$ and $U$ using integrator. Here, $\phi$ is treated as a constant field.
-  \item Finally, use $P',U'$ to calculate Calculate $E'=tr({P'}^2)+S_G(U')+S_{pf}(U',\phi)$. Use a Metropolis to accept or reject the result~(configurations) \textbf{Note, by Ref.~\cite{latticeqcdbook2010} (Statement under Eq.~(4.16)), `reject' means add a duplicated old configuration.}.
-  \item Iterate from 1 to 5, until the number of configurations generated is sufficient.
-\end{enumerate}
-
-
-More on Metropolis step:
-
-If the hybrid Monte Carlo can be implemented exactly, then, when \index{equilibrium}equilibrium is reached, $H$ should be unchanged, so, in some implementation, the Metropolis step can be ignored to archive a better accept rate.
+\subsubsection{\index{MultiStepUpdator}Multi-Step Updator}
 

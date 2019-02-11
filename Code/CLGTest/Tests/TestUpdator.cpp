@@ -29,7 +29,7 @@ UINT TestUpdator(CParameters& sParam)
     //pAction->SetBeta(F(3.0));
 
     //Equilibration
-    appGetLattice()->m_pUpdator->Update(10, FALSE);
+    appGetLattice()->m_pUpdator->Update(5, FALSE);
 
     //Measure
     pMeasure->Reset();

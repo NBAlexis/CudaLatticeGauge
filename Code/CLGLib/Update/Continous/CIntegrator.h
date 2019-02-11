@@ -40,11 +40,11 @@ public:
 
     virtual void Evaluate() = 0;
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
-    void Accept();
-    void Prepare(UBOOL bLastAccepted);
+    void OnFinishTrajectory(UBOOL bAccepted);
+    void Prepare(UBOOL bLastAccepted, UINT uiStep);
     void UpdateP(Real fStep, UBOOL bCacheStaple);
     void UpdateU(Real fStep);
-    virtual Real GetEnergy() const;
+    virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
 
 protected:
 

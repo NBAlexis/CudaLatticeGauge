@@ -154,7 +154,7 @@ extern "C" {
         /**
         * Here, we keep same with Bridge++, that H(P)/D.O.F. = 0.5
         * can be called only after CLatticeData is created
-        * ret = r_a T_a, r_a is random real number, T_a are generators
+        * ret = i r_a T_a, r_a is random real number, T_a are generators
         * r_a T_a = r1 T1 + r2 T2 + ...
         *
         *     r3 +r8/sqrt3     r1-ir2        r4-ir5
@@ -174,15 +174,26 @@ extern "C" {
             Real r8 = _deviceRandomGaussF(fatIndex) * InvSqrt2;
 
             deviceSU3 ret;
-            ret.m_me[0] = _make_cuComplex(r3 + r8 * InvSqrt3, F(0.0));
-            ret.m_me[1] = _make_cuComplex(r1, -r2);
-            ret.m_me[2] = _make_cuComplex(r4, -r5);
-            ret.m_me[3] = _make_cuComplex(r1, r2);
-            ret.m_me[4] = _make_cuComplex(-r3 + r8 * InvSqrt3, F(0.0));
-            ret.m_me[5] = _make_cuComplex(r6, -r7);
-            ret.m_me[6] = _make_cuComplex(r4, r5);
-            ret.m_me[7] = _make_cuComplex(r6, r7);
-            ret.m_me[8] = _make_cuComplex(-r8 * InvSqrt3_2, F(0.0));
+            //we directly generate i ra Ta instead of ra Ta
+            ret.m_me[0] = _make_cuComplex(F(0.0), r3 + r8 * InvSqrt3);
+            ret.m_me[1] = _make_cuComplex(r2, r1);
+            ret.m_me[2] = _make_cuComplex(r5, r4);
+            ret.m_me[3] = _make_cuComplex(-r2, r1);
+            ret.m_me[4] = _make_cuComplex(F(0.0), -r3 + r8 * InvSqrt3);
+            ret.m_me[5] = _make_cuComplex(r7, r6);
+            ret.m_me[6] = _make_cuComplex(-r5, r4);
+            ret.m_me[7] = _make_cuComplex(-r7, r6);
+            ret.m_me[8] = _make_cuComplex(F(0.0), -r8 * InvSqrt3_2);
+
+            //ret.m_me[0] = _make_cuComplex(r3 + r8 * InvSqrt3, F(0.0));
+            //ret.m_me[1] = _make_cuComplex(r1, -r2);
+            //ret.m_me[2] = _make_cuComplex(r4, -r5);
+            //ret.m_me[3] = _make_cuComplex(r1, r2);
+            //ret.m_me[4] = _make_cuComplex(-r3 + r8 * InvSqrt3, F(0.0));
+            //ret.m_me[5] = _make_cuComplex(r6, -r7);
+            //ret.m_me[6] = _make_cuComplex(r4, r5);
+            //ret.m_me[7] = _make_cuComplex(r6, r7);
+            //ret.m_me[8] = _make_cuComplex(-r8 * InvSqrt3_2, F(0.0));
             return ret;
         }
 
@@ -849,7 +860,7 @@ extern "C" {
         * U' = exp(aU) = (1 + a U + a^2 U^2/2 +  ... + a^N U^N/N!)
         *    = 1 + a U (1 + a U /2 (1 + a U/3 ...))
         */
-        __device__ __inline__ deviceSU3 Exp(const _Complex& a, UINT uiPrecision) const
+        __device__ __inline__ deviceSU3 Exp(const _Complex& a, UINT uiPrecision, UBOOL bNormed = FALSE) const
         {
             deviceSU3 identity = makeSU3Id();
             deviceSU3 tmp;
@@ -878,7 +889,46 @@ extern "C" {
                 }
                 tmp = identity.AddC(tmp);
             }
-            tmp.Norm();
+            if (bNormed)
+            {
+                tmp.Norm();
+            }
+            
+            return tmp;
+        }
+
+        __device__ __inline__ deviceSU3 ExpReal(Real a, UINT uiPrecision, UBOOL bNormed = FALSE) const
+        {
+            deviceSU3 identity = makeSU3Id();
+            deviceSU3 tmp;
+
+            /**
+            * tmp = U
+            * loop1: tmp = 1+aU/N
+            * loop2: tmp = 1+(aU/(N-1))(1+aU/N)
+            * loop3: tmp = 1+(aU/(N-2))(1+aU/(N-1)(1+aU/N))
+            * ...
+            * loopN: tmp = 1+aU (1 + aU/2 (1+...))
+            */
+            for (UINT i = 0; i < uiPrecision; ++i)
+            {
+                _Complex alpha = _make_cuComplex(a / (uiPrecision - i), F(0.0));
+                //aU/(N-i) = this x alpha
+                deviceSU3 aUoN = MulCompC(alpha);
+                if (0 == i)
+                {
+                    tmp = aUoN;
+                }
+                else
+                {
+                    tmp.Mul(aUoN);
+                }
+                tmp = identity.AddC(tmp);
+            }
+            if (bNormed)
+            {
+                tmp.Norm();
+            }
             return tmp;
         }
 

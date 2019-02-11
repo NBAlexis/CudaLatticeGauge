@@ -35,11 +35,15 @@ public:
     virtual void AllocateBuffers(const CField* pField) = 0;
 
     /**
-    * Solve x for b=Mx or x=M^{-1}b, 
+    *
+    * \brief Solve x for b=Ax or x=A^{-1}b,
     * where M is a enum index of operator on x
-    * NOTE: pFieldX can be pFieldB, so pFieldB is not guaranteed constant!
+    *
+    * For those solvers using a trial start solution
+    * Since phi is unchanged, and U is changed slowly, the solution will also change slowly
+    * Therefor, use the last solution as a trial start solution is a good idea
     */
-    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM) = 0;
+    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart = NULL) = 0;
 
     class CLatticeData* m_pOwner;
 

@@ -260,6 +260,9 @@
     <ClCompile Include="Platform\CFileWin.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

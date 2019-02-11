@@ -46,8 +46,9 @@ CLatticeData::CLatticeData()
 
     , m_pFermionSolver(NULL)
     , m_pMeasurements(NULL)
+    , m_pFieldCache(NULL)
 {
-    
+    m_pFieldCache = new CFieldCache();
 }
 
 CLatticeData::~CLatticeData()
@@ -83,6 +84,7 @@ CLatticeData::~CLatticeData()
         appSafeDelete(m_pFieldPools[i]);
     }
 
+    appSafeDelete(m_pFieldCache);
     appSafeDelete(m_pGaugeField);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
@@ -142,9 +144,9 @@ void CLatticeData::OnUpdatorConfigurationAccepted()
     }
 }
 
-void CLatticeData::OnUpdatorFinished()
+void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
 {
-    if (NULL != m_pMeasurements)
+    if (NULL != m_pMeasurements && bMeasured)
     {
         m_pMeasurements->OnUpdateFinished(FALSE);
     }

@@ -86,6 +86,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp" />
     <CudaCompile Include="Core\CudaHelper.cu">
       <FileType>Document</FileType>
     </CudaCompile>

@@ -89,11 +89,6 @@ public:
     */
     virtual _Complex Dot(const CField* other) const = 0;
 
-    /**
-    * U = exp(a this)U
-    */
-    virtual void ExpMult(const _Complex& a, CField* U) const = 0;
-
     virtual void CopyTo(CField* U) const
     {
         assert(NULL != U);
@@ -165,6 +160,50 @@ protected:
         pNew->m_pPool = this;
         return pNew;
     }
+};
+
+class CLGAPI CFieldCache
+{
+public:
+    enum ECacheReason
+    {
+        CachedInverseDDdaggerField,
+    };
+
+    CFieldCache()
+    {
+
+    }
+    ~CFieldCache()
+    {
+        for (INT i = 0; i < m_pCachedFields.Num(); ++i)
+        {
+            appSafeDelete(m_pCachedFields[i]);
+        }
+    }
+
+    UBOOL CacheField(UINT uiID, CField* pField)
+    {
+        if (!m_pCachedFieldMaps.Exist(uiID))
+        {
+            m_pCachedFields.AddItem(pField);
+            m_pCachedFieldMaps.SetAt(uiID, pField);
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+    CField* GetCachedField(UINT uiID)
+    {
+        if (m_pCachedFieldMaps.Exist(uiID))
+        {
+            return m_pCachedFieldMaps[uiID];
+        }
+        return NULL;
+    }
+
+    TArray<CField*> m_pCachedFields;
+    THashMap<UINT, CField*> m_pCachedFieldMaps;
 };
 
 __END_NAMESPACE

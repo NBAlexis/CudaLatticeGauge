@@ -22,14 +22,10 @@ public:
     */
     CActionFermionWilsonNf2();
 
-    virtual Real Energy(const class CFieldGauge* pGauge) const;
-    virtual Real Energy(const class CFieldGauge* pGauge, const class CFieldGauge*) const
-    {
-        return Energy(pGauge);
-    }
+    virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL);
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
     virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
-    virtual void PrepareForHMC(const CFieldGauge* pGauge);
+    virtual void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate);
 
 protected:
 

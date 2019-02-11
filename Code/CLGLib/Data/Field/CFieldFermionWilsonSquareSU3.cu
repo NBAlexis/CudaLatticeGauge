@@ -515,6 +515,16 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
     _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, EFIT_RandomGaussian);
     _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE);
 
+    //cache a inverse DDdagger field
+    CFieldCache* pCache = appGetLattice()->m_pFieldCache;
+    CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
+    if (NULL == pField)
+    {
+        pField = GetCopy();
+        pCache->CacheField(CFieldCache::CachedInverseDDdaggerField, pField);
+    }
+    CFieldFermionWilsonSquareSU3* pCachedSU3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
+    pCachedSU3->InverseDDdagger(pGauge);
 }
 
 //Kai should be part of D operator
@@ -620,6 +630,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
 
     CField * pDDaggerPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
     CField * pDPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
+    CField * pCachedField = appGetLattice()->m_pFieldCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
     if (NULL == pDDaggerPhi || EFT_FermionWilsonSquareSU3 != pDDaggerPhi->GetFieldType()
      || NULL == pDPhi || EFT_FermionWilsonSquareSU3 != pDPhi->GetFieldType())
     {
@@ -636,8 +647,8 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     }
     CFieldFermionWilsonSquareSU3* pDDaggerPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDDaggerPhi);
     CFieldFermionWilsonSquareSU3* pDPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDPhi);
-    CopyTo(pDDaggerPhiWilson);
-    if (!pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3))
+    //if (!pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3))
+    if (!appGetFermionSolver()->Solve(pDDaggerPhiWilson, this, pGaugeSU3, EFO_F_DDdagger, pCachedField))
     {
         appCrucial(_T("Sparse Linear Solver failed...\n"));
         pDDaggerPhi->Return();
@@ -647,6 +658,10 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     //phi 2 = D^{-1}phi = D+ (DD+)^{-1} phi
     //It is faster to calcuate D+ phi2 then D^{-1} phi
     pDDaggerPhiWilson->CopyTo(pDPhiWilson);
+    if (NULL != pCachedField)
+    {
+        pDDaggerPhiWilson->CopyTo(pCachedField);
+    }
     pDPhiWilson->Ddagger(pGaugeSU3);
 
     preparethread;

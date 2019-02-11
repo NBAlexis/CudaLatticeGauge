@@ -34,7 +34,7 @@ void CActionFermionWilsonNf2::Initial(CLatticeData* pOwner, const CParameters& p
     }
 }
 
-void CActionFermionWilsonNf2::PrepareForHMC(const CFieldGauge* pGauge)
+void CActionFermionWilsonNf2::PrepareForHMC(const CFieldGauge* pGauge, UINT )
 {
     m_pFerimionField->PrepareForHMC(pGauge);
 }
@@ -47,7 +47,7 @@ UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(const CFieldGauge* pGauge, 
     return m_pFerimionField->CalculateForce(pGauge, pForce);
 }
 
-Real CActionFermionWilsonNf2::Energy(const CFieldGauge* pGauge) const
+Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
 {
     //(D^-1 phi)^2
     CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));

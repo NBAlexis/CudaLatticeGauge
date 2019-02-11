@@ -54,10 +54,10 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pStapleField->InitialField(EFIT_Zero);
 }
 
-void CIntegrator::Prepare(UBOOL bLastAccepted)
+void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
 {
     //we may not accept the evaluation, so we need to copy it first
-    if (!bLastAccepted)
+    if (!bLastAccepted || 0 == uiStep)
     {
         m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField);
         m_bStapleCached = FALSE;
@@ -66,7 +66,7 @@ void CIntegrator::Prepare(UBOOL bLastAccepted)
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
-        m_lstActions[i]->PrepareForHMC(m_pGaugeField);
+        m_lstActions[i]->PrepareForHMC(m_pGaugeField, uiStep);
     }
 
     //generate a random momentum field to start
@@ -74,18 +74,24 @@ void CIntegrator::Prepare(UBOOL bLastAccepted)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::Accept()
+void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
 {
-    m_pGaugeField->CopyTo(m_pLattice->m_pGaugeField);
+    if (bAccepted)
+    {
+        m_pGaugeField->CopyTo(m_pLattice->m_pGaugeField);
+    }
+    for (INT i = 0; i < m_lstActions.Num(); ++i)
+    {
+        m_lstActions[i]->OnFinishTrajectory(bAccepted);
+    }
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
 void CIntegrator::UpdateU(Real fStep)
 {
     //U(k) = exp (i e P) U(k-1)
-    m_pMomentumField->ExpMult(_make_cuComplex(F(0.0), fStep), m_pGaugeField);
+    m_pMomentumField->ExpMult(fStep, m_pGaugeField);
     checkCudaErrors(cudaDeviceSynchronize());
-    //m_pGaugeField->DebugPrintMe();
 }
 
 void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
@@ -103,45 +109,39 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
 
     //P = P + e F
     m_bStapleCached = bCacheStaple;
-    m_pMomentumField->Axpy(_make_cuComplex(F(0.0), fStep), m_pForceField);
+    m_pMomentumField->Axpy(fStep, m_pForceField);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-Real CIntegrator::GetEnergy() const
+Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
 {
-#if _CLG_DEBUG
-    CCString sLog = _T("");
-#endif
-
-    //get P energy
     Real retv = m_pMomentumField->CalculateKinematicEnergy();
 
 #if _CLG_DEBUG
-    sLog.Format(_T("Kin:%f"), retv);
+    CCString sLog = _T("");
+    sLog.Format(_T("kin:%f, "), retv);
 #endif
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
 #if _CLG_DEBUG
-        Real fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
+        Real fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
         CCString sThisActionInfo = _T("");
         sThisActionInfo.Format(_T(" Action%d:%f, "), i + 1, fActionEnergy);
         sLog += sThisActionInfo;
         retv += fActionEnergy;
 #else
-        retv += m_bStapleCached ? m_lstActions[i]->Energy(m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
+        retv += m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
 #endif
     }
 #if _CLG_DEBUG
-    appDetailed(_T("H:%s \n"), sLog.c_str());
+    appDetailed(_T("H (%s) = %s \n"), bBeforeEvolution ? "before" : "after" , sLog.c_str());
 #endif
     return retv;
 }
 
 __CLGIMPLEMENT_CLASS(CIntegratorLeapFrog)
-
-__CLGIMPLEMENT_CLASS(CIntegratorOmelyan)
 
 __END_NAMESPACE
 

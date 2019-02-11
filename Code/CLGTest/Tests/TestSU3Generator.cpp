@@ -53,11 +53,11 @@ UINT TestSU3Generator(CParameters& sParam)
 
     appGeneral(_T("\n expected:res = 0+0i:%f+%fi, 0.5:%f\n"), average.x / fieldSampleCount, average.y / fieldSampleCount, sigma / fieldSampleCount);
 
-    if (appAbs(average.x / fieldSampleCount) > accuracy)
+    if (appAbs(average.x) > accuracy)
     {
         ++uiError;
     }
-    if (appAbs(average.y) > accuracy)
+    if (appAbs(average.y / fieldSampleCount) > accuracy)
     {
         ++uiError;
     }

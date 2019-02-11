@@ -24,7 +24,7 @@ public:
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
     void OnUpdatorConfigurationAccepted();
-    void OnUpdatorFinished();
+    void OnUpdatorFinished(UBOOL bMeasured);
     void GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);
 
@@ -35,6 +35,7 @@ public:
     THashMap<BYTE, class CField*> m_pFieldMap;
     TArray<class CFieldPool*> m_pFieldPools;
     THashMap<BYTE, class CFieldPool*> m_pFieldPoolMap;
+    class CFieldCache* m_pFieldCache;
 
     /**
     * \note we assume the first action is gauge action

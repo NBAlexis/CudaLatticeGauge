@@ -29,6 +29,12 @@ D.~H. Weingarten and D.~N. Petcher.
   integration for lattice gauge theories with fermions.}}
 \newblock {\em Phys. Lett. B}, 99(4):333¨C338, 1981.
 
+\bibitem{latticeqcdreview2009}
+Martin~L$\rm \ddot{u}$scher.
+\newblock \href{http://arxiv.org/abs/1002.4232}{{Computational Strategies in
+  Lattice QCD}}.
+\newblock 2009, arXiv:1002.4232.
+
 \bibitem{bridge}
 S.~Ueda et. al.
 \newblock \href{http://dx.doi.org/10.1088/1742-6596/523/1/012046}{{Development

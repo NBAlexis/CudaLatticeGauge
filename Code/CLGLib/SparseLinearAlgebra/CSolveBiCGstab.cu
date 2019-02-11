@@ -65,8 +65,9 @@ void CSLASolverBiCGStab::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM)
+UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart)
 {
+    CField* pB = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pP = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pV = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
@@ -82,17 +83,25 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
         fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
     }
 
-    appParanoiac(_T("-- CSLASolverBiCGStab::Solve start --\n"));
+    appParanoiac(_T("-- CSLASolverBiCGStab::Solve start operator: %s--\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
 
-    //Using b as the guess, (Assuming M is near identity?)
-    pFieldB->CopyTo(pX);
+    pFieldB->CopyTo(pB);
 
+    //Using b as the guess, (Assuming A is near identity?)
     //r_0 = b - A x_0
-    pFieldB->CopyTo(pR); 
+    if (NULL == pStart)
+    {
+        pFieldB->CopyTo(pR);
+        pFieldB->CopyTo(pX);
+    }
+    else 
+    {
+        pStart->CopyTo(pR);
+        pStart->CopyTo(pX);
+    }
     pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
-    //appGeneral(_T("==================== kai = %f ==================\n"), m_pR->m_)
     pR->ScalarMultply(F(-1.0)); //-A x_0
-    pR->AxpyPlus(pX); //b - A x_0
+    pR->AxpyPlus(pB); //b - A x_0
     pR->CopyTo(pRh);
 
     Real rho = 0;
@@ -139,7 +148,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pR->CopyTo(pS);
             pS->Axpy(-alpha, pV);
 
-            if (0 == (j - 1) % m_uiDevationCheck)
+            if (0 != j && (0 == j % m_uiDevationCheck))
             {
                 //Normal of S is small, then stop
                 Real fDeviation = _cuCabsf(pS->Dot(pS)) / fBLength;
@@ -149,6 +158,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
                     //pX->Axpy(alpha, pP); //This is tested a better result not to do the final step
                     pX->CopyTo(pFieldX);
 
+                    pB->Return();
                     pX->Return();
                     pP->Return();
                     pV->Return();
@@ -183,13 +193,14 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
 
         pR->ApplyOperator(uiM, pGaugeFeild); //A x_0
         pR->ScalarMultply(-1); //-A x_0
-        pR->AxpyPlus(pX); //b - A x_0
+        pR->AxpyPlus(pB); //b - A x_0
         pR->CopyTo(pRh);
     }
 
     //The solver failed.
     appCrucial(_T("CSLASolverBiCGStab fail to solve!"));
 
+    pB->Return();
     pX->Return();
     pP->Return();
     pV->Return();

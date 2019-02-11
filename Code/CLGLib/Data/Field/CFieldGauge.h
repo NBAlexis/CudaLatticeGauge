@@ -36,6 +36,12 @@ public:
     virtual Real CalculateKinematicEnergy() const = 0;
 
     /**
+    * U = exp(a this)U
+    */
+    virtual void ExpMult(const _Complex& a, CField* U) const = 0;
+    virtual void ExpMult(Real a, CField* U) const = 0;
+
+    /**
     * Due to numerical precision, sometimes, the Unitary matrix will diviate from Unitary a little bit.
     * This is to make the elements Unitary again.
     */

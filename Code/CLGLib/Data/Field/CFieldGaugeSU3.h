@@ -67,6 +67,8 @@ public:
 #pragma endregion
 
     virtual void ExpMult(const _Complex& a, CField* U) const;
+    virtual void ExpMult(Real a, CField* U) const;
+
     virtual void ElementNormalize();
     virtual _Complex Dot(const CField* other) const;
 

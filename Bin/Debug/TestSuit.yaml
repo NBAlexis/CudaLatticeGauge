@@ -205,7 +205,7 @@ TestUpdatorLeapFrog:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 4
+    ExponentialPrecision : 6
     ActionListLength : 1
     MeasureListLength : 1
     ExpectedRes : 0.2064
@@ -215,12 +215,12 @@ TestUpdatorLeapFrog:
         ## UpdatorType = { CHMC }
         UpdatorType : CHMC
 
-        Metropolis : 0
+        Metropolis : 1
         
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorLeapFrog
         IntegratorStepLength : 1
-        IntegratorStep : 40
+        IntegratorStep : 30
 
     Gauge:
 	
@@ -249,7 +249,7 @@ TestUpdatorOmelyan:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 4
+    ExponentialPrecision : 6
     ActionListLength : 1
     MeasureListLength : 1
     ExpectedRes : 0.2064
@@ -259,12 +259,13 @@ TestUpdatorOmelyan:
         ## UpdatorType = { CHMC }
         UpdatorType : CHMC
 
-        Metropolis : 0
+        Metropolis : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 40
+        IntegratorStep : 10
+        Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
 	

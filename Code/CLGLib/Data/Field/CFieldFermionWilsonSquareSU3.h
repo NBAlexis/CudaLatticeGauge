@@ -47,8 +47,6 @@ public:
 
     virtual _Complex Dot(const CField* other) const;
 
-    virtual void ExpMult(const _Complex& , CField* ) const { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
-
     //pGauge must be gauge SU3
     virtual void D(const CField* pGauge);
     virtual void Ddagger(const CField* pGauge);
