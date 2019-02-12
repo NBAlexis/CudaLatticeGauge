@@ -84,6 +84,7 @@
     <ClCompile Include="CLGLib_Private.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <FileType>Document</FileType>
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp" />

@@ -122,9 +122,6 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h">
       <Filter>Data\Boundary</Filter>
     </ClInclude>
-    <ClInclude Include="Tools\Math\SU3.h">
-      <Filter>Tools\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Lattice\CIndexSquare.h">
       <Filter>Data\Lattice</Filter>
     </ClInclude>
@@ -224,9 +221,11 @@
     <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\SU3.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CLGLib_Private.cpp" />
     <ClCompile Include="Tools\Tracer.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
@@ -263,6 +262,7 @@
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
+    <ClCompile Include="CLGLib_Private.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

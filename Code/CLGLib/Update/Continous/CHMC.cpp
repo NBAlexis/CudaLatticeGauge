@@ -59,7 +59,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             appDetailed(_T(" HMC: step = %d, H_dff = %f\n"),
                 i + 1, 
                 fDiff);
-            diff_H = _exp(fDiff);  // Delta H (SA)
+            diff_H = _hostexp(fDiff);  // Delta H (SA)
             rand = GetRandomReal();
         }
 

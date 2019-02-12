@@ -247,6 +247,7 @@ void _kernelStapleAtSiteSU3CacheIndex(
 {
     intokernaldir;
 
+    //Real test_force = F(0.0);
     betaOverN = betaOverN * F(-0.5);
     UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
@@ -292,6 +293,7 @@ void _kernelStapleAtSiteSU3CacheIndex(
             //staple calculated
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(res);
+            //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
             force.Ta();
             force.MulReal(betaOverN);
 
@@ -299,6 +301,7 @@ void _kernelStapleAtSiteSU3CacheIndex(
             pForceData[linkIndex].Add(force);
         }
     }
+    //printf("typical gauge force = %f\n", test_force);
 }
 
 /**

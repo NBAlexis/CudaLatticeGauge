@@ -384,7 +384,7 @@ Real CLGAPI CalculateE(const TArray<UINT> & decompose)
     Real fAv = outPutHost[0] / (2.0f * total);
     Real fBv = outPutHost[1] / (2.0f * total) - fAv * fAv;
 
-    return _sqrt(fBv);
+    return _hostsqrt(fBv);
 }
 
 #pragma endregion

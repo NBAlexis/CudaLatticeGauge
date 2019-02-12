@@ -9,7 +9,7 @@
 
 #include "CLGTest.h"
 
-UINT TestSolver(CParameters& sParam)
+UINT TestSolver(CParameters& )
 {
     UINT uiError = 0;
     Real fMaxError = F(0.000001);

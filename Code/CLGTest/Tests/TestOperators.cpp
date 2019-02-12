@@ -11,7 +11,7 @@
 
 #include "CLGTest.h"
 
-UINT TestOperators(CParameters& sParam)
+UINT TestOperators(CParameters& )
 {
     //appGetLattice()->m_pUpdator->Update(2, TRUE);
     //CCudaHelper::DebugFunction();

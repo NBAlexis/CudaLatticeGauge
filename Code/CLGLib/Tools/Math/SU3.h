@@ -465,11 +465,11 @@ extern "C" {
             m_me[8] = _cuCsubf(m_me[8], right.m_me[8]);
         }
 
-        __device__ __inline__ void AddReal(const Real& right)
+        __device__ __inline__ void AddReal(Real right)
         {
-            m_me[0] = _cuCaddf(m_me[0], right);
-            m_me[4] = _cuCaddf(m_me[4], right);
-            m_me[8] = _cuCaddf(m_me[8], right);
+            m_me[0] = cuCaddf_cr(m_me[0], right);
+            m_me[4] = cuCaddf_cr(m_me[4], right);
+            m_me[8] = cuCaddf_cr(m_me[8], right);
         }
 
         __device__ __inline__ void AddComp(const _Complex& right)
@@ -479,11 +479,11 @@ extern "C" {
             m_me[8] = _cuCaddf(m_me[8], right);
         }
 
-        __device__ __inline__ void SubReal(const Real& right)
+        __device__ __inline__ void SubReal(Real right)
         {
-            m_me[0] = _cuCsubf(m_me[0], right);
-            m_me[4] = _cuCsubf(m_me[4], right);
-            m_me[8] = _cuCsubf(m_me[8], right);
+            m_me[0] = cuCsubf_cr(m_me[0], right);
+            m_me[4] = cuCsubf_cr(m_me[4], right);
+            m_me[8] = cuCsubf_cr(m_me[8], right);
         }
 
         __device__ __inline__ void SubComp(const _Complex& right)
@@ -532,15 +532,15 @@ extern "C" {
 
         __device__ __inline__ void MulReal(Real right)
         {
-            m_me[0] = _cuCmulf(m_me[0], right);
-            m_me[1] = _cuCmulf(m_me[1], right);
-            m_me[2] = _cuCmulf(m_me[2], right);
-            m_me[3] = _cuCmulf(m_me[3], right);
-            m_me[4] = _cuCmulf(m_me[4], right);
-            m_me[5] = _cuCmulf(m_me[5], right);
-            m_me[6] = _cuCmulf(m_me[6], right);
-            m_me[7] = _cuCmulf(m_me[7], right);
-            m_me[8] = _cuCmulf(m_me[8], right);
+            m_me[0] = cuCmulf_cr(m_me[0], right);
+            m_me[1] = cuCmulf_cr(m_me[1], right);
+            m_me[2] = cuCmulf_cr(m_me[2], right);
+            m_me[3] = cuCmulf_cr(m_me[3], right);
+            m_me[4] = cuCmulf_cr(m_me[4], right);
+            m_me[5] = cuCmulf_cr(m_me[5], right);
+            m_me[6] = cuCmulf_cr(m_me[6], right);
+            m_me[7] = cuCmulf_cr(m_me[7], right);
+            m_me[8] = cuCmulf_cr(m_me[8], right);
         }
 
         __device__ __inline__ void MulComp(const _Complex& right)
@@ -695,6 +695,11 @@ extern "C" {
             return m_me[0].x + m_me[4].x + m_me[8].x;
         }
 
+        __device__ __inline__ Real ImTr() const
+        {
+            return m_me[0].y + m_me[4].y + m_me[8].y;
+        }
+
         __device__ __inline__ void Re()
         {
             m_me[0] = _make_cuComplex(m_me[0].x, F(0.0));
@@ -830,10 +835,10 @@ extern "C" {
         */
         __device__ __inline__ void Norm()
         {
-            Real fDiv1 = 1.0f / _sqrt(cuCabsSqf(m_me[0]) + cuCabsSqf(m_me[1]) + cuCabsSqf(m_me[2]));
-            m_me[0] = _cuCmulf(m_me[0], fDiv1);
-            m_me[1] = _cuCmulf(m_me[1], fDiv1);
-            m_me[2] = _cuCmulf(m_me[2], fDiv1);
+            Real fDiv1 = F(1.0) / _sqrt(__cuCabsSqf(m_me[0]) + __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2]));
+            m_me[0] = cuCmulf_cr(m_me[0], fDiv1);
+            m_me[1] = cuCmulf_cr(m_me[1], fDiv1);
+            m_me[2] = cuCmulf_cr(m_me[2], fDiv1);
 
             //it is the name in Bridge++
             _Complex sp1 = _cuConjf(
@@ -846,10 +851,10 @@ extern "C" {
             m_me[3] = _cuCsubf(m_me[3], _cuCmulf(sp1, m_me[0]));
             m_me[4] = _cuCsubf(m_me[4], _cuCmulf(sp1, m_me[1]));
             m_me[5] = _cuCsubf(m_me[5], _cuCmulf(sp1, m_me[2]));
-            Real fDiv2 = F(1.0) / _sqrt(cuCabsSqf(m_me[3]) + cuCabsSqf(m_me[4]) + cuCabsSqf(m_me[5]));
-            m_me[3] = _cuCmulf(m_me[3], fDiv2);
-            m_me[4] = _cuCmulf(m_me[4], fDiv2);
-            m_me[5] = _cuCmulf(m_me[5], fDiv2);
+            Real fDiv2 = F(1.0) / _sqrt(__cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5]));
+            m_me[3] = cuCmulf_cr(m_me[3], fDiv2);
+            m_me[4] = cuCmulf_cr(m_me[4], fDiv2);
+            m_me[5] = cuCmulf_cr(m_me[5], fDiv2);
 
             m_me[6] = _cuConjf(_cuCsubf(_cuCmulf(m_me[1], m_me[5]), _cuCmulf(m_me[2], m_me[4])));
             m_me[7] = _cuConjf(_cuCsubf(_cuCmulf(m_me[2], m_me[3]), _cuCmulf(m_me[0], m_me[5])));
@@ -876,7 +881,7 @@ extern "C" {
             for (UINT i = 0; i < uiPrecision; ++i)
             {
                 Real exp_factor = F(1.0) / (uiPrecision - i);
-                _Complex alpha = _cuCmulf(a, exp_factor);
+                _Complex alpha = cuCmulf_cr(a, exp_factor);
                 //aU/(N-i) = this x alpha
                 deviceSU3 aUoN = MulCompC(alpha);
                 if (0 == i)

@@ -20,6 +20,8 @@
 #define _pow pow
 #define _sin sin
 #define _cos cos
+#define _hostexp exp
+#define _hostsqrt sqrt
 
 #define _make_cuComplex make_cuDoubleComplex
 #define _cuCaddf cuCadd
@@ -33,12 +35,15 @@
 
 #else
 
+//the __function is Intrinsic Functions which can be only used in device
 #define _sqrt sqrtf
 #define _log logf
 #define _exp expf
 #define _pow powf
 #define _sin sinf
 #define _cos cosf
+#define _hostexp expf
+#define _hostsqrt sqrtf
 
 #define _make_cuComplex make_cuComplex
 #define _cuCaddf cuCaddf

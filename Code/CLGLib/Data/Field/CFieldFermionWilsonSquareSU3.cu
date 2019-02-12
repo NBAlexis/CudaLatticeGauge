@@ -269,6 +269,8 @@ __global__ void _kernelDFermionWilsonSquareSU3(
         {
             pResultData[siteIndexX] = gamma5.MulWilsonC(pResultData[siteIndexX]);
         }
+
+        //pResultData[siteIndexX].MulReal(1 / (F(2.0) * kai));
     }
 }
 
@@ -288,8 +290,9 @@ __global__ void _kernelDWilsonForceSU3(
 {
     intokernaldir;
 
-    //gammaMatrix gamma5 = bDiracChiralGamma ? __diracGamma->m_gm[GAMMA5] : __chiralGamma->m_gm[GAMMA5];
-    _Complex cKai = _make_cuComplex(F(0.0), -fKai);
+    //Real test_force = F(0.0);
+    //Real test_force2 = F(0.0);
+    fKai = F(2.0) * fKai;
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -312,10 +315,9 @@ __global__ void _kernelDWilsonForceSU3(
 
             SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(siteIndexX, -(idir + 1));
             SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, siteIndexX, (idir + 1));
-            SIndex x_m_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, siteIndexX, -(idir + 1));
 
             deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-            deviceWilsonVectorSU3 x_m_mu_Left(pInverseDDdagger[x_m_mu_Fermion.m_uiSiteIndex]);
+            deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
             deviceSU3 x_Gauge_element = pGauge[linkIndex];
 
@@ -330,15 +332,19 @@ __global__ void _kernelDWilsonForceSU3(
                 //(1-gamma _mu) Ti U(x,mu) phi(x+ mu) - (1+gamma _mu) U^{dagger}(x) Ti phi(x)
 
                 //(1 - gamma_mu) Ti U(x,mu) phi(x+ mu)
-                deviceSU3 res = deviceSU3::makeSU3Contract(x_Left, Ti_U_x_mu_phi.SubC(gammaMu.MulWilsonC(Ti_U_x_mu_phi)));
+                _Complex res = x_Left.ConjugateDotC(Ti_U_x_mu_phi.SubC(gammaMu.MulWilsonC(Ti_U_x_mu_phi)));
 
                 //- (1 + gamma _mu)U^{dagger}(x) Ti phi(x)
-                res.Sub(deviceSU3::makeSU3Contract(x_m_mu_Left, Udagger_x_m_mu_Ti_phi.AddC(gammaMu.MulWilsonC(Udagger_x_m_mu_Ti_phi))));
+                res = _cuCsubf(res, x_p_mu_Left.ConjugateDotC(Udagger_x_m_mu_Ti_phi.AddC(gammaMu.MulWilsonC(Udagger_x_m_mu_Ti_phi))));
 
-                pForce[linkIndex].Add(res.Im2C().MulC(__SU3Generators[i]).MulCompC(cKai));
+                //2ik Im(...)
+                //test_force += res.y * fKai;
+                //test_force2 += res.x * fKai;
+                pForce[linkIndex].Add(__SU3Generators[i].MulCompC(_make_cuComplex(F(0.0), res.y * fKai)));
             }
         }
     }
+    //printf("typical fermion force = %f(%f), kai= %f\n", test_force, test_force2, fKai);
 }
 
 __global__ void _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDiracChiralGamma)
@@ -569,7 +575,9 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge)
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     preparethread;
+    //Ddagger first, m_pDeviceDataCopy = D+ m_pDeviceData
     _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pFieldSU3->m_pDeviceData, m_pDeviceDataCopy, m_fKai, m_byFieldId, TRUE, TRUE);
+    //Then D, m_pDeviceData = D m_pDeviceDataCopy
     _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE);
 }
 
@@ -660,6 +668,8 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     pDDaggerPhiWilson->CopyTo(pDPhiWilson);
     if (NULL != pCachedField)
     {
+        //The gauge field is changing slowly, and D depends only on gauge, also change slowly
+        //Use the last solution as start point will accelerate the solver, so we cache it
         pDDaggerPhiWilson->CopyTo(pCachedField);
     }
     pDPhiWilson->Ddagger(pGaugeSU3);

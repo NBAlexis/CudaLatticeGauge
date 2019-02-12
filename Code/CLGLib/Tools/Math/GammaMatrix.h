@@ -60,16 +60,6 @@ extern "C" {
             return ret;
         }
 
-        /**
-        * ret = (Gamma . Spinor)[uiSpinorIndex]
-        */
-        __device__ __inline__ deviceSU3Vector MulVectorC(const deviceWilsonVectorSU3& other, UINT uiSpinorIndex) const
-        {
-            deviceSU3Vector nonZero = other.m_d[m_uiIndex[uiSpinorIndex]];
-            nonZero.MulCompI(m_me[uiSpinorIndex]);
-            return nonZero;
-        }
-
         UINT m_uiIndex[4];
         cuComplexI m_me[4];
 

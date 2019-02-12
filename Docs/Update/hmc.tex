@@ -58,10 +58,10 @@ We now, concentrate on two degenerate fermion flavours. i.e. considering
 Using $\det (DD^{\dagger})=\det (D)\det (D^{\dagger})$ and $\det(M^{-1})=\left(\det (M)\right)^{-1}$ and \textcolor[rgb]{1,0,0}{$\det (D)=\det (D^{\dagger})$} (\textbf{Only for Wilson Fermions or $\gamma _5$-hermiticity fermions, $\hat{D}^{\dagger}=\gamma _5 D \gamma _5 + m=\gamma _5 (D+m) \gamma _5=\gamma _5 \hat{D} \gamma _5$, and $\det(\hat{D}^{\dagger})=\det(\gamma _5)\det(\hat{D})\det(\gamma _5)=\det (\hat{D})$.} See also Ref.~\cite{weingarten1981}.), one can show Eq.~(8.9) of Ref.~\cite{latticeqcdbook2010} (Eq.~(2.77) of Ref.~\cite{latticeqcdreview2009})
 \begin{equation}
 \begin{split}
-&\int \mathcal{D}[\bar{\psi}]\mathcal{D}[\psi]\exp\left(-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d\right)=\det (\hat{D}\hat{D}^{\dagger})=\int \mathcal{D}[\phi] \exp (-\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi)
+&\int \mathcal{D}[\bar{\psi}]\mathcal{D}[\psi]\exp\left(-\bar{\psi}_u \hat{D} \psi _u-\bar{\psi}_d \hat{D} \psi _d\right)=\det (\hat{D}\hat{D}^{\dagger})=\int \mathcal{D}[\phi] \exp (\textcolor[rgb]{1,0,0}{-}\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1} \phi)
 \end{split}
 \end{equation}
-where $\phi$ now is a complex Bosnic field.
+where $\phi$ now is a complex Bosnic field. (Note that, there is a sign typo in Eq.~(8.31) of Ref.~\cite{latticeqcdbook2010}, see also Eqs.~(8.38) and (8.39) of Ref.~\cite{latticeqcdbook2010} )
 
 So, generally, we are using HMC to evaluate the action with 'Pseudofermions`, or in other words, we are working with an action including only gauge and bosons.
 \begin{equation}
@@ -140,7 +140,7 @@ so
 \begin{split}
 &\frac{\partial}{\partial \omega _a (\mu,n)}S_G=-\frac{\beta}{2N}{\rm Re}{\rm tr}\left[\frac{\partial}{\partial \omega _a}U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]=-\frac{\beta}{2N}{\rm tr}\left[\frac{\partial}{\partial \omega _a}\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)+\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
 &=-i\frac{\beta}{2N}{\rm tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)T^{\dagger}_aU^{\dagger}_{\mu}(n)\right]=-i\frac{\beta}{2N}{\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
-&=-\frac{\beta}{N} i{\rm Im\;tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
+&=\frac{\beta}{N} {\rm Im\;tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
 \end{split}
 \end{equation}
 This is the Eq.~(8.41) of Ref.~\cite{latticeqcdbook2010}.
@@ -148,7 +148,7 @@ This is the Eq.~(8.41) of Ref.~\cite{latticeqcdbook2010}.
 Using (Checked by Mathematica that Eq.~(8.42) of Ref.~\cite{latticeqcdbook2010} is incompatable with our notation, but replacing the $UA-A^{\dagger}U^{\dagger}$ of Eq.~(8.42) with $\{UA\}_{TA}$ is correct. Also, Eq.~(2.58) of Ref.~\cite{latticeqcdbook2017} is different from ours, in our formulism, it is correct by replacing $2T_a{\rm Re}[tr[T_a\cdot W]]$ of Eq.~(2.58) with $2iT_a{\rm Im}[tr[T_a\cdot W]]$)
 \begin{equation}
 \begin{split}
-&\sum _a {\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]T_a=\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
+&\sum _a {\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]T_a=2i\sum _a{\rm Im}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]T_a=\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}\\
 &\{W\}_{TA}=\frac{W-W^{\dagger}}{2}-{\rm tr}\left(\frac{W-W^{\dagger}}{2N}\right)\mathbb{I}\\
 \end{split}
 \end{equation}
@@ -160,7 +160,7 @@ where $\mathbb{I}$ is identity matrix. Therefor
 \end{split}
 \label{eq.hmc.force}
 \end{equation}
-Note that, $\{U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\}_{TA}=-2i\sum _aT_a{\rm Im}[tr[T_a\cdot W]]$, so $\dot{\omega}_a=\frac{\beta}{N}{\rm Im}[tr[T_a\cdot W]]$ is still a \textbf{real} number.
+Note that, $\dot{\omega}_a=\frac{\beta}{N}{\rm Im}[tr[T_a\cdot W]]$ is still a \textbf{real} number.
 
 Eq.~(\ref{eq.hmc.force}) is same as Eqs.~(2.53), (2.56) and (2.57) of Ref.~\cite{latticeqcdbook2017}.
 
@@ -207,10 +207,10 @@ Using the Wilson Fermion action
 \begin{equation}
 \begin{split}
 &\hat{D}=C(D+1)\\
-&D=-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x)\delta _{x,x+\mu}+(1+\gamma _{\mu})U_{\mu}^{-1}(x-\mu)\delta _{x,x-\mu}\right)\\
+&D=-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(x _L)\delta _{x _L,(x+\mu)_R}+(1+\gamma _{\mu})U_{\mu}^{-1}(x _L-\mu)\delta _{x_L,(x-\mu)_R}\right)\\
 \end{split}
 \end{equation}
-with $C=m_f+\left(4/a\right)$ and $\kappa=1/(2am_f+8)$.
+with $C=m_f+\left(4/a\right)=1/2a\kappa$ and $\kappa=1/(2am_f+8)$. One can rescale the field and set $C=1$.
 
 The force of $\phi$ on $U$ is obtained as $\partial _{\omega_a}S_{pf}$. The result for Wilson Fermion action is shown in Eqs.~(8.39), (8.44) and (8.45) of Ref.~\cite{latticeqcdbook2010} as
 \begin{equation}
@@ -218,7 +218,7 @@ The force of $\phi$ on $U$ is obtained as $\partial _{\omega_a}S_{pf}$. The resu
 &F=i\sum _a\dot{\omega}_aT_a=i\sum _a\left(-\partial _{\omega _a}\left(S_G[U_{\mu}(n)]+S_{pf}[U_{\mu}(n)]\right)\right)T_a=F_G+F_{pf}.\\
 &F_{pf}=i\sum _a\left(-\partial _{\omega _a}S_{pf}[U_{\mu}(n)]\right)T_a=-i\sum_aT^a \frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\} \\
+&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x\textcolor[rgb]{1,0,0}{+}\mu)_L,x_R} \right\} \\
 &\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^a} \gamma _5\\
 \end{split}
 \end{equation}
@@ -229,7 +229,7 @@ where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^a$ are $SU
 &\left(T^a\right)^{\dagger}=T^a,\;\;\frac{\partial M^{-1}}{\partial \omega _{\mu}^a}=-M^{-1}\frac{\partial M}{\partial \omega _{\mu}^a}M^{-1}\\
 \end{split}
 \end{equation}
-are used.
+are used. (Note that, Eq.~(8.45) of Ref.~\cite{latticeqcdbook2010} has a sign typo, see also Eq.~(2.82) of Ref.~\cite{latticeqcdreview2009})
 
 We can simplify it further by $\left(\hat{D}^{\dagger}(\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}=\left((\hat{D}\hat{D}^{\dagger})^{-1}\phi\right)^{\dagger}\hat{D}$, so
 \begin{equation}
@@ -244,7 +244,7 @@ and
 \begin{equation}
 \begin{split}
 &\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
-&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta _{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x-\mu)_L}\delta _{x,x_R} \right\}\\
+&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x+\mu)_L,x_R}\right\}\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-2\kappa{\rm Im}\left[\left(\phi _1 ^{\dagger} M \phi _2\right)\right]\\
 \end{split}
 \end{equation}
@@ -399,9 +399,9 @@ In Sec.~\ref{hmc_scheme}, the basic idea is introduced. However, the implementat
 \label{eq.hmc.update_leapfrog}
 \end{subequations}
 
-\textcolor[rgb]{1,0,0}{\textbf{Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,n}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,n}S$.}}
+Note that, the sign of $F$ is `+' here which is different from Ref.~\cite{latticeqcdbook2010}, because in Ref.~\cite{latticeqcdbook2010}, $F=\partial _{\mu,n}S = -\dot{P}$. Here we define $F=\dot{P}=-\partial _{\mu,n}S$.
 
-or simply written as
+Or simply written as
 \begin{equation}
 \begin{split}
 &P_{\epsilon}\circ U_{\epsilon}\circ P_{\frac{1}{2}\epsilon}\left(P_0,U_0\right)
@@ -453,10 +453,10 @@ Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\ci
 \end{enumerate}
 
 \begin{itemize}
- \item More on Metropolis step:
+ \item More on \index{Metropolis}Metropolis step:
 \end{itemize}
 
-If the hybrid Monte Carlo can be implemented exactly, then, when \index{equilibrium}equilibrium is reached, $H$ should be unchanged, so, in some implementation, the Metropolis step can be ignored to archive a better accept rate.
+If the hybrid Monte Carlo can be implemented exactly, then, when \index{equilibrium}equilibrium is reached, $H$ should be unchanged, so, in some implementation, the Metropolis step can be ignored to archive a better accept rate. The parameter \verb"Metropolis" of parameter \verb"Updator" can be set to $1$ if Metropolis step is enabled and $0$ otherwise.
 
 \subsection{\index{optimized_hmc}Optimization of HMC}
 

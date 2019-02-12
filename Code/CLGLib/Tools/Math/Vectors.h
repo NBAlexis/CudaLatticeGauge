@@ -104,9 +104,9 @@ extern "C" {
 
         __device__ __inline__ void SubReal(Real other)
         {
-            m_ve[0] = _cuCsubf(m_ve[0], other);
-            m_ve[1] = _cuCsubf(m_ve[1], other);
-            m_ve[2] = _cuCsubf(m_ve[2], other);
+            m_ve[0] = cuCsubf_cr(m_ve[0], other);
+            m_ve[1] = cuCsubf_cr(m_ve[1], other);
+            m_ve[2] = cuCsubf_cr(m_ve[2], other);
         }
 
         __device__ __inline__ void Add(const deviceSU3Vector& other)
@@ -125,16 +125,16 @@ extern "C" {
 
         __device__ __inline__ void AddReal(Real other)
         {
-            m_ve[0] = _cuCaddf(m_ve[0], other);
-            m_ve[1] = _cuCaddf(m_ve[1], other);
-            m_ve[2] = _cuCaddf(m_ve[2], other);
+            m_ve[0] = cuCaddf_cr(m_ve[0], other);
+            m_ve[1] = cuCaddf_cr(m_ve[1], other);
+            m_ve[2] = cuCaddf_cr(m_ve[2], other);
         }
 
         __device__ __inline__ void MulReal(Real other)
         {
-            m_ve[0] = _cuCmulf(m_ve[0], other);
-            m_ve[1] = _cuCmulf(m_ve[1], other);
-            m_ve[2] = _cuCmulf(m_ve[2], other);
+            m_ve[0] = cuCmulf_cr(m_ve[0], other);
+            m_ve[1] = cuCmulf_cr(m_ve[1], other);
+            m_ve[2] = cuCmulf_cr(m_ve[2], other);
         }
 
         __device__ __inline__ void MulComp(const _Complex& other)

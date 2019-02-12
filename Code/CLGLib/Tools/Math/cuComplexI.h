@@ -36,16 +36,16 @@ extern "C" {
     __device__ static __inline__ cuComplexI cuConjI(const cuComplexI& x) { return make_cuComplexI(cuCrealI(x), -cuCimagI(x)); }
 
     __device__ static __inline__ cuComplexI cuCaddI(const cuComplexI& a, const cuComplexI& b) { return make_cuComplexI(a.x + b.x, a.y + b.y); }
-    __device__ static __inline__ _Complex cuCFaddI(const _Complex& a, const cuComplexI& b) { return _make_cuComplex(a.x + b.x, a.y + b.y); }
-    __device__ static __inline__ _Complex cuCIaddF(const cuComplexI& a, const _Complex& b) { return _make_cuComplex(a.x + b.x, a.y + b.y); }
+    __device__ static __inline__ _Complex cuCFaddI(const _Complex& a, const cuComplexI& b)    { return _make_cuComplex(a.x + b.x, a.y + b.y); }
+    __device__ static __inline__ _Complex cuCIaddF(const cuComplexI& a, const _Complex& b)    { return _make_cuComplex(a.x + b.x, a.y + b.y); }
 
     __device__ static __inline__ cuComplexI cuCsubI(const cuComplexI& a, const cuComplexI& b) { return make_cuComplexI(a.x - b.x, a.y - b.y); }
-    __device__ static __inline__ _Complex cuCFsubI(const _Complex& a, const cuComplexI& b) { return _make_cuComplex(a.x - b.x, a.y - b.y); }
-    __device__ static __inline__ _Complex cuCIsubF(const cuComplexI& a, const _Complex& b) { return _make_cuComplex(a.x - b.x, a.y - b.y); }
+    __device__ static __inline__ _Complex cuCFsubI(const _Complex& a, const cuComplexI& b)    { return _make_cuComplex(a.x - b.x, a.y - b.y); }
+    __device__ static __inline__ _Complex cuCIsubF(const cuComplexI& a, const _Complex& b)    { return _make_cuComplex(a.x - b.x, a.y - b.y); }
 
     __device__ static __inline__ cuComplexI cuCmulI(const cuComplexI& a, const cuComplexI& b) { return make_cuComplexI(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
-    __device__ static __inline__ _Complex cuCFmulI(const _Complex& a, const cuComplexI& b) { return _make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
-    __device__ static __inline__ _Complex cuCImulF(const cuComplexI& a, const _Complex& b) { return _make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
+    __device__ static __inline__ _Complex cuCFmulI(const _Complex& a, const cuComplexI& b)    { return _make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
+    __device__ static __inline__ _Complex cuCImulF(const cuComplexI& a, const _Complex& b)    { return _make_cuComplex(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x); }
 
     __device__ static __inline__ Real cuCabsI(const cuComplexI& x) { return _sqrt((Real)(x.x * x.x + x.y * x.y)); }
 
