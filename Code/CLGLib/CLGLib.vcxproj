@@ -55,8 +55,9 @@
     <ClInclude Include="Platform\PlatformIncs.h" />
     <ClInclude Include="Platform\WinDefine.h" />
     <ClInclude Include="Platform\WinFunction.h" />
-    <ClInclude Include="SparseLinearAlgebra\CSLASolve.h" />
-    <ClInclude Include="SparseLinearAlgebra\CSolveBiCGstab.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
@@ -87,6 +88,7 @@
       <FileType>Document</FileType>
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp" />
     <CudaCompile Include="Core\CudaHelper.cu">
       <FileType>Document</FileType>
@@ -107,7 +109,7 @@
     <ClCompile Include="Platform\WinFunction.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <CudaCompile Include="Data\Lattice\CIndex.cu" />
-    <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cu" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>

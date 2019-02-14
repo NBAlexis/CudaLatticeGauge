@@ -54,7 +54,7 @@ public:
 
 #pragma endregion
 
-    virtual UBOOL ApplyOperator(EFieldOperator , const CField* )
+    virtual UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real )
     {
         appCrucial("CFieldGauge: Do Operator implimented yet");
         return FALSE;

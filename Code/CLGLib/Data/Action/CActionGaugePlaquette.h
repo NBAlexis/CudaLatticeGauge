@@ -25,7 +25,7 @@ public:
     virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable);
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
 
-    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple = NULL) const;
+    virtual UBOOL CalculateForceOnGauge(UINT uiStep, const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple = NULL) const;
     virtual void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate);
     virtual void OnFinishTrajectory(UBOOL bAccepted);
 

@@ -94,7 +94,7 @@ void CIntegrator::UpdateU(Real fStep)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
+void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera)
 {
     // recalc force
     m_pForceField->Zero();
@@ -103,7 +103,7 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
+        m_lstActions[i]->CalculateForceOnGauge(uiItera, m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 

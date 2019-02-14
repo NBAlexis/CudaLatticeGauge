@@ -48,16 +48,16 @@ public:
     virtual _Complex Dot(const CField* other) const;
 
     //pGauge must be gauge SU3
-    virtual void D(const CField* pGauge);
-    virtual void Ddagger(const CField* pGauge);
-    virtual void DDdagger(const CField* pGauge);
+    virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
+    virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
+    virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
     virtual UBOOL InverseD(const CField* pGauge);
     virtual UBOOL InverseDdagger(const CField* pGauge);
     virtual UBOOL InverseDDdagger(const CField* pGauge);
     virtual void ApplyGamma(EGammaMatrix eGamma);
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce) const;
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const;
 
 protected:
 

@@ -94,6 +94,8 @@ UINT TestSolver(CParameters& )
 
 __REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab);
 
+__REGIST_TEST(TestSolver, Solver, TestSolverGMRES);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

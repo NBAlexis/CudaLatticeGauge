@@ -11,8 +11,8 @@
 
 UINT TestFermionUpdator(CParameters& sParam)
 {
-    appGetLattice()->m_pUpdator->Update(5, TRUE);
-    //CCudaHelper::DebugFunction();
+    appGetLattice()->m_pUpdator->Update(20, FALSE);
+    appGetLattice()->m_pUpdator->Update(20, TRUE);
     return 0;
 }
 

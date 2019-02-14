@@ -200,12 +200,6 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="SparseLinearAlgebra\CSolveBiCGstab.h">
-      <Filter>SparseLinearAlgebra</Filter>
-    </ClInclude>
-    <ClInclude Include="SparseLinearAlgebra\CSLASolve.h">
-      <Filter>SparseLinearAlgebra</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasurementManager.h">
       <Filter>Measurement</Filter>
     </ClInclude>
@@ -223,6 +217,15 @@
     </ClInclude>
     <ClInclude Include="Tools\Math\SU3.h">
       <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSLASolver.h">
+      <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -263,6 +266,9 @@
       <Filter>Update\Continous</Filter>
     </ClCompile>
     <ClCompile Include="CLGLib_Private.cu" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -304,14 +310,14 @@
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <Filter>Data\Lattice</Filter>
     </CudaCompile>
-    <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cu">
-      <Filter>SparseLinearAlgebra</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldGauge.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionFermionWilsonNf2.cpp">
       <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

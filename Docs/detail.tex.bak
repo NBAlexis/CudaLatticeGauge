@@ -30,6 +30,8 @@
 \usepackage{amssymb}
 %\usepackage{ctex}  %就是在这里引入了ctex宏包，下面就可以直接输入中文编译之后就可以正常输出啦
 
+\usepackage{algorithm,algpseudocode}
+
 \hyphenation{ALPGEN}
 \hyphenation{EVTGEN}
 \hyphenation{PYTHIA}
@@ -82,6 +84,8 @@
 
 \input "update/hmc.tex"
 
+\section{\label{update}Update scheme}
+
 \input "update/solver.tex"
 
 \clearpage
@@ -89,6 +93,8 @@
 \section{\label{measure}Measurement}
 
 \input "Measurement/PlatqutteEnergy.tex"
+
+\input "Measurement/MesonCorrelator.tex"
 
 \clearpage
 

@@ -1,0 +1,38 @@
+
+Given a matrix $A$ and a vector ${\bf b}$. The solver works out the solution
+\begin{equation}
+\begin{split}
+&{\bf b}=A{\bf x},\;\;{\bf x} = A^{-1}{\bf b}.
+\end{split}
+\end{equation}
+
+\subsection{\label{Krylov_subspace}\index{Krylov subspace}Krylov subspace}
+
+In short, the Krylov subspace methods assumes
+\begin{equation}
+\begin{split}
+&{\bf x} \approx \sum _{l=0}^{k-1} C_lA^l{\bf b}\in K_k=span\left\{{\bf b},A{\bf b},\ldots,A^{k-1}{\bf b}\right\}.
+\end{split}
+\end{equation}
+with finite $k$, where $C_k$ are coefficients. The equation $0={\bf b}-A{\bf x}$ becomes
+\begin{equation}
+\begin{split}
+&\|{\bf b}- \sum _{l=0}^{k-1} C_lA^{l+1}{\bf b}\|=0
+\end{split}
+\label{eq.krylov1}
+\end{equation}
+This is a problem in $k+1$ dimension, where $k$ is independent of the dimension of ${\bf b}$, and usually significantly smaller than the dimension of ${\bf b}$. The Eq.~(\ref{eq.krylov1}) can be understand that, if ${\bf x}_k\approx A^{-1}{\bf b}$ is approximation of the solution in $k$ dimension, in the $k+1$ dimension
+\begin{equation}
+\begin{split}
+&\left({\bf b}-A{\bf x}\right)_{k+1} \bot K_k
+\end{split}
+\label{eq.krylov2}
+\end{equation}
+
+That is, if we have a multi-dimension vector $v_n$, and its projection in 3-dimension ($D=k+1$) is a vector ${\bf v}_3$, if we want to find a plane ($D=k$) such that the projection of $v_n$ in the plane is minimized, the plane is chosen to be the one orthogonal to ${\bf v}_3$.
+
+
+
+
+
+

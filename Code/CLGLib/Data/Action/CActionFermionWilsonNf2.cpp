@@ -16,8 +16,10 @@ __CLGIMPLEMENT_CLASS(CActionFermionWilsonNf2)
 
 CActionFermionWilsonNf2::CActionFermionWilsonNf2()
     : CAction()
+    , m_uiMutiStep(1)
 {
 }
+
 
 void CActionFermionWilsonNf2::Initial(CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
@@ -32,6 +34,19 @@ void CActionFermionWilsonNf2::Initial(CLatticeData* pOwner, const CParameters& p
     {
         appCrucial(_T("CActionFermionWilsonNf2 work with only CFieldFermionWilsonSquareSU3!\n"));
     }
+
+    INT iMultiStep = 1;
+    if (param.FetchValueINT(_T("MultiStep"), iMultiStep))
+    {
+        if (iMultiStep > 0)
+        {
+            m_uiMutiStep = static_cast<UINT>(iMultiStep);
+        }
+        else
+        {
+            appCrucial(_T("CActionFermionWilsonNf2 MultiStep must > 0\n"));
+        }
+    }
 }
 
 void CActionFermionWilsonNf2::PrepareForHMC(const CFieldGauge* pGauge, UINT )
@@ -42,9 +57,24 @@ void CActionFermionWilsonNf2::PrepareForHMC(const CFieldGauge* pGauge, UINT )
 /**
 * To make it constant, we need to build a few temp fields outside this class
 */
-UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge *) const
+UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(UINT uiStep, const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge *) const
 {
-    return m_pFerimionField->CalculateForce(pGauge, pForce);
+    if (m_uiMutiStep > 1)
+    {
+        CFieldGauge* pCachedForce = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pFieldCache->GetCachedField(m_byActionId + CFieldCache::CachedForceFieldStart));
+        if (0 == uiStep % m_uiMutiStep || NULL == pCachedForce)
+        {
+            if (NULL == pCachedForce)
+            {
+                pCachedForce = dynamic_cast<CFieldGauge*>(pForce->GetCopy());
+                appGetLattice()->m_pFieldCache->CacheField(m_byActionId + CFieldCache::CachedForceFieldStart, pCachedForce);
+            }
+            return m_pFerimionField->CalculateForce(pGauge, pForce, pCachedForce);
+        }
+        pForce->AxpyPlus(pCachedForce);
+        return TRUE;
+    }
+    return m_pFerimionField->CalculateForce(pGauge, pForce, NULL);
 }
 
 Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )

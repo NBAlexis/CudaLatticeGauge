@@ -47,6 +47,18 @@ __DEFINE_ENUM(EFieldOperator,
     EFO_ForceDWORD = 0x7fffffff,
     )
 
+
+/**
+* When apply operator, it is convinient to apply a coefficient at the same time
+*/
+enum EOperatorCoefficientType
+{
+    EOCT_None, // (1.0)
+    EOCT_Minus, // (-1.0)
+    EOCT_Real, // Real Number
+    EOCT_Complex, //Complex Number
+};
+
 class CLGAPI CField : public CBase
 {
 public:
@@ -98,7 +110,7 @@ public:
 
     virtual CField* GetCopy() const = 0;
 
-    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield) = 0;
+    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
 
 #pragma endregion
 
@@ -167,7 +179,10 @@ class CLGAPI CFieldCache
 public:
     enum ECacheReason
     {
-        CachedInverseDDdaggerField,
+        CachedInverseDDdaggerField = 1,
+
+        //the real ID = 100 + action ID
+        CachedForceFieldStart = 100,
     };
 
     CFieldCache()

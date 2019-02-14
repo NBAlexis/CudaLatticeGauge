@@ -11,11 +11,16 @@
 \indexentry{solver|hyperpage}{12}
 \indexentry{BiCGStab|hyperpage}{12}
 \indexentry{leap frog|hyperpage}{15}
+\indexentry{Metropolis|hyperpage}{16}
 \indexentry{equilibrium|hyperpage}{16}
 \indexentry{optimized_hmc|hyperpage}{16}
 \indexentry{Omelyan|hyperpage}{16}
 \indexentry{MultiStepUpdator|hyperpage}{17}
-\indexentry{solver|hyperpage}{17}
-\indexentry{plaquette energy|hyperpage}{18}
-\indexentry{meson|hyperpage}{18}
-\indexentry{correlator|hyperpage}{18}
+\indexentry{solver|hyperpage}{18}
+\indexentry{Krylov subspace|hyperpage}{18}
+\indexentry{GMRES|hyperpage}{18}
+\indexentry{BiCGStab|hyperpage}{22}
+\indexentry{GCR|hyperpage}{22}
+\indexentry{plaquette energy|hyperpage}{23}
+\indexentry{meson|hyperpage}{23}
+\indexentry{correlator|hyperpage}{23}

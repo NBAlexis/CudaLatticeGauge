@@ -42,7 +42,7 @@ public:
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
     void OnFinishTrajectory(UBOOL bAccepted);
     void Prepare(UBOOL bLastAccepted, UINT uiStep);
-    void UpdateP(Real fStep, UBOOL bCacheStaple);
+    void UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera);
     void UpdateU(Real fStep);
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
 

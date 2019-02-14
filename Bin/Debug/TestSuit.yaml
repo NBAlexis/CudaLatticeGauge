@@ -384,6 +384,57 @@ TestSolverBiCGStab:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+TestSolverGMRES:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+	
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 15
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 5
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+
 TestFermionUpdator:
 
     Dim : 4
@@ -410,7 +461,7 @@ TestFermionUpdator:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 15
 
     Gauge:
 	
@@ -432,31 +483,30 @@ TestFermionUpdator:
 
         FieldId : 2
 
-        PoolNumber : 10
+        PoolNumber : 15
 
     Solver:
 
-        SolverName : CSLASolverBiCGStab
+        SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        DiviationStep : 10
-        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
-        MaxStep : 10
+        MaxDim : 10
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.000001
-        Restart : 8
+        Accuracy : 0.0000001
+        Restart : 10
         ## 0 is recommanded
         AbsoluteAccuracy : 0
 
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 5.2
+        Beta : 2.5
 
     Action2:
 
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
+        ## MultiStep : 2
 
     Measure1:
 

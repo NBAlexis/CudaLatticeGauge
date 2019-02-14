@@ -38,7 +38,7 @@ public:
     * So the "pGauge" must be a copy of real gauge field, not the orignal one!
     * Can fail due to solver
     */
-    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
+    virtual UBOOL CalculateForceOnGauge(UINT uiStep, const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const = 0;
 
     /**
     * Generate randoms

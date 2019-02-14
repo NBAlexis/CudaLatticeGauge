@@ -34,27 +34,32 @@ public:
     {
         Real fHalfEstep = F(0.5) * m_fEStep;
         appDetailed("  Omelyan sub step 0\n");
-        UpdateP(m_f2Lambda * fHalfEstep, FALSE);
+        UINT uiForceStep = 0;
+        UpdateP(m_f2Lambda * fHalfEstep, FALSE, uiForceStep);
+        ++uiForceStep;
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
         {
             UpdateU(fHalfEstep);
-            UpdateP(m_fEStep * (F(1.0) - m_f2Lambda), FALSE);
+            UpdateP(m_fEStep * (F(1.0) - m_f2Lambda), FALSE, uiForceStep);
+            ++uiForceStep;
             UpdateU(fHalfEstep);
 
             if (uiStep < m_uiStepCount)
             {
                 appDetailed("  Omelyan sub step %d\n", uiStep);
-                UpdateP(m_fEStep * m_f2Lambda, FALSE);
+                UpdateP(m_fEStep * m_f2Lambda, FALSE, uiForceStep);
+                ++uiForceStep;
             }
             else
             {
                 appDetailed("  Omelyan last step %d\n", uiStep);
-                UpdateP(m_f2Lambda * fHalfEstep, TRUE);
+                UpdateP(m_f2Lambda * fHalfEstep, TRUE, uiForceStep);
+                ++uiForceStep;
             }
         }
 
-        m_pGaugeField->ElementNormalize();
+        //m_pGaugeField->ElementNormalize();
     }
 
 protected:

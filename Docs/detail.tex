@@ -30,6 +30,8 @@
 \usepackage{amssymb}
 %\usepackage{ctex}  %就是在这里引入了ctex宏包，下面就可以直接输入中文编译之后就可以正常输出啦
 
+\usepackage{algorithm,algpseudocode}
+
 \hyphenation{ALPGEN}
 \hyphenation{EVTGEN}
 \hyphenation{PYTHIA}
@@ -82,7 +84,17 @@
 
 \input "update/hmc.tex"
 
-\input "update/solver.tex"
+\clearpage
+
+\section{\label{solver}\index{solver}Sparse linear algebra solver}
+
+\input "SparseLinearAlgebra/solver.tex"
+
+\input "SparseLinearAlgebra/gmres.tex"
+
+\input "SparseLinearAlgebra/bicgstab.tex"
+
+\input "SparseLinearAlgebra/gcr.tex"
 
 \clearpage
 

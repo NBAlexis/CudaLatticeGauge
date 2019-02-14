@@ -123,8 +123,9 @@ UINT uiDir = _DC_Dir;
 #include "Data/Action/CActionGaugePlaquette.h"
 #include "Data/Action/CActionFermionWilsonNf2.h"
 
-#include "SparseLinearAlgebra/CSLASolve.h"
-#include "SparseLinearAlgebra/CSolveBiCGstab.h"
+#include "SparseLinearAlgebra/CSLASolver.h"
+#include "SparseLinearAlgebra/CSolverBiCGstab.h"
+#include "SparseLinearAlgebra/CSolverGMRES.h"
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"
