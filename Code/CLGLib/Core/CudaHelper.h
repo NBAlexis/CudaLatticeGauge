@@ -20,7 +20,7 @@ extern "C" bool runCudaTest(const int argc, const char **argv,
 
 enum { kSharedLength = 1024, };
 
-enum { kContentLength = 1024,};
+enum { kContentLength = 1024, };
 
 extern __constant__ UINT _constIntegers[kContentLength];
 extern __constant__ Real _constFloats[kContentLength];
@@ -28,8 +28,35 @@ extern __constant__ Real _constFloats[kContentLength];
 extern __constant__ class CRandom* __r;
 extern __constant__ class CIndex* __idx;
 
-extern __constant__ class gammaMatrixSet* __diracGamma;
-extern __constant__ class gammaMatrixSet* __chiralGamma;
+enum EGammaMatrix
+{
+    ZERO,
+    UNITY,
+    GAMMA1,
+    GAMMA2,
+    GAMMA3,
+    GAMMA4,
+    GAMMA5,
+    GAMMA51,
+    GAMMA52,
+    GAMMA53,
+    GAMMA54,
+    GAMMA15,
+    GAMMA25,
+    GAMMA35,
+    GAMMA45,
+    SIGMA12,
+    SIGMA23,
+    SIGMA31,
+    SIGMA41,
+    SIGMA42,
+    SIGMA43,
+    CHARGECONJG,
+    EGM_MAX,
+};
+
+extern __constant__ struct gammaMatrix __diracGamma[EGM_MAX];
+extern __constant__ struct gammaMatrix __chiralGamma[EGM_MAX];
 
 extern __constant__ struct deviceSU3 __SU3Generators[9];
 

@@ -68,7 +68,6 @@
     <ClInclude Include="Tools\Data\MemStack.h" />
     <ClInclude Include="Tools\EnumGather.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
-    <ClInclude Include="Tools\Math\cuComplexI.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
     <ClInclude Include="Tools\Math\SU3.h" />

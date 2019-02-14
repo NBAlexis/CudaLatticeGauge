@@ -15,17 +15,17 @@ __constant__ UINT _constIntegers[kContentLength];
 __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
 __constant__ CIndex* __idx;
-__constant__ gammaMatrixSet* __diracGamma;
-__constant__ gammaMatrixSet* __chiralGamma;
+__constant__ gammaMatrix __diracGamma[EGM_MAX];
+__constant__ gammaMatrix __chiralGamma[EGM_MAX];
 __constant__ deviceSU3 __SU3Generators[9];
 
 /**
 * The construction is on device
 */
-__global__ void _kernelCreateMatrix(gammaMatrixSet** ppPtrDirac, gammaMatrixSet** ppPtrChiral, deviceSU3* pGenerator)
+__global__ void _kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, deviceSU3* pGenerator)
 {
-    (*ppPtrDirac) = new gammaMatrixSet(EGMS_Dirac);
-    (*ppPtrChiral) = new gammaMatrixSet(EGMS_Chiral);
+    gammaMatrixSet::CreateGammaMatrix(EGMS_Dirac, pDirac);
+    gammaMatrixSet::CreateGammaMatrix(EGMS_Chiral, pChiral);
 
     for (int i = 0; i < 9; ++i)
     {
@@ -374,26 +374,26 @@ void CCudaHelper::CopyRandomPointer(const CRandom* r) const
 
 void CCudaHelper::CreateGammaMatrix() const
 {
-    gammaMatrixSet** ppDiracGamma;
-    gammaMatrixSet** ppChiralGamma;
+    gammaMatrix* pDiracGamma;
+    gammaMatrix* pChiralGamma;
     deviceSU3* pSU3;
 
     //create pointer
-    checkCudaErrors(cudaMalloc((void**)&ppDiracGamma, sizeof(gammaMatrixSet*)));
-    checkCudaErrors(cudaMalloc((void**)&ppChiralGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMalloc((void**)&pDiracGamma, sizeof(gammaMatrix) * EGM_MAX));
+    checkCudaErrors(cudaMalloc((void**)&pChiralGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMalloc((void**)&pSU3, sizeof(deviceSU3) * 9));
 
     //craete content
-    _kernelCreateMatrix << <1, 1 >> > (ppDiracGamma, ppChiralGamma, pSU3);
+    _kernelCreateMatrix << <1, 1 >> > (pDiracGamma, pChiralGamma, pSU3);
 
     //copy to constant
-    checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, ppDiracGamma, sizeof(gammaMatrixSet*)));
-    checkCudaErrors(cudaMemcpyToSymbol(__chiralGamma, ppChiralGamma, sizeof(gammaMatrixSet*)));
+    checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, pDiracGamma, sizeof(gammaMatrix) * EGM_MAX));
+    checkCudaErrors(cudaMemcpyToSymbol(__chiralGamma, pChiralGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMemcpyToSymbol(__SU3Generators, pSU3, sizeof(deviceSU3) * 9));
 
     //free pointers (already copy to constant, no need)
-    checkCudaErrors(cudaFree(ppDiracGamma));
-    checkCudaErrors(cudaFree(ppChiralGamma));
+    checkCudaErrors(cudaFree(pDiracGamma));
+    checkCudaErrors(cudaFree(pChiralGamma));
     checkCudaErrors(cudaFree(pSU3));
 }
 

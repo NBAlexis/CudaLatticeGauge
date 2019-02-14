@@ -1,13 +1,13 @@
 
 -- Rewrite gamma matrix, to use a UINT.
 
--- Implement BiCGStab with pre
-
--- Implement GMRES
+-- Implement BiCGStab with precondition
 
 -- Implement GCR
 
--- Implement Multi-step updator
-
 -- Implement Meson correlator measure
+
+-- Rewrite thread decompose
+
+-- Enable temprature
 

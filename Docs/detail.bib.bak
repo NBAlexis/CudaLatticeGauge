@@ -24,7 +24,7 @@
 }
 
 @article{latticeqcdreview2009,
-      author         = "Martin L$\rm \"{u}$scher",
+      author         = "Martin L$\rm \ddot{u}$scher",
       title          = "{Computational Strategies in Lattice QCD}",
       year           = "2009",
       eprint         = "1002.4232",
@@ -54,6 +54,10 @@
       year           = "1981",
       pages          = "333¨C338",
       doi            = "10.1016/0370-2693(81)90112-x",
+}
+
+@book{templates,
+      author        = "R. Barrett and M. Berry and T. F. Chan and J. Demmel and J. Donato and J. Dongarra and V. Eijkhout and R. Pozo and C. Romine and H. Van der Vorst",
 }
 
 %Classical

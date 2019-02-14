@@ -1,10 +1,10 @@
 \begin{theindex}
 
-  \item BiCGStab, \hyperpage{12}
+  \item BiCGStab, \hyperpage{12}, \hyperpage{22}
 
   \indexspace
 
-  \item correlator, \hyperpage{17}
+  \item correlator, \hyperpage{23}
 
   \indexspace
 
@@ -13,7 +13,12 @@
   \indexspace
 
   \item fat index, \hyperpage{4}
-  \item force, \hyperpage{7}
+  \item force, \hyperpage{8}
+
+  \indexspace
+
+  \item GCR, \hyperpage{22}
+  \item GMRES, \hyperpage{18}
 
   \indexspace
 
@@ -21,32 +26,37 @@
 
   \indexspace
 
-  \item Integrator, \hyperpage{8}
+  \item Integrator, \hyperpage{9}
+
+  \indexspace
+
+  \item Krylov subspace, \hyperpage{18}
 
   \indexspace
 
   \item Langevin equation, \hyperpage{7}
-  \item leap frog, \hyperpage{14}
+  \item leap frog, \hyperpage{15}
   \item link index, \hyperpage{4}
 
   \indexspace
 
-  \item meson, \hyperpage{17}
+  \item meson, \hyperpage{23}
+  \item Metropolis, \hyperpage{16}
   \item molecular dynamics, \hyperpage{7}
 
   \indexspace
 
-  \item Omelyan, \hyperpage{15}
+  \item Omelyan, \hyperpage{16}
 
   \indexspace
 
-  \item plaquette energy, \hyperpage{17}
+  \item plaquette energy, \hyperpage{23}
   \item pseudofermions, \hyperpage{6}
 
   \indexspace
 
   \item site index, \hyperpage{4}
-  \item solver, \hyperpage{11}, \hyperpage{16}
-  \item staple, \hyperpage{8}
+  \item solver, \hyperpage{12}, \hyperpage{18}
+  \item staple, \hyperpage{9}
 
 \end{theindex}

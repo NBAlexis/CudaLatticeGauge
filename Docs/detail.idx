@@ -10,17 +10,15 @@
 \indexentry{Integrator|hyperpage}{9}
 \indexentry{solver|hyperpage}{12}
 \indexentry{BiCGStab|hyperpage}{12}
-\indexentry{leap frog|hyperpage}{15}
-\indexentry{Metropolis|hyperpage}{16}
-\indexentry{equilibrium|hyperpage}{16}
-\indexentry{optimized_hmc|hyperpage}{16}
-\indexentry{Omelyan|hyperpage}{16}
-\indexentry{MultiStepUpdator|hyperpage}{17}
-\indexentry{solver|hyperpage}{18}
-\indexentry{Krylov subspace|hyperpage}{18}
-\indexentry{GMRES|hyperpage}{18}
-\indexentry{BiCGStab|hyperpage}{22}
-\indexentry{GCR|hyperpage}{22}
-\indexentry{plaquette energy|hyperpage}{23}
-\indexentry{meson|hyperpage}{23}
-\indexentry{correlator|hyperpage}{23}
+\indexentry{leap frog|hyperpage}{14}
+\indexentry{Metropolis|hyperpage}{15}
+\indexentry{equilibrium|hyperpage}{15}
+\indexentry{Omelyan|hyperpage}{15}
+\indexentry{solver|hyperpage}{17}
+\indexentry{Krylov subspace|hyperpage}{17}
+\indexentry{GMRES|hyperpage}{17}
+\indexentry{BiCGStab|hyperpage}{21}
+\indexentry{GCR|hyperpage}{21}
+\indexentry{plaquette energy|hyperpage}{22}
+\indexentry{meson|hyperpage}{22}
+\indexentry{correlator|hyperpage}{22}

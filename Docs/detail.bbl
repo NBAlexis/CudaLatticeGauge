@@ -41,4 +41,17 @@ S.~Ueda et. al.
   of an object oriented lattice QCD code "Bridge++" on accelerators}}.
 \newblock {\em Journal of Physics: Conference Series}, 523:012046, 2014.
 
+\bibitem{templates}
+R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,
+  V.~Eijkhout, R.~Pozo, C.~Romine, and H.~Van der Vorst.
+\newblock {Templates for the Solution of Linear Systems: Building Blocks for
+  Iterative Methods}.
+\newblock 1994, \href{http://www.netlib.org/templates/Templates.html}{Available
+  at: http://www.netlib.org/templates/Templates.html}.
+
+\bibitem{sparselinearbook1}
+Yousef Saad.
+\newblock {Iterative methods for sparse linear systems}.
+\newblock 2003.
+
 \end{thebibliography}

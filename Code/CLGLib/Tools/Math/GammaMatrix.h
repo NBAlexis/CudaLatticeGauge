@@ -2,9 +2,13 @@
 // FILENAME : GammaMatrix.h
 // 
 // DESCRIPTION:
-// This is a gamma matrix implementation from Bridge++
+// The Gamma matrix is a USHORT divded into 8 parts (2 bits for each), we use UINT to align it to 4 bytes
 //
-// m_uiIndex[row]: index of element in raw which is non-zero (is m_me[row])
+// The data is 0000000000000000 | a_1 | a_2 | a_3 | a_4 | b_1 | b_2 | b_3 | b_4
+// Where a_i and b_i = (0, 1, 2, 3)
+//
+// The a_i element of row(i) is none-zero, the value is b_i element of Z4
+// 
 //
 // REVISION:
 //  [12/7/2018 nbale]
@@ -19,24 +23,37 @@ __BEGIN_NAMESPACE
 extern "C" {
 #endif /* __cplusplus */
 
-    struct alignas(64) gammaMatrix
+    struct alignas(4) gammaMatrix
     {
-    public:
-        __device__ gammaMatrix()
+        //Initialize is not allowed for constant variables
+        __device__ gammaMatrix() 
+        { 
+
+        }
+        __device__ gammaMatrix(UINT uiValue) : m_uiValue(uiValue) { }
+        __device__ gammaMatrix(const gammaMatrix& other) : m_uiValue(other.m_uiValue) { }
+
+        /**
+        * b = 0, 1, 2, 3
+        * for 1, i, -1, -i
+        */
+        __device__ __inline__ static deviceSU3Vector MultZ4(const deviceSU3Vector& v, UINT uiB)
         {
-            for (INT i = 0; i < 4; ++i)
-            {
-                m_uiIndex[i] = 0;
-                m_me[i] = make_cuComplexI(0, 0);
-            }
+            // real : 0,1,2,3  -> 1, 0, -1, 0
+            // imag : 0,1,2,3  -> 0, 1, 0, -1
+            return v.MulCompC(_make_cuComplex(3 == uiB ? F(0.0) : (F(1.0) - uiB), 0 == uiB ? F(0.0) : (F(2.0) - uiB)));
         }
 
-        __device__ __inline__ void Set(UINT x, UINT y, INT r, INT i)
+        __device__ __inline__ void Set(UINT x, UINT y, UINT b)
         {
             assert(x < 4);
             assert(y < 4);
-            m_uiIndex[x] = y;
-            m_me[x] = make_cuComplexI(r, i);
+            assert(b < 4);
+
+            UINT uiShift = x << 1;
+            UINT uiIndex = y << (uiShift + 8);
+            UINT uiV = b << uiShift;
+            m_uiValue = m_uiValue | uiIndex | uiV;
         }
 
         /**
@@ -44,67 +61,67 @@ extern "C" {
         */
         __device__ __inline__ deviceWilsonVectorSU3 MulWilsonC(const deviceWilsonVectorSU3& other) const
         {
-            deviceWilsonVectorSU3 ret = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
-            ret.m_d[0] = other.m_d[m_uiIndex[0]];
-            ret.m_d[0].MulCompI(m_me[0]);
+            deviceWilsonVectorSU3 ret;
+            UINT uiIndexOfRow1  = (m_uiValue >>   8) & 3;
+            UINT uiIndexOfRow2  = (m_uiValue >>  10) & 3;
+            UINT uiIndexOfRow3  = (m_uiValue >>  12) & 3;
+            UINT uiIndexOfRow4  = (m_uiValue >>  14) & 3;
+            UINT uiZ4OfRow1     = (m_uiValue/*>>0*/) & 3;
+            UINT uiZ4OfRow2     = (m_uiValue >>   2) & 3;
+            UINT uiZ4OfRow3     = (m_uiValue >>   4) & 3;
+            UINT uiZ4OfRow4     = (m_uiValue >>   6) & 3;
 
-            ret.m_d[1] = other.m_d[m_uiIndex[1]];
-            ret.m_d[1].MulCompI(m_me[1]);
-
-            ret.m_d[2] = other.m_d[m_uiIndex[2]];
-            ret.m_d[2].MulCompI(m_me[2]);
-
-            ret.m_d[3] = other.m_d[m_uiIndex[3]];
-            ret.m_d[3].MulCompI(m_me[3]);
+            ret.m_d[0] = MultZ4(other.m_d[uiIndexOfRow1], uiZ4OfRow1);
+            ret.m_d[1] = MultZ4(other.m_d[uiIndexOfRow2], uiZ4OfRow2);
+            ret.m_d[2] = MultZ4(other.m_d[uiIndexOfRow3], uiZ4OfRow3);
+            ret.m_d[3] = MultZ4(other.m_d[uiIndexOfRow4], uiZ4OfRow4);
 
             return ret;
         }
-
-        UINT m_uiIndex[4];
-        cuComplexI m_me[4];
 
         /*
         * We are on device. Do not use thie function...
         * this is on device, so use print
         */
-        __device__ __inline__ void Print()
+        __device__ __inline__ void Print() const
         {
+            INT reals[4];
+            INT imags[4];
+            reals[0] = 1;
+            reals[1] = 0;
+            reals[2] = -1;
+            reals[3] = 0;
+            imags[0] = 0;
+            imags[1] = 1;
+            imags[2] = 0;
+            imags[3] = -1;
             for (int row = 0; row < 4; ++row)
             {
-                if (m_uiIndex[row] == 0)
+                UINT uiShift = (row << 1);
+                UINT uiRow = (m_uiValue >> (8 + uiShift)) & 3;
+                UINT uiB = (m_uiValue >> uiShift) & 3;
+
+                if (uiRow == 0)
                 {
                     printf("(%2d,%2d) 0     0     0\n",
-                        m_me[row].x, m_me[row].y);
+                        reals[uiB], imags[uiB]);
                 }
-                else if (m_uiIndex[row] == 1)
+                else if (uiRow == 1)
                 {
                     printf("0     (%2d,%2d) 0     0\n",
-                        m_me[row].x, m_me[row].y);
+                        reals[uiB], imags[uiB]);
                 }
-                else if (m_uiIndex[row] == 2)
+                else if (uiRow == 2)
                 {
                     printf("0     0     (%2d,%2d) 0     0\n",
-                        m_me[row].x, m_me[row].y);
+                        reals[uiB], imags[uiB]);
                 }
-                else if (m_uiIndex[row] == 3)
+                else if (uiRow == 3)
                 {
                     printf("0     0     0     (%2d,%2d)\n",
-                        m_me[row].x, m_me[row].y);
+                        reals[uiB], imags[uiB]);
                 }
             }
-        }
-
-        gammaMatrix __device__ __inline__ Mult(INT n) const
-        {
-            gammaMatrix ret;
-
-            for (int row = 0; row < 4; ++row)
-            {
-                ret.m_uiIndex[row] = m_uiIndex[row];
-                ret.m_me[row] = cuCmulI(m_me[row], make_cuComplexI(n, 0));
-            }
-
-            return ret;
         }
 
         friend class gammaMatrixSet;
@@ -114,66 +131,63 @@ extern "C" {
         /**
         * For those have (g1 * g2)__{ab} = g1_{ac} g2_{cb}
         */
-        gammaMatrix __device__ __inline__ _mult(const gammaMatrix& other) const
+        __device__ __inline__ gammaMatrix _mult(const gammaMatrix& other) const
         {
-            gammaMatrix ret;
+            UINT uiNew = 0;
 
             for (int row = 0; row < 4; ++row)
             {
-                ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
-                ret.m_me[row] = cuCmulI(m_me[row], other.m_me[m_uiIndex[row]]);
+                UINT uiShiftMe = (row << 1);
+                UINT uiRowMe = (m_uiValue >> (8 + uiShiftMe)) & 3;
+                UINT uiBMe = (m_uiValue >> uiShiftMe) & 3;
+
+                UINT uiShiftOther = uiRowMe << 1;
+                UINT uiRowOther = (other.m_uiValue >> (8 + uiShiftOther)) & 3;
+                UINT uiBOther = (other.m_uiValue >> uiShiftOther) & 3;
+
+                uiBOther = (uiBOther + uiBMe) & 3;
+
+                UINT uiIndexNew = uiRowOther << (uiShiftMe + 8);
+                UINT uiBNew = uiBOther << uiShiftMe;
+                uiNew = uiNew | uiIndexNew | uiBNew;
             }
 
-            return ret;
+            return gammaMatrix(uiNew);
         }
 
         /**
         * For those have (g1 * g2)__{ab} = i g1_{ac} g2_{cb}
         */
-        gammaMatrix __device__ __inline__ _mult_i(const gammaMatrix& other) const
+        __device__ __inline__ gammaMatrix _mult_i(const gammaMatrix& other) const
         {
-            gammaMatrix ret;
+            UINT uiNew = 0;
 
             for (int row = 0; row < 4; ++row)
             {
-                ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
-                ret.m_me[row] = cuCmulI(make_cuComplexI(0, 1), cuCmulI(m_me[row], other.m_me[m_uiIndex[row]]));
+                UINT uiShiftMe = (row << 1);
+                UINT uiRowMe = (m_uiValue >> (8 + uiShiftMe)) & 3;
+                UINT uiBMe = (m_uiValue >> uiShiftMe) & 3;
+
+                UINT uiShiftOther = uiRowMe << 1;
+                UINT uiRowOther = (other.m_uiValue >> (8 + uiShiftOther)) & 3;
+                UINT uiBOther = (other.m_uiValue >> uiShiftOther) & 3;
+
+                uiBOther = (uiBOther + uiBMe + 1) & 3;
+
+                UINT uiIndexNew = uiRowOther << (uiShiftMe + 8);
+                UINT uiBNew = uiBOther << uiShiftMe;
+                uiNew = uiNew | uiIndexNew | uiBNew;
             }
 
-            return ret;
+            return gammaMatrix(uiNew);
         }
+
+        UINT m_uiValue;
     };
 
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
-
-enum EGammaMatrix
-{
-    ZERO,
-    UNITY,
-    GAMMA1,
-    GAMMA2,
-    GAMMA3,
-    GAMMA4,
-    GAMMA5,
-    GAMMA51,
-    GAMMA52,
-    GAMMA53,
-    GAMMA54,
-    GAMMA15,
-    GAMMA25,
-    GAMMA35,
-    GAMMA45,
-    SIGMA12,
-    SIGMA23,
-    SIGMA31,
-    SIGMA41,
-    SIGMA42,
-    SIGMA43,
-    CHARGECONJG,
-    EGM_MAX,
-};
 
 enum EGammaMatrixSet
 {
@@ -181,102 +195,98 @@ enum EGammaMatrixSet
     EGMS_Chiral,
 };
 
-class gammaMatrixSet
+class gammaMatrixSet 
 {
 public:
-    __device__ gammaMatrixSet(EGammaMatrixSet eSet)
+    __device__ static void CreateGammaMatrix(EGammaMatrixSet eSet, gammaMatrix* gmarray)
     {
-        m_gm[UNITY].Set(0, 0, 1, 0);
-        m_gm[UNITY].Set(1, 1, 1, 0);
-        m_gm[UNITY].Set(2, 2, 1, 0);
-        m_gm[UNITY].Set(3, 3, 1, 0);
+        //Gamma matrix is not initialized
+        for (UINT i = 0; i < EGM_MAX; ++i)
+        {
+            gmarray[i].m_uiValue = 0;
+        }
+        gmarray[UNITY].Set(0, 0, 0);
+        gmarray[UNITY].Set(1, 1, 0);
+        gmarray[UNITY].Set(2, 2, 0);
+        gmarray[UNITY].Set(3, 3, 0);
 
         if (EGMS_Dirac == eSet)
         {
-            m_gm[GAMMA1].Set(0, 3, 0, -1);
-            m_gm[GAMMA1].Set(1, 2, 0, -1);
-            m_gm[GAMMA1].Set(2, 1, 0, 1);
-            m_gm[GAMMA1].Set(3, 0, 0, 1);
+            gmarray[GAMMA1].Set(0, 3, 3);
+            gmarray[GAMMA1].Set(1, 2, 3);
+            gmarray[GAMMA1].Set(2, 1, 1);
+            gmarray[GAMMA1].Set(3, 0, 1);
 
-            m_gm[GAMMA2].Set(0, 3, -1, 0);
-            m_gm[GAMMA2].Set(1, 2, 1, 0);
-            m_gm[GAMMA2].Set(2, 1, 1, 0);
-            m_gm[GAMMA2].Set(3, 0, -1, 0);
+            gmarray[GAMMA2].Set(0, 3, 2);
+            gmarray[GAMMA2].Set(1, 2, 0);
+            gmarray[GAMMA2].Set(2, 1, 0);
+            gmarray[GAMMA2].Set(3, 0, 2);
 
-            m_gm[GAMMA3].Set(0, 2, 0, -1);
-            m_gm[GAMMA3].Set(1, 3, 0, 1);
-            m_gm[GAMMA3].Set(2, 0, 0, 1);
-            m_gm[GAMMA3].Set(3, 1, 0, -1);
+            gmarray[GAMMA3].Set(0, 2, 3);
+            gmarray[GAMMA3].Set(1, 3, 1);
+            gmarray[GAMMA3].Set(2, 0, 1);
+            gmarray[GAMMA3].Set(3, 1, 3);
 
-            m_gm[GAMMA4].Set(0, 0, 1, 0);
-            m_gm[GAMMA4].Set(1, 1, 1, 0);
-            m_gm[GAMMA4].Set(2, 2, -1, 0);
-            m_gm[GAMMA4].Set(3, 3, -1, 0);
+            gmarray[GAMMA4].Set(0, 0, 0);
+            gmarray[GAMMA4].Set(1, 1, 0);
+            gmarray[GAMMA4].Set(2, 2, 2);
+            gmarray[GAMMA4].Set(3, 3, 2);
 
-            m_gm[GAMMA5].Set(0, 2, 1, 0);
-            m_gm[GAMMA5].Set(1, 3, 1, 0);
-            m_gm[GAMMA5].Set(2, 0, 1, 0);
-            m_gm[GAMMA5].Set(3, 1, 1, 0);
+            gmarray[GAMMA5].Set(0, 2, 0);
+            gmarray[GAMMA5].Set(1, 3, 0);
+            gmarray[GAMMA5].Set(2, 0, 0);
+            gmarray[GAMMA5].Set(3, 1, 0);
         }
-        else 
+        else
         {
-            m_gm[GAMMA1].Set(0, 3, 0, -1);
-            m_gm[GAMMA1].Set(1, 2, 0, -1);
-            m_gm[GAMMA1].Set(2, 1, 0, 1);
-            m_gm[GAMMA1].Set(3, 0, 0, 1);
+            gmarray[GAMMA1].Set(0, 3, 3);
+            gmarray[GAMMA1].Set(1, 2, 3);
+            gmarray[GAMMA1].Set(2, 1, 1);
+            gmarray[GAMMA1].Set(3, 0, 1);
 
-            m_gm[GAMMA2].Set(0, 3, -1, 0);
-            m_gm[GAMMA2].Set(1, 2, 1, 0);
-            m_gm[GAMMA2].Set(2, 1, 1, 0);
-            m_gm[GAMMA2].Set(3, 0, -1, 0);
+            gmarray[GAMMA2].Set(0, 3, 2);
+            gmarray[GAMMA2].Set(1, 2, 0);
+            gmarray[GAMMA2].Set(2, 1, 0);
+            gmarray[GAMMA2].Set(3, 0, 2);
 
-            m_gm[GAMMA3].Set(0, 2, 0, -1);
-            m_gm[GAMMA3].Set(1, 3, 0, 1);
-            m_gm[GAMMA3].Set(2, 0, 0, 1);
-            m_gm[GAMMA3].Set(3, 1, 0, -1);
+            gmarray[GAMMA3].Set(0, 2, 3);
+            gmarray[GAMMA3].Set(1, 3, 1);
+            gmarray[GAMMA3].Set(2, 0, 1);
+            gmarray[GAMMA3].Set(3, 1, 3);
 
-            m_gm[GAMMA4].Set(0, 2, -1, 0);
-            m_gm[GAMMA4].Set(1, 3, -1, 0);
-            m_gm[GAMMA4].Set(2, 0, -1, 0);
-            m_gm[GAMMA4].Set(3, 1, -1, 0);
+            gmarray[GAMMA4].Set(0, 2, 2);
+            gmarray[GAMMA4].Set(1, 3, 2);
+            gmarray[GAMMA4].Set(2, 0, 2);
+            gmarray[GAMMA4].Set(3, 1, 2);
 
-            m_gm[GAMMA5].Set(0, 0, 1, 0);
-            m_gm[GAMMA5].Set(1, 1, 1, 0);
-            m_gm[GAMMA5].Set(2, 2, -1, 0);
-            m_gm[GAMMA5].Set(3, 3, -1, 0);
+            gmarray[GAMMA5].Set(0, 0, 0);
+            gmarray[GAMMA5].Set(1, 1, 0);
+            gmarray[GAMMA5].Set(2, 2, 2);
+            gmarray[GAMMA5].Set(3, 3, 2);
         }
 
-        m_gm[GAMMA51] = m_gm[GAMMA5]._mult(m_gm[GAMMA1]);
-        m_gm[GAMMA52] = m_gm[GAMMA5]._mult(m_gm[GAMMA2]);
-        m_gm[GAMMA53] = m_gm[GAMMA5]._mult(m_gm[GAMMA3]);
-        m_gm[GAMMA54] = m_gm[GAMMA5]._mult(m_gm[GAMMA4]);
+        gmarray[GAMMA51] = gmarray[GAMMA5]._mult(gmarray[GAMMA1]);
+        gmarray[GAMMA52] = gmarray[GAMMA5]._mult(gmarray[GAMMA2]);
+        gmarray[GAMMA53] = gmarray[GAMMA5]._mult(gmarray[GAMMA3]);
+        gmarray[GAMMA54] = gmarray[GAMMA5]._mult(gmarray[GAMMA4]);
 
-        m_gm[GAMMA15] = m_gm[GAMMA1]._mult(m_gm[GAMMA5]);
-        m_gm[GAMMA25] = m_gm[GAMMA2]._mult(m_gm[GAMMA5]);
-        m_gm[GAMMA35] = m_gm[GAMMA3]._mult(m_gm[GAMMA5]);
-        m_gm[GAMMA45] = m_gm[GAMMA4]._mult(m_gm[GAMMA5]);
+        gmarray[GAMMA15] = gmarray[GAMMA1]._mult(gmarray[GAMMA5]);
+        gmarray[GAMMA25] = gmarray[GAMMA2]._mult(gmarray[GAMMA5]);
+        gmarray[GAMMA35] = gmarray[GAMMA3]._mult(gmarray[GAMMA5]);
+        gmarray[GAMMA45] = gmarray[GAMMA4]._mult(gmarray[GAMMA5]);
 
-        m_gm[SIGMA12] = m_gm[GAMMA2]._mult_i(m_gm[GAMMA1]);
-        m_gm[SIGMA23] = m_gm[GAMMA3]._mult_i(m_gm[GAMMA2]);
-        m_gm[SIGMA31] = m_gm[GAMMA1]._mult_i(m_gm[GAMMA3]);
+        gmarray[SIGMA12] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA1]);
+        gmarray[SIGMA23] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA2]);
+        gmarray[SIGMA31] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA3]);
 
-        m_gm[SIGMA41] = m_gm[GAMMA1]._mult_i(m_gm[GAMMA4]);
-        m_gm[SIGMA42] = m_gm[GAMMA2]._mult_i(m_gm[GAMMA4]);
-        m_gm[SIGMA43] = m_gm[GAMMA3]._mult_i(m_gm[GAMMA4]);
+        gmarray[SIGMA41] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA4]);
+        gmarray[SIGMA42] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA4]);
+        gmarray[SIGMA43] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA4]);
 
-        m_gm[CHARGECONJG] = m_gm[GAMMA4]._mult(m_gm[GAMMA2]);
+        gmarray[CHARGECONJG] = gmarray[GAMMA4]._mult(gmarray[GAMMA2]);
     }
-
-    __device__ void Print()
-    {
-        for (INT i = 0; i < EGM_MAX; ++i)
-        {
-            m_gm[i].Print();
-        }
-    }
-
-    gammaMatrix m_gm[EGM_MAX];
 };
+
 
 __END_NAMESPACE
 

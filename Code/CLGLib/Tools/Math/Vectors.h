@@ -144,13 +144,6 @@ extern "C" {
             m_ve[2] = _cuCmulf(m_ve[2], other);
         }
 
-        __device__ __inline__ void MulCompI(const cuComplexI& other)
-        {
-            m_ve[0] = cuCFmulI(m_ve[0], other);
-            m_ve[1] = cuCFmulI(m_ve[1], other);
-            m_ve[2] = cuCFmulI(m_ve[2], other);
-        }
-
         __device__ __inline__ deviceSU3Vector SubRealC(Real other) const { deviceSU3Vector ret(*this); ret.SubReal(other); return ret; }
         __device__ __inline__ deviceSU3Vector SubCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.SubComp(other); return ret; }
         __device__ __inline__ deviceSU3Vector SubC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
@@ -161,7 +154,6 @@ extern "C" {
 
         __device__ __inline__ deviceSU3Vector MulRealC(Real other) const { deviceSU3Vector ret(*this); ret.MulReal(other); return ret; }
         __device__ __inline__ deviceSU3Vector MulCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.MulComp(other); return ret; }
-        __device__ __inline__ deviceSU3Vector MulCompIC(const cuComplexI& other) const { deviceSU3Vector ret(*this); ret.MulCompI(other); return ret; }
 
         _Complex m_ve[3];
     };

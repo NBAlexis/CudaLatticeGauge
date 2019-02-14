@@ -204,7 +204,7 @@ __global__ void _kernelDFermionWilsonSquareSU3(
 {
     intokernaldir;
 
-    gammaMatrix gamma5 = bDiracChiralGamma ? __diracGamma->m_gm[GAMMA5] : __chiralGamma->m_gm[GAMMA5];
+    gammaMatrix gamma5 = bDiracChiralGamma ? __diracGamma[GAMMA5] : __chiralGamma[GAMMA5];
 
     for (UINT it = 0; it < uiTLength; ++it)
     {
@@ -222,9 +222,7 @@ __global__ void _kernelDFermionWilsonSquareSU3(
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             //Get Gamma mu
-            gammaMatrix gammaMu = bDiracChiralGamma ? 
-                  __diracGamma->m_gm[GAMMA1 + idir]
-                : __chiralGamma->m_gm[GAMMA1 + idir];
+            gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
 
             //x, mu
             UINT linkIndex = _deviceGetLinkIndex(siteIndexX, idir);
@@ -320,9 +318,7 @@ __global__ void _kernelDWilsonForceSU3(
         for (UINT idir = 0; idir < uiDir; ++idir)
         {
             //Get Gamma mu
-            gammaMatrix gammaMu = bDiracChiralGamma ?
-                  __diracGamma->m_gm[GAMMA1 + idir]
-                : __chiralGamma->m_gm[GAMMA1 + idir];
+            gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
 
             //x, mu
             UINT linkIndex = _deviceGetLinkIndex(coord, idir);
@@ -371,7 +367,7 @@ __global__ void _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT ui
 {
     intokernal;
 
-    gammaMatrix theMatrix = bDiracChiralGamma ? __diracGamma->m_gm[uiGamma] : __chiralGamma->m_gm[uiGamma];
+    gammaMatrix theMatrix = bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma];
 
     for (UINT it = 0; it < uiTLength; ++it)
     {

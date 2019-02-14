@@ -1,5 +1,7 @@
 \subsection{\label{GMRES}\index{GMRES}GMRES}
 
+This section we follow Refs.~\cite{templates} and \cite{sparselinearbook1}.
+
 Assume a set of basis has been found. For example, if the subspace is found by using modified Gram-Schmidt as
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -66,7 +68,12 @@ Or, to solve an equation in $k$ dimension
 Now, we need to solve $H^{-1}$, we can do this by applying rotation matrix, defining
 \begin{equation}
 \begin{split}
-&J_0={\left.\left(\begin{array}{ccccc}
+&J_0=
+{\left.\left(\begin{array}{cc}
+ R & 0 \\
+0 & \mathbb{I}_{k-2} \\
+\end{array}\right)\right. }_{D=k}
+={\left.\left(\begin{array}{ccccc}
 \textcolor[rgb]{1,0,0}{c_0^*} & \textcolor[rgb]{1,0,0}{s_0^*} & 0 & \ldots & 0 \\
 -s_0 & c_0 & 0 & \ldots & 0 \\
 0 & 0 & 1 & \ldots & 0 \\
@@ -96,6 +103,24 @@ with (Note that the first 2 lines are changed entirely)
 &c_0=\frac{h_{00}}{\sqrt{h_{00}^2+h_{10}^2}},\;\;s_0=\frac{h_{10}}{\sqrt{h_{00}^2+h_{10}^2}}
 \end{split}
 \end{equation}
+where $\mathbb{I}_l$ is dimension $l$ identity matrix. Similarly, after this, one can rotation matrices
+\begin{equation}
+\begin{split}
+&J_1=
+{\left.\left(\begin{array}{ccc}
+ \mathbb{I}_1 & 0 & 0 \\
+0 & R & 0 \\
+0 & 0 & \mathbb{I}_{k-3} \\
+\end{array}\right)\right. }_{D=k},
+J_2=
+{\left.\left(\begin{array}{ccc}
+ \mathbb{I}_2 & 0 & 0 \\
+0 & R & 0 \\
+0 & 0 & \mathbb{I}_{k-4} \\
+\end{array}\right)\right. }_{D=k},\ldots
+\end{split}
+\end{equation}
+To make $H$ triangular.
 
 The algorithm is
 \begin{algorithm}[H]

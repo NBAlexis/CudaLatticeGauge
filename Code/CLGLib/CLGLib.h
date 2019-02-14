@@ -93,7 +93,6 @@ UINT uiTLength = _DC_Lt; \
 UINT uiDir = _DC_Dir;
 
 
-#include "Tools/Math/cuComplexI.h"
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
 #include "Tools/Math/Vectors.h" //vectors.h must ealier than gamma matrix

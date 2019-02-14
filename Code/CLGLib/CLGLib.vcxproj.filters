@@ -140,9 +140,6 @@
     <ClInclude Include="Update\Continous\CHMC.h">
       <Filter>Update\Continous</Filter>
     </ClInclude>
-    <ClInclude Include="Tools\Math\cuComplexI.h">
-      <Filter>Tools\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Math\GammaMatrix.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
