@@ -37,7 +37,7 @@ public:
         , m_pStdStream(NULL)
         , m_pStream(NULL)
     {
-
+        Initial(CRUCIAL);
     }
 
     ~CTracer(void)
@@ -127,7 +127,11 @@ public:
     {
         if ((level <= m_eLevel))
         {
-            assert(NULL != m_pStdStream);
+            //assert(NULL != m_pStdStream);
+            if (NULL == m_pStdStream)
+            {
+                //Maybe the first initial is not entered?
+            }
 
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
 

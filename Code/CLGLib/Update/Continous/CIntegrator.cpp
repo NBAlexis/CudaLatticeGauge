@@ -132,7 +132,7 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
         sLog += sThisActionInfo;
         retv += fActionEnergy;
 #else
-        retv += m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(m_pGaugeField);
+        retv += m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
 #endif
     }
 #if _CLG_DEBUG

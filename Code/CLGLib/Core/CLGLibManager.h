@@ -28,7 +28,7 @@ public:
         , m_pLatticeData(NULL)
         , m_pFileSystem(NULL)
     {
-        appInitialTracer(GENERAL);
+
     }
     ~CCLGLibManager()
     {

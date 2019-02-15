@@ -161,23 +161,34 @@ public:
     __device__ __inline__ Real _deviceRandomGaussF(UINT fatIndex)
     {
         Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+        Real f2 = __mul(_deviceRandomF(fatIndex), PI2);
 
-        Real oneMinusf1 = 1 - f1;
-        Real inSqrt = -_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)) * 2;
-        Real amplitude = _sqrt(inSqrt > 0 ? inSqrt : 0) * InvSqrt2;
-        return cos(f2) * amplitude;
+        Real oneMinusf1 = __sub(F(1.0), f1);
+        Real inSqrt = -__mul(_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)), F(2.0));
+        Real amplitude = __mul(_sqrt(inSqrt > 0 ? inSqrt : 0), InvSqrt2);
+        return _cos(f2) * amplitude;
+    }
+
+    __device__ __inline__ Real _deviceRandomGaussFSqrt2(UINT fatIndex)
+    {
+        Real f1 = _deviceRandomF(fatIndex);
+        Real f2 = __mul(_deviceRandomF(fatIndex), PI2);
+
+        Real oneMinusf1 = __sub(F(1.0), f1);
+        Real inSqrt = -__mul(_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)), F(2.0));
+        Real amplitude = __mul(_sqrt(inSqrt > 0 ? inSqrt : 0), F(0.5));
+        return _cos(f2) * amplitude;
     }
 
     __device__ __inline__ _Complex _deviceRandomGaussC(UINT fatIndex)
     {
         Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+        Real f2 = __mul(_deviceRandomF(fatIndex), PI2);
 
-        Real oneMinusf1 = 1 - f1;
-        Real inSqrt = -_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)) * 2;
-        Real amplitude = _sqrt(inSqrt > 0 ? inSqrt : 0) * InvSqrt2;
-        return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
+        Real oneMinusf1 = __sub(F(1.0), f1);
+        Real inSqrt = -__mul(_log(oneMinusf1 > 0 ? oneMinusf1 : (FLT_MIN)), F(2.0));
+        Real amplitude = __mul(_sqrt(inSqrt > 0 ? inSqrt : 0), InvSqrt2);
+        return _make_cuComplex(__mul(_cos(f2), amplitude), __mul(_sin(f2), amplitude));
     }
 
     __host__ __inline__ Real GetRandomF()
@@ -254,6 +265,8 @@ protected:
 __DefineRandomFuncion(Real, F)
 
 __DefineRandomFuncion(Real, GaussF)
+
+__DefineRandomFuncion(Real, GaussFSqrt2)
 
 __DefineRandomFuncion(_Complex, GaussC)
 

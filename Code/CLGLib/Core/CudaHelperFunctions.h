@@ -27,6 +27,8 @@
 
 #include <curand.h>
 #include <curand_kernel.h>
+//#include <math_functions.h>
+//#include <device_functions.h>
 
 #pragma endregion Includes
 

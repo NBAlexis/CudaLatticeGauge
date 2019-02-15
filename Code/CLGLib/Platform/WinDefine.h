@@ -16,6 +16,9 @@
 //No using when compile with nvcc...
 #pragma warning(disable : 4819) /* The file contains a character that cannot be represented in the current code page (936) (In Cuda XML file)*/
 #pragma warning(disable : 4324) /* 'struct_name' : structure was padded due to __declspec(align())*/
+#pragma warning(disable : 4505) /* local unreferenced function removed */
+#pragma warning(disable : 4515) /* namespace uses iteself (from thrud) */
+#pragma warning(disable : 4100) /* unreferenced formal parameter */
 
 #pragma endregion Warnings
 

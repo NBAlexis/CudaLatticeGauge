@@ -527,7 +527,6 @@ TestOperators:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.2064
 
     Updator:
 

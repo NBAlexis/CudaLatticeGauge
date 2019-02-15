@@ -262,10 +262,12 @@
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
-    <ClCompile Include="CLGLib_Private.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
+    <ClCompile Include="Update\Continous\CIntegrator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -285,9 +287,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionTorusSquare.cu">
       <Filter>Data\Boundary</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Update\Continous\CIntegrator.cpp">
-      <Filter>Update\Continous</Filter>
     </CudaCompile>
     <CudaCompile Include="Tools\Math\Random.cu">
       <Filter>Tools\Math</Filter>
@@ -310,11 +309,6 @@
     <CudaCompile Include="Data\Field\CFieldGauge.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionFermionWilsonNf2.cpp">
-      <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="SparseLinearAlgebra\CSolveBiCGstab.cpp">
-      <Filter>SparseLinearAlgebra</Filter>
-    </CudaCompile>
+    <CudaCompile Include="CLGLib_Private.cu" />
   </ItemGroup>
 </Project>

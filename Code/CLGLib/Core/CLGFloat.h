@@ -20,6 +20,12 @@
 #define _pow pow
 #define _sin sin
 #define _cos cos
+#define __add(a, b) ((a) + (b))
+#define __mul(a, b) ((a) * (b))
+#define __div(a, b) ((a) / (b))
+#define __sub(a, b) ((a) - (b))
+#define __ma(a, b, c) ((a) * (b) + (c))
+#define __rcp(a) (1.0 / (a))
 #define _hostexp exp
 #define _hostsqrt sqrt
 
@@ -35,6 +41,20 @@
 
 #else
 
+#if defined(__cplusplus) && defined(__CUDACC__)
+#define _sqrt __fsqrt_rn
+#define _log __logf
+#define _exp __expf
+#define _pow __powf
+#define _sin __sinf
+#define _cos __cosf
+#define __add(a, b) __fadd_rn(a, b)
+#define __mul(a, b) __fmul_rn(a, b)
+#define __div(a, b) __fdividef(a, b)
+#define __sub(a, b) __fsub_rn(a, b)
+#define __ma(a, b, c) __fma_rn(a, b, c)
+#define __rcp(a) __frcp_rn(a)
+#else
 //the __function is Intrinsic Functions which can be only used in device
 #define _sqrt sqrtf
 #define _log logf
@@ -42,6 +62,15 @@
 #define _pow powf
 #define _sin sinf
 #define _cos cosf
+#define __add(a, b) ((a) + (b))
+#define __mul(a, b) ((a) * (b))
+#define __div(a, b) ((a) / (b))
+#define __sub(a, b) ((a) - (b))
+//a * b + c
+#define __ma(a, b, c) fma(a, b, c)
+#define __rcp(a) (1.0f / (a))
+#endif
+
 #define _hostexp expf
 #define _hostsqrt sqrtf
 
