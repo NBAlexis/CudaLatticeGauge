@@ -51,12 +51,12 @@ void _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialTy
         break;
         case EFIT_Random:
         {
-            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(coord, idir + 1));
+            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
         }
         break;
         case EFIT_RandomGenerator:
         {
-            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(coord, idir + 1));
+            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(uiSiteIndex, idir + 1));
         }
         break;
         case EFIT_SumGenerator:
@@ -139,28 +139,22 @@ void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
 */
 __global__ void _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
 {
-    intokernaldir;
+    gaugeSU3KernelFuncionStart;
 
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            printf("link at %d: %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i\n",
-                linkIndex,
-                pDeviceData[linkIndex].m_me[0].x, pDeviceData[linkIndex].m_me[0].y,
-                pDeviceData[linkIndex].m_me[1].x, pDeviceData[linkIndex].m_me[1].y,
-                pDeviceData[linkIndex].m_me[2].x, pDeviceData[linkIndex].m_me[2].y,
-                pDeviceData[linkIndex].m_me[3].x, pDeviceData[linkIndex].m_me[3].y,
-                pDeviceData[linkIndex].m_me[4].x, pDeviceData[linkIndex].m_me[4].y,
-                pDeviceData[linkIndex].m_me[5].x, pDeviceData[linkIndex].m_me[5].y,
-                pDeviceData[linkIndex].m_me[6].x, pDeviceData[linkIndex].m_me[6].y,
-                pDeviceData[linkIndex].m_me[7].x, pDeviceData[linkIndex].m_me[7].y,
-                pDeviceData[linkIndex].m_me[8].x, pDeviceData[linkIndex].m_me[8].y
-            );
-        }
-    }
+    printf("link at %d: %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i, %f+%f i\n",
+        uiLinkIndex,
+        pDeviceData[uiLinkIndex].m_me[0].x, pDeviceData[uiLinkIndex].m_me[0].y,
+        pDeviceData[uiLinkIndex].m_me[1].x, pDeviceData[uiLinkIndex].m_me[1].y,
+        pDeviceData[uiLinkIndex].m_me[2].x, pDeviceData[uiLinkIndex].m_me[2].y,
+        pDeviceData[uiLinkIndex].m_me[3].x, pDeviceData[uiLinkIndex].m_me[3].y,
+        pDeviceData[uiLinkIndex].m_me[4].x, pDeviceData[uiLinkIndex].m_me[4].y,
+        pDeviceData[uiLinkIndex].m_me[5].x, pDeviceData[uiLinkIndex].m_me[5].y,
+        pDeviceData[uiLinkIndex].m_me[6].x, pDeviceData[uiLinkIndex].m_me[6].y,
+        pDeviceData[uiLinkIndex].m_me[7].x, pDeviceData[uiLinkIndex].m_me[7].y,
+        pDeviceData[uiLinkIndex].m_me[8].x, pDeviceData[uiLinkIndex].m_me[8].y
+    );
+
+    gaugeSU3KernelFuncionEnd
 }
 
 /**
@@ -177,62 +171,59 @@ void _kernelStapleAtSiteSU3(
 
     betaOverN = betaOverN * F(-0.5);
     SIndex plaquttes[kMaxPlaqutteCache];
-    for (UINT it = 0; it < uiTLength; ++it)
+
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        UINT uiPlaqutteCount = 0;
+        UINT uiPlaqutteLength = 0;
+
+        //int2.x is linkIndex
+        //int2.y is fieldIndex (may on bounday)
+        //sign of int2.y is whether inverse
+        __idx->_deviceGetPlaquttesAtLink(plaquttes, uiPlaqutteCount, uiPlaqutteLength, linkIndex);
+        //printf("plaqutte count = %d, length = %d\n", uiPlaqutteCount, uiPlaqutteLength);
+        deviceSU3 res = deviceSU3::makeSU3Zero();
+
+        //there are 6 staples, each is sum of two plaquttes
+        for (int i = 0; i < uiPlaqutteCount; ++i)
         {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            UINT uiPlaqutteCount = 0;
-            UINT uiPlaqutteLength = 0;
-
-            //int2.x is linkIndex
-            //int2.y is fieldIndex (may on bounday)
-            //sign of int2.y is whether inverse
-            __idx->_deviceGetPlaquttesAtLink(plaquttes, uiPlaqutteCount, uiPlaqutteLength, linkIndex);
-            //printf("plaqutte count = %d, length = %d\n", uiPlaqutteCount, uiPlaqutteLength);
-            deviceSU3 res = deviceSU3::makeSU3Zero();
-
-            //there are 6 staples, each is sum of two plaquttes
-            for (int i = 0; i < uiPlaqutteCount; ++i)
+            SIndex first = plaquttes[i * (uiPlaqutteLength - 1)];
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.NeedToDagger())
             {
-                SIndex first = plaquttes[i * (uiPlaqutteLength - 1)];
-                deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-                if (first.NeedToDagger())
-                {
-                    toAdd.Dagger();
-                }
-
-                for (int j = 1; j < uiPlaqutteLength - 1; ++j)
-                {
-                    SIndex nextlink = plaquttes[i * (uiPlaqutteLength - 1) + j];
-                    deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                    if (nextlink.NeedToDagger())
-                    {
-                        toAdd.MulDagger(toMul);
-                    }
-                    else
-                    {
-                        toAdd.Mul(toMul);
-                    }
-                    
-                }
-                res.Add(toAdd);
-            }
-            if (NULL != pStapleData)
-            {
-                pStapleData[linkIndex] = res;
+                toAdd.Dagger();
             }
 
-            //staple calculated
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(res);
-            force.Ta();
-            force.MulReal(betaOverN);
+            for (int j = 1; j < uiPlaqutteLength - 1; ++j)
+            {
+                SIndex nextlink = plaquttes[i * (uiPlaqutteLength - 1) + j];
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.NeedToDagger())
+                {
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
+                }
 
-            //force is additive
-            pForceData[linkIndex].Add(force);
+            }
+            res.Add(toAdd);
         }
+        if (NULL != pStapleData)
+        {
+            pStapleData[linkIndex] = res;
+        }
+
+        //staple calculated
+        deviceSU3 force(pDeviceData[linkIndex]);
+        force.MulDagger(res);
+        force.Ta();
+        force.MulReal(betaOverN);
+
+        //force is additive
+        pForceData[linkIndex].Add(force);
     }
 }
 
@@ -252,56 +243,51 @@ void _kernelStapleAtSiteSU3CacheIndex(
     UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        deviceSU3 res = deviceSU3::makeSU3Zero();
+
+        //there are 6 staples, each is sum of two plaquttes
+        for (int i = 0; i < plaqCount; ++i)
         {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            deviceSU3 res = deviceSU3::makeSU3Zero();
-
-            //there are 6 staples, each is sum of two plaquttes
-            for (int i = 0; i < plaqCount; ++i)
+            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.NeedToDagger())
             {
-                SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-                deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-                if (first.NeedToDagger())
-                {
-                    toAdd.Dagger();
-                }
-
-                for (int j = 1; j < plaqLengthm1; ++j)
-                {
-                    SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                    deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                    if (nextlink.NeedToDagger())
-                    {
-                        toAdd.MulDagger(toMul);
-                    }
-                    else
-                    {
-                        toAdd.Mul(toMul);
-                    }
-                }
-                res.Add(toAdd);
-            }
-            if (NULL != pStapleData)
-            {
-                pStapleData[linkIndex] = res;
+                toAdd.Dagger();
             }
 
-            //staple calculated
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(res);
-            //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
-            force.Ta();
-            force.MulReal(betaOverN);
-
-            //force is additive
-            pForceData[linkIndex].Add(force);
+            for (int j = 1; j < plaqLengthm1; ++j)
+            {
+                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.NeedToDagger())
+                {
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
+                }
+            }
+            res.Add(toAdd);
         }
+        if (NULL != pStapleData)
+        {
+            pStapleData[linkIndex] = res;
+        }
+
+        //staple calculated
+        deviceSU3 force(pDeviceData[linkIndex]);
+        force.MulDagger(res);
+        //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
+        force.Ta();
+        force.MulReal(betaOverN);
+
+        //force is additive
+        pForceData[linkIndex].Add(force);
     }
-    //printf("typical gauge force = %f\n", test_force);
 }
 
 /**
@@ -317,49 +303,43 @@ void _kernelPlaqutteEnergySU3(
 
     Real resThisThread = F(0.0);
     SIndex plaquttes[kMaxPlaqutteCache];
-    for (UINT it = 0; it < uiTLength; ++it)
+    UINT uiPlaqutteCount = 0;
+    UINT uiPlaqutteLength = 0;
+    __idx->_deviceGetPlaquttesAtSite(plaquttes, uiPlaqutteCount, uiPlaqutteLength, uiSiteIndex);
+
+    for (int i = 0; i < uiPlaqutteCount; ++i)
     {
-        coord[3] = it;
+        SIndex first = plaquttes[i * uiPlaqutteLength];
 
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        UINT uiPlaqutteCount = 0;
-        UINT uiPlaqutteLength = 0;
-        __idx->_deviceGetPlaquttesAtSite(plaquttes, uiPlaqutteCount, uiPlaqutteLength, siteIndex);
-
-        for (int i = 0; i < uiPlaqutteCount; ++i)
+        deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+        if (first.NeedToDagger())
         {
-            SIndex first = plaquttes[i * uiPlaqutteLength];
+            toAdd.Dagger();
+        }
 
-            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            if (first.NeedToDagger())
+        for (int j = 1; j < uiPlaqutteLength; ++j)
+        {
+            SIndex nextlink = plaquttes[i * uiPlaqutteLength + j];
+            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+            if (nextlink.NeedToDagger())
             {
-                toAdd.Dagger();
+                toAdd.MulDagger(toMul);
             }
-
-            for (int j = 1; j < uiPlaqutteLength; ++j)
+            else
             {
-                SIndex nextlink = plaquttes[i * uiPlaqutteLength + j];
-                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                if (nextlink.NeedToDagger())
-                {
-                    toAdd.MulDagger(toMul);
-                }
-                else
-                {
-                    toAdd.Mul(toMul);
-                }
+                toAdd.Mul(toMul);
             }
+        }
 
 #if _CLG_DEBUG
-            Real reTr = toAdd.ReTr();
-            assert(reTr > -F(1.50001));
-            assert(reTr < F(3.00001));
+        Real reTr = toAdd.ReTr();
+        assert(reTr > -F(1.50001));
+        assert(reTr < F(3.00001));
 #endif
-            resThisThread += (F(3.0)-toAdd.ReTr());
-        }
+        resThisThread += (F(3.0) - toAdd.ReTr());
     }
 
-    results[__thread_id] = resThisThread * betaOverN;
+    results[uiSiteIndex] = resThisThread * betaOverN;
 
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
@@ -376,45 +356,38 @@ void _kernelPlaqutteEnergySU3CacheIndex(
 
     Real resThisThread = F(0.0);
     UINT plaqCountAll = plaqCount * plaqLength;
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (int i = 0; i < plaqCount; ++i)
     {
-        coord[3] = it;
-
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-
-        for (int i = 0; i < plaqCount; ++i)
+        SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
+        deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+        if (first.NeedToDagger())
         {
-            SIndex first = pCachedIndex[i * plaqLength + siteIndex * plaqCountAll];
-            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            if (first.NeedToDagger())
-            {
-                toAdd.Dagger();
-            }
+            toAdd.Dagger();
+        }
 
-            for (int j = 1; j < plaqLength; ++j)
+        for (int j = 1; j < plaqLength; ++j)
+        {
+            SIndex nextlink = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
+            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+            if (nextlink.NeedToDagger())
             {
-                SIndex nextlink = pCachedIndex[i * plaqLength + j + siteIndex * plaqCountAll];
-                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                if (nextlink.NeedToDagger())
-                {
-                    toAdd.MulDagger(toMul);
-                }
-                else
-                {
-                    toAdd.Mul(toMul);
-                }
+                toAdd.MulDagger(toMul);
             }
+            else
+            {
+                toAdd.Mul(toMul);
+            }
+        }
 
 #if _CLG_DEBUG
-            Real reTr = toAdd.ReTr();
-            assert(reTr > -F(1.50001));
-            assert(reTr < F(3.00001));
+        Real reTr = toAdd.ReTr();
+        assert(reTr > -F(1.50001));
+        assert(reTr < F(3.00001));
 #endif
-            resThisThread += (F(3.0) - toAdd.ReTr());
-        }
+        resThisThread += (F(3.0) - toAdd.ReTr());
     }
 
-    results[__thread_id] = resThisThread * betaOverN;
+    results[uiSiteIndex] = resThisThread * betaOverN;
 
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
@@ -430,18 +403,14 @@ void _kernelPlaqutteEnergyUsingStableSU3(
 
     Real resThisThread = F(0.0);
     SIndex plaquttes[kMaxPlaqutteCache];
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            //For each link, there are 6 staples
-            resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
-        }
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        //For each link, there are 6 staples
+        resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
     }
 
-    results[__thread_id] = resThisThread * betaOverN * F(0.25);
+    results[uiSiteIndex] = resThisThread * betaOverN * F(0.25);
 
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
@@ -457,18 +426,14 @@ void _kernelExpMultSU3(
 {
     intokernaldir;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            deviceSU3 expP = pMyDeviceData[linkIndex].Exp(a, _DC_ExpPrecision);
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        deviceSU3 expP = pMyDeviceData[linkIndex].Exp(a, _DC_ExpPrecision);
 
-            expP.Mul(pU[linkIndex]);
-            expP.Norm();
-            pU[linkIndex] = expP;
-        }
+        expP.Mul(pU[linkIndex]);
+        expP.Norm();
+        pU[linkIndex] = expP;
     }
 }
 
@@ -480,18 +445,14 @@ void _kernelExpMultSU3Real(
 {
     intokernaldir;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
 
-            expP.Mul(pU[linkIndex]);
-            expP.Norm();
-            pU[linkIndex] = expP;
-        }
+        expP.Mul(pU[linkIndex]);
+        expP.Norm();
+        pU[linkIndex] = expP;
     }
 }
 
@@ -504,18 +465,14 @@ void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceDa
 {
     intokernaldir;
 
-    Real resThisThread = 0;
-    for (UINT it = 0; it < uiTLength; ++it)
+    Real resThisThread = F(0.0);
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread += pDeviceData[linkIndex].DaggerMulC(pDeviceData[linkIndex]).ReTr();
-        }
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        resThisThread += pDeviceData[linkIndex].DaggerMulC(pDeviceData[linkIndex]).ReTr();
     }
 
-    results[__thread_id] = resThisThread;
+    results[uiSiteIndex] = resThisThread;
 }
 
 
@@ -524,14 +481,10 @@ void _kernelNormalizeSU3(deviceSU3 * pMyDeviceData)
 {
     intokernaldir;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            pMyDeviceData[linkIndex].Norm();
-        }
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        pMyDeviceData[linkIndex].Norm();
     }
 }
 
@@ -544,17 +497,13 @@ void _kernelDotSU3(
     intokernaldir;
 
     _Complex resThisThread = _make_cuComplex(0,0);
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].DaggerMulC(pOtherDeviceData[linkIndex]).Tr());
-        }
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        resThisThread = _cuCaddf(resThisThread, pMyDeviceData[linkIndex].DaggerMulC(pOtherDeviceData[linkIndex]).Tr());
     }
 
-    result[__thread_id] = resThisThread;
+    result[uiSiteIndex] = resThisThread;
 }
 
 __global__
@@ -564,9 +513,10 @@ void _kernelSetConfigurationSU3(
 {
     gaugeSU3KernelFuncionStart
 
-    //In Bridge, it is t,z,y,x
-    //x + y * nx + z * nx * ny + t * nx * ny * nz
-    UINT uiBridgeSiteIndex = coord[3] * _DC_Lx * _DC_Ly * _DC_Lz + coord[2] * _DC_Lx * _DC_Ly + coord[1] * _DC_Lx + coord[0];
+        //In Bridge, it is t,z,y,x
+        //x + y * nx + z * nx * ny + t * nx * ny * nz
+    int4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
+    UINT uiBridgeSiteIndex = xyzt.w * _DC_Lx * _DC_Ly * _DC_Lz + xyzt.z * _DC_Lx * _DC_Ly + xyzt.y * _DC_Lx + xyzt.x;
     UINT uiBridgeLinkIndex = uiBridgeSiteIndex * _DC_Dir + idir;
 
     //0 1 2

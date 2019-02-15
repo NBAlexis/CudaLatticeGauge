@@ -28,7 +28,7 @@ UINT RunTest(CParameters&params, TestList* pTest)
     timer.Start();
     UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
-    appGeneral(_T("=========== Finished, errors: %d, cost: %f(ms)\n"), uiErrors, timer.Elapsed());
+    appGeneral(_T("=========== Finished, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), uiErrors, timer.Elapsed());
 
     //Final
     appQuitCLG();
@@ -103,9 +103,8 @@ int main(int argc, char * argv[])
         }
     }
 
-    UBOOL bCorrectInput = FALSE;
     INT inputNumber = -1;
-    while (!bCorrectInput)
+    while (TRUE)
     {
         ListAllTests(category);
         inputNumber = -1;
@@ -113,7 +112,7 @@ int main(int argc, char * argv[])
         std::getline(std::cin, name);
         CCString sRes(name.c_str());
         INT number = appStrToINT(sRes);
-
+        UBOOL bExcuted = FALSE;
         if (sRes == _T("q"))
         {
             break;
@@ -123,6 +122,7 @@ int main(int argc, char * argv[])
             if (number >= 0 && number < allTests.Num())
             {
                 RunTest(params, allTests[number]);
+                bExcuted = TRUE;
             }
         }
         else if (sRes == _T("a"))
@@ -144,9 +144,43 @@ int main(int argc, char * argv[])
                 }
             }
             timer.Stop();
-            appGeneral(_T("Run all test with %d(success) / %d(total) (with %d errors) and %f secs"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 1000.0f);
+            appGeneral(_T("Run all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 0.001f);
+            bExcuted = TRUE;
         }
         else
+        {
+            TArray<CCString> keys = category.GetAllKeys();
+            for (INT i = 0; i < keys.Num(); ++i)
+            {
+                CCString sInput = sRes;
+                CCString sKey = keys[i];
+                if (sInput == sKey)
+                {
+                    CTimer timer;
+                    timer.Start();
+                    UINT uiError = 0;
+                    UINT uiPassed = 0;
+                    for (INT j = 0; j < category[keys[i]]->Num(); ++j)
+                    {
+                        UINT uiThisError = RunTest(params, category[keys[i]]->GetAt(j));
+                        if (0 == uiThisError)
+                        {
+                            ++uiPassed;
+                        }
+                        else
+                        {
+                            uiError += uiThisError;
+                        }
+                    }
+                    timer.Stop();
+                    appGeneral(_T("Run all %s test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), keys[i].c_str(), uiPassed, category[sKey]->Num(), uiError, timer.Elapsed() * 0.001f);
+                    break;
+                    bExcuted = TRUE;
+                }
+            }
+        }
+
+        if (!bExcuted)
         {
             COUT << _T("Input commond:") << name << _T(" not kown") << std::endl;
         }

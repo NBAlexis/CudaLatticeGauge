@@ -19,84 +19,7 @@
 
 #define __FetchStringWithDefault(tagname, defaultv) __FetchStringWithDefaultSub(params, tagname, defaultv)
 
-#define __Divisible(a, b) ( (b * (a/b)) == a )
-
 __BEGIN_NAMESPACE
-
-/**
-* find all factors of input number
-*/
-inline TArray<UINT> _getFactors(UINT length)
-{
-    TArray<UINT> ret;
-    ret.AddItem(1);
-    for (UINT i = 2; i < (length / 2); ++i)
-    {
-        if (__Divisible(length, i))
-        {
-            ret.AddItem(i);
-        }
-    }
-    if (length > 1)
-    {
-        ret.AddItem(length);
-    }
-    return ret;
-}
-
-/**
-* find the max block size for thread decompose
-*/
-inline TArray<UINT> _getDecompose(const TArray<UINT>& contraints, const TArray<UINT>& latticeLength)
-{
-    UINT uiBlockSize = 1;
-    TArray<UINT> ret;
-    
-    //number of blocks
-    ret.AddItem(latticeLength[0]);
-    ret.AddItem(latticeLength[1]);
-    ret.AddItem(latticeLength[2]);
-    //block size
-    ret.AddItem(1);
-    ret.AddItem(1);
-    ret.AddItem(1);
-
-    TArray<UINT> factorsOfX = _getFactors(latticeLength[0]);
-    TArray<UINT> factorsOfY = _getFactors(latticeLength[1]);
-    TArray<UINT> factorsOfZ = _getFactors(latticeLength[2]);
-    for (INT i = 0; i < factorsOfX.Num(); ++i)
-    {
-        for (INT j = 0; j < factorsOfX.Num(); ++j)
-        {
-            for (INT k = 0; k < factorsOfX.Num(); ++k)
-            {
-                if (factorsOfX[i] <= (UINT)contraints[1]
-                 && factorsOfY[j] <= (UINT)contraints[2]
-                 && factorsOfZ[k] <= (UINT)contraints[3])
-                {
-                    UINT uiThreadPerBlcok = factorsOfX[i] * factorsOfX[j] * factorsOfX[k];
-                    if (uiThreadPerBlcok <= (UINT)contraints[0]
-                     && uiThreadPerBlcok > uiBlockSize)
-                    {
-                        uiBlockSize = uiThreadPerBlcok;
-
-                        //number of blocks
-                        ret[0] = latticeLength[0] / factorsOfX[i];
-                        ret[1] = latticeLength[1] / factorsOfY[j];
-                        ret[2] = latticeLength[2] / factorsOfZ[k];
-
-                        //block size
-                        ret[3] = factorsOfX[i];
-                        ret[4] = factorsOfY[j];
-                        ret[5] = factorsOfZ[k];
-                    }
-                }
-            }
-        }
-    }
-
-    return ret;
-}
 
 CLGAPI CCLGLibManager GCLGManager;
 
@@ -170,6 +93,11 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);
+    m_InitialCache.constIntegers[ECI_GridDimZT] = m_InitialCache.constIntegers[ECI_Lz] * m_InitialCache.constIntegers[ECI_Lt];
+    TArray<UINT> latticeDim;
+    latticeDim.AddItem(intValues[0] * intValues[1]); //xy
+    latticeDim.AddItem(intValues[2]); //z
+    latticeDim.AddItem(intValues[3]); //t
 
     m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
     m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir];
@@ -177,7 +105,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constFloats[ECF_InverseSqrtLink16] = F(1.0) / _sqrt(F(16.0) * m_InitialCache.constIntegers[ECI_LinkCount]);
     
     UBOOL bAutoDecompose = TRUE;
-    __FetchIntWithDefault(_T("ThreadAutoDecompose"), 0);
+    __FetchIntWithDefault(_T("ThreadAutoDecompose"), 1);
 
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
 
@@ -201,9 +129,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
             || deviceConstraints[2] < (UINT)intValues[1]
             || deviceConstraints[3] < (UINT)intValues[2]
             || deviceConstraints[0] < (UINT)(intValues[0] * intValues[1] * intValues[2])
-            || !__Divisible(m_InitialCache.constIntegers[ECI_Lx], (UINT)intValues[0])
-            || !__Divisible(m_InitialCache.constIntegers[ECI_Ly], (UINT)intValues[1])
-            || !__Divisible(m_InitialCache.constIntegers[ECI_Lz], (UINT)intValues[2])
+            || !__Divisible(latticeDim[0], (UINT)intValues[0])
+            || !__Divisible(latticeDim[1], (UINT)intValues[1])
+            || !__Divisible(latticeDim[2], (UINT)intValues[2])
             )
         {
             appCrucial(_T("ThreadAutoDecompose = 0 but not ThreadDecompose is invalid (should >= 1, should be divisible by lattice length, should < max thread constraints), will use auto decompose"));
@@ -215,21 +143,16 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
             m_InitialCache.constIntegers[ECI_DecompLx] = static_cast<UINT>(intValues[0]);
             m_InitialCache.constIntegers[ECI_DecompLy] = static_cast<UINT>(intValues[1]);
             m_InitialCache.constIntegers[ECI_DecompLz] = static_cast<UINT>(intValues[2]);
-            m_InitialCache.constIntegers[ECI_DecompX] = m_InitialCache.constIntegers[ECI_Lx] / m_InitialCache.constIntegers[ECI_DecompLx];
-            m_InitialCache.constIntegers[ECI_DecompY] = m_InitialCache.constIntegers[ECI_Ly] / m_InitialCache.constIntegers[ECI_DecompLy];
-            m_InitialCache.constIntegers[ECI_DecompZ] = m_InitialCache.constIntegers[ECI_Lz] / m_InitialCache.constIntegers[ECI_DecompLz];
-            m_InitialCache.constIntegers[ECI_ThreadCount] = m_InitialCache.constIntegers[ECI_Lx] * m_InitialCache.constIntegers[ECI_Ly] * m_InitialCache.constIntegers[ECI_Lz];
+            m_InitialCache.constIntegers[ECI_DecompX] = latticeDim[0] / m_InitialCache.constIntegers[ECI_DecompLx];
+            m_InitialCache.constIntegers[ECI_DecompY] = latticeDim[1] / m_InitialCache.constIntegers[ECI_DecompLy];
+            m_InitialCache.constIntegers[ECI_DecompZ] = latticeDim[2] / m_InitialCache.constIntegers[ECI_DecompLz];
             m_InitialCache.constIntegers[ECI_ThreadCountPerBlock] = intValues[0] * intValues[1] * intValues[2];
         }
     }
 
     if (bAutoDecompose)
     {
-        TArray <UINT> latticeSize;
-        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Lx]);
-        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Ly]);
-        latticeSize.AddItem(m_InitialCache.constIntegers[ECI_Lz]);
-        TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeSize);
+        TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeDim);
 
         m_InitialCache.constIntegers[ECI_DecompX] = decomp[0];
         m_InitialCache.constIntegers[ECI_DecompY] = decomp[1];
@@ -238,9 +161,8 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
         m_InitialCache.constIntegers[ECI_DecompLy] = decomp[4];
         m_InitialCache.constIntegers[ECI_DecompLz] = decomp[5];
         m_InitialCache.constIntegers[ECI_ThreadCountPerBlock] = decomp[3] * decomp[4] * decomp[5];
-        m_InitialCache.constIntegers[ECI_ThreadCount] = decomp[0] * decomp[1] * decomp[2] * decomp[3] * decomp[4] * decomp[5];
     }
-    appGeneral(_T("\n will run on lattice (%d,%d,%d,%d) with (%d x %d x %d) blocks and (%d x %d x %d) threads per block\n")
+    appGeneral(_T("\n will run on lattice ( (%d,%d),%d,%d) with (xy %d x z %d x t %d) blocks and (xy %d x z %d x t %d) threads per block\n")
         , m_InitialCache.constIntegers[ECI_Lx]
         , m_InitialCache.constIntegers[ECI_Ly]
         , m_InitialCache.constIntegers[ECI_Lz]
@@ -293,7 +215,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
-    m_pCudaHelper->AllocateTemeraryBuffers(_HC_ThreadCount);
+    m_pCudaHelper->AllocateTemeraryBuffers(_HC_Volumn);
 
 #pragma endregion
 

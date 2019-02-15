@@ -23,28 +23,23 @@ void _kernelCachePlaqIndex(SIndex *pDevicePlaqPerSite, SIndex *pDevicePlaqPerLin
     intokernaldir;
 
     SIndex tmpPlaq[kMaxPlaqutteCache];
-    for (UINT it = 0; it < uiTLength; ++it)
+    UINT uiPlaqutteCount = 0;
+    UINT uiPlaqutteLength = 0;
+    __idx->_deviceGetPlaquttesAtSite(tmpPlaq, uiPlaqutteCount, uiPlaqutteLength, uiSiteIndex);
+
+    for (UINT iplaqIndex = 0; iplaqIndex < uiPlaqutteCount * uiPlaqutteLength; ++iplaqIndex)
     {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        UINT uiPlaqutteCount = 0;
-        UINT uiPlaqutteLength = 0;
-        __idx->_deviceGetPlaquttesAtSite(tmpPlaq, uiPlaqutteCount, uiPlaqutteLength, siteIndex);
+        pDevicePlaqPerSite[uiSiteIndex * (uiPlaqutteCount * uiPlaqutteLength) + iplaqIndex] = tmpPlaq[iplaqIndex];
+    }
 
-        for (UINT iplaqIndex = 0; iplaqIndex < uiPlaqutteCount * uiPlaqutteLength; ++iplaqIndex)
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        __idx->_deviceGetPlaquttesAtLink(tmpPlaq, uiPlaqutteCount, uiPlaqutteLength, linkIndex);
+
+        for (UINT iplaqIndex = 0; iplaqIndex < uiPlaqutteCount * (uiPlaqutteLength - 1); ++iplaqIndex)
         {
-            pDevicePlaqPerSite[siteIndex * (uiPlaqutteCount * uiPlaqutteLength) + iplaqIndex] = tmpPlaq[iplaqIndex];
-        }
-
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
-            __idx->_deviceGetPlaquttesAtLink(tmpPlaq, uiPlaqutteCount, uiPlaqutteLength, linkIndex);
-
-            for (UINT iplaqIndex = 0; iplaqIndex < uiPlaqutteCount * (uiPlaqutteLength - 1); ++iplaqIndex)
-            {
-                pDevicePlaqPerLink[linkIndex * (uiPlaqutteCount * (uiPlaqutteLength - 1)) + iplaqIndex] = tmpPlaq[iplaqIndex];
-            }
+            pDevicePlaqPerLink[linkIndex * (uiPlaqutteCount * (uiPlaqutteLength - 1)) + iplaqIndex] = tmpPlaq[iplaqIndex];
         }
     }
 }

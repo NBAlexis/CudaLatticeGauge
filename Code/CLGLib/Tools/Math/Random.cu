@@ -23,68 +23,50 @@ void _kernalAllocateSeedTable(UINT* pDevicePtr)
 
     UINT uiSeed = _DC_Seed;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir + 1; ++idir)
-        {
-            UINT fatIndex = _deviceGetFatIndex(coord, idir);
-            CRandom::_deviceAsignSeeds(pDevicePtr, uiSeed, fatIndex);
-        }
+        UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
+        CRandom::_deviceAsignSeeds(pDevicePtr, uiSeed, fatIndex);
     }
 }
 
 __global__
 void _kernalInitialXORWOW(curandState * states)
 {
-    intokernaldir;
+    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
 
     UINT uiSeed = _DC_Seed;
-
-    for (UINT it = 0; it < uiTLength; ++it)
+    UINT uiDir = _DC_Dir;
+    for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir + 1; ++idir)
-        {
-            UINT fatIndex = _deviceGetFatIndex(coord, idir);
-            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
-        }
+        UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
+        curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
     }
 }
 
 __global__
 void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 {
-    intokernaldir;
-
+    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
     UINT uiSeed = _DC_Seed;
-
-    for (UINT it = 0; it < uiTLength; ++it)
+    UINT uiDir = _DC_Dir;
+    for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir + 1; ++idir)
-        {
-            UINT fatIndex = _deviceGetFatIndex(coord, idir);
-            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
-        }
+        UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
+        curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
     }
 }
 
 __global__
 void _kernalInitialMRG(curandStateMRG32k3a  * states)
 {
-    intokernaldir;
-
+    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
     UINT uiSeed = _DC_Seed;
-
-    for (UINT it = 0; it < uiTLength; ++it)
+    UINT uiDir = _DC_Dir;
+    for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
-        coord[3] = it;
-        for (UINT idir = 0; idir < uiDir + 1; ++idir)
-        {
-            UINT fatIndex = _deviceGetFatIndex(coord, idir);
-            curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
-        }
+        UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
+        curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
     }
 }
 
@@ -92,30 +74,14 @@ __global__
 void _kernalInitialSobel32(curandStateSobol32* states, curandDirectionVectors32_t* dirs)
 {
     intokernal;
-
-    UINT uiSeed = _DC_Seed;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        curand_init(dirs[siteIndex], uiSeed % 16, &states[siteIndex]);
-    }
+    curand_init(dirs[uiSiteIndex], _DC_Seed % 16, &states[uiSiteIndex]);
 }
 
 __global__
 void _kernalInitialScrambledSobel32(curandStateScrambledSobol32* states, UINT* consts, curandDirectionVectors32_t* dirs)
 {
     intokernal;
-
-    UINT uiSeed = _DC_Seed;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        curand_init(dirs[siteIndex], consts[siteIndex], uiSeed % __SOBEL_OFFSET_MAX, &states[siteIndex]);
-    }
+    curand_init(dirs[uiSiteIndex], consts[uiSiteIndex], _DC_Seed % __SOBEL_OFFSET_MAX, &states[uiSiteIndex]);
 }
 
 CRandom::~CRandom()
@@ -170,24 +136,53 @@ CRandom::~CRandom()
     }
 }
 
+//Initial XORWOW only support 512 threads per block
 void CRandom::InitialStatesXORWOW(UINT )
 {
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volumn * (_HC_Dir + 1)));
-    preparethread;
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    deviceConstraints[0] = 512;
+    TArray<UINT> latticeDim;
+    latticeDim.AddItem(_HC_Lx * _HC_Ly);
+    latticeDim.AddItem(_HC_Lz);
+    latticeDim.AddItem(_HC_Lt);
+    TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeDim);
+    dim3 block(decomp[0], decomp[1], decomp[2]);
+    dim3 threads(decomp[3], decomp[4], decomp[5]);
     _kernalInitialXORWOW << <block, threads >> > (m_pDeviceRandStatesXORWOW);
 }
 
+//Initial Philox only support 256 threads per block
 void CRandom::InitialStatesPhilox(UINT )
 {
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volumn * (_HC_Dir + 1)));
-    preparethread;
+
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    deviceConstraints[0] = 256;
+    TArray<UINT> latticeDim;
+    latticeDim.AddItem(_HC_Lx * _HC_Ly);
+    latticeDim.AddItem(_HC_Lz);
+    latticeDim.AddItem(_HC_Lt);
+    TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeDim);
+    dim3 block(decomp[0], decomp[1], decomp[2]);
+    dim3 threads(decomp[3], decomp[4], decomp[5]);
+
     _kernalInitialPhilox << <block, threads >> > (m_pDeviceRandStatesPhilox);
 }
 
+//Initial MRG only support 256 threads per block
 void CRandom::InitialStatesMRG(UINT )
 {
     checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volumn * (_HC_Dir + 1)));
-    preparethread;
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    deviceConstraints[0] = 256;
+    TArray<UINT> latticeDim;
+    latticeDim.AddItem(_HC_Lx * _HC_Ly);
+    latticeDim.AddItem(_HC_Lz);
+    latticeDim.AddItem(_HC_Lt);
+    TArray <UINT> decomp = _getDecompose(deviceConstraints, latticeDim);
+    dim3 block(decomp[0], decomp[1], decomp[2]);
+    dim3 threads(decomp[3], decomp[4], decomp[5]);
     _kernalInitialMRG << <block, threads >> > (m_pDeviceRandStatesMRG);
 }
 
@@ -258,9 +253,10 @@ Real GetRandomReal()
 __global__ void _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithreadCount)
 {
     __shared__ UINT sData1[1024];
-    //__shared__ UINT sData2[1024];
+    __shared__ UINT sData2[1024];
     UINT uiToAdd = 0;
-    //UINT uiToAdd2 = 0;
+    UINT uiToAdd2 = 0;
+    //We have a very large grid, but for a block, it is always smaller (or equval to volumn)
     UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
     for (UINT i = 0; i < uiLoop; ++i)
     {
@@ -270,29 +266,24 @@ __global__ void _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLo
         {
             ++uiToAdd;
         }
-        //++uiToAdd2;
+        ++uiToAdd2;
     }
     sData1[fatIndex] = uiToAdd;
-    //sData2[fatIndex] = uiToAdd2;
-    //if (0 == threadIdx.x)
-    //{
-    //    sData1[0] = 0;
-    //    sData1[1] = 0;
-    //}
+    sData2[fatIndex] = uiToAdd2;
 
     __syncthreads();
     if (threadIdx.x == 0 && threadIdx.y == 0 && threadIdx.z == 0)
     {
         UINT all1 = 0;
-        //UINT all2 = 0;
+        UINT all2 = 0;
         for (UINT i = 0; i < uithreadCount; ++i)
         {
             all1 += sData1[i];
-            //all2 += sData2[i];
+            all2 += sData2[i];
         }
         //printf("how many?= %d\n", all1);
         atomicAdd(output, all1);
-        //atomicAdd(output + 1, all2);
+        atomicAdd(output + 1, all2);
     }
 }
 

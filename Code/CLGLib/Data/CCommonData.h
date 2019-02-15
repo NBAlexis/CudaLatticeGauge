@@ -41,6 +41,9 @@
 #define _DC_MultZ (_constIntegers[ECI_MultZ])
 #define _HC_MultZ (appGetCudaHelper()->m_ConstIntegers[ECI_MultZ])
 
+#define _DC_GridDimZT (_constIntegers[ECI_GridDimZT])
+#define _HC_GridDimZT (appGetCudaHelper()->m_ConstIntegers[ECI_GridDimZT])
+
 #define _DC_DecompX (_constIntegers[ECI_DecompX])
 #define _HC_DecompX (appGetCudaHelper()->m_ConstIntegers[ECI_DecompX])
 #define _DC_DecompY (_constIntegers[ECI_DecompY])
@@ -55,8 +58,6 @@
 #define _HC_DecompLz (appGetCudaHelper()->m_ConstIntegers[ECI_DecompLz])
 #define _DC_ThreadCountPerBlock (_constIntegers[ECI_ThreadCountPerBlock])
 #define _HC_ThreadCountPerBlock (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCountPerBlock])
-#define _DC_ThreadCount (_constIntegers[ECI_ThreadCount])
-#define _HC_ThreadCount (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCount])
 
 #define _HC_SUN (appGetCudaHelper()->m_ConstIntegers[ECI_SUN])
 #define _HC_PlaqutteCount (appGetCudaHelper()->m_ConstIntegers[ECI_PlaqutteCount])

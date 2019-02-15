@@ -417,7 +417,7 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     cudaGetDeviceProperties(&deviceProp, 0);
 
     //We need to constrain it further for shared memeory per block
-    ret.AddItem(deviceProp.maxThreadsPerBlock > kSharedLength ? kSharedLength : deviceProp.maxThreadsPerBlock);
+    ret.AddItem(deviceProp.maxThreadsPerBlock);
     ret.AddItem(deviceProp.maxThreadsDim[0]);
     ret.AddItem(deviceProp.maxThreadsDim[1]);
     ret.AddItem(deviceProp.maxThreadsDim[2]);

@@ -16,9 +16,8 @@ __BEGIN_NAMESPACE
 extern "C" bool runCudaTest(const int argc, const char **argv,
     char *data, int2 *data_int2, unsigned int len);
 
-#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
-
-enum { kSharedLength = 1024, };
+//((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
+//#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z))
 
 enum { kContentLength = 1024, };
 
@@ -77,11 +76,11 @@ enum EConstIntId
     ECI_DecompX, //number of blocks
     ECI_DecompY,
     ECI_DecompZ,
-    ECI_DecompLx, //threads per block
-    ECI_DecompLy,
-    ECI_DecompLz,
+    ECI_DecompLx, //threads per block (Also known as blockDim.x)
+    ECI_DecompLy, //threads per block (Also known as blockDim.y)
+    ECI_DecompLz, //threads per block (Also known as blockDim.z)
+    ECI_GridDimZT, // ECI_Lz*ECI_Lt
     ECI_ThreadCountPerBlock, //thread per block
-    ECI_ThreadCount, //thread per grid (just lx*ly*lz)
     ECI_RandomSeed,
     ECI_ExponentPrecision,
     ECI_ActionListLength,

@@ -77,7 +77,7 @@ UINT TestOperators(CParameters& )
     {
         ++uiErrors;
     }
-    if (appAbs(dot5.y + dot6.y)  > 0.01f)
+    if (appAbs(dot5.y - dot6.y)  > 0.01f)
     {
         ++uiErrors;
     }

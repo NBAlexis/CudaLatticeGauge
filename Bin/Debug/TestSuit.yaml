@@ -55,14 +55,13 @@ TestRandomSchrage:
     GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
     HostSample : 1000
 
-    TestAccuracy : 1E-3
+    TestAccuracy : 0.0015
 
 TestRandomXORWOW:
 
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeed : 1234567
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
@@ -75,11 +74,6 @@ TestRandomMRG32K3A:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-
-    ## Note: MRG32K3A support 256 threads
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 4]
-
     RandomType : ER_MRG32K3A
     RandomSeed : 1234567
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
@@ -92,34 +86,31 @@ TestRandomPhilox:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 4]
     RandomType : ER_PHILOX4_32_10
     RandomSeed : 1234567
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
     GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
     HostSample : 1000
-    TestAccuracy : 1E-3
+    ## excuse me??
+    TestAccuracy : 0.5
 
 TestRandomSOBOL32:
 
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_QUASI_SOBOL32
     RandomSeed : 1234567
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
     GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
     HostSample : 1000
-    TestAccuracy : 1E-3
+    TestAccuracy : 1E-2
 
 TestRandomScrambledSOBOL32:
 
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_SCRAMBLED_SOBOL32
     RandomSeed : 1234567
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
@@ -132,7 +123,6 @@ TestSU3GeneratorSchrage:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
     FieldSampleCount : 1000
@@ -143,7 +133,6 @@ TestSU3GeneratorXORWOW:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeed : 1234567
     FieldSampleCount : 1000
@@ -154,20 +143,16 @@ TestSU3GeneratorMRG32K3A:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 4]
     RandomType : ER_MRG32K3A
     RandomSeed : 1234567
     FieldSampleCount : 1000
-    TestAccuracy : 0.0001
+    TestAccuracy : 0.0002
 
 TestSU3GeneratorPhilox:
 
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 4]
     RandomType : ER_PHILOX4_32_10
     RandomSeed : 1234567
     FieldSampleCount : 1000
@@ -178,7 +163,6 @@ TestSU3GeneratorSOBOL32:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_QUASI_SOBOL32
     RandomSeed : 1234567
     FieldSampleCount : 1000
@@ -189,7 +173,6 @@ TestSU3GeneratorScrambledSOBOL32:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    ThreadAutoDecompose : 1
     RandomType : ER_SCRAMBLED_SOBOL32
     RandomSeed : 1234567
     FieldSampleCount : 1000

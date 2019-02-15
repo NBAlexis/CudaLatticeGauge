@@ -11,8 +11,8 @@
 
 UINT TestFileIO(CParameters& sParam)
 {
-    appGeneral(_T("size of sindex = %d\n"), sizeof(SIndex));
-    CCudaHelper::DebugFunction();
+    //appGeneral(_T("size of sindex = %d\n"), sizeof(SIndex));
+    //CCudaHelper::DebugFunction();
 
     Real fExpected = F(0.625129946974942);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);

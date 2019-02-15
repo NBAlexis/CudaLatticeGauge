@@ -13,16 +13,12 @@
 
 #define gaugeSU3KernelFuncionStart \
     intokernaldir; \
-    for (UINT it = 0; it < uiTLength; ++it) \
+    for (UINT idir = 0; idir < uiDir; ++idir) \
     { \
-        coord[3] = it; \
-        for (UINT idir = 0; idir < uiDir; ++idir) \
-        { \
-           UINT uiLinkIndex = _deviceGetLinkIndex(coord, idir); 
+        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir); 
 
 
 #define gaugeSU3KernelFuncionEnd \
-        } \
     } 
 
 

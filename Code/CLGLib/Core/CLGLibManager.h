@@ -11,6 +11,8 @@
 #ifndef _CLGLIBMANAGER_H_
 #define _CLGLIBMANAGER_H_
 
+#define __Divisible(a, b) ( (b * (a/b)) == a )
+
 __BEGIN_NAMESPACE
 
 struct CLGAPI SCLGLibManangerInitialCache
@@ -97,6 +99,81 @@ inline class CFileSystem* appGetFileSystem()
 inline class CSLASolver* appGetFermionSolver()
 {
     return appGetLattice()->m_pFermionSolver;
+}
+
+/**
+* find all factors of input number
+*/
+inline TArray<UINT> _getFactors(UINT length)
+{
+    TArray<UINT> ret;
+    ret.AddItem(1);
+    for (UINT i = 2; i < (length / 2); ++i)
+    {
+        if (__Divisible(length, i))
+        {
+            ret.AddItem(i);
+        }
+    }
+    if (length > 1)
+    {
+        ret.AddItem(length);
+    }
+    return ret;
+}
+
+/**
+* find the max block size for thread decompose
+*/
+inline TArray<UINT> _getDecompose(const TArray<UINT>& contraints, const TArray<UINT>& latticeLength)
+{
+    UINT uiBlockSize = 1;
+    TArray<UINT> ret;
+
+    //number of blocks
+    ret.AddItem(latticeLength[0]);
+    ret.AddItem(latticeLength[1]);
+    ret.AddItem(latticeLength[2]);
+    //block size
+    ret.AddItem(1);
+    ret.AddItem(1);
+    ret.AddItem(1);
+
+    TArray<UINT> factorsOfX = _getFactors(latticeLength[0]);
+    TArray<UINT> factorsOfY = _getFactors(latticeLength[1]);
+    TArray<UINT> factorsOfZ = _getFactors(latticeLength[2]);
+    for (INT i = 0; i < factorsOfX.Num(); ++i)
+    {
+        for (INT j = 0; j < factorsOfY.Num(); ++j)
+        {
+            for (INT k = 0; k < factorsOfZ.Num(); ++k)
+            {
+                if (factorsOfX[i] <= (UINT)contraints[1]
+                    && factorsOfY[j] <= (UINT)contraints[2]
+                    && factorsOfZ[k] <= (UINT)contraints[3])
+                {
+                    UINT uiThreadPerBlcok = factorsOfX[i] * factorsOfY[j] * factorsOfZ[k];
+                    if (uiThreadPerBlcok <= (UINT)contraints[0]
+                        && uiThreadPerBlcok > uiBlockSize)
+                    {
+                        uiBlockSize = uiThreadPerBlcok;
+
+                        //number of blocks
+                        ret[0] = latticeLength[0] / factorsOfX[i];
+                        ret[1] = latticeLength[1] / factorsOfY[j];
+                        ret[2] = latticeLength[2] / factorsOfZ[k];
+
+                        //block size
+                        ret[3] = factorsOfX[i];
+                        ret[4] = factorsOfY[j];
+                        ret[5] = factorsOfZ[k];
+                    }
+                }
+            }
+        }
+    }
+
+    return ret;
 }
 
 __END_NAMESPACE

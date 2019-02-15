@@ -82,7 +82,7 @@ __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorMRG32K3A);
 
 __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorSOBOL32);
 
-__REGIST_TEST(TestSU3Generator, Random, TestRandomScrambledSOBOL32);
+__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorScrambledSOBOL32);
 
 
 //=============================================================================

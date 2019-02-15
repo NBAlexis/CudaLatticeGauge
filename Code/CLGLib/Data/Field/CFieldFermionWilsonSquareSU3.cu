@@ -22,30 +22,24 @@ __global__ void _kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 *
 {
     intokernal;
 
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndexX = _deviceGetSiteIndex(coord);
+    printf("%d=((%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi))\n",
+        uiSiteIndex,
+        pData[uiSiteIndex].m_d[0].m_ve[0].x, pData[uiSiteIndex].m_d[0].m_ve[0].y,
+        pData[uiSiteIndex].m_d[0].m_ve[1].x, pData[uiSiteIndex].m_d[0].m_ve[1].y,
+        pData[uiSiteIndex].m_d[0].m_ve[2].x, pData[uiSiteIndex].m_d[0].m_ve[2].y,
 
-        printf("%d,%d,%d,%d=((%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi),(%1.2f %1.2fi, %1.2f %1.2fi, %1.2f %1.2fi))\n", 
-            coord[0], coord[1], coord[2], coord[3],
-            pData[siteIndexX].m_d[0].m_ve[0].x, pData[siteIndexX].m_d[0].m_ve[0].y,
-            pData[siteIndexX].m_d[0].m_ve[1].x, pData[siteIndexX].m_d[0].m_ve[1].y,
-            pData[siteIndexX].m_d[0].m_ve[2].x, pData[siteIndexX].m_d[0].m_ve[2].y,
+        pData[uiSiteIndex].m_d[1].m_ve[0].x, pData[uiSiteIndex].m_d[1].m_ve[0].y,
+        pData[uiSiteIndex].m_d[1].m_ve[1].x, pData[uiSiteIndex].m_d[1].m_ve[1].y,
+        pData[uiSiteIndex].m_d[1].m_ve[2].x, pData[uiSiteIndex].m_d[1].m_ve[2].y,
 
-            pData[siteIndexX].m_d[1].m_ve[0].x, pData[siteIndexX].m_d[1].m_ve[0].y,
-            pData[siteIndexX].m_d[1].m_ve[1].x, pData[siteIndexX].m_d[1].m_ve[1].y,
-            pData[siteIndexX].m_d[1].m_ve[2].x, pData[siteIndexX].m_d[1].m_ve[2].y,
+        pData[uiSiteIndex].m_d[2].m_ve[0].x, pData[uiSiteIndex].m_d[2].m_ve[0].y,
+        pData[uiSiteIndex].m_d[2].m_ve[1].x, pData[uiSiteIndex].m_d[2].m_ve[1].y,
+        pData[uiSiteIndex].m_d[2].m_ve[2].x, pData[uiSiteIndex].m_d[2].m_ve[2].y,
 
-            pData[siteIndexX].m_d[2].m_ve[0].x, pData[siteIndexX].m_d[2].m_ve[0].y,
-            pData[siteIndexX].m_d[2].m_ve[1].x, pData[siteIndexX].m_d[2].m_ve[1].y,
-            pData[siteIndexX].m_d[2].m_ve[2].x, pData[siteIndexX].m_d[2].m_ve[2].y,
-
-            pData[siteIndexX].m_d[3].m_ve[0].x, pData[siteIndexX].m_d[3].m_ve[0].y,
-            pData[siteIndexX].m_d[3].m_ve[1].x, pData[siteIndexX].m_d[3].m_ve[1].y,
-            pData[siteIndexX].m_d[3].m_ve[2].x, pData[siteIndexX].m_d[3].m_ve[2].y
-            );
-    }
+        pData[uiSiteIndex].m_d[3].m_ve[0].x, pData[uiSiteIndex].m_d[3].m_ve[0].y,
+        pData[uiSiteIndex].m_d[3].m_ve[1].x, pData[uiSiteIndex].m_d[3].m_ve[1].y,
+        pData[uiSiteIndex].m_d[3].m_ve[2].x, pData[uiSiteIndex].m_d[3].m_ve[2].y
+    );
 }
 
 __global__ void _kernelAxpyPlusFermionWilsonSquareSU3(
@@ -53,13 +47,7 @@ __global__ void _kernelAxpyPlusFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pOther)
 {
     intokernal;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].Add(pOther[siteIndex]);
-    }
+    pMe[uiSiteIndex].Add(pOther[uiSiteIndex]);
 }
 
 __global__ void _kernelAxpyMinusFermionWilsonSquareSU3(
@@ -67,13 +55,7 @@ __global__ void _kernelAxpyMinusFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pOther)
 {
     intokernal;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].Sub(pOther[siteIndex]);
-    }
+    pMe[uiSiteIndex].Sub(pOther[uiSiteIndex]);
 }
 
 __global__ void _kernelAxpyComplexFermionWilsonSquareSU3(
@@ -81,13 +63,7 @@ __global__ void _kernelAxpyComplexFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex a)
 {
     intokernal;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].Add(pOther[siteIndex].MulCompC(a));
-    }
+    pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
 }
 
 __global__ void _kernelAxpyRealFermionWilsonSquareSU3(
@@ -95,13 +71,7 @@ __global__ void _kernelAxpyRealFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
 {
     intokernal;
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].Add(pOther[siteIndex].MulRealC(a));
-    }
+    pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulRealC(a));
 }
 
 __global__ void _kernelDotFermionWilsonSquareSU3(
@@ -110,14 +80,7 @@ __global__ void _kernelDotFermionWilsonSquareSU3(
     _Complex * result)
 {
     intokernal;
-    _Complex res = _make_cuComplex(F(0.0), F(0.0));
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        res = _cuCaddf(res, pMe[siteIndex].ConjugateDotC(pOther[siteIndex]));
-    }
-    result[__thread_id] = res;
+    result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
 }
 
 __global__ void _kernelScalarMultiplyComplex(
@@ -125,12 +88,7 @@ __global__ void _kernelScalarMultiplyComplex(
     _Complex a)
 {
     intokernal;
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].MulComp(a);
-    }
+    pMe[uiSiteIndex].MulComp(a);
 }
 
 __global__ void _kernelScalarMultiplyReal(
@@ -138,12 +96,7 @@ __global__ void _kernelScalarMultiplyReal(
     Real a)
 {
     intokernal;
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndex = _deviceGetSiteIndex(coord);
-        pMe[siteIndex].MulReal(a);
-    }
+    pMe[uiSiteIndex].MulReal(a);
 }
 
 /**
@@ -155,30 +108,23 @@ __global__ void _kernelInitialFermionWilsonSquareSU3(
 {
     intokernal;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    switch (eInitialType)
     {
-        coord[3] = it;
-        UINT siteIndexX = _deviceGetSiteIndex(coord);
-        UINT fatIndex = _deviceGetFatIndex(siteIndexX, 0);
-
-        switch (eInitialType)
-        {
-            case EFIT_Zero:
-                {
-                    pDevicePtr[siteIndexX] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
-                }
-                break;
-            case EFIT_RandomGaussian:
-                {
-                    pDevicePtr[siteIndexX] = deviceWilsonVectorSU3::makeRandomGaussian(fatIndex);
-                }
-                break;
-            default:
-                {
-                    printf("Wilson Fermion Field cannot be initialized with this type!");
-                }
-            break;
-        }
+    case EFIT_Zero:
+    {
+        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    }
+    break;
+    case EFIT_RandomGaussian:
+    {
+        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
+    }
+    break;
+    default:
+    {
+        printf("Wilson Fermion Field cannot be initialized with this type!");
+    }
+    break;
     }
 }
 
@@ -206,82 +152,75 @@ __global__ void _kernelDFermionWilsonSquareSU3(
 
     gammaMatrix gamma5 = bDiracChiralGamma ? __diracGamma[GAMMA5] : __chiralGamma[GAMMA5];
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
+    if (bDDagger)
     {
-        coord[3] = it;
-        //x
-        UINT siteIndexX = _deviceGetSiteIndex(coord);
-        deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
-        pResultData[siteIndexX] = pDeviceData[siteIndexX];
-        if (bDDagger)
-        {
-            pResultData[siteIndexX] = gamma5.MulWilsonC(pResultData[siteIndexX]);
-        }
+        pResultData[uiSiteIndex] = gamma5.MulWilsonC(pResultData[uiSiteIndex]);
+    }
 
-        //idir = mu
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            //Get Gamma mu
-            gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
+    //idir = mu
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        //Get Gamma mu
+        gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
 
-            //x, mu
-            UINT linkIndex = _deviceGetLinkIndex(siteIndexX, idir);
+        //x, mu
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-            SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(siteIndexX, -(idir + 1));
-            SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, siteIndexX, (idir + 1));
-            SIndex x_m_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, siteIndexX, -(idir + 1));          
+        SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+        SIndex x_m_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, -(idir + 1));
 
-            //Assuming periodic
-            //get U(x,mu), U^{dagger}(x-mu), 
-            deviceSU3 x_Gauge_element = pGauge[linkIndex];
-            deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
-            x_m_mu_Gauge_element.Dagger();
+        //Assuming periodic
+        //get U(x,mu), U^{dagger}(x-mu), 
+        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
+        x_m_mu_Gauge_element.Dagger();
 
-            deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
-            deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];
-
-            if (bDDagger)
-            {
-                x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
-                x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
-            }
-
-            //hopping terms
-            
-            //U(x,mu) phi(x+ mu)
-            deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
-            result.Add(u_phi_x_p_m);
-
-            //- gammamu U(x,mu) phi(x+ mu)
-            result.Sub(gammaMu.MulWilsonC(u_phi_x_p_m));
-
-            //U^{dagger}(x-mu) phi(x-mu)
-            deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
-            result.Add(u_dagger_phi_x_m_m);
-
-            //gammamu U^{dagger}(x-mu) phi(x-mu)
-            result.Add(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
-        }
-
-        //result = phi(x) - kai sum _mu result
-        result.MulReal(kai);
-        pResultData[siteIndexX].Sub(result);
+        deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
+        deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];
 
         if (bDDagger)
         {
-            pResultData[siteIndexX] = gamma5.MulWilsonC(pResultData[siteIndexX]);
+            x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
+            x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
         }
 
-        switch (eCoeff)
-        {
-        case EOCT_Real:
-            pResultData[siteIndexX].MulReal(fCoeff);
-            break;
-        case EOCT_Complex:
-            pResultData[siteIndexX].MulComp(cCoeff);
-            break;
-        }
-        //pResultData[siteIndexX].MulReal(1 / (F(2.0) * kai));
+        //hopping terms
+
+        //U(x,mu) phi(x+ mu)
+        deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+        result.Add(u_phi_x_p_m);
+
+        //- gammamu U(x,mu) phi(x+ mu)
+        result.Sub(gammaMu.MulWilsonC(u_phi_x_p_m));
+
+        //U^{dagger}(x-mu) phi(x-mu)
+        deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+        result.Add(u_dagger_phi_x_m_m);
+
+        //gammamu U^{dagger}(x-mu) phi(x-mu)
+        result.Add(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+
+    //result = phi(x) - kai sum _mu result
+    result.MulReal(kai);
+    pResultData[uiSiteIndex].Sub(result);
+
+    if (bDDagger)
+    {
+        pResultData[uiSiteIndex] = gamma5.MulWilsonC(pResultData[uiSiteIndex]);
+    }
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        pResultData[uiSiteIndex].MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        pResultData[uiSiteIndex].MulComp(cCoeff);
+        break;
     }
 }
 
@@ -306,75 +245,60 @@ __global__ void _kernelDWilsonForceSU3(
     //Real test_force2 = F(0.0);
     fKai = F(2.0) * fKai;
 
-    for (UINT it = 0; it < uiTLength; ++it)
+    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
+
+    //idir = mu
+    for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        coord[3] = it;
-        //x
-        UINT siteIndexX = _deviceGetSiteIndex(coord);
-        deviceWilsonVectorSU3 x_Left(pInverseDDdagger[siteIndexX]);
-        deviceWilsonVectorSU3 x_Right(pInverseD[siteIndexX]);
+        //Get Gamma mu
+        gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
 
-        //idir = mu
-        for (UINT idir = 0; idir < uiDir; ++idir)
+        //x, mu
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+
+        deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+        deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+
+        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+
+        deviceSU3 forceOfThisLink = deviceSU3::makeSU3Zero();
+        for (UINT i = 0; i < 8; ++i)
         {
-            //Get Gamma mu
-            gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
+            //get Ti U(x,mu) phi(x+mu)
+            deviceWilsonVectorSU3 Ti_U_x_mu_phi = __SU3Generators[i].MulC(x_Gauge_element).MulWilsonVector(x_p_mu_Right);
+            //get U^{dagger}(x) Ti phi(x), 
+            deviceWilsonVectorSU3 Udagger_x_m_mu_Ti_phi = x_Gauge_element.DaggerMulC(__SU3Generators[i]).MulWilsonVector(x_Right);
 
-            //x, mu
-            UINT linkIndex = _deviceGetLinkIndex(coord, idir);
+            //hopping terms
+            //(1-gamma _mu) Ti U(x,mu) phi(x+ mu) - (1+gamma _mu) U^{dagger}(x) Ti phi(x)
 
-            SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(siteIndexX, -(idir + 1));
-            SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, siteIndexX, (idir + 1));
+            //(1 - gamma_mu) Ti U(x,mu) phi(x+ mu)
+            _Complex res = x_Left.ConjugateDotC(Ti_U_x_mu_phi.SubC(gammaMu.MulWilsonC(Ti_U_x_mu_phi)));
 
-            deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-            deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+            //- (1 + gamma _mu)U^{dagger}(x) Ti phi(x)
+            res = _cuCsubf(res, x_p_mu_Left.ConjugateDotC(Udagger_x_m_mu_Ti_phi.AddC(gammaMu.MulWilsonC(Udagger_x_m_mu_Ti_phi))));
 
-            deviceSU3 x_Gauge_element = pGauge[linkIndex];
-
-            deviceSU3 forceOfThisLink = deviceSU3::makeSU3Zero();
-            for (UINT i = 0; i < 8; ++i)
-            {
-                //get Ti U(x,mu) phi(x+mu)
-                deviceWilsonVectorSU3 Ti_U_x_mu_phi = __SU3Generators[i].MulC(x_Gauge_element).MulWilsonVector(x_p_mu_Right);
-                //get U^{dagger}(x) Ti phi(x), 
-                deviceWilsonVectorSU3 Udagger_x_m_mu_Ti_phi = x_Gauge_element.DaggerMulC(__SU3Generators[i]).MulWilsonVector(x_Right);
-
-                //hopping terms
-                //(1-gamma _mu) Ti U(x,mu) phi(x+ mu) - (1+gamma _mu) U^{dagger}(x) Ti phi(x)
-
-                //(1 - gamma_mu) Ti U(x,mu) phi(x+ mu)
-                _Complex res = x_Left.ConjugateDotC(Ti_U_x_mu_phi.SubC(gammaMu.MulWilsonC(Ti_U_x_mu_phi)));
-
-                //- (1 + gamma _mu)U^{dagger}(x) Ti phi(x)
-                res = _cuCsubf(res, x_p_mu_Left.ConjugateDotC(Udagger_x_m_mu_Ti_phi.AddC(gammaMu.MulWilsonC(Udagger_x_m_mu_Ti_phi))));
-
-                //2ik Im(...)
-                //test_force += res.y * fKai;
-                //test_force2 += res.x * fKai;
-                forceOfThisLink.Add(__SU3Generators[i].MulCompC(_make_cuComplex(F(0.0), res.y * fKai)));
-            }
-            pForce[linkIndex].Add(forceOfThisLink);
-            if (NULL != pCachedForce)
-            {
-                pCachedForce[linkIndex] = forceOfThisLink;
-            }
+            //2ik Im(...)
+            //test_force += res.y * fKai;
+            //test_force2 += res.x * fKai;
+            forceOfThisLink.Add(__SU3Generators[i].MulCompC(_make_cuComplex(F(0.0), res.y * fKai)));
+        }
+        pForce[linkIndex].Add(forceOfThisLink);
+        if (NULL != pCachedForce)
+        {
+            pCachedForce[linkIndex] = forceOfThisLink;
         }
     }
-    //printf("typical fermion force = %f(%f), kai= %f\n", test_force, test_force2, fKai);
 }
 
 __global__ void _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDiracChiralGamma)
 {
     intokernal;
-
-    gammaMatrix theMatrix = bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma];
-
-    for (UINT it = 0; it < uiTLength; ++it)
-    {
-        coord[3] = it;
-        UINT siteIndexX = _deviceGetSiteIndex(coord);
-        pDeviceData[siteIndexX] = theMatrix.MulWilsonC(pDeviceData[siteIndexX]);
-    }
+    pDeviceData[uiSiteIndex] = (bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma]).MulWilsonC(pDeviceData[uiSiteIndex]);
 }
 
 #pragma endregion

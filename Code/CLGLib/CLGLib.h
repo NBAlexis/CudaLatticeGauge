@@ -78,18 +78,10 @@ dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
 
 
 #define intokernal \
-UINT coord[4]; \
-coord[0] = threadIdx.x + blockIdx.x * blockDim.x; \
-coord[1] = threadIdx.y + blockIdx.y * blockDim.y; \
-coord[2] = threadIdx.z + blockIdx.z * blockDim.z; \
-UINT uiTLength = _DC_Lt; 
+UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); 
 
 #define intokernaldir \
-UINT coord[4]; \
-coord[0] = threadIdx.x + blockIdx.x * blockDim.x; \
-coord[1] = threadIdx.y + blockIdx.y * blockDim.y; \
-coord[2] = threadIdx.z + blockIdx.z * blockDim.z; \
-UINT uiTLength = _DC_Lt; \
+UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); \
 UINT uiDir = _DC_Dir;
 
 
