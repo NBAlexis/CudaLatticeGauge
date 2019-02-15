@@ -1,6 +1,4 @@
 
--- Rewrite gamma matrix, to use a UINT.
-
 -- Implement BiCGStab with precondition
 
 -- Implement GCR

@@ -151,9 +151,9 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             pX->Return();
             pW->Return();
             pR->Return();
-            for (UINT i = 0; i < m_uiMaxDim; ++i)
+            for (UINT k = 0; k < m_uiMaxDim; ++k)
             {
-                m_lstVectors[i]->Return();
+                m_lstVectors[k]->Return();
             }
             m_lstVectors.RemoveAll();
             return TRUE;
@@ -206,9 +206,10 @@ void CSLASolverGMRES::RotateH(UINT uiHeisenbergDim)
 
 void CSLASolverGMRES::SolveY(UINT uiHeisenbergDim)
 {
-    for (INT i = uiHeisenbergDim - 1; i > -1; --i)
+    INT iHeisenbergDim = static_cast<INT>(uiHeisenbergDim);
+    for (INT i = iHeisenbergDim - 1; i > -1; --i)
     {
-        for (INT j = i + 1; j < uiHeisenbergDim; ++j)
+        for (INT j = i + 1; j < iHeisenbergDim; ++j)
         {
             m_g[i] = _cuCsubf(m_g[i], _cuCmulf(m_h[HIndex(i, j)], m_y[j]));
         }

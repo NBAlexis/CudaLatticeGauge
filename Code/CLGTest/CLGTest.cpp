@@ -36,25 +36,39 @@ UINT RunTest(CParameters&params, TestList* pTest)
     return uiErrors;
 }
 
-void ListAllTests(const TArray<TestList*>& allTests)
+void ListAllTests(const THashMap<CCString, TArray<TestList*>*>& category)
 {
-    for (INT i = 0; i <= (allTests.Num() + 1) / 4; ++i)
+    TArray<CCString> sKeys = category.GetAllKeys();
+    for (INT k = 0; k < sKeys.Num(); ++k)
     {
-        for (INT j = 0; j < 4; ++j)
+        COUT << _T("============== ") << sKeys[k] << _T(" ==============\n");
+        TArray<TestList*>* lst = category.GetAt(sKeys[k]); //category[] only work with non-const THashMap
+        for (INT i = 0; i <= lst->Num() / 3; ++i)
         {
-            INT indexOfTest = i * 4 + j;
-            if (indexOfTest < allTests.Num())
+            for (INT j = 0; j < 3; ++j)
             {
-                TCHAR names[256];
-                sprintf_s(names, _T("%d - %s    "), indexOfTest + 1, allTests[indexOfTest]->m_sParamName);
-                COUT << names;
+                INT indexOfTest = i * 3 + j;
+                if (indexOfTest < lst->Num())
+                {
+                    TCHAR names[256];
+                    sprintf_s(names, _T("%d - %s,    "), lst->GetAt(indexOfTest)->m_uiIndex, lst->GetAt(indexOfTest)->m_sParamName);
+                    COUT << names;
+                }
             }
-            else if (indexOfTest == allTests.Num())
-            {
-                COUT << "0 - All";
-            }
+            COUT << std::endl;
         }
-        COUT << std::endl;
+    }
+
+    COUT << _T("============== Common ==============\nq - Quit,    a - All\n");
+}
+
+void DeleteAllLists(THashMap<CCString, TArray<TestList*>*>& category)
+{
+    //delete the lists
+    TArray<CCString> sKeys = category.GetAllKeys();
+    for (INT i = 0; i < sKeys.Num(); ++i)
+    {
+        appSafeDelete(category[sKeys[i]]);
     }
 }
 
@@ -64,14 +78,28 @@ int main(int argc, char * argv[])
     CParameters params;
     CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
     appSetupLog(params);
-    UINT uiTotalError = 0;
 
     TArray<TestList*> allTests;
+    THashMap<CCString, TArray<TestList*>*> category;
+    UINT uiIndex = 0;
     for (TestList* pTest = _testSuits; NULL != pTest; pTest = pTest->m_pNext)
     {
         if (params.Exist(pTest->m_sParamName))
         {
+            pTest->m_uiIndex = uiIndex;
+            ++uiIndex;
             allTests.AddItem(pTest);
+            CCString sCategory = pTest->m_sCatogary;
+            if (category.Exist(sCategory))
+            {
+                category[sCategory]->AddItem(pTest);
+            }
+            else
+            {
+                TArray<TestList*>* newList = new TArray<TestList*>();
+                newList->AddItem(pTest);
+                category.SetAt(sCategory, newList);
+            }
         }
     }
 
@@ -79,29 +107,52 @@ int main(int argc, char * argv[])
     INT inputNumber = -1;
     while (!bCorrectInput)
     {
-        ListAllTests(allTests);
+        ListAllTests(category);
         inputNumber = -1;
-        CIN >> inputNumber;
-        if (inputNumber >= 0 && inputNumber < allTests.Num() + 1)
+        std::string name;
+        std::getline(std::cin, name);
+        CCString sRes(name.c_str());
+        INT number = appStrToINT(sRes);
+
+        if (sRes == _T("q"))
         {
-            bCorrectInput = TRUE;
+            break;
+        }
+        if (appIntToString(number) == sRes)
+        {
+            if (number >= 0 && number < allTests.Num())
+            {
+                RunTest(params, allTests[number]);
+            }
+        }
+        else if (sRes == _T("a"))
+        {
+            CTimer timer;
+            timer.Start();
+            UINT uiError = 0;
+            UINT uiPassed = 0;
+            for (INT i = 0; i < allTests.Num(); ++i)
+            {
+                UINT uiThisError = RunTest(params, allTests[i]);
+                if (0 == uiThisError)
+                {
+                    ++uiPassed;
+                }
+                else
+                {
+                    uiError += uiThisError;
+                }
+            }
+            timer.Stop();
+            appGeneral(_T("Run all test with %d(success) / %d(total) (with %d errors) and %f secs"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 1000.0f);
+        }
+        else
+        {
+            COUT << _T("Input commond:") << name << _T(" not kown") << std::endl;
         }
     }
-
-    UINT uiError = 0;
-    if (0 == inputNumber)
-    {
-        for (INT i = 0; i < allTests.Num(); ++i)
-        {
-            uiError += RunTest(params, allTests[i]);
-        }
-    }
-    else
-    {
-        uiError += RunTest(params, allTests[inputNumber - 1]);
-    }
-
-    return uiError;
+    DeleteAllLists(category);
+    return 0;
 }
 
 //=============================================================================

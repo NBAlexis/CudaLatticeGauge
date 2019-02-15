@@ -13,8 +13,7 @@
 
 UINT TestOperators(CParameters& )
 {
-    //appGetLattice()->m_pUpdator->Update(2, TRUE);
-    //CCudaHelper::DebugFunction();
+    UINT uiErrors = 0;
 
     //test Ddagger
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
@@ -32,6 +31,39 @@ UINT TestOperators(CParameters& )
     appGeneral(_T("Estimator f1.f1 = (%f %f); f2.f2 = (%f %f); f1.f2 = (%f %f); f2.f1 = (%f %f)\n"),
         dot1.x / (12 * _HC_Volumn), dot1.y, dot2.x / (12 * _HC_Volumn), dot2.y, dot3.x / (12 * _HC_Volumn), dot3.y / (12 * _HC_Volumn), dot4.x / (12 * _HC_Volumn), dot4.y / (12 * _HC_Volumn));
 
+    if (appAbs(1.0f - dot1.x / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot1.y) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(1.0f - dot2.x / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot2.y) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot3.x / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot3.y / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot4.x / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot4.y / (12 * _HC_Volumn)) > 0.01f)
+    {
+        ++uiErrors;
+    }
+
     pF1->CopyTo(pF3);
     pF3->D(pGauge);
     pF2->CopyTo(pF4);
@@ -41,10 +73,20 @@ UINT TestOperators(CParameters& )
     appGeneral(_T("DDagger f2.(D.f1) = (%f %f); (D+.f2).f1 = (%f %f);\n"),
         dot5.x, dot5.y, dot6.x, dot6.y);
 
-    return 0;
+    if (appAbs(dot5.x - dot6.x) > 0.01f)
+    {
+        ++uiErrors;
+    }
+    if (appAbs(dot5.y + dot6.y)  > 0.01f)
+    {
+        ++uiErrors;
+    }
+    //CCudaHelper::DebugFunction();
+
+    return uiErrors;
 }
 
-__REGIST_TEST(TestOperators, Field, TestOperators);
+__REGIST_TEST(TestOperators, Misc, TestOperators);
 
 
 //=============================================================================

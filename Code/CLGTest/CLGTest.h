@@ -14,6 +14,7 @@ struct STestSuits##paramName : public TestList \
 { \
     STestSuits##paramName(testfunction pf) \
     { \
+        m_uiIndex = 0; \
         m_pfTest = pf; \
         m_sCatogary = _T(#catogary); \
         m_sParamName = _T(#paramName); \
@@ -27,6 +28,7 @@ typedef UINT (*testfunction)(CParameters& sParamName);
 
 struct STestSuits
 {
+    UINT m_uiIndex;
     testfunction m_pfTest;
     const TCHAR* m_sCatogary;
     const TCHAR* m_sParamName;

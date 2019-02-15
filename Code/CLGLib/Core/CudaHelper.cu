@@ -35,30 +35,19 @@ __global__ void _kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, d
 
 __global__ void _kernelDebugFunction()
 {
-    deviceSU3 a1 = deviceSU3::makeSU3Random(0);
-    deviceSU3Vector v1 = deviceSU3Vector::makeZeroSU3Vector();
-
-    deviceWilsonVectorSU3 v2;
-    //v2.DebugPrint();
-    //a1.DebugPrint();
-    printf("deviceSu3: %d, deviceSU3Vector: %d, deviceWilsonVectorSU3: %d\n", 
-        sizeof(deviceSU3), 
-        sizeof(deviceSU3Vector), 
-        sizeof(deviceWilsonVectorSU3));
-
-    printf("deviceSU3Vector: %d, deviceWilsonVectorSU3: %d\n",
-        sizeof(deviceSU3Vector),
-        sizeof(deviceWilsonVectorSU3));
-
-    printf("deviceWilsonVectorSU3: %d\n",
-        sizeof(deviceWilsonVectorSU3));
-
-    printf("SIndex: %d\n",
-        sizeof(SIndex));
-
     for (UINT i = 0; i < 9; ++i)
     {
         __SU3Generators[i].DebugPrint();
+    }
+
+    for (UINT i = 0; i < EGM_MAX; ++i)
+    {
+        __diracGamma[i].Print();
+    }
+
+    for (UINT i = 0; i < EGM_MAX; ++i)
+    {
+        __chiralGamma[i].Print();
     }
 }
 

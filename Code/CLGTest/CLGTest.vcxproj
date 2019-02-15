@@ -25,6 +25,7 @@
     </ClCompile>
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
+    <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
     <ClCompile Include="Tests\TestOperators.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
