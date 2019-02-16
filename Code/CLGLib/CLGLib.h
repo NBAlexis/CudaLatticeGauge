@@ -117,6 +117,7 @@ UINT uiDir = _DC_Dir;
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
 #include "SparseLinearAlgebra/CSolverGMRES.h"
+#include "SparseLinearAlgebra/CSolverGCR.h"
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"

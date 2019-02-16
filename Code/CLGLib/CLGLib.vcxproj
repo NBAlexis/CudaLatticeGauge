@@ -57,6 +57,7 @@
     <ClInclude Include="Platform\WinFunction.h" />
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
@@ -87,6 +88,7 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGCR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp" />
     <CudaCompile Include="Core\CudaHelper.cu">

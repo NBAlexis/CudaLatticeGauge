@@ -14,7 +14,7 @@ __BEGIN_NAMESPACE
 __CLGIMPLEMENT_CLASS(CSLASolverBiCGStab)
 
 CSLASolverBiCGStab::CSLASolverBiCGStab() 
-    : m_pOwner(NULL) 
+    : CSLASolver()
     , m_uiReTry(1)
     , m_uiDevationCheck(10)
     , m_uiStepCount(20)
@@ -147,7 +147,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pR->CopyTo(pS);
             pS->Axpy(-alpha, pV);
 
-            if (0 != j && (0 == j % m_uiDevationCheck))
+            if (0 == (j + 1) % m_uiDevationCheck)
             {
                 //Normal of S is small, then stop
                 Real fDeviation = _cuCabsf(pS->Dot(pS)) / fBLength;

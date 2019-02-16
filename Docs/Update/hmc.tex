@@ -1,8 +1,8 @@
-\subsection{\label{hmc}\index{hmc}HMC}
+\subsection{\label{sec:hmc}\index{hmc}HMC}
 
 HMC is abbreviation for hybrid Monte Carlo.
 
-\subsubsection{\label{hmc_scheme}The Fermion action}
+\subsubsection{\label{sec:hmc_action}The Fermion action}
 
 Cooperating with HMC, the fermion is usually the \index{pseudofermions}'Pseudofermions`.
 
@@ -71,7 +71,7 @@ So, generally, we are using HMC to evaluate the action with 'Pseudofermions`, or
 \end{equation}
 where $pf$ is short for pseudofermion.
 
-\subsubsection{\label{hmc_scheme}Basic idea, force from gauge field}
+\subsubsection{\label{sec:hmc_scheme}Basic idea, force from gauge field}
 
 The basic idea is to use a \index{molecular dynamics}molecular dynamics simulation, i.e, it is a integration of \index{Langevin equation}Langevin equation.
 
@@ -190,7 +190,7 @@ Knowing $U(n\epsilon),P(n\epsilon),F(n\epsilon)$, we can calculate $U((n+1)\epsi
 Then we are able to calculate $F((n+1)\epsilon)$ again using Eq.~(\ref{eq.hmc.force}).
 Then we can calculate $P((n+1)\epsilon)$ using Eq.~(\ref{eq.hmc.update_basic}).c.
 
-\subsubsection{\label{forceOfPseudofermions}Force of pseudofermions}
+\subsubsection{\label{sec:forceOfPseudofermions}Force of pseudofermions}
 
 For important sampling, one can generate both $U$ and $\phi$ by $e^{-S}$. In molecular dynamics simulation, it can be simplified as:
 
@@ -218,11 +218,11 @@ The force of $\phi$ on $U$ is obtained as $\partial _{\omega_a}S_{pf}$. The resu
 &F=i\sum _a\dot{\omega}_aT_a=i\sum _a\left(-\partial _{\omega _a}\left(S_G[U_{\mu}(n)]+S_{pf}[U_{\mu}(n)]\right)\right)T_a=F_G+F_{pf}.\\
 &F_{pf}=i\sum _a\left(-\partial _{\omega _a}S_{pf}[U_{\mu}(n)]\right)T_a=-i\sum_aT^a \frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x\textcolor[rgb]{1,0,0}{+}\mu)_L,x_R} \right\} \\
+&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta_{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x\textcolor[rgb]{1,0,0}{+}\mu)_L}\delta _{x,x_R} \right\} \\
 &\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^a} \gamma _5\\
 \end{split}
 \end{equation}
-where $F_G$ is force from $U$ introduced in Sec.~\ref{hmc_scheme}, $T^a$ are $SU(3)$ generators. $x_L,x_R$ are coordinate index of the left and right pseudofermion field. And
+where $F_G$ is force from $U$ introduced in Sec.~\ref{sec:hmc_scheme}, $T^a$ are $SU(3)$ generators. $x_L,x_R$ are coordinate index of the left and right pseudofermion field. And
 \begin{equation}
 \begin{split}
 &U_{\mu}=\exp (i\sum _a \omega _{\mu}^a T^a)U_0,\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
@@ -244,7 +244,7 @@ and
 \begin{equation}
 \begin{split}
 &\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
-&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x+\mu)_L,x_R}\right\}\\
+&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}T^a\delta _{(x+\mu)_L,x_R}\right\}\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-2\kappa{\rm Im}\left[\left(\phi _1 ^{\dagger} M \phi _2\right)\right]\\
 \end{split}
 \end{equation}
@@ -261,9 +261,50 @@ Note that, $D$ is changing when integrating the Langevin equation.
 
 The last part is how to calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$.
 
-\subsubsection{\label{Solver_In_HMC}\index{solver}Solver in HMC}
+\begin{itemize}
+  \item Anti-Hermitian traceless of the force
+\end{itemize}
 
-To calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$, we need a solver. The detail of solvers will be introduced in Sec.~\ref{solver}. Here we establish a simple introduction.
+See from Eq.~(\ref{eq.hmc.force}), the force from the gauge field is an anti-Hermitian traceless matrix.
+
+The result above can be further simplified. Note that
+\begin{equation}
+\begin{split}
+&\phi_{L1}(n)=\phi _1(n),\;\;\phi _{R1}(n)=(1-\gamma _{\mu})\phi _2(n+\mu),\\
+&\phi_{L2}(n)=\phi _1(n+\mu),\;\;\phi _{R1}(n)=(1+\gamma _{\mu})\phi _2(n),\\
+\end{split}
+\end{equation}
+One have
+\begin{equation}
+\begin{split}
+&{\rm Im}\left[\phi _1^{\dagger}M\phi _2\right]_{\mu}^a(n)={\rm Im}\left[\phi _{L1}^{\dagger}T^aU_{\mu}(n)\phi _{R1}\right]-{\rm Im}\left[\phi _{L2}^{\dagger}U_{\mu}^{\dagger}(n)T^a\phi _{R2}\right]\\
+&={\rm Im}\left[\phi _{L1}^{\dagger}T^aU_{\mu}(n)\phi _{R1}\right]+{\rm Im}\left[\phi _{R2}^{\dagger}T^aU_{\mu}(n)\phi _{L2}\right]\\
+\end{split}
+\end{equation}
+
+For any vector
+\begin{equation}
+\begin{split}
+&{\rm Im}\left[L^{\dagger}TUR\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}L_{\alpha}^*T_{\alpha\beta}U_{\beta\rho}V_{\rho}\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}T_{\alpha\beta}U_{\beta\rho}V_{\rho}L_{\alpha}^*\right]={\rm Im}\left[{\rm tr}\left[TU(VL^{\dagger})\right]\right]\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&F^{pf}_{\mu}(n)=2i\kappa{\rm Im}\left[\phi _1^{\dagger}M\phi _2\right]_{\mu}(n)=\kappa \left(2i\sum _a{\rm Im}{\rm tr}\left[T^a U_{\mu}(n)\left(\phi _{R1}\phi _{L1}^{\dagger}+\phi _{R2}\phi _{L2}^{\dagger}\right)\right]T^a\right)\\
+&=\kappa \left.\left\{U_{\mu}(n)\left(\phi _{R1}\phi _{L1}^{\dagger}+\phi _{R2}\phi _{L2}^{\dagger}\right)\right\}\right|_{TA}
+\end{split}
+\end{equation}
+which is also an anti-Hermitian traceless matrix.
+
+\textbf{So, the momentum is always anti-Hermitian traceless.}.
+
+For anti-Hermitian traceless matrix $M$, the $\exp(M)$ can be simplified as Appendix. A of Ref.~\cite{luscher2005}. 
+
+\subsubsection{\label{sec:Solver_In_HMC}\index{solver}Solver in HMC}
+
+To calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$, we need a solver. The detail of solvers will be introduced in Sec.~\ref{sec:solver}. Here we establish a simple introduction.
 
 Let $M$ be a matrix operating on a vector, for example, $M=(\hat{D}\hat{D}^{\dagger})$, the goal of the solver is to find $x$ such $b=M\cdot x$, and therefor $x=(\hat{D}\hat{D}^{\dagger})^{-1}b$.
 
@@ -322,9 +363,9 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
 \caption{\label{alg.BiCGStab}BiCGStab}
 \end{algorithm}
 
-\subsubsection{\label{Leap frog}\index{leap frog}Leap frog integrator}
+\subsubsection{\label{sec:Leap frog}\index{leap frog}Leap frog integrator}
 
-In Sec.~\ref{hmc_scheme}, the basic idea is introduced. However, the implementation is slightly different.
+In Sec.~\ref{sec:hmc_scheme}, the basic idea is introduced. However, the implementation is slightly different.
 \begin{subequations}
 \begin{eqnarray}
 &U_{\mu}(0,x)=gauge(x),\;\;P_{\mu}(0,x)=\sum _{a}r_a(\mu,x)T_a\\
@@ -365,7 +406,7 @@ The pseudo code can be written as
 \caption{leap-frog integration}
 \end{algorithm}
 
-\subsubsection{\label{summaryOfHMC}A summary of HMC with pseudofermions}
+\subsubsection{\label{sec:summaryOfHMC}A summary of HMC with pseudofermions}
 
 Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\cite{latticeqcdbook2010}. The HMC with fermions can be divided into 6 steps.
 
@@ -384,9 +425,9 @@ Now, every part is ready. We summary the HMC following the Sec.8.2.3 in Ref.~\ci
 
 If the hybrid Monte Carlo can be implemented exactly, then, when \index{equilibrium}equilibrium is reached, $H$ should be unchanged, so, in some implementation, the Metropolis step can be ignored to archive a better accept rate. The parameter \verb"Metropolis" of parameter \verb"Updator" can be set to $1$ if Metropolis step is enabled and $0$ otherwise.
 
-\subsection{\label{optimized_hmc}Optimization of HMC}
+\subsection{\label{sec:optimized_hmc}Optimization of HMC}
 
-\subsubsection{\label{Omelyan}\index{Omelyan}Omelyan integrator}
+\subsubsection{\label{sec:Omelyan}\index{Omelyan}Omelyan integrator}
 
 The Omelyan integrator can be simply written as (c.f. Eq.~(2.80) of Ref.~\cite{latticeqcdbook2017})
 \begin{equation}
@@ -407,9 +448,9 @@ In practical, the $\lambda$ is a tunable parameter, and usually, $2\lambda = 0.3
 
 Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one trajectory, it is $1.5$ time faster~\cite{latticeqcdreview2009}, implying the number of sub-step needed is about $1/3$ of leap-frog.
 
-\subsubsection{\label{MultiStepUpdator}Multi-Step Updator}
+\subsubsection{\label{sec:MultiStepUpdator}Multi-Step Updator}
 
-\subsubsection{\label{CachedSolution}Cached solution}
+\subsubsection{\label{sec:CachedSolution}Cached solution}
 
 The pseudo fermion field is generate only once for a trajectory and is not changed. Also, the gauge field is changing slowly in one trajectory, this make the solutions for ${\bf x}_1=D^{-1}{\bf b}$ or ${\bf x}_2=\left(DD^{\dagger}\right)^{-1}{\bf b}$, where $D$ depends on $U$ and ${\bf b}$ is the pseudo fermion field, only change slowly.
 

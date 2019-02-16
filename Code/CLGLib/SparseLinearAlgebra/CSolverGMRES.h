@@ -29,8 +29,6 @@ public:
     virtual void ReleaseBuffers();
     virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart = NULL);
 
-    class CLatticeData* m_pOwner;
-
 protected:
 
     void RotateH(UINT uiK);

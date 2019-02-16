@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{latticeqcdbook2017}
 Michael~G$\rm\ddot{u}$nther Francesco~Knechtli and Michael Peardon.
@@ -40,6 +40,13 @@ S.~Ueda et. al.
 \newblock \href{http://dx.doi.org/10.1088/1742-6596/523/1/012046}{{Development
   of an object oriented lattice QCD code "Bridge++" on accelerators}}.
 \newblock {\em Journal of Physics: Conference Series}, 523:012046, 2014.
+
+\bibitem{luscher2005}
+Martin~L$\rm \ddot{u}$scher.
+\newblock
+  \href{http://dx.doi.org/10.1016/j.cpc.2004.10.004}{{Schwarz-preconditioned
+  HMC algorithm for two-flavor lattice QCD}}.
+\newblock {\em Computer Physics Communications}, 165:199--220, 2005.
 
 \bibitem{templates}
 R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,

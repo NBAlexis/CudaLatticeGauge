@@ -84,9 +84,17 @@
 
 \input "update/hmc.tex"
 
-\section{\label{update}Update scheme}
+\clearpage
 
-\input "update/solver.tex"
+\section{\label{solver}\index{solver}Sparse linear algebra solver}
+
+\input "SparseLinearAlgebra/solver.tex"
+
+\input "SparseLinearAlgebra/gmres.tex"
+
+\input "SparseLinearAlgebra/gcr.tex"
+
+\input "SparseLinearAlgebra/bicgstab.tex"
 
 \clearpage
 

@@ -417,6 +417,59 @@ TestSolverGMRES:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+TestSolverGCR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+	
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 25
+
+    Solver:
+
+        SolverName : CSLASolverGCR
+        SolverForFieldId : 2
+        MaxDim : 10
+        ## Iterate can be larger than MaxDim to truncate, but a restart seems much better
+        Iterate : 10
+        DiviationStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        ## For this solver, restart quickly is better
+        Restart : 50
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
 
 TestFermionUpdator:
 

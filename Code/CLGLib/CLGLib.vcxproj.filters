@@ -224,6 +224,9 @@
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -265,9 +268,18 @@
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
-    <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp" />
-    <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
-    <ClCompile Include="Update\Continous\CIntegrator.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGCR.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp">
+      <Filter>Data\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegrator.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

@@ -5,7 +5,7 @@
 
 -- Implement Meson correlator measure
 
--- Rewrite thread decompose
-
 -- Enable temprature
+
+-- Configuration save/load
 

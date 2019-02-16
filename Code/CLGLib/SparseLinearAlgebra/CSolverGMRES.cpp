@@ -2,7 +2,7 @@
 // FILENAME : CSolverBiCGStab.cpp
 // 
 // DESCRIPTION:
-// This is the class for all fields, gauge, fermion and spin fields are inherent from it
+// This is the class for GMRES Solver
 //
 // REVISION:
 //  [02/12/2019 nbale]
@@ -14,7 +14,7 @@ __BEGIN_NAMESPACE
 __CLGIMPLEMENT_CLASS(CSLASolverGMRES)
 
 CSLASolverGMRES::CSLASolverGMRES()
-    : m_pOwner(NULL) 
+    : CSLASolver()
     , m_uiReStart(3)
     , m_uiMaxDim(20)
     , m_fAccuracy(F(0.000001))
