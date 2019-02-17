@@ -448,10 +448,11 @@ void _kernelExpMultSU3Real(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
+        //deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
+        deviceSU3 expP = pMyDeviceData[linkIndex].QuickExp(a);
 
         expP.Mul(pU[linkIndex]);
-        expP.Norm();
+        //expP.Norm();
         pU[linkIndex] = expP;
     }
 }

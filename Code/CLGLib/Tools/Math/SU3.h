@@ -54,7 +54,7 @@ extern "C" {
 
         __device__ void DebugPrint() const
         {
-            printf("=%2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n %2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n %2.3f%s%2.3fi, %2.3f%s%2.3fi, %2.3f%s%2.3fi;\n",
+            printf("=%1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n %1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n %1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n",
                 m_me[0].x,
                 m_me[0].y < 0 ? "" : "+",
                 m_me[0].y,
@@ -331,7 +331,14 @@ extern "C" {
         }
 
         /**
-        * This is not called...
+        * This is not right left^{dagger}
+        * Let left = L1,L2,L3 right = R1, R2, R3
+        * li = sum _{spin}Li
+        * ri = sum _{spin}Ri
+        * res = 
+        *  l1^* r1, l2^* r1, l3^*r1
+        *  l1^* r2, l2^* r2, l3^*r2
+        *  l1^* r3, l2^* r3, l3^*r3
         */
         __device__ __inline__ static deviceSU3 makeSU3Contract(const deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
         {
@@ -349,34 +356,34 @@ extern "C" {
 
             ret.m_me[1] = _cuCaddf(
                 _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[1]),
-                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[1])
-                ),
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[1]),
-                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[1])
-                )
-            );
-
-            ret.m_me[2] = _cuCaddf(
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[2]),
-                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[2])
-                ),
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[2]),
-                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[2])
-                )
-            );
-
-            ret.m_me[3] = _cuCaddf(
-                _cuCaddf(
                     _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[0]),
                     _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[0])
                 ),
                 _cuCaddf(
                     _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[0]),
                     _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[0])
+                )
+            );
+
+            ret.m_me[2] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[0])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[0]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[0])
+                )
+            );
+
+            ret.m_me[3] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[1])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[1]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[1])
                 )
             );
 
@@ -393,34 +400,34 @@ extern "C" {
 
             ret.m_me[5] = _cuCaddf(
                 _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[2]),
-                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[2])
-                ),
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[2]),
-                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[2])
-                )
-            );
-
-            ret.m_me[6] = _cuCaddf(
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[0]),
-                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[0])
-                ),
-                _cuCaddf(
-                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[0]),
-                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[0])
-                )
-            );
-
-            ret.m_me[7] = _cuCaddf(
-                _cuCaddf(
                     _cuCmulf(_cuConjf(left.m_d[0].m_ve[2]), right.m_d[0].m_ve[1]),
                     _cuCmulf(_cuConjf(left.m_d[1].m_ve[2]), right.m_d[1].m_ve[1])
                 ),
                 _cuCaddf(
                     _cuCmulf(_cuConjf(left.m_d[2].m_ve[2]), right.m_d[2].m_ve[1]),
                     _cuCmulf(_cuConjf(left.m_d[3].m_ve[2]), right.m_d[3].m_ve[1])
+                )
+            );
+
+            ret.m_me[6] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[0]), right.m_d[0].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[0]), right.m_d[1].m_ve[2])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[0]), right.m_d[2].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[0]), right.m_d[3].m_ve[2])
+                )
+            );
+
+            ret.m_me[7] = _cuCaddf(
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[0].m_ve[1]), right.m_d[0].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[1].m_ve[1]), right.m_d[1].m_ve[2])
+                ),
+                _cuCaddf(
+                    _cuCmulf(_cuConjf(left.m_d[2].m_ve[1]), right.m_d[2].m_ve[2]),
+                    _cuCmulf(_cuConjf(left.m_d[3].m_ve[1]), right.m_d[3].m_ve[2])
                 )
             );
 
@@ -771,6 +778,25 @@ extern "C" {
             return tmp;
         }
 
+
+        __device__ __inline deviceSU3 Transpose() const 
+        {
+
+            deviceSU3 tmp;
+            tmp.m_me[0] = m_me[0];
+            tmp.m_me[1] = m_me[3];
+            tmp.m_me[2] = m_me[6];
+
+            tmp.m_me[3] = m_me[1];
+            tmp.m_me[4] = m_me[4];
+            tmp.m_me[5] = m_me[7];
+
+            tmp.m_me[6] = m_me[2];
+            tmp.m_me[7] = m_me[5];
+            tmp.m_me[8] = m_me[8];
+            return tmp;
+        }
+
         /**
         * A=(U-U^dagger)/2
         * res = A - tr(A)/3
@@ -938,6 +964,127 @@ extern "C" {
                 tmp.Norm();
             }
             return tmp;
+        }
+
+        /**
+        * For anti hermitian matrix only
+        * see SU3Norm.nb
+        */
+        __device__ __inline__ deviceSU3 QuickExp(Real a) const
+        {
+            Real aOver12 = __mul(a, F(0.08333333333333333333333333333333));
+            Real aOver6 = __mul(a, F(0.16666666666666666666666666666667));
+
+            //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/12
+            Real y1 = __mul(aOver12, __sub(m_me[0].y, m_me[4].y));
+            Real y2 = __mul(aOver12, __sub(m_me[0].y, m_me[8].y));
+            Real y3 = __mul(aOver6, __sub(m_me[4].y, m_me[8].y));
+
+            //l1 = y1^2 + (|m12|/4)^2
+            //l2 = y2^2 + (|m13|/4)^2
+            //l3 = y3^2 + (|m23|/2)^2
+            Real a2 = __mul(a, a);
+            Real aSqOver16 = __mul(a2, F(0.0625));
+            Real aSqOver4 = __mul(a2, F(0.25));
+            Real l1 = __add(__mul(y1, y1), __mul(aSqOver16, __cuCabsSqf(m_me[1])));
+            Real l2 = __add(__mul(y2, y2), __mul(aSqOver16, __cuCabsSqf(m_me[2])));
+            Real l3 = __add(__mul(y3, y3), __mul(aSqOver4, __cuCabsSqf(m_me[5])));
+
+            //dn1 = 1/ (1 + y1^2 +  (|m12|/4)^2)
+            Real dn1 = __rcp(__add(F(1.0), l1));
+            Real dn2 = __rcp(__add(F(1.0), l2));
+            Real dn3 = __rcp(__add(F(1.0), l3));
+
+            //dn1(1 - l1) = -l1 x dn1 + dn1
+            Real c1r = __ma(-l1, dn1, dn1);
+            Real c2r = __ma(-l2, dn2, dn2);
+            Real c3r = __ma(-l3, dn3, dn3);
+            Real c1i = __mul(F(2.0), __mul(dn1, y1));
+            Real c2i = __mul(F(2.0), __mul(dn2, y2));
+            Real c3i = __mul(F(2.0), __mul(dn3, y3));
+
+            Real halfa = __mul(F(0.5), a);
+            Real halfadn1 = __mul(halfa, dn1);
+            Real halfadn2 = __mul(halfa, dn2);
+            Real adn3 = __mul(a, dn3);
+            Real a1r = __mul(halfadn2, m_me[1].x);
+            Real a2r = __mul(halfadn2, m_me[2].x);
+            Real a3r = __mul(adn3, m_me[5].x);
+            Real a1i = __mul(halfadn1, m_me[1].y);
+            Real a2i = __mul(halfadn2, m_me[2].y);
+            Real a3i = __mul(adn3, m_me[5].y);
+
+            deviceSU3 midMatrix;
+            Real abs2a = __add(__mul(a2r, a2r), __mul(a2i, a2i));
+            Real abs2c = __sub(__mul(c2r, c2r), __mul(c2i, c2i));
+            //q1 = c2i - c2r c3i - c2i c3r
+            //q2 = c2r - c2i c3i + c2r c3r
+            Real q1 = __sub(c2i, __add(__mul(c2r, c3i), __mul(c2i, c3r)));
+            Real q2 = __sub(c2r, __sub(__mul(c2i, c3i), __mul(c2r, c3r)));
+            Real c2ic2r = __mul(F(2.0), __mul(c2i, c2r));
+            //(abs2c-abs2a c3r)+I(2 c2i c2r+abs2a c3i)
+            midMatrix.m_me[0] = _make_cuComplex(
+                __sub(abs2c, __mul(abs2a, c3r)),
+                __add(c2ic2r, __mul(abs2a, c3i))
+            );
+
+            //-a2i a3i-a2r a3r+I (a2r a3i-a2i a3r)
+            midMatrix.m_me[1] = _make_cuComplex(
+                -__add(__mul(a2i, a3i), __mul(a2r, a3r)),
+                 __sub(__mul(a2r, a3i), __mul(a2i, a3r))
+            );
+
+            //(a2r q2-a2i q1)+(a2i q2+a2r q1)I
+            Real a2rq1 = __mul(a2r, q1);
+            Real a2iq1 = __mul(a2i, q1);
+            Real a2rq2 = __mul(a2r, q2);
+            Real a2iq2 = __mul(a2i, q2);
+            midMatrix.m_me[2] = _make_cuComplex(
+                __sub(a2rq2, a2iq1),
+                __add(a2iq2, a2rq1)
+            );
+
+            midMatrix.m_me[3] = _make_cuComplex(midMatrix.m_me[1].x, -midMatrix.m_me[1].y);
+            midMatrix.m_me[4] = _make_cuComplex(c3r, c3i);
+
+            //a3i c2i+a3r c2r+I (-a3r c2i+a3i c2r)
+            Real a3ic2i = __mul(a3i, c2i);
+            Real a3rc2r = __mul(a3r, c2r);
+            Real a3rc2i = __mul(a3r, c2i);
+            Real a3ic2r = __mul(a3i, c2r);
+            midMatrix.m_me[5] = _make_cuComplex(
+                __add(a3ic2i, a3rc2r),
+                __sub(a3ic2r, a3rc2i)
+            );
+
+            //-a2r q2-a2i q1+(a2i q2-a2r q1)I
+            midMatrix.m_me[6] = _make_cuComplex(
+                -__add(a2rq2, a2iq1),
+                 __sub(a2iq2, a2rq1)
+            );
+
+            //a3i c2i-a3r c2r+I (a3r c2i+a3i c2r)
+            midMatrix.m_me[7] = _make_cuComplex(
+                __sub(a3ic2i, a3rc2r),
+                __add(a3rc2i, a3ic2r)
+            );
+
+            //-abs2a-2 c2i c2r c3i+ c3r abs2c+I(- c3i abs2c-2 c2i c2r c3r)
+            midMatrix.m_me[8] = _make_cuComplex(
+                __sub(__mul(c3r, abs2c), __add(abs2a, __mul(c3i, c2ic2r))),
+               -__add(__mul(c3i, abs2c), __mul(c3r, c2ic2r))
+            );
+
+            deviceSU3 u1Matrix = deviceSU3::makeSU3Id();
+            u1Matrix.m_me[0] = _make_cuComplex(c1r, c1i);
+            u1Matrix.m_me[4] = _make_cuComplex(c1r, -c1i);
+            u1Matrix.m_me[1] = _make_cuComplex(a1r, a1i);
+            u1Matrix.m_me[3] = _make_cuComplex(-a1r, a1i);
+
+            midMatrix.Mul(u1Matrix);
+            u1Matrix.Mul(midMatrix);
+
+            return u1Matrix;
         }
 
 #pragma endregion

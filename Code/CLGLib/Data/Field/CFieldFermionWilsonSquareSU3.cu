@@ -241,10 +241,6 @@ __global__ void _kernelDWilsonForceSU3(
 {
     intokernaldir;
 
-    //Real test_force = F(0.0);
-    //Real test_force2 = F(0.0);
-    fKai = F(2.0) * fKai;
-
     deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
 
@@ -262,31 +258,20 @@ __global__ void _kernelDWilsonForceSU3(
 
         deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
-
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
 
-        deviceSU3 forceOfThisLink = deviceSU3::makeSU3Zero();
-        for (UINT i = 0; i < 8; ++i)
-        {
-            //get Ti U(x,mu) phi(x+mu)
-            deviceWilsonVectorSU3 Ti_U_x_mu_phi = __SU3Generators[i].MulC(x_Gauge_element).MulWilsonVector(x_p_mu_Right);
-            //get U^{dagger}(x) Ti phi(x), 
-            deviceWilsonVectorSU3 Udagger_x_m_mu_Ti_phi = x_Gauge_element.DaggerMulC(__SU3Generators[i]).MulWilsonVector(x_Right);
+        deviceWilsonVectorSU3 right1(x_p_mu_Right);
+        right1.Sub(gammaMu.MulWilsonC(right1));
+        deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, right1);
 
-            //hopping terms
-            //(1-gamma _mu) Ti U(x,mu) phi(x+ mu) - (1+gamma _mu) U^{dagger}(x) Ti phi(x)
+        deviceWilsonVectorSU3 right2(x_Right);
+        right2.Add(gammaMu.MulWilsonC(right2));
+        mid.Add(deviceSU3::makeSU3Contract(right2, x_p_mu_Left));
 
-            //(1 - gamma_mu) Ti U(x,mu) phi(x+ mu)
-            _Complex res = x_Left.ConjugateDotC(Ti_U_x_mu_phi.SubC(gammaMu.MulWilsonC(Ti_U_x_mu_phi)));
+        deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
+        forceOfThisLink.Ta();
+        forceOfThisLink.MulReal(fKai);
 
-            //- (1 + gamma _mu)U^{dagger}(x) Ti phi(x)
-            res = _cuCsubf(res, x_p_mu_Left.ConjugateDotC(Udagger_x_m_mu_Ti_phi.AddC(gammaMu.MulWilsonC(Udagger_x_m_mu_Ti_phi))));
-
-            //2ik Im(...)
-            //test_force += res.y * fKai;
-            //test_force2 += res.x * fKai;
-            forceOfThisLink.Add(__SU3Generators[i].MulCompC(_make_cuComplex(F(0.0), res.y * fKai)));
-        }
         pForce[linkIndex].Add(forceOfThisLink);
         if (NULL != pCachedForce)
         {

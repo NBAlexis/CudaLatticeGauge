@@ -50,7 +50,7 @@ public:
             }
         }
 
-        //m_pGaugeField->ElementNormalize();
+        m_pGaugeField->ElementNormalize();
     }
 };
 

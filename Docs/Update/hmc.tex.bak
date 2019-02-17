@@ -218,7 +218,7 @@ The force of $\phi$ on $U$ is obtained as $\partial _{\omega_a}S_{pf}$. The resu
 &F=i\sum _a\dot{\omega}_aT_a=i\sum _a\left(-\partial _{\omega _a}\left(S_G[U_{\mu}(n)]+S_{pf}[U_{\mu}(n)]\right)\right)T_a=F_G+F_{pf}.\\
 &F_{pf}=i\sum _a\left(-\partial _{\omega _a}S_{pf}[U_{\mu}(n)]\right)T_a=-i\sum_aT^a \frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right) = -\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)^{\dagger}\left(\frac{\partial D}{\partial \omega _{\mu}^a}\hat{D}^{\dagger}+\hat{D}\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^a}\right)\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right).\\
-&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x\textcolor[rgb]{1,0,0}{+}\mu)_L,x_R} \right\} \\
+&\frac{\partial \hat{D}}{\partial {\omega _{\mu}^a}}=\left(\frac{\partial D}{\partial {\omega _{\mu}^a}}\right)_{x_L.x_R}=-i\kappa \left\{(1-\gamma _{\mu})T^aU_{\mu}(x)\delta_{x,x_L}\delta _{x,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x)T^a\delta _{x,(x\textcolor[rgb]{1,0,0}{+}\mu)_L}\delta _{x,x_R} \right\} \\
 &\hat{D}^{\dagger} = \gamma _5 \hat{D} \gamma _5, \;\;\frac{\partial D^{\dagger}}{\partial \omega _{\mu}^i}=\gamma _5 \frac{\partial D}{\partial \omega _{\mu}^a} \gamma _5\\
 \end{split}
 \end{equation}
@@ -244,7 +244,7 @@ and
 \begin{equation}
 \begin{split}
 &\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
-&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}(x_L)\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}(x_L)T^a\delta _{(x+\mu)_L,x_R}\right\}\\
+&\left(M_a\right)_{x_L,x_R}=\left\{(1-\gamma _{\mu})T^aU_{\mu}\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}T^a\delta _{(x+\mu)_L,x_R}\right\}\\
 &\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-2\kappa{\rm Im}\left[\left(\phi _1 ^{\dagger} M \phi _2\right)\right]\\
 \end{split}
 \end{equation}
@@ -261,7 +261,46 @@ Note that, $D$ is changing when integrating the Langevin equation.
 
 The last part is how to calculate $(\hat{D}\hat{D}^{\dagger})^{-1}$.
 
-The result above can be further simplified.
+\begin{itemize}
+  \item Anti-Hermitian traceless of the force
+\end{itemize}
+
+See from Eq.~(\ref{eq.hmc.force}), the force from the gauge field is an anti-Hermitian traceless matrix.
+
+The result above can be further simplified. Note that
+\begin{equation}
+\begin{split}
+&\phi_{L1}(n)=\phi _1(n),\;\;\phi _{R1}(n)=(1-\gamma _{\mu})\phi _2(n+\mu),\\
+&\phi_{L2}(n)=\phi _1(n+\mu),\;\;\phi _{R1}(n)=(1+\gamma _{\mu})\phi _2(n),\\
+\end{split}
+\end{equation}
+One have
+\begin{equation}
+\begin{split}
+&{\rm Im}\left[\phi _1^{\dagger}M\phi _2\right]_{\mu}^a(n)={\rm Im}\left[\phi _{L1}^{\dagger}T^aU_{\mu}(n)\phi _{R1}\right]-{\rm Im}\left[\phi _{L2}^{\dagger}U_{\mu}^{\dagger}(n)T^a\phi _{R2}\right]\\
+&={\rm Im}\left[\phi _{L1}^{\dagger}T^aU_{\mu}(n)\phi _{R1}\right]+{\rm Im}\left[\phi _{R2}^{\dagger}T^aU_{\mu}(n)\phi _{L2}\right]\\
+\end{split}
+\end{equation}
+
+For any vector
+\begin{equation}
+\begin{split}
+&{\rm Im}\left[L^{\dagger}TUR\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}L_{\alpha}^*T_{\alpha\beta}U_{\beta\rho}R_{\rho}\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}T_{\alpha\beta}U_{\beta\rho}R_{\rho}L_{\alpha}^*\right]={\rm Im}\left[{\rm tr}\left[TU(VL^{\dagger})\right]\right]\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&F^{pf}_{\mu}(n)=2i\kappa{\rm Im}\left[\phi _1^{\dagger}M\phi _2\right]_{\mu}(n)=\kappa \left(2i\sum _a{\rm Im}{\rm tr}\left[T^a U_{\mu}(n)\left(\phi _{R1}\phi _{L1}^{\dagger}+\phi _{R2}\phi _{L2}^{\dagger}\right)\right]T^a\right)\\
+&=\kappa \left.\left\{U_{\mu}(n)\left(\phi _{R1}\phi _{L1}^{\dagger}+\phi _{R2}\phi _{L2}^{\dagger}\right)\right\}\right|_{TA}
+\end{split}
+\end{equation}
+which is also an anti-Hermitian traceless matrix.
+
+\textbf{So, the momentum is always anti-Hermitian traceless.}.
+
+For anti-Hermitian traceless matrix $M$, the $\exp(M)$ can be simplified as Appendix. A of Ref.~\cite{luscher2005}. 
 
 \subsubsection{\label{sec:Solver_In_HMC}\index{solver}Solver in HMC}
 

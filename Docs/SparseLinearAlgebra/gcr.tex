@@ -29,7 +29,7 @@ which can be obtained order by order as
 \end{split}
 \end{equation}
 
-The algorithm with incomplete basis (also called ORTHOMIN) is
+There are GCR, ORTHOMIN, ORTHODIR. Both GCR and ORTHOMIN have oscillation (tested with random Gaussian pseudo fermion field and random gauge field), when iterating, sometimes, $\|{\bf p}^{i}\|\gg \|{\bf p}^{i-1}$, and $\|{\bf p}^{i+1}\|\ll \|{\bf p}^{i}$ and $\|{\bf p}^{i+2}\|\gg \|{\bf p}^{i+1}$, so we use ORTHODIR. The algorithm is
 \begin{algorithm}[H]
 \begin{algorithmic}
 \State ${\bf x}={\bf b}$
@@ -40,14 +40,14 @@ The algorithm with incomplete basis (also called ORTHOMIN) is
     \For{$j=0$ to $k-1$}
         \State $\alpha = (A{\bf p}_j)^*\cdot {\bf r} / \|A{\bf p}_j\|^2$
         \State ${\bf x}={\bf x}+\alpha {\bf p}_j$
-        \If {$\|{\bf b}-A{\bf x}\| < \epsilon$}
+        \State ${\bf r}={\bf r}-\alpha A{\bf p}_j$
+        \If {$\|{\bf r}\| < \epsilon$}
             \Return $\bf x$
             \Comment {Success}
-        \EndIf
-        \State ${\bf r}={\bf r}-\alpha A{\bf p}_j$
-        \State ${\bf p}_{j+1}={\bf r}$
+        \EndIf        
+        \State ${\bf p}_{j+1}=A{\bf p}_j$
         \For{$k=j-l+1$ to $j$}
-            \State $\beta = (A{\bf p}_k)^*\cdot {\bf r} / \|A{\bf p}_k\|^2$
+            \State $\beta = (A{\bf p}_k)^*\cdot A^2{\bf p}_j / \|A{\bf p}_k\|^2$
             \State ${\bf p}_{j+1}={\bf p}_{j+1}+\beta {\bf p}_k$
         \EndFor
     \EndFor
@@ -58,3 +58,5 @@ The algorithm with incomplete basis (also called ORTHOMIN) is
 \end{algorithmic}
 \caption{incomplete GCR with restart}
 \end{algorithm}
+
+\textbf{Note that, GCR is much slower than GMRES and BiCGStab. A strategy to improve the speed is to restart quickly.}

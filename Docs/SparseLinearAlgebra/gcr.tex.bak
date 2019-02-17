@@ -1,5 +1,7 @@
 \subsection{\label{sec:GCR}\index{GCR}GCR}
 
+This section we follow Ref.~\cite{sparselinearbook1}.
+
 The GCR solver is similar to GMRES in Sec.~\ref{sec:GMRES}, but the orthogonal basis are obtained in a different way. If one have a set of orthogonal basis such that
 \begin{equation}
 \begin{split}
@@ -27,4 +29,32 @@ which can be obtained order by order as
 \end{split}
 \end{equation}
 
-The algorithm with incomplete basis (ORTHOMIN) is
+The algorithm with incomplete basis (also called ORTHOMIN) is
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}={\bf b}$
+\Comment {Use ${\bf b}$ as trail and start}
+\For{$i=0$ to $r$}
+\Comment {restart r times}
+    \State{${\bf r}={\bf b}-A{\bf x}$, ${\bf p}_0 = {\bf r}$}
+    \For{$j=0$ to $k-1$}
+        \State $\alpha = (A{\bf p}_j)^*\cdot {\bf r} / \|A{\bf p}_j\|^2$
+        \State ${\bf x}={\bf x}+\alpha {\bf p}_j$
+        \If {$\|{\bf b}-A{\bf x}\| < \epsilon$}
+            \Return $\bf x$
+            \Comment {Success}
+        \EndIf
+        \State ${\bf r}={\bf r}-\alpha A{\bf p}_j$
+        \State ${\bf p}_{j+1}={\bf r}$
+        \For{$k=j-l+1$ to $j$}
+            \State $\beta = (A{\bf p}_k)^*\cdot {\bf r} / \|A{\bf p}_k\|^2$
+            \State ${\bf p}_{j+1}={\bf p}_{j+1}+\beta {\bf p}_k$
+        \EndFor
+    \EndFor
+\EndFor
+
+\Return $\bf x$
+\Comment {Failed with the closest result}
+\end{algorithmic}
+\caption{incomplete GCR with restart}
+\end{algorithm}

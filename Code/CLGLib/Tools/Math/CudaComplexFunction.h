@@ -31,7 +31,7 @@ extern "C" {
     */
     __device__ static __inline__ Real __cuCabsSqf(const _Complex& c)
     {
-        return c.x * c.x + c.y * c.y;
+        return __add(__mul(c.x, c.x), __mul(c.y, c.y));
     }
 
     /**
@@ -39,9 +39,9 @@ extern "C" {
     */
     __device__ static __inline__ _Complex __cuCpowerf(const _Complex& c, Real p)
     {
-        Real fArg = __cuCargf(c) * p;
+        Real fArg = __mul(__cuCargf(c), p);
         Real fAbs = _pow(_cuCabsf(c), p);
-        return _make_cuComplex(_cos(fArg) * fAbs, _sin(fArg) * fAbs);
+        return _make_cuComplex(__mul(_cos(fArg), fAbs), __mul(_sin(fArg), fAbs));
     }
 
     /**
@@ -72,34 +72,34 @@ extern "C" {
 
     __device__ static __inline__ _Complex cuCaddf_cr(const _Complex& x, Real y)
     {
-        return _make_cuComplex(_cuCrealf(x) + y, _cuCimagf(x));
+        return _make_cuComplex(__add(x.x, y), x.y);
     }
     __device__ static __inline__ _Complex cuCaddf_rc(Real y, const _Complex& x)
     {
-        return _make_cuComplex(_cuCrealf(x) + y, _cuCimagf(x));
+        return _make_cuComplex(__add(x.x, y), _cuCimagf(x));
     }
 
     __device__ static __inline__ _Complex cuCdivf_cr(const _Complex& x, Real y)
     {
-        return _make_cuComplex(_cuCrealf(x) / y, _cuCimagf(x) / y);
+        return _make_cuComplex(__div(x.x, y), __div(x.y, y));
     }
 
     __device__ static __inline__ _Complex cuCmulf_cr(const _Complex& x, Real y)
     {
-        return _make_cuComplex(_cuCrealf(x) * y, _cuCimagf(x) * y);
+        return _make_cuComplex(__mul(x.x, y), __mul(x.y, y));
     }
     __device__ static __inline__ _Complex cuCmulf_rc(Real y, const _Complex& x)
     {
-        return _make_cuComplex(_cuCrealf(x) * y, _cuCimagf(x) * y);
+        return _make_cuComplex(__mul(x.x, y), __mul(x.y, y));
     }
 
     __device__ static __inline__ _Complex cuCsubf_cr(const _Complex& x, Real y)
     {
-        return _make_cuComplex(_cuCrealf(x) - y, _cuCimagf(x));
+        return _make_cuComplex(__sub(x.x, y), x.y);
     }
     __device__ static __inline__ _Complex cuCsubf_rc(Real y, const _Complex& x)
     {
-        return _make_cuComplex(y - _cuCrealf(x), -_cuCimagf(x));
+        return _make_cuComplex(__sub(y, x.x), x.y);
     }
 
 #if defined(__cplusplus)
