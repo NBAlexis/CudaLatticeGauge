@@ -46,6 +46,7 @@ public:
     virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart = NULL) = 0;
 
     class CLatticeData* m_pOwner;
+    virtual CCString GetInfos(const CCString &tab) const { return tab + _T("##The solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n"); }
 
 protected:
 

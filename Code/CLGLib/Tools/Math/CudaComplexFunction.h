@@ -18,6 +18,19 @@ __BEGIN_NAMESPACE
 extern "C" {
 #endif /* __cplusplus */
 
+    __device__ static __inline__ _Complex __cuCaddf(const _Complex& a, const _Complex& b)
+    {
+        return _make_cuComplex(__add(a.x, b.x), __add(a.y, b.y));
+    }
+
+    __device__ static __inline__ _Complex __cuCmulf(const _Complex& a, const _Complex& b)
+    {
+        return _make_cuComplex(
+            __sub(__mul(a.x, b.x), __mul(a.y, b.y)),
+            __add(__mul(a.x, b.y), __mul(a.y, b.x))
+        );
+    }
+
     /**
     * arg(c)
     */

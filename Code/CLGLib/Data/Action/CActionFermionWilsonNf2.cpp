@@ -91,6 +91,13 @@ Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CF
     return res.x;
 }
 
+CCString CActionFermionWilsonNf2::GetInfos(const CCString &tab) const
+{
+    CCString sRet;
+    sRet = tab + _T("Name : CActionFermionWilsonNf2\n");
+    return sRet;
+}
+
 __END_NAMESPACE
 
 

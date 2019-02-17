@@ -309,6 +309,36 @@ void CFieldFermionWilsonSquareSU3::InitialField(EFieldInitialType eInitialType)
     _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, eInitialType);
 }
 
+void CFieldFermionWilsonSquareSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFieldType)
+{
+    if (eFieldType != EFFT_CLGBin)
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3::InitialFieldWithFile: Only support CLG Bin File\n"));
+        return;
+    }
+
+    UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * 24 * m_uiSiteCount);
+    deviceWilsonVectorSU3* readData = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
+    BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        FLOAT thisSite[24];
+        memcpy(thisSite, data + i * sizeof(FLOAT) * 24, sizeof(FLOAT) * 24);
+        for (UINT j = 0; j < 4; ++j)
+        {
+            for (UINT k = 0; k < 3; ++k)
+            {
+                readData[i].m_d[j].m_ve[k] = _make_cuComplex(
+                    static_cast<Real>(thisSite[2 * (j * 3 + k)]), 
+                    static_cast<Real>(thisSite[2 * (j * 3 + k) + 1]));
+            }
+        }
+    }
+    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyHostToDevice));
+    free(data);
+    free(readData);
+}
+
 void CFieldFermionWilsonSquareSU3::InitialOtherParameters(CParameters& params)
 {
     params.FetchValueReal(_T("Hopping"), m_fKai);
@@ -316,11 +346,7 @@ void CFieldFermionWilsonSquareSU3::InitialOtherParameters(CParameters& params)
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3: Kai is nearly 0, such that Dphi \approx phi! This will cause problem!\n"));
     }
-
-    if (m_fKai > F(0.12500001))
-    {
-        appGeneral(_T("CFieldFermionWilsonSquareSU3: Kai = 1/sqrt{2am+8}, note: this kai>1/8\n"));
-    }
+    CCommonData::m_fKai = m_fKai;
 }
 
 void CFieldFermionWilsonSquareSU3::DebugPrintMe() const
@@ -453,6 +479,10 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
     {
         pField = GetCopy();
         pCache->CacheField(CFieldCache::CachedInverseDDdaggerField, pField);
+    }
+    else
+    {
+        CopyTo(pField);
     }
     CFieldFermionWilsonSquareSU3* pCachedSU3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
     pCachedSU3->InverseDDdagger(pGauge);
@@ -646,6 +676,44 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     pDPhi->Return();
 
     return TRUE;
+}
+
+void CFieldFermionWilsonSquareSU3::SetKai(Real fKai)
+{
+    m_fKai = fKai;
+    CCommonData::m_fKai = fKai;
+}
+
+void CFieldFermionWilsonSquareSU3::SaveToFile(const CCString &fileName) const
+{
+    deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
+    UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 24);
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        FLOAT oneSite[24];
+        for (UINT j = 0; j < 4; ++j)
+        {
+            for (UINT k = 0; k < 3; ++k)
+            {
+                oneSite[2 * (j * 3 + k)] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].x);
+                oneSite[2 * (j * 3 + k) + 1] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].y);
+            }
+        }
+        memcpy(saveData + sizeof(FLOAT) * i * 24, oneSite, sizeof(FLOAT) * 24);
+    }
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    free(saveData);
+    free(toSave);
+}
+
+CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
+{
+    CCString sRet;
+    sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3\n");
+    sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
+    return sRet;
 }
 
 __END_NAMESPACE

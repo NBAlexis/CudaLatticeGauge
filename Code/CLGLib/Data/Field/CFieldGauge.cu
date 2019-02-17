@@ -17,8 +17,9 @@ __BEGIN_NAMESPACE
 /**
 * Initial SU3 Field with a value
 */
-__global__
-void _kernelCachePlaqIndex(SIndex *pDevicePlaqPerSite, SIndex *pDevicePlaqPerLink)
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelCachePlaqIndex(SIndex *pDevicePlaqPerSite, SIndex *pDevicePlaqPerLink)
 {
     intokernaldir;
 

@@ -26,6 +26,7 @@ public:
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
     virtual UBOOL CalculateForceOnGauge(UINT uiStep, const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple) const;
     virtual void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate);
+    virtual CCString GetInfos(const CCString &tab) const;
 
 protected:
 

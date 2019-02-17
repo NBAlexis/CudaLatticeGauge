@@ -22,7 +22,9 @@ __constant__ deviceSU3 __SU3Generators[9];
 /**
 * The construction is on device
 */
-__global__ void _kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, deviceSU3* pGenerator)
+__global__ void 
+_CLG_LAUNCH_BOUND_SINGLE
+_kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, deviceSU3* pGenerator)
 {
     gammaMatrixSet::CreateGammaMatrix(EGMS_Dirac, pDirac);
     gammaMatrixSet::CreateGammaMatrix(EGMS_Chiral, pChiral);
@@ -33,7 +35,9 @@ __global__ void _kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, d
     }
 }
 
-__global__ void _kernelDebugFunction()
+__global__ void 
+_CLG_LAUNCH_BOUND_SINGLE
+_kernelDebugFunction()
 {
     for (UINT i = 0; i < 9; ++i)
     {
@@ -53,7 +57,7 @@ __global__ void _kernelDebugFunction()
 
 struct complex_plus_for_thrust
 {
-    __host__ __device__ _Complex operator()(const _Complex &lhs, const _Complex &rhs) const { return _cuCaddf(lhs, rhs); }
+    __device__ _Complex operator()(const _Complex &lhs, const _Complex &rhs) const { return _cuCaddf(lhs, rhs); }
 };
 
 CCudaHelper::~CCudaHelper()
@@ -439,18 +443,50 @@ void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
 */
 _Complex CCudaHelper::ThreadBufferSum(_Complex * pDeviceBuffer)
 {
-    //checkCudaErrors(cudaDeviceSynchronize());
-    thrust::device_ptr<_Complex> dp(pDeviceBuffer);
-    thrust::device_vector<_Complex> d_x(dp, dp + m_uiThreadCount);
-    return thrust::reduce(d_x.begin(), d_x.end(), _make_cuComplex(0, 0), complex_plus_for_thrust());
+    checkCudaErrors(cudaDeviceSynchronize());
+    //thrust::device_ptr<_Complex> dp(pDeviceBuffer);
+    //thrust::device_vector<_Complex> d_x(dp, dp + m_uiThreadCount);
+    //return thrust::reduce(d_x.begin(), d_x.end(), _make_cuComplex(0, 0), complex_plus_for_thrust());
+
+    TArray<_Complex> sums;
+    for (UINT i = 0; i < ((m_uiThreadCount - 1) / _HC_SummationDecompose) + 1; ++i)
+    {
+        UINT end = appMin(_HC_SummationDecompose, m_uiThreadCount - i * _HC_SummationDecompose);
+        thrust::device_ptr<_Complex> dp(pDeviceBuffer + i * _HC_SummationDecompose);
+        thrust::device_vector<_Complex> d_x(dp, dp + end);
+        sums.AddItem(thrust::reduce(d_x.begin(), d_x.end(), _make_cuComplex(F(0.0), F(0.0)), complex_plus_for_thrust()));
+    }
+
+    _Complex ret = sums[0];
+    for (INT i = 1; i < sums.Num(); ++i)
+    {
+        ret = _cuCaddfHost(ret, sums[i]);
+    }
+    return ret;
 }
 
 Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
 {
-    //checkCudaErrors(cudaDeviceSynchronize());
-    thrust::device_ptr<Real> dp(pDeviceBuffer);
-    thrust::device_vector<Real> d_x(dp, dp + m_uiThreadCount);
-    return thrust::reduce(d_x.begin(), d_x.end(), (Real)0, thrust::plus<Real>());
+    checkCudaErrors(cudaDeviceSynchronize());
+    //thrust::device_ptr<Real> dp(pDeviceBuffer);
+    //thrust::device_vector<Real> d_x(dp, dp + m_uiThreadCount);
+    //return thrust::reduce(d_x.begin(), d_x.end(), F(0.0), thrust::plus<Real>());
+
+    TArray<Real> sums;
+    for (UINT i = 0; i < ((m_uiThreadCount - 1) / _HC_SummationDecompose) + 1; ++i)
+    {
+        UINT end = appMin(_HC_SummationDecompose, m_uiThreadCount - i * _HC_SummationDecompose);
+        thrust::device_ptr<Real> dp(pDeviceBuffer + i * _HC_SummationDecompose);
+        thrust::device_vector<Real> d_x(dp, dp + end);
+        sums.AddItem(thrust::reduce(d_x.begin(), d_x.end(), F(0.0), thrust::plus<Real>()));
+    }
+
+    Real ret = sums[0];
+    for (INT i = 1; i < sums.Num(); ++i)
+    {
+        ret += sums[i];
+    }
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

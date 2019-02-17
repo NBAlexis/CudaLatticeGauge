@@ -67,6 +67,8 @@ public:
 
     virtual void ElementNormalize();
     virtual _Complex Dot(const CField* other) const;
+    virtual void SaveToFile(const CCString &fileName) const;
+    virtual CCString GetInfos(const CCString &tab) const;
 
     deviceSU3* m_pDeviceData;
 

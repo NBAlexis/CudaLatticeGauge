@@ -62,11 +62,12 @@
 #define _HC_SUN (appGetCudaHelper()->m_ConstIntegers[ECI_SUN])
 #define _HC_PlaqutteCount (appGetCudaHelper()->m_ConstIntegers[ECI_PlaqutteCount])
 #define _HC_LinkCount (appGetCudaHelper()->m_ConstIntegers[ECI_LinkCount])
+#define _HC_ThreadConstraint (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaint])
+#define _HC_SummationDecompose (appGetCudaHelper()->m_ConstIntegers[ECI_SummationDecompose])
 
 #define _DC_Seed (_constIntegers[ECI_RandomSeed])
 #define _HC_Seed (appGetCudaHelper()->m_ConstIntegers[ECI_RandomSeed])
 #define _DC_ExpPrecision (_constIntegers[ECI_ExponentPrecision])
-#define _HC_ExpPrecision (appGetCudaHelper()->m_ConstIntegers[ECI_ExponentPrecision])
 
 #define _DC_ActionListL (_constIntegers[ECI_ActionListLength])
 #define _HC_ActionListL (appGetCudaHelper()->m_ConstIntegers[ECI_ActionListLength])

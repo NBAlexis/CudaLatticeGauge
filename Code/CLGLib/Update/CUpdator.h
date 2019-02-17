@@ -26,22 +26,27 @@ class CLGAPI CUpdator : public CBase
 {
 public:
 
-    CUpdator() : m_pOwner(NULL) { ; }
+    CUpdator() : m_pOwner(NULL), m_uiUpdateCall(0), m_bSaveConfigurations(FALSE) { ; }
     virtual UINT Update(UINT iSteps, UBOOL bMeasure) = 0;
     virtual Real CalculateEnergy() = 0;
 
     virtual EUpdatorType GetUpdatorType() const { return EUT_Max; }
     virtual void Initial(class CLatticeData* pOwner, const CParameters& params) = 0;
+    virtual CCString GetInfos(const CCString& sTab) const = 0;
 
     class CLatticeData* m_pOwner;
 
     void SetConfigurationCount(UINT uiCount) { m_iAcceptedConfigurationCount = uiCount; }
     UINT GetConfigurationCount() const { return m_iAcceptedConfigurationCount; }
     void OnConfigurationAccepted();
+    void SaveConfiguration(UINT uiUpdateStep);
 
 protected:
 
+    UINT m_uiUpdateCall;
     UINT m_iAcceptedConfigurationCount;
+    UBOOL m_bSaveConfigurations;
+    CCString m_sConfigurationPrefix;
 };
 
 __END_NAMESPACE

@@ -27,6 +27,16 @@
 //Note that single float is rarely the problem for accuracy, but much much faster
 #define _CLG_DOUBLEFLOAT 0
 
+//_CLG_USE_LAUNCH_BOUND = 0 or 1.
+//It's better to complie using the maximum thread per block of the device of the computer.
+#define _CLG_USE_LAUNCH_BOUND 1
+#define _CLG_LAUNCH_MAX_THREAD 1024
+
+//It is best to compile both 0 and 1 to see the difference.
+//Sometimes, the compiler will try to optimize the instractions but just make things slower.
+//Then, _CLG_USE_INTRINSC_FLOAT = 1 should be used to prevent compiler from 'optimize' it.
+#define _CLG_USE_INTRINSC_FLOAT 0
+
 #endif //#ifndef _CLGSETUP_H_
 
 //=============================================================================

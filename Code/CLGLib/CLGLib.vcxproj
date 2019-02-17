@@ -82,6 +82,7 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Update\CUpdator.cpp" />
     <CudaCompile Include="CLGLib_Private.cu">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -246,7 +247,7 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_61,sm_61;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
@@ -254,6 +255,8 @@
       <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <Emulation>false</Emulation>
       <FastMath>true</FastMath>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -283,7 +286,7 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_61,sm_61;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
@@ -291,6 +294,8 @@
       <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <Emulation>false</Emulation>
       <FastMath>true</FastMath>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -319,11 +324,14 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_61,sm_61;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <PtxAsOptionV>false</PtxAsOptionV>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -355,11 +363,14 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_60,sm_60;compute_61,sm_61;compute_70,sm_70;compute_75,sm_75;</CodeGeneration>
+      <CodeGeneration>compute_61,sm_61;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <PtxAsOptionV>false</PtxAsOptionV>
+      <Keep>true</Keep>
+      <KeepDir>$(IntDir)Cuda\</KeepDir>
     </CudaCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

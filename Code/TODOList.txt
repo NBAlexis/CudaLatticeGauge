@@ -1,11 +1,17 @@
 
+-- Cache index
+
+-- The cached solution is solved twice
+
+-- Add Launch Bound for all
+
 -- Implement BiCGStab with precondition
 
--- Implement GCR
+-- deflation
 
 -- Implement Meson correlator measure
 
 -- Enable temprature
 
--- Configuration save/load
+
 

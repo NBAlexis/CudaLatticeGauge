@@ -280,6 +280,9 @@
     <ClCompile Include="Update\Continous\CIntegrator.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
+    <ClCompile Include="Update\CUpdator.cpp">
+      <Filter>Update</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

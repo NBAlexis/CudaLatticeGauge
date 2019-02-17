@@ -108,6 +108,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("ThreadAutoDecompose"), 1);
 
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    m_InitialCache.constIntegers[ECI_ThreadConstaint] = deviceConstraints[0];
 
     if (0 == iVaules)
     {
@@ -182,7 +183,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("RandomSeed"), 1234567);
     m_InitialCache.constIntegers[ECI_RandomSeed] = static_cast<UINT>(iVaules);
 
-    __FetchIntWithDefault(_T("ExponentialPrecision"), 8);
+    __FetchIntWithDefault(_T("ExponentialPrecision"), 0);
     m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("ActionListLength"), 0);
@@ -196,6 +197,11 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 
     __FetchIntWithDefault(_T("MeasureListLength"), 0);
     m_InitialCache.constIntegers[ECI_MeasureListLength] = static_cast<UINT>(iVaules);
+
+    UINT iThreadConstraint = m_InitialCache.constIntegers[ECI_ThreadConstaint];
+    __FetchIntWithDefault(_T("SummationDecompose"), iThreadConstraint);
+    m_InitialCache.constIntegers[ECI_SummationDecompose] = static_cast<UINT>(iVaules);
+    appDetailed(_T("Summation decompose: %d\n"), m_InitialCache.constIntegers[ECI_SummationDecompose]);
 
     m_InitialCache.constIntegers[ECI_SUN] = 1;
     if (params.Exist(_T("Gauge")))
@@ -233,6 +239,8 @@ void CCLGLibManager::InitialRandom(CParameters &)
     appGeneral(_T("Create the %s random with seed:%d\n"), __ENUM_TO_STRING(ERandom, m_InitialCache.eR).c_str(), m_InitialCache.constIntegers[ECI_RandomSeed]);
 
     m_pCudaHelper->CopyRandomPointer(m_pLatticeData->m_pDeviceRandom);
+    m_pLatticeData->m_uiRandomType = static_cast<UINT>(m_InitialCache.eR);
+    m_pLatticeData->m_uiRandomSeed = m_InitialCache.constIntegers[ECI_RandomSeed];
 }
 
 void CCLGLibManager::CreateGaugeField(class CParameters& params)
@@ -382,6 +390,9 @@ void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
     checkCudaErrors(cudaFree(devicePtrIndex));
 
     appGeneral(_T("Create the index %s\n"), sValues.c_str());
+
+    m_pLatticeData->m_uiIndexType = static_cast<UINT>(eIT);
+    m_pLatticeData->m_uiBoundaryConditionType = static_cast<UINT>(eBC);
 }
 
 void CCLGLibManager::CreateActionList(class CParameters& params)

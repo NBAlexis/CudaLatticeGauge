@@ -31,6 +31,7 @@ __DEFINE_ENUM(EFieldInitialType,
 __DEFINE_ENUM(EFieldFileType,
     EFFT_BridgePPTXT,
     EFFT_BridgePPBin,
+    EFFT_CLGBin,
     
     EFFT_ForceDWORD = 0x7fffffff,
     )
@@ -89,7 +90,9 @@ public:
     //This is a * me
     virtual void ScalarMultply(const _Complex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
-    
+    virtual void SaveToFile(const CCString &fileName) const = 0;
+    virtual CCString GetInfos(const CCString &tab) const = 0;
+
 #pragma endregion
 
 #pragma region Other useful operators

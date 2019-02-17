@@ -27,8 +27,11 @@ public:
     void OnUpdatorFinished(UBOOL bMeasured);
     void GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);
+    CCString GetInfos(const CCString& sTab) const;
 
     class CRandom* m_pRandom;
+    UINT m_uiRandomType;
+    UINT m_uiRandomSeed;
 
     class CFieldGauge* m_pGaugeField;
     TArray<class CField*> m_pOtherFields; //for delete
@@ -51,9 +54,9 @@ public:
     //https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i
     class CRandom* m_pDeviceRandom;
     class CIndex* m_pDeviceIndex;
-
+    UINT m_uiIndexType;
+    UINT m_uiBoundaryConditionType;
     class CSLASolver* m_pFermionSolver;
-    
 
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.GetAt(byId); }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.GetAt(byId); }

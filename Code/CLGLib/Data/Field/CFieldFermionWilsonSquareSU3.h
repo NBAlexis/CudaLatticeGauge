@@ -31,6 +31,7 @@ public:
     }
 
     virtual void InitialField(EFieldInitialType eInitialType);
+    virtual void InitialFieldWithFile(const CCString&, EFieldFileType);
     virtual void InitialOtherParameters(CParameters& params);
     virtual void DebugPrintMe() const;
 
@@ -58,6 +59,9 @@ public:
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
     virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const;
+    virtual void SaveToFile(const CCString &fileName) const;
+    virtual CCString GetInfos(const CCString &tab) const;
+    void SetKai(Real fKai);
 
 protected:
 

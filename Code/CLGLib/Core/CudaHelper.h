@@ -87,6 +87,8 @@ enum EConstIntId
     ECI_FermionFieldLength,
     ECI_MeasureListLength,
     ECI_SUN,
+    ECI_ThreadConstaint,
+    ECI_SummationDecompose,
 
     ECI_ForceDWORD = 0x7fffffff,
 };

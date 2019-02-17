@@ -45,6 +45,7 @@ public:
     void UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera);
     void UpdateU(Real fStep);
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
+    virtual CCString GetInfos(const CCString& sTab) const = 0;
 
 protected:
 

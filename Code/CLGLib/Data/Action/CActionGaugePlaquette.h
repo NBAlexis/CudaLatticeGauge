@@ -28,6 +28,7 @@ public:
     virtual UBOOL CalculateForceOnGauge(UINT uiStep, const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple = NULL) const;
     virtual void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate);
     virtual void OnFinishTrajectory(UBOOL bAccepted);
+    virtual CCString GetInfos(const CCString &tab) const;
 
     void SetBeta(Real fBeta);
     Real GetEnergyPerPlaqutte() const;

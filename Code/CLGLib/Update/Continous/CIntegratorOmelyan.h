@@ -62,6 +62,8 @@ public:
         m_pGaugeField->ElementNormalize();
     }
 
+    virtual CCString GetInfos(const CCString& sTab) const;
+
 protected:
 
     Real m_f2Lambda;

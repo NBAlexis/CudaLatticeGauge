@@ -69,6 +69,20 @@ FORCEINLINE UINT appGetTimeStamp(void)
     return static_cast<UINT>(time(0));
 }
 
+FORCEINLINE void appGetTimeNow(TCHAR* outchar, UINT buffSize)
+{
+    time_t now = time(0);
+    ctime_s(outchar, buffSize, &now);
+}
+
+FORCEINLINE void appGetTimeUtc(TCHAR* outchar, UINT buffSize)
+{
+    time_t now = time(0);
+    tm gmtm;
+    gmtime_s(&gmtm, &now);
+    asctime_s(outchar, static_cast<size_t>(buffSize), &gmtm);
+}
+
 CLGAPI INT appUnicodeToAnsi(ANSICHAR* mbstr, const UNICHAR* wcstr, INT bufsize);
 CLGAPI INT appAnsiToUnicode(UNICHAR* wcstr, const ANSICHAR* mbstr, INT bufsize);
 

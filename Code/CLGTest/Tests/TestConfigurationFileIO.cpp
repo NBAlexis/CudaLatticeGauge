@@ -43,6 +43,48 @@ __REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPText);
 
 __REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin);
 
+UINT TestFileIOWithUpdate(CParameters& sParam)
+{
+    appGetLattice()->m_pUpdator->Update(10, TRUE);
+    return 0;
+}
+
+__REGIST_TEST(TestFileIOWithUpdate, FileIO, TestSaveConfigurationLowMode);
+
+UINT TestFileIOCLG(CParameters& sParam)
+{
+    UINT uiError = 0;
+    appGetLattice()->m_pGaugeField->SaveToFile(_T("testGauge.con"));
+    appGetLattice()->GetFieldById(2)->SaveToFile(_T("testFermion.con"));
+
+    CFieldGaugeSU3* pNewGauge = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
+    pNewGauge->InitialFieldWithFile(_T("testGauge.con"), EFFT_CLGBin);
+    CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
+    pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
+
+    _Complex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __rcp(_HC_Volumn * _HC_Dir));
+    pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
+    _Complex res2 = pNewFermion->Dot(pNewFermion);
+
+    appGeneral(_T("Gauge file test: expeted 3.0 + 0.0i, res = %f%s%f"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
+    appGeneral(_T("Fermion file test: expeted 0.0 + 0.0i, res = %f%s%f"), res2.x, res2.y > 0 ? _T("+") : _T(""), res2.y);
+
+    if (appAbs(res1.x - F(3.0)) > F(0.000001)
+     || appAbs(res1.y) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(res2.x) > F(0.000001)
+     || appAbs(res2.y) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    return uiError;
+}
+
+__REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration);
 
 //=============================================================================
 // END OF FILE

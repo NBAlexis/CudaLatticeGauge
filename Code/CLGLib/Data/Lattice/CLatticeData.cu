@@ -14,7 +14,9 @@ __BEGIN_NAMESPACE
 Real CLGAPI CCommonData::m_fBeta = 0;
 Real CLGAPI CCommonData::m_fKai = 0;
 
-__global__ void _kernelDeletePtrs(CIndex * pdeviceIndex)
+__global__ void 
+_CLG_LAUNCH_BOUND_SINGLE
+_kernelDeletePtrs(CIndex * pdeviceIndex)
 {
     if (NULL != pdeviceIndex)
     {
@@ -22,7 +24,9 @@ __global__ void _kernelDeletePtrs(CIndex * pdeviceIndex)
     }
 }
 
-__global__ void _kernelGetPlaqLengthCount(UINT* deviceData)
+__global__ void 
+_CLG_LAUNCH_BOUND_SINGLE
+_kernelGetPlaqLengthCount(UINT* deviceData)
 {
     UINT length, countPersite, countPerLink;
     __idx->_deviceGetPlaqutteCountLength(length, countPersite, countPerLink);
@@ -47,6 +51,11 @@ CLatticeData::CLatticeData()
     , m_pFermionSolver(NULL)
     , m_pMeasurements(NULL)
     , m_pFieldCache(NULL)
+
+    , m_uiRandomType(0)
+    , m_uiRandomSeed(0)
+    , m_uiIndexType(0)
+    , m_uiBoundaryConditionType(0)
 {
     m_pFieldCache = new CFieldCache();
 }
@@ -167,6 +176,53 @@ void CLatticeData::GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite,
     plaqLength = hostData[0];
     countPerSite = hostData[1];
     countPerLink = hostData[2];
+}
+
+CCString CLatticeData::GetInfos(const CCString& sTab) const
+{
+    CCString sRet;
+    CCString sInfos;
+    sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
+    sRet = sTab + sInfos;
+    sInfos.Format(_T("Random : %s\n"), __ENUM_TO_STRING(ERandom, static_cast<ERandom>(m_uiRandomType)).c_str());
+    sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("RandomSeed : %d\n"), m_uiRandomSeed);
+    sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("IndexType : %s\n"), __ENUM_TO_STRING(EIndexType, static_cast<EIndexType>(m_uiIndexType)).c_str());
+    sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("BoundaryCondition : %s\n"), __ENUM_TO_STRING(EBoundaryCondition, static_cast<EBoundaryCondition>(m_uiBoundaryConditionType)).c_str());
+    sRet = sRet + sTab + sInfos;
+    if (NULL != m_pFermionSolver)
+    {
+        sRet = sRet + sTab + _T("Solver : \n");
+        sRet = sRet + m_pFermionSolver->GetInfos(sTab + _T("    "));
+    }
+    if (NULL != m_pUpdator)
+    {
+        sRet = sRet + sTab + _T("Updator : \n");
+        sRet = sRet + m_pUpdator->GetInfos(sTab + _T("    "));
+    }
+
+    if (NULL != m_pGaugeField)
+    {
+        sRet = sRet + sTab + _T("GaugeField : \n");
+        sRet = sRet + m_pGaugeField->GetInfos(sTab + _T("    "));
+    }
+    sInfos.Format(_T("OtherFieldCount : %d\n"), m_pOtherFields.Num());
+    sRet = sRet + sTab + sInfos;
+    for (INT i = 0; i < m_pOtherFields.Num(); ++i)
+    {
+        sRet = sRet + sTab + _T("OtherField") + appIntToString(i) + _T(" : \n");
+        sRet = sRet + m_pOtherFields[i]->GetInfos(sTab + _T("    "));
+    }
+    sInfos.Format(_T("ActionCount : %d\n"), m_pActionList.Num());
+    sRet = sRet + sTab + sInfos;
+    for (INT i = 0; i < m_pActionList.Num(); ++i)
+    {
+        sRet = sRet + sTab + _T("OtherField") + appIntToString(i) + _T(" : \n");
+        sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
+    }
+    return sRet;
 }
 
 __END_NAMESPACE

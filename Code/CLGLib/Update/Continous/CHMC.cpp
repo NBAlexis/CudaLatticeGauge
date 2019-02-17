@@ -27,10 +27,22 @@ void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
     INT iMetro = 0;
     params.FetchValueINT(_T("Metropolis"), iMetro);
     m_bMetropolis = (0 != iMetro);
+
+    INT iSave = 0;
+    params.FetchValueINT(_T("SaveConfiguration"), iSave);
+    m_bSaveConfigurations = (0 != iSave);
+
+    if (m_bSaveConfigurations)
+    {
+        m_sConfigurationPrefix = _T("Untitled");
+        params.FetchStringValue(_T("ConfigurationFilePrefix"), m_sConfigurationPrefix);
+        m_sConfigurationPrefix.Format(_T("%s_%d"), m_sConfigurationPrefix.c_str(), appGetTimeStamp());
+    }
 }
 
 UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 {
+    ++m_uiUpdateCall;
     UBOOL bAccepted = FALSE;
 
     Real fEnergy = F(0.0);
@@ -81,6 +93,11 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         {
             m_pOwner->OnUpdatorConfigurationAccepted();
         }
+
+        if (m_bSaveConfigurations && (bAccepted || 0 == i))
+        {
+            SaveConfiguration(i + 1);
+        }
     }
 
     checkCudaErrors(cudaGetLastError());
@@ -89,6 +106,16 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 
     m_pOwner->OnUpdatorFinished(bMeasure);
     return m_iAcceptedConfigurationCount;
+}
+
+CCString CHMC::GetInfos(const CCString &tab) const
+{
+    CCString sRet;
+    sRet = sRet + tab + _T("Name : HMC\n");
+    sRet = sRet + tab + _T("Integrator : \n");
+    sRet = sRet + m_pIntegrator->GetInfos(tab + _T("    "));
+    sRet = sRet + tab + _T("Metropolis : ") + (m_bMetropolis ? _T("1\n") : _T("0\n"));
+    return sRet;
 }
 
 __END_NAMESPACE

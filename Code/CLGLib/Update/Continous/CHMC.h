@@ -28,6 +28,7 @@ public:
     class CIntegrator* m_pIntegrator;
 
     virtual void Initial(class CLatticeData* pOwner, const CParameters& params);
+    virtual CCString GetInfos(const CCString &tab) const;
 
 protected:
 

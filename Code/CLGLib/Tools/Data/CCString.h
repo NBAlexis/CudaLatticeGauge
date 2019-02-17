@@ -783,16 +783,20 @@ inline CCString appFloatToString(Real inFloata, INT inPrecesion = 4)
 
     INT inUp = (INT)(inFloata);
     Real infDown = (inFloata -   (Real)(inUp));
-    infDown = infDown < 0.0f ? (infDown * -1.f) : infDown;
-    for (INT i = 0; i < inPrecesion; ++i)
-        infDown *= 10.f;
+    infDown = infDown < F(0.0) ? (infDown * F(-1.0)) : infDown;
 
+    INT leftMost = 10;
+    for (INT i = 0; i < inPrecesion; ++i)
+    {
+        infDown *= F(10.0);
+        leftMost *= 10;
+    }
     INT inDown = (INT)infDown;
 
     CCString outStr;
     outStr = appIntToString(inUp);
     outStr += _T(".");
-    outStr += appIntToString(inDown);
+    outStr += appIntToString(inDown + leftMost).Right(inPrecesion);
 
     return outStr;
 }

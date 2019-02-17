@@ -96,6 +96,14 @@ Real CActionGaugePlaquette::GetEnergyPerPlaqutte() const
     return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 }
 
+CCString CActionGaugePlaquette::GetInfos(const CCString &tab) const
+{
+    CCString sRet;
+    sRet = tab + _T("Name : CActionGaugePlaquette\n");
+    sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+    return sRet;
+}
+
 __END_NAMESPACE
 
 

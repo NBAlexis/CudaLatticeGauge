@@ -30,6 +30,14 @@
 //#include <math_functions.h>
 //#include <device_functions.h>
 
+#if _CLG_USE_LAUNCH_BOUND
+#define _CLG_LAUNCH_BOUND  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD, 1)
+#else
+#define _CLG_LAUNCH_BOUND
+#endif
+
+#define _CLG_LAUNCH_BOUND_SINGLE __launch_bounds__(1, 1)
+
 #pragma endregion Includes
 
 

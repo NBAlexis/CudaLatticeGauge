@@ -50,6 +50,8 @@ public:
 
     virtual void OnFinishTrajectory(UBOOL /* bAccepted */) { ; }
 
+    virtual CCString GetInfos(const CCString &tab) const = 0;
+
     BYTE GetActionId() const { return m_byActionId; }
 
 protected:
