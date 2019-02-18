@@ -530,7 +530,6 @@ TestSolverGMRESLowMode:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 6
 
     FermionFieldCount : 1
 
@@ -541,7 +540,11 @@ TestSolverGMRESLowMode:
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Identity
+        FieldInitialType : EFIT_ReadFromFile
+		
+        GaugeFileType : EFFT_CLGBin
+
+        GaugeFileName : LowMode.con_
 		
 
     FermionField1:
@@ -552,7 +555,7 @@ TestSolverGMRESLowMode:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Hopping : 0.125
+        Hopping : 0.1355
 
         FieldId : 2
 
@@ -683,6 +686,84 @@ TestFermionUpdator:
         Restart : 10
         ## 0 is recommanded
         AbsoluteAccuracy : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 2.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestFermionUpdatorLargeScale:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [32, 32, 32, 16]
+    ThreadAutoDecompose : 0
+    ThreadDecompose : [8, 8, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 8
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.17
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 0.5
+        IntegratorStep : 50
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1355
+
+        FieldId : 2
+
+        PoolNumber : 15
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0000001
+        Restart : 10
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
 
     Action1:
    
@@ -855,8 +936,8 @@ TestSaveConfigurationLowMode:
     LatticeLength : [8, 8, 8, 8]
     LatticeIndex : EIndexType_Square
     LatticeBoundary : EBC_TorusSquare
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 8]
+    ##ThreadAutoDecompose : 0
+    ##ThreadDecompose : [8, 8, 8]
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
@@ -874,10 +955,10 @@ TestSaveConfigurationLowMode:
         
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 0.15
+        IntegratorStepLength : 1
         IntegratorStep : 8
-        SaveConfiguration : 1
-        ConfigurationFilePrefix : TestSaveConfiguration
+        ##SaveConfiguration : 1
+        ##ConfigurationFilePrefix : TestSaveConfiguration
 
     Gauge:
 	
@@ -885,8 +966,12 @@ TestSaveConfigurationLowMode:
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Identity
+        FieldInitialType : EFIT_ReadFromFile
 		
+        GaugeFileType : EFFT_CLGBin
+
+        GaugeFileName : LowMode.con_
+
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -906,9 +991,9 @@ TestSaveConfigurationLowMode:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MaxDim : 60
+        MaxDim : 100
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
+        Accuracy : 0.000000001
         Restart : 50
         ## 0 is recommanded
         AbsoluteAccuracy : 0

@@ -12,7 +12,8 @@
 
 __BEGIN_NAMESPACE
 
-__global__ void _kernelCreateIndex(void** devicePtr, deviceBoundaryCondition ** pBC, UINT* size, EIndexType eIT)
+__global__ void _CLG_LAUNCH_BOUND_SINGLE
+_kernelCreateIndex(void** devicePtr, deviceBoundaryCondition ** pBC, UINT* size, EIndexType eIT)
 {
     if (eIT == EIndexType_Square)
     {

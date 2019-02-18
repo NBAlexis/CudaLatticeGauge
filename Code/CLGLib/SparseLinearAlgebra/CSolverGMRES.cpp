@@ -143,9 +143,10 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         {
             pX->Axpy(m_y[j], m_lstVectors[j]);
         }
-        appParanoiac(_T("CSLASolverGMRES::Solve deviation: ---- restart ----. last divation = %f\n"), fLastDiavation);
+        
         if (fLastDiavation < m_fAccuracy * fBLength)
         {
+            appParanoiac(_T("CSLASolverGMRES::Solve deviation: ---- finished ----. last divation = %f\n"), fLastDiavation);
             pX->CopyTo(pFieldX);
 
             pX->Return();
@@ -158,6 +159,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             m_lstVectors.RemoveAll();
             return TRUE;
         }
+        appParanoiac(_T("CSLASolverGMRES::Solve deviation: ---- restart ----. last divation = %f\n"), fLastDiavation);
     }
 
     appParanoiac(_T("CSLASolverGMRES::Solve failed: last divation = %f\n"), fLastDiavation);

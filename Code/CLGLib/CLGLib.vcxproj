@@ -83,11 +83,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Update\CUpdator.cpp" />
-    <CudaCompile Include="CLGLib_Private.cu">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    <ClCompile Include="CLGLib_Private.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <FileType>Document</FileType>
-    </CudaCompile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRES.cpp" />
@@ -124,19 +126,6 @@
     <Text Include="FileTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Core\CudaCommon.cu">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-    </CudaCompile>
-    <CudaCompile Include="Core\CudaHelper_Test.cu">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-    </CudaCompile>
     <ClCompile Include="Data\Action\CActionGaugePlaquette.cpp">
       <FileType>Document</FileType>
     </ClCompile>
@@ -228,7 +217,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -252,11 +241,12 @@
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
       </AdditionalCompilerOptions>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <Emulation>false</Emulation>
       <FastMath>true</FastMath>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
+      <PtxAsOptionV>false</PtxAsOptionV>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -267,7 +257,7 @@
       <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
     </ClCompile>
@@ -291,11 +281,12 @@
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
       </AdditionalCompilerOptions>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <Emulation>false</Emulation>
       <FastMath>true</FastMath>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
+      <PtxAsOptionV>false</PtxAsOptionV>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -313,6 +304,8 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -328,7 +321,7 @@
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <PtxAsOptionV>false</PtxAsOptionV>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
@@ -348,8 +341,8 @@
       <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);_WINDLL</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>Z2InterfacePch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
@@ -367,7 +360,7 @@
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
-      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4515  -Xcompiler /wd4505  -Xcompiler /wd4201  -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
       <PtxAsOptionV>false</PtxAsOptionV>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>

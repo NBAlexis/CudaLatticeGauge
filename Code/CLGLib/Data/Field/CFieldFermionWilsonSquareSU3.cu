@@ -18,7 +18,8 @@ __CLGIMPLEMENT_CLASS(CFieldFermionWilsonSquareSU3)
 
 #pragma region Kernel
 
-__global__ void _kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pData)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 * __restrict__ pData)
 {
     intokernal;
 
@@ -42,7 +43,8 @@ __global__ void _kernelPrintFermionWilsonSquareSU3(const deviceWilsonVectorSU3 *
     );
 }
 
-__global__ void _kernelAxpyPlusFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyPlusFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther)
 {
@@ -50,7 +52,8 @@ __global__ void _kernelAxpyPlusFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex]);
 }
 
-__global__ void _kernelAxpyMinusFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyMinusFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther)
 {
@@ -58,7 +61,8 @@ __global__ void _kernelAxpyMinusFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Sub(pOther[uiSiteIndex]);
 }
 
-__global__ void _kernelAxpyComplexFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyComplexFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex a)
 {
@@ -66,7 +70,8 @@ __global__ void _kernelAxpyComplexFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
 }
 
-__global__ void _kernelAxpyRealFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyRealFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
 {
@@ -74,7 +79,8 @@ __global__ void _kernelAxpyRealFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulRealC(a));
 }
 
-__global__ void _kernelDotFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther, 
     _Complex * result)
@@ -83,7 +89,8 @@ __global__ void _kernelDotFermionWilsonSquareSU3(
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
 }
 
-__global__ void _kernelScalarMultiplyComplex(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiplyComplex(
     deviceWilsonVectorSU3 * pMe, 
     _Complex a)
 {
@@ -91,7 +98,8 @@ __global__ void _kernelScalarMultiplyComplex(
     pMe[uiSiteIndex].MulComp(a);
 }
 
-__global__ void _kernelScalarMultiplyReal(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiplyReal(
     deviceWilsonVectorSU3 * pMe, 
     Real a)
 {
@@ -102,7 +110,8 @@ __global__ void _kernelScalarMultiplyReal(
 /**
 *
 */
-__global__ void _kernelInitialFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 *pDevicePtr, 
     EFieldInitialType eInitialType)
 {
@@ -136,7 +145,8 @@ __global__ void _kernelInitialFermionWilsonSquareSU3(
 * If bDagger, it is gamma5, D, gamma5
 *
 */
-__global__ void _kernelDFermionWilsonSquareSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pGauge,
     deviceWilsonVectorSU3* pResultData,
@@ -229,7 +239,8 @@ __global__ void _kernelDFermionWilsonSquareSU3(
 * Therefor cannot make together with _kernelDWilson
 *
 */
-__global__ void _kernelDWilsonForceSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDWilsonForceSU3(
     const deviceWilsonVectorSU3* __restrict__ pInverseD,
     const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
     const deviceSU3* __restrict__ pGauge,
@@ -280,7 +291,8 @@ __global__ void _kernelDWilsonForceSU3(
     }
 }
 
-__global__ void _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDiracChiralGamma)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDiracChiralGamma)
 {
     intokernal;
     pDeviceData[uiSiteIndex] = (bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma]).MulWilsonC(pDeviceData[uiSiteIndex]);
@@ -484,8 +496,6 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
     {
         CopyTo(pField);
     }
-    CFieldFermionWilsonSquareSU3* pCachedSU3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
-    pCachedSU3->InverseDDdagger(pGauge);
 }
 
 //Kai should be part of D operator

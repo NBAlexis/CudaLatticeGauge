@@ -288,12 +288,6 @@
     <Text Include="FileTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Core\CudaHelper_Test.cu">
-      <Filter>Core</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Core\CudaCommon.cu">
-      <Filter>Core</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
@@ -324,6 +318,6 @@
     <CudaCompile Include="Data\Field\CFieldGauge.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="CLGLib_Private.cu" />
+    <CudaCompile Include="CLGLib_Private.cpp" />
   </ItemGroup>
 </Project>

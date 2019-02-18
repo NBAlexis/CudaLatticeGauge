@@ -32,8 +32,8 @@
 
 __BEGIN_NAMESPACE
 
-//For 4D cubic, this is 18
-#define kMaxPlaqutteCache (32)
+//For 4D cubic, this is 24
+#define kMaxPlaqutteCache (24)
 
 //EIT been used with Enum Integrator Type
 

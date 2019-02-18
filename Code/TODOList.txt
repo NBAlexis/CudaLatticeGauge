@@ -3,8 +3,6 @@
 
 -- The cached solution is solved twice
 
--- Add Launch Bound for all
-
 -- Implement BiCGStab with precondition
 
 -- deflation
@@ -12,6 +10,7 @@
 -- Implement Meson correlator measure
 
 -- Enable temprature
+
 
 
 

@@ -18,6 +18,15 @@ UINT TestFermionUpdator(CParameters& sParam)
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
 
+UINT TestFermionUpdatorL(CParameters& sParam)
+{
+    appGetLattice()->m_pUpdator->Update(1, TRUE);
+    return 0;
+}
+
+
+__REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale);
+
 
 //=============================================================================
 // END OF FILE

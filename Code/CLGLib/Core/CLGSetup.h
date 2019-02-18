@@ -29,7 +29,7 @@
 
 //_CLG_USE_LAUNCH_BOUND = 0 or 1.
 //It's better to complie using the maximum thread per block of the device of the computer.
-#define _CLG_USE_LAUNCH_BOUND 1
+#define _CLG_USE_LAUNCH_BOUND 0
 #define _CLG_LAUNCH_MAX_THREAD 1024
 
 //It is best to compile both 0 and 1 to see the difference.

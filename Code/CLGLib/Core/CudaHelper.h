@@ -13,9 +13,6 @@
 
 __BEGIN_NAMESPACE
 
-extern "C" bool runCudaTest(const int argc, const char **argv,
-    char *data, int2 *data_int2, unsigned int len);
-
 //((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
 //#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z))
 
@@ -113,6 +110,21 @@ public:
 
     static void DebugFunction();
 
+    static inline UINT GetReduceDim(UINT uiLength)
+    {
+        UINT iRet = 0;
+        while ((1U << iRet) < uiLength)
+        {
+            ++iRet;
+        }
+        return iRet;
+    }
+
+    static Real ReduceReal(Real* deviceBuffer, UINT uiLength);
+    Real ReduceRealWithThreadCount(Real* deviceBuffer);
+    static _Complex ReduceComplex(_Complex* deviceBuffer, UINT uiLength);
+    _Complex ReduceComplexWithThreadCount(_Complex* deviceBuffer);
+
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
     void SetDeviceIndex(class CIndex** ppIdx) const;
@@ -144,7 +156,10 @@ public:
     //struct SIndex* m_pIndexBuffer;
     _Complex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
+
+    //thread per grid ( = volumn)
     UINT m_uiThreadCount;
+    UINT m_uiReducePower;
 
     #pragma endregion
 };

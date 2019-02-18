@@ -45,7 +45,7 @@ __REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin);
 
 UINT TestFileIOWithUpdate(CParameters& sParam)
 {
-    appGetLattice()->m_pUpdator->Update(10, TRUE);
+    appGetLattice()->m_pUpdator->Update(150, TRUE);
     return 0;
 }
 
@@ -62,7 +62,7 @@ UINT TestFileIOCLG(CParameters& sParam)
     CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
-    _Complex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __rcp(_HC_Volumn * _HC_Dir));
+    _Complex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volumn * _HC_Dir));
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
     _Complex res2 = pNewFermion->Dot(pNewFermion);
 

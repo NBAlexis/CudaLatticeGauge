@@ -29,8 +29,8 @@ __CLGIMPLEMENT_CLASS(CFieldGaugeSU3)
 /**
 * Initial SU3 Field with a value
 */
-__global__
-void _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
 {
     deviceSU3 id = deviceSU3::makeSU3Id();
     deviceSU3 zero = deviceSU3::makeSU3Zero();
@@ -74,8 +74,8 @@ void _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialTy
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Complex a)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Complex a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -84,8 +84,8 @@ void _kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Co
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, Real a)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, Real a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -94,8 +94,8 @@ void _kernelAxpySU3Real(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, 
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelAxpyPlusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyPlusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
 {
     gaugeSU3KernelFuncionStart
 
@@ -104,8 +104,8 @@ void _kernelAxpyPlusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelAxpyMinusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyMinusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
 {
     gaugeSU3KernelFuncionStart
 
@@ -114,8 +114,8 @@ void _kernelAxpyMinusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -124,8 +124,8 @@ void _kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
     gaugeSU3KernelFuncionEnd
 }
 
-__global__
-void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -137,7 +137,8 @@ void _kernelScalarMultiplySU3Real(deviceSU3 *pDevicePtr, Real a)
 /**
 * debug kernel
 */
-__global__ void _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
 {
     gaugeSU3KernelFuncionStart;
 
@@ -160,8 +161,8 @@ __global__ void _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
 /**
 * calculate Staple and Force At Site
 */
-__global__
-void _kernelStapleAtSiteSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelStapleAtSiteSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     deviceSU3 *pStapleData, //can be NULL
     deviceSU3 *pForceData,
@@ -227,8 +228,8 @@ void _kernelStapleAtSiteSU3(
     }
 }
 
-__global__
-void _kernelStapleAtSiteSU3CacheIndex(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelStapleAtSiteSU3CacheIndex(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
@@ -293,8 +294,8 @@ void _kernelStapleAtSiteSU3CacheIndex(
 /**
 * calculate Staple and eneregy At Site
 */
-__global__
-void _kernelPlaqutteEnergySU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergySU3(
     const deviceSU3 * __restrict__ pDeviceData,
     Real betaOverN,
     Real* results)
@@ -344,8 +345,8 @@ void _kernelPlaqutteEnergySU3(
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
 
-__global__
-void _kernelPlaqutteEnergySU3CacheIndex(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergySU3CacheIndex(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
@@ -392,8 +393,8 @@ void _kernelPlaqutteEnergySU3CacheIndex(
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
 
-__global__
-void _kernelPlaqutteEnergyUsingStableSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergyUsingStableSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     const deviceSU3 * __restrict__ pStableData,
     Real betaOverN,
@@ -418,8 +419,8 @@ void _kernelPlaqutteEnergyUsingStableSU3(
 /**
 *
 */
-__global__
-void _kernelExpMultSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelExpMultSU3(
     const deviceSU3 * __restrict__ pMyDeviceData,
     _Complex a,
     deviceSU3 *pU)
@@ -437,8 +438,8 @@ void _kernelExpMultSU3(
     }
 }
 
-__global__
-void _kernelExpMultSU3Real(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelExpMultSU3Real(
     const deviceSU3 * __restrict__ pMyDeviceData,
     Real a,
     deviceSU3 *pU)
@@ -461,8 +462,8 @@ void _kernelExpMultSU3Real(
 /**
 * Trace (P^2)
 */
-__global__ 
-void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, Real* results)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, Real* results)
 {
     intokernaldir;
 
@@ -477,8 +478,8 @@ void _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceDa
 }
 
 
-__global__
-void _kernelNormalizeSU3(deviceSU3 * pMyDeviceData)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelNormalizeSU3(deviceSU3 * pMyDeviceData)
 {
     intokernaldir;
 
@@ -489,8 +490,8 @@ void _kernelNormalizeSU3(deviceSU3 * pMyDeviceData)
     }
 }
 
-__global__
-void _kernelDotSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotSU3(
     const deviceSU3 * __restrict__ pMyDeviceData, 
     const deviceSU3 * __restrict__ pOtherDeviceData,
     _Complex* result)
@@ -507,8 +508,8 @@ void _kernelDotSU3(
     result[uiSiteIndex] = resThisThread;
 }
 
-__global__
-void _kernelSetConfigurationSU3(
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSetConfigurationSU3(
     deviceSU3* pDeviceData,
     const Real* __restrict__ pRealData)
 {

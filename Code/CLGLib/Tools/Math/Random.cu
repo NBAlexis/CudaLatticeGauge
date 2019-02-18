@@ -9,15 +9,10 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
-///* include MTGP host helper functions */
-//#include <curand_mtgp32_host.h>
-///* include MTGP pre-computed parameter sets */
-//#include <curand_mtgp32dc_p_11213.h>
-
 __BEGIN_NAMESPACE
 
-__global__ 
-void _kernalAllocateSeedTable(UINT* pDevicePtr)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalAllocateSeedTable(UINT* pDevicePtr)
 {
     intokernaldir;
 
@@ -30,8 +25,8 @@ void _kernalAllocateSeedTable(UINT* pDevicePtr)
     }
 }
 
-__global__
-void _kernalInitialXORWOW(curandState * states)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalInitialXORWOW(curandState * states)
 {
     UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
 
@@ -44,8 +39,8 @@ void _kernalInitialXORWOW(curandState * states)
     }
 }
 
-__global__
-void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 {
     UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
     UINT uiSeed = _DC_Seed;
@@ -57,8 +52,8 @@ void _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
     }
 }
 
-__global__
-void _kernalInitialMRG(curandStateMRG32k3a  * states)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalInitialMRG(curandStateMRG32k3a  * states)
 {
     UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
     UINT uiSeed = _DC_Seed;
@@ -70,15 +65,15 @@ void _kernalInitialMRG(curandStateMRG32k3a  * states)
     }
 }
 
-__global__
-void _kernalInitialSobel32(curandStateSobol32* states, curandDirectionVectors32_t* dirs)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalInitialSobel32(curandStateSobol32* states, curandDirectionVectors32_t* dirs)
 {
     intokernal;
     curand_init(dirs[uiSiteIndex], _DC_Seed % 16, &states[uiSiteIndex]);
 }
 
-__global__
-void _kernalInitialScrambledSobel32(curandStateScrambledSobol32* states, UINT* consts, curandDirectionVectors32_t* dirs)
+__global__ void _CLG_LAUNCH_BOUND
+_kernalInitialScrambledSobel32(curandStateScrambledSobol32* states, UINT* consts, curandDirectionVectors32_t* dirs)
 {
     intokernal;
     curand_init(dirs[uiSiteIndex], consts[uiSiteIndex], _DC_Seed % __SOBEL_OFFSET_MAX, &states[uiSiteIndex]);
@@ -250,7 +245,8 @@ Real GetRandomReal()
 
 #pragma region Test
 
-__global__ void _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithreadCount)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithreadCount)
 {
     __shared__ UINT sData1[1024];
     __shared__ UINT sData2[1024];
@@ -287,7 +283,8 @@ __global__ void _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLo
     }
 }
 
-__global__ void _kernelMCE(Real* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithreadCount)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMCE(Real* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithreadCount)
 {
     __shared__ Real sData1[1024];
     __shared__ Real sData2[1024];

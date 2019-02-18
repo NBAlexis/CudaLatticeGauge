@@ -138,15 +138,15 @@ extern "C" {
         __device__ __inline__ static deviceSU3 makeSU3Random(UINT fatIndex)
         {
             deviceSU3 ret;
-            ret.m_me[0] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[1] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[2] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[3] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[4] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[5] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[6] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[7] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
-            ret.m_me[8] = _make_cuComplex(__sub(_deviceRandomF(fatIndex), F(0.5)), __sub(_deviceRandomF(fatIndex), F(0.5)));
+            ret.m_me[0] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[1] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[2] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[3] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[4] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[5] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[6] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[7] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
+            ret.m_me[8] = _make_cuComplex(_deviceRandomF(fatIndex) - F(0.5), _deviceRandomF(fatIndex) - F(0.5));
             ret.Norm();
             return ret;
         }
@@ -175,15 +175,15 @@ extern "C" {
 
             deviceSU3 ret;
             //we directly generate i ra Ta instead of ra Ta
-            ret.m_me[0] = _make_cuComplex(F(0.0), __ma(r8, InvSqrt3, r3));
+            ret.m_me[0] = _make_cuComplex(F(0.0), r8 * InvSqrt3 + r3);
             ret.m_me[1] = _make_cuComplex(r2, r1);
             ret.m_me[2] = _make_cuComplex(r5, r4);
             ret.m_me[3] = _make_cuComplex(-r2, r1);
-            ret.m_me[4] = _make_cuComplex(F(0.0), __ma(r8, InvSqrt3, -r3));
+            ret.m_me[4] = _make_cuComplex(F(0.0), r8 * InvSqrt3 - r3);
             ret.m_me[5] = _make_cuComplex(r7, r6);
             ret.m_me[6] = _make_cuComplex(-r5, r4);
             ret.m_me[7] = _make_cuComplex(-r7, r6);
-            ret.m_me[8] = _make_cuComplex(F(0.0), __mul(-r8, InvSqrt3_2));
+            ret.m_me[8] = _make_cuComplex(F(0.0), -r8 * InvSqrt3_2);
 
             //ret.m_me[0] = _make_cuComplex(r3 + r8 * InvSqrt3, F(0.0));
             //ret.m_me[1] = _make_cuComplex(r1, -r2);
@@ -200,15 +200,15 @@ extern "C" {
         __device__ __inline__ static deviceSU3 makeSU3SumGenerator(Real fDivide)
         {
             deviceSU3 ret;
-            ret.m_me[0] = _make_cuComplex(__ma(fDivide, InvSqrt3, fDivide), F(0.0));
+            ret.m_me[0] = _make_cuComplex(fDivide * InvSqrt3 + fDivide, F(0.0));
             ret.m_me[1] = _make_cuComplex(fDivide, -fDivide);
             ret.m_me[2] = _make_cuComplex(fDivide, -fDivide);
             ret.m_me[3] = _make_cuComplex(fDivide, fDivide);
-            ret.m_me[4] = _make_cuComplex(__ma(fDivide, InvSqrt3, -fDivide), F(0.0));
+            ret.m_me[4] = _make_cuComplex(fDivide * InvSqrt3 - fDivide, F(0.0));
             ret.m_me[5] = _make_cuComplex(fDivide, -fDivide);
             ret.m_me[6] = _make_cuComplex(fDivide, fDivide);
             ret.m_me[7] = _make_cuComplex(fDivide, fDivide);
-            ret.m_me[8] = _make_cuComplex(__mul(-fDivide, InvSqrt3_2), F(0.0));
+            ret.m_me[8] = _make_cuComplex(-fDivide * InvSqrt3_2, F(0.0));
             return ret;
         }
 
@@ -702,12 +702,12 @@ extern "C" {
         */
         __device__ __inline__ Real ReTr() const
         {
-            return __add(__add(m_me[0].x, m_me[4].x), m_me[8].x);
+            return m_me[0].x + m_me[4].x + m_me[8].x;
         }
 
         __device__ __inline__ Real ImTr() const
         {
-            return __add(__add(m_me[0].y, m_me[4].y), m_me[8].y);
+            return m_me[0].y + m_me[4].y + m_me[8].y;
         }
 
         __device__ __inline__ void Re()
@@ -824,10 +824,10 @@ extern "C" {
             m_me[5] = _make_cuComplex(F(0.5) * _cuCrealf(new5), F(0.5) * _cuCimagf(new5));
             m_me[7] = _make_cuComplex(-_cuCrealf(m_me[5]), _cuCimagf(m_me[5]));
 
-            Real fImgTr = __div(__add(m_me[0].y, __add(m_me[4].y, m_me[8].y)), F(3.0));
-            m_me[0] = _make_cuComplex(F(0.0), __sub(m_me[0].y, fImgTr));
-            m_me[4] = _make_cuComplex(F(0.0), __sub(m_me[4].y, fImgTr));
-            m_me[8] = _make_cuComplex(F(0.0), __sub(m_me[8].y, fImgTr));
+            Real fImgTr = __div(m_me[0].y + m_me[4].y + m_me[8].y, F(3.0));
+            m_me[0] = _make_cuComplex(F(0.0), m_me[0].y - fImgTr);
+            m_me[4] = _make_cuComplex(F(0.0), m_me[4].y - fImgTr);
+            m_me[8] = _make_cuComplex(F(0.0), m_me[8].y - fImgTr);
         }
 
         /**
@@ -864,7 +864,7 @@ extern "C" {
         */
         __device__ __inline__ void Norm()
         {
-            Real fDiv1 = __rcp(_sqrt(__cuCabsSqf(m_me[0]) + __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2])));
+            Real fDiv1 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[0]) + __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2])));
             m_me[0] = cuCmulf_cr(m_me[0], fDiv1);
             m_me[1] = cuCmulf_cr(m_me[1], fDiv1);
             m_me[2] = cuCmulf_cr(m_me[2], fDiv1);
@@ -880,7 +880,7 @@ extern "C" {
             m_me[3] = _cuCsubf(m_me[3], _cuCmulf(sp1, m_me[0]));
             m_me[4] = _cuCsubf(m_me[4], _cuCmulf(sp1, m_me[1]));
             m_me[5] = _cuCsubf(m_me[5], _cuCmulf(sp1, m_me[2]));
-            Real fDiv2 = __rcp(_sqrt(__cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5])));
+            Real fDiv2 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5])));
             m_me[3] = cuCmulf_cr(m_me[3], fDiv2);
             m_me[4] = cuCmulf_cr(m_me[4], fDiv2);
             m_me[5] = cuCmulf_cr(m_me[5], fDiv2);
@@ -909,7 +909,7 @@ extern "C" {
             */
             for (UINT i = 0; i < uiPrecision; ++i)
             {
-                Real exp_factor = __rcp(uiPrecision - i);
+                Real exp_factor = __div(F(1.0), uiPrecision - i);
                 _Complex alpha = cuCmulf_cr(a, exp_factor);
                 //aU/(N-i) = this x alpha
                 deviceSU3 aUoN = MulCompC(alpha);
@@ -972,107 +972,107 @@ extern "C" {
         */
         __device__ __inline__ deviceSU3 QuickExp(Real a) const
         {
-            Real aOver12 = __mul(a, F(0.08333333333333333333333333333333));
-            Real aOver6 = __mul(a, F(0.16666666666666666666666666666667));
+            Real aOver12 = a * F(0.08333333333333333333333333333333);
+            Real aOver6 = a * F(0.16666666666666666666666666666667);
 
             //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/12
-            Real y1 = __mul(aOver12, __sub(m_me[0].y, m_me[4].y));
-            Real y2 = __mul(aOver12, __sub(m_me[0].y, m_me[8].y));
-            Real y3 = __mul(aOver6, __sub(m_me[4].y, m_me[8].y));
+            Real y1 = aOver12 * (m_me[0].y - m_me[4].y);
+            Real y2 = aOver12 * (m_me[0].y - m_me[8].y);
+            Real y3 = aOver6 * (m_me[4].y - m_me[8].y);
 
             //l1 = y1^2 + (|m12|/4)^2
             //l2 = y2^2 + (|m13|/4)^2
             //l3 = y3^2 + (|m23|/2)^2
-            Real a2 = __mul(a, a);
-            Real aSqOver16 = __mul(a2, F(0.0625));
-            Real aSqOver4 = __mul(a2, F(0.25));
-            Real l1 = __add(__mul(y1, y1), __mul(aSqOver16, __cuCabsSqf(m_me[1])));
-            Real l2 = __add(__mul(y2, y2), __mul(aSqOver16, __cuCabsSqf(m_me[2])));
-            Real l3 = __add(__mul(y3, y3), __mul(aSqOver4, __cuCabsSqf(m_me[5])));
+            Real a2 = a * a;
+            Real aSqOver16 = a2 * F(0.0625);
+            Real aSqOver4 = a2 * F(0.25);
+            Real l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]); 
+            Real l2 = y2 * y2 + aSqOver16 * __cuCabsSqf(m_me[2]);
+            Real l3 = y2 * y2 + aSqOver4 * __cuCabsSqf(m_me[5]);
 
             //dn1 = 1/ (1 + y1^2 +  (|m12|/4)^2)
-            Real dn1 = __rcp(__add(F(1.0), l1));
-            Real dn2 = __rcp(__add(F(1.0), l2));
-            Real dn3 = __rcp(__add(F(1.0), l3));
+            Real dn1 = __div(F(1.0), F(1.0) + l1);
+            Real dn2 = __div(F(1.0), F(1.0) + l2);
+            Real dn3 = __div(F(1.0), F(1.0) + l3);
 
             //dn1(1 - l1) = -l1 x dn1 + dn1
-            Real c1r = __ma(-l1, dn1, dn1);
-            Real c2r = __ma(-l2, dn2, dn2);
-            Real c3r = __ma(-l3, dn3, dn3);
-            Real c1i = __mul(F(2.0), __mul(dn1, y1));
-            Real c2i = __mul(F(2.0), __mul(dn2, y2));
-            Real c3i = __mul(F(2.0), __mul(dn3, y3));
+            Real c1r = dn1 - l1 * dn1;
+            Real c2r = dn2 - l2 * dn2;
+            Real c3r = dn3 - l3 * dn3;
+            Real c1i = F(2.0) * y1 * dn1;
+            Real c2i = F(2.0) * y2 * dn2;
+            Real c3i = F(2.0) * y3 * dn3;
 
-            Real halfa = __mul(F(0.5), a);
-            Real halfadn1 = __mul(halfa, dn1);
-            Real halfadn2 = __mul(halfa, dn2);
-            Real adn3 = __mul(a, dn3);
-            Real a1r = __mul(halfadn2, m_me[1].x);
-            Real a2r = __mul(halfadn2, m_me[2].x);
-            Real a3r = __mul(adn3, m_me[5].x);
-            Real a1i = __mul(halfadn1, m_me[1].y);
-            Real a2i = __mul(halfadn2, m_me[2].y);
-            Real a3i = __mul(adn3, m_me[5].y);
+            Real halfa = F(0.5) * a;
+            Real halfadn1 = halfa * dn1;
+            Real halfadn2 = halfa * dn2;
+            Real adn3 = a * dn3;
+            Real a1r = halfadn1 * m_me[1].x;
+            Real a2r = halfadn2 * m_me[2].x;
+            Real a3r = adn3 * m_me[5].x;
+            Real a1i = halfadn1 * m_me[1].y;
+            Real a2i = halfadn2 * m_me[2].y;
+            Real a3i = adn3 * m_me[5].y;
 
             deviceSU3 midMatrix;
-            Real abs2a = __add(__mul(a2r, a2r), __mul(a2i, a2i));
-            Real abs2c = __sub(__mul(c2r, c2r), __mul(c2i, c2i));
+            Real abs2a = a2r * a2r + a2i * a2i;
+            Real abs2c = c2r * c2r - c2i * c2i;
             //q1 = c2i - c2r c3i - c2i c3r
             //q2 = c2r - c2i c3i + c2r c3r
-            Real q1 = __sub(c2i, __add(__mul(c2r, c3i), __mul(c2i, c3r)));
-            Real q2 = __sub(c2r, __sub(__mul(c2i, c3i), __mul(c2r, c3r)));
-            Real c2ic2r = __mul(F(2.0), __mul(c2i, c2r));
+            Real q1 = c2i - c2r * c3i - c2i * c3r;
+            Real q2 = c2r - c2i * c3i + c2r * c3r; 
+            Real c2ic2r = F(2.0) * c2i * c2r;
             //(abs2c-abs2a c3r)+I(2 c2i c2r+abs2a c3i)
             midMatrix.m_me[0] = _make_cuComplex(
-                __sub(abs2c, __mul(abs2a, c3r)),
-                __add(c2ic2r, __mul(abs2a, c3i))
+                abs2c - abs2a * c3r,
+                c2ic2r + abs2a * c3i
             );
 
             //-a2i a3i-a2r a3r+I (a2r a3i-a2i a3r)
             midMatrix.m_me[1] = _make_cuComplex(
-                -__add(__mul(a2i, a3i), __mul(a2r, a3r)),
-                 __sub(__mul(a2r, a3i), __mul(a2i, a3r))
+                -a2i * a3i - a2r * a3r,
+                 a2r * a3i - a2i * a3r
             );
 
             //(a2r q2-a2i q1)+(a2i q2+a2r q1)I
-            Real a2rq1 = __mul(a2r, q1);
-            Real a2iq1 = __mul(a2i, q1);
-            Real a2rq2 = __mul(a2r, q2);
-            Real a2iq2 = __mul(a2i, q2);
+            Real a2rq1 = a2r * q1;
+            Real a2iq1 = a2i * q1;
+            Real a2rq2 = a2r * q2;
+            Real a2iq2 = a2i * q2;
             midMatrix.m_me[2] = _make_cuComplex(
-                __sub(a2rq2, a2iq1),
-                __add(a2iq2, a2rq1)
+                a2rq2 - a2iq1,
+                a2iq2 + a2rq1
             );
 
             midMatrix.m_me[3] = _make_cuComplex(midMatrix.m_me[1].x, -midMatrix.m_me[1].y);
             midMatrix.m_me[4] = _make_cuComplex(c3r, c3i);
 
             //a3i c2i+a3r c2r+I (-a3r c2i+a3i c2r)
-            Real a3ic2i = __mul(a3i, c2i);
-            Real a3rc2r = __mul(a3r, c2r);
-            Real a3rc2i = __mul(a3r, c2i);
-            Real a3ic2r = __mul(a3i, c2r);
+            Real a3ic2i = a3i * c2i;
+            Real a3rc2r = a3r * c2r;
+            Real a3rc2i = a3r * c2i;
+            Real a3ic2r = a3i * c2r;
             midMatrix.m_me[5] = _make_cuComplex(
-                __add(a3ic2i, a3rc2r),
-                __sub(a3ic2r, a3rc2i)
+                a3ic2i + a3rc2r,
+                a3ic2r - a3rc2i
             );
 
             //-a2r q2-a2i q1+(a2i q2-a2r q1)I
             midMatrix.m_me[6] = _make_cuComplex(
-                -__add(a2rq2, a2iq1),
-                 __sub(a2iq2, a2rq1)
+                -a2rq2 - a2iq1,
+                 a2iq2 - a2rq1
             );
 
             //a3i c2i-a3r c2r+I (a3r c2i+a3i c2r)
             midMatrix.m_me[7] = _make_cuComplex(
-                __sub(a3ic2i, a3rc2r),
-                __add(a3rc2i, a3ic2r)
+                a3ic2i - a3rc2r,
+                a3rc2i + a3ic2r
             );
 
             //-abs2a-2 c2i c2r c3i+ c3r abs2c+I(- c3i abs2c-2 c2i c2r c3r)
             midMatrix.m_me[8] = _make_cuComplex(
-                __sub(__mul(c3r, abs2c), __add(abs2a, __mul(c3i, c2ic2r))),
-               -__add(__mul(c3i, abs2c), __mul(c3r, c2ic2r))
+                c3r * abs2c - abs2a - c3i * c2ic2r,
+               -c3i * abs2c - c3r * c2ic2r
             );
 
             deviceSU3 u1Matrix = deviceSU3::makeSU3Id();

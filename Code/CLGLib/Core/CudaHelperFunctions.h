@@ -20,10 +20,10 @@
 #include "math.h"
 #include "cuComplex.h"
 
-#include <thrust/transform_reduce.h>
-#include <thrust/functional.h>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
+//#include <thrust/transform_reduce.h>
+//#include <thrust/functional.h>
+//#include <thrust/device_vector.h>
+//#include <thrust/host_vector.h>
 
 #include <curand.h>
 #include <curand_kernel.h>
@@ -32,11 +32,11 @@
 
 #if _CLG_USE_LAUNCH_BOUND
 #define _CLG_LAUNCH_BOUND  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD, 1)
+#define _CLG_LAUNCH_BOUND_SINGLE __launch_bounds__(1, 1)
 #else
 #define _CLG_LAUNCH_BOUND
+#define _CLG_LAUNCH_BOUND_SINGLE
 #endif
-
-#define _CLG_LAUNCH_BOUND_SINGLE __launch_bounds__(1, 1)
 
 #pragma endregion Includes
 

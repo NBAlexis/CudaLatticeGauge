@@ -20,20 +20,13 @@
 #define _pow pow
 #define _sin sin
 #define _cos cos
-#define __add(a, b) ((a) + (b))
-#define __mul(a, b) ((a) * (b))
 #define __div(a, b) ((a) / (b))
-#define __sub(a, b) ((a) - (b))
-#define __ma(a, b, c) ((a) * (b) + (c))
-#define __rcp(a) (1.0 / (a))
 #define _hostexp exp
 #define _hostsqrt sqrt
 
 #define _make_cuComplex make_cuDoubleComplex
 #define _cuCaddf cuCadd
 #define _cuCmulf cuCmul
-#define _cuCaddfHost cuCadd
-#define _cuCmulfHost cuCmul
 #define _cuCsubf cuCsub
 #define _cuConjf cuConj
 #define _cuCrealf cuCreal
@@ -50,21 +43,7 @@
 #define _pow __powf
 #define _sin __sinf
 #define _cos __cosf
-#if _CLG_USE_INTRINSC_FLOAT
-#define __add(a, b) __fadd_rn(a, b)
-#define __mul(a, b) __fmul_rn(a, b)
 #define __div(a, b) __fdividef(a, b)
-#define __sub(a, b) __fsub_rn(a, b)
-#define __ma(a, b, c) __fma_rn(a, b, c)
-#define __rcp(a) __frcp_rn(a)
-#else
-#define __add(a, b) ((a) + (b))
-#define __mul(a, b) ((a) * (b))
-#define __div(a, b) ((a) / (b))
-#define __sub(a, b) ((a) - (b))
-#define __ma(a, b, c) fma(a, b, c)
-#define __rcp(a) (1.0f / (a))
-#endif
 #else
 //the __function is Intrinsic Functions which can be only used in device
 #define _sqrt sqrtf
@@ -73,23 +52,15 @@
 #define _pow powf
 #define _sin sinf
 #define _cos cosf
-#define __add(a, b) ((a) + (b))
-#define __mul(a, b) ((a) * (b))
 #define __div(a, b) ((a) / (b))
-#define __sub(a, b) ((a) - (b))
-//a * b + c
-#define __ma(a, b, c) fma(a, b, c)
-#define __rcp(a) (1.0f / (a))
 #endif
 
 #define _hostexp expf
 #define _hostsqrt sqrtf
 
 #define _make_cuComplex make_cuComplex
-#define _cuCaddf __cuCaddf
-#define _cuCmulf __cuCmulf
-#define _cuCaddfHost cuCaddf
-#define _cuCmulfHost cuCmulf
+#define _cuCaddf cuCaddf
+#define _cuCmulf cuCmulf
 #define _cuCsubf cuCsubf
 #define _cuConjf cuConjf
 #define _cuCrealf cuCrealf
