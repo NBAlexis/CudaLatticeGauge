@@ -39,7 +39,6 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pGaugeField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
     m_pGaugeField->m_pOwner = pLattice;
     m_pGaugeField->InitialField(EFIT_Zero);
-    m_pGaugeField->CachePlaqutteIndexes();
 
     m_pForceField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
     m_pForceField->m_pOwner = pLattice;

@@ -1,15 +1,19 @@
 
--- Cache index
+-- Cache index, also remove int4 for index which cost many registers
 
--- The cached solution is solved twice
+-- Cache force field and staple field rewrite
+
+-- Cache fermion field rewrite
+
+-- Implement Meson correlator measure
+
+-- Enable temprature
 
 -- Implement BiCGStab with precondition
 
 -- deflation
 
--- Implement Meson correlator measure
 
--- Enable temprature
 
 
 

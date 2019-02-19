@@ -149,6 +149,8 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
     BYTE byFieldId,
@@ -178,9 +180,9 @@ _kernelDFermionWilsonSquareSU3(
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
-        SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
-        SIndex x_m_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, -(idir + 1));
+        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex]; //__idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1]; //__idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, -(idir + 1));
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
@@ -244,6 +246,7 @@ _kernelDWilsonForceSU3(
     const deviceWilsonVectorSU3* __restrict__ pInverseD,
     const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
     const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
     deviceSU3* pCachedForce,
     Real fKai,
@@ -264,8 +267,8 @@ _kernelDWilsonForceSU3(
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
-        SIndex x_p_mu_Fermion = __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+        //SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
         deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
@@ -303,13 +306,11 @@ _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDi
 CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() : CFieldFermion(), m_fKai(F(0.125))
 {
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataCopy, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount));
 }
 
 CFieldFermionWilsonSquareSU3::~CFieldFermionWilsonSquareSU3()
 {
     checkCudaErrors(cudaFree(m_pDeviceData));
-    checkCudaErrors(cudaFree(m_pDeviceDataCopy));
 }
 
 /**
@@ -479,11 +480,18 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
         return;
     }
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     preparethread;
-    _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, EFIT_RandomGaussian);
-    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
-
+    _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (
+        pPooled->m_pDeviceData,
+        EFIT_RandomGaussian);
+    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+    pPooled->Return();
     //cache a inverse DDdagger field
     CFieldCache* pCache = appGetLattice()->m_pFieldCache;
     CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
@@ -507,8 +515,9 @@ void CFieldFermionWilsonSquareSU3::D(const CField* pGauge, EOperatorCoefficientT
         return;
     }
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    checkCudaErrors(cudaMemcpy(m_pDeviceDataCopy, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
     _Complex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
@@ -519,7 +528,13 @@ void CFieldFermionWilsonSquareSU3::D(const CField* pGauge, EOperatorCoefficientT
     }
 
     preparethread;
-    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData, 
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+    pPooled->Return();
 }
 
 //Kai should be part of D operator
@@ -531,8 +546,8 @@ void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge, EOperatorCoeffi
         return;
     }
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    checkCudaErrors(cudaMemcpy(m_pDeviceDataCopy, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
     _Complex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
@@ -543,7 +558,13 @@ void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge, EOperatorCoeffi
     }
 
     preparethread;
-    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE, eCoeffType, fRealCoeff, cCompCoeff);
+    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData, 
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE, eCoeffType, fRealCoeff, cCompCoeff);
+    pPooled->Return();
 }
 
 void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
@@ -562,12 +583,24 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
         eCoeffType = EOCT_Real;
         fRealCoeff = F(-1.0);
     }
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
     preparethread;
     //Ddagger first, m_pDeviceDataCopy = D+ m_pDeviceData
-    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pFieldSU3->m_pDeviceData, m_pDeviceDataCopy, m_fKai, m_byFieldId, TRUE, TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
+        m_pDeviceData, 
+        pFieldSU3->m_pDeviceData, 
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        pPooled->m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //Then D, m_pDeviceData = D m_pDeviceDataCopy
-    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceDataCopy, pFieldSU3->m_pDeviceData, m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+    _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData, 
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+    pPooled->Return();
 }
 
 UBOOL CFieldFermionWilsonSquareSU3::InverseD(const CField* pGauge)
@@ -678,6 +711,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
         pDPhiWilson->m_pDeviceData,
         pDDaggerPhiWilson->m_pDeviceData,
         pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         pForceSU3->m_pDeviceData,
         NULL == pCacheForceForceSU3 ? NULL : pCacheForceForceSU3->m_pDeviceData,
         m_fKai, m_byFieldId, TRUE);

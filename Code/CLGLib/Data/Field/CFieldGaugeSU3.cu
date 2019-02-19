@@ -158,6 +158,7 @@ _kernelPrintSU3(const deviceSU3 * __restrict__ pDeviceData)
     gaugeSU3KernelFuncionEnd
 }
 
+#if Discard
 /**
 * calculate Staple and Force At Site
 */
@@ -173,7 +174,7 @@ _kernelStapleAtSiteSU3(
     betaOverN = betaOverN * F(-0.5);
     SIndex plaquttes[kMaxPlaqutteCache];
 
-    for (UINT idir = 0; idir < uiDir; ++idir)
+    for (BYTE idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         UINT uiPlaqutteCount = 0;
@@ -187,7 +188,7 @@ _kernelStapleAtSiteSU3(
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
         //there are 6 staples, each is sum of two plaquttes
-        for (int i = 0; i < uiPlaqutteCount; ++i)
+        for (BYTE i = 0; i < uiPlaqutteCount; ++i)
         {
             SIndex first = plaquttes[i * (uiPlaqutteLength - 1)];
             deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
@@ -196,7 +197,7 @@ _kernelStapleAtSiteSU3(
                 toAdd.Dagger();
             }
 
-            for (int j = 1; j < uiPlaqutteLength - 1; ++j)
+            for (BYTE j = 1; j < uiPlaqutteLength - 1; ++j)
             {
                 SIndex nextlink = plaquttes[i * (uiPlaqutteLength - 1) + j];
                 deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
@@ -227,6 +228,7 @@ _kernelStapleAtSiteSU3(
         pForceData[linkIndex].Add(force);
     }
 }
+#endif
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelStapleAtSiteSU3CacheIndex(
@@ -291,6 +293,7 @@ _kernelStapleAtSiteSU3CacheIndex(
     }
 }
 
+#if Discard
 /**
 * calculate Staple and eneregy At Site
 */
@@ -344,6 +347,7 @@ _kernelPlaqutteEnergySU3(
 
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
+#endif
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergySU3CacheIndex(
@@ -357,7 +361,7 @@ _kernelPlaqutteEnergySU3CacheIndex(
 
     Real resThisThread = F(0.0);
     UINT plaqCountAll = plaqCount * plaqLength;
-    for (int i = 0; i < plaqCount; ++i)
+    for (BYTE i = 0; i < plaqCount; ++i)
     {
         SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
         deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
@@ -366,11 +370,11 @@ _kernelPlaqutteEnergySU3CacheIndex(
             toAdd.Dagger();
         }
 
-        for (int j = 1; j < plaqLength; ++j)
+        for (BYTE j = 1; j < plaqLength; ++j)
         {
-            SIndex nextlink = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-            if (nextlink.NeedToDagger())
+            first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
+            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
             }
@@ -416,48 +420,41 @@ _kernelPlaqutteEnergyUsingStableSU3(
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
 
-/**
-*
-*/
 __global__ void _CLG_LAUNCH_BOUND
-_kernelExpMultSU3(
-    const deviceSU3 * __restrict__ pMyDeviceData,
-    _Complex a,
-    deviceSU3 *pU)
-{
-    intokernaldir;
-
-    for (UINT idir = 0; idir < uiDir; ++idir)
-    {
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        deviceSU3 expP = pMyDeviceData[linkIndex].Exp(a, _DC_ExpPrecision);
-
-        expP.Mul(pU[linkIndex]);
-        expP.Norm();
-        pU[linkIndex] = expP;
-    }
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelExpMultSU3Real(
+_kernelExpMultSU3RealQ(
     const deviceSU3 * __restrict__ pMyDeviceData,
     Real a,
     deviceSU3 *pU)
 {
     intokernaldir;
 
-    for (UINT idir = 0; idir < uiDir; ++idir)
+    for (BYTE idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         //deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
-        deviceSU3 expP = 0 == _DC_ExpPrecision ? pMyDeviceData[linkIndex].QuickExp(a) : pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
-
+        deviceSU3 expP = pMyDeviceData[linkIndex].QuickExp(a);
         expP.Mul(pU[linkIndex]);
-        //expP.Norm();
         pU[linkIndex] = expP;
     }
 }
+__global__ void _CLG_LAUNCH_BOUND
+_kernelExpMultSU3Real(
+    const deviceSU3 * __restrict__ pMyDeviceData,
+    Real a,
+    deviceSU3 *pU,
+    BYTE prec)
+{
+    intokernaldir;
 
+    for (BYTE idir = 0; idir < uiDir; ++idir)
+    {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        //deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, _DC_ExpPrecision);
+        deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, prec);
+        expP.Mul(pU[linkIndex]);
+        pU[linkIndex] = expP;
+    }
+}
 
 /**
 * Trace (P^2)
@@ -517,7 +514,7 @@ _kernelSetConfigurationSU3(
 
         //In Bridge, it is t,z,y,x
         //x + y * nx + z * nx * ny + t * nx * ny * nz
-    int4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
+    SSmallInt4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
     UINT uiBridgeSiteIndex = xyzt.w * _DC_Lx * _DC_Ly * _DC_Lz + xyzt.z * _DC_Lx * _DC_Ly + xyzt.y * _DC_Lx + xyzt.x;
     UINT uiBridgeLinkIndex = uiBridgeSiteIndex * _DC_Dir + idir;
 
@@ -755,48 +752,30 @@ void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* p
 
     preparethread;
 
-    if (!m_bPlaqutteIndexCached)
-    {
-        _kernelStapleAtSiteSU3 << <block, threads >> > (
-            m_pDeviceData, 
-            NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, 
-            betaOverN);
-    }
-    else 
-    {
-        _kernelStapleAtSiteSU3CacheIndex << <block, threads >> > (
-            m_pDeviceData, 
-            m_pPlaquttesPerLink,
-            m_uiPlaqutteLength,
-            m_uiPlaqutteCountPerLink,
-            NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData, 
-            pForceSU3->m_pDeviceData, 
-            betaOverN);
-    }
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+
+    _kernelStapleAtSiteSU3CacheIndex << <block, threads >> > (
+        m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
+        NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
+        pForceSU3->m_pDeviceData,
+        betaOverN);
 }
 
 Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
 {
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+
     preparethread;
-    if (!m_bPlaqutteIndexCached)
-    {
-        _kernelPlaqutteEnergySU3 << <block, threads >> > (
-            m_pDeviceData, 
-            betaOverN, 
-            _D_RealThreadBuffer);
-    }
-    else 
-    {
-        _kernelPlaqutteEnergySU3CacheIndex << <block, threads >> > (
-            m_pDeviceData, 
-            m_pPlaquttesPerSite,
-            m_uiPlaqutteLength,
-            m_uiPlaqutteCountPerSite,
-            betaOverN, 
-            _D_RealThreadBuffer);
-    }
-    
+    _kernelPlaqutteEnergySU3CacheIndex << <block, threads >> > (
+        m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
+        betaOverN,
+        _D_RealThreadBuffer);
 
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
@@ -837,20 +816,6 @@ CFieldGaugeSU3::~CFieldGaugeSU3()
     checkCudaErrors(cudaFree(m_pDeviceData));
 }
 
-void CFieldGaugeSU3::ExpMult(const _Complex& a, CField* U) const
-{
-    if (NULL == U || EFT_GaugeSU3 != U->GetFieldType())
-    {
-        appCrucial("CFieldGaugeSU3: U field is not SU3");
-        return;
-    }
-
-    CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(U);
-
-    preparethread;
-    _kernelExpMultSU3 << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
-}
-
 void CFieldGaugeSU3::ExpMult(Real a, CField* U) const
 {
     if (NULL == U || EFT_GaugeSU3 != U->GetFieldType())
@@ -862,7 +827,15 @@ void CFieldGaugeSU3::ExpMult(Real a, CField* U) const
     CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(U);
 
     preparethread;
-    _kernelExpMultSU3Real << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+    if (0 == _HC_ExpPrecision)
+    {
+        _kernelExpMultSU3RealQ << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+    }
+    else
+    {
+        _kernelExpMultSU3Real << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData, static_cast<BYTE>(_HC_ExpPrecision));
+    }
+    
 }
 
 void CFieldGaugeSU3::ElementNormalize()

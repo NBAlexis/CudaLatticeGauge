@@ -16,6 +16,8 @@
 //DC for device constant
 //HC for host constant
 
+enum { _kMaxFieldCount = 8, };
+
 #define _DC_Dim (_constIntegers[ECI_Dim])
 #define _HC_Dim (appGetCudaHelper()->m_ConstIntegers[ECI_Dim])
 
@@ -68,6 +70,7 @@
 #define _DC_Seed (_constIntegers[ECI_RandomSeed])
 #define _HC_Seed (appGetCudaHelper()->m_ConstIntegers[ECI_RandomSeed])
 #define _DC_ExpPrecision (_constIntegers[ECI_ExponentPrecision])
+#define _HC_ExpPrecision (appGetCudaHelper()->m_ConstIntegers[ECI_ExponentPrecision])
 
 #define _DC_ActionListL (_constIntegers[ECI_ActionListLength])
 #define _HC_ActionListL (appGetCudaHelper()->m_ConstIntegers[ECI_ActionListLength])
@@ -94,7 +97,19 @@ __DEFINE_ENUM(EFieldType,
 
     )
 
+#if defined(__cplusplus)
+    extern "C" {
+#endif /* __cplusplus */
+    //instead of int4
+    struct CLGAPI alignas(4) SSmallInt4
+    {
+        __device__ SSmallInt4() {}
 
+        SBYTE x, y, z, w;
+    };
+#if defined(__cplusplus)
+}
+#endif /* __cplusplus */
 
 //====================================================
 // Some common structures
@@ -108,11 +123,11 @@ __device__ __inline__ static UINT _deviceGetSiteIndex(const UINT* coord)
 {
     return coord[0] * _DC_MultX + coord[1] * _DC_MultY + coord[2] * _DC_MultZ + coord[3];
 }
-__device__ __inline__ static UINT _deviceGetLinkIndex(UINT siteIndex, UINT dir)
+__device__ __inline__ static UINT _deviceGetLinkIndex(UINT siteIndex, BYTE dir)
 {
     return siteIndex * _DC_Dir + dir;
 }
-__device__ __inline__ static UINT _deviceGetLinkIndex(const UINT* coord, UINT dir)
+__device__ __inline__ static UINT _deviceGetLinkIndex(const UINT* coord, BYTE dir)
 {
     return _deviceGetSiteIndex(coord) * _DC_Dir + dir;
 }
@@ -121,42 +136,44 @@ __device__ __inline__ static UINT _deviceGetLinkIndex(const UINT* coord, UINT di
 * for site, dir_plus_one = 0
 * for link, dir_plus_one = dir + 1
 */
-__device__ __inline__ static UINT _deviceGetFatIndex(const UINT* coord, UINT dir_plus_one)
+__device__ __inline__ static UINT _deviceGetFatIndex(const UINT* coord, BYTE dir_plus_one)
 {
     return _deviceGetSiteIndex(coord) * (_DC_Dir + 1) + dir_plus_one;
 }
 
-__device__ __inline__ static UINT _deviceGetFatIndex(UINT uiSiteIndex, UINT dir_plus_one)
+__device__ __inline__ static UINT _deviceGetFatIndex(UINT uiSiteIndex, BYTE dir_plus_one)
 {
     return uiSiteIndex * (_DC_Dir + 1) + dir_plus_one;
 }
 
 /**
-* int4.xyzw = x, y, z, t
+* SSmallInt4.xyzw = x, y, z, t
 */
-__device__ __inline__ static int4 __deviceSiteIndexToInt4(UINT siteIndex)
+__device__ __inline__ static SSmallInt4 __deviceSiteIndexToInt4(UINT siteIndex)
 {
-    int4 xyzt;
-    xyzt.x = siteIndex / _DC_MultX;
-    xyzt.y = (siteIndex % _DC_MultX) / _DC_MultY;
-    xyzt.z = (siteIndex % _DC_MultY) / _DC_MultZ;
-    xyzt.w = (siteIndex % _DC_MultZ);
+    SSmallInt4 xyzt;
+    xyzt.x = static_cast<SBYTE>(siteIndex / _DC_MultX);
+    xyzt.y = static_cast<SBYTE>((siteIndex % _DC_MultX) / _DC_MultY);
+    xyzt.z = static_cast<SBYTE>((siteIndex % _DC_MultY) / _DC_MultZ);
+    xyzt.w = static_cast<SBYTE>((siteIndex % _DC_MultZ));
     return xyzt;
 }
-__device__ __inline__ static int4 __deviceLinkIndexToInt4(UINT linkIndex)
+__device__ __inline__ static SSmallInt4 __deviceLinkIndexToInt4(UINT linkIndex)
 {
     return __deviceSiteIndexToInt4(linkIndex / _DC_Dir);
 }
-__device__ __inline__ static int4 __deviceFatIndexToInt4(UINT fatIndex)
+__device__ __inline__ static SSmallInt4 __deviceFatIndexToInt4(UINT fatIndex)
 {
     return __deviceSiteIndexToInt4(fatIndex / (_DC_Dir + 1));
 }
 
 #pragma endregion
 
+//at most 8 tags
 enum
 {
-    _kDagger = 0x01,
+    _kDagger            = 0x01,
+    _kOpposite          = 0x02,
 };
 
 #if defined(__cplusplus)
@@ -170,15 +187,17 @@ extern "C" {
             , m_byDir(0)
             , m_byTag(0)
             , m_byBoundaryFieldId(0)
+            , m_byReginId(0)
         {
 
         }
 
-        __device__ SIndex(UINT uiIndex, BYTE dir = 0, BYTE indexTag = 0, BYTE bcField = 0)
+        __device__ SIndex(UINT uiIndex, BYTE dir = 0, BYTE indexTag = 0, BYTE bcField = 0, BYTE byRegionId = 0)
             : m_uiSiteIndex(uiIndex)
             , m_byDir(dir)
             , m_byTag(indexTag)
             , m_byBoundaryFieldId(bcField)
+            , m_byReginId(byRegionId)
         {
 
         }
@@ -188,24 +207,30 @@ extern "C" {
             , m_byDir(other.m_byDir)
             , m_byTag(other.m_byTag)
             , m_byBoundaryFieldId(other.m_byBoundaryFieldId)
+            , m_byReginId(other.m_byReginId)
         {
 
         }
 
         __device__ __inline__ void DebugPrint() const
         {
-            int4 xyzt = __deviceSiteIndexToInt4(m_uiSiteIndex);
-            printf("(xyzt:%d,%d,%d,%d)_(%x)%s\n", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
+            SSmallInt4 xyzt = __deviceSiteIndexToInt4(m_uiSiteIndex);
+            printf("%s(xyzt:%d,%d,%d,%d)_(%x)%s\n", NeedToOpposite() ? "-" : "", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
         }
 
         __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (_kDagger & m_byTag); }
+        __device__ __inline__ UBOOL NeedToOpposite() const { return 0 != (_kOpposite & m_byTag); }
         __device__ __inline__ UBOOL NeedBoundaryField() const { return 0 != m_byBoundaryFieldId; }
 
         UINT m_uiSiteIndex;
         BYTE m_byDir;
         BYTE m_byTag;
         BYTE m_byBoundaryFieldId;
-        BYTE m_byUnused;
+
+        /**
+        * For miscellaneous usage
+        */
+        BYTE m_byReginId;
     };
 
 #if defined(__cplusplus)

@@ -38,7 +38,8 @@ public:
     /**
     * U = exp(a this)U
     */
-    virtual void ExpMult(const _Complex& a, CField* U) const = 0;
+    //Discard
+    //virtual void ExpMult(const _Complex& a, CField* U) const = 0;
     virtual void ExpMult(Real a, CField* U) const = 0;
 
     /**
@@ -46,11 +47,6 @@ public:
     * This is to make the elements Unitary again.
     */
     virtual void ElementNormalize() = 0;
-
-    /**
-    * Optimize
-    */
-    void CachePlaqutteIndexes();
 
 #pragma endregion
 
@@ -66,13 +62,6 @@ protected:
 
     UINT m_uiLinkeCount;
 
-    UBOOL m_bPlaqutteIndexCached;
-    UINT m_uiPlaqutteLength;
-    UINT m_uiPlaqutteCountPerSite;
-    UINT m_uiPlaqutteCountPerLink;
-
-    SIndex* m_pPlaquttesPerSite;
-    SIndex* m_pPlaquttesPerLink;
 };
 
 __END_NAMESPACE

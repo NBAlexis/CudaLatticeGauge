@@ -18,11 +18,15 @@ class CLGAPI CBoundaryConditionTorusSquare : public deviceBoundaryCondition
 
 public:
 
-    __device__ CBoundaryConditionTorusSquare() : deviceBoundaryCondition() { ; }
+    __device__ CBoundaryConditionTorusSquare();
 
-    __device__ virtual SIndex _devcieGetMappedIndex(const int4 &site, const int4 &fromsite) const;
+    __device__ virtual SIndex _devcieGetMappedIndex(const SSmallInt4 &site, const SIndex &fromsite) const;
 
-    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const int4 &site, const int4 &fromsite) const;
+    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const SSmallInt4 &site, const SIndex &fromsite) const;
+
+    __device__ virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
+
+    SSmallInt4 m_FermionBC[_kMaxFieldCount];
 };
 
 __END_NAMESPACE

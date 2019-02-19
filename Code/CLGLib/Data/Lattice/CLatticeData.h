@@ -25,8 +25,9 @@ public:
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
     void OnUpdatorConfigurationAccepted();
     void OnUpdatorFinished(UBOOL bMeasured);
-    void GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink);
+    void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);
+    void SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc);
     CCString GetInfos(const CCString& sTab) const;
 
     class CRandom* m_pRandom;
@@ -54,6 +55,7 @@ public:
     //https://stackoverflow.com/questions/53781421/cuda-the-member-field-with-device-ptr-and-device-member-function-to-visit-it-i
     class CRandom* m_pDeviceRandom;
     class CIndex* m_pDeviceIndex;
+    class CIndexCache* m_pIndexCache;
     UINT m_uiIndexType;
     UINT m_uiBoundaryConditionType;
     class CSLASolver* m_pFermionSolver;

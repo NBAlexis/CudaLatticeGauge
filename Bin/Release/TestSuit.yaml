@@ -707,8 +707,8 @@ TestFermionUpdatorLargeScale:
     Dim : 4
     Dir : 4
     LatticeLength : [32, 32, 32, 16]
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 8]
+    ##ThreadAutoDecompose : 0
+    ##ThreadDecompose : [8, 8, 8]
     LatticeIndex : EIndexType_Square
     LatticeBoundary : EBC_TorusSquare
     RandomType : ER_Schrage

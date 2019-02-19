@@ -19,9 +19,19 @@
 
 #define __LINE_MUL(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], right.m_me[d]), _cuCmulf(m_me[b], right.m_me[ee])), _cuCmulf(m_me[c], right.m_me[ff]))
 
+#define __LINE_MULARRAY(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(left[a], right[d]), _cuCmulf(left[b], right[ee])), _cuCmulf(left[c], right[ff]))
+
 #define __LINE_MULND(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(m_me[a], _cuConjf(right.m_me[d])), _cuCmulf(m_me[b], _cuConjf(right.m_me[ee]))), _cuCmulf(m_me[c], _cuConjf(right.m_me[ff])))
 
 #define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), right.m_me[ff]))
+
+
+//x * a + y * b
+//= (xr * ar - xi * ai) + (yr * br - yi * bi)
+//+((xi * ar + xr * ai) + (yi * br + yr * bi))i
+#define __TWO_COMPLEX_MULT_4(xr, xi, yr, yi, ar, ai, br, bi) \
+    _make_cuComplex( ((xr) * (ar) - (xi) * (ai)) + ((yr) * (br) - (yi) * (bi)), \
+                     ((xi) * (ar) + (xr) * (ai)) + ((yi) * (br) + (yr) * (bi)) );
 
 // 1.0f / _sqrt(3)
 #define InvSqrt3 (F(0.5773502691896258))
@@ -50,6 +60,11 @@ extern "C" {
         __device__ deviceSU3(const deviceSU3& other)
         {
             memcpy(m_me, other.m_me, sizeof(_Complex) * 9);
+        }
+
+        __device__ deviceSU3(const _Complex* __restrict__ other)
+        {
+            memcpy(m_me, other, sizeof(_Complex) * 9);
         }
 
         __device__ void DebugPrint() const
@@ -523,6 +538,28 @@ extern "C" {
             memcpy(m_me, res, sizeof(_Complex) * 9);
         }
 
+        /**
+        * low reg count version of multiply
+        */
+        __device__ __inline__ static void ArrayMul(_Complex* left, const _Complex* __restrict__ right)
+        {
+            _Complex tmp[3];
+            tmp[0] = __LINE_MULARRAY(0, 1, 2, 0, 3, 6);
+            tmp[1] = __LINE_MULARRAY(0, 1, 2, 1, 4, 7);
+            tmp[2] = __LINE_MULARRAY(0, 1, 2, 2, 5, 8);
+            memcpy(left, tmp, sizeof(_Complex) * 3);
+
+            tmp[0] = __LINE_MULARRAY(3, 4, 5, 0, 3, 6);
+            tmp[1] = __LINE_MULARRAY(3, 4, 5, 1, 4, 7);
+            tmp[2] = __LINE_MULARRAY(3, 4, 5, 2, 5, 8);
+            memcpy(left + 3, tmp, sizeof(_Complex) * 3);
+
+            tmp[0] = __LINE_MULARRAY(6, 7, 8, 0, 3, 6);
+            tmp[1] = __LINE_MULARRAY(6, 7, 8, 1, 4, 7);
+            tmp[2] = __LINE_MULARRAY(6, 7, 8, 2, 5, 8);
+            memcpy(left + 6, tmp, sizeof(_Complex) * 3);
+        }
+
         __device__ __inline__ deviceSU3 MulC(const deviceSU3& right) const
         {
             deviceSU3 ret;
@@ -663,6 +700,20 @@ extern "C" {
 
         __device__ __inline__ deviceSU3 MulCompC(const _Complex& right) const { deviceSU3 ret(*this); ret.MulComp(right); return ret; }
         __device__ __inline__ deviceSU3 MulRealC(const Real& right) const { deviceSU3 ret(*this); ret.MulReal(right); return ret; }
+
+        //the reduce regcount version
+        __device__ __inline__ void MulRealCArray(_Complex* res, const Real& right) const 
+        { 
+            res[0] = _make_cuComplex(m_me[0].x * right, m_me[0].y * right);
+            res[1] = _make_cuComplex(m_me[1].x * right, m_me[1].y * right);
+            res[2] = _make_cuComplex(m_me[2].x * right, m_me[2].y * right);
+            res[3] = _make_cuComplex(m_me[3].x * right, m_me[3].y * right);
+            res[4] = _make_cuComplex(m_me[4].x * right, m_me[4].y * right);
+            res[5] = _make_cuComplex(m_me[5].x * right, m_me[5].y * right);
+            res[6] = _make_cuComplex(m_me[6].x * right, m_me[6].y * right);
+            res[7] = _make_cuComplex(m_me[7].x * right, m_me[7].y * right);
+            res[8] = _make_cuComplex(m_me[8].x * right, m_me[8].y * right);
+        }
 
 #pragma endregion operators
 
@@ -891,12 +942,21 @@ extern "C" {
         }
 
         /**
+        * U = U + 1
+        */
+        __device__ __inline__ void AddId()
+        {
+            m_me[0].x += F(1.0);
+            m_me[4].x += F(1.0);
+            m_me[8].x += F(1.0);
+        }
+
+        /**
         * U' = exp(aU) = (1 + a U + a^2 U^2/2 +  ... + a^N U^N/N!)
         *    = 1 + a U (1 + a U /2 (1 + a U/3 ...))
         */
-        __device__ __inline__ deviceSU3 Exp(const _Complex& a, UINT uiPrecision, UBOOL bNormed = FALSE) const
+        __device__ __inline__ deviceSU3 Exp(const _Complex& a, BYTE uiPrecision) const
         {
-            deviceSU3 identity = makeSU3Id();
             deviceSU3 tmp;
 
             /**
@@ -907,9 +967,9 @@ extern "C" {
             * ...
             * loopN: tmp = 1+aU (1 + aU/2 (1+...))
             */
-            for (UINT i = 0; i < uiPrecision; ++i)
+            for (BYTE i = 0; i < uiPrecision; ++i)
             {
-                Real exp_factor = __div(F(1.0), uiPrecision - i);
+                Real exp_factor = __rcp(uiPrecision - i);
                 _Complex alpha = cuCmulf_cr(a, exp_factor);
                 //aU/(N-i) = this x alpha
                 deviceSU3 aUoN = MulCompC(alpha);
@@ -921,20 +981,19 @@ extern "C" {
                 {
                     tmp.Mul(aUoN);
                 }
-                tmp = identity.AddC(tmp);
+                tmp.AddId();
             }
-            if (bNormed)
-            {
-                tmp.Norm();
-            }
+            //if (bNormed)
+            //{
+            //    tmp.Norm();
+            //}
             
             return tmp;
         }
 
-        __device__ __inline__ deviceSU3 ExpReal(Real a, UINT uiPrecision, UBOOL bNormed = FALSE) const
+        __device__ __inline__ deviceSU3 ExpReal(Real a, BYTE uiPrecision) const
         {
-            deviceSU3 identity = makeSU3Id();
-            deviceSU3 tmp;
+            _Complex tmp[9];
 
             /**
             * tmp = U
@@ -944,38 +1003,119 @@ extern "C" {
             * ...
             * loopN: tmp = 1+aU (1 + aU/2 (1+...))
             */
-            for (UINT i = 0; i < uiPrecision; ++i)
+            for (BYTE i = 0; i < uiPrecision; ++i)
             {
-                _Complex alpha = _make_cuComplex(__div(a, (uiPrecision - i)), F(0.0));
+                //_Complex alpha = _make_cuComplex(__div(a, (uiPrecision - i)), F(0.0));
                 //aU/(N-i) = this x alpha
-                deviceSU3 aUoN = MulCompC(alpha);
+                //deviceSU3 aUoN = MulCompC(_make_cuComplex(__div(a, (uiPrecision - i)), F(0.0)));
                 if (0 == i)
                 {
-                    tmp = aUoN;
+                    MulRealCArray(tmp, __div(a, (uiPrecision - i)));
                 }
                 else
                 {
-                    tmp.Mul(aUoN);
+                    _Complex tmp2[9];
+                    MulRealCArray(tmp2, __div(a, (uiPrecision - i)));
+                    ArrayMul(tmp, tmp2);
                 }
-                tmp = identity.AddC(tmp);
+                tmp[0].x += F(1.0);
+                tmp[4].x += F(1.0);
+                tmp[8].x += F(1.0);
             }
-            if (bNormed)
-            {
-                tmp.Norm();
-            }
-            return tmp;
+            return deviceSU3(tmp);
         }
 
+        //for release, let the compliler do this
+#if _CLG_DEBUG
+#define aOver12 tmpReal[0]
+#define aOver6 tmpReal[1]
+#define y1 tmpReal[2]
+#define y2 tmpReal[0] //aOver12 not used
+#define y3 tmpReal[1] //aOver6 not used
+#define a2 tmpReal[3]
+#define aSqOver16 tmpReal[4]
+#define aSqOver4 tmpReal[3] //a2 not used
+#define l1 tmpReal[5]
+#define l2 tmpReal[4] //aSqOver16 not used
+#define l3 tmpReal[3] //aSqOver4 not used
+#define dn1 tmpReal[6]
+#define dn2 tmpReal[7]
+#define dn3 tmpReal[8] //now y1(2),y2(0),y3(1),l1(5),l2(4),l3(3) all not used
+#define halfa tmpReal[0]
+#define halfadn1 tmpReal[1]
+#define halfadn2 tmpReal[0] //halfa not used
+#define adn3 tmpReal[2]
+
+#define abs2a tmpReal[0]
+#define abs2c tmpReal[1]
+#define c2ic2r tmpReal[2]
+
+#define q1 tmpReal[0]
+#define q2 tmpReal[1]
+#define a2rq1 tmpReal[2]
+#define a2iq1 tmpReal[0]
+#define a2rq2 tmpReal[3]
+#define a2iq2 tmpReal[1]
+
+#define a3ic2i tmpReal[0]
+#define a3rc2r tmpReal[1]
+#define a3rc2i tmpReal[2]
+#define a3ic2r tmpReal[3]
+#endif
         /**
         * For anti hermitian matrix only
         * see SU3Norm.nb
         */
         __device__ __inline__ deviceSU3 QuickExp(Real a) const
         {
+#if _CLG_DEBUG
+            Real tmpReal[9];
+            aOver12 = a * F(0.08333333333333333333333333333333);
+            aOver6 = a * F(0.16666666666666666666666666666667);
+
+            //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/6
+            y1 = aOver12 * (m_me[0].y - m_me[4].y);
+            y2 = aOver12 * (m_me[0].y - m_me[8].y);
+            y3 = aOver6 * (m_me[4].y - m_me[8].y);
+
+            //l1 = y1^2 + (|m12|/4)^2
+            //l2 = y2^2 + (|m13|/4)^2
+            //l3 = y3^2 + (|m23|/2)^2
+            a2 = a * a;
+            aSqOver16 = a2 * F(0.0625);
+            aSqOver4 = a2 * F(0.25);
+            l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]);
+            l2 = y2 * y2 + aSqOver16 * __cuCabsSqf(m_me[2]);
+            l3 = y3 * y3 + aSqOver4 * __cuCabsSqf(m_me[5]);
+
+            //dn1 = 1/ (1 + y1^2 +  (|m12|/4)^2)
+            dn1 = __div(F(1.0), F(1.0) + l1);
+            dn2 = __div(F(1.0), F(1.0) + l2);
+            dn3 = __div(F(1.0), F(1.0) + l3);
+
+            //dn1(1 - l1) = -l1 x dn1 + dn1
+            Real c1r = dn1 - l1 * dn1;
+            Real c2r = dn2 - l2 * dn2;
+            Real c3r = dn3 - l3 * dn3;
+            Real c1i = F(2.0) * y1 * dn1;
+            Real c2i = F(2.0) * y2 * dn2;
+            Real c3i = F(2.0) * y3 * dn3;
+
+            halfa = F(0.5) * a;
+            halfadn1 = halfa * dn1;
+            halfadn2 = halfa * dn2;
+            adn3 = a * dn3;
+            Real a1r = halfadn1 * m_me[1].x;
+            Real a2r = halfadn2 * m_me[2].x;
+            Real a3r = adn3 * m_me[5].x;
+            Real a1i = halfadn1 * m_me[1].y;
+            Real a2i = halfadn2 * m_me[2].y;
+            Real a3i = adn3 * m_me[5].y;
+#else
             Real aOver12 = a * F(0.08333333333333333333333333333333);
             Real aOver6 = a * F(0.16666666666666666666666666666667);
 
-            //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/12
+            //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/6
             Real y1 = aOver12 * (m_me[0].y - m_me[4].y);
             Real y2 = aOver12 * (m_me[0].y - m_me[8].y);
             Real y3 = aOver6 * (m_me[4].y - m_me[8].y);
@@ -986,9 +1126,9 @@ extern "C" {
             Real a2 = a * a;
             Real aSqOver16 = a2 * F(0.0625);
             Real aSqOver4 = a2 * F(0.25);
-            Real l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]); 
+            Real l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]);
             Real l2 = y2 * y2 + aSqOver16 * __cuCabsSqf(m_me[2]);
-            Real l3 = y2 * y2 + aSqOver4 * __cuCabsSqf(m_me[5]);
+            Real l3 = y3 * y3 + aSqOver4 * __cuCabsSqf(m_me[5]);
 
             //dn1 = 1/ (1 + y1^2 +  (|m12|/4)^2)
             Real dn1 = __div(F(1.0), F(1.0) + l1);
@@ -1013,79 +1153,241 @@ extern "C" {
             Real a1i = halfadn1 * m_me[1].y;
             Real a2i = halfadn2 * m_me[2].y;
             Real a3i = adn3 * m_me[5].y;
+#endif
 
-            deviceSU3 midMatrix;
-            Real abs2a = a2r * a2r + a2i * a2i;
-            Real abs2c = c2r * c2r - c2i * c2i;
-            //q1 = c2i - c2r c3i - c2i c3r
-            //q2 = c2r - c2i c3i + c2r c3r
-            Real q1 = c2i - c2r * c3i - c2i * c3r;
-            Real q2 = c2r - c2i * c3i + c2r * c3r; 
-            Real c2ic2r = F(2.0) * c2i * c2r;
+            //6 Temp Reals
+            //deviceSU3 midMatrix;
+            //to reduce regcount
+            _Complex midMatrix[8];
+#if _CLG_DEBUG
+            abs2a = a2r * a2r + a2i * a2i;
+            abs2c = c2r * c2r - c2i * c2i;
+
+            c2ic2r = F(2.0) * c2i * c2r;
             //(abs2c-abs2a c3r)+I(2 c2i c2r+abs2a c3i)
-            midMatrix.m_me[0] = _make_cuComplex(
+            midMatrix[0] = _make_cuComplex(
                 abs2c - abs2a * c3r,
                 c2ic2r + abs2a * c3i
             );
 
+            //-abs2a-2 c2i c2r c3i+ c3r abs2c+I(- c3i abs2c-2 c2i c2r c3r)
+            midMatrix[7] = _make_cuComplex(
+                c3r * abs2c - abs2a - c3i * c2ic2r,
+                -c3i * abs2c - c3r * c2ic2r
+            );
+
             //-a2i a3i-a2r a3r+I (a2r a3i-a2i a3r)
-            midMatrix.m_me[1] = _make_cuComplex(
+            midMatrix[1] = _make_cuComplex(
+                -a2i * a3i - a2r * a3r,
+                a2r * a3i - a2i * a3r
+            );
+
+            //q1 = c2i - c2r c3i - c2i c3r
+            //q2 = c2r - c2i c3i + c2r c3r
+            q1 = c2i - c2r * c3i - c2i * c3r;
+            q2 = c2r - c2i * c3i + c2r * c3r;
+
+            //(a2r q2-a2i q1)+(a2i q2+a2r q1)I
+            a2rq1 = a2r * q1;
+            a2iq1 = a2i * q1;
+            a2rq2 = a2r * q2;
+            a2iq2 = a2i * q2;
+            midMatrix[2] = _make_cuComplex(
+                a2rq2 - a2iq1,
+                a2iq2 + a2rq1
+            );
+
+            //-a2r q2-a2i q1+(a2i q2-a2r q1)I
+            midMatrix[5] = _make_cuComplex(
+                -a2rq2 - a2iq1,
+                a2iq2 - a2rq1
+            );
+
+            //midMatrix[3] = _make_cuComplex(midMatrix[1].x, -midMatrix[1].y);
+            midMatrix[3] = _make_cuComplex(c3r, c3i);
+
+            //a3i c2i+a3r c2r+I (-a3r c2i+a3i c2r)
+            a3ic2i = a3i * c2i;
+            a3rc2r = a3r * c2r;
+            a3rc2i = a3r * c2i;
+            a3ic2r = a3i * c2r;
+            midMatrix[4] = _make_cuComplex(
+                a3ic2i + a3rc2r,
+                a3ic2r - a3rc2i
+            );
+
+            //a3i c2i-a3r c2r+I (a3r c2i+a3i c2r)
+            midMatrix[6] = _make_cuComplex(
+                a3ic2i - a3rc2r,
+                a3rc2i + a3ic2r
+            );
+#else
+            Real abs2a = a2r * a2r + a2i * a2i;
+            Real abs2c = c2r * c2r - c2i * c2i;
+
+            Real c2ic2r = F(2.0) * c2i * c2r;
+            //(abs2c-abs2a c3r)+I(2 c2i c2r+abs2a c3i)
+            midMatrix[0] = _make_cuComplex(
+                abs2c - abs2a * c3r,
+                c2ic2r + abs2a * c3i
+            );
+
+            //-abs2a-2 c2i c2r c3i+ c3r abs2c+I(- c3i abs2c-2 c2i c2r c3r)
+            midMatrix[7] = _make_cuComplex(
+                c3r * abs2c - abs2a - c3i * c2ic2r,
+                -c3i * abs2c - c3r * c2ic2r
+            );
+
+            //-a2i a3i-a2r a3r+I (a2r a3i-a2i a3r)
+            midMatrix[1] = _make_cuComplex(
                 -a2i * a3i - a2r * a3r,
                  a2r * a3i - a2i * a3r
             );
+
+            //q1 = c2i - c2r c3i - c2i c3r
+            //q2 = c2r - c2i c3i + c2r c3r
+            Real q1 = c2i - c2r * c3i - c2i * c3r;
+            Real q2 = c2r - c2i * c3i + c2r * c3r;
 
             //(a2r q2-a2i q1)+(a2i q2+a2r q1)I
             Real a2rq1 = a2r * q1;
             Real a2iq1 = a2i * q1;
             Real a2rq2 = a2r * q2;
             Real a2iq2 = a2i * q2;
-            midMatrix.m_me[2] = _make_cuComplex(
+            midMatrix[2] = _make_cuComplex(
                 a2rq2 - a2iq1,
                 a2iq2 + a2rq1
             );
 
-            midMatrix.m_me[3] = _make_cuComplex(midMatrix.m_me[1].x, -midMatrix.m_me[1].y);
-            midMatrix.m_me[4] = _make_cuComplex(c3r, c3i);
+            //-a2r q2-a2i q1+(a2i q2-a2r q1)I
+            midMatrix[5] = _make_cuComplex(
+               -a2rq2 - a2iq1,
+                a2iq2 - a2rq1
+            );
+
+            //midMatrix[3] = _make_cuComplex(midMatrix[1].x, -midMatrix[1].y);
+            midMatrix[3] = _make_cuComplex(c3r, c3i);
 
             //a3i c2i+a3r c2r+I (-a3r c2i+a3i c2r)
             Real a3ic2i = a3i * c2i;
             Real a3rc2r = a3r * c2r;
             Real a3rc2i = a3r * c2i;
             Real a3ic2r = a3i * c2r;
-            midMatrix.m_me[5] = _make_cuComplex(
+            midMatrix[4] = _make_cuComplex(
                 a3ic2i + a3rc2r,
                 a3ic2r - a3rc2i
             );
 
-            //-a2r q2-a2i q1+(a2i q2-a2r q1)I
-            midMatrix.m_me[6] = _make_cuComplex(
-                -a2rq2 - a2iq1,
-                 a2iq2 - a2rq1
-            );
-
             //a3i c2i-a3r c2r+I (a3r c2i+a3i c2r)
-            midMatrix.m_me[7] = _make_cuComplex(
+            midMatrix[6] = _make_cuComplex(
                 a3ic2i - a3rc2r,
                 a3rc2i + a3ic2r
             );
+#endif
 
-            //-abs2a-2 c2i c2r c3i+ c3r abs2c+I(- c3i abs2c-2 c2i c2r c3r)
-            midMatrix.m_me[8] = _make_cuComplex(
-                c3r * abs2c - abs2a - c3i * c2ic2r,
-               -c3i * abs2c - c3r * c2ic2r
-            );
+            //To reduce regcount
+            //deviceSU3 u1Matrix = deviceSU3::makeSU3Id();
+            //u1Matrix.m_me[0] = _make_cuComplex(c1r, c1i);
+            //u1Matrix.m_me[4] = _make_cuComplex(c1r, -c1i);
+            //u1Matrix.m_me[1] = _make_cuComplex(a1r, a1i);
+            //u1Matrix.m_me[3] = _make_cuComplex(-a1r, a1i);
 
-            deviceSU3 u1Matrix = deviceSU3::makeSU3Id();
-            u1Matrix.m_me[0] = _make_cuComplex(c1r, c1i);
-            u1Matrix.m_me[4] = _make_cuComplex(c1r, -c1i);
-            u1Matrix.m_me[1] = _make_cuComplex(a1r, a1i);
-            u1Matrix.m_me[3] = _make_cuComplex(-a1r, a1i);
+            //midMatrix.Mul(u1Matrix);
+            //u1Matrix.Mul(midMatrix);
+            _Complex res[9];
 
-            midMatrix.Mul(u1Matrix);
-            u1Matrix.Mul(midMatrix);
+            //First step is midMatrix * u1Matrix
+            //midMatrix is
+            //0  1  2
+            //1* 3  4
+            //5  6  7
+            //u1 Matrix is
+            // c  a   0
+            //-a* c*  0
+            // 0  0   1
 
-            return u1Matrix;
+            //x = midMatrix[0], y = midMatrix[1], A = c, B = -a*
+            res[0] = __TWO_COMPLEX_MULT_4(midMatrix[0].x, midMatrix[0].y, midMatrix[1].x, midMatrix[1].y, c1r, c1i, -a1r, a1i);
+            //x = midMatrix[0], y = midMatrix[1], A = a, B = c*
+            res[1] = __TWO_COMPLEX_MULT_4(midMatrix[0].x, midMatrix[0].y, midMatrix[1].x, midMatrix[1].y, a1r, a1i, c1r, -c1i);
+            res[2] = midMatrix[2];
+            //x = midMatrix[1]*, y = midMatrix[3], A = c, B = -a*
+            res[3] = __TWO_COMPLEX_MULT_4(midMatrix[1].x, -midMatrix[1].y, midMatrix[3].x, midMatrix[3].y, c1r, c1i, -a1r, a1i);
+            //x = midMatrix[1]*, y = midMatrix[3], A = a, B = c*
+            res[4] = __TWO_COMPLEX_MULT_4(midMatrix[1].x, -midMatrix[1].y, midMatrix[3].x, midMatrix[3].y, a1r, a1i, c1r, -c1i);
+            res[5] = midMatrix[4];
+
+            //x = midMatrix[5], y = midMatrix[6], A = c, B = -a*
+            res[6] = __TWO_COMPLEX_MULT_4(midMatrix[5].x, midMatrix[5].y, midMatrix[6].x, midMatrix[6].y, c1r, c1i, -a1r, a1i);
+            //x = midMatrix[5], y = midMatrix[6], A = a, B = c*
+            res[7] = __TWO_COMPLEX_MULT_4(midMatrix[5].x, midMatrix[5].y, midMatrix[6].x, midMatrix[6].y, a1r, a1i, c1r, -c1i);
+            res[8] = midMatrix[7];
+
+            //midMatrix is not using now, we reuse it
+            //Now we calculate 
+            //u1Matrix * res
+            //u1 Matrix is
+            // c  a   0
+            //-a* c*  0
+            // 0  0   1
+            //res is
+            //0  1  2
+            //3  4  5
+            //6  7  8
+            //
+            // c a 0 3
+            midMatrix[0] = __TWO_COMPLEX_MULT_4(c1r, c1i, a1r, a1i, res[0].x, res[0].y, res[3].x, res[3].y);
+            // c a 1 4
+            midMatrix[1] = __TWO_COMPLEX_MULT_4(c1r, c1i, a1r, a1i, res[1].x, res[1].y, res[4].x, res[4].y);
+            // c a 2 5
+            midMatrix[2] = __TWO_COMPLEX_MULT_4(c1r, c1i, a1r, a1i, res[2].x, res[2].y, res[5].x, res[5].y);
+            // -a* c* 0 3
+            midMatrix[3] = __TWO_COMPLEX_MULT_4(-a1r, a1i, c1r, -c1i, res[0].x, res[0].y, res[3].x, res[3].y);
+            // -a* c* 1 4
+            midMatrix[4] = __TWO_COMPLEX_MULT_4(-a1r, a1i, c1r, -c1i, res[1].x, res[1].y, res[4].x, res[4].y);
+            // -a* c* 2 5
+            midMatrix[5] = __TWO_COMPLEX_MULT_4(-a1r, a1i, c1r, -c1i, res[2].x, res[2].y, res[5].x, res[5].y);
+            memcpy(res, midMatrix, sizeof(_Complex) * 6);
+
+            return deviceSU3(res);
         }
+
+#if _CLG_DEBUG
+#undef aOver12
+#undef aOver6
+#undef y1
+#undef y2
+#undef y3
+#undef a2
+#undef aSqOver16
+#undef aSqOver4
+#undef l1
+#undef l2
+#undef l3
+#undef dn1
+#undef dn2
+#undef dn3
+#undef halfa
+#undef halfadn1
+#undef halfadn2
+#undef adn3
+
+#undef abs2a
+#undef abs2c
+#undef c2ic2r
+
+#undef q1
+#undef q2
+#undef a2rq1
+#undef a2iq1
+#undef a2rq2
+#undef a2iq2
+
+#undef a3ic2i
+#undef a3rc2r
+#undef a3rc2i
+#undef a3ic2r
+#endif
 
 #pragma endregion
 

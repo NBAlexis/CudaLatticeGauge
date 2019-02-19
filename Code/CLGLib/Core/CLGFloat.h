@@ -21,6 +21,7 @@
 #define _sin sin
 #define _cos cos
 #define __div(a, b) ((a) / (b))
+#define __rcp(a) (F(1.0) / (a))
 #define _hostexp exp
 #define _hostsqrt sqrt
 
@@ -43,7 +44,8 @@
 #define _pow __powf
 #define _sin __sinf
 #define _cos __cosf
-#define __div(a, b) __fdividef(a, b)
+#define __div __fdividef
+#define __rcp __frcp_rn
 #else
 //the __function is Intrinsic Functions which can be only used in device
 #define _sqrt sqrtf
@@ -53,6 +55,7 @@
 #define _sin sinf
 #define _cos cosf
 #define __div(a, b) ((a) / (b))
+#define __rcp(a) (F(1.0) / (a))
 #endif
 
 #define _hostexp expf

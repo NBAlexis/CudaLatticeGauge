@@ -17,10 +17,10 @@ __BEGIN_NAMESPACE
 * manipulate site
 */
 __device__ __inline__ static
-int4 _deviceMoveSquareSite(int4 ret, INT dir)
+SSmallInt4 _deviceMoveSquareSite(SSmallInt4 ret, SBYTE dir)
 {
     UBOOL bReverse = dir < 0;
-    UINT uDir = bReverse ? ((-dir) - 1) : (dir - 1);
+    BYTE uDir = static_cast<BYTE>(bReverse ? ((-dir) - 1) : (dir - 1));
     if (0 == uDir)
     {
         if (bReverse)
@@ -73,17 +73,24 @@ class CLGAPI CIndexSquare : public CIndex
 public:
     __device__ CIndexSquare(class deviceBoundaryCondition * devicePtr) : CIndex(devicePtr) { ; }
 
-    __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiLinkIndex, UINT st = kSpaceTime) const;
-    __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, UINT& count, UINT& plaqutteLength, UINT uiSiteIndex, UINT st = kSpaceTime) const;
-    __device__ virtual void _deviceGetPlaqutteCountLength(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink)
+    /**
+    * To be discarded..
+    * 
+    */
+    __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiLinkIndex, BYTE st = kSpaceTime) const;
+    __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiSiteIndex, BYTE st = kSpaceTime) const;
+    __device__ virtual void _deviceGetPlaquttesAtLinkAll(SIndex* retV, UINT uiLinkIndex) const;
+    __device__ virtual void _deviceGetPlaquttesAtSiteAll(SIndex* retV, UINT uiSiteIndex) const;
+
+    __device__ virtual void _deviceGetPlaqutteCountLength(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
     {
         plaqLength = 4;
-        countPerSite = _DC_Dim * (_DC_Dim - 1) / 2;
-        countPerLink = 2 * (_DC_Dim - 1);
+        countPerSite = static_cast<BYTE>(_DC_Dim * (_DC_Dim - 1) / 2);
+        countPerLink = static_cast<BYTE>(2 * (_DC_Dim - 1));
     }
 
-    __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, INT uiWalkDir) const;
-    __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, INT uiWalkDir) const;
+    __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, SBYTE uiWalkDir) const;
+    __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, SBYTE uiWalkDir) const;
 };
 
 __END_NAMESPACE

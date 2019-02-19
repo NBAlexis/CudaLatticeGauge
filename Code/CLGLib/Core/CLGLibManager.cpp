@@ -285,7 +285,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
     m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
     if (NULL != m_pLatticeData->m_pDeviceIndex)
     {
-        pGauge->CachePlaqutteIndexes();
+        m_pLatticeData->m_pIndexCache->CachePlaquttes();
     }
 
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
@@ -312,7 +312,12 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
 
     __FetchIntWithDefault(_T("FieldId"), -1);
     BYTE byFieldId = static_cast<BYTE>(iVaules);
-
+    assert(byFieldId < kMaxFieldCount && byFieldId > 1);
+    if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
+    {
+        appCrucial(_T("The field Id must > 1 and < %d\n"), kMaxFieldCount);
+        exit(EXIT_FAILURE);
+    }
     if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
         appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d!"), sFermionClassName.c_str(), byFieldId);
@@ -325,7 +330,10 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     pFermion->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
     m_pLatticeData->m_pOtherFields.AddItem(pFermion);
-
+    if (NULL != m_pLatticeData->m_pDeviceIndex)
+    {
+        m_pLatticeData->m_pIndexCache->CacheFermion(byFieldId);
+    }
     __FetchIntWithDefault(_T("PoolNumber"), 0);
     if (iVaules > 0)
     {

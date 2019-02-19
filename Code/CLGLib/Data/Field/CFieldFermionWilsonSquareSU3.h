@@ -68,8 +68,6 @@ protected:
     Real m_fKai;
 
     deviceWilsonVectorSU3* m_pDeviceData;
-    //When calculating D phi etc, the neigbour will change, so we need to copy it before calculate
-    deviceWilsonVectorSU3* m_pDeviceDataCopy;
 
 };
 

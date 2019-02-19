@@ -82,7 +82,7 @@ UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (t
 
 #define intokernaldir \
 UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); \
-UINT uiDir = _DC_Dir;
+BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
 
 #include "Tools/Math/CudaComplexFunction.h"

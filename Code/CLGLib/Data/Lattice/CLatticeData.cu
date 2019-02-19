@@ -26,14 +26,21 @@ _kernelDeletePtrs(CIndex * pdeviceIndex)
 
 __global__ void 
 _CLG_LAUNCH_BOUND_SINGLE
-_kernelGetPlaqLengthCount(UINT* deviceData)
+_kernelGetPlaqLengthCount(BYTE* deviceData)
 {
-    UINT length, countPersite, countPerLink;
+    BYTE length, countPersite, countPerLink;
     __idx->_deviceGetPlaqutteCountLength(length, countPersite, countPerLink);
 
     deviceData[0] = length;
     deviceData[1] = countPersite;
     deviceData[2] = countPerLink;
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND_SINGLE
+_kernelSetBondaryCondition(BYTE byFieldId, SBoundCondition bc)
+{
+    __idx->m_pBoundaryCondition->SetFieldSpecificBc(byFieldId, bc);
 }
 
 /**
@@ -51,6 +58,7 @@ CLatticeData::CLatticeData()
     , m_pFermionSolver(NULL)
     , m_pMeasurements(NULL)
     , m_pFieldCache(NULL)
+    , m_pIndexCache(NULL)
 
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
@@ -58,6 +66,7 @@ CLatticeData::CLatticeData()
     , m_uiBoundaryConditionType(0)
 {
     m_pFieldCache = new CFieldCache();
+    m_pIndexCache = new CIndexCache();
 }
 
 CLatticeData::~CLatticeData()
@@ -95,6 +104,7 @@ CLatticeData::~CLatticeData()
 
     appSafeDelete(m_pFieldCache);
     appSafeDelete(m_pGaugeField);
+    appSafeDelete(m_pIndexCache);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
     appSafeDelete(m_pFermionSolver);
@@ -161,21 +171,26 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
     }
 }
 
-void CLatticeData::GetPlaquetteLengthCount(UINT& plaqLength, UINT& countPerSite, UINT& countPerLink)
+void CLatticeData::GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
 {
-    UINT * deviceData;
-    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(UINT) * 3));
+    BYTE * deviceData;
+    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(BYTE) * 3));
 
     _kernelGetPlaqLengthCount << <1, 1 >> > (deviceData);
 
-    UINT hostData[3];
+    BYTE hostData[3];
 
-    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(UINT) * 3, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(BYTE) * 3, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaFree(deviceData));
 
     plaqLength = hostData[0];
     countPerSite = hostData[1];
     countPerLink = hostData[2];
+}
+
+void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc)
+{
+    _kernelSetBondaryCondition << <1, 1 >> > (byFieldId, bc);
 }
 
 CCString CLatticeData::GetInfos(const CCString& sTab) const
