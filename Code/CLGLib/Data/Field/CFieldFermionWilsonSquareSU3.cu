@@ -203,17 +203,37 @@ _kernelDFermionWilsonSquareSU3(
 
         //U(x,mu) phi(x+ mu)
         deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
-        result.Add(u_phi_x_p_m);
+        if (x_p_mu_Fermion.NeedToOpposite())
+        {
+            result.Sub(u_phi_x_p_m);
 
-        //- gammamu U(x,mu) phi(x+ mu)
-        result.Sub(gammaMu.MulWilsonC(u_phi_x_p_m));
+            //- gammamu U(x,mu) phi(x+ mu)
+            result.Add(gammaMu.MulWilsonC(u_phi_x_p_m));
+        }
+        else
+        {
+            result.Add(u_phi_x_p_m);
+
+            //- gammamu U(x,mu) phi(x+ mu)
+            result.Sub(gammaMu.MulWilsonC(u_phi_x_p_m));
+        }
 
         //U^{dagger}(x-mu) phi(x-mu)
         deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
-        result.Add(u_dagger_phi_x_m_m);
+        if (x_m_mu_Fermion.NeedToOpposite())
+        {
+            result.Sub(u_dagger_phi_x_m_m);
 
-        //gammamu U^{dagger}(x-mu) phi(x-mu)
-        result.Add(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
+            //gammamu U^{dagger}(x-mu) phi(x-mu)
+            result.Sub(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
+        }
+        else
+        {
+            result.Add(u_dagger_phi_x_m_m);
+
+            //gammamu U^{dagger}(x-mu) phi(x-mu)
+            result.Add(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
+        }
     }
 
     //result = phi(x) - kai sum _mu result
@@ -269,7 +289,6 @@ _kernelDWilsonForceSU3(
 
         //SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
         SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
-
         deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
@@ -284,7 +303,14 @@ _kernelDWilsonForceSU3(
 
         deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
         forceOfThisLink.Ta();
-        forceOfThisLink.MulReal(fKai);
+        if (x_p_mu_Fermion.NeedToOpposite())
+        {
+            forceOfThisLink.MulReal(-fKai);
+        }
+        else
+        {
+            forceOfThisLink.MulReal(fKai);
+        }
 
         pForce[linkIndex].Add(forceOfThisLink);
         if (NULL != pCachedForce)
@@ -305,12 +331,12 @@ _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDi
 
 CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() : CFieldFermion(), m_fKai(F(0.125))
 {
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount));
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount));
 }
 
 CFieldFermionWilsonSquareSU3::~CFieldFermionWilsonSquareSU3()
 {
-    checkCudaErrors(cudaFree(m_pDeviceData));
+    checkCudaErrors(__cudaFree(m_pDeviceData));
 }
 
 /**
@@ -492,6 +518,8 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     pPooled->Return();
+
+    m_fLength = Dot(this).x;
     //cache a inverse DDdagger field
     CFieldCache* pCache = appGetLattice()->m_pFieldCache;
     CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);

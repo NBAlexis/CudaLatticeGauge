@@ -117,7 +117,7 @@ void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameter
     if (NULL == m_pFermionSolver)
     {
         appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
     m_pFermionSolver->Configurate(param);
     m_pFermionSolver->AllocateBuffers(pFermionField);

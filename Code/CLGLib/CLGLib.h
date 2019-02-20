@@ -48,6 +48,7 @@
 #endif
 
 #include "Core/CudaHelperFunctions.h"
+#include "Core/CCudaBuffer.h"
 #include "Core/CLGFloat.h"
 
 #include "Tools/Data/CLinkedList.h"

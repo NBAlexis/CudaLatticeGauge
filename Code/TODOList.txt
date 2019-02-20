@@ -1,10 +1,4 @@
 
--- Cache index, also remove int4 for index which cost many registers
-
--- Cache force field and staple field rewrite
-
--- Cache fermion field rewrite
-
 -- Implement Meson correlator measure
 
 -- Enable temprature

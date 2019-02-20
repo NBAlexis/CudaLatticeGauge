@@ -122,7 +122,7 @@ void CCudaHelper::DeviceQuery()
         appGeneral("cudaGetDeviceCount returned %d\n-> %s\n",
             static_cast<INT>(error_id), cudaGetErrorString(error_id));
         appCrucial("Result = FAIL\n");
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     // This function call returns 0 if there are no CUDA capable devices.
@@ -452,13 +452,13 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
         appCrucial("cudaGetDeviceCount returned %d\n-> %s\n",
             static_cast<INT>(error_id), cudaGetErrorString(error_id));
         appCrucial("Result = FAIL\n");
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     if (0 == deviceCount)
     {
         appCrucial(_T("This program need GPU but you do NOT have a GPU.\n"));
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     cudaSetDevice(0);

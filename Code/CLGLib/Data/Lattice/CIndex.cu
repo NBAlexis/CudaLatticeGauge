@@ -78,8 +78,8 @@ void CIndexCache::CachePlaquttes()
 {
     appGetLattice()->GetPlaquetteLengthCount(m_uiPlaqutteLength, m_uiPlaqutteCountPerSite, m_uiPlaqutteCountPerLink);
 
-    checkCudaErrors(cudaMalloc((void**)&m_pPlaqutteCache, _HC_Volumn * sizeof(SIndex) * m_uiPlaqutteLength * m_uiPlaqutteCountPerSite));
-    checkCudaErrors(cudaMalloc((void**)&m_pStappleCache, _HC_Volumn * _HC_Dir * sizeof(SIndex) * (m_uiPlaqutteLength - 1) * m_uiPlaqutteCountPerLink));
+    checkCudaErrors(__cudaMalloc((void**)&m_pPlaqutteCache, _HC_Volumn * sizeof(SIndex) * m_uiPlaqutteLength * m_uiPlaqutteCountPerSite));
+    checkCudaErrors(__cudaMalloc((void**)&m_pStappleCache, _HC_Volumn * _HC_Dir * sizeof(SIndex) * (m_uiPlaqutteLength - 1) * m_uiPlaqutteCountPerLink));
 
     preparethread;
     _kernelCachePlaqIndex << <block, threads >> > (m_pPlaqutteCache, m_pStappleCache, m_uiPlaqutteCountPerLink, m_uiPlaqutteCountPerSite, m_uiPlaqutteLength);
@@ -91,8 +91,8 @@ void CIndexCache::CachePlaquttes()
 void CIndexCache::CacheFermion(BYTE byFieldId)
 {
     assert(byFieldId < kMaxFieldCount);
-    checkCudaErrors(cudaMalloc((void**)&m_pGaugeMoveCache[byFieldId], _HC_Volumn * _HC_Dir * sizeof(SIndex)));
-    checkCudaErrors(cudaMalloc((void**)&m_pFermionMoveCache[byFieldId], _HC_Volumn * _HC_Dir * 2 * sizeof(SIndex)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pGaugeMoveCache[byFieldId], _HC_Volumn * _HC_Dir * sizeof(SIndex)));
+    checkCudaErrors(__cudaMalloc((void**)&m_pFermionMoveCache[byFieldId], _HC_Volumn * _HC_Dir * 2 * sizeof(SIndex)));
 
     preparethread;
     _kernelCacheMoveIndex << <block, threads >> > (byFieldId, m_pGaugeMoveCache[byFieldId], m_pFermionMoveCache[byFieldId]);

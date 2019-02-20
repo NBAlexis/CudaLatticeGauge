@@ -4,8 +4,8 @@
 ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
 VerboseLevel : PARANOIAC
 VerboseOutput : timestamp
-ShowDeviceInformation : 1
-ShowParameterContent : 1
+ShowDeviceInformation : 0
+ShowParameterContent : 0
 
 
 ## dim = {2, 3, 4}
@@ -403,6 +403,8 @@ TestSolverGMRES:
 
         PoolNumber : 15
 
+        Period : [1, 1, 1, -1]
+
     Solver:
 
         SolverName : CSLASolverGMRES
@@ -673,7 +675,12 @@ TestFermionUpdator:
 
         FieldId : 2
 
-        PoolNumber : 15
+        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
+        ## = 6 + MaxDim of GMRES
+        PoolNumber : 16
+
+        ## Still have problem here
+        Period : [1, 1, 1, -1]
 
     Solver:
 
@@ -704,16 +711,31 @@ TestFermionUpdator:
 
 TestFermionUpdatorLargeScale:
 
+    ## For 32x32x32x32 lattice
+    ## 5 Gauge Fields - gauge, force, staple, evaluating gauge, momentum. 2.5GB (about 512MB each)
+    ## Total 18 Fermion fields.
+    ## 2(one for Fermion, one for cached DDdaggerInverse) 
+    ## + (Pool 6 + MaxDim) of GMRES Fermion fields, 
+    ## About 2.4GB (about 128Mb each)
+    ## 4 Index Buffers
+    ## Gauge Plaqutte per site, 8 x 24 x site = (200 Mb)
+    ## Staples, 8 x 24 x link = (800 Mb)
+    ## Gauge and Fermion move cache, about 12Mb
+    ## Random Number = 16Mb
+    ## Total > 5GB(Maximum avialiab of this computer is 4.9GB...)
+    ## AllocateBuffer : 4.9
+    ## Will test 32x32x32x32 on GTX1070 someday
     Dim : 4
     Dir : 4
     LatticeLength : [32, 32, 32, 16]
-    ThreadAutoDecompose : 0
-    ThreadDecompose : [8, 8, 8]
+    ##LatticeLength : [32, 32, 32, 32]
+    ##ThreadAutoDecompose : 0
+    ##ThreadDecompose : [8, 8, 8]
     LatticeIndex : EIndexType_Square
     LatticeBoundary : EBC_TorusSquare
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 8
+    ExponentialPrecision : 0
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
@@ -728,7 +750,7 @@ TestFermionUpdatorLargeScale:
         
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 0.5
+        IntegratorStepLength : 1
         IntegratorStep : 50
 
     Gauge:
@@ -751,7 +773,9 @@ TestFermionUpdatorLargeScale:
 
         FieldId : 2
 
-        PoolNumber : 15
+        PoolNumber : 16
+
+        Period : [1, 1, 1, -1]
 
     Solver:
 
@@ -760,7 +784,7 @@ TestFermionUpdatorLargeScale:
         ## Check Accuracy every DiviationStep steps
         MaxDim : 10
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000001
+        Accuracy : 0.000001
         Restart : 10
         ## 0 is recommanded
         AbsoluteAccuracy : 1

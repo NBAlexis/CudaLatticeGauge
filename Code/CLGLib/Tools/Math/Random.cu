@@ -86,46 +86,46 @@ CRandom::~CRandom()
     {
     case ER_Schrage:
         {
-            checkCudaErrors(cudaFree(m_pDeviceSeedTable));
+            checkCudaErrors(__cudaFree(m_pDeviceSeedTable));
         }
         break;
     case ER_MRG32K3A:
         {
             CURAND_CALL(curandDestroyGenerator(m_HGen));
-            checkCudaErrors(cudaFree(m_deviceBuffer));
-            checkCudaErrors(cudaFree(m_pDeviceRandStatesMRG));
+            checkCudaErrors(__cudaFree(m_deviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceRandStatesMRG));
         }
         break;
     case ER_PHILOX4_32_10:
         {
             CURAND_CALL(curandDestroyGenerator(m_HGen));
-            checkCudaErrors(cudaFree(m_deviceBuffer));
-            checkCudaErrors(cudaFree(m_pDeviceRandStatesPhilox));
+            checkCudaErrors(__cudaFree(m_deviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceRandStatesPhilox));
         }
         break;
     case ER_QUASI_SOBOL32:
         {
             CURAND_CALL(curandDestroyGenerator(m_HGen));
-            checkCudaErrors(cudaFree(m_deviceBuffer));
-            checkCudaErrors(cudaFree(m_pDeviceRandStatesSobol32));
-            checkCudaErrors(cudaFree(m_pDeviceSobolDirVec));
+            checkCudaErrors(__cudaFree(m_deviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceRandStatesSobol32));
+            checkCudaErrors(__cudaFree(m_pDeviceSobolDirVec));
         }
         break;
     case ER_SCRAMBLED_SOBOL32:
         {
             CURAND_CALL(curandDestroyGenerator(m_HGen));
-            checkCudaErrors(cudaFree(m_deviceBuffer));
-            checkCudaErrors(cudaFree(m_pDeviceRandStatesScrambledSobol32));
-            checkCudaErrors(cudaFree(m_pDeviceSobolDirVec));
-            checkCudaErrors(cudaFree(m_pDeviceSobelConsts));
+            checkCudaErrors(__cudaFree(m_deviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceRandStatesScrambledSobol32));
+            checkCudaErrors(__cudaFree(m_pDeviceSobolDirVec));
+            checkCudaErrors(__cudaFree(m_pDeviceSobelConsts));
         }
         break;
     case ER_XORWOW:
         default:
         {
             CURAND_CALL(curandDestroyGenerator(m_HGen));
-            checkCudaErrors(cudaFree(m_deviceBuffer));
-            checkCudaErrors(cudaFree(m_pDeviceRandStatesXORWOW));
+            checkCudaErrors(__cudaFree(m_deviceBuffer));
+            checkCudaErrors(__cudaFree(m_pDeviceRandStatesXORWOW));
         }
         break;
     }
@@ -134,7 +134,7 @@ CRandom::~CRandom()
 //Initial XORWOW only support 512 threads per block
 void CRandom::InitialStatesXORWOW(UINT )
 {
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volumn * (_HC_Dir + 1)));
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 512;
     TArray<UINT> latticeDim;
@@ -150,7 +150,7 @@ void CRandom::InitialStatesXORWOW(UINT )
 //Initial Philox only support 256 threads per block
 void CRandom::InitialStatesPhilox(UINT )
 {
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volumn * (_HC_Dir + 1)));
 
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 256;
@@ -168,7 +168,7 @@ void CRandom::InitialStatesPhilox(UINT )
 //Initial MRG only support 256 threads per block
 void CRandom::InitialStatesMRG(UINT )
 {
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volumn * (_HC_Dir + 1)));
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 256;
     TArray<UINT> latticeDim;
@@ -185,9 +185,9 @@ void CRandom::InitialStatesSobol32(UINT )
 {
     //support only 20000 dimensions, so using _HC_Volumn instead
     m_uiFatIdDivide = _HC_Dir + 1;
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesSobol32, 
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesSobol32,
         sizeof(curandStateSobol32) * _HC_Volumn));
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobolDirVec, 
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobolDirVec,
         sizeof(curandDirectionVectors32_t) * _HC_Volumn));
 
     //int[32]
@@ -204,11 +204,11 @@ void CRandom::InitialStatesSobol32(UINT )
 void CRandom::InitialStatesScrambledSobol32(UINT )
 {
     m_uiFatIdDivide = _HC_Dir + 1;
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceRandStatesScrambledSobol32, 
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesScrambledSobol32,
         sizeof(curandStateScrambledSobol32) * _HC_Volumn));
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobolDirVec, 
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobolDirVec,
         sizeof(curandDirectionVectors32_t) * _HC_Volumn));
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSobelConsts, 
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobelConsts,
         sizeof(UINT) * _HC_Volumn));
 
     curandDirectionVectors32_t *hostVectors32;
@@ -233,7 +233,7 @@ void CRandom::InitialStatesScrambledSobol32(UINT )
 
 void CRandom::InitialTableSchrage(UINT )
 {
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
     preparethread;
     _kernalAllocateSeedTable << <block, threads >> > (m_pDeviceSeedTable);
 }

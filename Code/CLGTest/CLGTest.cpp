@@ -13,10 +13,11 @@ TestList* _testSuits;
 
 UINT RunTest(CParameters&params, TestList* pTest)
 {
-    appGeneral("=========== Testing:%s \n", pTest->m_sParamName);
+    appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
 
     CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
-
+    appGeneral(_T("============= Parameters =============\n"));
+    paramForTheTest.Dump(_T(""));
     //Initial
     if (!appInitialCLG(paramForTheTest))
     {
@@ -58,8 +59,6 @@ void ListAllTests(const THashMap<CCString, TArray<TestList*>*>& category)
             COUT << std::endl;
         }
     }
-
-    COUT << _T("============== Common ==============\nq - Quit,    a - All\n");
 }
 
 void DeleteAllLists(THashMap<CCString, TArray<TestList*>*>& category)
@@ -104,9 +103,11 @@ int main(int argc, char * argv[])
     }
 
     INT inputNumber = -1;
+    ListAllTests(category);
     while (TRUE)
     {
-        ListAllTests(category);
+        COUT << _T("============== Tests ==============\nq - Quit,  l - List all,  r - Run all,  p - Print Device info\n");
+        //ListAllTests(category);
         inputNumber = -1;
         std::string name;
         std::getline(std::cin, name);
@@ -117,7 +118,18 @@ int main(int argc, char * argv[])
         {
             break;
         }
-        if (appIntToString(number) == sRes)
+
+        if (sRes == _T("l"))
+        {
+            ListAllTests(category);
+            bExcuted = TRUE;
+        }
+        else if (sRes == _T("p"))
+        {
+            CCudaHelper::DeviceQuery();
+            bExcuted = TRUE;
+        }
+        else if (appIntToString(number) == sRes)
         {
             if (number >= 0 && number < allTests.Num())
             {
@@ -125,7 +137,7 @@ int main(int argc, char * argv[])
                 bExcuted = TRUE;
             }
         }
-        else if (sRes == _T("a"))
+        else if (sRes == _T("r"))
         {
             CTimer timer;
             timer.Start();

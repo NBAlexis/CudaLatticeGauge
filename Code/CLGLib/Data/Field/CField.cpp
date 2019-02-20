@@ -11,7 +11,11 @@
 
 __BEGIN_NAMESPACE
 
-CField::CField() : CBase(), m_pOwner(NULL), m_pPool(NULL)
+CField::CField() 
+    : CBase()
+    , m_pOwner(NULL)
+    , m_pPool(NULL)
+    , m_fLength(F(1.0))
 {
     
 }

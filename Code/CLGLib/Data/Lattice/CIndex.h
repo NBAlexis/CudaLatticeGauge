@@ -110,22 +110,22 @@ public:
     {
         if (NULL != m_pPlaqutteCache)
         {
-            checkCudaErrors(cudaFree(m_pPlaqutteCache));
+            checkCudaErrors(__cudaFree(m_pPlaqutteCache));
         }
         if (NULL != m_pStappleCache)
         {
-            checkCudaErrors(cudaFree(m_pStappleCache));
+            checkCudaErrors(__cudaFree(m_pStappleCache));
         }
 
         for (UINT i = 0; i < kMaxFieldCount; ++i)
         {
             if (NULL != m_pGaugeMoveCache[i])
             {
-                checkCudaErrors(cudaFree(m_pGaugeMoveCache[i]));
+                checkCudaErrors(__cudaFree(m_pGaugeMoveCache[i]));
             }
             if (NULL != m_pFermionMoveCache[i])
             {
-                checkCudaErrors(cudaFree(m_pFermionMoveCache[i]));
+                checkCudaErrors(__cudaFree(m_pFermionMoveCache[i]));
             }
         }
     }

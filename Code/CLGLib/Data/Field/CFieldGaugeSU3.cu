@@ -718,11 +718,11 @@ void CFieldGaugeSU3::SetByArray(Real* array)
     //checkCudaErrors(cudaMemcpy(m_pDeviceData, array, sizeof(Real) * _HC_LinkCount * 18, cudaMemcpyHostToDevice));
     
     Real* pDeviceArray;
-    checkCudaErrors(cudaMalloc((void**)&pDeviceArray, sizeof(Real) * _HC_LinkCount * 18));
+    checkCudaErrors(__cudaMalloc((void**)&pDeviceArray, sizeof(Real) * _HC_LinkCount * 18));
     checkCudaErrors(cudaMemcpy(pDeviceArray, array, sizeof(Real) * _HC_LinkCount * 18, cudaMemcpyHostToDevice));
     preparethread;
     _kernelSetConfigurationSU3 << <block, threads >> > (m_pDeviceData, pDeviceArray);
-    checkCudaErrors(cudaFree(pDeviceArray));
+    checkCudaErrors(__cudaFree(pDeviceArray));
 
     free(array);
 
@@ -808,12 +808,12 @@ Real CFieldGaugeSU3::CalculateKinematicEnergy() const
 
 CFieldGaugeSU3::CFieldGaugeSU3() : CFieldGauge()
 {
-    checkCudaErrors(cudaMalloc((void **)&m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount));
 }
 
 CFieldGaugeSU3::~CFieldGaugeSU3()
 {
-    checkCudaErrors(cudaFree(m_pDeviceData));
+    checkCudaErrors(__cudaFree(m_pDeviceData));
 }
 
 void CFieldGaugeSU3::ExpMult(Real a, CField* U) const

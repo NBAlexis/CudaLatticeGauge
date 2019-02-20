@@ -227,6 +227,9 @@
     <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="Core\CCudaBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">

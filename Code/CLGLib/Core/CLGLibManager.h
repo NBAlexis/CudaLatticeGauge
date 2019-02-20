@@ -29,6 +29,7 @@ public:
         : m_pCudaHelper(NULL)
         , m_pLatticeData(NULL)
         , m_pFileSystem(NULL)
+        , m_pBuffer(NULL)
     {
 
     }
@@ -47,6 +48,7 @@ public:
     class CCudaHelper* m_pCudaHelper;
     class CLatticeData* m_pLatticeData;
     class CFileSystem* m_pFileSystem;
+    class CCudaBuffer* m_pBuffer;
 
     void SetupLog(class CParameters& params);
 
@@ -99,6 +101,11 @@ inline class CFileSystem* appGetFileSystem()
 inline class CSLASolver* appGetFermionSolver()
 {
     return appGetLattice()->m_pFermionSolver;
+}
+
+inline CCudaBuffer* GetBuffer()
+{
+    return GCLGManager.m_pBuffer;
 }
 
 /**

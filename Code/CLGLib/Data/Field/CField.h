@@ -86,7 +86,7 @@ public:
 
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const _Complex& a, const CField* x) = 0;
-
+    Real GetLength() const { return m_fLength; }
     //This is a * me
     virtual void ScalarMultply(const _Complex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
@@ -109,6 +109,7 @@ public:
         assert(NULL != U);
         U->m_pOwner = m_pOwner;
         U->m_byFieldId = m_byFieldId;
+        U->m_fLength = m_fLength;
     }
 
     virtual CField* GetCopy() const = 0;
@@ -119,6 +120,7 @@ public:
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
+    Real m_fLength;
 
     void Return();
 
@@ -151,6 +153,7 @@ public:
         {
             return m_pPool.Pop();
         }
+        appGeneral(_T("Warning: Field Pool Out Number!!!\n"));
         CField* newOne = CreateNew();
         return newOne;
     }

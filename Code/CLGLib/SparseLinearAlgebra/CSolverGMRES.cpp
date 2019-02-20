@@ -86,7 +86,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
     {
-        fBLength = pFieldB->Dot(pFieldB).x;
+        fBLength = pFieldB->GetLength();//pFieldB->Dot(pFieldB).x;
     }
 
     appParanoiac(_T("-- CSLASolverGMRES::Solve start operator: %s-- fLength = %f --\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str(), fBLength);

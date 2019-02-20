@@ -39,9 +39,9 @@ void CCLGLibManager::SetupLog(CParameters &params)
 
     //check whether to log parameter file
     INT iTag = 0;
-    appGeneral(_T("============================== Parameter =============================\n\n"));
+    //appGeneral(_T("============================== Parameter =============================\n\n"));
     __CheckTag(_T("ShowParameterContent"), params.Dump());
-    appGeneral(_T("============================== GPU =============================\n\n"));
+    //appGeneral(_T("============================== GPU =============================\n\n"));
     __CheckTag(_T("ShowDeviceInformation"), CCudaHelper::DeviceQuery());
 
     appGeneral(_T("============================== Log Start =============================\n\n"));
@@ -273,7 +273,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
          || !params.FetchStringValue(_T("GaugeFileName"), sFileName))
         {
             appCrucial(_T("Gauge initial type is EFIT_ReadFromFile, but cannot find GaugeFileType or GaugeFileName!\n"));
-            exit(EXIT_FAILURE);
+            _FAIL_EXIT;
         }
         EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
         pGauge->m_pOwner = m_pLatticeData;
@@ -316,7 +316,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
     {
         appCrucial(_T("The field Id must > 1 and < %d\n"), kMaxFieldCount);
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
     if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
@@ -330,6 +330,16 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     pFermion->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
     m_pLatticeData->m_pOtherFields.AddItem(pFermion);
+    TArray<INT> periodic;
+    if (params.FetchValueArrayINT(_T("Period"), periodic))
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+    }
     if (NULL != m_pLatticeData->m_pDeviceIndex)
     {
         m_pLatticeData->m_pIndexCache->CacheFermion(byFieldId);
@@ -367,7 +377,7 @@ void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
     if (0 == iBoundaryClassSize)
     {
         appCrucial(_T("Create Boundary Condition failed! %s"), sValues.c_str());
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     __FetchStringWithDefault(_T("LatticeIndex"), _T("EIndexType_Square"));
@@ -384,7 +394,7 @@ void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
     if (0 == indexClassSize)
     {
         appCrucial(_T("Create Index Failed!!!: %s"), sValues.c_str());
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     //Now, we need to copy the content of ptr to lattice
@@ -430,7 +440,7 @@ void CCLGLibManager::CreateActionList(class CParameters& params)
                 //We have already set the constant ECI_ActionListLength
                 //So, NULL is not allowed!
                 appCrucial(_T("Create Action Failed: %s\n"), sActionName.c_str());
-                exit(EXIT_FAILURE);
+                _FAIL_EXIT;
             }
         }
     }
@@ -455,7 +465,7 @@ void CCLGLibManager::CreateUpdator(class CParameters& params)
         if (NULL == pHMC || NULL == integrator)
         {
             appCrucial(_T("HMC need a integrator!, but s = %s"), sValues.c_str());
-            exit(EXIT_FAILURE);
+            _FAIL_EXIT;
         }
 
         sUpdatorInfo += (" Integrator:" + sValues);
@@ -467,7 +477,7 @@ void CCLGLibManager::CreateUpdator(class CParameters& params)
     else
     {
         appCrucial(_T("Failed to create Updator! s = %s"), sValues.c_str());
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
 
     appGeneral(_T("Create Updator %s\n"), sUpdatorInfo.c_str());
@@ -501,7 +511,7 @@ void CCLGLibManager::CreateMeasurement(class CParameters& params)
                 //We have already set the constant ECI_ActionListLength
                 //So, NULL is not allowed!
                 appCrucial(_T("Create Measure Failed: %s\n"), sMeasureName.c_str());
-                exit(EXIT_FAILURE);
+                _FAIL_EXIT;
             }
         }
     }
@@ -521,7 +531,7 @@ void CCLGLibManager::CreateSolver(class CParameters& params)
     if (NULL == pField)
     {
         appCrucial(_T("Solver must be created for a specified field!\n"));
-        exit(EXIT_FAILURE);
+        _FAIL_EXIT;
     }
     m_pLatticeData->CreateFermionSolver(sSolverName, params, pField);
 }
@@ -531,6 +541,17 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     m_pCudaHelper = new CCudaHelper();
     m_pLatticeData = new CLatticeData();
     m_pFileSystem = new CFileSystem();
+    m_pBuffer = new CCudaBuffer();
+
+    //Allocate Buffer
+    Real fBufferSize = F(0.0);
+    if (params.FetchValueReal(_T("AllocateBuffer"), fBufferSize))
+    {
+        if (fBufferSize > F(0.1) && fBufferSize < F(32.0))
+        {
+            m_pBuffer->Initial(static_cast<FLOAT>(fBufferSize));
+        }
+    }
 
     InitialLatticeAndConstant(params);
     InitialRandom(params);
@@ -596,6 +617,7 @@ void CCLGLibManager::Quit()
     appSafeDelete(m_pLatticeData);
     appSafeDelete(m_pCudaHelper);
     appSafeDelete(m_pFileSystem);
+    appSafeDelete(m_pBuffer);
 
     INT devCount;
     cudaGetDeviceCount(&devCount);

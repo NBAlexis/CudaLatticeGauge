@@ -92,10 +92,11 @@ SIndex CBoundaryConditionTorusSquare::_devcieGetMappedIndex(const SSmallInt4 &si
     return SIndex(x * _DC_MultX
                 + y * _DC_MultY
                 + z * _DC_MultZ
-                + t,
-        fromsite.m_byTag,
-        0,
-        byOldRegion);
+                + t, //index
+        0, //dir
+        0, //tag
+        0, //field
+        byOldRegion); //region
 }
 
 /**
@@ -116,22 +117,23 @@ SIndex CBoundaryConditionTorusSquare::_devcieGetFermionMappedIndex(BYTE byFieldI
     //It means it go back from the minus-t region to normal one
     //So whether need to opposite, is decided whether the t-bit is 1
     SBYTE retOpposite = 1;
-    if (m_FermionBC[byFieldId].x < 0 && ret.m_byReginId & 0x01)
+    if (m_FermionBC[byFieldId].x < 0 && (0 != (ret.m_byReginId & 0x01)))
     {
         retOpposite = -1;
     }
-    if (m_FermionBC[byFieldId].y < 0 && ret.m_byReginId & 0x02)
+    if (m_FermionBC[byFieldId].y < 0 && (0 != (ret.m_byReginId & 0x02)))
     {
         retOpposite = retOpposite * -1;
     }
-    if (m_FermionBC[byFieldId].z < 0 && ret.m_byReginId & 0x04)
+    if (m_FermionBC[byFieldId].z < 0 && (0 != (ret.m_byReginId & 0x04)))
     {
         retOpposite = retOpposite * -1;
     }
-    if (m_FermionBC[byFieldId].w < 0 && ret.m_byReginId & 0x08)
+    if (m_FermionBC[byFieldId].w < 0 && (0 != (ret.m_byReginId & 0x08)))
     {
         retOpposite = retOpposite * -1;
     }
+
     if (retOpposite < 0)
     {
         ret.m_byTag = _kOpposite;

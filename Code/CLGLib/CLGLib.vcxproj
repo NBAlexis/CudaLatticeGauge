@@ -22,6 +22,7 @@
     <ClInclude Include="CLGLib.h" />
     <ClInclude Include="CLGLib_Private.h" />
     <ClInclude Include="Core\CBase.h" />
+    <ClInclude Include="Core\CCudaBuffer.h" />
     <ClInclude Include="Core\CLGDefine.h" />
     <ClInclude Include="Core\CLGFloat.h" />
     <ClInclude Include="Core\CLGLibManager.h" />

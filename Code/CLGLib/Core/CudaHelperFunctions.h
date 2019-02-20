@@ -38,6 +38,12 @@
 #define _CLG_LAUNCH_BOUND_SINGLE
 #endif
 
+#define _FAIL_EXIT \
+DEVICE_RESET \
+exit(EXIT_FAILURE); 
+
+
+
 #pragma endregion Includes
 
 
