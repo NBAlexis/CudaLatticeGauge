@@ -204,13 +204,13 @@ extern "C" {
 
 #else
 
-#if _CLG_DOUBLEFLOAT
-#define __GAMMA_ALIGN 128
-#else
-#define __GAMMA_ALIGN 64
-#endif
+//#if _CLG_DOUBLEFLOAT
+//#define __GAMMA_ALIGN 128
+//#else
+//#define __GAMMA_ALIGN 64
+//#endif
 
-    struct alignas(__GAMMA_ALIGN) gammaMatrix
+    struct alignas(16) gammaMatrix
     {
         //Initialize is not allowed for constant variables
         __device__ gammaMatrix() 
@@ -220,14 +220,15 @@ extern "C" {
 
         __device__ void Reset() { }
 
-        __device__ __inline__ void Set(UINT x, UINT y, UINT b)
+        __device__ __inline__ void Set(BYTE x, BYTE y, BYTE b)
         {
             assert(x < 4);
             assert(y < 4);
             assert(b < 4);
 
             m_uiIndex[x] = y;
-            m_cV[x] = _make_cuComplex(3 == b ? F(0.0) : (F(1.0) - b), 0 == b ? F(0.0) : (F(2.0) - b));
+            m_byZ4[x] = b;
+            //m_cV[x] = _make_cuComplex(3 == b ? F(0.0) : (F(1.0) - b), 0 == b ? F(0.0) : (F(2.0) - b));
         }
 
         /**
@@ -237,10 +238,14 @@ extern "C" {
         {
             deviceWilsonVectorSU3 ret;
 
-            ret.m_d[0] = other.m_d[m_uiIndex[0]].MulCompC(m_cV[0]);
-            ret.m_d[1] = other.m_d[m_uiIndex[1]].MulCompC(m_cV[1]);
-            ret.m_d[2] = other.m_d[m_uiIndex[2]].MulCompC(m_cV[2]);
-            ret.m_d[3] = other.m_d[m_uiIndex[3]].MulCompC(m_cV[3]);
+            //ret.m_d[0] = other.m_d[m_uiIndex[0]].MulCompC(m_cV[0]);
+            //ret.m_d[1] = other.m_d[m_uiIndex[1]].MulCompC(m_cV[1]);
+            //ret.m_d[2] = other.m_d[m_uiIndex[2]].MulCompC(m_cV[2]);
+            //ret.m_d[3] = other.m_d[m_uiIndex[3]].MulCompC(m_cV[3]);
+            ret.m_d[0] = other.m_d[m_uiIndex[0]].MulZ4C(m_byZ4[0]);
+            ret.m_d[1] = other.m_d[m_uiIndex[1]].MulZ4C(m_byZ4[1]);
+            ret.m_d[2] = other.m_d[m_uiIndex[2]].MulZ4C(m_byZ4[2]);
+            ret.m_d[3] = other.m_d[m_uiIndex[3]].MulZ4C(m_byZ4[3]);
 
             return ret;
         }
@@ -251,27 +256,28 @@ extern "C" {
         */
         __device__ __inline__ void Print() const
         {
-            for (int row = 0; row < 4; ++row)
+            for (BYTE row = 0; row < 4; ++row)
             {
+                _Complex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
                 if (row == 0)
                 {
                     printf("(%2f,%2f) 0     0     0\n",
-                        m_cV[row].x, m_cV[row].y);
+                        cv.x, cv.y);
                 }
                 else if (row == 1)
                 {
                     printf("0     (%2f,%2f) 0     0\n",
-                        m_cV[row].x, m_cV[row].y);
+                        cv.x, cv.y);
                 }
                 else if (row == 2)
                 {
                     printf("0     0     (%2f,%2f) 0     0\n",
-                        m_cV[row].x, m_cV[row].y);
+                        cv.x, cv.y);
                 }
                 else if (row == 3)
                 {
                     printf("0     0     0     (%2f,%2f)\n",
-                        m_cV[row].x, m_cV[row].y);
+                        cv.x, cv.y);
                 }
             }
         }
@@ -290,7 +296,8 @@ extern "C" {
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
-                ret.m_cV[row] = _cuCmulf(m_cV[row], other.m_cV[m_uiIndex[row]]);
+                ret.m_byZ4[row] = (m_byZ4[row] + other.m_byZ4[m_uiIndex[row]]) & 0x03;
+                //ret.m_cV[row] = _cuCmulf(m_cV[row], other.m_cV[m_uiIndex[row]]);
             }
 
             return ret;
@@ -306,14 +313,63 @@ extern "C" {
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
-                ret.m_cV[row] = _cuCmulf(_make_cuComplex(F(0.0), F(1.0)), _cuCmulf(m_cV[row], other.m_cV[m_uiIndex[row]]));
+                ret.m_byZ4[row] = (m_byZ4[row] + other.m_byZ4[m_uiIndex[row]] + 1) & 0x03;
+                //ret.m_cV[row] = _cuCmulf(_make_cuComplex(F(0.0), F(1.0)), _cuCmulf(m_cV[row], other.m_cV[m_uiIndex[row]]));
             }
 
             return ret;
         }
 
-        UINT m_uiIndex[4];
-        _Complex m_cV[4];
+        /**
+        * Note that, except for Unitary and Gamma5, SIGMA12 and SIGMA43 matrix
+        *
+        * When m_uiIndex[0] = 1, we must have m_uiIndex[1] = 0.
+        * at the same time, m_uiIndex[2] = 3, m_uiIndex[3] = 2.
+        *
+        * When m_uiIndex[0] = 2, we must have m_uiIndex[2] = 0.
+        * at the same time, m_uiIndex[1] = 3, m_uiIndex[3] = 1.
+        *
+        * So, we only need to know m_uiIndex[0], i, we known every m_uiIndex[]
+        *
+        * for m_uiIndex[0] = 0, m_uiIndex[1] = 1, m_uiIndex[2] = 2, m_uiIndex[3] = 3
+        * for m_uiIndex[0] = m and i = n, m_uiIndex[0] = m, m_uiIndex[m] = 0, m_uiIndex[i] = n(k!=0,m,n) m_uiIndex[n] = i
+        *
+        */
+        __device__ __inline__ void CalculateNextSymmetricIndex()
+        {
+            if (0 == m_uiIndex[0])
+            {
+                m_byNextSymmetricIndex = 0;
+                //m_uiIndex[0] = 0, m_uiIndex[1] = 1, m_uiIndex[2] = 2, m_uiIndex[3] = 3
+            }
+            else if (1 == m_uiIndex[0])
+            {
+                m_byNextSymmetricIndex = 2;
+                //m_uiIndex[0] = 1, m_uiIndex[1] = 0, m_uiIndex[2] = 3, m_uiIndex[3] = 2
+            }
+            //two cases
+            //m_uiIndex[0] = 2, m_uiIndex[1] = 3, m_uiIndex[2] = 0, m_uiIndex[3] = 1
+            //or
+            //m_uiIndex[0] = 3, m_uiIndex[1] = 2, m_uiIndex[3] = 0, m_uiIndex[2] = 1
+            //Both can be set as m_byNextSymmetricIndex = 1, but we also can distinguish them
+            else if (2 == m_uiIndex[0])
+            {
+                m_byNextSymmetricIndex = 3; //can be both 1 or 3
+                //m_uiIndex[0] = 2, m_uiIndex[1] = 3, m_uiIndex[2] = 0, m_uiIndex[3] = 1
+            }
+            else
+            {
+                m_byNextSymmetricIndex = 1; //can be both 1 or 2
+                //m_uiIndex[0] = 3, m_uiIndex[1] = 2, m_uiIndex[3] = 0, m_uiIndex[2] = 1
+            }
+        }
+
+    public:
+
+        //_Complex m_cV[4];
+        BYTE m_byZ4[4];
+        BYTE m_uiIndex[4];
+        BYTE m_byNextSymmetricIndex;
     };
 
 #endif
@@ -417,6 +473,11 @@ public:
         gmarray[SIGMA43] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA4]);
 
         gmarray[CHARGECONJG] = gmarray[GAMMA4]._mult(gmarray[GAMMA2]);
+
+        for (UINT i = 0; i < EGM_MAX; ++i)
+        {
+            gmarray[i].CalculateNextSymmetricIndex();
+        }
     }
 };
 

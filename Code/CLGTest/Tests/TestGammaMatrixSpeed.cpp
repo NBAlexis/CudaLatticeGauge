@@ -26,6 +26,7 @@ UINT TestGammaMatrix(CParameters& )
     return 0;
 }
 
+//930 - 990 ms
 //__REGIST_TEST(TestGammaMatrix, Misc, TestGammaMatrixSpeed);
 
 

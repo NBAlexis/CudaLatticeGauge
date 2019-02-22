@@ -50,7 +50,8 @@ Note that, they are all Grassman numbers (exchange three times will introduce a 
 Using the Wick theorem for Grassman numbers ($f$ is flavour index, $c$ is color index, $a,b$ are spinor index).
 \begin{equation}
 \begin{split}
-&\langle \psi _1 \bar{\psi}_1\ldots \psi _n \bar{\psi}_n\rangle = \frac{1}{Z_f}\int \mathcal{\psi}\exp \left(\textcolor[rgb]{1,0,0}{+}\sum _{n}\bar{\psi}M\psi\right) =(-1)^n \det \left[M^{-1}\right]\\
+&\langle \ldots \rangle = \frac{1}{Z_f}\int \mathcal{D}\left[\psi\right]\ldots \exp \left(\textcolor[rgb]{1,0,0}{-}\sum _{l,m}^N\bar{\psi}_lM_{lm}\psi_m\right).\\
+&\langle \psi _{i_1}\ldots \psi _{i_n} \bar{\psi}_{j_1}\ldots \bar{\psi}_{j_n}\rangle = \sum _{P}{\rm sign}(P)\prod ^N_n \left(M^{-1}\right)_{i_n,j_{P_n}}.\\
 &\langle \psi^f (n)_{a,c_1}\bar{\psi}^f_{b,c_2}(m)\rangle = -D_{f,a,b,c_1,c_2}^{-1}(n,m).\\
 \end{split}
 \end{equation}
@@ -61,7 +62,7 @@ Then we can multiply gamma matrix back
 \end{split}
 \end{equation}
 
-The trace is for both color and spinor space.
+The trace is for both color and spinor space. 
 
 \begin{itemize}
   \item iso-singlet
@@ -69,6 +70,188 @@ The trace is for both color and spinor space.
 
 Denote the variables as $C_S$ and $O_S$.
 
-\subsubsection{\label{MonteCarloInMonteCarlo}Monte Carlo in Monte Carlo}
+\subsubsection{\label{Source}\index{source}Sources}
 
-Trace estimator.
+\begin{itemize}
+  \item Fourier transform
+\end{itemize}
+
+Usually, one need to know the observable in momentum space, which is
+\begin{equation}
+\begin{split}
+&\tilde{C}({\bf p},n_t;{\bf 0}, 0)\equiv \frac{1}{\sqrt{\Lambda _3}}\sum _{{\bf n}\in \Lambda _3}\exp (-ia {\bf n}\cdot {\bf p})C({\bf n},n_t;{\bf 0},0)\\
+\end{split}
+\label{eq.mesoncorrelator.Fourier}
+\end{equation}
+where $\Lambda _3$ denotes the spatial lattice.
+
+For hadron spectroscopy, 
+\begin{equation}
+\begin{split}
+&\tilde{C}({\bf p},n_t;{\bf 0}, 0)\propto \exp\left(-an_tE_0({\bf p})\right)\times \left(1+\mathcal{O}\left(e^{-an_t\Delta E}\right)\right)
+\end{split}
+\end{equation}
+where $E_0({\bf p})$ is the ground state energy (dissipative relation?) and $\Delta E$ is the energy gap between ground state and the lowest excitation, and
+\begin{equation}
+\begin{split}
+&E_0({\bf p})=\sqrt{m_H^2+|{\bf p}|^2}\times \left(1+\mathcal{O}\left(a|{\bf p}|\right)\right)\\
+\end{split}
+\end{equation}
+
+For zero momentum, we find $m_H$. That is why the lattice at $t$-dir is usually larger than the spatial directions.
+
+From Eq.~(\ref{eq.mesoncorrelator.Fourier}), we only need to calculate $C(n,0)$ for all $n$. That is a \index{point source}\textbf{point source}.
+
+Using $\{\gamma _{\mu},\gamma _5\}=0$ and $\gamma _5^2=1$, $\{\gamma _{\mu},\gamma _5\}=0$, so
+\begin{equation}
+\begin{split}
+&\left(\Gamma D^{-1}(n,m)\Gamma D^{-1}(m,n)\right)=\left(\Gamma D^{-1}(n,m) \Gamma \gamma _5 \left(D^{-1}(n,m)\right)^{\dagger}\gamma _5\right)\\
+&{\rm tr}_{c,s}\left[\Gamma D^{-1}(n,m) \Gamma \gamma _5 \left(D^{-1}(n,m)\right)^{\dagger}\gamma _5\right]={\rm tr}_{c,s}\left[\gamma _5\Gamma D^{-1}(n,m) \Gamma \gamma _5 \left(D^{-1}(n,m)\right)^{\dagger}\right]\\
+&=\textcolor[rgb]{0,0,1}{\pm} {\rm tr}_{c,s}\left[\Gamma' D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\right]\\
+&=\textcolor[rgb]{0,0.5,0}{\pm} {\rm tr}_{c,s}\left[\Gamma'^{\dagger} D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\right]\\
+\end{split}
+\end{equation}
+where $\Gamma ' = \Gamma \gamma _5$ and $\textcolor[rgb]{0,0,1}{\pm}$ come from $\gamma _5\Gamma=\pm \Gamma \gamma _5$, and $\textcolor[rgb]{0,0.5,0}{\pm}$ come from both $\gamma _5\Gamma=\pm \Gamma \gamma _5$ and $\Gamma ^{\dagger}=\pm \Gamma ^{\dagger}$. Note that it is in fact a \textbf{real} number because
+\begin{equation}
+\begin{split}
+&{\rm tr}_{c,s}\left[\Gamma'^{\dagger} D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\right]={\rm tr}_{c,s}\left[D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\Gamma'^{\dagger} \right]\\
+&\left({\rm tr}_{c,s}\left[\Gamma'^{\dagger} D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\right]\right)^*={\rm tr}_{c,s}\left[\left(D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\Gamma'^{\dagger} \right)^{\dagger}\right]\\
+&={\rm tr}_{c,s}\left[\Gamma' D^{-1}(n,m) {\Gamma'}^{\dagger} \left(D^{-1}(n,m)\right)^{\dagger}\right]={\rm tr}_{c,s}\left[{\Gamma'}^{\dagger} D^{-1}(n,m) \Gamma' \left(D^{-1}(n,m)\right)^{\dagger}\right]
+\end{split}
+\end{equation}
+With point source, we need only to calculate $D^{-1}(n,0)$, which is a $12\times 12=144$ elements matrix field on each site, with the matrix element
+\begin{equation}
+\begin{split}
+&D^{-1}(n,m_0)_{c_1,c_2,s_1,s_2}=\sum _{m,c_3,s_3}D^{-1}(n,m)_{c_1,c_3,s_1,s_3}\left(S(m_0,c_2,s_2;m,c_3,s_3)\right)\\
+&D^{-1}(n,m_0)_{:,c_2,:,s_2}=D^{-1} \phi ^{S}_{m_0,c_2,s_2}\\
+\end{split}
+\end{equation}
+
+In the last line, $:,c_2,:,s_2$ denote one column of the $12\times 12$ matrix, and $\phi ^{S}_{m_0,c_2,s_2}$ is \index{pseudofermions}pseudo-fermion field with only one none-zero element (the \index{point source}\textbf{point source} at $m_0$, in our case, $m_0=({\bf 0},0)$)
+\begin{equation}
+\begin{split}
+&\phi ^{S}_{m_0,c_2,s_2}(m)_{c,s}=\delta (m-m_0)\delta (c-c_2)\delta (s-s_2)\\
+\end{split}
+\end{equation}
+In matrix form it is
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{c} D^{-1}_{1,cs} \\ D^{-1}_{2,cs} \\ D^{-1}_{3,cs} \\ \ldots \\ D^{-1}_{10,cs}\\ D^{-1}_{11,cs} \\ D^{-1}_{12,cs_2}\end{array}\right)=\left(\begin{array}{ccccccc} 
+D^{-1}_{1,1} & D^{-1}_{1,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{1,cs}} & \ldots &  D^{-1}_{1,11} & D^{-1}_{1,12} \\
+D^{-1}_{2,1} & D^{-1}_{2,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{2,cs}} & \ldots &  D^{-1}_{2,11} & D^{-1}_{2,12} \\
+D^{-1}_{3,1} & D^{-1}_{3,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{3,cs}} & \ldots &  D^{-1}_{3,11} & D^{-1}_{3,12} \\
+\ldots & \ldots & \ldots & \ldots & \ldots &  \ldots & \ldots \\
+D^{-1}_{10,1} & D^{-1}_{0,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{10,cs}} & \ldots &  D^{-1}_{10,11} & D^{-1}_{10,12} \\
+D^{-1}_{11,1} & D^{-1}_{11,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{11,cs}} & \ldots &  D^{-1}_{11,11} & D^{-1}_{11,12} \\
+D^{-1}_{12,1} & D^{-1}_{12,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{12,cs}} & \ldots &  D^{-1}_{12,11} & D^{-1}_{12,12} \\
+ \end{array}\right)\left(\begin{array}{c} 0\\ \ldots \\ 0 \\ 1 _{idx=cs}\\ 0 \\ \ldots \\ 0 \end{array}\right)
+\end{split}
+\label{eq.mesoncorrelator.matrix1}
+\end{equation}
+
+So, we need $12$ point sources to fill the $12\times 12$ matrix. Now, for each site, we can calculate the trace, and obtain a \textbf{real} field defined on sites
+\begin{equation}
+\begin{split}
+&\Phi (n) = {\rm tr}_{c,s}\left(\Gamma D^{-1}\Gamma D^{-1}\right)
+\end{split}
+\end{equation}
+
+The final step is to sum the spatial lattice with the weight $e^{-ia{\bf n}\cdot {\bf p}}$ for each $n_t$, note that, the result should be calculated for each (assume periodic boundary condition for spatial directions)
+\begin{equation}
+\begin{split}
+&{\bf p}\in \left\{(p_1,p_2,p_3)|p_i=\frac{2\pi}{a N_i}k_i, k_i=-\frac{N_i}{2}-1,\ldots \frac{N_i}{2}\right\}
+\end{split}
+\end{equation}
+where $N_i$ is the length of the lattice at $i$ direction.
+
+Therefor, $\tilde{C}({\bf p})$ is a complex field defined on spatial \index{reciprocal space}\textbf{reciprocal space}.
+
+For spectroscopy, we need only the data for ${\bf p}=0$, because when $\Delta E\ll 1$
+\begin{equation}
+\begin{split}
+&\tilde{C}(n_t)\equiv \tilde{C}({\bf 0},n_t;{\bf 0},0)\propto \exp \left(-a n_t m_H\right).
+\end{split}
+\end{equation}
+
+Note that, for $k_i=0$, we need \textbf{even} number of length at spatial directions.
+
+\begin{itemize}
+  \item Detail of implementation
+\end{itemize}
+
+We can write $D^{-1}$ in the form of $4\times 4$ matrices, with elements as $3\times 3$ matrices, as
+\begin{equation}
+\begin{split}
+&D^{-1}=\left(\begin{array}{cccc} 
+U_{11} & U_{12} & U_{13} & U_{14} \\
+U_{21} & U_{22} & U_{23} & U_{24} \\
+U_{31} & U_{32} & U_{33} & U_{34} \\
+U_{41} & U_{42} & U_{43} & U_{44} \\
+\end{array}\right)
+\end{split}
+\end{equation}
+If our pseudo-fermion field is organized as
+\begin{equation}
+\begin{split}
+&\phi ^{S=s\times 3+c}(n)=\left(d_0,d_1,d_2,d_3\right), d_s=\left(v_0,v_1,v_2\right)\\
+\end{split}
+\end{equation}
+Using Eq.~(\ref{eq.mesoncorrelator.matrix1}), one have
+\begin{equation}
+\begin{split}
+&U_{ij}=\left(\begin{array}{ccc}
+\phi ^{j\times 3 + 0} (d_i,v_0) & \phi ^{j\times 3 + 1}(d_i,v_0) & \phi ^{j\times 3 + 2}(d_i,v_0)  \\
+\phi ^{j\times 3 + 0} (d_i,v_1) & \phi ^{j\times 3 + 1}(d_i,v_1) & \phi ^{j\times 3 + 2}(d_i,v_1)  \\
+\phi ^{j\times 3 + 0} (d_i,v_2) & \phi ^{j\times 3 + 1}(d_i,v_2) & \phi ^{j\times 3 + 2}(d_i,v_2)  \\
+\end{array}\right)
+\end{split}
+\end{equation}
+The $\Gamma$ intersect between $D^{-1}$ and $\left(D^{-1}\right)^{\dagger}$ is a permutation of rows in spinor space, for example
+\begin{equation}
+\begin{split}
+&\gamma _1=\left(\begin{array}{cccc}
+0 & 0 & 0 & c_1 \\
+0 & 0 & c_2 & 0 \\
+0 & c_3 & 0 & 0 \\
+c_4 & 0 & 0 & 0 \\
+\end{array}\right),\;\;\begin{array}{cccc} p(1)=4,&p(2)=3,&p(3)=2,&p(4)=1 \\ c_1=-i, & c_2=-i, &c_3=i, &c_4=i \end{array}
+\end{split}
+\end{equation}
+where $c_i$ are coefficients and $c_i\in \mathbb{Z}_4$ group. $p(i)=j$ denote that the none-zero of the $i$-th row is $j$-element, (also, the none-zero of the $i$-th column is $j$-element, because $\gamma _{\mu}^{\dagger}=\gamma _{\mu}$.), and $c_i=c_{p(i)}^*$.
+
+So one have such that
+\begin{equation}
+\begin{split}
+&\Gamma ' D^{-1}=\left(\begin{array}{cccc}
+c_1U_{p(1)1} & c_1U_{p(1)2} & c_1U_{p(1)3} & c_1U_{p(1)4} \\
+c_2U_{p(2)1} & c_2U_{p(2)2} & c_2U_{p(2)3} & c_2U_{p(2)4} \\
+c_3U_{p(3)1} & c_3U_{p(3)2} & c_3U_{p(3)3} & c_3U_{p(3)4} \\
+c_4U_{p(4)1} & c_4U_{p(4)2} & c_4U_{p(4)3} & c_4U_{p(4)4} \\
+\end{array}\right),\\
+&\Gamma ' D^{-1} {\Gamma'}^{\dagger}=\left(\begin{array}{cccc}
+c_1c^*_{p(1)}U_{p(1)p(1)} & c_1c^*_{p(2)}U_{p(1)p(2)} & c_1c^*_{p(3)}U_{p(1)p(3)} & c_1c^*_{p(4)}U_{p(1)p(4)} \\
+c_2c^*_{p(1)}U_{p(2)p(1)} & c_2c^*_{p(2)}U_{p(2)p(2)} & c_2c^*_{p(3)}U_{p(2)p(3)} & c_2c^*_{p(4)}U_{p(2)p(4)} \\
+c_3c^*_{p(1)}U_{p(3)p(1)} & c_3c^*_{p(2)}U_{p(3)p(2)} & c_3c^*_{p(3)}U_{p(3)p(3)} & c_3c^*_{p(4)}U_{p(3)p(4)} \\
+c_4c^*_{p(1)}U_{p(4)p(1)} & c_4c^*_{p(2)}U_{p(4)p(2)} & c_4c^*_{p(3)}U_{p(4)p(3)} & c_4c^*_{p(4)}U_{p(4)p(4)} \\
+\end{array}\right)\\
+&=\left(\begin{array}{cccc}
+c_1c_1U_{p(1)p(1)} & c_1c_2U_{p(1)p(2)} & c_1c_3U_{p(1)p(3)} & c_1c_4U_{p(1)p(4)} \\
+c_2c_1U_{p(2)p(1)} & c_2c_2U_{p(2)p(2)} & c_2c_3U_{p(2)p(3)} & c_2c_4U_{p(2)p(4)} \\
+c_3c_1U_{p(3)p(1)} & c_3c_2U_{p(3)p(2)} & c_3c_3U_{p(3)p(3)} & c_3c_4U_{p(3)p(4)} \\
+c_4c_1U_{p(4)p(1)} & c_4c_2U_{p(4)p(2)} & c_4c_3U_{p(4)p(3)} & c_4c_4U_{p(4)p(4)} \\
+\end{array}\right)\\
+\end{split}
+\end{equation}
+
+Finally we have
+\begin{equation}
+\begin{split}
+&{\rm tr}_{c,s}\left[\Gamma ' D^{-1}{\Gamma '}^{\dagger}\left(D^{-1}\right)^{\dagger}\right] = \sum _{ij}c_ic_j {\rm tr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]=\sum _{ij}c_ic_j {\rm tr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]
+\end{split}
+\end{equation}
+
+This can be further simplified.
+
+
+\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
+

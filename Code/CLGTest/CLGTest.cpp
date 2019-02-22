@@ -106,7 +106,7 @@ int main(int argc, char * argv[])
     ListAllTests(category);
     while (TRUE)
     {
-        COUT << _T("============== Tests ==============\nq - Quit,  l - List all,  r - Run all,  p - Print Device info\n");
+        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  p - Print Device info\n");
         //ListAllTests(category);
         inputNumber = -1;
         std::string name;

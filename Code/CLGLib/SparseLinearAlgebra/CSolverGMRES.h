@@ -37,7 +37,6 @@ protected:
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;
-    UBOOL m_bAbsoluteAccuracy;
     Real m_fAccuracy;
     Real m_fBeta;
 

@@ -32,7 +32,6 @@ protected:
     UINT m_uiReTry;
     UINT m_uiDevationCheck;
     UINT m_uiStepCount;
-    UBOOL m_bAbsoluteAccuracy;
     Real m_fAccuracy;
 };
 

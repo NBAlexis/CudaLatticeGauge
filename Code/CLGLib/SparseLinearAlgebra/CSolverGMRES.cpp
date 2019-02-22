@@ -19,7 +19,6 @@ CSLASolverGMRES::CSLASolverGMRES()
     , m_uiMaxDim(20)
     , m_fAccuracy(F(0.000001))
     , m_fBeta(F(0.0))
-    , m_bAbsoluteAccuracy(FALSE)
 {
 
 }

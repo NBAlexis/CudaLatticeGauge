@@ -90,6 +90,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
     m_InitialCache.constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
     m_InitialCache.constIntegers[ECI_Volumn] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_Volumn_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);

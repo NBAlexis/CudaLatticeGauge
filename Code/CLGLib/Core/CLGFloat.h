@@ -22,6 +22,7 @@
 #define _cos cos
 #define __div(a, b) ((a) / (b))
 #define __rcp(a) (F(1.0) / (a))
+#define _hostlog log
 #define _hostexp exp
 #define _hostsqrt sqrt
 
@@ -58,6 +59,7 @@
 #define __rcp(a) (F(1.0) / (a))
 #endif
 
+#define _hostlog logf
 #define _hostexp expf
 #define _hostsqrt sqrtf
 

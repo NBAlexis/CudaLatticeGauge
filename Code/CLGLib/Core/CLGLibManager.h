@@ -183,6 +183,19 @@ inline TArray<UINT> _getDecompose(const TArray<UINT>& contraints, const TArray<U
     return ret;
 }
 
+
+inline class CCString GetCLGVersion()
+{
+    CCString sRet;
+    sRet.Format(_T("%d.%d"), __GVERSION, __GVERSION_S);
+    return sRet;
+}
+
+__host__ __inline__ static UINT _hostGetSiteIndex(const SSmallInt4& coord)
+{
+    return static_cast<UINT>(coord.x * _HC_MultX + coord.y * _HC_MultY + coord.z * _HC_MultZ + coord.w);
+}
+
 __END_NAMESPACE
 
 #endif //#ifndef _CLGLIBMANAGER_H_

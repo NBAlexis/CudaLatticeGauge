@@ -39,6 +39,7 @@
 #endif
 
 #define _FAIL_EXIT \
+appFlushLog(); \
 DEVICE_RESET \
 exit(EXIT_FAILURE); 
 

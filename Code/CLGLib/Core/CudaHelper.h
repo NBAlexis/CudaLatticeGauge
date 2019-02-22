@@ -24,9 +24,7 @@ extern __constant__ Real _constFloats[kContentLength];
 extern __constant__ class CRandom* __r;
 extern __constant__ class CIndex* __idx;
 
-enum EGammaMatrix
-{
-    ZERO,
+__DEFINE_ENUM(EGammaMatrix,
     UNITY,
     GAMMA1,
     GAMMA2,
@@ -49,7 +47,7 @@ enum EGammaMatrix
     SIGMA43,
     CHARGECONJG,
     EGM_MAX,
-};
+    )
 
 extern __constant__ struct gammaMatrix __diracGamma[EGM_MAX];
 extern __constant__ struct gammaMatrix __chiralGamma[EGM_MAX];
@@ -65,6 +63,7 @@ enum EConstIntId
     ECI_Lz,
     ECI_Lt,
     ECI_Volumn,
+    ECI_Volumn_xyz,
     ECI_PlaqutteCount,
     ECI_LinkCount,
     ECI_MultX,

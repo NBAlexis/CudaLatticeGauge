@@ -37,7 +37,6 @@ protected:
     UINT m_uiMaxDim;
     UINT m_uiIterateNumber;
     UINT m_uiCheckError;
-    UBOOL m_bAbsoluteAccuracy;
     Real m_fAccuracy;
 };
 

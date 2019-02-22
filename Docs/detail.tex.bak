@@ -72,7 +72,7 @@
     basicstyle=\footnotesize\ttfamily,
 }
 
-\section{\label{data}Data}
+\section{\label{sec:data}Data}
 
 \input "data/index.tex"
 
@@ -80,13 +80,13 @@
 
 \clearpage
 
-\section{\label{update}Update scheme}
+\section{\label{sec:update}Update scheme}
 
 \input "update/hmc.tex"
 
 \clearpage
 
-\section{\label{solver}\index{solver}Sparse linear algebra solver}
+\section{\label{sec:solver}\index{solver}Sparse linear algebra solver}
 
 \input "SparseLinearAlgebra/solver.tex"
 
@@ -98,21 +98,23 @@
 
 \clearpage
 
-\section{\label{measure}Measurement}
+\section{\label{sec:measure}Measurement}
 
 \input "Measurement/PlatqutteEnergy.tex"
 
 \input "Measurement/MesonCorrelator.tex"
 
+\input "Measurement/MesonCorrelator.tex"
+
 \clearpage
 
-\section{\label{Programming}Programming}
+\section{\label{sec:Programming}Programming}
 
 \input "programming/cuda.tex"
 
 \clearpage
 
-\section{\label{Testing}Testing}
+\section{\label{sec:Testing}Testing}
 
 \input "tests/testRandom.tex"
 

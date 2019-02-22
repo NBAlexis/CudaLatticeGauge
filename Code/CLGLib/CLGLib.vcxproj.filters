@@ -89,9 +89,6 @@
     <ClInclude Include="Data\Field\CField.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldBoson.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Field\CFieldFermion.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
@@ -230,6 +227,12 @@
     <ClInclude Include="Core\CCudaBuffer.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldScalar.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureMesonCorrelator.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -286,6 +289,7 @@
     <ClCompile Include="Update\CUpdator.cpp">
       <Filter>Update</Filter>
     </ClCompile>
+    <ClCompile Include="CLGLib_Private.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -321,6 +325,8 @@
     <CudaCompile Include="Data\Field\CFieldGauge.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="CLGLib_Private.cpp" />
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

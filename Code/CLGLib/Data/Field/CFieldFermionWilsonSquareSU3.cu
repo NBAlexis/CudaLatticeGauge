@@ -124,6 +124,11 @@ _kernelInitialFermionWilsonSquareSU3(
         pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     }
     break;
+    case EFIT_Identity:
+    {
+        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeOneWilsonVectorSU3();
+    }
+    break;
     case EFIT_RandomGaussian:
     {
         pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
@@ -327,6 +332,21 @@ _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDi
     pDeviceData[uiSiteIndex] = (bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma]).MulWilsonC(pDeviceData[uiSiteIndex]);
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMakePointSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite, BYTE bySpin, BYTE byColor)
+{
+    intokernal;
+    if (uiSiteIndex == uiDesiredSite)
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeOneWilsonVectorSU3SpinColor(bySpin, byColor);
+    }
+    else
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    }
+}
+
 #pragma endregion
 
 CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() : CFieldFermion(), m_fKai(F(0.125))
@@ -519,7 +539,10 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
         m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     pPooled->Return();
 
-    m_fLength = Dot(this).x;
+    if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    {
+        m_fLength = Dot(this).x;
+    }
     //cache a inverse DDdagger field
     CFieldCache* pCache = appGetLattice()->m_pFieldCache;
     CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
@@ -748,6 +771,23 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     pDPhi->Return();
 
     return TRUE;
+}
+
+void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceData)
+{
+    UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
+    switch (sourceData.m_eSourceType)
+    {
+    case EFS_Point:
+    {
+        preparethread;
+        _kernelMakePointSource<<<block, threads >>>(m_pDeviceData, uiSiteIndex, sourceData.m_bySpinIndex, sourceData.m_byColorIndex);
+    }
+    break;
+    default:
+        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
+        break;
+    }
 }
 
 void CFieldFermionWilsonSquareSU3::SetKai(Real fKai)

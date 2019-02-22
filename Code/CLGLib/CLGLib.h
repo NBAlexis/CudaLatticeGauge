@@ -104,9 +104,9 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Data/Field/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldGaugeZ2.h"
 
-#include "Data/Field/CFieldBoson.h"
+//#include "Data/Field/CFieldBoson.h"
 
-#include "Data/Field/CFieldSpin.h"
+//#include "Data/Field/CFieldSpin.h"
 
 #include "Data/Field/CFieldFermion.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3.h"
@@ -122,6 +122,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"
+#include "Measurement/CMeasureMesonCorrelator.h"
 #include "Measurement/CMeasurementManager.h"
 
 #include "Update/CUpdator.h"

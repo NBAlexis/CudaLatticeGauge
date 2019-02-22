@@ -86,6 +86,7 @@ public:
 
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const _Complex& a, const CField* x) = 0;
+    //Why is it not const: One may calculate length and set fLength only when needed.
     Real GetLength() const { return m_fLength; }
     //This is a * me
     virtual void ScalarMultply(const _Complex& a) = 0;

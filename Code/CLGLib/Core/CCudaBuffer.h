@@ -17,6 +17,7 @@
 __BEGIN_NAMESPACE
 
 extern CLGAPI void appGeneral(const TCHAR *format, ...);
+inline void appFlushLog();
 
 class CLGAPI CCudaBuffer
 {

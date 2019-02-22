@@ -59,15 +59,17 @@ public:
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
     virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const;
+    virtual void InitialAsSource(const SFermionSource& sourceData);
     virtual void SaveToFile(const CCString &fileName) const;
     virtual CCString GetInfos(const CCString &tab) const;
+
     void SetKai(Real fKai);
+
+    deviceWilsonVectorSU3 * m_pDeviceData;
 
 protected:
 
     Real m_fKai;
-
-    deviceWilsonVectorSU3* m_pDeviceData;
 
 };
 

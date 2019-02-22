@@ -50,7 +50,8 @@ Note that, they are all Grassman numbers (exchange three times will introduce a 
 Using the Wick theorem for Grassman numbers ($f$ is flavour index, $c$ is color index, $a,b$ are spinor index).
 \begin{equation}
 \begin{split}
-&\langle \psi _1 \bar{\psi}_1\ldots \psi _n \bar{\psi}_n\rangle = \frac{1}{Z_f}\int \mathcal{\psi}\exp \left(\textcolor[rgb]{1,0,0}{+}\sum _{n}\bar{\psi}M\psi\right) =(-1)^n 
+&\langle \ldots \rangle = \frac{1}{Z_f}\int \mathcal{D}\left[\psi\right]\ldots \exp \left(\textcolor[rgb]{1,0,0}{-}\sum _{l,m}^N\bar{\psi}_lM_{lm}\psi_m\right).\\
+&\langle \psi _{i_1}\ldots \psi _{i_n} \bar{\psi}_{j_1}\ldots \bar{\psi}_{j_n}\rangle = \sum _{P}{\rm sign}(P)\prod ^N_n \left(M^{-1}\right)_{i_n,j_{P_n}}.\\
 &\langle \psi^f (n)_{a,c_1}\bar{\psi}^f_{b,c_2}(m)\rangle = -D_{f,a,b,c_1,c_2}^{-1}(n,m).\\
 \end{split}
 \end{equation}
@@ -61,13 +62,40 @@ Then we can multiply gamma matrix back
 \end{split}
 \end{equation}
 
-The trace is for both color and spinor space.
+The trace is for both color and spinor space. 
 
 \begin{itemize}
   \item iso-singlet
 \end{itemize}
 
 Denote the variables as $C_S$ and $O_S$.
+
+\begin{itemize}
+  \item Fourier transform
+\end{itemize}
+
+Usually, one need to know the observable in momentum space, which is
+\begin{equation}
+\begin{split}
+&C({\bf p},n_t;{\bf 0}, 0)\equiv \frac{1}{\sqrt{\Lambda _3}}\sum _{{\bf n}\in \Lambda _3}\exp (-ia {\bf n}\cdot {\bf p})C({\bf n},n_t;{\bf 0},0)\\
+\end{split}
+\end{equation}
+where $\Lambda _3$ denotes the spatial lattice.
+
+For hadron spectroscopy, $C({\bf p},n_t;{\bf 0}, 0)\propto \exp\left(-an_tE_0({\bf p})\right)\times \left(1+\mathcal{O}\left(e^{-an_t\Delta E}\right)\right)$, where $E_0({\bf p})$ is the ground state energy (dissipative relation?) and $\Delta E$ is the energy gap between ground state and the lowest excitation, and
+\begin{equation}
+\begin{split}
+&E_0({\bf p})=\sqrt{m_H^2+|{\bf p}|^2}\times \left(1+\mathcal{O}\left(a|{\bf p}|\right)\right)\\
+\end{split}
+\end{equation}
+
+For zero momentum, we find $m_H$. That is why the lattice at $t$-dir is usually larger than the spatial directions.
+
+\subsubsection{\label{Source}\index{source}Sources}
+
+
+
+\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
 
 \subsubsection{\label{MonteCarloInMonteCarlo}Monte Carlo in Monte Carlo}
 

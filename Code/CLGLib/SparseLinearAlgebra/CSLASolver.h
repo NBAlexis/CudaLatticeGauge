@@ -24,7 +24,7 @@ class CLGAPI CSLASolver : public CBase
 {
 public:
 
-    CSLASolver() : m_pOwner(NULL) { ; }
+    CSLASolver() : m_pOwner(NULL) , m_bAbsoluteAccuracy(FALSE) { ; }
 
     virtual void Configurate(const CParameters& param) = 0;
 
@@ -47,11 +47,13 @@ public:
 
     class CLatticeData* m_pOwner;
     virtual CCString GetInfos(const CCString &tab) const { return tab + _T("##The solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n"); }
+    UBOOL IsAbsoluteAccuracy() const {return m_bAbsoluteAccuracy; }
 
 protected:
 
     UINT m_uiAccurayCheckInterval;
     Real m_fAccuracy;
+    UBOOL m_bAbsoluteAccuracy;
 };
 
 __END_NAMESPACE

@@ -183,6 +183,11 @@ inline void appSetTracer(EVerboseLevel eLevel, const CCString& filename)
     GTracer.SetOutStream(filename);
 }
 
+inline void appFlushLog()
+{
+    GTracer.Flush();
+}
+
 __END_NAMESPACE
 
 #endif //_TRACER_H_

@@ -77,6 +77,24 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ static deviceSU3Vector makeOneSU3Vector()
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _make_cuComplex(F(1.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
+            ret.m_ve[2] = _make_cuComplex(F(1.0), F(0.0));
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU3Vector makeOneSU3VectorColor(BYTE byColor)
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _make_cuComplex(0 == byColor ? F(1.0) : F(0.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(1 == byColor ? F(1.0) : F(0.0), F(0.0));
+            ret.m_ve[2] = _make_cuComplex(2 == byColor ? F(1.0) : F(0.0), F(0.0));
+            return ret;
+        }
+
         /**
         * This is sum _3 (v^* v)
         */
@@ -144,6 +162,37 @@ extern "C" {
             m_ve[2] = _cuCmulf(m_ve[2], other);
         }
 
+        /**
+        * v = i^k v
+        */
+        __device__ __inline__ void MulZ4(BYTE byZ4)
+        {
+            switch (byZ4)
+            {
+            case 1:
+            {
+                m_ve[0] = _make_cuComplex(-m_ve[0].y, m_ve[0].x);
+                m_ve[1] = _make_cuComplex(-m_ve[1].y, m_ve[1].x);
+                m_ve[2] = _make_cuComplex(-m_ve[2].y, m_ve[2].x);
+            }
+            break;
+            case 2:
+            {
+                m_ve[0] = _make_cuComplex(-m_ve[0].x, -m_ve[0].y);
+                m_ve[1] = _make_cuComplex(-m_ve[1].x, -m_ve[1].y);
+                m_ve[2] = _make_cuComplex(-m_ve[2].x, -m_ve[2].y);
+            }
+            break;
+            case 3:
+            {
+                m_ve[0] = _make_cuComplex(m_ve[0].y, -m_ve[0].x);
+                m_ve[1] = _make_cuComplex(m_ve[1].y, -m_ve[1].x);
+                m_ve[2] = _make_cuComplex(m_ve[2].y, -m_ve[2].x);
+            }
+            break;
+            }
+        }
+
         __device__ __inline__ void Opposite()
         {
             m_ve[0].x = -m_ve[0].x;
@@ -164,6 +213,7 @@ extern "C" {
 
         __device__ __inline__ deviceSU3Vector MulRealC(Real other) const { deviceSU3Vector ret(*this); ret.MulReal(other); return ret; }
         __device__ __inline__ deviceSU3Vector MulCompC(const _Complex& other) const { deviceSU3Vector ret(*this); ret.MulComp(other); return ret; }
+        __device__ __inline__ deviceSU3Vector MulZ4C(BYTE z4) const { deviceSU3Vector ret(*this); ret.MulZ4(z4); return ret; }
 
         _Complex m_ve[3];
     };
@@ -248,6 +298,50 @@ extern "C" {
             ret.m_d[1] = deviceSU3Vector::makeZeroSU3Vector();
             ret.m_d[2] = deviceSU3Vector::makeZeroSU3Vector();
             ret.m_d[3] = deviceSU3Vector::makeZeroSU3Vector();
+            return ret;
+        }
+
+        __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3()
+        {
+            deviceWilsonVectorSU3 ret;
+            ret.m_d[0] = deviceSU3Vector::makeOneSU3Vector();
+            ret.m_d[1] = deviceSU3Vector::makeOneSU3Vector();
+            ret.m_d[2] = deviceSU3Vector::makeOneSU3Vector();
+            ret.m_d[3] = deviceSU3Vector::makeOneSU3Vector();
+            return ret;
+        }
+
+        __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3Spin(BYTE spinIndex)
+        {
+            deviceWilsonVectorSU3 ret;
+            for (BYTE bySp = 0; bySp < 4; ++bySp)
+            {
+                if (bySp == spinIndex)
+                {
+                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3Vector();
+                }
+                else
+                {
+                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector();
+                }
+            }
+            return ret;
+        }
+
+        __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3SpinColor(BYTE spinIndex, BYTE colorIndex)
+        {
+            deviceWilsonVectorSU3 ret;
+            for (BYTE bySp = 0; bySp < 4; ++bySp)
+            {
+                if (bySp == spinIndex)
+                {
+                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3VectorColor(colorIndex);
+                }
+                else
+                {
+                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector();
+                }
+            }
             return ret;
         }
 
@@ -344,6 +438,14 @@ extern "C" {
             m_d[3].MulComp(other);
         }
 
+        __device__ __inline__ void MulZ4(BYTE z4)
+        {
+            m_d[0].MulZ4(z4);
+            m_d[1].MulZ4(z4);
+            m_d[2].MulZ4(z4);
+            m_d[3].MulZ4(z4);
+        }
+
         __device__ __inline__ deviceWilsonVectorSU3 AddRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.AddReal(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 AddCompC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.AddComp(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 AddVectorC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.AddVector(other); return ret; }
@@ -356,6 +458,7 @@ extern "C" {
 
         __device__ __inline__ deviceWilsonVectorSU3 MulRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.MulReal(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulCompC(const _Complex& other) const { deviceWilsonVectorSU3 ret(*this); ret.MulComp(other); return ret; }
+        __device__ __inline__ deviceWilsonVectorSU3 MulZ4C(BYTE z4) const { deviceWilsonVectorSU3 ret(*this); ret.MulZ4(z4); return ret; }
 
         union
         {

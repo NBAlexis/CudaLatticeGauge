@@ -35,6 +35,8 @@ enum { _kMaxFieldCount = 8, };
 
 #define _DC_Volumn (_constIntegers[ECI_Volumn])
 #define _HC_Volumn (appGetCudaHelper()->m_ConstIntegers[ECI_Volumn])
+#define _DC_Volumn_xyz (_constIntegers[ECI_Volumn_xyz])
+#define _HC_Volumn_xyz (appGetCudaHelper()->m_ConstIntegers[ECI_Volumn_xyz])
 
 #define _DC_MultX (_constIntegers[ECI_MultX])
 #define _HC_MultX (appGetCudaHelper()->m_ConstIntegers[ECI_MultX])
@@ -122,6 +124,10 @@ __DEFINE_ENUM(EFieldType,
 __device__ __inline__ static UINT _deviceGetSiteIndex(const UINT* coord)
 {
     return coord[0] * _DC_MultX + coord[1] * _DC_MultY + coord[2] * _DC_MultZ + coord[3];
+}
+__device__ __inline__ static UINT _deviceGetSiteIndex(const SSmallInt4& coord)
+{
+    return static_cast<UINT>(coord.x * _DC_MultX + coord.y * _DC_MultY + coord.z * _DC_MultZ + coord.w);
 }
 __device__ __inline__ static UINT _deviceGetLinkIndex(UINT siteIndex, BYTE dir)
 {

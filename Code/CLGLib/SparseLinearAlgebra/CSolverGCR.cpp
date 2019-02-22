@@ -20,7 +20,6 @@ CSLASolverGCR::CSLASolverGCR()
     , m_uiIterateNumber(50)
     , m_uiCheckError(5)
     , m_fAccuracy(F(0.000001))
-    , m_bAbsoluteAccuracy(FALSE)
 {
 
 }

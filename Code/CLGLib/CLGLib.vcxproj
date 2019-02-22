@@ -39,7 +39,7 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
     <ClInclude Include="Data\Field\CField.h" />
-    <ClInclude Include="Data\Field\CFieldBoson.h" />
+    <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CFieldGauge.h" />
@@ -51,6 +51,7 @@
     <ClInclude Include="Data\Lattice\CLatticeData.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
     <ClInclude Include="Measurement\CMeasurementManager.h" />
+    <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
     <ClInclude Include="Platform\CFile.h" />
     <ClInclude Include="Platform\PlatformIncs.h" />
@@ -115,6 +116,7 @@
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <CudaCompile Include="Data\Lattice\CIndex.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>

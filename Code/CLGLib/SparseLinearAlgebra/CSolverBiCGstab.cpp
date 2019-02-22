@@ -19,7 +19,6 @@ CSLASolverBiCGStab::CSLASolverBiCGStab()
     , m_uiDevationCheck(10)
     , m_uiStepCount(20)
     , m_fAccuracy(F(0.000001))
-    , m_bAbsoluteAccuracy(FALSE)
 {
 
 }

@@ -13,6 +13,18 @@
 
 __BEGIN_NAMESPACE
 
+__DEFINE_ENUM(EFermionSource,
+    EFS_Point,
+)
+
+struct CLGAPI SFermionSource
+{
+    EFermionSource m_eSourceType;
+    SSmallInt4 m_sSourcePoint;
+    BYTE m_bySpinIndex;
+    BYTE m_byColorIndex;
+};
+
 class CLGAPI CFieldFermion : public CField
 {
 public:
@@ -73,6 +85,7 @@ public:
     virtual UBOOL InverseD(const CField* pGauge) = 0;
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
+    virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
 
 protected:
 
