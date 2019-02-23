@@ -29,6 +29,13 @@ UINT TestGammaMatrix(CParameters& )
 //930 - 990 ms
 //__REGIST_TEST(TestGammaMatrix, Misc, TestGammaMatrixSpeed);
 
+UINT TestDebugFunction(CParameters&)
+{
+    CCudaHelper::DebugFunction();
+    return 0;
+}
+
+__REGIST_TEST(TestDebugFunction, Misc, TestDebug);
 
 //=============================================================================
 // END OF FILE

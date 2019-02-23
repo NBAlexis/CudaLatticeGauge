@@ -29,13 +29,15 @@ protected:
 
     void CalculateCorrelator(const CFieldGauge* pGaugeField);
 
+public:
+
     BYTE m_byFermionFieldId;
     UINT m_uiLt;
     Real m_f2OverVolumnSqrt;
-    EGammaMatrix m_eGamma;
+    TArray<EGammaMatrix> m_lstGammas;
 
     //When a configuration is generated, result[nt] = (result[nt] * N + newresult[nt])/(N+1), N=N+1,
-    TArray<Real> m_lstResults;
+    TArray<TArray<Real>> m_lstResults;
     UINT m_uiResoultCount;
     //This is a complex field at each site
     _Complex * m_pDeviceCorrelator;

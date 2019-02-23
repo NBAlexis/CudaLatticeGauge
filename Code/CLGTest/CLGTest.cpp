@@ -75,7 +75,11 @@ int main(int argc, char * argv[])
 {
     //Load settings
     CParameters params;
+#if _CLG_DEBUG
     CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
+#else
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
+#endif
     appSetupLog(params);
 
     TArray<TestList*> allTests;

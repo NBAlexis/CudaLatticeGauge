@@ -34,12 +34,11 @@ UINT TestUpdator(CParameters& sParam)
     //Measure
     pMeasure->Reset();
     appGetLattice()->m_pUpdator->Update(20, TRUE);
-    pMeasure->Report();
 
     Real fRes = pMeasure->m_fLastRealResult;
-    appGeneral(_T("res : expected=0.2064 res=%f"), fRes);
+    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
 
-    if (appAbs(fRes - F(0.2064)) > F(0.005))
+    if (appAbs(fRes - fExpected) > F(0.005))
     {
         return 1;
     }

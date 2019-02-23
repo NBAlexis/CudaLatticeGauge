@@ -259,22 +259,23 @@ extern "C" {
             for (BYTE row = 0; row < 4; ++row)
             {
                 _Complex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
-                if (row == 0)
+                BYTE byNoneZero = m_uiIndex[row];
+                if (byNoneZero == 0)
                 {
                     printf("(%2f,%2f) 0     0     0\n",
                         cv.x, cv.y);
                 }
-                else if (row == 1)
+                else if (byNoneZero == 1)
                 {
                     printf("0     (%2f,%2f) 0     0\n",
                         cv.x, cv.y);
                 }
-                else if (row == 2)
+                else if (byNoneZero == 2)
                 {
-                    printf("0     0     (%2f,%2f) 0     0\n",
+                    printf("0     0     (%2f,%2f) 0\n",
                         cv.x, cv.y);
                 }
-                else if (row == 3)
+                else if (byNoneZero == 3)
                 {
                     printf("0     0     0     (%2f,%2f)\n",
                         cv.x, cv.y);
@@ -443,10 +444,15 @@ public:
             gmarray[GAMMA3].Set(2, 0, 1);
             gmarray[GAMMA3].Set(3, 1, 3);
 
-            gmarray[GAMMA4].Set(0, 2, 2);
-            gmarray[GAMMA4].Set(1, 3, 2);
-            gmarray[GAMMA4].Set(2, 0, 2);
-            gmarray[GAMMA4].Set(3, 1, 2);
+            //this is from bridge++, however, the Ref.~book2010, shows it is incorrect.
+            //gmarray[GAMMA4].Set(0, 2, 2);
+            //gmarray[GAMMA4].Set(1, 3, 2);
+            //gmarray[GAMMA4].Set(2, 0, 2);
+            //gmarray[GAMMA4].Set(3, 1, 2);
+            gmarray[GAMMA4].Set(0, 2, 0);
+            gmarray[GAMMA4].Set(1, 3, 0);
+            gmarray[GAMMA4].Set(2, 0, 0);
+            gmarray[GAMMA4].Set(3, 1, 0);
 
             gmarray[GAMMA5].Set(0, 0, 0);
             gmarray[GAMMA5].Set(1, 1, 0);

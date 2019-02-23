@@ -159,7 +159,6 @@ _kernelDFermionWilsonSquareSU3(
     deviceWilsonVectorSU3* pResultData,
     Real kai,
     BYTE byFieldId,
-    UBOOL bDiracChiralGamma,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -167,8 +166,7 @@ _kernelDFermionWilsonSquareSU3(
 {
     intokernaldir;
 
-    gammaMatrix gamma5 = bDiracChiralGamma ? __diracGamma[GAMMA5] : __chiralGamma[GAMMA5];
-
+    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
     if (bDDagger)
@@ -180,7 +178,7 @@ _kernelDFermionWilsonSquareSU3(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
+        gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -275,8 +273,7 @@ _kernelDWilsonForceSU3(
     deviceSU3* pForce,
     deviceSU3* pCachedForce,
     Real fKai,
-    BYTE byFieldId,
-    UBOOL bDiracChiralGamma)
+    BYTE byFieldId)
 {
     intokernaldir;
 
@@ -287,7 +284,7 @@ _kernelDWilsonForceSU3(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        gammaMatrix gammaMu = bDiracChiralGamma ? __diracGamma[GAMMA1 + idir] : __chiralGamma[GAMMA1 + idir];
+        gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -326,10 +323,10 @@ _kernelDWilsonForceSU3(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma, UBOOL bDiracChiralGamma)
+_kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma)
 {
     intokernal;
-    pDeviceData[uiSiteIndex] = (bDiracChiralGamma ? __diracGamma[uiGamma] : __chiralGamma[uiGamma]).MulWilsonC(pDeviceData[uiSiteIndex]);
+    pDeviceData[uiSiteIndex] = __chiralGamma[uiGamma].MulWilsonC(pDeviceData[uiSiteIndex]);
 }
 
 
@@ -512,7 +509,7 @@ void CFieldFermionWilsonSquareSU3::ScalarMultply(Real a)
 void CFieldFermionWilsonSquareSU3::ApplyGamma(EGammaMatrix eGamma)
 {
     preparethread;
-    _kernelApplyGammaSU3 << <block, threads >> >(m_pDeviceData, static_cast<UINT>(eGamma), TRUE);
+    _kernelApplyGammaSU3 << <block, threads >> >(m_pDeviceData, static_cast<UINT>(eGamma));
 }
 /**
 * generate phi by gaussian random.
@@ -536,7 +533,7 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
         pFieldSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+        m_pDeviceData, m_fKai, m_byFieldId, FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     pPooled->Return();
 
     if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
@@ -584,7 +581,7 @@ void CFieldFermionWilsonSquareSU3::D(const CField* pGauge, EOperatorCoefficientT
         pFieldSU3->m_pDeviceData, 
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+        m_pDeviceData, m_fKai, m_byFieldId, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
     pPooled->Return();
 }
 
@@ -614,7 +611,7 @@ void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge, EOperatorCoeffi
         pFieldSU3->m_pDeviceData, 
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE, eCoeffType, fRealCoeff, cCompCoeff);
+        m_pDeviceData, m_fKai, m_byFieldId, TRUE, eCoeffType, fRealCoeff, cCompCoeff);
     pPooled->Return();
 }
 
@@ -643,14 +640,14 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
         pFieldSU3->m_pDeviceData, 
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        pPooled->m_pDeviceData, m_fKai, m_byFieldId, TRUE, TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+        pPooled->m_pDeviceData, m_fKai, m_byFieldId, TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //Then D, m_pDeviceData = D m_pDeviceDataCopy
     _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
         pPooled->m_pDeviceData,
         pFieldSU3->m_pDeviceData, 
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_pDeviceData, m_fKai, m_byFieldId, TRUE, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+        m_pDeviceData, m_fKai, m_byFieldId, FALSE, eCoeffType, fRealCoeff, cCompCoeff);
     pPooled->Return();
 }
 
@@ -765,7 +762,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         pForceSU3->m_pDeviceData,
         NULL == pCacheForceForceSU3 ? NULL : pCacheForceForceSU3->m_pDeviceData,
-        m_fKai, m_byFieldId, TRUE);
+        m_fKai, m_byFieldId);
 
     pDDaggerPhi->Return();
     pDPhi->Return();

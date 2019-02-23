@@ -49,7 +49,7 @@ __DEFINE_ENUM(EGammaMatrix,
     EGM_MAX,
     )
 
-extern __constant__ struct gammaMatrix __diracGamma[EGM_MAX];
+//extern __constant__ struct gammaMatrix __diracGamma[EGM_MAX];
 extern __constant__ struct gammaMatrix __chiralGamma[EGM_MAX];
 
 extern __constant__ struct deviceSU3 __SU3Generators[9];

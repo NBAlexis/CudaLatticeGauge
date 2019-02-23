@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  22 FEB 2019 17:12
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  23 FEB 2019 13:57
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1431,8 +1431,8 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 128.
  ) 
 Here is how much of TeX's memory you used:
- 28218 strings out of 492976
- 469059 string characters out of 3141819
+ 28221 strings out of 492976
+ 469080 string characters out of 3141819
  951136 words of memory out of 3000000
  31250 multiletter control sequences out of 15000+200000
  554560 words of font info for 107 fonts, out of 3000000 for 9000
@@ -1458,9 +1458,9 @@ e1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm
 /cmtt10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/M
 iKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><D:/CTEX/MiKTeX/fonts/type1/
 public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (39 pages, 498366 bytes).
+Output written on detail.pdf (39 pages, 498947 bytes).
 PDF statistics:
- 997 PDF objects out of 1000 (max. 8388607)
- 381 named destinations out of 1000 (max. 500000)
+ 1000 PDF objects out of 1000 (max. 8388607)
+ 384 named destinations out of 1000 (max. 500000)
  365 words of extra memory for PDF output out of 10000 (max. 10000000)
 

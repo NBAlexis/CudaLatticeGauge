@@ -167,7 +167,7 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
 {
     if (NULL != m_pMeasurements && bMeasured)
     {
-        m_pMeasurements->OnUpdateFinished(FALSE);
+        m_pMeasurements->OnUpdateFinished(TRUE);
     }
 }
 

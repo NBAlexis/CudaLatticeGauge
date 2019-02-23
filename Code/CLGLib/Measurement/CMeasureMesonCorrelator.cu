@@ -10,6 +10,13 @@
 
 #include "CLGLib_Private.h"
 
+//c2^*: if c2=i^0 or i^2, c2*=i^0 or i^2, if c2=i^1, c2*=i^3, if c2=i^3, c2*=i^1
+//so, (((c2 & 1) << 1) + c2) & 3
+//for c2 = 0, 2, (c2 & 1 << 1)=0, so it is (c2 & 3) = 0, 2
+//for c2 = 1, 3, (c2 & 1 << 1)=2, so it is (3 or 5)&3 = 3 or 1
+//& 3 is not need because i^1 = i^5
+#define __z4h(v) ((((v) & 1) << 1) + (v))
+
 __BEGIN_NAMESPACE
 
 #pragma region kernels
@@ -34,7 +41,7 @@ _kernelCalculateCorrelatorSU3(
     //Constract U_{p(i)p(j)}
     _Complex uijdagger[3];
     _Complex upipj[3];
-    gammaMatrix gm = bDirac ? gammaMatrix(__diracGamma[eGamma]) : gammaMatrix(__chiralGamma[eGamma]);
+    gammaMatrix gm = __chiralGamma[eGamma];
     for (BYTE i = 1; i < 4; ++i)
     {
         for (BYTE j = i + 1; j < 4; ++j)
@@ -62,11 +69,13 @@ _kernelCalculateCorrelatorSU3(
             tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
             tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
 
-            //coefficient c1c2
+
+            //coefficient c1c2*=i^(c1+c2*)
             //it can only be 0,2,4,6,8...
             //for 2,6,10,... it is -1, otherwise, it is 1.
             //for 2,6,10, gm.m_byZ4[i] + gm.m_byZ4[j]) & 0x02 = 2, otherwise is 0
-            res += (F(1.0) - ((gm.m_byZ4[i] + gm.m_byZ4[j]) & 0x02)) * tmpRes;
+            //res += (F(1.0) - ((gm.m_byZ4[i] + __z4h(gm.m_byZ4[gm.m_uiIndex[j]])) & 0x02)) * tmpRes;
+            res += (F(1.0) - ((gm.m_byZ4[i] + __z4h(gm.m_byZ4[j])) & 0x02)) * tmpRes;
         }
     }
 
@@ -91,7 +100,8 @@ _kernelCalculateCorrelatorSU3(
             tmpRes += uijdagger[1].x * uijdagger[1].x + uijdagger[1].y * uijdagger[1].y;
             tmpRes += uijdagger[2].x * uijdagger[2].x + uijdagger[2].y * uijdagger[2].y;
 
-            res += (F(1.0) - ((gm.m_byZ4[i] + gm.m_byZ4[i]) & 0x02)) * F(0.5) *tmpRes;
+            //res += (F(1.0) - ((gm.m_byZ4[i] + __z4h(gm.m_byZ4[i])) & 0x02)) * F(0.5) *tmpRes;
+            res += F(0.5) * tmpRes;
         }
     }
     else
@@ -114,7 +124,8 @@ _kernelCalculateCorrelatorSU3(
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        res += (F(1.0) - ((gm.m_byZ4[0] + gm.m_byZ4[gm.m_uiIndex[0]]) & 0x02)) * tmpRes;
+        //res += (F(1.0) - ((gm.m_byZ4[0] + __z4h(gm.m_byZ4[gm.m_uiIndex[0]])) & 0x02)) * tmpRes;
+        res += tmpRes;
 
         //U_kk and U_pkpk
         BYTE byNextIdx = gm.m_byNextSymmetricIndex;
@@ -134,7 +145,8 @@ _kernelCalculateCorrelatorSU3(
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        res += (F(1.0) - ((gm.m_byZ4[byNextIdx] + gm.m_byZ4[gm.m_uiIndex[byNextIdx]]) & 0x02)) * tmpRes;
+        //res += (F(1.0) - ((gm.m_byZ4[byNextIdx] + __z4h(gm.m_byZ4[gm.m_uiIndex[byNextIdx]])) & 0x02)) * tmpRes;
+        res += tmpRes;
     }
 
     //site index = xyz * lt + t
@@ -162,9 +174,25 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
         appCrucial(_T("CMeasureMesonCorrelator: must give a fermion field id, but fetch %d"), iValue);
     }
     m_byFermionFieldId = static_cast<BYTE>(iValue);
-    CCString sValue = _T("UNITY");
-    param.FetchStringValue(_T("GammaMatrix"), sValue);
-    m_eGamma = __STRING_TO_ENUM(EGammaMatrix, sValue);
+    TArray<CCString> allGammas;
+    param.FetchStringVectorValue(_T("GammaMatrix"), allGammas);
+    if (0 == allGammas.Num())
+    {
+        allGammas.AddItem(_T("UNITY"));
+    }
+    m_lstGammas.RemoveAll();
+    for (INT i = 0; i < allGammas.Num(); ++i)
+    {
+        EGammaMatrix eGamma = __STRING_TO_ENUM(EGammaMatrix, allGammas[i]);
+        if (m_lstGammas.FindItemIndex(eGamma) < 0)
+        {
+            m_lstGammas.AddItem(eGamma);
+        }
+    }
+    if (0 == m_lstGammas.Num())
+    {
+        m_lstGammas.AddItem(UNITY);
+    }
 
     m_uiLt = _HC_Lt;
     m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volumn));
@@ -188,10 +216,29 @@ void CMeasureMesonCorrelator::Report()
         appGeneral(_T("Not measured yet.\n"));
         return;
     }
-    assert(m_lstResults.Num() == static_cast<INT>(m_uiLt));
-    for (UINT i = 0; i < m_uiLt; ++i)
+    if (0 == m_lstGammas.Num())
     {
-        appGeneral(_T("CMeasureMesonCorrelator: C(nt=%d)=%f, log(C(nt))=%f\n"), i, m_lstResults[i], _hostlog(appAbs(m_lstResults[i])));
+        appGeneral(_T("No Gamma matrix is measured.\n"));
+        return;
+    }
+    assert(m_lstResults.Num() == m_lstGammas.Num());
+    appGeneral(_T("CMeasureMesonCorrelator final report: Number of configurations = %d\n"), m_uiResoultCount);
+    for (INT i = 0; i < m_lstResults.Num(); ++i)
+    {
+        assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
+        appGeneral(_T("CMeasureMesonCorrelator final report Gamma = %s, C(nt=0 to %d)=\n"),
+            __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]).c_str(),
+            m_lstResults[i].Num() - 1);
+        for (UINT j = 0; j < m_uiLt; ++j)
+        {
+            appGeneral(_T("%8.12f, "), m_lstResults[i][j]);
+        }
+        appGeneral(_T("\n log10(C(nt))=\n"));
+        for (UINT j = 0; j < m_uiLt; ++j)
+        {
+            appGeneral(_T("%8.12f, "), _hostlog10(appAbs(m_lstResults[i][j])));
+        }
+        appGeneral(_T("\n"));
     }
 }
 
@@ -251,33 +298,43 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGaugeField
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
 
     preparethread;
-    _kernelCalculateCorrelatorSU3 << <block, threads >> > ((const deviceWilsonVectorSU3**)ppDevicePtr, m_eGamma, TRUE, _D_RealThreadBuffer);
+    for (INT i = 0; i < m_lstGammas.Num(); ++i)
+    {
+        _kernelCalculateCorrelatorSU3 << <block, threads >> > (
+            (const deviceWilsonVectorSU3**)ppDevicePtr, 
+            m_lstGammas[i],
+            TRUE, 
+            _D_RealThreadBuffer);
 
-    Real* sumSpatial = (Real*)appAlloca(sizeof(Real) * m_uiLt);
-    for (UINT i = 0; i < m_uiLt; ++i)
-    {
-        sumSpatial[i] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + i * _HC_Volumn_xyz, _HC_Volumn_xyz);
-        appParanoiac(_T("CMeasureMesonCorrelator: C(nt=%d)=%f, log(C(nt))=%f\n"), i, sumSpatial[i], _hostlog(appAbs(sumSpatial[i])));
-    }
-
-    //anverage
-    if (m_uiResoultCount == 0)
-    {
-        for (UINT i = 0; i < m_uiLt; ++i)
+        appParanoiac(_T("CMeasureMesonCorrelator for %s: "), __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]).c_str());
+        Real* sumSpatial = (Real*)appAlloca(sizeof(Real) * m_uiLt);
+        for (UINT j = 0; j < m_uiLt; ++j)
         {
-            m_lstResults.AddItem(sumSpatial[i]);
+            sumSpatial[j] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + j * _HC_Volumn_xyz, _HC_Volumn_xyz);
+            appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, "), j, sumSpatial[j], _hostlog10(appAbs(sumSpatial[j])));
         }
-        ++m_uiResoultCount;
-    }
-    else
-    {
-        assert(m_lstResults.Num() == static_cast<INT>(m_uiLt));
-        for (UINT i = 0; i < m_uiLt; ++i)
+        appParanoiac(_T("\n"));
+        //anverage
+        if (m_uiResoultCount == 0)
         {
-            m_lstResults[i] = (m_lstResults[i] * m_uiResoultCount + sumSpatial[i]) / (m_uiResoultCount + 1);
+            TArray<Real> thisGammaResult;
+            for (UINT j = 0; j < m_uiLt; ++j)
+            {
+                thisGammaResult.AddItem(sumSpatial[j]);
+            }
+            m_lstResults.AddItem(thisGammaResult);
         }
-        ++m_uiResoultCount;
+        else
+        {
+            assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
+            for (UINT j = 0; j < m_uiLt; ++j)
+            {
+                m_lstResults[i][j] = 
+                    (m_lstResults[i][j] * m_uiResoultCount + sumSpatial[j]) / (m_uiResoultCount + 1);
+            }
+        }
     }
+    ++m_uiResoultCount;
 
     for (UINT i = 0; i < 12; ++i)
     {

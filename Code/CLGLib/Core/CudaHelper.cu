@@ -15,7 +15,8 @@ __constant__ UINT _constIntegers[kContentLength];
 __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
 __constant__ CIndex* __idx;
-__constant__ gammaMatrix __diracGamma[EGM_MAX];
+//why we create Dirac gamma matrix?
+//__constant__ gammaMatrix __diracGamma[EGM_MAX];
 __constant__ gammaMatrix __chiralGamma[EGM_MAX];
 __constant__ deviceSU3 __SU3Generators[9];
 
@@ -26,9 +27,9 @@ __constant__ deviceSU3 __SU3Generators[9];
 */
 __global__ void 
 _CLG_LAUNCH_BOUND_SINGLE
-_kernelCreateMatrix(gammaMatrix* pDirac, gammaMatrix* pChiral, deviceSU3* pGenerator)
+_kernelCreateMatrix(/*gammaMatrix* pDirac,*/ gammaMatrix* pChiral, deviceSU3* pGenerator)
 {
-    gammaMatrixSet::CreateGammaMatrix(EGMS_Dirac, pDirac);
+    //gammaMatrixSet::CreateGammaMatrix(EGMS_Dirac, pDirac);
     gammaMatrixSet::CreateGammaMatrix(EGMS_Chiral, pChiral);
 
     for (int i = 0; i < 9; ++i)
@@ -44,11 +45,6 @@ _kernelDebugFunction()
     for (UINT i = 0; i < 9; ++i)
     {
         __SU3Generators[i].DebugPrint();
-    }
-
-    for (UINT i = 0; i < EGM_MAX; ++i)
-    {
-        __diracGamma[i].Print();
     }
 
     for (UINT i = 0; i < EGM_MAX; ++i)
@@ -412,25 +408,21 @@ void CCudaHelper::CopyRandomPointer(const CRandom* r) const
 
 void CCudaHelper::CreateGammaMatrix() const
 {
-    gammaMatrix* pDiracGamma;
     gammaMatrix* pChiralGamma;
     deviceSU3* pSU3;
 
     //create pointer
-    checkCudaErrors(cudaMalloc((void**)&pDiracGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMalloc((void**)&pChiralGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMalloc((void**)&pSU3, sizeof(deviceSU3) * 9));
 
     //craete content
-    _kernelCreateMatrix << <1, 1 >> > (pDiracGamma, pChiralGamma, pSU3);
+    _kernelCreateMatrix << <1, 1 >> > (pChiralGamma, pSU3);
 
     //copy to constant
-    checkCudaErrors(cudaMemcpyToSymbol(__diracGamma, pDiracGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMemcpyToSymbol(__chiralGamma, pChiralGamma, sizeof(gammaMatrix) * EGM_MAX));
     checkCudaErrors(cudaMemcpyToSymbol(__SU3Generators, pSU3, sizeof(deviceSU3) * 9));
 
     //free pointers (already copy to constant, no need)
-    checkCudaErrors(cudaFree(pDiracGamma));
     checkCudaErrors(cudaFree(pChiralGamma));
     checkCudaErrors(cudaFree(pSU3));
 }

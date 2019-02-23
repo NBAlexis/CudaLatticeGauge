@@ -285,7 +285,7 @@ One have
 For any vector
 \begin{equation}
 \begin{split}
-&{\rm Im}\left[L^{\dagger}TUR\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}L_{\alpha}^*T_{\alpha\beta}U_{\beta\rho}R_{\rho}\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}T_{\alpha\beta}U_{\beta\rho}R_{\rho}L_{\alpha}^*\right]={\rm Im}\left[{\rm tr}\left[TU(VL^{\dagger})\right]\right]\\
+&{\rm Im}\left[L^{\dagger}TUR\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}L_{\alpha}^*T_{\alpha\beta}U_{\beta\rho}R_{\rho}\right]={\rm Im}\left[\sum _{\alpha,\beta,\rho}T_{\alpha\beta}U_{\beta\rho}R_{\rho}L_{\alpha}^*\right]={\rm Im}\left[{\rm tr}\left[TU(RL^{\dagger})\right]\right]\\
 \end{split}
 \end{equation}
 
