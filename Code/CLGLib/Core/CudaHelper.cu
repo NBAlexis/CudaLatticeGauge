@@ -42,15 +42,20 @@ __global__ void
 _CLG_LAUNCH_BOUND_SINGLE
 _kernelDebugFunction()
 {
-    for (UINT i = 0; i < 9; ++i)
-    {
-        __SU3Generators[i].DebugPrint();
-    }
+    deviceSU3 a = deviceSU3::makeSU3Random(1);
+    deviceSU3 b = deviceSU3::makeSU3Random(2);
+    a.Add(b);
+    _Complex res0 = deviceSU3::Determinent(a.m_me);
+    printf("det = %f %f\n", res0.x, res0.y);
+    a.DebugPrint();
 
-    for (UINT i = 0; i < EGM_MAX; ++i)
-    {
-        __chiralGamma[i].Print();
-    }
+    a.Proj(6);
+    
+    _Complex res1 = deviceSU3::Determinent(a.m_me);
+    a.DaggerMul(a);
+
+    printf("det = %f %f\n", res1.x, res1.y);
+    a.DebugPrint();
 }
 
 __global__ void 

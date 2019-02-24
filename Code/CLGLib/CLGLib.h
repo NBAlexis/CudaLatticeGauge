@@ -125,6 +125,9 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Measurement/CMeasureMesonCorrelator.h"
 #include "Measurement/CMeasurementManager.h"
 
+#include "Update/GaugeSmearing/CGaugeSmearing.h"
+#include "Update/GaugeSmearing/CGaugeSmearingAPEProj.h"
+#include "Update/GaugeSmearing/CGaugeSmearingAPEStout.h"
 #include "Update/CUpdator.h"
 #include "Update/Continous/CIntegrator.h"
 #include "Update/Continous/CIntegratorLeapFrog.h"

@@ -293,6 +293,53 @@ _kernelStapleAtSiteSU3CacheIndex(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateOnlyStaple(
+    const deviceSU3 * __restrict__ pDeviceData,
+    const SIndex * __restrict__ pCachedIndex,
+    UINT plaqLength, UINT plaqCount,
+    deviceSU3 *pStapleData)
+{
+    intokernaldir;
+
+    //Real test_force = F(0.0);
+    UINT plaqLengthm1 = plaqLength - 1;
+    UINT plaqCountAll = plaqCount * plaqLengthm1;
+
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        deviceSU3 res = deviceSU3::makeSU3Zero();
+
+        //there are 6 staples, each is sum of two plaquttes
+        for (int i = 0; i < plaqCount; ++i)
+        {
+            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.NeedToDagger())
+            {
+                toAdd.Dagger();
+            }
+
+            for (int j = 1; j < plaqLengthm1; ++j)
+            {
+                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.NeedToDagger())
+                {
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
+                }
+            }
+            res.Add(toAdd);
+        }
+        pStapleData[linkIndex] = res;
+    }
+}
+
 #if Discard
 /**
 * calculate Staple and eneregy At Site
@@ -762,6 +809,24 @@ void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* p
         NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
         pForceSU3->m_pDeviceData,
         betaOverN);
+}
+
+void CFieldGaugeSU3::CalculateOnlyStaple(CFieldGauge* pStable) const
+{
+    if (NULL == pStable || EFT_GaugeSU3 != pStable->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: stable field is not SU3");
+        return;
+    }
+    CFieldGaugeSU3* pStableSU3 = dynamic_cast<CFieldGaugeSU3*>(pStable);
+
+    preparethread;
+    _kernelCalculateOnlyStaple << <block, threads >> > (
+        m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
+        pStableSU3->m_pDeviceData);
 }
 
 Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const

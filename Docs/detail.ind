@@ -1,14 +1,21 @@
 \begin{theindex}
 
-  \item BiCGStab, \hyperpage{12}, \hyperpage{22}
+  \item APE smearing, \hyperpage{17}
+  \item APE stout, \hyperpage{18}
 
   \indexspace
 
-  \item correlator, \hyperpage{23}
+  \item BiCGStab, \hyperpage{13}, \hyperpage{25}
+
+  \indexspace
+
+  \item correlator, \hyperpage{26}
 
   \indexspace
 
   \item equilibrium, \hyperpage{16}
+  \item exceptional configurations, \hyperpage{17}
+  \item extend sources, \hyperpage{31}
 
   \indexspace
 
@@ -17,8 +24,11 @@
 
   \indexspace
 
-  \item GCR, \hyperpage{22}
-  \item GMRES, \hyperpage{18}
+  \item gauge fixing, \hyperpage{31}
+  \item gauge smearing, \hyperpage{17}
+  \item gauge smoothing, \hyperpage{17}
+  \item GCR, \hyperpage{23}
+  \item GMRES, \hyperpage{19}
 
   \indexspace
 
@@ -30,17 +40,18 @@
 
   \indexspace
 
-  \item Krylov subspace, \hyperpage{18}
+  \item Krylov subspace, \hyperpage{19}
 
   \indexspace
 
   \item Langevin equation, \hyperpage{7}
   \item leap frog, \hyperpage{15}
   \item link index, \hyperpage{4}
+  \item low mode, \hyperpage{17}
 
   \indexspace
 
-  \item meson, \hyperpage{23}
+  \item meson, \hyperpage{26}
   \item Metropolis, \hyperpage{16}
   \item molecular dynamics, \hyperpage{7}
 
@@ -50,13 +61,20 @@
 
   \indexspace
 
-  \item plaquette energy, \hyperpage{23}
-  \item pseudofermions, \hyperpage{6}
+  \item plaquette energy, \hyperpage{26}
+  \item point source, \hyperpage{28, 29}
+  \item pseudofermions, \hyperpage{6}, \hyperpage{29}
+
+  \indexspace
+
+  \item reciprocal space, \hyperpage{29}
 
   \indexspace
 
   \item site index, \hyperpage{4}
-  \item solver, \hyperpage{12}, \hyperpage{18}
-  \item staple, \hyperpage{9}
+  \item solver, \hyperpage{13}, \hyperpage{19}
+  \item source, \hyperpage{28}
+  \item staple, \hyperpage{9}, \hyperpage{17}
+  \item stout, \hyperpage{18}
 
 \end{theindex}

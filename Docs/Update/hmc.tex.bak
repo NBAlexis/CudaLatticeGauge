@@ -129,7 +129,7 @@ Defined by Newton, $dp/dt$ is a force, so $\dot{P}$ is called `force'. See Eqs.~
 \end{equation}
 \textbf{Note that $S_G\neq \sum _{\mu,n} S_G[U_{\mu}(n)]$. $S_G[U_{\mu}(n)]$ is convenient for derivate which collecting all terms related to the specified bond. For plaquettes with 4 edges, $S_G=\frac{1}{4} \sum _{\mu,n} S_G[U_{\mu}(n)]$. }
 
-$S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'. The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
+$S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'(see Eq.~(\ref{eq.plaqutteEnergy.staple})). The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
 \begin{equation}
 \begin{split}
 &U_{\mu}(n)=\exp \left(i \sum _a\omega _a(\mu,n) T_a\right)U_{\mu}^0(n)
@@ -300,7 +300,7 @@ which is also an anti-Hermitian traceless matrix.
 
 \textbf{So, the momentum is always anti-Hermitian traceless.}.
 
-For anti-Hermitian traceless matrix $M$, the $\exp(M)$ can be simplified as Appendix. A of Ref.~\cite{luscher2005}. 
+For anti-Hermitian traceless matrix $M$, the $\exp(M)$ can be simplified as Appendix. A of Ref.~\cite{luscher2005}.
 
 \subsubsection{\label{sec:Solver_In_HMC}\index{solver}Solver in HMC}
 
@@ -341,13 +341,13 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
             \State ${\bf p}={\bf r}+\beta\left({\bf p}-\omega {\bf v}\right)$
         \EndIf
         \State ${\bf v}=A{\bf p}$
-        \State $\alpha = \rho / \left({\bf r}_h^*\cdot {\bf v}\right)$        
+        \State $\alpha = \rho / \left({\bf r}_h^*\cdot {\bf v}\right)$
         \State ${\bf s}={\bf r}-\alpha {\bf v}$
         \If {$0\neq j$ and $0=\mod(j,5)$}
             \State $er=\|{\bf s}\|$
             \Comment {Check deviation every 5 steps}
             \If {$er<\epsilon$}
-                
+
                 \Return ${\bf x}$
             \EndIf
         \EndIf
@@ -455,3 +455,38 @@ Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one t
 The pseudo fermion field is generate only once for a trajectory and is not changed. Also, the gauge field is changing slowly in one trajectory, this make the solutions for ${\bf x}_1=D^{-1}{\bf b}$ or ${\bf x}_2=\left(DD^{\dagger}\right)^{-1}{\bf b}$, where $D$ depends on $U$ and ${\bf b}$ is the pseudo fermion field, only change slowly.
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
+
+\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
+
+In HMC with fermions, the computer power is consumed mainly in solving the $D^{-1}$. The small eigenvalues of the $D$ operator is the main reason to slow down the solver, which is the so called \index{low mode}\textbf{low mode} or \index{exceptional configurations}\textbf{exceptional configurations}.
+
+Gauge smearing (\index{gauge smoothing}gauge smoothing) is one of the method to ease the problem by replacing the original configuration with a gauge equivalent but easier configuration. There are several different smearing methods. In CLGLib, only two are implemented.
+
+\begin{itemize}
+  \item \index{APE smearing}APE
+\end{itemize}
+
+It use
+\begin{equation}
+\begin{split}
+&U_{\mu}'=\mathcal{P}\left((1-\alpha)U_{\mu} + \frac{\alpha}{6}\Sigma _{\mu}\right)
+\end{split}
+\end{equation}
+where $\Sigma _{\mu}$ is the \index{staple}staple, (see Eq.~(\ref{eq.plaqutteEnergy.staple})). In CLGLib, staples are cached. After smoothing, $\mathcal{P}$ is a projection project to result to $SU(3)$ and can be approximated as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State $U =U / \sqrt{tr(U^{\dagger}U / 3)}$
+\For{$i=0$ to $i$}
+\Comment {iterate i times}
+    \State{$x = U \left(\frac{3}{2}-\frac{1}{2}U^{\dagger}U\right)$}
+    \State{$U = \left(1-\frac{i}{3}{\rm Im}(\det(x))\right)x$}
+\EndFor
+
+\Return $U$
+\end{algorithmic}
+\caption{$\mathcal{P}(U)$ approximately}
+\end{algorithm}
+
+\begin{itemize}
+  \item \index{APE stout}APE stout
+\end{itemize}

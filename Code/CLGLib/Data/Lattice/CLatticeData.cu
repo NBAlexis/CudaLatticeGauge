@@ -59,6 +59,7 @@ CLatticeData::CLatticeData()
     , m_pMeasurements(NULL)
     , m_pFieldCache(NULL)
     , m_pIndexCache(NULL)
+    , m_pGaugeSmearing(NULL)
 
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
@@ -108,6 +109,7 @@ CLatticeData::~CLatticeData()
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
     appSafeDelete(m_pFermionSolver);
+    appSafeDelete(m_pGaugeSmearing);
 }
 
 void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField)

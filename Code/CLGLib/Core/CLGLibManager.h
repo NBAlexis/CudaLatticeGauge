@@ -68,6 +68,7 @@ protected:
     void CreateUpdator(class CParameters& params);
     void CreateMeasurement(class CParameters& params);
     void CreateSolver(class CParameters& params);
+    void CreateGaugeSmearing(class CParameters& params);
 
 };
 
@@ -101,6 +102,11 @@ inline class CFileSystem* appGetFileSystem()
 inline class CSLASolver* appGetFermionSolver()
 {
     return appGetLattice()->m_pFermionSolver;
+}
+
+inline class CGaugeSmearing* appGetGaugeSmearing()
+{
+    return appGetLattice()->m_pGaugeSmearing;
 }
 
 inline CCudaBuffer* GetBuffer()

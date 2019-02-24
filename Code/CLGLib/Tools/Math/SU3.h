@@ -25,6 +25,8 @@
 
 #define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), right.m_me[ff]))
 
+#define __LINE_MULDN_ME(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), m_me[d]), _cuCmulf(_cuConjf(m_me[b]), m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), m_me[ff]))
+
 
 //x * a + y * b
 //= (xr * ar - xi * ai) + (yr * br - yi * bi)
@@ -939,6 +941,84 @@ extern "C" {
             m_me[6] = _cuConjf(_cuCsubf(_cuCmulf(m_me[1], m_me[5]), _cuCmulf(m_me[2], m_me[4])));
             m_me[7] = _cuConjf(_cuCsubf(_cuCmulf(m_me[2], m_me[3]), _cuCmulf(m_me[0], m_me[5])));
             m_me[8] = _cuConjf(_cuCsubf(_cuCmulf(m_me[0], m_me[4]), _cuCmulf(m_me[1], m_me[3])));
+        }
+
+        __device__ __inline__ void Proj(BYTE ite = 4)
+        {
+            //tr(me^+ me) = m0^* m0 + m1^* m1 + m2^* m2 + ...
+            Real fDiv =
+                __cuCabsSqf(m_me[0])
+                + __cuCabsSqf(m_me[1])
+                + __cuCabsSqf(m_me[2])
+                + __cuCabsSqf(m_me[3])
+                + __cuCabsSqf(m_me[4])
+                + __cuCabsSqf(m_me[5])
+                + __cuCabsSqf(m_me[6])
+                + __cuCabsSqf(m_me[7])
+                + __cuCabsSqf(m_me[8]);
+            //1 / sqrt( tr(me^+ me) / 3 )
+            fDiv = __rcp(_sqrt(fDiv * F(0.3333333333333)));
+            m_me[0] = cuCmulf_cr(m_me[0], fDiv);
+            m_me[1] = cuCmulf_cr(m_me[1], fDiv);
+            m_me[2] = cuCmulf_cr(m_me[2], fDiv);
+            m_me[3] = cuCmulf_cr(m_me[3], fDiv);
+            m_me[4] = cuCmulf_cr(m_me[4], fDiv);
+            m_me[5] = cuCmulf_cr(m_me[5], fDiv);
+            m_me[6] = cuCmulf_cr(m_me[6], fDiv);
+            m_me[7] = cuCmulf_cr(m_me[7], fDiv);
+            m_me[8] = cuCmulf_cr(m_me[8], fDiv);
+
+            _Complex x[9];
+            _Complex tmp[3];
+            for (BYTE byIt = 0; byIt < ite; ++byIt)
+            {
+                //x = (-1/2) me^+ me
+                x[0] = cuCmulf_cr(__LINE_MULDN_ME(0, 3, 6, 0, 3, 6), F(-0.5));
+                x[1] = cuCmulf_cr(__LINE_MULDN_ME(0, 3, 6, 1, 4, 7), F(-0.5));
+                x[2] = cuCmulf_cr(__LINE_MULDN_ME(0, 3, 6, 2, 5, 8), F(-0.5));
+                x[3] = cuCmulf_cr(__LINE_MULDN_ME(1, 4, 7, 0, 3, 6), F(-0.5));
+                x[4] = cuCmulf_cr(__LINE_MULDN_ME(1, 4, 7, 1, 4, 7), F(-0.5));
+                x[5] = cuCmulf_cr(__LINE_MULDN_ME(1, 4, 7, 2, 5, 8), F(-0.5));
+                x[6] = cuCmulf_cr(__LINE_MULDN_ME(2, 5, 8, 0, 3, 6), F(-0.5));
+                x[7] = cuCmulf_cr(__LINE_MULDN_ME(2, 5, 8, 1, 4, 7), F(-0.5));
+                x[8] = cuCmulf_cr(__LINE_MULDN_ME(2, 5, 8, 2, 5, 8), F(-0.5));
+
+                //x += (3/2)
+                x[0].x = x[0].x + F(1.5);
+                x[4].x = x[4].x + F(1.5);
+                x[8].x = x[8].x + F(1.5);
+
+                //x = me.x
+                tmp[0] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[0], x[0]), _cuCmulf(m_me[1], x[3])), _cuCmulf(m_me[2], x[6]));
+                tmp[1] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[0], x[1]), _cuCmulf(m_me[1], x[4])), _cuCmulf(m_me[2], x[7]));
+                tmp[2] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[0], x[2]), _cuCmulf(m_me[1], x[5])), _cuCmulf(m_me[2], x[8]));
+                //we do not need m_me[0,1,2] anymore
+                memcpy(m_me, tmp, sizeof(_Complex) * 3);
+                tmp[0] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[3], x[0]), _cuCmulf(m_me[4], x[3])), _cuCmulf(m_me[5], x[6]));
+                tmp[1] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[3], x[1]), _cuCmulf(m_me[4], x[4])), _cuCmulf(m_me[5], x[7]));
+                tmp[2] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[3], x[2]), _cuCmulf(m_me[4], x[5])), _cuCmulf(m_me[5], x[8]));
+                memcpy(m_me + 3, tmp, sizeof(_Complex) * 3);
+                tmp[0] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[6], x[0]), _cuCmulf(m_me[7], x[3])), _cuCmulf(m_me[8], x[6]));
+                tmp[1] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[6], x[1]), _cuCmulf(m_me[7], x[4])), _cuCmulf(m_me[8], x[7]));
+                tmp[2] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[6], x[2]), _cuCmulf(m_me[7], x[5])), _cuCmulf(m_me[8], x[8]));
+                memcpy(m_me + 6, tmp, sizeof(_Complex) * 3);
+
+                //me = x
+                //coef = det(me)
+                _Complex coef = Determinent(m_me);
+                //coef = 1 - (i/3)Im(coef)
+                coef = _make_cuComplex(F(1.0), -F(0.33333333333) * coef.y);
+                //me = coef me
+                m_me[0] = _cuCmulf(coef, m_me[0]);
+                m_me[1] = _cuCmulf(coef, m_me[1]);
+                m_me[2] = _cuCmulf(coef, m_me[2]);
+                m_me[3] = _cuCmulf(coef, m_me[3]);
+                m_me[4] = _cuCmulf(coef, m_me[4]);
+                m_me[5] = _cuCmulf(coef, m_me[5]);
+                m_me[6] = _cuCmulf(coef, m_me[6]);
+                m_me[7] = _cuCmulf(coef, m_me[7]);
+                m_me[8] = _cuCmulf(coef, m_me[8]);
+            }
         }
 
         /**

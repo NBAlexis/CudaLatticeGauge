@@ -82,6 +82,9 @@
     <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
     <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
     <ClInclude Include="Update\CUpdator.h" />
+    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearing.h" />
+    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.h" />
+    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Update\CUpdator.cpp" />
@@ -124,6 +127,8 @@
     <ClCompile Include="Tools\Tracer.cpp" />
     <ClCompile Include="Update\Continous\CHMC.cpp" />
     <ClCompile Include="Update\Continous\CIntegrator.cpp" />
+    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
+    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

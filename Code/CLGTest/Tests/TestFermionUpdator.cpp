@@ -33,6 +33,8 @@ UINT TestFermionUpdator(CParameters& sParam)
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
 
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWithSmearing);
+
 UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 {
     CMeasureMesonCorrelator* pMeasure = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));

@@ -41,6 +41,7 @@ public:
 #pragma region HMC
 
     virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const;
+    virtual void CalculateOnlyStaple(CFieldGauge* pStable) const;
     virtual void MakeRandomGenerator();
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const;
     virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const;

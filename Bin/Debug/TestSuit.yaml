@@ -725,6 +725,94 @@ TestFermionUpdator:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+TestFermionUpdatorWithSmearing:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.17
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 15
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1355
+
+        FieldId : 2
+
+        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
+        ## = 6 + MaxDim of GMRES
+        PoolNumber : 16
+
+        ## Still have problem here
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0000001
+        Restart : 10
+        ## 0 is recommanded
+        AbsoluteAccuracy :0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 2.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeSmearing :
+
+        SmearingName : CGaugeSmearingAPEStout
+        RhoS : 0.02
+        RhoT : 0.02
+        Iterate : 3
+
 TestFermionUpdatorLargeScale:
 
     ## For 32x32x32x32 lattice
@@ -986,7 +1074,6 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
         GammaMatrix : [ UNITY, GAMMA4, GAMMA5, GAMMA54, GAMMA45 ]
         FieldId : 2
 
-
 TestOperators:
 
     Dim : 4
@@ -1063,6 +1150,100 @@ TestOperators:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+TestGaugeSmearingAPEStout:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 0
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 16
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0000001
+        Restart : 10
+        ## 0 is recommanded
+        AbsoluteAccuracy :0
+
+    GaugeSmearing :
+
+        SmearingName : CGaugeSmearingAPEStout
+        RhoS : 0.02
+        RhoT : 0.02
+        Iterate : 3
+
+TestGaugeSmearingAPEProj:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 0
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 16
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0000001
+        Restart : 10
+        ## 0 is recommanded
+        AbsoluteAccuracy :0
+
+    GaugeSmearing :
+
+        SmearingName : CGaugeSmearingAPEProj
+        Alpha : 0.3
+        ProjIterate : 6
+        Iterate : 1
 
 TestGammaMatrixSpeed:
 

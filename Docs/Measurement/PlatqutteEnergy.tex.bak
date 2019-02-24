@@ -17,3 +17,5 @@ The plaquette energy is defined as
 \end{split}
 \end{equation}
 which is the average (average according to configurations) energy of plaquettes per plaquette (average according to plaquettes).
+
+This is also $\langle W ^{1\times 1}\rangle$.

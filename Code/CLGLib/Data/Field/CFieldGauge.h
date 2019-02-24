@@ -27,6 +27,8 @@ public:
     */
     virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const = 0;
 
+    virtual void CalculateOnlyStaple(CFieldGauge* pStable) const = 0;
+
     virtual void MakeRandomGenerator() = 0;
 
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const = 0;

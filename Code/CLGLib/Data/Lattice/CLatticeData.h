@@ -60,12 +60,17 @@ public:
     UINT m_uiBoundaryConditionType;
     class CSLASolver* m_pFermionSolver;
 
+    class CGaugeSmearing* m_pGaugeSmearing;
+
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.GetAt(byId); }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.GetAt(byId); }
     class CField* GetPooledFieldById(BYTE byId);
 };
 
 inline class CSLASolver* appGetFermionSolver();
+
+inline class CGaugeSmearing* appGetGaugeSmearing();
+
 
 __END_NAMESPACE
 

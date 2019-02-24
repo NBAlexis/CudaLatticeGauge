@@ -59,7 +59,7 @@ public:
             }
         }
 
-        m_pGaugeField->ElementNormalize();
+        FinishEvaluate();
     }
 
     virtual CCString GetInfos(const CCString& sTab) const;

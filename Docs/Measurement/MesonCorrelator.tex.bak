@@ -203,7 +203,7 @@ Using Eq.~(\ref{eq.mesoncorrelator.matrix1}), one have
 \phi ^{j\times 3 + 0} (d_i,v_0) & \phi ^{j\times 3 + 1}(d_i,v_0) & \phi ^{j\times 3 + 2}(d_i,v_0)  \\
 \phi ^{j\times 3 + 0} (d_i,v_1) & \phi ^{j\times 3 + 1}(d_i,v_1) & \phi ^{j\times 3 + 2}(d_i,v_1)  \\
 \phi ^{j\times 3 + 0} (d_i,v_2) & \phi ^{j\times 3 + 1}(d_i,v_2) & \phi ^{j\times 3 + 2}(d_i,v_2)  \\
-\end{array}\right)\\
+\end{array}\right),\\
 &U_{ij}^T=\left(\begin{array}{ccc}
 \phi ^{j\times 3 + 0} (d_i,v_0) & \phi ^{j\times 3 + 0}(d_i,v_1) & \phi ^{j\times 3 + 0}(d_i,v_2)  \\
 \phi ^{j\times 3 + 1} (d_i,v_0) & \phi ^{j\times 3 + 1}(d_i,v_1) & \phi ^{j\times 3 + 1}(d_i,v_2)  \\
@@ -234,29 +234,29 @@ c_3U_{p(3)1} & c_3U_{p(3)2} & c_3U_{p(3)3} & c_3U_{p(3)4} \\
 c_4U_{p(4)1} & c_4U_{p(4)2} & c_4U_{p(4)3} & c_4U_{p(4)4} \\
 \end{array}\right),\\
 &\Gamma ' D^{-1} {\Gamma'}^{\dagger}=\left(\begin{array}{cccc}
-c_1c^*_{p(1)}U_{p(1)p(1)} & c_1c^*_{p(2)}U_{p(1)p(2)} & c_1c^*_{p(3)}U_{p(1)p(3)} & c_1c^*_{p(4)}U_{p(1)p(4)} \\
-c_2c^*_{p(1)}U_{p(2)p(1)} & c_2c^*_{p(2)}U_{p(2)p(2)} & c_2c^*_{p(3)}U_{p(2)p(3)} & c_2c^*_{p(4)}U_{p(2)p(4)} \\
-c_3c^*_{p(1)}U_{p(3)p(1)} & c_3c^*_{p(2)}U_{p(3)p(2)} & c_3c^*_{p(3)}U_{p(3)p(3)} & c_3c^*_{p(4)}U_{p(3)p(4)} \\
-c_4c^*_{p(1)}U_{p(4)p(1)} & c_4c^*_{p(2)}U_{p(4)p(2)} & c_4c^*_{p(3)}U_{p(4)p(3)} & c_4c^*_{p(4)}U_{p(4)p(4)} \\
+c_1c^*_1U_{p(1)p(1)} & c_1c^*_2U_{p(1)p(2)} & c_1c^*_3U_{p(1)p(3)} & c_1c^*_4U_{p(1)p(4)} \\
+c_2c^*_1U_{p(2)p(1)} & c_2c^*_2U_{p(2)p(2)} & c_2c^*_3U_{p(2)p(3)} & c_2c^*_4U_{p(2)p(4)} \\
+c_3c^*_1U_{p(3)p(1)} & c_3c^*_2U_{p(3)p(2)} & c_3c^*_3U_{p(3)p(3)} & c_3c^*_4U_{p(3)p(4)} \\
+c_4c^*_1U_{p(4)p(1)} & c_4c^*_2U_{p(4)p(2)} & c_4c^*_3U_{p(4)p(3)} & c_4c^*_4U_{p(4)p(4)} \\
 \end{array}\right)\\
 \end{split}
 \end{equation}
 
-Finally we have
+Finally we have (Note $U$ is not a SU(3) matrix)
 \begin{equation}
 \begin{split}
-&{\rm tr}_{c,s}\left[\Gamma ' D^{-1}{\Gamma '}^{\dagger}\left(D^{-1}\right)^{\dagger}\right] = \sum _{ij}c_ic_{p(j)}^* {\rm tr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]=\sum _{ij}c_ic_{p(j)}^* {\rm tr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]
+&{\rm tr}_{c,s}\left[\Gamma ' D^{-1}{\Gamma '}^{\dagger}\left(D^{-1}\right)^{\dagger}\right] = \sum _{ij}c_ic_j^* {\rm tr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]=\sum _{ij}c_ic_j^* {\rm tr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]
 \end{split}
 \end{equation}
 
-This can be further simplified, note that the result should be a real number, so for $i\neq j$, if ${\rm tr}\left[U^{\dagger}_{p(i)p(j)}U_{ij}\right]$ is present, so must be ${\rm tr}\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]$ with the same sign. This is guaranteed by symmetric matrix, i.e. if $p(i)=a$, one must have $p(a)=i$, and also $c_ic^*_{p(j)}=c_{p(i)}c_j^*$ as shown below.
+This can be further simplified, note that the result should be a real number, so for $i\neq j$, if ${\rm tr}\left[U^{\dagger}_{p(i)p(j)}U_{ij}\right]$ is present, so must be ${\rm tr}\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]$ with the same sign. This is guaranteed by symmetric matrix, i.e. if $p(i)=a$, one must have $p(a)=i$, and also $c_ic^*_j=c_{p(i)}c_{p(j)}^*$ as shown below.
 
-To prove $c_ic^*_{p(j)}=c_{p(i)}c_j^*$, we need to consider:
+To prove $c_ic^*_j=c_{p(i)}c_{p(j)}^*$, we need to consider:
 
 \begin{enumerate}
-  \item $\Gamma ^{\dagger}=\pm \Gamma$ and $p(i)=i$. In this case, $c_i=c_{p(i)}$, and $c_ic^*_{p(j)}=c_{p(i)}c_j^*$ is straightforwardly.
-  \item $\Gamma ^{\dagger}=\Gamma$ and $p(i)\neq i$. In this case, $c_i=c_{p(i)}^*$, so $c_ic^*_{p(j)}=c^*_{p(i)}c_j$. Note that, $c_i$ are either all real or all imaginary, so $c_ic^*_{p(j)}=c^*_{p(i)}c_j=c_{p(i)}c_j^*$.
-  \item 
+  \item $\Gamma ^{\dagger}=\pm \Gamma$ and $p(i)=i$. In this case, $c_i=c_{p(i)}$, and $c_ic^*_j=c_{p(i)}c_{p(j)}^*$ is straightforward.
+  \item $\Gamma ^{\dagger}=\Gamma$ and $p(i)\neq i$. In this case, $c_i=c_{p(i)}^*$, so $c_ic^*_j=c^*_{p(i)}c_{p(j)}$. Note that, $c_i$ are either all real or all imaginary, so $c_ic^*_j=c^*_{p(i)}c_{p(j)}=c_{p(i)}c_{p(j)}^*$.
+  \item $\Gamma ^{\dagger}=-\Gamma$ and $p(i)\neq i$. In this case, $c_i=-c_{p(i)}^*$, so $c_ic^*_j=c^*_{p(i)}c_{p(j)}=c_{p(i)}c_{p(j)}^*$.
 \end{enumerate}
 
 So, we have two cases, one for $p(1)=1$, and one for $p(1)\neq 1$
@@ -264,12 +264,12 @@ So, we have two cases, one for $p(1)=1$, and one for $p(1)\neq 1$
 \begin{split}
 &{\rm tr}_{c,s}\left[\Gamma ' D^{-1}{\Gamma '}^{\dagger}\left(D^{-1}\right)^{\dagger}\right]\\
 & = \left\{\begin{array}{cc}
-2\sum _{i>1,j>i}c_ic_j {\rm Retr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]+\sum _{i=1,2,3,4}c_ic_i {\rm tr}_c\left[U_{p(i)p(i)}U^{\dagger}_{ii}\right] & p(i)=i\\
-2\sum _{i>1,j>i}c_ic_j {\rm Retr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]+2\sum _{i=1,k}c_ic_i {\rm Retr}_c\left[U_{p(i)p(i)}U^{\dagger}_{ii}\right] & p(1)\neq 1,k\\
+2\sum _{i>1,j>i}c_ic_j^* {\rm Retr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]+\sum _{i=1,2,3,4}{\rm tr}_c\left[U^{\dagger}_{ii}U_{ii}\right] & p(i)=i\\
+2\sum _{i>1,j>i}c_ic_j^* {\rm Retr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]+2\sum _{i=1,k}{\rm Retr}_c\left[U^{\dagger}_{ii}U_{p(i)p(i)}\right] & p(1)\neq 1,k\\
 \end{array}\right.
 \end{split}
 \end{equation}
 
 
-\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
+
 

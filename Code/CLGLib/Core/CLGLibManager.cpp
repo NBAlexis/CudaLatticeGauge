@@ -537,6 +537,17 @@ void CCLGLibManager::CreateSolver(class CParameters& params)
     m_pLatticeData->CreateFermionSolver(sSolverName, params, pField);
 }
 
+void CCLGLibManager::CreateGaugeSmearing(class CParameters& params)
+{
+    CCString sSmearingName = _T("CGaugeSmearingAPEStout");
+    params.FetchStringValue(_T("SmearingName"), sSmearingName);
+    m_pLatticeData->m_pGaugeSmearing = dynamic_cast<CGaugeSmearing*>(appCreate(sSmearingName));
+    if (NULL != m_pLatticeData->m_pGaugeSmearing)
+    {
+        m_pLatticeData->m_pGaugeSmearing->Initial(m_pLatticeData, params);
+    }
+}
+
 UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 {
     m_pCudaHelper = new CCudaHelper();
@@ -591,6 +602,12 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CParameters solver = params.GetParameter(_T("Solver"));
         CreateSolver(solver);
+    }
+
+    if (params.Exist(_T("GaugeSmearing")))
+    {
+        CParameters gaugesmearing = params.GetParameter(_T("GaugeSmearing"));
+        CreateGaugeSmearing(gaugesmearing);
     }
 
     if (params.Exist(_T("Updator")))

@@ -14,19 +14,26 @@
 \indexentry{Metropolis|hyperpage}{16}
 \indexentry{equilibrium|hyperpage}{16}
 \indexentry{Omelyan|hyperpage}{16}
-\indexentry{solver|hyperpage}{18}
-\indexentry{Krylov subspace|hyperpage}{18}
-\indexentry{GMRES|hyperpage}{18}
-\indexentry{GCR|hyperpage}{22}
-\indexentry{BiCGStab|hyperpage}{24}
-\indexentry{plaquette energy|hyperpage}{25}
-\indexentry{meson|hyperpage}{25}
-\indexentry{correlator|hyperpage}{25}
-\indexentry{source|hyperpage}{27}
-\indexentry{point source|hyperpage}{27}
-\indexentry{pseudofermions|hyperpage}{28}
+\indexentry{gauge smearing|hyperpage}{17}
+\indexentry{low mode|hyperpage}{17}
+\indexentry{exceptional configurations|hyperpage}{17}
+\indexentry{gauge smoothing|hyperpage}{17}
+\indexentry{APE smearing|hyperpage}{17}
+\indexentry{staple|hyperpage}{17}
+\indexentry{stout|hyperpage}{18}
+\indexentry{APE stout|hyperpage}{18}
+\indexentry{solver|hyperpage}{19}
+\indexentry{Krylov subspace|hyperpage}{19}
+\indexentry{GMRES|hyperpage}{19}
+\indexentry{GCR|hyperpage}{23}
+\indexentry{BiCGStab|hyperpage}{25}
+\indexentry{plaquette energy|hyperpage}{26}
+\indexentry{meson|hyperpage}{26}
+\indexentry{correlator|hyperpage}{26}
+\indexentry{source|hyperpage}{28}
 \indexentry{point source|hyperpage}{28}
-\indexentry{reciprocal space|hyperpage}{28}
-\indexentry{gauge smearing|hyperpage}{30}
-\indexentry{gauge fixing|hyperpage}{30}
-\indexentry{extend sources|hyperpage}{30}
+\indexentry{pseudofermions|hyperpage}{29}
+\indexentry{point source|hyperpage}{29}
+\indexentry{reciprocal space|hyperpage}{29}
+\indexentry{gauge fixing|hyperpage}{31}
+\indexentry{extend sources|hyperpage}{31}
