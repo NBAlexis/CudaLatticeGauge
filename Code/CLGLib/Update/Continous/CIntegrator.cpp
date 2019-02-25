@@ -114,15 +114,7 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera)
 
 void CIntegrator::FinishEvaluate()
 {
-    if (NULL != appGetGaugeSmearing())
-    {
-        appGetGaugeSmearing()->GaugeSmearing(m_pGaugeField, m_pStapleField);
-        m_pGaugeField->ElementNormalize();
-    }
-    else
-    {
-        m_pGaugeField->ElementNormalize();
-    }
+    m_pGaugeField->ElementNormalize();
 }
 
 Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const

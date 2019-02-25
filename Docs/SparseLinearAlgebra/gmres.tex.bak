@@ -1,4 +1,4 @@
-\subsection{\label{GMRES}\index{GMRES}GMRES}
+\subsection{\label{sec:GMRES}\index{GMRES}GMRES}
 
 This section we follow Refs.~\cite{templates} and \cite{sparselinearbook1}.
 

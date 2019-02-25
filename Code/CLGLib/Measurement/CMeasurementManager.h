@@ -18,7 +18,7 @@ class CLGAPI CMeasurementManager
 public:
     CMeasurementManager(class CLatticeData* pOwner) : m_iAcceptedConfigurationCount(0), m_pOwner(pOwner) {}
 
-    void OnConfigurationAccepted();
+    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     void OnUpdateFinished(UBOOL bReport = TRUE);
     void Reset();
 

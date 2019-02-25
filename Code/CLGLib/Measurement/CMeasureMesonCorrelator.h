@@ -20,14 +20,14 @@ public:
     CMeasureMesonCorrelator() : CMeasure(), m_uiResoultCount(0) {}
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
 
-    virtual void OnConfigurationAccepted();
+    virtual void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField);
     virtual void Average(UINT uiConfigurationCount);
     virtual void Report();
     virtual void Reset();
 
 protected:
 
-    void CalculateCorrelator(const CFieldGauge* pGaugeField);
+    void CalculateCorrelator(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField);
 
 public:
 

@@ -11,50 +11,33 @@
 
 #include "CLGTest.h"
 
-UINT TestGaugeSmearing(CParameters&)
+UINT TestGaugeSmearing(CParameters& sParam)
 {
-    Real fBetaOverN = F(2.5);
-    CFieldGauge* pGauge = appGetLattice()->m_pGaugeField;
-    CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    //CMeasureMesonCorrelator* pMeasure = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    //if (NULL == pMeasure)
+    //{
+    //    return 1;
+    //}
+    //Real fExpected = F(0.625);
+    //sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
-    CFieldGauge* pForce = dynamic_cast<CFieldGauge*>(pGauge->GetCopy());
-    CFieldGauge* pStaple = dynamic_cast<CFieldGauge*>(pGauge->GetCopy());
+    //appGetLattice()->m_pUpdator->Update(10, FALSE);
+    //appGetLattice()->m_pUpdator->Update(20, TRUE);
 
-    //calculate staple for smearing
-    pGauge->CalculateOnlyStaple(pStaple);
-
-    //Calculate energy before smearing
-    Real fGaugeEnergy = pGauge->CalculatePlaqutteEnergyUsingStable(fBetaOverN, pStaple);
-    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
-    assert(NULL != pPooled);
-    pFermion->CopyTo(pPooled);
-    pPooled->InverseD(pGauge);
-    Real fFermionEnergy = pPooled->Dot(pPooled).x;
-
-    //Do the smearing
-    appGetGaugeSmearing()->GaugeSmearing(pGauge, pStaple);
-
-    Real fGaugeEnergy2 = pGauge->CalculatePlaqutteEnergy(fBetaOverN);
-    pFermion->CopyTo(pPooled);
-    pPooled->InverseD(pGauge);
-    Real fFermionEnergy2 = pPooled->Dot(pPooled).x;
-
-    appGeneral(_T("E: G:%f(%f) F:%f(%f), Total = %f(%f) diff=%f"), 
-        fGaugeEnergy, 
-        fGaugeEnergy2, 
-        fFermionEnergy, 
-        fFermionEnergy2, 
-        fGaugeEnergy + fFermionEnergy,
-        fGaugeEnergy2 + fFermionEnergy2,
-        fGaugeEnergy + fFermionEnergy - (fGaugeEnergy2 + fFermionEnergy2));
+    //Real fRes = pMeasure->m_lstResults[0][0];
+    //appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+    //if (appAbs(fRes - fExpected) > F(0.01))
+    //{
+    //    return 1;
+    //}
 
     return 0;
 }
 
 //930 - 990 ms
-__REGIST_TEST(TestGaugeSmearing, Misc, TestGaugeSmearingAPEProj);
+//__REGIST_TEST(TestGaugeSmearing, Updator, TestGaugeSmearingAPEProj);
 
-__REGIST_TEST(TestGaugeSmearing, Misc, TestGaugeSmearingAPEStout);
+//__REGIST_TEST(TestGaugeSmearing, Updator, TestGaugeSmearingAPEStout);
 
 
 //=============================================================================

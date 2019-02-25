@@ -91,7 +91,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         //If rejected, just accept the old configuration and trigger the measure
         if (bMeasure)
         {
-            m_pOwner->OnUpdatorConfigurationAccepted();
+            m_pOwner->OnUpdatorConfigurationAccepted(m_pIntegrator->m_pGaugeField, m_pIntegrator->m_pStapleField);
         }
 
         if (m_bSaveConfigurations && (bAccepted || 0 == i))

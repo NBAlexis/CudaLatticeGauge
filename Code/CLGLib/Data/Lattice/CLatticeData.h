@@ -23,7 +23,7 @@ public:
     ~CLatticeData();
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
-    void OnUpdatorConfigurationAccepted();
+    void OnUpdatorConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     void OnUpdatorFinished(UBOOL bMeasured);
     void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);

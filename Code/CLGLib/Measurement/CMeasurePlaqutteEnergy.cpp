@@ -14,9 +14,9 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CMeasurePlaqutteEnergy)
 
-void CMeasurePlaqutteEnergy::OnConfigurationAccepted()
+void CMeasurePlaqutteEnergy::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
 {
-    Real plaqutteEneregy = m_pLatticeData->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / _HC_SUN);
+    Real plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergyUsingStable(F(1.0) / _HC_SUN, pCorrespondingStaple);
     plaqutteEneregy = plaqutteEneregy / _HC_PlaqutteCount;
     Real plaqEnergy = F(1.0) - plaqutteEneregy;
     m_lstData.AddItem(plaqEnergy);

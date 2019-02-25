@@ -17,18 +17,18 @@
 \contentsline {subsubsection}{\numberline {2.2.1}Omelyan integrator}{16}{subsubsection.2.2.1}
 \contentsline {subsubsection}{\numberline {2.2.2}Multi-Step Updator}{17}{subsubsection.2.2.2}
 \contentsline {subsubsection}{\numberline {2.2.3}Cached solution}{17}{subsubsection.2.2.3}
-\contentsline {subsubsection}{\numberline {2.2.4}Gauge smearing}{17}{subsubsection.2.2.4}
-\contentsline {section}{\numberline {3}Sparse linear algebra solver}{19}{section.3}
-\contentsline {subsection}{\numberline {3.1}Krylov subspace}{19}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}GMRES}{19}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}GCR}{23}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}BiCGStab}{25}{subsection.3.4}
-\contentsline {section}{\numberline {4}Measurement}{26}{section.4}
-\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{26}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Meson Correlator}{26}{subsection.4.2}
-\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{26}{subsubsection.4.2.1}
-\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{26}{subsubsection.4.2.2}
-\contentsline {subsubsection}{\numberline {4.2.3}Sources}{28}{subsubsection.4.2.3}
+\contentsline {section}{\numberline {3}Sparse linear algebra solver}{18}{section.3}
+\contentsline {subsection}{\numberline {3.1}Krylov subspace}{18}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}GMRES}{18}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}GCR}{22}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}BiCGStab}{24}{subsection.3.4}
+\contentsline {section}{\numberline {4}Measurement}{25}{section.4}
+\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{25}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Meson Correlator}{25}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{25}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{25}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Sources}{27}{subsubsection.4.2.3}
+\contentsline {subsubsection}{\numberline {4.2.4}Gauge smearing}{30}{subsubsection.4.2.4}
 \contentsline {subsection}{\numberline {4.3}Extend sources and gauge fixing}{31}{subsection.4.3}
 \contentsline {subsubsection}{\numberline {4.3.1}Extend sources}{31}{subsubsection.4.3.1}
 \contentsline {subsubsection}{\numberline {4.3.2}Gauge fixing}{31}{subsubsection.4.3.2}

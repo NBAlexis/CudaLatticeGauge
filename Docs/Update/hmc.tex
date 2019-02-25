@@ -334,6 +334,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
     \Comment {Restart $r$ times}
     \State ${\bf r}_h={\bf r}$
     \For{$j=0$ to $itera$}
+        \State $\rho = {\bf r}_h^* \cdot {\bf r}_j$
         \If {$j=0$}
             \State ${\bf p}={\bf r}$
         \Else
@@ -352,7 +353,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
             \EndIf
         \EndIf
         \State ${\bf t}=A{\bf s}$
-        \State $\omega = |{\bf t}^*\cdot {\bf s}|/\|{\bf t}\|$
+        \State $\omega = {\bf s}^*\cdot {\bf t}/\|{\bf t}\|$
         \State ${\bf r}={\bf s}-\omega {\bf t}$
         \State ${\bf x}={\bf x}+\alpha {\bf p}+\omega {\bf s}$
         \State $\rho _p=\rho$
@@ -360,7 +361,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
     \EndFor
 \EndFor
 \end{algorithmic}
-\caption{\label{alg.BiCGStab}BiCGStab}
+\caption{\label{alg.BiCGStab}BiCGStab, note that, the numbers are \textbf{complex} number.}
 \end{algorithm}
 
 \subsubsection{\label{sec:Leap frog}\index{leap frog}Leap frog integrator}
@@ -456,50 +457,6 @@ The pseudo fermion field is generate only once for a trajectory and is not chang
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
 
-\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
 
-In HMC with fermions, the computer power is consumed mainly in solving the $D^{-1}$. The small eigenvalues of the $D$ operator is the main reason to slow down the solver, which is the so called \index{low mode}\textbf{low mode} or \index{exceptional configurations}\textbf{exceptional configurations}.
-
-Gauge smearing (\index{gauge smoothing}gauge smoothing) is one of the method to ease the problem by replacing the original configuration with a gauge equivalent but easier configuration. There are several different smearing methods. In CLGLib, only two are implemented.
-
-\begin{itemize}
-  \item \index{APE smearing}APE
-\end{itemize}
-
-It use
-\begin{equation}
-\begin{split}
-&U_{\mu}'=\mathcal{P}\left((1-\alpha)U_{\mu} + \frac{\alpha}{6}\Sigma _{\mu}\right)
-\end{split}
-\end{equation}
-where $\Sigma _{\mu}$ is the \index{staple}staple, (see Eq.~(\ref{eq.plaqutteEnergy.staple})). In CLGLib, staples are cached. After smoothing, $\mathcal{P}$ is a projection project to result to $SU(3)$ and can be approximated as
-\begin{algorithm}[H]
-\begin{algorithmic}
-\State $U =U / \sqrt{tr(U^{\dagger}U / 3)}$
-\For{$i=0$ to $r$}
-\Comment {iterate r times}
-    \State{$x = U \left(\frac{3}{2}-\frac{1}{2}U^{\dagger}U\right)$}
-    \State{$U = \left(1-\frac{i}{3}{\rm Im}(\det(x))\right)x$}
-\EndFor
-
-\Return $U$
-\end{algorithmic}
-\caption{$\mathcal{P}(U)$ approximately}
-\end{algorithm}
-
-Usually, iterate for $4$ times, it can archive $\mathcal{\alpha}$ accuracy.
-
-\begin{itemize}
-  \item \index{stout}\index{APE stout}APE stout
-\end{itemize}
-
-In this approach, it construct a $SU(3)$ candidate directly by the staples. (Therefor, no need to project). Using
-
-\begin{equation}
-\begin{split}
-&\Omega _{\mu}=\rho _{\mu} \Sigma _{\mu} U_{\mu}^{\dagger},\;Q_{\mu}=\left\{\Omega_{\mu}\right\}_{TA},\;U_{\mu}'=\exp (Q_{\mu}) U_{\mu}\\
-\end{split}
-\end{equation}
-where $\rho_{\mu}$ is usually set to be $\rho_{1,2,3}=\rho,\rho_{4}=0$. Note that, there is no sum over $\mu$ in the above equation. Also, note that, $\exp$ is not accurate unless $\rho$ is small enough, however, one can iterate the smearing for a few sub-steps.
 
 

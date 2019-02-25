@@ -25,7 +25,7 @@ public:
         m_byId = byId; 
     }
 
-    virtual void OnConfigurationAccepted();
+    virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     virtual void Average(UINT uiConfigurationCount);
     virtual void Report();
     virtual void Reset();

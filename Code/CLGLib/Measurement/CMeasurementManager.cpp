@@ -12,14 +12,14 @@
 
 __BEGIN_NAMESPACE
 
-void CMeasurementManager::OnConfigurationAccepted()
+void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
 {
     ++m_iAcceptedConfigurationCount;
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
         if (NULL != m_lstAllMeasures[i])
         {
-            m_lstAllMeasures[i]->OnConfigurationAccepted();
+            m_lstAllMeasures[i]->OnConfigurationAccepted(pAcceptGauge, pCorrespondingStaple);
         }
     }
 }

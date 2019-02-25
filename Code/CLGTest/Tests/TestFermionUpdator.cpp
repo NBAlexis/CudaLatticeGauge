@@ -33,7 +33,7 @@ UINT TestFermionUpdator(CParameters& sParam)
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWithSmearing);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorBiCGStab);
 
 UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 {
@@ -42,19 +42,35 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     {
         return 1;
     }
-    Real fExpected = F(0.625);
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+
+    UINT uiError = 0;
+
 #if _CLG_DEBUG
+
+    TArray<Real> lstResExpected;
+    sParam.FetchValueArrayReal(_T("ExpectedRes"), lstResExpected);
+    assert(lstResExpected.Num() == _HC_Lt - 1);
     appGetLattice()->m_pUpdator->Update(10, FALSE);
     appGetLattice()->m_pUpdator->Update(20, TRUE);
 
-    Real fRes = pMeasure->m_lstResults[0][0];
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
-    if (appAbs(fRes - fExpected) > F(0.01))
+    TArray<Real> lstRes;
+    appGeneral(_T("res = expected vs test: "));
+    
+    for (INT i = 1; i < _HC_Lt; ++i)
     {
-        return 1;
+        Real fRes = _hostlog10(pMeasure->m_lstResults[0][i] / pMeasure->m_lstResults[0][0]);
+        appGeneral(_T("%f : %f, "), lstResExpected[i - 1], fRes);
+        if (appAbs(fRes - lstResExpected[i - 1]) > F(0.25))
+        {
+            ++uiError;
+        }
     }
+    appGeneral(_T("\n"));
+
 #else
+
+    Real fExpected = F(0.625);
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
     appGetLattice()->m_pUpdator->Update(20, FALSE);
     appGetLattice()->m_pUpdator->Update(50, TRUE);
 
@@ -64,8 +80,9 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     {
         return 1;
     }
+
 #endif
-    return 0;
+    return uiError;
 }
 
 #if _CLG_DEBUG
@@ -73,6 +90,10 @@ __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdator
 #else
 __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelatorRelease);
 #endif
+
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEProj);
+
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEStout);
 
 UINT TestFermionUpdatorL(CParameters& sParam)
 {

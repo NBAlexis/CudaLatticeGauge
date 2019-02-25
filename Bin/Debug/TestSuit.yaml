@@ -725,7 +725,7 @@ TestFermionUpdator:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-TestFermionUpdatorWithSmearing:
+TestFermionUpdatorBiCGStab:
 
     Dim : 4
     Dir : 4
@@ -781,10 +781,12 @@ TestFermionUpdatorWithSmearing:
 
     Solver:
 
-        SolverName : CSLASolverGMRES
+        SolverName : CSLASolverBiCGStab
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MaxDim : 10
+        DiviationStep : 12
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.0000001
         Restart : 10
@@ -805,13 +807,6 @@ TestFermionUpdatorWithSmearing:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
-
-    GaugeSmearing :
-
-        SmearingName : CGaugeSmearingAPEStout
-        RhoS : 0.02
-        RhoT : 0.02
-        Iterate : 3
 
 TestFermionUpdatorLargeScale:
 
@@ -921,7 +916,7 @@ TestFermionUpdatorWithMesonCorrelator:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.625
+    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
 
     Updator:
 
@@ -1161,22 +1156,48 @@ TestGaugeSmearingAPEStout:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 0
-    ActionListLength : 0
+    ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 0
+    MeasureListLength : 1
+    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 15
 
     Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 		
     FermionField1:
         
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
         FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
+
         Hopping : 0.1355
+
         FieldId : 2
+
+        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
+        ## = 6 + MaxDim of GMRES
         PoolNumber : 16
+
+        ## Still have problem here
         Period : [1, 1, 1, -1]
 
     Solver:
@@ -1186,17 +1207,34 @@ TestGaugeSmearingAPEStout:
         ## Check Accuracy every DiviationStep steps
         MaxDim : 10
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000001
-        Restart : 10
+        Accuracy : 0.00001
+        Restart : 30
         ## 0 is recommanded
-        AbsoluteAccuracy :0
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.2
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasureMesonCorrelator
+        GammaMatrix : [ UNITY ]
+        FieldId : 2
 
     GaugeSmearing :
 
         SmearingName : CGaugeSmearingAPEStout
-        RhoS : 0.02
-        RhoT : 0.02
-        Iterate : 3
+        RhoS : 0.1
+        RhoT : 0.0
+        Iterate : 1
 
 TestGaugeSmearingAPEProj:
 
@@ -1208,22 +1246,48 @@ TestGaugeSmearingAPEProj:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 0
-    ActionListLength : 0
+    ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 0
+    MeasureListLength : 1
+    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 15
 
     Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 		
     FermionField1:
         
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
         FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
+
         Hopping : 0.1355
+
         FieldId : 2
+
+        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
+        ## = 6 + MaxDim of GMRES
         PoolNumber : 16
+
+        ## Still have problem here
         Period : [1, 1, 1, -1]
 
     Solver:
@@ -1233,10 +1297,27 @@ TestGaugeSmearingAPEProj:
         ## Check Accuracy every DiviationStep steps
         MaxDim : 10
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000001
-        Restart : 10
+        Accuracy : 0.00001
+        Restart : 30
         ## 0 is recommanded
-        AbsoluteAccuracy :0
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.2
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasureMesonCorrelator
+        GammaMatrix : [ UNITY ]
+        FieldId : 2
 
     GaugeSmearing :
 

@@ -19,7 +19,7 @@ public:
     CMeasure() : m_pOwner(NULL), m_fLastRealResult(F(0.0)) {}
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId) = 0;
-    virtual void OnConfigurationAccepted() = 0;
+    virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) = 0;
     virtual void Average(UINT uiConfigurationCount) = 0;
     virtual void Report() = 0;
     virtual void Reset() = 0;

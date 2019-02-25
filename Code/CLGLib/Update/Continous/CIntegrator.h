@@ -56,10 +56,14 @@ protected:
 
     Real m_fUpdateResultEnery;
 
+public:
+
     CFieldGauge* m_pGaugeField;
     CFieldGauge* m_pForceField;
     CFieldGauge* m_pMomentumField;
     CFieldGauge* m_pStapleField;
+
+protected:
 
     class CHMC* m_pOwner;
     CLatticeData* m_pLattice;

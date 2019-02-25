@@ -46,7 +46,7 @@
     <Filter Include="Measurement">
       <UniqueIdentifier>{919429bf-7879-4919-bc24-e4edef2b91a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Update\GaugeSmearing">
+    <Filter Include="Measurement\GaugeSmearing">
       <UniqueIdentifier>{dafabea5-5d56-4811-9ee3-15d3fee27451}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -236,14 +236,14 @@
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearing.h">
-      <Filter>Update\GaugeSmearing</Filter>
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h">
+      <Filter>Measurement\GaugeSmearing</Filter>
     </ClInclude>
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.h">
-      <Filter>Update\GaugeSmearing</Filter>
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h">
+      <Filter>Measurement\GaugeSmearing</Filter>
     </ClInclude>
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.h">
-      <Filter>Update\GaugeSmearing</Filter>
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h">
+      <Filter>Measurement\GaugeSmearing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -340,11 +340,11 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.cu">
-      <Filter>Update\GaugeSmearing</Filter>
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu">
+      <Filter>Measurement\GaugeSmearing</Filter>
     </CudaCompile>
-    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.cu">
-      <Filter>Update\GaugeSmearing</Filter>
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu">
+      <Filter>Measurement\GaugeSmearing</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

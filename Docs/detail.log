@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  24 FEB 2019 07:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  25 FEB 2019 20:32
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1360,16 +1360,16 @@ Overfull \hbox (4.56367pt too wide) detected at line 224
 
 [10] [11] [12]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 363.
- [13] [14] [15] [16] [17]) [18] (SparseLinearAlgebra/solver.tex)
-(SparseLinearAlgebra/gmres.tex [19
+put line 364.
+ [13] [14] [15] [16]) [17] (SparseLinearAlgebra/solver.tex)
+(SparseLinearAlgebra/gmres.tex [18
 
-] [20] [21] [22])
-(SparseLinearAlgebra/gcr.tex [23]) [24] (SparseLinearAlgebra/bicgstab.tex)
-[25] (Measurement/PlatqutteEnergy.tex) (Measurement/MesonCorrelator.tex
-[26
+] [19] [20] [21])
+(SparseLinearAlgebra/gcr.tex [22]) [23] (SparseLinearAlgebra/bicgstab.tex)
+[24] (Measurement/PlatqutteEnergy.tex) (Measurement/MesonCorrelator.tex
+[25
 
-] [27] [28] [29] [30]) (Measurement/ExtendSource.tex) [31]
+] [26] [27] [28] [29] [30]) (Measurement/ExtendSource.tex) [31]
 (programming/cuda.tex
 Overfull \hbox (2.43213pt too wide) in paragraph at lines 7--8
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/53
@@ -1418,8 +1418,8 @@ Package rerunfilecheck Warning: File `detail.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `detail.out':
-(rerunfilecheck)             Before: FD5D8AD0FE27E64925447C7F89A6718A;8058
-(rerunfilecheck)             After:  9717C7DF07B590D574B10FA27D334999;6186.
+(rerunfilecheck)             Before: 13F3D5EC93091729F6DB39890B57DCE9;8058
+(rerunfilecheck)             After:  2B67EDDCF29A65C5FF86939A79FCDE4D;6186.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
@@ -1432,7 +1432,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 128.
 Here is how much of TeX's memory you used:
  28226 strings out of 492976
  469150 string characters out of 3141819
- 951181 words of memory out of 3000000
+ 951228 words of memory out of 3000000
  31251 multiletter control sequences out of 15000+200000
  554560 words of font info for 107 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
@@ -1457,7 +1457,7 @@ e1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm
 /cmtt10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb><D:/CTEX/M
 iKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><D:/CTEX/MiKTeX/fonts/type1/
 public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (40 pages, 506410 bytes).
+Output written on detail.pdf (40 pages, 506300 bytes).
 PDF statistics:
  1025 PDF objects out of 1200 (max. 8388607)
  388 named destinations out of 1000 (max. 500000)

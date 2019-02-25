@@ -157,11 +157,12 @@ CField* CLatticeData::GetPooledFieldById(BYTE byId)
     return m_pFieldPoolMap[byId]->GetOne();
 }
 
-void CLatticeData::OnUpdatorConfigurationAccepted()
+void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
 {
+    //accept gauge already copy to m_pGaugeField in Updator, maybe change this behavour in the furture.
     if (NULL != m_pMeasurements)
     {
-        m_pMeasurements->OnConfigurationAccepted();
+        m_pMeasurements->OnConfigurationAccepted(pAcceptGauge, pCorrespondingStaple);
     }
 }
 

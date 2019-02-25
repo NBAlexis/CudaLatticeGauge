@@ -199,9 +199,9 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     m_uiResoultCount = 0;
 }
 
-void CMeasureMesonCorrelator::OnConfigurationAccepted()
+void CMeasureMesonCorrelator::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
-    CalculateCorrelator(appGetLattice()->m_pGaugeField);
+    CalculateCorrelator(pGaugeField, pStapleField);
 }
 
 void CMeasureMesonCorrelator::Average(UINT)
@@ -238,6 +238,11 @@ void CMeasureMesonCorrelator::Report()
         {
             appGeneral(_T("%8.12f, "), _hostlog10(appAbs(m_lstResults[i][j])));
         }
+        appGeneral(_T("\n log10(C(nt)/C(0))=\n"));
+        for (UINT j = 1; j < m_uiLt; ++j)
+        {
+            appGeneral(_T("%8.12f, "), _hostlog10(appAbs(m_lstResults[i][j] / m_lstResults[i][0])));
+        }
         appGeneral(_T("\n"));
     }
 }
@@ -250,13 +255,29 @@ void CMeasureMesonCorrelator::Reset()
     m_lstResults.RemoveAll();
 }
 
-void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGaugeField)
+void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, const CFieldGauge* pStaple)
 {
-    if (NULL == pGaugeField || EFT_GaugeSU3 != pGaugeField->GetFieldType())
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
         return;
     }
+
+    CFieldGauge* pCopyGauge = NULL;
+    const CFieldGauge* pGaugeField = NULL;
+    if (NULL != appGetGaugeSmearing())
+    {
+        pCopyGauge = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
+        CFieldGaugeSU3* pCopyStaple = dynamic_cast<CFieldGaugeSU3*>(pStaple->GetCopy());
+        appGetGaugeSmearing()->GaugeSmearing(pCopyGauge, pCopyStaple);
+        appSafeDelete(pCopyStaple);
+        pGaugeField = pCopyGauge;
+    }
+    else
+    {
+        pGaugeField = pGauge;
+    }
+
     CFieldFermionWilsonSquareSU3* pFermionSources[12];
     for (UINT i = 0; i < 12; ++i)
     {
@@ -341,6 +362,8 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGaugeField
         pFermionSources[i]->Return();
     }
     checkCudaErrors(cudaFree(ppDevicePtr));
+
+    appSafeDelete(pCopyGauge);
 }
 
 

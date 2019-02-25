@@ -53,6 +53,9 @@
     <ClInclude Include="Measurement\CMeasurementManager.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
+    <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
     <ClInclude Include="Platform\CFile.h" />
     <ClInclude Include="Platform\PlatformIncs.h" />
     <ClInclude Include="Platform\WinDefine.h" />
@@ -82,9 +85,6 @@
     <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
     <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
     <ClInclude Include="Update\CUpdator.h" />
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearing.h" />
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.h" />
-    <ClInclude Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Update\CUpdator.cpp" />
@@ -120,6 +120,8 @@
     <CudaCompile Include="Data\Lattice\CIndex.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>
@@ -127,8 +129,6 @@
     <ClCompile Include="Tools\Tracer.cpp" />
     <ClCompile Include="Update\Continous\CHMC.cpp" />
     <ClCompile Include="Update\Continous\CIntegrator.cpp" />
-    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
-    <CudaCompile Include="Update\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

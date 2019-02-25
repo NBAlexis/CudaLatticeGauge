@@ -102,11 +102,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     pR->AxpyPlus(pFieldB); //pR->AxpyPlus(pB); //b - A x_0
     pR->CopyTo(pRh);
 
-    Real rho = 0;
-    Real last_rho = 0;
-    Real alpha = 0;
-    Real beta = 0;
-    Real omega = 0;
+    _Complex rho = _make_cuComplex(F(0.0), F(0.0));
+    _Complex last_rho = _make_cuComplex(F(0.0), F(0.0));
+    _Complex alpha = _make_cuComplex(F(0.0), F(0.0));
+    _Complex beta = _make_cuComplex(F(0.0), F(0.0));
+    _Complex omega = _make_cuComplex(F(0.0), F(0.0));
 
     for (UINT i = 0; i < m_uiReTry; ++i)
     {
@@ -114,8 +114,8 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
         {
             //==========
             //One step
-            rho = _cuCabsf(pRh->Dot(pR));//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
-            if (appAbs(rho) < FLT_MIN)
+            rho = pRh->Dot(pR);//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
+            if (__cuCabsSqf(rho) < FLT_MIN)
             {
                 appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.18f\n"), rho);
                 break;
@@ -128,7 +128,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             else //if not the first iteration, 
             {
                 //beta = last_alpha * rho /(last_omega * last_rho)
-                beta = alpha * rho / (omega * last_rho);
+                beta = _cuCdivf(_cuCmulf(alpha, rho), _cuCmulf(omega, last_rho));
                 //p(i) = r(i-1)+beta( p(i-1) - last_omega v(i-1) )
                 pV->ScalarMultply(omega);
                 pP->AxpyMinus(pV);
@@ -140,16 +140,16 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pP->CopyTo(pV);
             pV->ApplyOperator(uiM, pGaugeFeild);
 
-            alpha = rho / (_cuCabsf(pRh->Dot(pV)));//alpha = rho / (rh dot v(i))
+            alpha = _cuCdivf(rho, pRh->Dot(pV));//alpha = rho / (rh dot v(i))
 
             //s=r(i-1) - alpha v(i)
             pR->CopyTo(pS);
-            pS->Axpy(-alpha, pV);
+            pS->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pV);
 
             if (0 == (j + 1) % m_uiDevationCheck)
             {
                 //Normal of S is small, then stop
-                Real fDeviation = _cuCabsf(pS->Dot(pS)) / fBLength;
+                Real fDeviation = pS->Dot(pS).x / fBLength;
                 appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:%d, iteration:%d, deviation:%8.18f\n"), i, j, fDeviation);
                 if (fDeviation < m_fAccuracy)
                 {
@@ -172,11 +172,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pS->CopyTo(pT);
             pT->ApplyOperator(uiM, pGaugeFeild);
 
-            omega = _cuCabsf(pT->Dot(pS)) / _cuCabsf(pT->Dot(pT));//omega = ts / tt
+            omega = cuCdivf_cr(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt
 
             //r(i)=s-omega t
             pS->CopyTo(pR);
-            pR->Axpy(-omega, pT);
+            pR->Axpy(_make_cuComplex(-omega.x, -omega.y), pT);
 
             //x(i)=x(i-1) + alpha p + omega s
             pX->Axpy(alpha, pP);

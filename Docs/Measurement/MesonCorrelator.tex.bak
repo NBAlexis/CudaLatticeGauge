@@ -242,7 +242,7 @@ c_4c^*_1U_{p(4)p(1)} & c_4c^*_2U_{p(4)p(2)} & c_4c^*_3U_{p(4)p(3)} & c_4c^*_4U_{
 \end{split}
 \end{equation}
 
-Finally we have (Note $U$ is not a SU(3) matrix)
+Finally we have (Note $U$ is not a $SU(3)$ matrix)
 \begin{equation}
 \begin{split}
 &{\rm tr}_{c,s}\left[\Gamma ' D^{-1}{\Gamma '}^{\dagger}\left(D^{-1}\right)^{\dagger}\right] = \sum _{ij}c_ic_j^* {\rm tr}_c\left[U_{p(i)p(j)}U^{\dagger}_{ij}\right]=\sum _{ij}c_ic_j^* {\rm tr}_c\left[U^{\dagger}_{ij}U_{p(i)p(j)}\right]
