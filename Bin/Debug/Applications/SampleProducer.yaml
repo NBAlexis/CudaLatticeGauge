@@ -1,0 +1,99 @@
+
+VerboseLevel : GENERAL
+##VerboseLevel : PARANOIAC
+VerboseOutput : timestamp
+ShowDeviceInformation : 0
+ShowParameterContent : 0
+
+Dim : 4
+Dir : 4
+LatticeLength : [8, 8, 8, 16]
+LatticeIndex : EIndexType_Square
+LatticeBoundary : EBC_TorusSquare
+RandomType : ER_Schrage
+RandomSeedType : ERST_Timestamp
+RandomSeed : 7654321
+ActionListLength : 2
+FermionFieldCount : 1
+
+##SampleJob : ESJ_FillSample
+##SampleJob : ESJ_CheckSample
+SampleJob : ESJ_BuildSample
+SampleParameter : [601, 20, 58, 70]
+KappaRange : [0.08, 0.16]
+##KappaRange : [0.1, 0.16]
+CheckRange : [1, 1760]
+SampleList : [639, 640, 580, 583, 584, 585, 586, 587, 588, 589, 590, 563, 564, 565, 566, 567, 568, 569, 570, 559, 560, 543, 544, 545, 546, 547, 548, 549, 550, 530]
+SampleListGauge : [63, 63, 57, 58, 58, 58, 58, 58, 58, 58, 58, 56, 56, 56, 56, 56, 56, 56, 56, 55, 55, 54, 54, 54, 54, 54, 54, 54, 54, 52]
+
+BuildGauge:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 16]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    RandomType : ER_Schrage
+    RandomSeedType : ERST_Timestamp
+    RandomSeed : 7654321
+    ActionListLength : 1
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 0
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    Action1:
+        ActionName : CActionGaugePlaquette
+        Beta : 1
+
+Updator:
+    UpdatorType : CHMC
+    Metropolis : 0
+    IntegratorType : CIntegratorOmelyan
+    IntegratorStepLength : 0.1
+    IntegratorStep : 5
+    Omelyan2Lambda : 0.38636665500756728
+
+Gauge:
+    FieldName : CFieldGaugeSU3
+    FieldInitialType : EFIT_Random
+		
+FermionField1:
+    FieldName : CFieldFermionWilsonSquareSU3
+    FieldInitialType : EFIT_RandomGaussian
+    Hopping : 0.1355
+    FieldId : 2
+    PoolNumber : 10
+    Period : [1, 1, 1, -1]
+
+Solver:
+    SolverName : CSLASolverBiCGStab
+    SolverForFieldId : 2
+    DiviationStep : 10
+    MaxStep : 150
+    Accuracy : 0.00000000000001
+    Restart : 150
+    AbsoluteAccuracy :1
+
+##    SolverName : CSLASolverGMRES
+##    SolverForFieldId : 2
+##    MaxDim : 75
+##    Accuracy : 0.00000000000001
+##    Restart : 100
+##    AbsoluteAccuracy : 1
+
+Action1:
+    ActionName : CActionGaugePlaquette
+    Beta : 1
+
+Action2:
+    ActionName : CActionFermionWilsonNf2
+    FieldId : 2

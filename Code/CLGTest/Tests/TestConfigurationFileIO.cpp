@@ -47,7 +47,7 @@ UINT TestFileIOWithUpdate(CParameters& sParam)
     return 0;
 }
 
-__REGIST_TEST(TestFileIOWithUpdate, FileIO, TestSaveConfigurationLowMode);
+//__REGIST_TEST(TestFileIOWithUpdate, FileIO, TestSaveConfigurationLowMode);
 
 UINT TestFileIOCLG(CParameters& sParam)
 {

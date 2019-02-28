@@ -2,7 +2,7 @@
 // FILENAME : CFile.h
 // 
 // DESCRIPTION:
-//
+// 
 // REVISION:
 //  [01/31/2019 nbale]
 //=============================================================================
@@ -10,6 +10,8 @@
 
 #ifndef _CFILE_H_
 #define _CFILE_H_
+
+///TODO: Use boost 
 
 __BEGIN_NAMESPACE
 
@@ -29,6 +31,8 @@ public:
     UBOOL WriteAllBytes(const TCHAR* sFilename, BYTE* data, UINT uiSize);
     CCString ReadAllText(const TCHAR* sFilename);
     UBOOL WriteAllText(const TCHAR* sFilename, const CCString& data);
+
+    //UBOOL MakeDir(const CCString& dirPath);
 
     UBOOL SetDefaultDirectory(const TCHAR* Filename);
     class CCString GetDefaultDirectory();

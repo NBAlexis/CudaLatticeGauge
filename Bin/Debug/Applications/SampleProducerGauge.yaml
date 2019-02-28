@@ -1,0 +1,31 @@
+
+VerboseLevel : GENERAL
+VerboseOutput : timestamp
+ShowDeviceInformation : 0
+ShowParameterContent : 0
+
+Dim : 4
+Dir : 4
+LatticeLength : [8, 8, 8, 16]
+LatticeIndex : EIndexType_Square
+LatticeBoundary : EBC_TorusSquare
+RandomType : ER_Schrage
+RandomSeedType : ERST_Timestamp
+RandomSeed : 7654321
+ActionListLength : 1
+
+Updator:
+    UpdatorType : CHMC
+    Metropolis : 0
+    IntegratorType : CIntegratorOmelyan
+    IntegratorStepLength : 1
+    IntegratorStep : 10
+    Omelyan2Lambda : 0.38636665500756728
+
+Gauge:
+    FieldName : CFieldGaugeSU3
+    FieldInitialType : EFIT_Random
+		
+Action1:
+    ActionName : CActionGaugePlaquette
+    Beta : 1

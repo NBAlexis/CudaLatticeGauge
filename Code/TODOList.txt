@@ -1,13 +1,14 @@
 
--- Implement Meson correlator measure
 
 -- Enable temprature
 
 -- Implement BiCGStab with precondition
 
--- deflation
+-- deflation?
 
+-- Change the platform specific functions to boost (cross platform)
 
+-- CMake? (cross platform)
 
 
 

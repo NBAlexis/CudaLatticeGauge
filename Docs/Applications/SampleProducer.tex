@@ -1,0 +1,6 @@
+\subsection{\label{sec:SampleProducer}Sample Producer}
+
+In HMC, the most time-consuming operation is $\left(DD^{\dagger}\right)^{-1} \phi$, which need to solve the Wilson-Dirac equation, a matrix equation ${\bf b}=A{\bf x}$, where $A=DD^{\dagger}$ is a matrix depending on the gauge field and acting on the pseudo-fermion field.
+
+At the same time, applying machine learning algorithms to physics problems has gained more and more attentions. The machine learning algorithms has been applied to solve partial differential equations~\cite{aipde}. In Ref.~\cite{aisolver1}, deep learning is applied to map between potential and energy bypassing the need to solve the Schr$\rm \ddot{o}$dinger equation, in other words, the Schr$\rm \ddot{o}$dinger equation is implicitly solved by the network. So, it is reasonable to ask whether the machine learning can also help to solve the Wilson-Dirac equation? For example, is it possible to train the network to output eigenvectors by inputting a gauge field, or even better output ${\bf x}$ by inputting a gauge field and a pseudo-fermion field ${\bf b}$?
+ 

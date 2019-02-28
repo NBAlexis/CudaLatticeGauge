@@ -34,6 +34,7 @@ public:
     ~CFieldGaugeSU3();
 
     virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType);
+    virtual void InitialWithByte(BYTE* byData);
     virtual void InitialField(EFieldInitialType eInitialType);
     virtual EFieldType GetFieldType() const { return EFT_GaugeSU3; }
     virtual void DebugPrintMe() const;
@@ -68,6 +69,7 @@ public:
     virtual void ElementNormalize();
     virtual _Complex Dot(const CField* other) const;
     virtual void SaveToFile(const CCString &fileName) const;
+    virtual BYTE* CopyDataOut(UINT &uiSize) const;
     virtual CCString GetInfos(const CCString &tab) const;
 
     deviceSU3* m_pDeviceData;

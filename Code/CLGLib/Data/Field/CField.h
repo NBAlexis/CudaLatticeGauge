@@ -69,6 +69,7 @@ public:
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
     virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
+    virtual void InitialWithByte(BYTE* byData) = 0;
     virtual void InitialOtherParameters(CParameters& ) {}
 
     virtual void DebugPrintMe() const = 0;
@@ -86,12 +87,14 @@ public:
 
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const _Complex& a, const CField* x) = 0;
-    //Why is it not const: One may calculate length and set fLength only when needed.
     Real GetLength() const { return m_fLength; }
     //This is a * me
     virtual void ScalarMultply(const _Complex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
     virtual void SaveToFile(const CCString &fileName) const = 0;
+    //Why we need this? because the data structure are aligned.
+    //Remember to free the buffer
+    virtual BYTE* CopyDataOut(UINT &uiSize) const = 0;
     virtual CCString GetInfos(const CCString &tab) const = 0;
 
 #pragma endregion

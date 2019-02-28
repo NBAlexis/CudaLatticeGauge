@@ -183,6 +183,15 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 
     __FetchIntWithDefault(_T("RandomSeed"), 1234567);
     m_InitialCache.constIntegers[ECI_RandomSeed] = static_cast<UINT>(iVaules);
+    CCString sRandomSeedType;
+    if (params.FetchStringValue(_T("RandomSeedType"), sRandomSeedType))
+    {
+        ERandomSeedType eRST = __STRING_TO_ENUM(ERandomSeedType, sRandomSeedType);
+        if (ERST_Timestamp == eRST)
+        {
+            m_InitialCache.constIntegers[ECI_RandomSeed] = appGetTimeStamp();
+        }
+    }
 
     __FetchIntWithDefault(_T("ExponentialPrecision"), 0);
     m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);

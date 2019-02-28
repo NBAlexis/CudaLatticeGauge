@@ -374,24 +374,29 @@ void CFieldFermionWilsonSquareSU3::InitialFieldWithFile(const CCString& sFileNam
     }
 
     UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * 24 * m_uiSiteCount);
-    deviceWilsonVectorSU3* readData = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
     BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+    InitialWithByte(data);
+    free(data);
+}
+
+void CFieldFermionWilsonSquareSU3::InitialWithByte(BYTE* byData)
+{
+    deviceWilsonVectorSU3* readData = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
     for (UINT i = 0; i < m_uiSiteCount; ++i)
     {
         FLOAT thisSite[24];
-        memcpy(thisSite, data + i * sizeof(FLOAT) * 24, sizeof(FLOAT) * 24);
+        memcpy(thisSite, byData + i * sizeof(FLOAT) * 24, sizeof(FLOAT) * 24);
         for (UINT j = 0; j < 4; ++j)
         {
             for (UINT k = 0; k < 3; ++k)
             {
                 readData[i].m_d[j].m_ve[k] = _make_cuComplex(
-                    static_cast<Real>(thisSite[2 * (j * 3 + k)]), 
+                    static_cast<Real>(thisSite[2 * (j * 3 + k)]),
                     static_cast<Real>(thisSite[2 * (j * 3 + k) + 1]));
             }
         }
     }
     checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyHostToDevice));
-    free(data);
     free(readData);
 }
 
@@ -795,8 +800,16 @@ void CFieldFermionWilsonSquareSU3::SetKai(Real fKai)
 
 void CFieldFermionWilsonSquareSU3::SaveToFile(const CCString &fileName) const
 {
+    UINT uiSize = 0;
+    BYTE* saveData = CopyDataOut(uiSize);
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    free(saveData);
+}
+
+BYTE* CFieldFermionWilsonSquareSU3::CopyDataOut(UINT &uiSize) const
+{
     deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
-    UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 24);
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 24);
     BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
     checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToHost));
     for (UINT i = 0; i < m_uiSiteCount; ++i)
@@ -812,9 +825,11 @@ void CFieldFermionWilsonSquareSU3::SaveToFile(const CCString &fileName) const
         }
         memcpy(saveData + sizeof(FLOAT) * i * 24, oneSite, sizeof(FLOAT) * 24);
     }
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
-    free(saveData);
+    
+    //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    //free(saveData);
     free(toSave);
+    return saveData;
 }
 
 CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const

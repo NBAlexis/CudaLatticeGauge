@@ -71,10 +71,39 @@
       year           = "2003",
 }
 
-@article{sparselinearbook1,
-      author         = "Yousef Saad",
-      title          = "{Iterative methods for sparse linear systems}",
-      year           = "2003",
+@article{luscher2005,
+      author         = "Martin L$\rm \ddot{u}$scher",
+      title          = "{Schwarz-preconditioned HMC algorithm for two-flavor lattice QCD}",
+      journal        = "Computer Physics Communications",
+      volume         = "165",
+      year           = "2005",
+      pages          = "199-220",
+      doi            = "10.1016/j.cpc.2004.10.004",
+}
+
+%======================================================================================
+%Application includes
+%======================================================================================
+
+@article{aipde,
+      author         = "Jiequn Han, Arnulf Jentzen, Weinan E",
+      title          = "{Solving high-dimensional partial differential equations using deep learning}",
+      year           = "2018",
+      journal        = "PNAS",
+      volume         = "115(34)",
+      pages          = "8505-8510",
+      doi            = "10.1073/pnas.1718942115"
+}
+
+@article{aisolver1,
+      author         = "Kyle Mills, Michael Spanner, Isaac Tamblyn",
+      title          = "{Deep learning and the Schr$\rm \ddot{o}$dinger equation}",
+      year           = "2017",
+      journal        = "Phys. Rev. A",
+      volume         = "96",
+      pages          = "042113",
+      doi            = "10.1103/PhysRevA.96.042113",
+      eprint         = "1702.01361"
 }
 
 %Classical

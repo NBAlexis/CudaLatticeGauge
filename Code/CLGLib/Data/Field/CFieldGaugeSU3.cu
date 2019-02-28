@@ -724,29 +724,8 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
     {
         UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * 18 * m_uiLinkeCount);
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
-        deviceSU3* readData = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
-        for (UINT i = 0; i < m_uiLinkeCount; ++i)
-        {
-            for (UINT j = 0; j < 16; ++j)
-            {
-                FLOAT oneLink[18];
-                memcpy(oneLink, data + sizeof(FLOAT) * 18 * i, sizeof(FLOAT) * 18);
-                if (j < 9)
-                {
-                    readData[i].m_me[j] = 
-                        _make_cuComplex(
-                            static_cast<Real>(oneLink[2 * j]),
-                            static_cast<Real>(oneLink[2 * j + 1]));
-                }
-                else
-                {
-                    readData[i].m_me[j] = _make_cuComplex(F(0.0), F(0.0));
-                }
-            }
-        }
-        checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+        InitialWithByte(data);
         free(data);
-        free(readData);
     }
     break;
     default:
@@ -754,6 +733,32 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         break;
 
     }
+}
+
+void CFieldGaugeSU3::InitialWithByte(BYTE* byData)
+{
+    deviceSU3* readData = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        for (UINT j = 0; j < 16; ++j)
+        {
+            FLOAT oneLink[18];
+            memcpy(oneLink, byData + sizeof(FLOAT) * 18 * i, sizeof(FLOAT) * 18);
+            if (j < 9)
+            {
+                readData[i].m_me[j] =
+                    _make_cuComplex(
+                        static_cast<Real>(oneLink[2 * j]),
+                        static_cast<Real>(oneLink[2 * j + 1]));
+            }
+            else
+            {
+                readData[i].m_me[j] = _make_cuComplex(F(0.0), F(0.0));
+            }
+        }
+    }
+    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+    free(readData);
 }
 
 void CFieldGaugeSU3::SetByArray(Real* array)
@@ -946,10 +951,18 @@ void CFieldGaugeSU3::DebugPrintMe() const
 
 void CFieldGaugeSU3::SaveToFile(const CCString &fileName) const
 {
+    UINT uiSize = 0;
+    BYTE* byToSave = CopyDataOut(uiSize);
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+    free(byToSave);
+}
+
+BYTE* CFieldGaugeSU3::CopyDataOut(UINT &uiSize) const
+{
     deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
     checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
     //fuck ofstream
-    UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiLinkeCount * 18);
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiLinkeCount * 18);
     BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
     for (UINT i = 0; i < m_uiLinkeCount; ++i)
     {
@@ -961,9 +974,9 @@ void CFieldGaugeSU3::SaveToFile(const CCString &fileName) const
         }
         memcpy(byToSave + i * sizeof(FLOAT) * 18, oneLink, sizeof(FLOAT) * 18);
     }
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-    free(byToSave);
     free(toSave);
+
+    return byToSave;
 }
 
 CCString CFieldGaugeSU3::GetInfos(const CCString &tab) const

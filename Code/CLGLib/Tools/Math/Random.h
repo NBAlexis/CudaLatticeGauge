@@ -50,6 +50,13 @@ __DEFINE_ENUM (ERandom,
     ER_ForceDWORD = 0x7fffffff,
     )
 
+__DEFINE_ENUM (ERandomSeedType,
+    ERST_Number,
+    ERST_Timestamp,
+
+    ERST_ForceDWORD = 0x7fffffff,
+    )
+
 class CLGAPI CRandom
 {
 public:

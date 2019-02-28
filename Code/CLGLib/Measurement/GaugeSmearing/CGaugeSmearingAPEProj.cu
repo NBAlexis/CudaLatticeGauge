@@ -68,7 +68,7 @@ void CGaugeSmearingAPEProj::Initial(class CLatticeData* pOwner, const CParameter
     }
     else if (iValue >= 4 && iValue < 255)
     {
-        m_byProjIterate = static_cast<UINT>(iValue);
+        m_byProjIterate = static_cast<BYTE>(iValue);
     }
     else
     {

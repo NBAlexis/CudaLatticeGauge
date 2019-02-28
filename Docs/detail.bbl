@@ -61,4 +61,16 @@ Yousef Saad.
 \newblock {Iterative methods for sparse linear systems}.
 \newblock 2003.
 
+\bibitem{aipde}
+Weinan~E Jiequn~Han, Arnulf~Jentzen.
+\newblock \href{http://dx.doi.org/10.1073/pnas.1718942115}{{Solving
+  high-dimensional partial differential equations using deep learning}}.
+\newblock {\em PNAS}, 115(34):8505--8510, 2018.
+
+\bibitem{aisolver1}
+Isaac~Tamblyn Kyle~Mills, Michael~Spanner.
+\newblock \href{http://dx.doi.org/10.1103/PhysRevA.96.042113}{{Deep learning
+  and the Schr$\rm \ddot{o}$dinger equation}}.
+\newblock {\em Phys. Rev. A}, 96:042113, 2017, arXiv:1702.01361.
+
 \end{thebibliography}

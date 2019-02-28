@@ -104,7 +104,7 @@
 
 \input "Measurement/MesonCorrelator.tex"
 
-\input "Measurement/MesonCorrelator.tex"
+\input "Measurement/ExtendSource.tex"
 
 \clearpage
 
@@ -119,6 +119,8 @@
 \input "tests/testRandom.tex"
 
 \clearpage
+
+\section{\label{sec:Testing}Applications}
 
 \printindex
 
