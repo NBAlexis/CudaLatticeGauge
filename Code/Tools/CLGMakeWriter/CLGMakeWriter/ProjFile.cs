@@ -11,7 +11,7 @@ namespace CLGMakeWriter
     {
         public CProjFile(string sFileName, string sProjPath)
         {
-            sProjPath = sProjPath + "/";
+            m_sProjectDir = sProjPath + "/";
             m_sContent = File.ReadAllText(sFileName);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(m_sContent);
@@ -19,7 +19,7 @@ namespace CLGMakeWriter
             XmlNodeList allClInclude = doc.GetElementsByTagName("ClInclude");
             for (int i = 0; i < allClInclude.Count; ++i)
             {
-                m_lstAllHeaderFiles.Add(Path.GetFullPath(Path.Combine(sProjPath, allClInclude[i].Attributes.GetNamedItem("Include").InnerText)));
+                m_lstAllHeaderFiles.Add(allClInclude[i].Attributes.GetNamedItem("Include").InnerText);
             }
 
             XmlNodeList allClCompile = doc.GetElementsByTagName("ClCompile");
@@ -31,7 +31,8 @@ namespace CLGMakeWriter
                 }
                 else
                 {
-                    m_lstAllCppFiles.Add(Path.GetFullPath(Path.Combine(sProjPath, allClCompile[i].Attributes.GetNamedItem("Include").InnerText)));
+                    //m_lstAllCppFiles.Add(Path.GetFullPath(Path.Combine(sProjPath, allClCompile[i].Attributes.GetNamedItem("Include").InnerText)));
+                    m_lstAllCppFiles.Add(allClCompile[i].Attributes.GetNamedItem("Include").InnerText);
                 }
             }
 
@@ -45,8 +46,7 @@ namespace CLGMakeWriter
                 }
                 else
                 {
-                    m_lstAllCuFiles.Add(Path.GetFullPath(Path.Combine(sProjPath, allCuCompile[i].Attributes.GetNamedItem("Include").InnerText)));
-                    Console.WriteLine(m_lstAllCuFiles[i]);
+                    m_lstAllCuFiles.Add(allCuCompile[i].Attributes.GetNamedItem("Include").InnerText);
                 }
             }
         }
@@ -59,7 +59,8 @@ namespace CLGMakeWriter
             {
                 if (sHeader.Contains("CLGDefine.h"))
                 {
-                    string sFileContent = File.ReadAllText(sHeader);
+                    string sFullPath = Path.GetFullPath(Path.Combine(m_sProjectDir, sHeader));
+                    string sFileContent = File.ReadAllText(sFullPath);
                     Match allMatch = Regex.Match(sFileContent, @"__GVERSION[\s]+\(([\d])+\)");
                     if (allMatch.Success && allMatch.Groups.Count > 1)
                     {
@@ -86,6 +87,7 @@ namespace CLGMakeWriter
         public readonly List<string> m_lstAllCppFiles = new List<string>();
 
         public string m_sContent;
+        public string m_sProjectDir;
     }
 }
 

@@ -11,10 +11,6 @@
 #ifndef _WINFUNCTION_H_
 #define _WINFUNCTION_H_
 
-//aligned alloca
-extern "C" void* __cdecl _alloca(SIZE_T);
-#define appAlloca(size) ((0 == size) ? 0 : _alloca((size+7)&~7))
-
 #define appInterlockedIncrement(n)	InterlockedIncrement((LONG*)(n))
 #define appInterlockedDecrement(n)	InterlockedDecrement((LONG*)(n))
 

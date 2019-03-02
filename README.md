@@ -2,8 +2,6 @@
 
 lattice gauge simulation with CUDA
 
-Only support SM60+ (most part support SM35+, but for atomic add double is supported only in SM60)
-
 Testing on GTX-1060 (6G)
 
 Using GMRES with 10 orthrognal basis, maximum supported (32 x 32 x 32 x 16)
@@ -14,4 +12,5 @@ GMRES with 10 orthrognal basis will converge with about 3 restarts)
 
 See detailed.pdf
 
+The default Code generation is "compute_61,sm_61";. To test on a GTX970m, please add "compute_52,sm_52;" . (NOTE, to support double float, must use a sm60+.)
 

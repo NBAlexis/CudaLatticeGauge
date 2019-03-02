@@ -88,6 +88,10 @@
 
 #define UN_USE(a) (void)a
 
+//aligned alloca
+//extern "C" void* __cdecl _alloca(size_t);
+#define appAlloca(size) ((0 == size) ? 0 : _alloca((size+7)&~7))
+
 #pragma endregion
 
 #endif //#ifndef _CLGDEFINE_H_
