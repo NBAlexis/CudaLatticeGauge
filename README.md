@@ -14,3 +14,6 @@ See detailed.pdf
 
 The default Code generation is "compute_61,sm_61";. To test on a GTX970m, please add "compute_52,sm_52;" . (NOTE, to support double float, must use a sm60+.)
 
+put
+CUDACXX=/usr/local/cuda-10.0/bin/nvcc
+into /etc/environment so that it is applied when using sudo.

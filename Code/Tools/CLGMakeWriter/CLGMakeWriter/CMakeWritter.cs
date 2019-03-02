@@ -13,12 +13,28 @@ namespace CLGMakeWriter
         {
             string sContent = "cmake_minimum_required(VERSION 3.8 FATAL_ERROR)\n\n";
 
-            //CMAKE_BINARY_DIR, CMAKE_SOURCE_DIR, CMAKE_CURRENT_BINARY_DIR all = /Code/CMake
+            sContent += "project(CLGLib LANGUAGES CXX CUDA)\n\n";
+
+            sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
+
+            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
+            sContent += "# First, we change it to /";
+            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../..)\n";
+
+            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/Bin/UbuntuDebug)\n";
+            sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
+            sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
+            sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
+            
+            sContent += "# This is our code file dir\n";
+            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/Code/CLGLib)\n";
+            sContent += "include_directories(\"${PROJECT_SOURCE_DIR}\")\n\n";
+
             sContent += "message(\"CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}\")\n";
             sContent += "message(\"CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}\")\n";
             sContent += "message(\"CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\")\n\n";
 
-            sContent += "project(CLGLib LANGUAGES CXX CUDA)\n\n";
+
             sContent += "include(CLGLib)\n\n";
             sContent += "add_library(CLGLib STATIC\n    ";
             foreach (string sFileName in projFile.m_lstAllHeaderFiles)
