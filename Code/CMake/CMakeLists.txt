@@ -4,7 +4,8 @@ project(CLGLib LANGUAGES CXX CUDA)
 
 set(CMAKE_GENERATOR_PLATFORM x64)
 
-# We start from CMAKE_SOURCE_DIR which should be /Code/CMake# First, we change it to /set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../..)
+# We start from CMAKE_SOURCE_DIR which should be /Code/CMake# First, we change it to /
+set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../..)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/Bin/UbuntuDebug)
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
@@ -18,7 +19,9 @@ message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
-include(CLGLib)
+include_directories(${CMAKE_SOURCE_DIR}/Code/CLGLib)
+
+add_definitions(-D_UBUNTU)
 
 add_library(CLGLib STATIC
     CLGLib.h
