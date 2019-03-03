@@ -19,15 +19,15 @@ namespace CLGMakeWriter
 
             sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
             sContent += "# First, we change it to /Code\n";
-            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/..)\n";
+            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR})\n";
 
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)\n";
+            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
 
             sContent += "# This is our code file dir\n";
-            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})\n";
+            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
 
@@ -43,15 +43,15 @@ namespace CLGMakeWriter
             sContent += "add_library(CLGLib STATIC\n    ";
             foreach (string sFileName in projFile.m_lstAllHeaderFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
+                sContent += "${PROJECT_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             foreach (string sFileName in projFile.m_lstAllCuFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
+                sContent += "${PROJECT_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             foreach (string sFileName in projFile.m_lstAllCppFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
+                sContent += "${PROJECT_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             sContent += ")\n\n";
  
@@ -82,11 +82,11 @@ set_target_properties( CLGLib
             sContent += "add_executable(CLGTest \n    ";
             foreach (string sFileName in slgTest.m_lstAllHeaderFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
+                sContent += "${PROJECT_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
             }
             foreach (string sFileName in slgTest.m_lstAllCppFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
+                sContent += "${PROJECT_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
             }
             sContent += ")\n\n";
 
