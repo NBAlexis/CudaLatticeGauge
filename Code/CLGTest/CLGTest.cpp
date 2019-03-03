@@ -14,7 +14,6 @@ TestList* _testSuits;
 UINT RunTest(CParameters&params, TestList* pTest)
 {
     appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
-
     CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
     appGeneral(_T("============= Parameters =============\n"));
     paramForTheTest.Dump(_T(""));
@@ -81,7 +80,8 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
 #endif
     appSetupLog(params);
-
+    appGeneral("123 %d\n", 456);
+    
     TArray<TestList*> allTests;
     THashMap<CCString, TArray<TestList*>*> category;
     UINT uiIndex = 0;

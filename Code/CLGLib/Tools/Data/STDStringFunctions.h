@@ -41,22 +41,14 @@ inline INT sprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, ..
     return result;
 }
 
-inline INT vsprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, ...)
+inline INT vsprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, va_list ap)
 {
-    va_list ap;
-    va_start(ap, format);
-    INT result = std::vsnprintf(buffer, sizeOfBuffer, format, ap);
-    va_end(ap);
-    return result;
+    return std::vsnprintf(buffer, sizeOfBuffer, format, ap);
 }
 
-inline INT vsnprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, ...)
+inline INT vsnprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, va_list ap)
 {
-    va_list ap;
-    va_start(ap, format);
-    INT result = std::vsnprintf(buffer, sizeOfBuffer, format, ap);
-    va_end(ap);
-    return result;
+    return std::vsnprintf(buffer, sizeOfBuffer, format, ap);
 }
 
 inline TCHAR* strcpy_s(TCHAR* dest, size_t length, const TCHAR* source)
