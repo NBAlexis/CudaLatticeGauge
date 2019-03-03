@@ -385,7 +385,12 @@ CCString CCString::FormatVS(const TCHAR* lpszFormat, va_list argList)
     return ret;
 }
 
+#if _CLG_WIN
 #define TCHAR_ARG   TCHAR
+#else
+#define TCHAR_ARG   INT
+#endif
+
 #define DOUBLE_ARG  DOUBLE
 
 /**
@@ -394,7 +399,9 @@ CCString CCString::FormatVS(const TCHAR* lpszFormat, va_list argList)
 */
 void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
 {
-    va_list argListSave = argList;
+    //va_list argListSave = argList;
+    va_list argListSave;
+    va_copy(argListSave, argList);
 
     // make a guess at the maximum length of the resulting string
     INT nMaxLen = 0;

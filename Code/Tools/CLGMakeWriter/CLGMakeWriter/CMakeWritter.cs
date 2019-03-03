@@ -36,6 +36,7 @@ namespace CLGMakeWriter
 
 
             sContent += "include_directories(${CMAKE_SOURCE_DIR})\n\n";
+
             sContent += "add_definitions(-D_UBUNTU)\n\n";
 
             sContent += "add_library(CLGLib STATIC\n    ";
