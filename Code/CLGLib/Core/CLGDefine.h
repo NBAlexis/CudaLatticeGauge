@@ -90,7 +90,7 @@
 
 //aligned alloca
 //extern "C" void* __cdecl _alloca(size_t);
-#define appAlloca(size) ((0 == size) ? 0 : _alloca((size+7)&~7))
+#define appAlloca(size) ((0 == size) ? 0 : alloca((size+7)&~7))
 
 #pragma endregion
 
