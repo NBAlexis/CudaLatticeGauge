@@ -132,7 +132,9 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 # CLGLib library to be built with -dc as the member functions 
 # could be called by other libraries and executables
 set_target_properties( CLGLib
-                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)/n/ntarget_link_libraries(CLGLib libcurand.so libcudadevrt.a libcudart.so)
+                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
+target_link_libraries(CLGLib libcurand.so libcudadevrt.a libcudart.so)
 
 
 
