@@ -47,7 +47,10 @@ namespace CLGMakeWriter
             Console.WriteLine(versionNumber[0].ToString() + "." + versionNumber[1].ToString());
 
             CMakeWritter writer = new CMakeWritter();
-            writer.WritteTheFile(projSolPath, clgLibProj);
+            Dictionary<string, CProjFile> apps = new Dictionary<string, CProjFile>();
+            apps.Add("CLGTest", new CProjFile(projCLGTestFilePath, projCLGTestPath));
+
+            writer.WritteTheFile(projSolPath, clgLibProj, apps);
 
             Console.WriteLine("work done, press enter to exit...");
             string byebye = Console.ReadLine();

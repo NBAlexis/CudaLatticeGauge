@@ -123,7 +123,7 @@ add_library(CLGLib STATIC
     ${CMAKE_SOURCE_DIR}/Data/Action/CActionGaugePlaquette.cpp
     )
 
-# Request that CLGLib be built with -std=c++11
+# Request that CLGLib be built with -std=c++14
 # As this is a public compile feature anything that links to 
 # CLGLib will also build with -std=c++14
 target_compile_features(CLGLib PUBLIC cxx_std_14)
@@ -132,4 +132,42 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 # CLGLib library to be built with -dc as the member functions 
 # could be called by other libraries and executables
 set_target_properties( CLGLib
-                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)project(CLGLib LANGUAGES CXX)
+
+set(CMAKE_GENERATOR_PLATFORM x64)
+
+# We start from CMAKE_SOURCE_DIR which should be /Code/CMake# First, we change it to /Code/CLGTest
+set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../CLGTest)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
+set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
+set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})
+
+# This is our code file dir
+set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}")
+
+message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
+include_directories(${CMAKE_SOURCE_DIR})/../CLGLib
+include_directories(${CMAKE_SOURCE_DIR})
+
+add_definitions(-D_UBUNTU)
+
+add_executable(CLGTest 
+    ${CMAKE_SOURCE_DIR}/CLGTest.h
+    ${CMAKE_SOURCE_DIR}/CLGTest.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestConfigurationFileIO.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestFermionUpdator.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestGammaMatrixSpeed.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestOperators.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestRandom.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestSolver.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestSU3Generator.cpp
+    ${CMAKE_SOURCE_DIR}/Tests/TestUpdator.cpp
+    )
+
+target_compile_features(CLGTest PUBLIC cxx_std_14)
+target_link_libraries(CLGTest CLGLib)
