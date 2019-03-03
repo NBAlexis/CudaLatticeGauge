@@ -4,15 +4,13 @@ project(CLG LANGUAGES CXX CUDA)
 
 set(CMAKE_GENERATOR_PLATFORM x64)
 
-# We start from CMAKE_SOURCE_DIR which should be /Code/CMake# First, we change it to /Code
-set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR})
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
+# We start from CMAKE_SOURCE_DIR which should be /Code/set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})
 
 # This is our code file dir
-set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)
+set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
 add_definitions(-D_UBUNTU)
 
 include_directories(${PROJECT_SOURCE_DIR}/CLGLib)
@@ -133,7 +131,7 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
-target_link_libraries(CLGLib libcurand_static.a libcudadevrt.a libcudart_static.a)
+target_link_libraries(CLGLib cudadevrt cudart_static curand_static)
 
 
 

@@ -17,17 +17,14 @@ namespace CLGMakeWriter
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
-            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
-            sContent += "# First, we change it to /Code\n";
-            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR})\n";
-
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
+            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/";
+            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
 
             sContent += "# This is our code file dir\n";
-            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)\n";
+            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
 
@@ -66,7 +63,7 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)";
 
-            sContent += "\n\ntarget_link_libraries(CLGLib libcurand_static.a libcudadevrt.a libcudart_static.a)\n\n";
+            sContent += "\n\ntarget_link_libraries(CLGLib cudadevrt cudart_static curand_static)\n\n";
 
             #endregion
 
@@ -100,7 +97,7 @@ set_target_properties( CLGLib
             sContent = sContent.Replace("\r", "\n");
             sContent = sContent.Replace("\\", "/");
 
-            File.WriteAllText(sSolDir + "CMake/CMakeLists.txt", sContent);
+            File.WriteAllText(sSolDir + "CMakeLists.txt", sContent);
 
             //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
             //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
