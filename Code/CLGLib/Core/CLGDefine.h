@@ -68,7 +68,7 @@
 # define __IMPORT_LIB(libname)	
 # undef FORCEINLINE
 # undef CDECL
-# define FORCEINLINE             __forceinline
+# define FORCEINLINE             __attribute__((always_inline))
 # define CDECL                   __cdecl
 
 # define SUPPORTS_PRAGMA_PACK 0
