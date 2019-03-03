@@ -4,18 +4,16 @@ project(CLG LANGUAGES CXX CUDA)
 
 set(CMAKE_GENERATOR_PLATFORM x64)
 
-# We start from CMAKE_SOURCE_DIR which should be /Code/set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)
+# We start from CMAKE_SOURCE_DIR which should be /Code/CMakeset(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
 set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})
 
 # This is our code file dir
-set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
+set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)
 add_definitions(-D_UBUNTU)
 
 include_directories(${PROJECT_SOURCE_DIR}/CLGLib)
-add_subdirectory(${PROJECT_SOURCE_DIR}/CLGLib)
-
 add_library(cudadevrt STATIC IMPORTED)
 add_library(cudart_static STATIC IMPORTED)
 add_library(cudrand_static STATIC IMPORTED)
@@ -141,8 +139,6 @@ target_link_libraries(CLGLib cudadevrt cudart_static curand_static)
 # =================
 
 include_directories(${PROJECT_SOURCE_DIR}/CLGTest)
-add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)
-
 add_executable(CLGTest 
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.h
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.cpp

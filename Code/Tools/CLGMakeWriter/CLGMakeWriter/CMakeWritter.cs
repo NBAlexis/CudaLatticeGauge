@@ -17,21 +17,21 @@ namespace CLGMakeWriter
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
-            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/";
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)\n";
+            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
+            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
 
             sContent += "# This is our code file dir\n";
-            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})\n";
+            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
 
             #region Add CLGLib
 
             sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGLib)\n";
-            sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGLib)\n\n";
+            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGLib)\n\n";
 
             sContent += "add_library(cudadevrt STATIC IMPORTED)\n";
             sContent += "add_library(cudart_static STATIC IMPORTED)\n";
@@ -74,7 +74,7 @@ set_target_properties( CLGLib
             sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\n";
 
             sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGTest)\n";
-            sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
+            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
 
             sContent += "add_executable(CLGTest \n    ";
             foreach (string sFileName in slgTest.m_lstAllHeaderFiles)
@@ -97,7 +97,7 @@ set_target_properties( CLGLib
             sContent = sContent.Replace("\r", "\n");
             sContent = sContent.Replace("\\", "/");
 
-            File.WriteAllText(sSolDir + "CMakeLists.txt", sContent);
+            File.WriteAllText(sSolDir + "CMake/CMakeLists.txt", sContent);
 
             //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
             //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
