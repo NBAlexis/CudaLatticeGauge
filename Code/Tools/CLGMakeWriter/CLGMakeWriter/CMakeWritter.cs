@@ -66,8 +66,9 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 # CLGLib library to be built with -dc as the member functions 
 # could be called by other libraries and executables
 set_target_properties( CLGLib
-                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)";
+                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)\n\n";
 
+            sContent += "target_link_libraries(CLGLib libcurand.so libcudadevrt.a libcudart.so)\n\n";
 
             #endregion
 
@@ -75,7 +76,7 @@ set_target_properties( CLGLib
 
             CProjFile slgTest = excutables["CLGTest"];
 
-            sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\nproject(CLGLib LANGUAGES CXX)\n\n";
+            sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\nproject(CLGTest LANGUAGES CXX)\n\n";
 
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
