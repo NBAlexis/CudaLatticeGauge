@@ -322,7 +322,10 @@ protected:
         BYTE* p = m_MemStack.PushBytes((INT)sizeof(TAssoc));
         memset(p, 0, sizeof(TAssoc));
         TAssoc* pAssoc = (TAssoc*)p;
-        pAssoc->TAssoc::TAssoc(key);
+        //pAssoc->TAssoc::TAssoc(key);
+        //calling constructor is non-standard, it only works in MSVC
+        //change to replacement new
+        pAssoc = new (pAssoc) TAssoc(key);
         ++m_nCount;
         return pAssoc;
     }

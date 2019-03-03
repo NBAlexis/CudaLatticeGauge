@@ -12,16 +12,6 @@
 #ifndef _RANDOM_H_
 #define _RANDOM_H_
 
-//save some constant memory of cuda?
-#define PI (F(3.141592653589))
-// - 1/4294967296UL
-#define AM (F(0.00000000023283064365386963))
-// - _sqrt(2)
-#define SQRT2 (F(1.4142135623730951))
-// - 1 / _sqrt(2), or _sqrt(2)/2
-#define InvSqrt2 (F(0.7071067811865475))
-// - 2.0f * PI
-#define PI2 (F(6.283185307179586))
 
 #define __SOBEL_OFFSET_MAX (4096)
 

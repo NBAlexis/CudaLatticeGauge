@@ -35,10 +35,6 @@
     _make_cuComplex( ((xr) * (ar) - (xi) * (ai)) + ((yr) * (br) - (yi) * (bi)), \
                      ((xi) * (ar) + (xr) * (ai)) + ((yi) * (br) + (yr) * (bi)) );
 
-// 1.0f / _sqrt(3)
-#define InvSqrt3 (F(0.5773502691896258))
-// 2.0f / _sqrt(3)
-#define InvSqrt3_2 (F(1.1547005383792517))
 
 #if _CLG_DOUBLEFLOAT
 #define __SU3MATRIX_ALIGN 256
