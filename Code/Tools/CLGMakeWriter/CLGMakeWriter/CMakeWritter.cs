@@ -17,25 +17,20 @@ namespace CLGMakeWriter
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
-            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
+            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake\n";
             sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
 
             sContent += "# This is our code file dir\n";
-            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/..)\n";
+            sContent += "set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
 
             #region Add CLGLib
 
             sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGLib)\n";
-            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGLib)\n\n";
-
-            sContent += "add_library(cudadevrt STATIC IMPORTED)\n";
-            sContent += "add_library(cudart_static STATIC IMPORTED)\n";
-            sContent += "add_library(cudrand_static STATIC IMPORTED)\n\n";
 
             sContent += "add_library(CLGLib STATIC\n    ";
             foreach (string sFileName in projFile.m_lstAllHeaderFiles)
@@ -63,7 +58,7 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)";
 
-            sContent += "\n\ntarget_link_libraries(CLGLib cudadevrt cudart_static curand_static)\n\n";
+            sContent += "\n\ntarget_link_libraries(CLGLib -lcurand)\n\n";
 
             #endregion
 
