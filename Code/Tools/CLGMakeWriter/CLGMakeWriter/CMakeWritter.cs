@@ -14,46 +14,44 @@ namespace CLGMakeWriter
         {
             string sContent = "cmake_minimum_required(VERSION 3.8 FATAL_ERROR)\n\n";
 
-            #region Add CLGLib
-
-            sContent += "project(CLGLib LANGUAGES CXX CUDA)\n\n";
-
+            sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
             sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
-            sContent += "# First, we change it to /Code/CLGLib\n";
-            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../CLGLib)\n";
+            sContent += "# First, we change it to /Code\n";
+            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/..)\n";
 
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
+            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../Bin/UbuntuDebug)\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
             sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
-            
+
             sContent += "# This is our code file dir\n";
             sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})\n";
-            sContent += "include_directories(\"${PROJECT_SOURCE_DIR}\")\n\n";
-
-            sContent += "message(\"CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}\")\n";
-            sContent += "message(\"CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}\")\n";
-            sContent += "message(\"CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\")\n\n";
-
-
-            sContent += "include_directories(${CMAKE_SOURCE_DIR})\n\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
+
+            #region Add CLGLib
+
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGLib)\n";
+            sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGLib)\n\n";
+
+            sContent += "add_library(cudadevrt STATIC IMPORTED)\n";
+            sContent += "add_library(cudart_static STATIC IMPORTED)\n";
+            sContent += "add_library(cudrand_static STATIC IMPORTED)\n\n";
 
             sContent += "add_library(CLGLib STATIC\n    ";
             foreach (string sFileName in projFile.m_lstAllHeaderFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/" + sFileName + "\n    ";
+                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             foreach (string sFileName in projFile.m_lstAllCuFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/" + sFileName + "\n    ";
+                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             foreach (string sFileName in projFile.m_lstAllCppFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/" + sFileName + "\n    ";
+                sContent += "${CMAKE_SOURCE_DIR}/CLGLib/" + sFileName + "\n    ";
             }
             sContent += ")\n\n";
  
@@ -68,7 +66,7 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)";
 
-            sContent += "\n\ntarget_link_libraries(CLGLib libcurand.so libcudadevrt.a libcudart.so)\n\n";
+            sContent += "\n\ntarget_link_libraries(CLGLib libcurand_static.a libcudadevrt.a libcudart_static.a)\n\n";
 
             #endregion
 
@@ -76,41 +74,19 @@ set_target_properties( CLGLib
 
             CProjFile slgTest = excutables["CLGTest"];
 
-            sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\nproject(CLGTest LANGUAGES CXX)\n\n";
+            sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\n";
 
-            sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
-
-            sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake";
-            sContent += "# First, we change it to /Code/CLGTest\n";
-            sContent += "set(CMAKE_SOURCE_DIR  ${CMAKE_SOURCE_DIR}/../CLGTest)\n";
-
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
-            sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
-            sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
-            sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
-
-            sContent += "# This is our code file dir\n";
-            sContent += "set(${PROJECT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})\n";
-            sContent += "include_directories(\"${PROJECT_SOURCE_DIR}\")\n\n";
-
-            sContent += "message(\"CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}\")\n";
-            sContent += "message(\"CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}\")\n";
-            sContent += "message(\"CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\")\n\n";
-
-
-            sContent += "include_directories(${CMAKE_SOURCE_DIR}/../CLGLib)\n";
-            sContent += "include_directories(${CMAKE_SOURCE_DIR})\n\n";
-
-            sContent += "add_definitions(-D_UBUNTU)\n\n";
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGTest)\n";
+            sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
 
             sContent += "add_executable(CLGTest \n    ";
             foreach (string sFileName in slgTest.m_lstAllHeaderFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/" + sFileName + "\n    ";
+                sContent += "${CMAKE_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
             }
             foreach (string sFileName in slgTest.m_lstAllCppFiles)
             {
-                sContent += "${CMAKE_SOURCE_DIR}/" + sFileName + "\n    ";
+                sContent += "${CMAKE_SOURCE_DIR}/CLGTest/" + sFileName + "\n    ";
             }
             sContent += ")\n\n";
 
