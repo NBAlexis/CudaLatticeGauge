@@ -132,7 +132,14 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 # CLGLib library to be built with -dc as the member functions 
 # could be called by other libraries and executables
 set_target_properties( CLGLib
-                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)project(CLGLib LANGUAGES CXX)
+                       PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
+
+# ==================== 
+# CLGTest 
+# =================
+
+project(CLGLib LANGUAGES CXX)
 
 set(CMAKE_GENERATOR_PLATFORM x64)
 
@@ -151,7 +158,7 @@ message("CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 message("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
-include_directories(${CMAKE_SOURCE_DIR})/../CLGLib
+include_directories(${CMAKE_SOURCE_DIR}/../CLGLib)
 include_directories(${CMAKE_SOURCE_DIR})
 
 add_definitions(-D_UBUNTU)
