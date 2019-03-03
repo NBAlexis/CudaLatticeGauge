@@ -34,7 +34,7 @@ public:
     //============================================================
     //some simple measurement only produce real or complex results
     Real m_fLastRealResult;
-    _Complex m_cLastComplexResult;
+    CLGComplex m_cLastComplexResult;
     
 };
 

@@ -40,7 +40,7 @@ public:
     TArray<TArray<Real>> m_lstResults;
     UINT m_uiResoultCount;
     //This is a complex field at each site
-    _Complex * m_pDeviceCorrelator;
+    CLGComplex * m_pDeviceCorrelator;
 };
 
 __END_NAMESPACE

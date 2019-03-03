@@ -258,7 +258,7 @@ extern "C" {
         {
             for (BYTE row = 0; row < 4; ++row)
             {
-                _Complex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
+                CLGComplex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
                 BYTE byNoneZero = m_uiIndex[row];
                 if (byNoneZero == 0)
                 {
@@ -367,12 +367,12 @@ extern "C" {
 
     public:
 
-        //_Complex m_cV[4];
+        //CLGComplex m_cV[4];
         //For Z4, we store b
         //i^b, b=0,1,2,3
         //(i^b)* = i ^ (((b & 1) << 1) + b) & 3
         //(i^b1 * i^b2) = i ^ (b1 + b2) & 3
-        //_Complex = _make_cuComplex(3 == b ? F(0.0) : (F(1.0) - b), 0 == b ? F(0.0) : (F(2.0) - b));
+        //CLGComplex = _make_cuComplex(3 == b ? F(0.0) : (F(1.0) - b), 0 == b ? F(0.0) : (F(2.0) - b));
         BYTE m_byZ4[4];
         BYTE m_uiIndex[4];
         BYTE m_byNextSymmetricIndex;

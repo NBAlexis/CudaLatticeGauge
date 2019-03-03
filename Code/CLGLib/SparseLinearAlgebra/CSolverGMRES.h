@@ -40,9 +40,9 @@ protected:
     Real m_fAccuracy;
     Real m_fBeta;
 
-    _Complex m_h[(_kMaxStep + 1) * _kMaxStep];
-    _Complex m_y[_kMaxStep];
-    _Complex m_g[_kMaxStep + 1];
+    CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];
+    CLGComplex m_y[_kMaxStep];
+    CLGComplex m_g[_kMaxStep + 1];
 
     TArray<class CField*> m_lstVectors;
 };

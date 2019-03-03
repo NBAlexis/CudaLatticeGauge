@@ -187,7 +187,7 @@ public:
         return _cos(f2) * amplitude;
     }
 
-    __device__ __inline__ _Complex _deviceRandomGaussC(UINT fatIndex)
+    __device__ __inline__ CLGComplex _deviceRandomGaussC(UINT fatIndex)
     {
         Real f1 = _deviceRandomF(fatIndex);
         Real f2 = _deviceRandomF(fatIndex) * PI2;
@@ -275,7 +275,7 @@ __DefineRandomFuncion(Real, GaussF)
 
 __DefineRandomFuncion(Real, GaussFSqrt2)
 
-__DefineRandomFuncion(_Complex, GaussC)
+__DefineRandomFuncion(CLGComplex, GaussC)
 
 extern CLGAPI Real GetRandomReal();
 

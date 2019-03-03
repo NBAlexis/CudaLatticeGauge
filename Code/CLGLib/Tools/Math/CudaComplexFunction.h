@@ -2,7 +2,7 @@
 // FILENAME : CudaComplexFunction.h
 // 
 // DESCRIPTION:
-// Add some function to _Complex where it does not have yet
+// Add some function to CLGComplex where it does not have yet
 //
 //
 // REVISION:
@@ -21,7 +21,7 @@ extern "C" {
     /**
     * arg(c)
     */
-    __device__ static __inline__ Real __cuCargf(const _Complex& c)
+    __device__ static __inline__ Real __cuCargf(const CLGComplex& c)
     {
         return atan2f(_cuCimagf(c), _cuCrealf(c));
     }
@@ -29,7 +29,7 @@ extern "C" {
     /**
     * |c|^2
     */
-    __device__ static __inline__ Real __cuCabsSqf(const _Complex& c)
+    __device__ static __inline__ Real __cuCabsSqf(const CLGComplex& c)
     {
         return c.x *c.x + c.y * c.y;
     }
@@ -37,7 +37,7 @@ extern "C" {
     /**
     * c^p
     */
-    __device__ static __inline__ _Complex __cuCpowerf(const _Complex& c, Real p)
+    __device__ static __inline__ CLGComplex __cuCpowerf(const CLGComplex& c, Real p)
     {
         Real fArg = __cuCargf(c) * p;
         Real fAbs = _pow(_cuCabsf(c), p);
@@ -47,7 +47,7 @@ extern "C" {
     /**
     * exp(c)
     */
-    __device__ static __inline__ _Complex __cuCexpf(const _Complex& c)
+    __device__ static __inline__ CLGComplex __cuCexpf(const CLGComplex& c)
     {
         Real factor = _exp(c.x);
         return _make_cuComplex(factor * _cos(c.y), factor * _sin(c.y));
@@ -56,11 +56,11 @@ extern "C" {
     /**
     * _sqrt(c)
     */
-    __device__ static __inline__ _Complex __cuCsqrtf(const _Complex& c)
+    __device__ static __inline__ CLGComplex __cuCsqrtf(const CLGComplex& c)
     {
         Real fRadius = _cuCabsf(c);
         Real fCosA = __div(c.x, _cuCabsf(c));
-        _Complex out;
+        CLGComplex out;
         out.x = _sqrt(F(0.5) * fRadius * (fCosA + F(1.0)));
         out.y = _sqrt(F(0.5) * fRadius * (F(1.0) - fCosA));
         // signbit should be false if x.y is negative
@@ -70,34 +70,34 @@ extern "C" {
         return out;
     }
 
-    __device__ static __inline__ _Complex cuCaddf_cr(const _Complex& x, Real y)
+    __device__ static __inline__ CLGComplex cuCaddf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(x.x + y, x.y);
     }
-    __device__ static __inline__ _Complex cuCaddf_rc(Real y, const _Complex& x)
+    __device__ static __inline__ CLGComplex cuCaddf_rc(Real y, const CLGComplex& x)
     {
         return _make_cuComplex(x.x + y, x.y);
     }
 
-    __device__ static __inline__ _Complex cuCdivf_cr(const _Complex& x, Real y)
+    __device__ static __inline__ CLGComplex cuCdivf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(__div(x.x, y), __div(x.y, y));
     }
 
-    __device__ static __inline__ _Complex cuCmulf_cr(const _Complex& x, Real y)
+    __device__ static __inline__ CLGComplex cuCmulf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(x.x * y, x.y * y);
     }
-    __device__ static __inline__ _Complex cuCmulf_rc(Real y, const _Complex& x)
+    __device__ static __inline__ CLGComplex cuCmulf_rc(Real y, const CLGComplex& x)
     {
         return _make_cuComplex(x.x * y, x.y * y);
     }
 
-    __device__ static __inline__ _Complex cuCsubf_cr(const _Complex& x, Real y)
+    __device__ static __inline__ CLGComplex cuCsubf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(x.x - y, x.y);
     }
-    __device__ static __inline__ _Complex cuCsubf_rc(Real y, const _Complex& x)
+    __device__ static __inline__ CLGComplex cuCsubf_rc(Real y, const CLGComplex& x)
     {
         return _make_cuComplex(y - x.x, x.y);
     }

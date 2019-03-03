@@ -45,13 +45,13 @@ _kernelDebugFunction()
     deviceSU3 a = deviceSU3::makeSU3Random(1);
     deviceSU3 b = deviceSU3::makeSU3Random(2);
     a.Add(b);
-    _Complex res0 = deviceSU3::Determinent(a.m_me);
+    CLGComplex res0 = deviceSU3::Determinent(a.m_me);
     printf("det = %f %f\n", res0.x, res0.y);
     a.DebugPrint();
 
     a.Proj(6);
     
-    _Complex res1 = deviceSU3::Determinent(a.m_me);
+    CLGComplex res1 = deviceSU3::Determinent(a.m_me);
     a.DaggerMul(a);
 
     printf("det = %f %f\n", res1.x, res1.y);
@@ -87,7 +87,7 @@ _kernelReduceReal2(Real* arr, UINT uiJump)
 
 __global__ void
 _CLG_LAUNCH_BOUND
-_kernelReduceComp1(_Complex* arr, UINT uiJump, UINT uiMax)
+_kernelReduceComp1(CLGComplex* arr, UINT uiJump, UINT uiMax)
 {
     UINT uiIdFrom = (threadIdx.x + blockIdx.x * blockDim.x) * (uiJump << 1) + uiJump;
     if (uiIdFrom < uiMax)
@@ -98,7 +98,7 @@ _kernelReduceComp1(_Complex* arr, UINT uiJump, UINT uiMax)
 
 __global__ void
 _CLG_LAUNCH_BOUND
-_kernelReduceComp2(_Complex* arr, UINT uiJump)
+_kernelReduceComp2(CLGComplex* arr, UINT uiJump)
 {
     UINT uiIdTo = (threadIdx.x + blockIdx.x * blockDim.x) * (uiJump << 1);
     arr[uiIdTo] = _cuCaddf(arr[uiIdTo], arr[uiIdTo + uiJump]);
@@ -479,14 +479,14 @@ void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
     m_uiThreadCount = uiThreadCount;
     m_uiReducePower = GetReduceDim((uiThreadCount + 1) >> 1);
     checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
-    checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(_Complex)* uiThreadCount));
+    checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(CLGComplex)* uiThreadCount));
 }
 
 /**
 * When block is not (1,1,1), some times, this will be excuted when only few block is finished.
 * Must wait until all blocks finished.
 */
-_Complex CCudaHelper::ThreadBufferSum(_Complex * pDeviceBuffer)
+CLGComplex CCudaHelper::ThreadBufferSum(CLGComplex * pDeviceBuffer)
 {
     return ReduceComplexWithThreadCount(pDeviceBuffer);
 }
@@ -542,7 +542,7 @@ Real CCudaHelper::ReduceRealWithThreadCount(Real* deviceBuffer)
     return result[0];
 }
 
-_Complex CCudaHelper::ReduceComplex(_Complex* deviceBuffer, UINT uiLength)
+CLGComplex CCudaHelper::ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength)
 {
     UINT iRequiredDim = (uiLength + 1) >> 1;
     UINT iPower = GetReduceDim(iRequiredDim);
@@ -561,12 +561,12 @@ _Complex CCudaHelper::ReduceComplex(_Complex* deviceBuffer, UINT uiLength)
             _kernelReduceComp2 << <iBlock, iThread >> > (deviceBuffer, iJump);
         }
     }
-    _Complex result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(_Complex), cudaMemcpyDeviceToHost);
+    CLGComplex result[1];
+    cudaMemcpy(result, deviceBuffer, sizeof(CLGComplex), cudaMemcpyDeviceToHost);
     return result[0];
 }
 
-_Complex CCudaHelper::ReduceComplexWithThreadCount(_Complex* deviceBuffer)
+CLGComplex CCudaHelper::ReduceComplexWithThreadCount(CLGComplex* deviceBuffer)
 {
     for (UINT i = 0; i <= m_uiReducePower; ++i)
     {
@@ -583,8 +583,8 @@ _Complex CCudaHelper::ReduceComplexWithThreadCount(_Complex* deviceBuffer)
             _kernelReduceComp2 << <iBlock, iThread >> > (deviceBuffer, iJump);
         }
     }
-    _Complex result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(_Complex), cudaMemcpyDeviceToHost);
+    CLGComplex result[1];
+    cudaMemcpy(result, deviceBuffer, sizeof(CLGComplex), cudaMemcpyDeviceToHost);
     return result[0];
 }
 

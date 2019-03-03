@@ -81,15 +81,16 @@
 
 __BEGIN_NAMESPACE
 
+//NOTE, _Complex is already a keyword in GCC
 #if _CLG_DOUBLEFLOAT
 
 typedef double Real;
-typedef cuDoubleComplex _Complex;
+typedef cuDoubleComplex CLGComplex;
 
 #else
 
 typedef float Real;
-typedef cuComplex _Complex;
+typedef cuComplex CLGComplex;
 
 #endif
 

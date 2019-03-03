@@ -102,11 +102,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     pR->AxpyPlus(pFieldB); //pR->AxpyPlus(pB); //b - A x_0
     pR->CopyTo(pRh);
 
-    _Complex rho = _make_cuComplex(F(0.0), F(0.0));
-    _Complex last_rho = _make_cuComplex(F(0.0), F(0.0));
-    _Complex alpha = _make_cuComplex(F(0.0), F(0.0));
-    _Complex beta = _make_cuComplex(F(0.0), F(0.0));
-    _Complex omega = _make_cuComplex(F(0.0), F(0.0));
+    CLGComplex rho = _make_cuComplex(F(0.0), F(0.0));
+    CLGComplex last_rho = _make_cuComplex(F(0.0), F(0.0));
+    CLGComplex alpha = _make_cuComplex(F(0.0), F(0.0));
+    CLGComplex beta = _make_cuComplex(F(0.0), F(0.0));
+    CLGComplex omega = _make_cuComplex(F(0.0), F(0.0));
 
     for (UINT i = 0; i < m_uiReTry; ++i)
     {

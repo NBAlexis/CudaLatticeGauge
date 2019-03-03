@@ -64,7 +64,7 @@ _kernelAxpyMinusFermionWilsonSquareSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyComplexFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
-    const deviceWilsonVectorSU3 * __restrict__ pOther, _Complex a)
+    const deviceWilsonVectorSU3 * __restrict__ pOther, CLGComplex a)
 {
     intokernal;
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
@@ -83,7 +83,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDotFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pMe, 
     const deviceWilsonVectorSU3 * __restrict__ pOther, 
-    _Complex * result)
+    CLGComplex * result)
 {
     intokernal;
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
@@ -92,7 +92,7 @@ _kernelDotFermionWilsonSquareSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyComplex(
     deviceWilsonVectorSU3 * pMe, 
-    _Complex a)
+    CLGComplex a)
 {
     intokernal;
     pMe[uiSiteIndex].MulComp(a);
@@ -162,7 +162,7 @@ _kernelDFermionWilsonSquareSU3(
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
-    _Complex cCoeff)
+    CLGComplex cCoeff)
 {
     intokernaldir;
 
@@ -471,7 +471,7 @@ void CFieldFermionWilsonSquareSU3::Axpy(Real a, const CField* x)
     _kernelAxpyRealFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
-void CFieldFermionWilsonSquareSU3::Axpy(const _Complex& a, const CField* x)
+void CFieldFermionWilsonSquareSU3::Axpy(const CLGComplex& a, const CField* x)
 {
     if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
     {
@@ -484,7 +484,7 @@ void CFieldFermionWilsonSquareSU3::Axpy(const _Complex& a, const CField* x)
     _kernelAxpyComplexFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
-_Complex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
+CLGComplex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
 {
     if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
     {
@@ -499,7 +499,7 @@ _Complex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
     return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 }
 
-void CFieldFermionWilsonSquareSU3::ScalarMultply(const _Complex& a)
+void CFieldFermionWilsonSquareSU3::ScalarMultply(const CLGComplex& a)
 {
     preparethread;
     _kernelScalarMultiplyComplex << <block, threads >> >(m_pDeviceData, a);
@@ -573,7 +573,7 @@ void CFieldFermionWilsonSquareSU3::D(const CField* pGauge, EOperatorCoefficientT
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
-    _Complex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;
@@ -603,7 +603,7 @@ void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge, EOperatorCoeffi
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
-    _Complex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;
@@ -630,7 +630,7 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     Real fRealCoeff = fCoeffReal;
-    _Complex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;

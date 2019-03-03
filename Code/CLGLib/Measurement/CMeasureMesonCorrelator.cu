@@ -39,8 +39,8 @@ _kernelCalculateCorrelatorSU3(
     Real res = F(0.0);
     //Constract U_{ij}
     //Constract U_{p(i)p(j)}
-    _Complex uijdagger[3];
-    _Complex upipj[3];
+    CLGComplex uijdagger[3];
+    CLGComplex upipj[3];
     gammaMatrix gm = __chiralGamma[eGamma];
     for (BYTE i = 1; i < 4; ++i)
     {
@@ -49,8 +49,8 @@ _kernelCalculateCorrelatorSU3(
             Real tmpRes = F(0.0);
 
             //UijT 0, 1, 2 and Upipj 0, 3, 6
-            memcpy(uijdagger, sources[j * 3 + 0][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
-            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[j * 3 + 0][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
+            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(CLGComplex) * 3);
 
             //uijdagger^* x upipj
             tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
@@ -58,13 +58,13 @@ _kernelCalculateCorrelatorSU3(
             tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
 
             //UijT 3, 4, 5 and Upipj 1, 4, 7
-            memcpy(uijdagger, sources[j * 3 + 1][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
-            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[j * 3 + 1][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
+            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(CLGComplex) * 3);
             tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
             tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
             tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-            memcpy(uijdagger, sources[j * 3 + 2][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
-            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[j * 3 + 2][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
+            memcpy(upipj, sources[gm.m_uiIndex[j] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[i]].m_ve, sizeof(CLGComplex) * 3);
             tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
             tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
             tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
@@ -87,15 +87,15 @@ _kernelCalculateCorrelatorSU3(
         {
             Real tmpRes = F(0.0);
             //p(i)=i
-            memcpy(uijdagger, sources[i * 3 + 0][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[i * 3 + 0][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
             tmpRes += uijdagger[0].x * uijdagger[0].x + uijdagger[0].y * uijdagger[0].y;
             tmpRes += uijdagger[1].x * uijdagger[1].x + uijdagger[1].y * uijdagger[1].y;
             tmpRes += uijdagger[2].x * uijdagger[2].x + uijdagger[2].y * uijdagger[2].y;
-            memcpy(uijdagger, sources[i * 3 + 1][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[i * 3 + 1][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
             tmpRes += uijdagger[0].x * uijdagger[0].x + uijdagger[0].y * uijdagger[0].y;
             tmpRes += uijdagger[1].x * uijdagger[1].x + uijdagger[1].y * uijdagger[1].y;
             tmpRes += uijdagger[2].x * uijdagger[2].x + uijdagger[2].y * uijdagger[2].y;
-            memcpy(uijdagger, sources[i * 3 + 2][uiSiteIndex].m_d[i].m_ve, sizeof(_Complex) * 3);
+            memcpy(uijdagger, sources[i * 3 + 2][uiSiteIndex].m_d[i].m_ve, sizeof(CLGComplex) * 3);
             tmpRes += uijdagger[0].x * uijdagger[0].x + uijdagger[0].y * uijdagger[0].y;
             tmpRes += uijdagger[1].x * uijdagger[1].x + uijdagger[1].y * uijdagger[1].y;
             tmpRes += uijdagger[2].x * uijdagger[2].x + uijdagger[2].y * uijdagger[2].y;
@@ -109,18 +109,18 @@ _kernelCalculateCorrelatorSU3(
         Real tmpRes = F(0.0);
 
         //U_00 and U_p0p0
-        memcpy(uijdagger, sources[0 * 3 + 0][uiSiteIndex].m_d[0].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[0 * 3 + 0][uiSiteIndex].m_d[0].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        memcpy(uijdagger, sources[0 * 3 + 1][uiSiteIndex].m_d[0].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[0 * 3 + 1][uiSiteIndex].m_d[0].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        memcpy(uijdagger, sources[0 * 3 + 2][uiSiteIndex].m_d[0].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[0 * 3 + 2][uiSiteIndex].m_d[0].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[0] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[0]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
@@ -130,18 +130,18 @@ _kernelCalculateCorrelatorSU3(
         //U_kk and U_pkpk
         BYTE byNextIdx = gm.m_byNextSymmetricIndex;
         tmpRes = F(0.0);
-        memcpy(uijdagger, sources[byNextIdx * 3 + 0][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[byNextIdx * 3 + 0][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 0][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        memcpy(uijdagger, sources[byNextIdx * 3 + 1][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[byNextIdx * 3 + 1][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 1][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;
-        memcpy(uijdagger, sources[byNextIdx * 3 + 2][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(_Complex) * 3);
-        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(_Complex) * 3);
+        memcpy(uijdagger, sources[byNextIdx * 3 + 2][uiSiteIndex].m_d[byNextIdx].m_ve, sizeof(CLGComplex) * 3);
+        memcpy(upipj, sources[gm.m_uiIndex[byNextIdx] * 3 + 2][uiSiteIndex].m_d[gm.m_uiIndex[byNextIdx]].m_ve, sizeof(CLGComplex) * 3);
         tmpRes += uijdagger[0].x * upipj[0].x + uijdagger[0].y * upipj[0].y;
         tmpRes += uijdagger[1].x * upipj[1].x + uijdagger[1].y * upipj[1].y;
         tmpRes += uijdagger[2].x * upipj[2].x + uijdagger[2].y * upipj[2].y;

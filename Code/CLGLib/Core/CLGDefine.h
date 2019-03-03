@@ -63,12 +63,12 @@
 # define __PACK_POP				pack(pop)
 #else
 # define __DLL_IMPORT			
-# define CCPRIVATE
+# define CLGAPIPRIVATE
 # define __DLL_EXPORT			
 # define __IMPORT_LIB(libname)	
 # undef FORCEINLINE
 # undef CDECL
-# define FORCEINLINE             __attribute__((always_inline))
+# define FORCEINLINE             inline
 # define CDECL                   __cdecl
 
 # define SUPPORTS_PRAGMA_PACK 0

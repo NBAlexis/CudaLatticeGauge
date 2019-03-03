@@ -293,7 +293,7 @@ _kernelMCE(Real* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithread
     UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
     for (UINT i = 0; i < uiLoop; ++i)
     {
-        _Complex c = _deviceRandomGaussC(fatIndex);
+        CLGComplex c = _deviceRandomGaussC(fatIndex);
         fToAdd += (c.x + c.y);
         fToAdd2 += (c.x * c.x + c.y * c.y);
     }

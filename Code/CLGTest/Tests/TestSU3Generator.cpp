@@ -27,7 +27,7 @@ UINT TestSU3Generator(CParameters& sParam)
         return 1;
     }
 
-    _Complex average = _make_cuComplex(0,0);
+    CLGComplex average = _make_cuComplex(0,0);
     Real sigma = 0;
     //size_t freeMemory;
     //size_t totalMemory;

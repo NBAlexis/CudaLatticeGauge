@@ -41,7 +41,7 @@ public:
     * U = exp(a this)U
     */
     //Discard
-    //virtual void ExpMult(const _Complex& a, CField* U) const = 0;
+    //virtual void ExpMult(const CLGComplex& a, CField* U) const = 0;
     virtual void ExpMult(Real a, CField* U) const = 0;
 
     /**

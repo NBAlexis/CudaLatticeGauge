@@ -119,7 +119,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             pW->ApplyOperator(uiM, pGaugeFeild);
             for (UINT k = 0; k <= j; ++k)
             {
-                _Complex dotc = m_lstVectors[k]->Dot(pW);
+                CLGComplex dotc = m_lstVectors[k]->Dot(pW);
                 m_h[HIndex(k, j)] = dotc;
                 //w -= h[k,j] v[k]
                 pW->Axpy(_make_cuComplex(-dotc.x, -dotc.y), m_lstVectors[k]);
@@ -184,22 +184,22 @@ void CSLASolverGMRES::RotateH(UINT uiHeisenbergDim)
         UINT ii = HIndex(i, i);
         UINT i1i = HIndex(i + 1, i);
         Real denomi = F(1.0) / _sqrt(__cuCabsSqf(m_h[ii]) + __cuCabsSqf(m_h[i1i]));
-        _Complex cs = cuCmulf_cr(m_h[ii], denomi);
-        _Complex sn = cuCmulf_cr(m_h[i1i], denomi);
-        _Complex cs_h = _cuConjf(cs);
-        _Complex sn_h = _cuConjf(sn);
+        CLGComplex cs = cuCmulf_cr(m_h[ii], denomi);
+        CLGComplex sn = cuCmulf_cr(m_h[i1i], denomi);
+        CLGComplex cs_h = _cuConjf(cs);
+        CLGComplex sn_h = _cuConjf(sn);
 
         for (UINT j = i; j < uiHeisenbergDim; ++j)
         {
             UINT ij = HIndex(i, j);
             UINT i1j = HIndex(i + 1, j);
 
-            _Complex hij = m_h[ij];
+            CLGComplex hij = m_h[ij];
             m_h[ij] = _cuCaddf(_cuCmulf(cs_h, hij), _cuCmulf(sn_h, m_h[i1j]));
             m_h[i1j] = _cuCsubf(_cuCmulf(cs, m_h[i1j]), _cuCmulf(sn, hij));
         }
 
-        _Complex minus_gi = _make_cuComplex(-m_g[i].x, -m_g[i].y);
+        CLGComplex minus_gi = _make_cuComplex(-m_g[i].x, -m_g[i].y);
         m_g[i] = _cuCmulf(cs_h, m_g[i]);
         m_g[i + 1] = _cuCmulf(sn, minus_gi);
     }

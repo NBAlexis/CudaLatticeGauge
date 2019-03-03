@@ -43,11 +43,11 @@ public:
     virtual void AxpyPlus(const CField* x);
     virtual void AxpyMinus(const CField* x);
     virtual void Axpy(Real a, const CField* x);
-    virtual void Axpy(const _Complex& a, const CField* x);
-    virtual void ScalarMultply(const _Complex& a);
+    virtual void Axpy(const CLGComplex& a, const CField* x);
+    virtual void ScalarMultply(const CLGComplex& a);
     virtual void ScalarMultply(Real a);
 
-    virtual _Complex Dot(const CField* other) const;
+    virtual CLGComplex Dot(const CField* other) const;
 
     //pGauge must be gauge SU3
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));

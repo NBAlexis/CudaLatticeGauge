@@ -58,8 +58,8 @@ public:
     virtual void AxpyPlus(const CField* x);
     virtual void AxpyMinus(const CField* x);
     virtual void Axpy(Real a, const CField* x);
-    virtual void Axpy(const _Complex& a, const CField* x);
-    virtual void ScalarMultply(const _Complex& a);
+    virtual void Axpy(const CLGComplex& a, const CField* x);
+    virtual void ScalarMultply(const CLGComplex& a);
     virtual void ScalarMultply(Real a);
 
 #pragma endregion
@@ -67,7 +67,7 @@ public:
     virtual void ExpMult(Real a, CField* U) const;
 
     virtual void ElementNormalize();
-    virtual _Complex Dot(const CField* other) const;
+    virtual CLGComplex Dot(const CField* other) const;
     virtual void SaveToFile(const CCString &fileName) const;
     virtual BYTE* CopyDataOut(UINT &uiSize) const;
     virtual CCString GetInfos(const CCString &tab) const;

@@ -131,7 +131,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
             pAP[j]->ApplyOperator(uiM, pGaugeFeild);
             length_AP[j] = pAP[j]->Dot(pAP[j]).x;
             //appParanoiac(_T("length p = %f ap = %f r = %f\n"), pP[j]->Dot(pP[j]).x, length_AP[j], pR->Dot(pR).x);
-            _Complex al = cuCdivf_cr(pAP[j]->Dot(pR), length_AP[j]);
+            CLGComplex al = cuCdivf_cr(pAP[j]->Dot(pR), length_AP[j]);
 
             pX->Axpy(al, pP[j]);
             pR->Axpy(_make_cuComplex(-al.x, -al.y), pAP[j]);
@@ -168,7 +168,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
                 {
                     if (k != nextPjIndex)
                     {
-                        _Complex beta = cuCdivf_cr(pAP[k]->Dot(pAAP), -length_AP[j]);
+                        CLGComplex beta = cuCdivf_cr(pAP[k]->Dot(pAAP), -length_AP[j]);
                         pP[nextPjIndex]->Axpy(beta, pP[k]);
                     }
                 }

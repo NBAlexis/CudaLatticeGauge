@@ -75,7 +75,7 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, _Complex a)
+_kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, CLGComplex a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -115,7 +115,7 @@ _kernelAxpyMinusSU3(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, _Complex a)
+_kernelScalarMultiplySU3Complex(deviceSU3 *pDevicePtr, CLGComplex a)
 {
     gaugeSU3KernelFuncionStart
 
@@ -538,11 +538,11 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDotSU3(
     const deviceSU3 * __restrict__ pMyDeviceData, 
     const deviceSU3 * __restrict__ pOtherDeviceData,
-    _Complex* result)
+    CLGComplex* result)
 {
     intokernaldir;
 
-    _Complex resThisThread = _make_cuComplex(0,0);
+    CLGComplex resThisThread = _make_cuComplex(0,0);
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -611,7 +611,7 @@ void CFieldGaugeSU3::AxpyMinus(const CField* x)
 
 }
 
-void CFieldGaugeSU3::ScalarMultply(const _Complex& a)
+void CFieldGaugeSU3::ScalarMultply(const CLGComplex& a)
 {
     preparethread;
     _kernelScalarMultiplySU3Complex << <block, threads >> > (m_pDeviceData, a);
@@ -636,7 +636,7 @@ void CFieldGaugeSU3::Axpy(Real a, const CField* x)
     _kernelAxpySU3Real << <block, threads >> > (m_pDeviceData, pSU3x->m_pDeviceData, a);
 }
 
-void CFieldGaugeSU3::Axpy(const _Complex& a, const CField* x)
+void CFieldGaugeSU3::Axpy(const CLGComplex& a, const CField* x)
 {
     if (NULL == x || EFT_GaugeSU3 != x->GetFieldType())
     {
@@ -914,7 +914,7 @@ void CFieldGaugeSU3::ElementNormalize()
     _kernelNormalizeSU3 << < block, threads >> > (m_pDeviceData);
 }
 
-_Complex CFieldGaugeSU3::Dot(const CField* other) const
+CLGComplex CFieldGaugeSU3::Dot(const CField* other) const
 {
     if (NULL == other || EFT_GaugeSU3 != other->GetFieldType())
     {

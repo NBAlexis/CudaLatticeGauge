@@ -86,10 +86,10 @@ public:
     virtual void AxpyMinus(const CField* x) = 0;
 
     virtual void Axpy(Real a, const CField* x) = 0;
-    virtual void Axpy(const _Complex& a, const CField* x) = 0;
+    virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
     Real GetLength() const { return m_fLength; }
     //This is a * me
-    virtual void ScalarMultply(const _Complex& a) = 0;
+    virtual void ScalarMultply(const CLGComplex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
     virtual void SaveToFile(const CCString &fileName) const = 0;
     //Why we need this? because the data structure are aligned.
@@ -106,7 +106,7 @@ public:
     * Using pDeviceBuffer, we make sure Dot function is a constant function as it should be.
     * The final result of dot, should be sum of pDeviceBuffer
     */
-    virtual _Complex Dot(const CField* other) const = 0;
+    virtual CLGComplex Dot(const CField* other) const = 0;
 
     virtual void CopyTo(CField* U) const
     {

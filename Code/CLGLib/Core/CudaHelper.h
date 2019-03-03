@@ -121,8 +121,8 @@ public:
 
     static Real ReduceReal(Real* deviceBuffer, UINT uiLength);
     Real ReduceRealWithThreadCount(Real* deviceBuffer);
-    static _Complex ReduceComplex(_Complex* deviceBuffer, UINT uiLength);
-    _Complex ReduceComplexWithThreadCount(_Complex* deviceBuffer);
+    static CLGComplex ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength);
+    CLGComplex ReduceComplexWithThreadCount(CLGComplex* deviceBuffer);
 
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
@@ -149,11 +149,11 @@ public:
         //checkCudaErrors(cudaFree(m_pIndexBuffer));
     }
 
-    _Complex ThreadBufferSum(_Complex * pDeviceBuffer);
+    CLGComplex ThreadBufferSum(CLGComplex * pDeviceBuffer);
     Real ThreadBufferSum(Real * pDeviceBuffer);
 
     //struct SIndex* m_pIndexBuffer;
-    _Complex * m_pComplexBufferThreadCount;
+    CLGComplex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
 
     //thread per grid ( = volumn)
