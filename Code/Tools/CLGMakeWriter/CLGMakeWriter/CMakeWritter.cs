@@ -18,10 +18,9 @@ namespace CLGMakeWriter
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
             sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake\n";
-            sContent += "set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
-            sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
-            sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})\n";
-            sContent += "set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})\n\n";
+            sContent += "set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
+            sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})\n";
+            sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})\n";
 
             sContent += "# This is our code file dir\n";
             sContent += "set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)\n";
