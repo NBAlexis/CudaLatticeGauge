@@ -115,7 +115,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             //==========
             //One step
             rho = pRh->Dot(pR);//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
-            if (__cuCabsSqf(rho) < FLT_MIN)
+            if (__cuCabsSqf(rho) < _CLG_FLT_MIN)
             {
                 appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.18f\n"), rho);
                 break;

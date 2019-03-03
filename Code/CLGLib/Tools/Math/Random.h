@@ -171,7 +171,7 @@ public:
         Real f2 = _deviceRandomF(fatIndex) * PI2;
 
         Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (FLT_MIN));
+        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
         Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
         return _cos(f2) * amplitude;
     }
@@ -182,7 +182,7 @@ public:
         Real f2 = _deviceRandomF(fatIndex) * PI2;
 
         Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (FLT_MIN));
+        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
         Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * F(0.5);
         return _cos(f2) * amplitude;
     }
@@ -193,7 +193,7 @@ public:
         Real f2 = _deviceRandomF(fatIndex) * PI2;
 
         Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (FLT_MIN));
+        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
         Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
         return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
     }

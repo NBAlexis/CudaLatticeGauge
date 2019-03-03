@@ -79,6 +79,43 @@
 
 #endif
 
+//They are not defined in GCC, so we define them explicitly
+
+#define _CLG_FLT_DECIMAL_DIG  9                       // # of decimal digits of rounding precision
+#define _CLG_FLT_DIG          6                       // # of decimal digits of precision
+#define _CLG_FLT_EPSILON      1.192092896e-07F        // smallest such that 1.0+FLT_EPSILON != 1.0
+#define _CLG_FLT_HAS_SUBNORM  1                       // type does support subnormal numbers
+#define _CLG_FLT_GUARD        0
+#define _CLG_FLT_MANT_DIG     24                      // # of bits in mantissa
+#define _CLG_FLT_MAX          3.402823466e+38F        // max value
+#define _CLG_FLT_MAX_10_EXP   38                      // max decimal exponent
+#define _CLG_FLT_MAX_EXP      128                     // max binary exponent
+#define _CLG_FLT_MIN          1.175494351e-38F        // min normalized positive value
+#define _CLG_FLT_MIN_10_EXP   (-37)                   // min decimal exponent
+#define _CLG_FLT_MIN_EXP      (-125)                  // min binary exponent
+#define _CLG_FLT_NORMALIZE    0
+#define _CLG_FLT_RADIX        2                       // exponent radix
+#define _CLG_FLT_TRUE_MIN     1.401298464e-45F        // min positive value
+
+
+//Those are constants we are using
+
+//save some constant memory of cuda?
+#define PI (F(3.141592653589))
+// - 1/4294967296UL
+#define AM (F(0.00000000023283064365386963))
+// - _sqrt(2)
+#define SQRT2 (F(1.4142135623730951))
+// - 1 / _sqrt(2), or _sqrt(2)/2
+#define InvSqrt2 (F(0.7071067811865475))
+// - 2.0f * PI
+#define PI2 (F(6.283185307179586))
+
+// 1.0f / _sqrt(3)
+#define InvSqrt3 (F(0.5773502691896258))
+// 2.0f / _sqrt(3)
+#define InvSqrt3_2 (F(1.1547005383792517))
+
 __BEGIN_NAMESPACE
 
 //NOTE, _Complex is already a keyword in GCC

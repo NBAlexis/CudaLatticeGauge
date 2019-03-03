@@ -805,7 +805,7 @@ inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate,
     const TCHAR * lpsz = (const TCHAR *)(orignString);
     TCHAR lp [CCString::MAX_PATH];
     memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
-    appStrcpy(lp, lpsz);
+    appStrcpy(lp, CCString::MAX_PATH, lpsz);
     INT location = -1;
     for (INT i = 0; i < seperate.Num(); ++i)
     {
@@ -829,7 +829,7 @@ inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate,
         if (bCutSep)
             ++location;
         memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
-        appStrcpy(lp, (lpsz + location));
+        appStrcpy(lp, CCString::MAX_PATH, (lpsz + location));
     }
     else
     {
