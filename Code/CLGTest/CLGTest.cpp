@@ -52,7 +52,7 @@ void ListAllTests(const THashMap<CCString, TArray<TestList*>*>& category)
                 if (indexOfTest < lst->Num())
                 {
                     TCHAR names[256];
-                    sprintf_s(names, _T("%d - %s,    "), lst->GetAt(indexOfTest)->m_uiIndex, lst->GetAt(indexOfTest)->m_sParamName);
+                    appSprintf(names, 256, _T("%d - %s,    "), lst->GetAt(indexOfTest)->m_uiIndex, lst->GetAt(indexOfTest)->m_sParamName);
                     COUT << names;
                 }
             }

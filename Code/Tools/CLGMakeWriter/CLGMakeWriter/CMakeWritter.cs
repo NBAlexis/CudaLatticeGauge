@@ -75,7 +75,7 @@ set_target_properties( CLGLib
 
             CProjFile slgTest = excutables["CLGTest"];
 
-            sContent += "project(CLGLib LANGUAGES CXX)\n\n";
+            sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\nproject(CLGLib LANGUAGES CXX)\n\n";
 
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
@@ -97,7 +97,7 @@ set_target_properties( CLGLib
             sContent += "message(\"CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}\")\n\n";
 
 
-            sContent += "include_directories(${CMAKE_SOURCE_DIR})/../CLGLib\n";
+            sContent += "include_directories(${CMAKE_SOURCE_DIR}/../CLGLib)\n";
             sContent += "include_directories(${CMAKE_SOURCE_DIR})\n\n";
 
             sContent += "add_definitions(-D_UBUNTU)\n\n";
