@@ -98,11 +98,11 @@ __REGIST_TEST(TestSolver, Solver, TestSolverGMRES);
 
 __REGIST_TEST(TestSolver, Solver, TestSolverGCR);
 
-__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
+//__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
 
-__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
+//__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
 
-__REGIST_TEST(TestSolver, Solver, TestSolverGCRLowMode);
+//__REGIST_TEST(TestSolver, Solver, TestSolverGCRLowMode);
 
 //=============================================================================
 // END OF FILE

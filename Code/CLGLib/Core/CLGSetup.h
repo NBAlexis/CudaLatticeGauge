@@ -21,7 +21,13 @@
 //Note: Important!
 //This is the tag for windows, msvc specific
 //Ignore _MSC_VER, which is just for Visual Studio IDE specific, and should be harmless
+#ifdef WIN32
 #define _CLG_WIN 1
+#endif
+
+//Since cuda only support x64, this is reductent. 
+//This is just for seperate those code depending on whether 32 or 64
+#define _CLG_X64 1
 
 //_CLG_DOUBLEFLOAT = 0 or 1. 
 //Note that single float is rarely the problem for accuracy, but much much faster

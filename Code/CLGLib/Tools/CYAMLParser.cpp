@@ -85,7 +85,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
     CParameters *current_params = &params;
     INT current_indent = 0;
 
-    BOOL expect_map = FALSE;
+    UBOOL expect_map = FALSE;
 
     while (iss.getline(buf, buf_size))
     {

@@ -120,7 +120,7 @@ TestRandomSOBOL32:
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
     GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
     HostSample : 1000
-    TestAccuracy : 1E-2
+    TestAccuracy : 3E-2
 
 TestRandomScrambledSOBOL32:
 
@@ -132,7 +132,7 @@ TestRandomScrambledSOBOL32:
     PiDecomp: [10, 10, 10, 16, 16, 4, 200]
     GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
     HostSample : 1000
-    TestAccuracy : 1E-3
+    TestAccuracy : 1E-2
 
 TestSU3GeneratorSchrage:
 
@@ -999,7 +999,7 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.1561
+    ExpectedResR : 0.1561
 
     Updator:
 
@@ -1160,6 +1160,7 @@ TestGaugeSmearingAPEStout:
     FermionFieldCount : 1
     MeasureListLength : 1
     ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
+    ExpectedResR : 0.616
 
     Updator:
 
@@ -1250,6 +1251,7 @@ TestGaugeSmearingAPEProj:
     FermionFieldCount : 1
     MeasureListLength : 1
     ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
+    ExpectedResR : 0.616
 
     Updator:
 

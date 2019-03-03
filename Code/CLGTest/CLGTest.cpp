@@ -147,6 +147,7 @@ int main(int argc, char * argv[])
             timer.Start();
             UINT uiError = 0;
             UINT uiPassed = 0;
+            TArray<CCString> problemTest;
             for (INT i = 0; i < allTests.Num(); ++i)
             {
                 UINT uiThisError = RunTest(params, allTests[i]);
@@ -157,10 +158,15 @@ int main(int argc, char * argv[])
                 else
                 {
                     uiError += uiThisError;
+                    problemTest.AddItem(allTests[i]->m_sParamName);
                 }
             }
             timer.Stop();
-            appGeneral(_T("Run all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 0.001f);
+            appGeneral(_T("\nRun all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 0.001f);
+            for (INT i = 0; i < problemTest.Num(); ++i)
+            {
+                appGeneral(_T("problem test suits: %s\n"), problemTest[i]);
+            }
             bExcuted = TRUE;
         }
         else

@@ -58,8 +58,7 @@
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
     <ClInclude Include="Platform\CFile.h" />
     <ClInclude Include="Platform\PlatformIncs.h" />
-    <ClInclude Include="Platform\WinDefine.h" />
-    <ClInclude Include="Platform\WinFunction.h" />
+    <ClInclude Include="Platform\PlatformDefine.h" />
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h" />
@@ -68,6 +67,7 @@
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
     <ClInclude Include="Tools\Data\CLinkedList.h" />
+    <ClInclude Include="Tools\Data\STDStringFunctions.h" />
     <ClInclude Include="Tools\Data\TArray.h" />
     <ClInclude Include="Tools\Data\TemplateFunctions.h" />
     <ClInclude Include="Tools\Data\THashMap.h" />
@@ -114,8 +114,7 @@
     </CudaCompile>
     <ClCompile Include="Measurement\CMeasurementManager.cpp" />
     <ClCompile Include="Measurement\CMeasurePlaqutteEnergy.cpp" />
-    <ClCompile Include="Platform\CFileWin.cpp" />
-    <ClCompile Include="Platform\WinFunction.cpp" />
+    <ClCompile Include="Platform\CFile.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <CudaCompile Include="Data\Lattice\CIndex.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
@@ -228,6 +227,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
@@ -264,7 +264,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);DEBUG=1;_WINDLL</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
@@ -314,6 +314,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -348,7 +349,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <PreprocessorDefinitions>WIN32;_MBCS;%(PreprocessorDefinitions);_WINDLL</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>

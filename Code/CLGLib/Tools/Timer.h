@@ -7,7 +7,6 @@
 // REVISION:
 //  [12/2/2018 nbale]
 //=============================================================================
-#include <chrono>
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
@@ -76,12 +75,12 @@ public:
 
 private:
 
-    BOOL m_bStarted;
+    UBOOL m_bStarted;
     ULONGLONG m_uiStart;
     FLOAT m_fElapsed;
     DWORD m_dwCounter;
     CCString m_sId;
-    BOOL m_bReportOnExit;
+    UBOOL m_bReportOnExit;
 };
 
 __END_NAMESPACE

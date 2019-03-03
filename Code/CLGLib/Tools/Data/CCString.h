@@ -10,106 +10,55 @@
 #ifndef _CCSTRING_H_
 #define _CCSTRING_H_
 
-//Warning: please do not use following functions, they are used internally(Used in class CCString)
-#define _appStrpbrk		_tcspbrk
-#define _appStrinc		_tcsinc
-#define _appStrrev		_tcsrev
-#define _appStrtol		_tcstol
-#define _appStrtoul		_tcstoul
-#define _appStrtod		_tcstod
-#define _appStrtof		_tcstof
-#define _appStrnicmp	_tcsnicmp
-
 __BEGIN_NAMESPACE
 
-FORCEINLINE void appStrTrimLeft(TCHAR* &InStr)
+inline void appStrTrimLeft(TCHAR* &InStr)
 {
     while (*InStr && (' ' == (*InStr) || '\t' == (*InStr)))
         ++InStr;
 }
 
-FORCEINLINE INT appStrToINT(const TCHAR* s)
+inline INT appStrToINT(const TCHAR* s)
 {
     INT base;
-    TCHAR* p = (TCHAR*)(s);
+    TCHAR* p = const_cast<TCHAR*>(s);
     appStrTrimLeft(p);
     if ('0' == p[0] && ('x' == p[1] || 'X' == p[1]))
         base = 16;
     else
         base = 10;
-    return _appStrtol(p, &p, base);
+    return appStoI(p, base);
 }
 
-FORCEINLINE UINT appStrToUINT(const TCHAR* s)
+inline UINT appStrToUINT(const TCHAR* s)
 {
     INT base;
-    TCHAR* p = (TCHAR*)(s);
+    TCHAR* p = const_cast<TCHAR*>(s);
     appStrTrimLeft(p);
     if ('0' == p[0] && ('x' == p[1] || 'X' == p[1]))
         base = 16;
     else
         base = 10;
-    return _appStrtoul(p, &p, base);
+    return appStoUI(p, base);
 }
 
-FORCEINLINE Real appStrToReal(const TCHAR* s)
+inline Real appStrToReal(const TCHAR* s)
 {
-    TCHAR *ending;
-
-#if UNICODE
-    std::wstring str_val(s);
-#else
-    std::string str_val(s);
-#endif
 #if _CLG_DOUBLEFLOAT
-    Real converted_value = _appStrtod(str_val.c_str(), &ending);
+    return static_cast<Real>(appStoD(s));
 #else
-    Real converted_value = _appStrtof(str_val.c_str(), &ending);
+    return static_cast<Real>(appStoD(s));
 #endif
-    if (*ending != 0)
-    {
-        printf(_T("String to float failed! string: %s"), s);
-        return F(0.0);
-    }
-    return converted_value;
 }
 
-FORCEINLINE FLOAT appStrToFLOAT(const TCHAR* s)
+inline FLOAT appStrToFLOAT(const TCHAR* s)
 {
-    TCHAR *ending;
-    
-#if UNICODE
-    std::wstring str_val(s);
-#else
-    std::string str_val(s);
-#endif
-
-    FLOAT converted_value = _appStrtof(str_val.c_str(), &ending);
-    if (*ending != 0)
-    {
-        printf(_T("String to float failed! string: %s"), s);
-        return 0.0f;
-    }
-    return converted_value;
+    return appStoF(s);
 }
 
-FORCEINLINE DOUBLE appStrToDOUBLE(const TCHAR* s)
+inline DOUBLE appStrToDOUBLE(const TCHAR* s)
 {
-    TCHAR *ending;
-
-#if UNICODE
-    std::wstring str_val(s);
-#else
-    std::string str_val(s);
-#endif
-
-    DOUBLE converted_value = _appStrtod(str_val.c_str(), &ending);
-    if (*ending != 0)
-    {
-        printf(_T("String to float failed! string: %s"), s);
-        return 0.0;
-    }
-    return converted_value;
+    return appStoD(s);
 }
 
 //=====================================================
@@ -119,8 +68,12 @@ FORCEINLINE DOUBLE appStrToDOUBLE(const TCHAR* s)
 
 class CLGAPIPRIVATE CCStringData
 {
+private:
+    std::atomic<INT> m_nRefs;             // reference count
+
 public:
-    LONG m_nRefs;             // reference count
+
+    friend class CCString;
 
     INT m_nDataLength;        // length of data (including terminator)
     INT m_nAllocLength;       // length of allocation
@@ -138,6 +91,8 @@ public:
 class CLGAPI CCString
 {
 public:
+    enum { MAX_PATH = 8192, };
+
     CCString();
     CCString(const CCString& stringSrc);
     CCString(TCHAR ch, INT nRepeat = 1);
@@ -295,7 +250,7 @@ public:
 
     const TCHAR* c_str() const { return m_pchData; }
 
-#if UNICODE
+#if _CLG_UNICODE
     //attention here!
     //need to free it yourself!
     operator const ANSICHAR*() const 
@@ -409,17 +364,19 @@ public:
     void MakeUpper()
     {
         CopyBeforeWrite();
-        appStrupr(m_pchData, appStrlen(m_pchData));
+        //appStrupr(m_pchData, appStrlen(m_pchData));
+        m_pchData = const_cast<TCHAR*>(appStrupr(m_pchData));
     }
     void MakeLower()
     {
         CopyBeforeWrite();
-        appStrlwr(m_pchData, appStrlen(m_pchData));
+        //appStrlwr(m_pchData, appStrlen(m_pchData));
+        m_pchData = const_cast<TCHAR*>(appStrlwr(m_pchData));
     }
     void MakeReverse()
     {
         CopyBeforeWrite();
-        _appStrrev(m_pchData);
+        appStrRev(m_pchData);
     }
 
     // trimming whitespace (either side)
@@ -442,7 +399,7 @@ public:
             }
             else
                 lpszLast = NULL;
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
         }
 
         if (lpszLast != NULL)
@@ -471,7 +428,7 @@ public:
             }
             else
                 lpszLast = NULL;
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
         }
 
         if (lpszLast != NULL)
@@ -499,7 +456,7 @@ public:
             }
             else
                 lpszLast = NULL;
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
         }
 
         if (lpszLast != NULL)
@@ -522,7 +479,7 @@ public:
         {
             if (appStrchr(lpszTargets, *lpsz) == NULL)
                 break;
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
         }
 
         if (lpsz != m_pchData)
@@ -542,7 +499,7 @@ public:
         const TCHAR* lpsz = m_pchData;
 
         while (chTarget == *lpsz)
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
 
         if (lpsz != m_pchData)
         {
@@ -596,7 +553,7 @@ public:
     }
     INT FindOneOf(const TCHAR* lpszCharSet) const
     {
-        TCHAR* lpsz = _appStrpbrk(m_pchData, lpszCharSet);
+        const TCHAR* lpsz = appStrpbrk(m_pchData, lpszCharSet);
         return (NULL == lpsz) ? -1 : (INT)(lpsz - m_pchData);
     }
 
@@ -678,37 +635,11 @@ inline void CCString::Init()
 }
 
 /**
-*
+* Did I write this many many years ago?
 */
 inline CCString appIntToString(INT inInta)
 {
-    INT inInt = inInta;
-    CCString outStr;
-    CCString signStr;
-    if (inInt < 0)
-    {
-        signStr = _T("-");
-        inInt = -1 * inInt;
-    }
-
-    if (0 == inInt)
-    {
-        ANSICHAR charint[2];
-        charint[0] =  '0';
-        charint[1] = 0;
-        outStr = outStr + CCString(  ANSI_TO_TCHAR ((const ANSICHAR *)(charint) ));
-    }
-
-    for (INT leftInt = inInt; leftInt != 0; leftInt = (INT)(leftInt / 10))
-    {
-        INT tmpInt = leftInt -(INT)(leftInt / 10) * 10;
-        ANSICHAR charint[2];
-        charint[0] = static_cast<ANSICHAR>(tmpInt + '0');
-        charint[1] =0;
-        //*charint = tmpInt + '0';
-        outStr = CCString(  ANSI_TO_TCHAR ((const ANSICHAR *)(charint) )) + outStr;
-    }
-    return (signStr + outStr);
+    return CCString(std::to_string(inInta).c_str());
 }
 
 /**
@@ -716,33 +647,7 @@ inline CCString appIntToString(INT inInta)
 */
 inline CCString appIntToString(SQWORD inInta)
 {
-    SQWORD inInt = inInta;
-    CCString outStr;
-    CCString signStr;
-    if (inInt < 0)
-    {
-        signStr = _T("-");
-        inInt = -1 * inInt;
-    }
-
-    if (0 == inInt)
-    {
-        ANSICHAR charint[2];
-        charint[0] = '0';
-        charint[1] = 0;
-        outStr = outStr + CCString(ANSI_TO_TCHAR((const ANSICHAR *)(charint)));
-    }
-
-    for (SQWORD leftInt = inInt; leftInt != 0; leftInt = (SQWORD)(leftInt / 10))
-    {
-        SQWORD tmpInt = leftInt - (SQWORD)(leftInt / 10) * 10;
-        ANSICHAR charint[2];
-        charint[0] = static_cast<ANSICHAR>(tmpInt + '0');
-        charint[1] = 0;
-        //*charint = tmpInt + '0';
-        outStr = CCString(ANSI_TO_TCHAR((const ANSICHAR *)(charint))) + outStr;
-    }
-    return (signStr + outStr);
+    return CCString(std::to_string(inInta).c_str());
 }
 
 /**
@@ -750,214 +655,26 @@ inline CCString appIntToString(SQWORD inInta)
 */
 inline CCString appIntToString(QWORD inInta)
 {
-    QWORD inInt = inInta;
-    CCString outStr;
-
-    if (0 == inInt)
-    {
-        ANSICHAR charint[2];
-        charint[0] = '0';
-        charint[1] = 0;
-        outStr = outStr + CCString(ANSI_TO_TCHAR((const ANSICHAR *)(charint)));
-    }
-
-    for (SQWORD leftInt = inInt; leftInt != 0; leftInt = (SQWORD)(leftInt / 10))
-    {
-        SQWORD tmpInt = leftInt - (SQWORD)(leftInt / 10) * 10;
-        ANSICHAR charint[2];
-        charint[0] = static_cast<ANSICHAR>(tmpInt + '0');
-        charint[1] = 0;
-        //*charint = tmpInt + '0';
-        outStr = CCString(ANSI_TO_TCHAR((const ANSICHAR *)(charint))) + outStr;
-    }
-    return outStr;
+    return CCString(std::to_string(inInta).c_str());
 }
 
 /**
 *
 */
-inline CCString appFloatToString(Real inFloata, INT inPrecesion = 4)
+inline CCString appFloatToString(Real inFloata)
 {
-    if (inPrecesion < 1)
-        inPrecesion = 8;
-
-    INT inUp = (INT)(inFloata);
-    Real infDown = (inFloata -   (Real)(inUp));
-    infDown = infDown < F(0.0) ? (infDown * F(-1.0)) : infDown;
-
-    INT leftMost = 10;
-    for (INT i = 0; i < inPrecesion; ++i)
-    {
-        infDown *= F(10.0);
-        leftMost *= 10;
-    }
-    INT inDown = (INT)infDown;
-
-    CCString outStr;
-    outStr = appIntToString(inUp);
-    outStr += _T(".");
-    outStr += appIntToString(inDown + leftMost).Right(inPrecesion);
-
-    return outStr;
+    return CCString(std::to_string(inFloata).c_str());
 }
 
 /**
-*
+* The thing is, since we don't have custum types (like vector, rotation or so) to sprint
+* Just use the standard one
 */
 inline CCString appStringFormatV(const TCHAR * lpszFormat, va_list argList)
 {
-    va_list argListSave;
-
-#ifndef WIN32
-    appMemcpy(&argListSave[0], argList, sizeof(va_list));
-#else
-    argListSave = argList;
-#endif
-
-    CCString outString;
-
-    for (const TCHAR* lpsz = lpszFormat; *lpsz != _T('\0'); lpsz = _appStrinc(lpsz))
-    {
-        // handle '%' character, but watch out for '%%'
-        if (*lpsz != _T('%') || *(lpsz = _appStrinc(lpsz))/*++lpsz*/ == _T('%'))
-        {
-            outString += (*lpsz);
-            continue;
-        }
-
-        // handle '%' character with format
-        //INT iType = 0;
-        INT nWidth = 0;
-        for (; *lpsz != _T('\0'); lpsz = _appStrinc(lpsz))
-        {
-            // check for valid flags
-            if (*lpsz == _T('#'))
-                outString += _T("0x");   // for '0x'
-            else if (*lpsz == _T('*'))
-                nWidth = va_arg(argList, INT);
-            else if (*lpsz == _T('-') || *lpsz == _T('+') || *lpsz == _T('0') ||
-                *lpsz == _T(' '))
-                ;
-            else // hit non-flag character
-                break;
-        }
-        // get width and skip it
-        if (0 == nWidth)
-        {
-            // width indicated by
-            nWidth = appStrToINT(lpsz);
-            for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
-                ;
-        }
-        assert(nWidth >= 0);
-
-        INT nPrecision = 0;
-        if (*lpsz == _T('.'))
-        {
-            // skip past '.' separator (width.precision)
-            lpsz = _appStrinc(lpsz);
-
-            // get precision and skip it
-            if (*lpsz == _T('*'))
-            {
-                nPrecision = va_arg(argList, INT);
-                lpsz = _appStrinc(lpsz);
-            }
-            else
-            {
-                nPrecision = appStrToINT(lpsz);
-                for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
-                    ;
-            }
-            assert(nPrecision >= 0);
-        }
-
-        // now should be on specifier
-        UBOOL bString = FALSE;
-
-        switch (*lpsz)
-        {
-            // single characters
-        case _T('c'):
-        case _T('C'):
-            outString += va_arg(argList, TCHAR);
-            bString = TRUE;
-            break;
-
-            // strings
-        case _T('s'):
-        case _T('S'):
-            {
-                const TCHAR* pstrNextArg = va_arg(argList, const TCHAR*);
-                if (pstrNextArg == NULL)
-                    outString += _T("(null)");
-                else
-                {
-                    outString += pstrNextArg;
-                }
-                bString = TRUE;
-            }
-            break;
-        }
-
-        // adjust nItemLen for strings
-        if (!bString)
-        {
-            Real f = 0.0f;
-            DOUBLE df = 0.0;
-            void * p = NULL;
-            PTRINT ipoint = 0;
-            //             FVector3 vec = FVector3::Zero;
-            //             FRotator rot = FRotator(0,0,0);
-            switch (*lpsz)
-            {
-                // integers
-            case _T('d'):
-            case _T('i'):
-            case _T('u'):
-            case _T('x'):
-            case _T('X'):
-            case _T('o'):
-                outString += appIntToString( va_arg(argList, INT) );
-                //todo:: nWidth and precision
-                break;
-
-            case _T('e'):
-            case _T('g'):
-            case _T('G'):
-                df = va_arg(argList, Real);
-                f = (Real)(df);
-                outString += appFloatToString( f, nPrecision );
-                //todo:: nWidth and precision
-                break;
-
-            case _T('f'):
-                f = va_arg(argList, Real);
-                outString += appFloatToString( f, nPrecision );
-                break;
-
-            case _T('p'):
-                p = va_arg(argList, void*);
-                ipoint = (PTRINT)(p);
-                outString += _T("p:");
-                outString += appIntToString(ipoint);
-                break;
-
-                // no output
-            case _T('n'):
-                va_arg(argList, INT*);
-                break;
-
-            default:
-                assert(FALSE);  // unknown formatting option
-            }
-        }
-
-    }
-
-    va_end(argListSave);
-
-    return outString;
+    CCString sRet;
+    sRet.FormatV(lpszFormat, argList);
+    return sRet;
 }
 
 /**
@@ -1002,8 +719,8 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
     TArray<CCString> outList;
     CCBitFlag flag(dwFlag);
     const TCHAR * lpsz = (const TCHAR *)(orignString);
-    TCHAR lp[MAX_PATH];
-    memset(lp, 0, MAX_PATH * sizeof(TCHAR));
+    TCHAR lp[CCString::MAX_PATH];
+    memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
     INT currentIndex = 0;
 
     while (1)
@@ -1048,7 +765,7 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
                 outList.AddItem(sNewWord);
             }
 
-            memset(lp, 0, MAX_PATH * sizeof(TCHAR));
+            memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
             currentIndex = 0;
             ++lpsz;
         }
@@ -1086,8 +803,8 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, INT sepera
 inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate, UBOOL bCutSep = FALSE, UBOOL bCutHead = FALSE)
 {
     const TCHAR * lpsz = (const TCHAR *)(orignString);
-    TCHAR lp [MAX_PATH];
-    memset(lp, 0, MAX_PATH * sizeof(TCHAR));
+    TCHAR lp [CCString::MAX_PATH];
+    memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
     appStrcpy(lp, lpsz);
     INT location = -1;
     for (INT i = 0; i < seperate.Num(); ++i)
@@ -1111,7 +828,7 @@ inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate,
     {
         if (bCutSep)
             ++location;
-        memset(lp, 0, MAX_PATH * sizeof(TCHAR));
+        memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
         appStrcpy(lp, (lpsz + location));
     }
     else
@@ -1134,16 +851,6 @@ inline CCString appGetCutTail(const CCString &orignString, INT seperate, UBOOL b
 }
 
 __END_NAMESPACE
-
-//Warning: please do not use following functions, they are used internally(Used in class CCString)
-#undef _appStrpbrk
-#undef _appStrinc
-#undef _appStrrev
-#undef _appStrtol
-#undef _appStrtoul
-#undef _appStrtod
-#undef _appStrtof
-#undef _appStrnicmp
 
 #endif //#ifndef _CCSTRING_H_
 

@@ -11,7 +11,8 @@
 #ifndef _CFILE_H_
 #define _CFILE_H_
 
-///TODO: Use boost 
+#pragma TODO (use boost::filesystem)
+
 
 __BEGIN_NAMESPACE
 
@@ -34,8 +35,8 @@ public:
 
     //UBOOL MakeDir(const CCString& dirPath);
 
-    UBOOL SetDefaultDirectory(const TCHAR* Filename);
-    class CCString GetDefaultDirectory();
+    //UBOOL SetDefaultDirectory(const TCHAR* Filename);
+    //class CCString GetDefaultDirectory();
 };
 
 __END_NAMESPACE

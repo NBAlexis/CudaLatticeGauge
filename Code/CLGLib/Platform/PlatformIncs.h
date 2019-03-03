@@ -11,17 +11,14 @@
 #ifndef _PLATFORMINCS_H_
 #define _PLATFORMINCS_H_
 
-#ifdef _CLG_WIN
-
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <stack>
 #include <cstdarg>
 
 #include <limits.h>
-#include <windows.h>
-#include <tchar.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
@@ -32,7 +29,10 @@
 #include <sstream>
 #include <assert.h>
 #include <time.h>
-//#include <tuple> std::ignored will not work on Cuda, because it will be called from devices
+
+#include <algorithm> //c++14
+#include <atomic> //replace interlock
+#include <chrono> //for timer
 
 #if _CLG_UNICODE
 
@@ -41,6 +41,7 @@ using OSTREAM = std::wostream;
 using OFSTREAM = std::wofstream;
 using IFSTREAM = std::wifstream;
 using ISTRINGSTREAM = std::wistringstream;
+using STDSTRING = std::wstring;
 #define COUT std::wcout
 #define CIN std::wcin
 
@@ -51,12 +52,13 @@ using OSTREAM = std::ostream;
 using OFSTREAM = std::ofstream;
 using IFSTREAM = std::ifstream;
 using ISTRINGSTREAM = std::istringstream;
+using STDSTRING = std::string;
 #define COUT std::cout
 #define CIN std::cin
 
 #endif
 
-#endif
+
 
 #endif //#ifndef _PLATFORMINCS_H_
 

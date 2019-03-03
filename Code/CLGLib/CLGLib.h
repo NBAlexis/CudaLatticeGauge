@@ -41,11 +41,9 @@
 #endif
 
 
-#if _CLG_WIN
 #include "Platform/PlatformIncs.h"
-#include "Platform/WinDefine.h"
-#include "Platform/WinFunction.h"
-#endif
+#include "Platform/PlatformDefine.h"
+#include "Tools/Data/STDStringFunctions.h"
 
 #include "Core/CudaHelperFunctions.h"
 #include "Core/CCudaBuffer.h"

@@ -51,12 +51,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Platform\WinFunction.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\WinDefine.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Timer.h">
       <Filter>Tools</Filter>
     </ClInclude>
@@ -245,13 +239,16 @@
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h">
       <Filter>Measurement\GaugeSmearing</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\PlatformDefine.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Data\STDStringFunctions.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
       <Filter>Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\WinFunction.cpp">
-      <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Core\CLGLibManager.cpp">
       <Filter>Core</Filter>
@@ -277,9 +274,6 @@
     <ClCompile Include="Measurement\CMeasurementManager.cpp">
       <Filter>Measurement</Filter>
     </ClCompile>
-    <ClCompile Include="Platform\CFileWin.cpp">
-      <Filter>Platform</Filter>
-    </ClCompile>
     <ClCompile Include="Update\Continous\CIntegratorOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
@@ -302,6 +296,9 @@
       <Filter>Update</Filter>
     </ClCompile>
     <ClCompile Include="CLGLib_Private.cpp" />
+    <ClCompile Include="Platform\CFile.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

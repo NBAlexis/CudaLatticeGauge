@@ -8,13 +8,6 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
-#define _appStrpbrk		_tcspbrk
-#define _appStrinc		_tcsinc
-#define _appStrrev		_tcsrev
-#define _appStrtol		_tcstol
-#define _appStrtod		_tcstod
-#define _appStrnicmp	_tcsnicmp
-
 __BEGIN_NAMESPACE
 
 //============================================================
@@ -36,7 +29,8 @@ CCString::CCString(const CCString& stringSrc)
     {
         assert(stringSrc.GetData() != _EmptyStringData);
         m_pchData = stringSrc.m_pchData;
-        appInterlockedIncrement(&GetData()->m_nRefs);
+        //appInterlockedIncrement(&GetData()->m_nRefs);
+        GetData()->m_nRefs++;
     }
     else
     {
@@ -97,7 +91,9 @@ CCString::~CCString()
 {
     if (GetData() != _EmptyStringData)
     {
-        if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
+        GetData()->m_nRefs--;
+        //if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
+        if (GetData()->m_nRefs <= 0)
             FreeData(GetData());
     }
 }
@@ -111,7 +107,9 @@ void CCString::Release()
     if (GetData() != _EmptyStringData)
     {
         assert(GetData()->m_nRefs != 0);
-        if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
+        GetData()->m_nRefs--;
+        //if (appInterlockedDecrement(&GetData()->m_nRefs) <= 0)
+        if (GetData()->m_nRefs <= 0)
             FreeData(GetData());
         Init();
     }
@@ -126,7 +124,9 @@ void CCString::Release(CCStringData* pData)
     if (pData != _EmptyStringData)
     {
         assert(pData->m_nRefs != 0);
-        if (appInterlockedDecrement(&pData->m_nRefs) <= 0)
+        pData->m_nRefs--;
+        //if (appInterlockedDecrement(&pData->m_nRefs) <= 0)
+        if (pData->m_nRefs <= 0)
             FreeData(pData);
     }
 }
@@ -167,7 +167,8 @@ const CCString& CCString::operator=(const CCString& stringSrc)
             Release();
             assert(stringSrc.GetData() != _EmptyStringData);
             m_pchData = stringSrc.m_pchData;
-            appInterlockedIncrement(&GetData()->m_nRefs);
+            //appInterlockedIncrement(&GetData()->m_nRefs);
+            GetData()->m_nRefs++;
         }
     }
     return *this;
@@ -344,7 +345,7 @@ void CCString::TrimLeft()
     const TCHAR* lpsz = m_pchData;
 
     while (appIsSpace(*lpsz))
-        lpsz = _appStrinc(lpsz);
+        lpsz = appStrInc(lpsz);
 
     if (lpsz != m_pchData)
     {
@@ -397,10 +398,10 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
 
     // make a guess at the maximum length of the resulting string
     INT nMaxLen = 0;
-    for (const TCHAR* lpsz = lpszFormat; *lpsz != _T('\0'); lpsz = _appStrinc(lpsz))
+    for (const TCHAR* lpsz = lpszFormat; *lpsz != _T('\0'); lpsz = appStrInc(lpsz))
     {
         // handle '%' character, but watch out for '%%'
-        if (*lpsz != _T('%') || *(lpsz = _appStrinc(lpsz)) == _T('%'))
+        if (*lpsz != _T('%') || *(lpsz = appStrInc(lpsz)) == _T('%'))
         {
             nMaxLen += (INT)appStrlen(lpsz);
             continue;
@@ -410,7 +411,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
 
         // handle '%' character with format
         INT nWidth = 0;
-        for (; *lpsz != _T('\0'); lpsz = _appStrinc(lpsz))
+        for (; *lpsz != _T('\0'); lpsz = appStrInc(lpsz))
         {
             // check for valid flags
             if (*lpsz == _T('#'))
@@ -427,9 +428,12 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
         if (nWidth == 0)
         {
             // width indicated by
-            nWidth = appStoi(lpsz);
-            for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
-                ;
+            if (appIsDigit(*lpsz))
+            {
+                nWidth = appStoI(lpsz);
+                for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = appStrInc(lpsz))
+                    ;
+            }
         }
         assert(nWidth >= 0);
 
@@ -437,18 +441,18 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
         if (*lpsz == _T('.'))
         {
             // skip past '.' separator (width.precision)
-            lpsz = _appStrinc(lpsz);
+            lpsz = appStrInc(lpsz);
 
             // get precision and skip it
             if (*lpsz == _T('*'))
             {
                 nPrecision = va_arg(argList, INT);
-                lpsz = _appStrinc(lpsz);
+                lpsz = appStrInc(lpsz);
             }
             else
             {
-                nPrecision = appStoi(lpsz);
-                for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = _appStrinc(lpsz))
+                nPrecision = appStoI(lpsz);
+                for (; *lpsz != _T('\0') && appIsDigit(*lpsz); lpsz = appStrInc(lpsz))
                     ;
             }
             assert(nPrecision >= 0);
@@ -500,7 +504,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
             case _T('o'):
                 va_arg(argList, INT);
                 nItemLen = 32;
-                nItemLen = max(nItemLen, nWidth+nPrecision);
+                nItemLen = appMax(nItemLen, nWidth+nPrecision);
                 break;
 
             case _T('e'):
@@ -679,7 +683,7 @@ INT CCString::Replace(TCHAR chOld, TCHAR chNew)
                 *psz = chNew;
                 ++nCount;
             }
-            psz = _appStrinc(psz);
+            psz = appStrInc(psz);
         }
     }
     return nCount;
@@ -709,7 +713,7 @@ INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
             ++nCount;
             lpszStart = lpszTarget + nSourceLen;
         }
-        lpszStart += lstrlen(lpszStart) + 1; //appStrlen different from lstrlen?
+        lpszStart += appStrlen(lpszStart) + 1; //appStrlen different from lstrlen?
     }
 
     // if any changes were made, make them
@@ -746,7 +750,7 @@ INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
                 lpszStart[nBalance] = _T('\0');
                 nOldLength += (nReplacementLen - nSourceLen);
             }
-            lpszStart += lstrlen(lpszStart) + 1; //appStrlen different from lstrlen?
+            lpszStart += appStrlen(lpszStart) + 1; //appStrlen different from lstrlen?
         }
         assert(m_pchData[nNewLength] == _T('\0'));
         GetData()->m_nDataLength = nNewLength;
@@ -772,9 +776,9 @@ INT CCString::Remove(TCHAR chRemove)
         if (*pstrSource != chRemove)
         {
             *pstrDest = *pstrSource;
-            pstrDest = _appStrinc(pstrDest);
+            pstrDest = appStrInc(pstrDest);
         }
-        pstrSource = _appStrinc(pstrSource);
+        pstrSource = appStrInc(pstrSource);
     }
     *pstrDest = _T('\0');
     INT nCount = (INT)(pstrSource - pstrDest);

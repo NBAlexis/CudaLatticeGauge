@@ -28,7 +28,6 @@
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
     <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
-    <ClCompile Include="Tests\TestGaugeSmearing.cpp" />
     <ClCompile Include="Tests\TestOperators.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
@@ -125,6 +124,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions);DEBUG=1</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGTest.h</PrecompiledHeaderFile>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -138,7 +138,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);DEBUG=1</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGTest.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
@@ -165,6 +165,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGTest.h</PrecompiledHeaderFile>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -188,7 +189,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CLGTest.h</PrecompiledHeaderFile>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>

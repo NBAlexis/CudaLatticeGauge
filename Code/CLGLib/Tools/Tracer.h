@@ -170,7 +170,7 @@ extern CLGAPI void appDetailed(const TCHAR *format, ...);
 extern CLGAPI void appParanoiac(const TCHAR *format, ...);
 
 #ifdef _CLG_DEBUG
-#   define appCrucial(...) {char ___msg[1024];appSprintf(___msg, sizeof(___msg), __VA_ARGS__);_appCrucial(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, ___msg);}
+#   define appCrucial(...) {char ___msg[1024];appSprintf(___msg, 1024, __VA_ARGS__);_appCrucial(_T("%s(%d): Error: %s\n"), _T(__FILE__), __LINE__, ___msg);}
 #else
 #   define appCrucial(...) {_appCrucial(__VA_ARGS__);}
 #endif

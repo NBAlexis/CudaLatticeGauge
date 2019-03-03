@@ -70,7 +70,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 #else
 
     Real fExpected = F(0.625);
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+    sParam.FetchValueReal(_T("ExpectedResR"), fExpected);
     appGetLattice()->m_pUpdator->Update(20, FALSE);
     appGetLattice()->m_pUpdator->Update(50, TRUE);
 
