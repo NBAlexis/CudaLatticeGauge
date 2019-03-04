@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CActionGaugePlaquette)
+
 class CLGAPI CActionGaugePlaquette : public CAction
 {
     __CLGDECLARE_CLASS(CActionGaugePlaquette)

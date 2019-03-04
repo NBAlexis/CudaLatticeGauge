@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CGaugeSmearingAPEStout)
+
 class CLGAPI CGaugeSmearingAPEStout : public CGaugeSmearing
 {
     __CLGDECLARE_CLASS(CGaugeSmearingAPEStout)

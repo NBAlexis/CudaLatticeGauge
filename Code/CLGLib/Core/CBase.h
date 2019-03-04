@@ -48,9 +48,22 @@ virtual CField* GetCopy() const \
 } \
 protected:
 
+//In Ubuntu, we are using static-link, see the problem at
+//https://stackoverflow.com/questions/4767925/how-to-force-gcc-to-link-unreferenced-static-c-objects-from-a-library
+//Tested that, the helper must be outside of the class
+
 
 #define __CLGIMPLEMENT_CLASS(class_name) \
+    class_name##helper::class_name##helper() {} \
     __DLL_EXPORT class_name::class##class_name class_name::m_StaticClass;
+
+
+#define __CLG_REGISTER_HELPER_HEADER(class_name) \
+struct class_name##helper \
+{ \
+    class_name##helper(); \
+}; \
+static class_name##helper s_##class_name##helper; 
 
 
 __BEGIN_NAMESPACE

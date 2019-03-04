@@ -25,6 +25,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU3)
+
 class CLGAPI CFieldGaugeSU3 : public CFieldGauge
 {
     __CLGDECLARE_FIELD(CFieldGaugeSU3)

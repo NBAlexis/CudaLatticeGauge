@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CMeasureMesonCorrelator)
+
 class CLGAPI CMeasureMesonCorrelator : public CMeasure
 {
     __CLGDECLARE_CLASS(CMeasureMesonCorrelator)

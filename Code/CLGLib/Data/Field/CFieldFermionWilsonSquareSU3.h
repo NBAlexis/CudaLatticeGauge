@@ -16,6 +16,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionWilsonSquareSU3)
+
 class CLGAPI CFieldFermionWilsonSquareSU3 : public CFieldFermion
 {
     __CLGDECLARE_FIELD(CFieldFermionWilsonSquareSU3)

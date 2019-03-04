@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CSLASolverBiCGStab)
+
 class CLGAPI CSLASolverBiCGStab : public CSLASolver
 {
     __CLGDECLARE_CLASS(CSLASolverBiCGStab)

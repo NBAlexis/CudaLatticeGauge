@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CIntegratorLeapFrog)
+
 class CLGAPI CIntegratorLeapFrog : public CIntegrator
 {
     __CLGDECLARE_CLASS(CIntegratorLeapFrog)

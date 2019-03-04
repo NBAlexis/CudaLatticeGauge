@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CMeasurePlaqutteEnergy)
+
 class CLGAPI CMeasurePlaqutteEnergy : public CMeasure
 {
     __CLGDECLARE_CLASS(CMeasurePlaqutteEnergy)

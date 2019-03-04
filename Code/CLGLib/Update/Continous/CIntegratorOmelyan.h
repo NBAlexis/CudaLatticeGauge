@@ -18,6 +18,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CIntegratorOmelyan)
+
 class CLGAPI CIntegratorOmelyan : public CIntegrator
 {
     __CLGDECLARE_CLASS(CIntegratorOmelyan)

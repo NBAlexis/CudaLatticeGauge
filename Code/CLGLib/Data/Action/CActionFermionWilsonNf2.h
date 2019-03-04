@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CActionFermionWilsonNf2)
+
 class CLGAPI CActionFermionWilsonNf2 : public CAction
 {
     __CLGDECLARE_CLASS(CActionFermionWilsonNf2)

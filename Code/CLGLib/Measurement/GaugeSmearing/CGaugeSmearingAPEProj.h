@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CGaugeSmearingAPEProj)
+
 class CLGAPI CGaugeSmearingAPEProj : public CGaugeSmearing
 {
     __CLGDECLARE_CLASS(CGaugeSmearingAPEProj)
