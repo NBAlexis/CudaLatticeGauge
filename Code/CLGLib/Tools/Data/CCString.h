@@ -175,6 +175,15 @@ protected:
         GetData()->m_nDataLength = nSrcLen;
         m_pchData[nSrcLen] = _T('\0');
     }
+
+    /**
+    * The buffer is going to change.
+    * There might be multiple CCString instance pointing to a same string buffer
+    * Therefor, copy it, so it will not affect other strings.
+    * For example, a="X", b=a; 
+    * when doing a.MakeLower(), 
+    * if not copy the buffer, a and b will become "x" at the same time
+    */
     void CopyBeforeWrite()
     {
         if (GetData()->m_nRefs > 1)
@@ -364,14 +373,12 @@ public:
     void MakeUpper()
     {
         CopyBeforeWrite();
-        //appStrupr(m_pchData, appStrlen(m_pchData));
-        m_pchData = const_cast<TCHAR*>(appStrupr(m_pchData));
+        appStrupr(m_pchData, GetLength() + 1, m_pchData);
     }
     void MakeLower()
     {
         CopyBeforeWrite();
-        //appStrlwr(m_pchData, appStrlen(m_pchData));
-        m_pchData = const_cast<TCHAR*>(appStrlwr(m_pchData));
+        appStrlwr(m_pchData, GetLength() + 1, m_pchData);
     }
     void MakeReverse()
     {

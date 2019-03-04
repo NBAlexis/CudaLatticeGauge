@@ -80,7 +80,6 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
 #endif
     appSetupLog(params);
-    appGeneral("123 %d\n", 456);
     
     TArray<TestList*> allTests;
     THashMap<CCString, TArray<TestList*>*> category;
@@ -118,6 +117,7 @@ int main(int argc, char * argv[])
         CCString sRes(name.c_str());
         INT number = appStrToINT(sRes);
         UBOOL bExcuted = FALSE;
+        sRes.MakeLower();
         if (sRes == _T("q"))
         {
             break;
@@ -169,6 +169,11 @@ int main(int argc, char * argv[])
             }
             bExcuted = TRUE;
         }
+        else if (sRes == _T("class"))
+        {
+            GClassGather.TraceAllClass();
+            appGeneral(_T("\n================================\n"));
+        }
         else
         {
             TArray<CCString> keys = category.GetAllKeys();
@@ -176,6 +181,7 @@ int main(int argc, char * argv[])
             {
                 CCString sInput = sRes;
                 CCString sKey = keys[i];
+                sKey.MakeLower();
                 if (sInput == sKey)
                 {
                     CTimer timer;

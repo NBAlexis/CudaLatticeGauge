@@ -127,23 +127,28 @@ inline DOUBLE appStoD(const TCHAR* str)
     }
 }
 
-inline const TCHAR* appStrupr(const TCHAR* s)
+inline void appStrupr(TCHAR* buff, size_t bufferL, const TCHAR* s)
 {
     STDSTRING str(s);
     std::transform(str.begin(), str.end(), str.begin(), appToUpper);
-    return str.c_str();
+    appStrcpy(buff, bufferL, str.c_str());
 }
 
-inline const TCHAR* appStrlwr(const TCHAR* s)
+inline void appStrlwr(TCHAR* buff, size_t bufferL, const TCHAR* s)
 {
     STDSTRING str(s);
     std::transform(str.begin(), str.end(), str.begin(), appToLower);
-    return str.c_str();
+    appStrcpy(buff, bufferL, str.c_str());
 }
 
 inline INT appStricmp(const TCHAR* a, const TCHAR* b)
 {
-    return appStrcmp(appStrupr(a), appStrupr(b));
+    STDSTRING stra(a);
+    std::transform(stra.begin(), stra.end(), stra.begin(), appToUpper);
+    STDSTRING strb(b);
+    std::transform(strb.begin(), strb.end(), strb.begin(), appToUpper);
+
+    return appStrcmp(stra.c_str(), strb.c_str());
 }
 
 inline TCHAR* appStrInc(const TCHAR* a)

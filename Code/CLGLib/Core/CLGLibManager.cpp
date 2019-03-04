@@ -474,7 +474,7 @@ void CCLGLibManager::CreateUpdator(class CParameters& params)
 
         if (NULL == pHMC || NULL == integrator)
         {
-            appCrucial(_T("HMC need a integrator!, but s = %s"), sValues.c_str());
+            appCrucial(_T("HMC need a integrator!, but s = %s\n"), sValues.c_str());
             _FAIL_EXIT;
         }
 

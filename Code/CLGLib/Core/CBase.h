@@ -108,7 +108,7 @@ public:
         ClassList * CurrentList = m_pClasses;
         for (; CurrentList; CurrentList = CurrentList->m_pNext)
         {
-            printf(_T("==we have class: %s"), CurrentList->GetName());
+            appGeneral(_T("==we have class: %s\n"), CurrentList->GetName());
         }
     }
 

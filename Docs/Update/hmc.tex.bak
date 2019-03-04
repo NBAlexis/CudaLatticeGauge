@@ -353,7 +353,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
             \EndIf
         \EndIf
         \State ${\bf t}=A{\bf s}$
-        \State $\omega = |{\bf t}^*\cdot {\bf s}|/\|{\bf t}\|$
+        \State $\omega = {\bf s}^*\cdot {\bf t}/\|{\bf t}\|$
         \State ${\bf r}={\bf s}-\omega {\bf t}$
         \State ${\bf x}={\bf x}+\alpha {\bf p}+\omega {\bf s}$
         \State $\rho _p=\rho$
@@ -361,7 +361,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
     \EndFor
 \EndFor
 \end{algorithmic}
-\caption{\label{alg.BiCGStab}BiCGStab}
+\caption{\label{alg.BiCGStab}BiCGStab, note that, the numbers are \textbf{complex} number.}
 \end{algorithm}
 
 \subsubsection{\label{sec:Leap frog}\index{leap frog}Leap frog integrator}
@@ -451,12 +451,14 @@ Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one t
 
 \subsubsection{\label{sec:MultiStepUpdator}Multi-Step Updator}
 
+It is implemented. It's said that the force of pseudo-fermion is significantly smaller, therefor no need to update as frequently as the gauge force.
+
 \subsubsection{\label{sec:CachedSolution}Cached solution}
 
 The pseudo fermion field is generate only once for a trajectory and is not changed. Also, the gauge field is changing slowly in one trajectory, this make the solutions for ${\bf x}_1=D^{-1}{\bf b}$ or ${\bf x}_2=\left(DD^{\dagger}\right)^{-1}{\bf b}$, where $D$ depends on $U$ and ${\bf b}$ is the pseudo fermion field, only change slowly.
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
 
-
+\subsubsection{\label{sec:CachedSolution}Cached solution}
 
 
