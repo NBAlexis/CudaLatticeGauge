@@ -79,6 +79,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegrator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorLeapFrog.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedOmelyan.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
@@ -95,6 +98,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedOmelyan.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/CLGLib_Private.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CLGLibManager.cpp
