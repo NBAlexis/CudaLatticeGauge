@@ -67,6 +67,10 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         if (m_bMetropolis)
         {
             Real fDiff = fEnergy - fEnergyNew;
+            if (m_bTestHDiff)
+            {
+                m_lstHDiff.AddItem(fDiff);
+            }
             //Metropolis
             appDetailed(_T(" HMC: step = %d, H_dff = %f\n"),
                 i + 1, 

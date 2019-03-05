@@ -29,26 +29,43 @@ UINT TestUpdator(CParameters& sParam)
     //pAction->SetBeta(F(3.0));
 
     //Equilibration
-    appGetLattice()->m_pUpdator->Update(5, FALSE);
+    appGetLattice()->m_pUpdator->Update(10, FALSE);
 
     //Measure
     pMeasure->Reset();
-    appGetLattice()->m_pUpdator->Update(20, TRUE);
+    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
+    appGetLattice()->m_pUpdator->Update(40, TRUE);
 
     Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
-
+    UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.005))
     {
-        return 1;
+        ++uiError;
     }
 
-    return 0;
+    UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.01\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+
+    if (uiAccept < 45)
+    {
+        ++uiError;
+    }
+
+    if (fHDiff > F(0.01))
+    {
+        ++uiError;
+    }
+
+    return uiError;
 }
 
 __REGIST_TEST(TestUpdator, Updator, TestUpdatorLeapFrog);
 
 __REGIST_TEST(TestUpdator, Updator, TestUpdatorOmelyan);
+
+__REGIST_TEST(TestUpdator, Updator, TestUpdatorForceGradient);
 
 
 //=============================================================================

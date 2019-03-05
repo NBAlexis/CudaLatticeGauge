@@ -26,7 +26,7 @@ class CLGAPI CUpdator : public CBase
 {
 public:
 
-    CUpdator() : m_pOwner(NULL), m_uiUpdateCall(0), m_bSaveConfigurations(FALSE) { ; }
+    CUpdator() : m_pOwner(NULL), m_uiUpdateCall(0), m_bSaveConfigurations(FALSE), m_bTestHDiff(FALSE) { ; }
     virtual UINT Update(UINT iSteps, UBOOL bMeasure) = 0;
     virtual Real CalculateEnergy() = 0;
 
@@ -41,12 +41,34 @@ public:
     void OnConfigurationAccepted();
     void SaveConfiguration(UINT uiUpdateStep);
 
+    void SetTestHdiff(UBOOL bTestHDiff) 
+    {
+        m_bTestHDiff = bTestHDiff;
+    }
+
+    Real GetHDiff() const
+    {
+        if (0 == m_lstHDiff.Num())
+        {
+            return F(0.0);
+        }
+
+        Real fAdd = F(0.0);
+        for (INT i = 0; i < m_lstHDiff.Num(); ++i)
+        {
+            fAdd += (m_lstHDiff[i] * m_lstHDiff[i]);
+        }
+        return fAdd / m_lstHDiff.Num();
+    }
+
 protected:
 
     UINT m_uiUpdateCall;
     UINT m_iAcceptedConfigurationCount;
     UBOOL m_bSaveConfigurations;
     CCString m_sConfigurationPrefix;
+    UBOOL m_bTestHDiff;
+    TArray<Real> m_lstHDiff;
 };
 
 __END_NAMESPACE

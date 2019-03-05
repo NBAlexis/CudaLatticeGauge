@@ -82,11 +82,13 @@
     <ClInclude Include="Tools\Timer.h" />
     <ClInclude Include="Update\Continous\CHMC.h" />
     <ClInclude Include="Update\Continous\CIntegrator.h" />
+    <ClInclude Include="Update\Continous\CIntegratorForceGradient.h" />
     <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
     <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\CUpdator.cpp" />
     <ClCompile Include="CLGLib_Private.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

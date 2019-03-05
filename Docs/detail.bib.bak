@@ -106,6 +106,40 @@
       eprint         = "1702.01361"
 }
 
+@article{forcegradient1,
+      author         = "A. D. Kennedy, M. A. Clark, P. J. Silva",
+      title          = "{Force Gradient Integrators}",
+      year           = "2009",
+      journal        = "PoS LAT",
+      volume         = "2009",
+      pages          = "021",
+      eprint         = "0910.2950"
+}
+
+@article{forcegradient2,
+      author         = "Hantao Yin, Robert D. Mawhinney",
+      title          = "{Improving DWF Simulations: the Force Gradient Integrator and the M$\rm \ddot{o}$bius Accelerated DWF Solver}",
+      year           = "2011",
+      journal        = "PoS LAT",
+      volume         = "2011",
+      pages          = "051",
+      eprint         = "1111.5059"
+}
+
+@article{forcegradient2,
+      author         = "Hantao Yin, Robert D. Mawhinney",
+      title          = "{Improving DWF Simulations: the Force Gradient Integrator and the M$\rm \ddot{o}$bius Accelerated DWF Solver}",
+      year           = "2011",
+      journal        = "PoS LAT",
+      volume         = "2011",
+      pages          = "051",
+      eprint         = "1111.5059"
+}
+
+%======================================================================================
+%End
+%======================================================================================
+
 %Classical
 @article{Z2GaugeStart,
       author         = "Franz J. Wegner",

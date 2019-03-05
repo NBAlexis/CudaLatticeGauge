@@ -129,7 +129,7 @@ Defined by Newton, $dp/dt$ is a force, so $\dot{P}$ is called `force'. See Eqs.~
 \end{equation}
 \textbf{Note that $S_G\neq \sum _{\mu,n} S_G[U_{\mu}(n)]$. $S_G[U_{\mu}(n)]$ is convenient for derivate which collecting all terms related to the specified bond. For plaquettes with 4 edges, $S_G=\frac{1}{4} \sum _{\mu,n} S_G[U_{\mu}(n)]$. }
 
-$S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'. The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
+$S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`staple'(see Eq.~(\ref{eq.plaqutteEnergy.staple})). The staple for $U_{\mu}(n)$ is independent of $U_{\mu}(n)$, denoting
 \begin{equation}
 \begin{split}
 &U_{\mu}(n)=\exp \left(i \sum _a\omega _a(\mu,n) T_a\right)U_{\mu}^0(n)
@@ -334,6 +334,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
     \Comment {Restart $r$ times}
     \State ${\bf r}_h={\bf r}$
     \For{$j=0$ to $itera$}
+        \State $\rho = {\bf r}_h^* \cdot {\bf r}_j$
         \If {$j=0$}
             \State ${\bf p}={\bf r}$
         \Else
@@ -352,7 +353,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
             \EndIf
         \EndIf
         \State ${\bf t}=A{\bf s}$
-        \State $\omega = |{\bf t}^*\cdot {\bf s}|/\|{\bf t}\|$
+        \State $\omega = {\bf s}^*\cdot {\bf t}/\|{\bf t}\|$
         \State ${\bf r}={\bf s}-\omega {\bf t}$
         \State ${\bf x}={\bf x}+\alpha {\bf p}+\omega {\bf s}$
         \State $\rho _p=\rho$
@@ -360,7 +361,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
     \EndFor
 \EndFor
 \end{algorithmic}
-\caption{\label{alg.BiCGStab}BiCGStab}
+\caption{\label{alg.BiCGStab}BiCGStab, note that, the numbers are \textbf{complex} number.}
 \end{algorithm}
 
 \subsubsection{\label{sec:Leap frog}\index{leap frog}Leap frog integrator}
@@ -448,7 +449,13 @@ In practical, the $\lambda$ is a tunable parameter, and usually, $2\lambda = 0.3
 
 Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one trajectory, it is $1.5$ time faster~\cite{latticeqcdreview2009}, implying the number of sub-step needed is about $1/3$ of leap-frog.
 
+\subsubsection{\label{sec:OmelyanForceGradient}\index{force-gradient integrator}Omelyan force-gradient integrator}
+
+
+
 \subsubsection{\label{sec:MultiStepUpdator}Multi-Step Updator}
+
+
 
 \subsubsection{\label{sec:CachedSolution}Cached solution}
 
@@ -456,8 +463,6 @@ The pseudo fermion field is generate only once for a trajectory and is not chang
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
 
-\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
+\subsubsection{\label{sec:Z4_fermion}Z4 pseudo fermion}
 
-In HMC with fermions, the computer power is consumed mainly in solving the $D^{-1}$. The small eigenvalues of the $D$ operator is the main reason to slow down the solver, which is the so called \index{low mode}\textbf{low mode} or \index{exceptional configurations}\textbf{exceptional configurations}.
 
-Gauge smearing (gauge smoothing) is one of the method to 

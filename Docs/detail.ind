@@ -1,7 +1,7 @@
 \begin{theindex}
 
-  \item APE smearing, \hyperpage{17}
-  \item APE stout, \hyperpage{18}
+  \item APE smearing, \hyperpage{31}
+  \item APE stout, \hyperpage{32}
 
   \indexspace
 
@@ -14,19 +14,20 @@
   \indexspace
 
   \item equilibrium, \hyperpage{16}
-  \item exceptional configurations, \hyperpage{17}
-  \item extend sources, \hyperpage{31}
+  \item exceptional configurations, \hyperpage{31}
+  \item extend sources, \hyperpage{32}
 
   \indexspace
 
   \item fat index, \hyperpage{4}
   \item force, \hyperpage{8}
+  \item force-gradient integrator, \hyperpage{17}
 
   \indexspace
 
-  \item gauge fixing, \hyperpage{31}
-  \item gauge smearing, \hyperpage{17}
-  \item gauge smoothing, \hyperpage{17}
+  \item gauge fixing, \hyperpage{32}
+  \item gauge smearing, \hyperpage{31}
+  \item gauge smoothing, \hyperpage{31}
   \item GCR, \hyperpage{23}
   \item GMRES, \hyperpage{19}
 
@@ -47,7 +48,7 @@
   \item Langevin equation, \hyperpage{7}
   \item leap frog, \hyperpage{15}
   \item link index, \hyperpage{4}
-  \item low mode, \hyperpage{17}
+  \item low mode, \hyperpage{31}
 
   \indexspace
 
@@ -74,7 +75,7 @@
   \item site index, \hyperpage{4}
   \item solver, \hyperpage{13}, \hyperpage{19}
   \item source, \hyperpage{28}
-  \item staple, \hyperpage{9}, \hyperpage{17}
-  \item stout, \hyperpage{18}
+  \item staple, \hyperpage{9}, \hyperpage{32}
+  \item stout, \hyperpage{32}
 
 \end{theindex}

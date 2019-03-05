@@ -59,7 +59,7 @@ protected:
 
 
 #define __CLG_REGISTER_HELPER_HEADER(class_name) \
-struct class_name##helper \
+struct CLGAPI class_name##helper \
 { \
     class_name##helper(); \
 }; \

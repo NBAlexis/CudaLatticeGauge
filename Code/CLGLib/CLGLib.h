@@ -130,6 +130,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Update/Continous/CIntegrator.h"
 #include "Update/Continous/CIntegratorLeapFrog.h"
 #include "Update/Continous/CIntegratorOmelyan.h"
+#include "Update/Continous/CIntegratorForceGradient.h"
 #include "Update/Continous/CHMC.h"
 
 #include "Core/CLGLibManager.h"

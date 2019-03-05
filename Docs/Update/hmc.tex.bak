@@ -449,9 +449,39 @@ In practical, the $\lambda$ is a tunable parameter, and usually, $2\lambda = 0.3
 
 Usually, for each sub-step, it is $2$ times slower then leap-frog, and for one trajectory, it is $1.5$ time faster~\cite{latticeqcdreview2009}, implying the number of sub-step needed is about $1/3$ of leap-frog.
 
+\subsubsection{\label{sec:OmelyanForceGradient}\index{force-gradient integrator}Omelyan force-gradient integrator}
+
+Start from the approximation
+\begin{equation}
+\begin{split}
+&\log\left(\exp(\frac{\epsilon S}{6})\exp(\frac{\epsilon T}{2})\exp\left(\frac{2}{3}\epsilon S+\frac{\epsilon^3}{72}[S,[S,T]]\right)\exp(\frac{\epsilon T}{2})\exp(\frac{\epsilon S}{6})\right)=S+T+\mathcal{O}(\epsilon ^4)+\mathcal{O}(\epsilon ^6)\\
+\end{split}
+\end{equation}
+with~\cite{forcegradient1}
+\begin{equation}
+\begin{split}
+&\mathcal{O}(\epsilon^4)\sim 10^{-4}\epsilon^4
+\end{split}
+\end{equation}
+
+The other 4 steps are the usual ones, except for $\exp\left(\frac{2}{3}\epsilon S+\frac{\epsilon^3}{72}[S,[S,T]]\right)$ which correspond to
+\begin{equation}
+\begin{split}
+&\omega_i\to \omega_i-\frac{2}{3}\tau \frac{\partial }{\partial \omega _i}S+\frac{1}{36}\tau ^3 \sum _j \left(\frac{\partial }{\partial \omega _j}S\right)\frac{\partial }{\partial \omega _j}\frac{\partial }{\partial \omega _i}S\\
+&p_i=\sum _a \omega ^a_iT^a\\
+\end{split}
+\end{equation}
+Use the approximation~\cite{forcegradient2}
+\begin{equation}
+\begin{split}
+&\frac{2}{3}\tau \frac{\partial }{\partial \omega _i}S-\frac{1}{36}\tau ^3 \sum _j \left(\frac{\partial }{\partial \omega _j}S\right)\frac{\partial }{\partial \omega _j}\frac{\partial }{\partial \omega _i}S\\
+&=\frac{2}{3}\tau \exp\left(-\frac{1}{24}\tau ^2 \left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)\frac{\partial}{\partial _i}S+\mathcal{O}(\tau ^5)\\
+\end{split}
+\end{equation}
+
 \subsubsection{\label{sec:MultiStepUpdator}Multi-Step Updator}
 
-It is implemented. It's said that the force of pseudo-fermion is significantly smaller, therefor no need to update as frequently as the gauge force.
+
 
 \subsubsection{\label{sec:CachedSolution}Cached solution}
 
@@ -459,6 +489,6 @@ The pseudo fermion field is generate only once for a trajectory and is not chang
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
 
-\subsubsection{\label{sec:CachedSolution}Cached solution}
+\subsubsection{\label{sec:Z4_fermion}Z4 pseudo fermion}
 
 

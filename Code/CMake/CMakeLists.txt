@@ -5,11 +5,9 @@ project(CLG LANGUAGES CXX CUDA)
 set(CMAKE_GENERATOR_PLATFORM x64)
 
 # We start from CMAKE_SOURCE_DIR which should be /Code/CMake
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
-set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR})
-set(CMAKE_CURRENT_BINARY_DIR  ${CMAKE_BINARY_DIR})
-
+set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
+set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 # This is our code file dir
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 add_definitions(-D_UBUNTU)
@@ -79,6 +77,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Timer.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CHMC.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegrator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorLeapFrog.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
@@ -95,6 +94,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/CLGLib_Private.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CLGLibManager.cpp

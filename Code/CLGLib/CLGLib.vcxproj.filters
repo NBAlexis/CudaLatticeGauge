@@ -245,6 +245,9 @@
     <ClInclude Include="Tools\Data\STDStringFunctions.h">
       <Filter>Tools\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorForceGradient.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -298,6 +301,9 @@
     <ClCompile Include="CLGLib_Private.cpp" />
     <ClCompile Include="Platform\CFile.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp">
+      <Filter>Update\Continous</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

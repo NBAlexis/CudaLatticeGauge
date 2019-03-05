@@ -48,6 +48,24 @@ Martin~L$\rm \ddot{u}$scher.
   HMC algorithm for two-flavor lattice QCD}}.
 \newblock {\em Computer Physics Communications}, 165:199--220, 2005.
 
+\bibitem{forcegradient1}
+P.~J.~Silva A.~D.~Kennedy, M. A.~Clark.
+\newblock \href{http://arxiv.org/abs/0910.2950}{{Force Gradient Integrators}}.
+\newblock {\em PoS LAT}, 2009:021, 2009, arXiv:0910.2950.
+
+\bibitem{forcegradient2}
+Robert D.~Mawhinney Hantao~Yin.
+\newblock \href{http://arxiv.org/abs/1111.5059}{{Improving DWF Simulations: the
+  Force Gradient Integrator and the M$\rm \ddot{o}$bius Accelerated DWF
+  Solver}}.
+\newblock {\em PoS LAT}, 2011:051, 2011, arXiv:1111.5059.
+
+\bibitem{forcegradient3}
+Dmitry~Shcherbakov et. al.
+\newblock \href{http://arxiv.org/abs/1512.03812}{{Adapted nested force-gradient
+  integrators: the Schwinger model case}}.
+\newblock 2015, arXiv:1512.03812.
+
 \bibitem{templates}
 R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,
   V.~Eijkhout, R.~Pozo, C.~Romine, and H.~Van der Vorst.
