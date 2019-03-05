@@ -16,30 +16,30 @@
 \contentsline {subsection}{\numberline {2.2}Optimization of HMC}{16}{subsection.2.2}
 \contentsline {subsubsection}{\numberline {2.2.1}Omelyan integrator}{16}{subsubsection.2.2.1}
 \contentsline {subsubsection}{\numberline {2.2.2}Omelyan force-gradient integrator}{17}{subsubsection.2.2.2}
-\contentsline {subsubsection}{\numberline {2.2.3}Multi-Step Updator}{18}{subsubsection.2.2.3}
-\contentsline {subsubsection}{\numberline {2.2.4}Cached solution}{18}{subsubsection.2.2.4}
-\contentsline {subsubsection}{\numberline {2.2.5}Z4 pseudo fermion}{18}{subsubsection.2.2.5}
-\contentsline {section}{\numberline {3}Sparse linear algebra solver}{19}{section.3}
-\contentsline {subsection}{\numberline {3.1}Krylov subspace}{19}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}GMRES}{19}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}GCR}{23}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}BiCGStab}{25}{subsection.3.4}
-\contentsline {section}{\numberline {4}Measurement}{26}{section.4}
-\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{26}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Meson Correlator}{26}{subsection.4.2}
-\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{26}{subsubsection.4.2.1}
-\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{26}{subsubsection.4.2.2}
-\contentsline {subsubsection}{\numberline {4.2.3}Sources}{28}{subsubsection.4.2.3}
-\contentsline {subsubsection}{\numberline {4.2.4}Gauge smearing}{31}{subsubsection.4.2.4}
-\contentsline {subsection}{\numberline {4.3}Extend sources and gauge fixing}{32}{subsection.4.3}
-\contentsline {subsubsection}{\numberline {4.3.1}Extend sources}{32}{subsubsection.4.3.1}
-\contentsline {subsubsection}{\numberline {4.3.2}Gauge fixing}{32}{subsubsection.4.3.2}
-\contentsline {section}{\numberline {5}Programming}{33}{section.5}
-\contentsline {subsection}{\numberline {5.1}cuda}{33}{subsection.5.1}
-\contentsline {subsubsection}{\numberline {5.1.1}blocks and threads}{33}{subsubsection.5.1.1}
-\contentsline {subsubsection}{\numberline {5.1.2}device member function}{33}{subsubsection.5.1.2}
-\contentsline {subsubsection}{\numberline {5.1.3}device virtual member function}{36}{subsubsection.5.1.3}
-\contentsline {section}{\numberline {6}Testing}{39}{section.6}
-\contentsline {subsection}{\numberline {6.1}random number}{39}{subsection.6.1}
-\contentsline {section}{\numberline {7}Applications}{40}{section.7}
-\contentsline {subsection}{\numberline {7.1}Sample Producer}{40}{subsection.7.1}
+\contentsline {subsubsection}{\numberline {2.2.3}Multi-rate integrator (nested integrator)}{18}{subsubsection.2.2.3}
+\contentsline {subsubsection}{\numberline {2.2.4}Cached solution}{19}{subsubsection.2.2.4}
+\contentsline {subsubsection}{\numberline {2.2.5}Z4 pseudo fermion}{19}{subsubsection.2.2.5}
+\contentsline {section}{\numberline {3}Sparse linear algebra solver}{20}{section.3}
+\contentsline {subsection}{\numberline {3.1}Krylov subspace}{20}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}GMRES}{20}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}GCR}{24}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}BiCGStab}{26}{subsection.3.4}
+\contentsline {section}{\numberline {4}Measurement}{27}{section.4}
+\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{27}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Meson Correlator}{27}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{27}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{27}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Sources}{29}{subsubsection.4.2.3}
+\contentsline {subsubsection}{\numberline {4.2.4}Gauge smearing}{32}{subsubsection.4.2.4}
+\contentsline {subsection}{\numberline {4.3}Extend sources and gauge fixing}{33}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Extend sources}{33}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Gauge fixing}{33}{subsubsection.4.3.2}
+\contentsline {section}{\numberline {5}Programming}{34}{section.5}
+\contentsline {subsection}{\numberline {5.1}cuda}{34}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}blocks and threads}{34}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}device member function}{34}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}device virtual member function}{37}{subsubsection.5.1.3}
+\contentsline {section}{\numberline {6}Testing}{40}{section.6}
+\contentsline {subsection}{\numberline {6.1}random number}{40}{subsection.6.1}
+\contentsline {section}{\numberline {7}Applications}{41}{section.7}
+\contentsline {subsection}{\numberline {7.1}Sample Producer}{41}{subsection.7.1}

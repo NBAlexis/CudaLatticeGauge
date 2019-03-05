@@ -15,26 +15,28 @@
 \indexentry{equilibrium|hyperpage}{16}
 \indexentry{Omelyan|hyperpage}{16}
 \indexentry{force-gradient integrator|hyperpage}{17}
-\indexentry{solver|hyperpage}{19}
-\indexentry{Krylov subspace|hyperpage}{19}
-\indexentry{GMRES|hyperpage}{19}
-\indexentry{GCR|hyperpage}{23}
-\indexentry{BiCGStab|hyperpage}{25}
-\indexentry{plaquette energy|hyperpage}{26}
-\indexentry{meson|hyperpage}{26}
-\indexentry{correlator|hyperpage}{26}
-\indexentry{source|hyperpage}{28}
-\indexentry{point source|hyperpage}{28}
-\indexentry{pseudofermions|hyperpage}{29}
+\indexentry{multi-rate integrator|hyperpage}{18}
+\indexentry{nested integrator|hyperpage}{18}
+\indexentry{solver|hyperpage}{20}
+\indexentry{Krylov subspace|hyperpage}{20}
+\indexentry{GMRES|hyperpage}{20}
+\indexentry{GCR|hyperpage}{24}
+\indexentry{BiCGStab|hyperpage}{26}
+\indexentry{plaquette energy|hyperpage}{27}
+\indexentry{meson|hyperpage}{27}
+\indexentry{correlator|hyperpage}{27}
+\indexentry{source|hyperpage}{29}
 \indexentry{point source|hyperpage}{29}
-\indexentry{reciprocal space|hyperpage}{29}
-\indexentry{gauge smearing|hyperpage}{31}
-\indexentry{low mode|hyperpage}{31}
-\indexentry{exceptional configurations|hyperpage}{31}
-\indexentry{gauge smoothing|hyperpage}{31}
-\indexentry{APE smearing|hyperpage}{31}
-\indexentry{staple|hyperpage}{32}
-\indexentry{stout|hyperpage}{32}
-\indexentry{APE stout|hyperpage}{32}
-\indexentry{gauge fixing|hyperpage}{32}
-\indexentry{extend sources|hyperpage}{32}
+\indexentry{pseudofermions|hyperpage}{30}
+\indexentry{point source|hyperpage}{30}
+\indexentry{reciprocal space|hyperpage}{30}
+\indexentry{gauge smearing|hyperpage}{32}
+\indexentry{low mode|hyperpage}{32}
+\indexentry{exceptional configurations|hyperpage}{32}
+\indexentry{gauge smoothing|hyperpage}{32}
+\indexentry{APE smearing|hyperpage}{32}
+\indexentry{staple|hyperpage}{33}
+\indexentry{stout|hyperpage}{33}
+\indexentry{APE stout|hyperpage}{33}
+\indexentry{gauge fixing|hyperpage}{33}
+\indexentry{extend sources|hyperpage}{33}

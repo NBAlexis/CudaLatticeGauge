@@ -116,6 +116,12 @@
 // 2.0f / _sqrt(3)
 #define InvSqrt3_2 (F(1.1547005383792517))
 
+#define OneOver6 (F(0.16666666666666666666666666666667))
+#define OneOver24 (F(0.04166666666666666666666666666667))
+
+//typically, 0.3-0.5 - arXiv:002.4232
+#define OmelyanLambda2 (F(0.38636665500756728))
+
 __BEGIN_NAMESPACE
 
 //NOTE, _Complex is already a keyword in GCC

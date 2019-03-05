@@ -9,9 +9,6 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
-#define OneOver6 (F(0.16666666666666666666666666666667))
-#define OneOver24 (F(0.04166666666666666666666666666667))
-
 __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CIntegratorForceGradient)
@@ -37,9 +34,7 @@ void CIntegratorForceGradient::Evaluate()
     Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
-    UINT uiForceStep = 0;
-    UpdateP(f1Over6Estep, FALSE, uiForceStep);
-    ++uiForceStep;
+    UpdateP(f1Over6Estep, FALSE);
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
@@ -51,16 +46,14 @@ void CIntegratorForceGradient::Evaluate()
         for (INT i = 0; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(uiForceStep, m_pGaugeField, m_pForceField, NULL);
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
             checkCudaErrors(cudaDeviceSynchronize());
         }
-        uiForceStep++;
 
         m_pGaugeField->CopyTo(m_pUPrime);
         m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
 
-        UpdateP(f2Over3Estep, FALSE, uiForceStep);
-        ++uiForceStep;
+        UpdateP(f2Over3Estep, FALSE);
 
         //restore U
         m_pUPrime->CopyTo(m_pGaugeField);
@@ -69,14 +62,12 @@ void CIntegratorForceGradient::Evaluate()
         if (uiStep < m_uiStepCount)
         {
             appDetailed("  Force Gradient sub step %d\n", uiStep);
-            UpdateP(f1Over3Estep, FALSE, uiForceStep);
-            ++uiForceStep;
+            UpdateP(f1Over3Estep, FALSE);
         }
         else
         {
             appDetailed("  Force Gradient last step %d\n", uiStep);
-            UpdateP(f1Over6Estep, TRUE, uiForceStep);
-            ++uiForceStep;
+            UpdateP(f1Over6Estep, TRUE);
         }
     }
 

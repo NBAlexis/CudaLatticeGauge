@@ -84,11 +84,17 @@
     <ClInclude Include="Update\Continous\CIntegrator.h" />
     <ClInclude Include="Update\Continous\CIntegratorForceGradient.h" />
     <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
+    <ClInclude Include="Update\Continous\CIntegratorNestedLeapFrog.h" />
+    <ClInclude Include="Update\Continous\CIntegratorNestedOmelyan.h" />
+    <ClInclude Include="Update\Continous\CIntegratorNestedForceGradient.h" />
     <ClInclude Include="Update\Continous\CIntegratorOmelyan.h" />
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp" />
     <ClCompile Include="Update\CUpdator.cpp" />
     <ClCompile Include="CLGLib_Private.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

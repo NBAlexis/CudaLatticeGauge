@@ -10,6 +10,10 @@ One trajectory with 50 Omelyan sub-steps cost about 470-490 secs
 (The speed is related with kappa and beta, 470secs is tested using kappa=0.1355 and beta=2.5, 
 GMRES with 10 orthrognal basis will converge with about 3 restarts)
 
+It is tested on a Notebook with two GPUs, Intel(R) HD Graphic 630 for dispalyer and GTX1060 for calculation.
+
+This is important because when connecting an additional displayer, the speed is significantly slower.
+
 See detailed.pdf for more.
 
 

@@ -26,16 +26,17 @@ UINT TestFermionUpdator(CParameters& sParam)
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(40, TRUE);
 #else
-    appGetLattice()->m_pUpdator->Update(20, TRUE);
+    appGetLattice()->m_pUpdator->Update(10, TRUE);
     Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
-    if (appAbs(fRes - fExpected) > F(0.01))
+    if (appAbs(fRes - fExpected) > F(0.02))
     {
         return 1;
     }
     return 0;
 #endif
     
+#if !_CLG_DEBUG
     Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
     UINT uiError = 0;
@@ -46,19 +47,20 @@ UINT TestFermionUpdator(CParameters& sParam)
 
     UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    appGeneral(_T("accept (%d/60) : expected >= 55. HDiff = %f : expected < 0.005\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/60) : expected >= 50. HDiff = %f : expected < 0.08\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
-    if (uiAccept < 55)
+    if (uiAccept < 50)
     {
         ++uiError;
     }
 
-    if (fHDiff > F(0.005))
+    if (fHDiff > F(0.08))
     {
         ++uiError;
     }
 
     return uiError;
+#endif
 }
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
@@ -67,7 +69,11 @@ __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan);
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorForceGradient);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanBiCGStab);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog);
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedOmelyan);
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedForceGradient);
 
 UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 {

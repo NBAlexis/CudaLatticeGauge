@@ -27,13 +27,8 @@ public:
     virtual void Evaluate()
     {
         Real fHalfPstep = F(0.5) * m_fEStep;
-        UINT uiForceStep = 0;
-        if (m_uiStepCount > 0)
-        {
-            UpdateP(fHalfPstep, FALSE, uiForceStep);
-            ++uiForceStep;
-            appDetailed("  leap frog sub step 0\n");
-        }
+        UpdateP(fHalfPstep, FALSE);
+        appDetailed("  leap frog sub step 0\n");
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
         {
@@ -41,13 +36,12 @@ public:
 
             if (uiStep < m_uiStepCount)
             {
-                UpdateP(m_fEStep, FALSE, uiForceStep);
-                ++uiForceStep;
+                UpdateP(m_fEStep, FALSE);
                 appDetailed("  leap frog sub step %d\n", uiStep);
             }
             else 
             {
-                UpdateP(fHalfPstep, TRUE, uiForceStep);
+                UpdateP(fHalfPstep, TRUE);
                 appDetailed("  leap frog last step %d\n", uiStep);
             }
         }

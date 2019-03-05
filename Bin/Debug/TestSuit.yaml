@@ -695,7 +695,7 @@ TestFermionUpdator:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.17
+    ExpectedRes : 0.535
 
     Updator:
 
@@ -707,7 +707,7 @@ TestFermionUpdator:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorLeapFrog
         IntegratorStepLength : 1
-        IntegratorStep : 45
+        IntegratorStep : 60
 
     Gauge:
 	
@@ -719,13 +719,13 @@ TestFermionUpdator:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
 
-        Hopping : 0.1355
+        Hopping : 0.1575
 
         FieldId : 2
 
         ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
         ## = 6 + MaxDim of GMRES
-        PoolNumber : 16
+        PoolNumber : 26
 
         Period : [1, 1, 1, -1]
 
@@ -733,15 +733,15 @@ TestFermionUpdator:
 
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
-        MaxDim : 10
+        MaxDim : 20
         Accuracy : 0.0001
-        Restart : 10
+        Restart : 15
         AbsoluteAccuracy : 1
 
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 2.5
+        Beta : 5.5
 
     Action2:
 
@@ -766,7 +766,7 @@ TestFermionUpdatorOmelyan:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.17
+    ExpectedRes : 0.535
 
     Updator:
 
@@ -774,7 +774,7 @@ TestFermionUpdatorOmelyan:
         Metropolis : 1
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 20
+        IntegratorStep : 25
 
     Gauge:
         FieldName : CFieldGaugeSU3
@@ -783,21 +783,21 @@ TestFermionUpdatorOmelyan:
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1355
+        Hopping : 0.1575
         FieldId : 2
-        PoolNumber : 16
+        PoolNumber : 26
         Period : [1, 1, 1, -1]
 
     Solver:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
-        MaxDim : 10
+        MaxDim : 20
         Accuracy : 0.0001
-        Restart : 10
+        Restart : 20
         AbsoluteAccuracy : 1
     Action1:
         ActionName : CActionGaugePlaquette
-        Beta : 2.5
+        Beta : 5.5
     Action2:
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
@@ -817,7 +817,7 @@ TestFermionUpdatorForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.17
+    ExpectedRes : 0.535
 
     Updator:
 
@@ -825,7 +825,7 @@ TestFermionUpdatorForceGradient:
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 9
+        IntegratorStep : 6
 
     Gauge:
         FieldName : CFieldGaugeSU3
@@ -834,29 +834,28 @@ TestFermionUpdatorForceGradient:
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1355
+        Hopping : 0.1575
         FieldId : 2
-        PoolNumber : 16
+        PoolNumber : 26
         Period : [1, 1, 1, -1]
 
     Solver:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
-        MaxDim : 10
-        Accuracy : 0.0001
-        Restart : 10
+        MaxDim : 20
+        Accuracy : 0.000005
+        Restart : 20
         AbsoluteAccuracy : 1
     Action1:
         ActionName : CActionGaugePlaquette
-        Beta : 2.5
+        Beta : 5.5
     Action2:
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
     Measure1:
         MeasureName : CMeasurePlaqutteEnergy
 
-
-TestFermionUpdatorOmelyanBiCGStab:
+TestFermionUpdatorNestedLeapFrog:
 
     Dim : 4
     Dir : 4
@@ -869,71 +868,168 @@ TestFermionUpdatorOmelyanBiCGStab:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.17
+    ExpectedRes : 0.535
 
     Updator:
-
-        ## UpdatorType = { CHMC }
         UpdatorType : CHMC
-
         Metropolis : 1
-        
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
+        IntegratorType : CIntegratorNestedLeapFrog
         IntegratorStepLength : 1
-        IntegratorStep : 15
+        IntegratorStep : 20
+        NestedStep : 5
 
     Gauge:
 	
-        ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 		
     FermionField1:
         
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
         FieldName : CFieldFermionWilsonSquareSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
-
-        Hopping : 0.1355
-
+        Hopping : 0.1575
         FieldId : 2
-
-        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
-        ## = 6 + MaxDim of GMRES
-        PoolNumber : 16
-
-        ## Still have problem here
+        PoolNumber : 26
         Period : [1, 1, 1, -1]
 
     Solver:
 
-        SolverName : CSLASolverBiCGStab
+        SolverName : CSLASolverGMRES
         SolverForFieldId : 2
-        ## Check Accuracy every DiviationStep steps
-        DiviationStep : 12
-        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
-        MaxStep : 10
-        ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000001
-        Restart : 10
-        ## 0 is recommanded
-        AbsoluteAccuracy :0
+        MaxDim : 20
+        Accuracy : 0.000001
+        Restart : 20
+        AbsoluteAccuracy : 1
 
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 2.5
+        Beta : 5.5
 
     Action2:
 
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
-        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestFermionUpdatorNestedOmelyan:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.535
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        NestedStep : 3
+
+    Gauge:
+	
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.000005
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestFermionUpdatorNestedForceGradient:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.535
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 3
+
+    Gauge:
+	
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.00005
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
 
     Measure1:
 

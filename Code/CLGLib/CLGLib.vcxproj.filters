@@ -248,6 +248,15 @@
     <ClInclude Include="Update\Continous\CIntegratorForceGradient.h">
       <Filter>Update\Continous</Filter>
     </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorNestedLeapFrog.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorNestedOmelyan.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorNestedForceGradient.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -303,6 +312,15 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
   </ItemGroup>

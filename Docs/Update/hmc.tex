@@ -483,8 +483,8 @@ Let $U'$ be a function of $U$, solving
 \begin{equation}
 \begin{split}
 &\frac{2}{3}\tau \exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)\frac{\partial}{\partial \omega_i}S(U)=\frac{2}{3}\tau\frac{\partial}{\partial \omega _i}S(U')\\
-&\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)\frac{\partial}{\partial \omega_i}U\frac{\partial S(U)}{\partial U}=\frac{\partial}{\partial \omega _i}U'\frac{\partial S(U')}{\partial U'}\\
-&\frac{\partial }{\partial \omega _i}\left(\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)U\right)=\frac{\partial }{\partial \omega _i}U'\\
+&\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)\frac{\partial}{\partial \omega_i}U\textcolor[rgb]{0,0,1}{\frac{\partial S(U)}{\partial U}}=\frac{\partial}{\partial \omega _i}U'\textcolor[rgb]{0,0,1}{\frac{\partial S(U')}{\partial U'}}\\
+&\textcolor[rgb]{0,0,1}{\frac{\partial }{\partial \omega _i}}\left(\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)U\right)=\textcolor[rgb]{0,0,1}{\frac{\partial }{\partial \omega _i}}U'\\
 &\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)U=U',\\
 &U'=\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)\frac{\partial}{\partial \omega _j}\right)U=\exp\left(-\frac{1}{24}\tau ^2 \sum _j\left(\frac{\partial}{\partial \omega _j}S\right)T_i\right)U\\
 \end{split}
@@ -502,9 +502,51 @@ It is easy to implement, we do not need to calculate second derivative, and $\su
 
 It is almost as accurate as force-gradient, see the compare in Ref.~\cite{forcegradient3}
 
-\subsubsection{\label{sec:MultiStepUpdator}Multi-Step Updator}
+\subsubsection{\label{sec:MultiRateUpdator}\index{multi-rate integrator}\index{nested integrator}Multi-rate integrator (nested integrator)}
+
+Following Ref.~\cite{forcegradient3}
+
+Assuming the action is $S=S_F+S_G$ with $S_G\gg S_F$, one can evaluate $S_G$ more often than $S_F$. In the case of lattice QCD, often, the $S_G$ is the cheap gauge force, and $S_F$ is the expansive fermion force.
+
+The nested scheme is different for leap-frog Omelyan and force-gradient integrator, but they are similar
+
+\begin{itemize}
+  \item Nested leap-frog
+\end{itemize}
+
+\begin{equation}
+\begin{split}
+&\Delta (h) =\exp (\frac{h}{2}S_F)\Delta _m (h) \exp (\frac{h}{2}S_F),\\
+&\Delta _m(h)=\left(\exp(\frac{h}{2m}S_G)\exp(\frac{h}{m}T)\exp(\frac{h}{2m}S_G)\right)^m.\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Nested Omelyan
+\end{itemize}
+
+\begin{equation}
+\begin{split}
+&\Delta (h) =\exp (\lambda h S_F)\Delta _m (\frac{h}{2})\exp((1-2\lambda)hS_F)\Delta _m(\frac{h}{2}) \exp (\epsilon h S_F),\\
+&\Delta _m(\textcolor[rgb]{1,0,0}{h})=\left(\exp(\frac{\lambda h}{m} S_G)\exp(\frac{h}{2m}T)\exp(\frac{1-2\lambda}{m}hS_G)\exp(\frac{h}{2m}T)\exp(\frac{\lambda h}{m}S_G)\right)^m.\\
+\end{split}
+\end{equation}
+
+\textbf{Note, it is $\Delta _m (\frac{h}{2})$ in the first line.}
+
+\begin{itemize}
+  \item Nested force-gradient
+\end{itemize}
+
+\begin{equation}
+\begin{split}
+&\Delta (h) =\exp (\frac{h}{6} S_F)\Delta _m (\frac{h}{2})\exp(\frac{2}{3}h S_F+\frac{1}{72}h^3 C_F)\Delta _m(\frac{h}{2}) \exp (\frac{h}{6} S_F),\\
+&\Delta _m(\textcolor[rgb]{1,0,0}{h})=\left(\exp(\frac{h}{6 m} S_G)\exp(\frac{h}{2m}T)\exp\left(\frac{2}{3}\frac{h}{m} S_G+\frac{1}{72}\left(\frac{h}{m}\right)^3 C_G\right)\exp(\frac{h}{2m}T)\exp(\frac{h}{6m}S_G)\right)^m.\\
+\end{split}
+\end{equation}
 
 
+\textbf{Note about the integrator: when analyzing the error of the integrators, it is assumed $e^T$, $e^{S_G}$ and $e^{S_F}$ can be calculated accurately. It is almost true for $e^{S_G}$, and almost true for $e^T$ as long as $\epsilon$ is not too large, but it is not true for $e^{S_F}$. Typically, using an optimized integrator, it needs more accurate criterion for solvers.}
 
 \subsubsection{\label{sec:CachedSolution}Cached solution}
 

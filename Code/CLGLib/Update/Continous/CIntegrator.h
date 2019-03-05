@@ -42,7 +42,7 @@ public:
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
     void OnFinishTrajectory(UBOOL bAccepted);
     void Prepare(UBOOL bLastAccepted, UINT uiStep);
-    void UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera);
+    void UpdateP(Real fStep, UBOOL bCacheStaple);
     void UpdateU(Real fStep);
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
     virtual CCString GetInfos(const CCString& sTab) const = 0;
@@ -68,6 +68,28 @@ protected:
     class CHMC* m_pOwner;
     CLatticeData* m_pLattice;
     TArray<class CAction*> m_lstActions;
+};
+
+class CLGAPI CNestedIntegrator : public CIntegrator
+{
+public:
+    CNestedIntegrator()
+        : CIntegrator()
+        , m_uiNestedStep(1)
+        , m_fNestedStepLength(F(0.0))
+    {
+    }
+
+    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    CCString GetNestedInfo(const CCString & sTab) const;
+
+    void UpdatePF(Real fStep);
+    void UpdatePG(Real fStep, UBOOL bCacheStaple);
+
+protected:
+
+    UINT m_uiNestedStep;
+    Real m_fNestedStepLength;
 };
 
 __END_NAMESPACE

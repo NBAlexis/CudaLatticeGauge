@@ -93,7 +93,7 @@ void CIntegrator::UpdateU(Real fStep)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera)
+void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
 {
     // recalc force
     m_pForceField->Zero();
@@ -102,7 +102,7 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, UINT uiItera)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(uiItera, m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
@@ -143,6 +143,58 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
     appDetailed(_T("H (%s) = %s \n"), bBeforeEvolution ? "before" : "after" , sLog.c_str());
 #endif
     return retv;
+}
+
+void CNestedIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params)
+{
+    CIntegrator::Initial(pOwner, pLattice, params);
+
+    INT iNestedStepCount = 3;
+    params.FetchValueINT(_T("NestedStep"), iNestedStepCount);
+    if (iNestedStepCount < 1)
+    {
+        appCrucial(_T("NestedStep must >= 1, but set to be %d!\n"), iNestedStepCount)
+    }
+    m_uiNestedStep = static_cast<UINT>(iNestedStepCount);
+    m_fNestedStepLength = m_fEStep / m_uiNestedStep;
+}
+
+CCString CNestedIntegrator::GetNestedInfo(const CCString & sTab) const
+{
+    return sTab + _T("Nested : ") + appIntToString(static_cast<INT>(m_uiNestedStep)) + _T("\n");
+}
+
+void CNestedIntegrator::UpdatePF(Real fStep)
+{
+    // recalc force
+    m_pForceField->Zero();
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    for (INT i = 1; i < m_lstActions.Num(); ++i)
+    {
+        //this is accumulate
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+
+    //P = P + e F
+    m_pMomentumField->Axpy(fStep, m_pForceField);
+    checkCudaErrors(cudaDeviceSynchronize());
+}
+
+void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
+{
+    // recalc force
+    m_pForceField->Zero();
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, bCacheStaple ? m_pStapleField : NULL);
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    //P = P + e F
+    m_bStapleCached = bCacheStaple;
+    m_pMomentumField->Axpy(fStep, m_pForceField);
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 __CLGIMPLEMENT_CLASS(CIntegratorLeapFrog)
