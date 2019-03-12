@@ -28,6 +28,7 @@
 #include "cuda_runtime.h"
 #include "vector_types.h"
 #include "cuda.h"
+#include "cuComplex.h"
 
 #define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
 
@@ -56,6 +57,16 @@ template <typename T> void check(T result, char const *const func, const char *c
             // Make sure we call CUDA Device Reset before exiting
             exit(EXIT_FAILURE);
     }
+}
+
+void StartTimer(unsigned long long & uiStart)
+{
+    uiStart = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+}
+
+float StopTimer(unsigned long long uiStart)
+{
+    return ((std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) - uiStart) * 0.001f;
 }
 
 #endif //#ifndef _CUDAHELP_H_

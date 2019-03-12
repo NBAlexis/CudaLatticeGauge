@@ -79,6 +79,20 @@ Yousef Saad.
 \newblock {Iterative methods for sparse linear systems}.
 \newblock 2003.
 
+\bibitem{luscher2010}
+Martin~L$\rm \ddot{u}$scher.
+\newblock \href{http://arxiv.org/abs/arXiv:1002.4232}{{Computational Strategies
+  in Lattice QCD}}.
+\newblock arXiv:arXiv:1002.4232.
+
+\bibitem{deflation}
+Hussam Al~Daas et. al.
+\newblock {Recycling Krylov subspaces and reducing deflation subspaces for
+  solving sequence of linear systems}.
+\newblock {\em RR-9206, Inria Paris}, 2018,
+  \href{https://hal.inria.fr/hal-01886546}{Available at:
+  https://hal.inria.fr/hal-01886546}.
+
 \bibitem{aipde}
 Weinan~E Jiequn~Han, Arnulf~Jentzen.
 \newblock \href{http://dx.doi.org/10.1073/pnas.1718942115}{{Solving

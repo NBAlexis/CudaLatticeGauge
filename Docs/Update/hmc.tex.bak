@@ -545,7 +545,8 @@ The nested scheme is different for leap-frog Omelyan and force-gradient integrat
 \end{split}
 \end{equation}
 
-\textbf{Note about the integrator: when analyzing the error of integrator, it is assumed $e^T$, $e^{S_G}$ and $e^{S_F}$ can be calculated accurately. It is almost true for $e^{S_G}$, and almost true for $e^T$ as long as $\epsilon$ is not too large, but it is not true for $S^{S_F}$. Typically, using an optimized integrator, it needs more accurate criterion for solvers.}
+
+\textbf{Note about the integrator: when analyzing the error of the integrators, it is assumed $e^T$, $e^{S_G}$ and $e^{S_F}$ can be calculated accurately. It is almost true for $e^{S_G}$, and almost true for $e^T$ as long as $\epsilon$ is not too large, but it is not true for $e^{S_F}$. Typically, using an optimized integrator, it needs more accurate criterion for solvers.}
 
 \subsubsection{\label{sec:CachedSolution}Cached solution}
 
@@ -555,4 +556,23 @@ So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ ca
 
 \subsubsection{\label{sec:Z4_fermion}Z4 pseudo fermion}
 
+In the pseudo-fermion approach, $\phi$ is a complex scalar field. However, it can also been viewed as a mathematical tool. To see this, what we are in fact evaluating is
+\begin{equation}
+\begin{split}
+&\int \mathcal{D}\phi \mathcal{D}\phi^{\dagger} \exp (-\phi ^{\dagger}\left(DD^{\dagger}\right)^{-1}\phi )\\
+\end{split}
+\end{equation}
+Let $\chi = D^{-1}\phi$, $\phi$ is a linear function of $\chi$, one have
+\begin{equation}
+\begin{split}
+&\phi=D\chi,\;\;\frac{\partial \phi _i}{\partial \chi _j}=\left(D\right)_{ji},\\
+&\mathcal{D}\phi \to \det \left[D\right]\mathcal{D}\chi,\;\;\mathcal{D}\phi^{\dagger} \to \det \left[D^{\dagger}\right]\mathcal{D}\chi^{\dagger}\\
+\end{split}
+\end{equation}
+It becomes
+\begin{equation}
+\begin{split}
+&\det[DD^{\dagger}]\int \mathcal{D}\chi \mathcal{D}\chi^{\dagger} \exp (-\chi ^{\dagger}\chi )\\
+\end{split}
+\end{equation}
 

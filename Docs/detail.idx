@@ -21,22 +21,33 @@
 \indexentry{Krylov subspace|hyperpage}{20}
 \indexentry{GMRES|hyperpage}{20}
 \indexentry{GCR|hyperpage}{24}
-\indexentry{BiCGStab|hyperpage}{26}
-\indexentry{plaquette energy|hyperpage}{27}
-\indexentry{meson|hyperpage}{27}
-\indexentry{correlator|hyperpage}{27}
-\indexentry{source|hyperpage}{29}
-\indexentry{point source|hyperpage}{29}
-\indexentry{pseudofermions|hyperpage}{30}
-\indexentry{point source|hyperpage}{30}
-\indexentry{reciprocal space|hyperpage}{30}
-\indexentry{gauge smearing|hyperpage}{32}
-\indexentry{low mode|hyperpage}{32}
-\indexentry{exceptional configurations|hyperpage}{32}
-\indexentry{gauge smoothing|hyperpage}{32}
-\indexentry{APE smearing|hyperpage}{32}
-\indexentry{staple|hyperpage}{33}
-\indexentry{stout|hyperpage}{33}
-\indexentry{APE stout|hyperpage}{33}
-\indexentry{gauge fixing|hyperpage}{33}
-\indexentry{extend sources|hyperpage}{33}
+\indexentry{GCRO-DR|hyperpage}{26}
+\indexentry{GMRES-MDR|hyperpage}{26}
+\indexentry{low mode|hyperpage}{26}
+\indexentry{deflation|hyperpage}{26}
+\indexentry{preconditioner|hyperpage}{26}
+\indexentry{preconditioner|hyperpage}{26}
+\indexentry{deflation|hyperpage}{27}
+\indexentry{GCRO-DR|hyperpage}{27}
+\indexentry{REV|hyperpage}{28}
+\indexentry{SVD|hyperpage}{28}
+\indexentry{Lanczos|hyperpage}{29}
+\indexentry{divide-and-conquer|hyperpage}{29}
+\indexentry{plaquette energy|hyperpage}{32}
+\indexentry{meson|hyperpage}{32}
+\indexentry{correlator|hyperpage}{32}
+\indexentry{source|hyperpage}{34}
+\indexentry{point source|hyperpage}{34}
+\indexentry{pseudofermions|hyperpage}{35}
+\indexentry{point source|hyperpage}{35}
+\indexentry{reciprocal space|hyperpage}{35}
+\indexentry{gauge smearing|hyperpage}{37}
+\indexentry{low mode|hyperpage}{37}
+\indexentry{exceptional configurations|hyperpage}{37}
+\indexentry{gauge smoothing|hyperpage}{37}
+\indexentry{APE smearing|hyperpage}{37}
+\indexentry{staple|hyperpage}{38}
+\indexentry{stout|hyperpage}{38}
+\indexentry{APE stout|hyperpage}{38}
+\indexentry{gauge fixing|hyperpage}{38}
+\indexentry{extend sources|hyperpage}{38}

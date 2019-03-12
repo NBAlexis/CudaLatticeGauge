@@ -94,7 +94,8 @@
 
 \input "SparseLinearAlgebra/gcr.tex"
 
-\input "SparseLinearAlgebra/bicgstab.tex"
+\input "SparseLinearAlgebra/gcro-dr.tex"
+
 
 \clearpage
 
@@ -120,7 +121,11 @@
 
 \clearpage
 
-\section{\label{sec:Testing}Applications}
+\section{\label{sec:Applications}Applications}
+
+\input "Applications/SampleProducer.tex"
+
+\clearpage
 
 \printindex
 

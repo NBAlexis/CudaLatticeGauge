@@ -473,3 +473,156 @@ int main()
     return 0;
 }
 
+
+
+//==================================== classical M S ====================================================
+
+#include "CudaHelper.h"
+
+#define _XD 11
+#define _YD 5
+
+//Single Block
+__global__ void _kernelSmallMatrixMult(cuComplex* res, 
+    const cuComplex* __restrict__ left, 
+    const cuComplex* __restrict__ right, 
+    int dx, int dy)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+    //dx=11, dy=5
+
+    res[x * dy + y] = make_cuComplex(0.0f, 0.0f);
+
+    for (int i = 0; i < dy; ++i)
+    {
+        res[x * dy + y] = cuCaddf(res[x * dy + y], 
+            cuCmulf(left[x * dy + i], right[i * dy + y]));
+    }
+}
+
+
+__global__ void _kernelInitialR(cuComplex* R, int dy)
+{
+    int i = threadIdx.x;
+    int j = threadIdx.y;
+    R[i * dy + j] = make_cuComplex(0.0f, 0.0f);
+}
+
+__global__ void _kernelEachLineR(const cuComplex* __restrict__ Q, cuComplex* R, int i, int dx, int dy)
+{
+    int j = threadIdx.x;
+    int n = threadIdx.y;
+
+    if (i <= j)
+    {
+        cuComplex toAdd = cuCmulf(cuConjf(Q[n * dy + i]), Q[n * dy + j]);
+        atomicAdd(&R[i * dy + j].x, toAdd.x);
+        atomicAdd(&R[i * dy + j].y, toAdd.y);
+    }
+}
+
+__global__ void _kernelCMSProj(cuComplex* Q, const cuComplex* __restrict__ R, int i, int dx, int dy)
+{
+    int j = threadIdx.x;
+    int n = threadIdx.y;
+
+    if (i > j)
+    {
+        cuComplex toAdd = cuCmulf(R[j * dy + i], Q[n * dy + j]);
+        atomicAdd(&Q[n * dy + i].x, -toAdd.x / R[j * dy + j].x);
+        atomicAdd(&Q[n * dy + i].y, -toAdd.y / R[j * dy + j].x);
+    }
+}
+
+__global__ void _kernelCMSNorm(cuComplex* Q, cuComplex* R, int dx, int dy)
+{
+    __shared__ float length[_YD];
+    int i = threadIdx.x;
+    int n = threadIdx.y;
+
+    Q[n * dy + i].x = Q[n * dy + i].x / R[i * dy + i].x;
+    Q[n * dy + i].y = Q[n * dy + i].y / R[i * dy + i].x;
+}
+
+void PrintMatrix(const cuComplex* mtr, int dx, int dy)
+{
+    printf("\n");
+    for (int i = 0; i < dx; ++i)
+    {
+        for (int j = 0; j < dy; ++j)
+        {
+            printf("%1.3f %s %1.3f I   ", mtr[i * dy + j].x, mtr[i * dy + j].y < 0.0f ? "" : "+", mtr[i * dy + j].y);
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+    cuComplex hij[_XD * _YD];
+    cuComplex pij[_YD * _YD];
+    cuComplex hpij[_XD * _YD]; 
+    cuComplex rij[_YD * _YD];
+    cuComplex qij[_XD * _YD];
+    cuComplex rescheckij[_XD * _YD];
+    for (int i = 0; i < _XD * _YD; ++i)
+    {
+        hij[i].x = (rand() % 11 - 5) / 5.0f;
+        hij[i].y = (rand() % 11 - 5) / 5.0f;
+        if (i < _YD * _YD)
+        {
+            pij[i].x = (rand() % 11 - 5) / 5.0f;
+            pij[i].y = (rand() % 11 - 5) / 5.0f;
+        }
+    }
+    cuComplex* deviceH = NULL;
+    cuComplex* deviceP = NULL;
+    cuComplex* deviceHP = NULL;
+    cuComplex* deviceQ = NULL;
+    cuComplex* deviceR = NULL;
+    cuComplex* deviceRes = NULL;
+    checkCudaErrors(cudaMalloc((void**)&deviceH, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceP, sizeof(cuComplex) * _YD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceHP, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceQ, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceR, sizeof(cuComplex) * _YD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceRes, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMemcpy(deviceH, hij, sizeof(cuComplex) * _XD * _YD, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(deviceP, pij, sizeof(cuComplex) * _YD * _YD, cudaMemcpyHostToDevice));
+    dim3 block(1, 1, 1);
+    dim3 thread(_XD, _YD, 1);
+    dim3 thread2(_YD, 1, 1);
+    dim3 thread3(_YD, _YD, 1);
+    dim3 thread4(_YD, _XD, 1);
+
+    _kernelSmallMatrixMult << <block, thread >> > (deviceHP, deviceH, deviceP, _XD, _YD);
+    _kernelInitialR << <block, thread3 >> > (deviceR,  _YD);
+    checkCudaErrors(cudaMemcpy(deviceQ, deviceHP, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToDevice));
+    for (int j = 0; j < _YD; ++j)
+    {
+        _kernelEachLineR << <block, thread4 >> > (deviceQ, deviceR, j, _XD, _YD);
+        if (j < _YD - 1)
+        {
+            _kernelCMSProj << <block, thread4 >> > (deviceQ, deviceR, j + 1, _XD, _YD);
+        }
+    }
+
+    _kernelCMSNorm << <block, thread4 >> > (deviceQ, deviceR, _XD, _YD);
+
+    _kernelSmallMatrixMult << <block, thread >> > (deviceRes, deviceQ, deviceR, _XD, _YD);
+
+    checkCudaErrors(cudaMemcpy(hpij, deviceHP, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(rij, deviceR, sizeof(cuComplex) * _YD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(qij, deviceQ, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(rescheckij, deviceRes, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+
+    PrintMatrix(hij, _XD, _YD);
+    PrintMatrix(pij, _YD, _YD);
+    PrintMatrix(hpij, _XD, _YD);
+    PrintMatrix(rij, _YD, _YD);
+    PrintMatrix(qij, _XD, _YD);
+    PrintMatrix(rescheckij, _XD, _YD);
+
+    return 0;
+}

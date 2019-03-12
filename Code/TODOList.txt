@@ -6,6 +6,8 @@
 
 -- deflation?
 
+-- Implement MGS QR factorization
+
 -- Change the platform specific functions to boost (cross platform)
 
 -- CMake? (cross platform)

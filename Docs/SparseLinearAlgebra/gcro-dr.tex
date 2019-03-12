@@ -1,0 +1,240 @@
+\subsection{\label{sec:GCRODR}\index{GCRO-DR}\index{GMRES-MDR} GCRO-DR and GMRES-MDR}
+
+`A comparison with the methods seen in the previous chapter indicates that in many cases, GMRES will be faster if the problem is well conditioned, resulting in a moderate number of steps required to converge. If many steps (say, in the hundreds) are required, then BICGSTAB and TFQMR may perform better. If memory is not an issue, GMRES or DQGMRES, with a large number of directions, is often the most reliable choice. The issue then is one of trading ribustness for memory usage. In general, a sound strategy is to focus on finding a good preconditioner rather than the best accelerator'. ~\cite{sparselinearbook1}.
+
+That might because the Krylov space will converge to the domain eigen-vector.
+
+From Fig.~1.~9 of Ref.~\cite{luscher2010}, the \index{low mode}low mode is the most critical problem, so CLGLib first implement low mode \index{deflation}deflation preconditioner\index{preconditioner}.
+
+In the following, we follow Ref.~\cite{deflation}.
+
+\subsubsection{\label{sec:preconditioner}\index{preconditioner}Brief introduction to deflation preconditioner}
+
+In short, the preconditioner means, one solve
+\begin{equation}
+\begin{split}
+&M^{-1}Ax=M^{-1}b,
+\end{split}
+\end{equation}
+or
+\begin{equation}
+\begin{split}
+&\left\{\begin{array}{c} AM^{-1}u=b\\ x=M^{-1}u\end{array}\right.
+\end{split}
+\end{equation}
+instead of $Ax=b$. If $M$ is chosen carefully, it is usually faster.
+
+Now, considering $A\in \mathbb{C}^{n\times n}$ and a matrix $Z\in \mathbb{C}^{n\times k}$ such that $Z=(v_1,v_2,\ldots,v_k)$ and each row is a vector $v_i\in \mathbb{C}^n$ such that $v_i^{\dagger}v_j=\delta _{ij}$. So $Z$ acts like a Unitary matrix $Z^{\dagger}Z=\mathbb{I}^{k\times k}$. Then we can use $Z$ to project $A$ on a subspace, as
+\begin{equation}
+\begin{split}
+&T=Z^{\dagger}AZ,\;\;Z^{\dagger}A=TZ^{\dagger}
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&Ax=b \Rightarrow \left(A-ZZ^{\dagger}A\right)x+ZT^{-1}Z^{\dagger}Ax=b-ZZ^{\dagger}b + ZT^{-1}Z^{\dagger}b\\
+\end{split}
+\end{equation}
+
+Note that $ZZ^{\dagger}\in \mathbb{C}^{n\times n}$ is not unitary matrix. $T\in \mathbb{C}^{k\times k}$ is a small matrix. And then, one can solve
+\begin{equation}
+\begin{split}
+&ZT^{-1}Z^{\dagger}Ax=ZT^{-1}Z^{\dagger}b \Rightarrow x=ZT^{-1}Z^{\dagger}b\\
+\end{split}
+\end{equation}
+exactly, while solving $\left(A-ZZ^{\dagger}A\right)x=b-ZZ^{\dagger}b$ by iteration methods such as GMRES.
+
+This is the so-called \textbf{subspace deflation}\index{deflation}.
+
+\subsubsection{\label{sec:gcrodr}\index{GCRO-DR}GCRO-DR}
+
+Start from Eq.~(\ref{eq,gemres.1}). Assume after the first-step GMRES, we have the orthogonal-normal basis $v_i$ which can be written as a matrix $V_m\in \mathbb{C}^{n\times m},V_{m+1}\in \mathbb{C}^{n\times (m+1)},H\in \mathbb{C}^{(m+1)\times m}$. On the other hand, will be introduced later, we have a set of deflation vectors, or a matrix $P_k\in \mathbb{C}^{\textcolor[rgb]{0,0,1}{m}\times k}$, such that
+\begin{equation}
+\begin{split}
+&AV_mP_k=V_{m+1}HP_k\\
+&\tilde {Y}_k\equiv V_mP_k \in \mathbb{C}^{n\times k}\\
+\end{split}
+\end{equation}
+Then $\tilde {Y}_k$ is the deflation matrix.
+
+Consider the matrix $HP_k=QR$, where $QR$ is the QR factorization, with $Q\in \mathbb{C}^{(m+1)\times k}$ and $R\in \mathbb{C}^{k\times k}$. And define
+\begin{equation}
+\begin{split}
+&C_k\equiv V_{m+1}Q\in \mathbb{C}^{n\times k}.
+\end{split}
+\end{equation}
+
+So, if $R$ which is a small upper triangular matrix such that $R^{-1}$ can be easily calculated, it is
+\begin{equation}
+\begin{split}
+&AV_mP_k=A\tilde{Y}_k=V_{m+1}HP_k=V_{m+1}QR=C_kR\\
+&C_k=A\tilde{Y}_kR^{-1}=A U,\;\;\;U\equiv \tilde{Y}_kR^{-1} \in \mathbb{C}^{n\times k}
+\end{split}
+\end{equation}
+
+Finally, the problem in GMRES Eq.~(\ref{eq,gemres.1}) is changed as
+\begin{equation}
+\begin{split}
+&\tilde{U}_k=U_kD_k=U_k\left(\begin{array}{cccc}
+\frac{1}{\|{\bf u}_1\|} & 0 & 0 & 0 \\
+0 & \frac{1}{\|{\bf u}_2\|} & 0 & 0 \\
+\ldots & \ldots & \ldots & \ldots \\
+0 & 0 & 0 & \frac{1}{\|{\bf u}_k\|} \\ 
+\end{array}\right) \in \mathbb{C}^{n\times k}\\
+&V^{(1)}_m=(U_k, V_{m-k})\in \mathbb{C}^{n\times m}\\
+&V^{(2)}_{m+1}=(C_k, V_{m-k+1})\in \mathbb{C}^{n\times (m+1)}\\
+&H'=\left(\begin{array}{cc}
+D_k & B_{m-k} \\
+0 & H_{m-k} 
+\end{array}\right) \in \mathbb{C}^{(m+1)\times m}\\
+&AV^{(1)}_m=V^{(2)}_{m+1}H'\\
+\end{split}
+\label{eq.gcrodr.1}
+\end{equation}
+
+where $V$ are orthogonal-normal basis obtained in GMRES, and $B_{m-k}=AV_{m-k}$. Note that \textcolor[rgb]{0,0,1}{$B_{m-k}\in \mathbb{C}^{(m-k)\times k}$ but $H_{m-k}\in \mathbb{C}^{(m-k+1)\times (m-k)}$}.
+
+From Eq.~(\ref{eq.gcrodr.1}), we find
+
+\begin{itemize}
+  \item The subspace is $k$ dimension subspace of $m$ dimension Krylov space.
+  \item With $H$, $V$ and $P$ known, we are able to calculate $QR=HP$, $U=V_mPR^{-1}$, $C=V_{m+1}Q$.
+\end{itemize}
+
+\subsubsection{\label{sec:deflationsubspace}The choice of deflation subspace}
+
+In the above, we have assumed $P_k\in \mathbb{C}^{m\times k}$ is already known. Now we concentrate on this part. 
+
+Let $A\in \mathbb{C}^{n\times n},V\in \mathbb{C}^{n\times k}$, \textbf{If $V$ is formed as orthogonal normal basis of subspace $S$}, then, if $(\lambda, w\in \mathbb{C}^m)$ is eigen-pair of $V^{\dagger}AV$, $(\lambda, u=V^{\dagger}w\in \mathbb{C}^n)$ is eigen-pair of $A$.
+
+Therefor, \textcolor[rgb]{0,0,1}{\textbf{$P_k$ is a matrix with $k$ rows, and each row is a eigen-vector of $H_m$ ( $H_m$ denoting the first $m$ row of $H_{m+1}$)}}, then, $VP_k$ is a matrix with $k$ rows such that each row is a eigen-vector of $A$ (approximately since $AV\approx VH \Rightarrow H \approx V^{\dagger}AV$).
+
+The first GMRES cycle will generate $H_m$ (denoting the first $m$ row of $H_{m+1}$), and $H_m\omega=\theta \omega$ is solved. However, starting from the second cycle of GCRO-DR, it is not $AV_m=V_{m+1}H_{m+1}$ but $AV_m^{(1)}=V_{m+1}^{(2)}H'_{m+1}$, such that \textcolor[rgb]{1,0,0}{\textbf{$V_{m+1}^{(2)}$ are orthogonal basis but $V_{m}^{(1)}$ are not orthogonal basis! (Therefor $V^{\dagger}AV$ does not hold!)}}. In this case, it is another eigen-problem which should be solved. This will be listed below without explain.
+
+By Ref.~\cite{deflation}, there are three strategies, \index{Ritz eigen-vector}\index{REV}Ritz eigen-vector~(REV), \index{harmonic Ritz eigen vector}harmonic Ritz eigen vector~(HEV) and \index{singular value decomposition}\index{SVD}singular value decomposition~(SVD). Either it is $REV>HEV>SVD$ or $SVD>HEV>REV$, so we only list REV and SVD here.
+
+\begin{itemize}
+  \item REV
+\end{itemize}
+
+The $k$ small eigen value of $m$, such that $m$ is
+
+\begin{equation}
+\begin{split}
+\left\{\begin{array}{l}
+H_m\omega = \theta \omega,\\
+\left(\begin{array}{cc} \tilde{U}_k^{\dagger}C_k & \tilde{U}_k^{\dagger}V_{m-k+1} \\ 0 & (I_{m-k},0)\end{array}\right) H'_{m+1}\omega = \theta \left(\begin{array}{cc} \tilde{U}_k^{\dagger}\tilde{U}_{k}  & \tilde{U}_k^{\dagger}V_{m-k} \\ V_{m-k}^{\dagger}\tilde{U}_k & I_{m-k}\end{array}\right)\omega,
+\end{array}\right.
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item SVD
+\end{itemize}
+
+The $k$ small eigen value of $m$, such that $m$ is
+
+\begin{equation}
+\begin{split}
+\left\{\begin{array}{l}
+H_m^{\dagger}H_m\omega = \theta \omega,\\
+{H'_{m+1}}^{\dagger}H'_{m+1}\omega = \theta \left(\begin{array}{cc} \tilde{U}_k^{\dagger}\tilde{U}_{k}  & 0 \\ 0 & I_{m-k}\end{array}\right)\omega,
+\end{array}\right.
+\end{split}
+\end{equation}
+
+Although $H_m$ is usually a small matrix, we still need to known how to calculate the eigen-value and eigen-vectors.
+
+Note that the second line of REV and SVD, that is a \index{generalized eigen-value problem}\index{GEV}\textbf{generalized eigen-value problem~(GEV)}.
+
+\subsubsection{\label{sec:eigenSolver}Eigen solver}
+
+There are many strategies. The most common algorithm is to transform a matrix to a \index{Hessenberg matrix}\textbf{Hessenberg matrix}.
+
+\begin{itemize}
+  \item \index{Householder reduction}Householder reduction
+\end{itemize}
+
+Tested that Householder reduction is faster than symmetric or unsymmetric Lanczos method when the matrix is large. On the other hand, for a Hermitian matrix, Householder can also produce Hermitian tri-diagonal matrix.
+
+\textbf{Note that this might be not true when the matrix is huge, and Hessenberg reduction is not a full reduction. In our case, we concentrate on matrix with $5<m<50$. Tested when about $7<m<30$ ($30 \times 30 \approx 1024$ is the maximum thread count on test machine), Householder is faster.}
+
+
+
+\subsubsection{\label{sec:implementationgcrodr}Implementation of GCRO-DR}
+
+Now, we concentrate on the implementation of GCRO-DR. First of all, we need to know how to apply ${\bf x}-AB^{\dagger}{\bf v}$, where $A,B\in \mathbb{C}^{n\times k}$ and ${\bf v}\in \mathbb{C}^n$.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=0$ to $k-1$}
+    \State{${\bf x}={\bf x}-\left({\bf b}_k^{\dagger}{\bf v}\right){\bf a}_k$}
+\EndFor
+
+\Return $\bf x$
+\end{algorithmic}
+\caption{${\bf x}={\bf x}-AB^{\dagger}{\bf v}$}
+\end{algorithm}
+
+The second thing is QR decompose of $\mathbb{C}^{n\times k}$ and $\mathbb{C}^{(m+1)\times k}$ matrix. For the $\mathbb{C}^{n\times k}$ matrix, the usually Arnoldi with modified Gram-Schmidt, i.e. Algorithm.~\ref{alg.ArnoldiModifiedGS} can be used.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=0$ to $k-1$}
+    \State $y_i=Ay_i$
+\EndFor
+\State ${\bf v}^{(0)}\:=y_0/\|{\bf y}_0\|$
+\For{$i=0$ to $k-2$}
+    \State ${\bf w}\:={\bf y}_{i+1}$
+    \For{$j=0$ to $i+1$}
+        \State $c={{\bf v}^{(j)}}^*\cdot {\bf w}$
+        \State ${\bf w}-=c{\bf v}^{(j)}$
+        \State $r[j,i]=c$
+    \EndFor
+    \State ${\bf v}^{(i+1)}={\bf w}/r[i+1,i+1]$
+\EndFor
+
+\Return {$Q=({\bf v}_0,\ldots, {\bf v}_{k-1})$, $R=r[i,j]$.}
+\end{algorithmic}
+\caption{modified Gram-Schmidt for QR factorization decompose of $A\tilde{Y}_k$}
+\end{algorithm}
+
+For the $\mathbb{C}^{(m+1)\times k}$ matrix, we use standard Gram-Schmidt for multi-thread since usually both $k$ and $m$ are small.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State {${\bf q}[k]=hp[m,k]$}
+\For{$i=0$ to $k-1$}
+    \For {$j\le i$}
+        \Comment {pallial for each $j$}
+        \State {$r[ji]={\bf q}_j^{\dagger}{\bf q}_i$}
+    \EndFor
+    \If {$i < k - 1$}
+        \For {$j\le i$}
+            \Comment {pallial for each $j$}
+            \State {${\bf q}_{i + 1}={\bf q}_{i + 1}-\frac{r[ji]}{r[jj]}{\bf q}_{j}$}
+            \Comment {Atomic add}
+        \EndFor    
+    \EndIf
+\EndFor
+\For{$i=0$ to $k-1$}
+    \State ${\bf q}_i={\bf q}_i/r[ii]$
+\EndFor
+
+\Return {$Q=({\bf q}_1,\ldots, {\bf q}_{k-1})$, $R=r[i,j]$.}
+\end{algorithmic}
+\caption{classical Gram-Schmidt for QR factorization decompose of $HP_k$}
+\end{algorithm}
+
+Then, we need to calculate $R^{-1}$ where $R$ is a upper triangular matrix, this is nothing but a modification of Algorithm.~\ref{alg.GEMRES.SolveY}.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=k-1$ to $0$}
+    \For{$j=i+1$ to $k-1$}
+        \State ${\bf y}[i]-=r[i,j] {\bf y}[j]$
+    \EndFor
+    \State ${\bf y}[i] = {\bf y}[i] / r[i,i]$
+\EndFor
+
+\Return ${\bf u}[k]={\bf y}[k]$.
+\end{algorithmic}
+\caption{$U_k=\tilde{Y}_k R^{-1}$}
+\end{algorithm}

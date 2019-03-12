@@ -554,6 +554,27 @@ The pseudo fermion field is generate only once for a trajectory and is not chang
 
 So, once ${\bf x}_{1,2}$ is obtained, in the same trajectory, ${\bf x}_{1,2}$ can be set as the initial trail solution for the solver.
 
+\begin{comment}
 \subsubsection{\label{sec:Z4_fermion}Z4 pseudo fermion}
 
+In the pseudo-fermion approach, $\phi$ is a complex scalar field. However, it can also been viewed as a mathematical tool. To see this, what we are in fact evaluating is
+\begin{equation}
+\begin{split}
+&\int \mathcal{D}\phi \mathcal{D}\phi^{\dagger} \exp (-\phi ^{\dagger}\left(DD^{\dagger}\right)^{-1}\phi )\\
+\end{split}
+\end{equation}
+Let $\chi = D^{-1}\phi$, $\phi$ is a linear function of $\chi$, one have
+\begin{equation}
+\begin{split}
+&\phi=D\chi,\;\;\frac{\partial \phi _i}{\partial \chi _j}=\left(D\right)_{ji},\\
+&\mathcal{D}\phi \to \det \left[D\right]\mathcal{D}\chi,\;\;\mathcal{D}\phi^{\dagger} \to \det \left[D^{\dagger}\right]\mathcal{D}\chi^{\dagger}\\
+\end{split}
+\end{equation}
+It becomes
+\begin{equation}
+\begin{split}
+&\det[DD^{\dagger}]\int \mathcal{D}\chi \mathcal{D}\chi^{\dagger} \exp (-\chi ^{\dagger}\chi )\\
+\end{split}
+\end{equation}
+\end{comment}
 

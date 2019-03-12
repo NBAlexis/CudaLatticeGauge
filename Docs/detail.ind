@@ -1,21 +1,25 @@
 \begin{theindex}
 
-  \item APE smearing, \hyperpage{31}
-  \item APE stout, \hyperpage{32}
+  \item APE smearing, \hyperpage{37}
+  \item APE stout, \hyperpage{38}
 
   \indexspace
 
-  \item BiCGStab, \hyperpage{13}, \hyperpage{25}
+  \item BiCGStab, \hyperpage{13}
 
   \indexspace
 
-  \item correlator, \hyperpage{26}
+  \item correlator, \hyperpage{32}
+
+  \indexspace
+
+  \item deflation, \hyperpage{26, 27}
 
   \indexspace
 
   \item equilibrium, \hyperpage{16}
-  \item exceptional configurations, \hyperpage{31}
-  \item extend sources, \hyperpage{32}
+  \item exceptional configurations, \hyperpage{37}
+  \item extend sources, \hyperpage{38}
 
   \indexspace
 
@@ -25,11 +29,13 @@
 
   \indexspace
 
-  \item gauge fixing, \hyperpage{32}
-  \item gauge smearing, \hyperpage{31}
-  \item gauge smoothing, \hyperpage{31}
-  \item GCR, \hyperpage{23}
-  \item GMRES, \hyperpage{19}
+  \item gauge fixing, \hyperpage{38}
+  \item gauge smearing, \hyperpage{37}
+  \item gauge smoothing, \hyperpage{37}
+  \item GCR, \hyperpage{24}
+  \item GCRO-DR, \hyperpage{26, 27}
+  \item GMRES, \hyperpage{20}
+  \item GMRES-MDR, \hyperpage{26}
 
   \indexspace
 
@@ -41,20 +47,25 @@
 
   \indexspace
 
-  \item Krylov subspace, \hyperpage{19}
+  \item Krylov subspace, \hyperpage{20}
 
   \indexspace
 
   \item Langevin equation, \hyperpage{7}
   \item leap frog, \hyperpage{15}
   \item link index, \hyperpage{4}
-  \item low mode, \hyperpage{31}
+  \item low mode, \hyperpage{26}, \hyperpage{37}
 
   \indexspace
 
-  \item meson, \hyperpage{26}
+  \item meson, \hyperpage{32}
   \item Metropolis, \hyperpage{16}
   \item molecular dynamics, \hyperpage{7}
+  \item multi-rate integrator, \hyperpage{18}
+
+  \indexspace
+
+  \item nested integrator, \hyperpage{18}
 
   \indexspace
 
@@ -62,20 +73,21 @@
 
   \indexspace
 
-  \item plaquette energy, \hyperpage{26}
-  \item point source, \hyperpage{28, 29}
-  \item pseudofermions, \hyperpage{6}, \hyperpage{29}
+  \item plaquette energy, \hyperpage{32}
+  \item point source, \hyperpage{34, 35}
+  \item preconditioner, \hyperpage{26}
+  \item pseudofermions, \hyperpage{6}, \hyperpage{35}
 
   \indexspace
 
-  \item reciprocal space, \hyperpage{29}
+  \item reciprocal space, \hyperpage{35}
 
   \indexspace
 
   \item site index, \hyperpage{4}
-  \item solver, \hyperpage{13}, \hyperpage{19}
-  \item source, \hyperpage{28}
-  \item staple, \hyperpage{9}, \hyperpage{32}
-  \item stout, \hyperpage{32}
+  \item solver, \hyperpage{13}, \hyperpage{20}
+  \item source, \hyperpage{34}
+  \item staple, \hyperpage{9}, \hyperpage{38}
+  \item stout, \hyperpage{38}
 
 \end{theindex}

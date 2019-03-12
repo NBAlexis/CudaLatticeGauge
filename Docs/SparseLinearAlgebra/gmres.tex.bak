@@ -17,7 +17,7 @@ Assume a set of basis has been found. For example, if the subspace is found by u
     \State ${\bf v}^{(i+1)}={\bf w}/\|{\bf w}\|$
 \EndFor
 \end{algorithmic}
-\caption{Arnoldi with modified Gram-Schmidt}
+\caption{\label{alg.ArnoldiModifiedGS}Arnoldi with modified Gram-Schmidt}
 \end{algorithm}
 
 Note that $\left({\bf w}-\left({\bf v}_i^*\cdot {\bf w}\right){\bf v}_i\right)^* \cdot {\bf v}_i=0$, and ${\bf x}_0$ is a trail solution, which can be set to be ${\bf b}$ at first. Now we obtain $k+1$ unitary orthogonal vectors, such that
@@ -45,6 +45,7 @@ which can be written as
 \begin{split}
 &(Av)_k=v_{k+1}H
 \end{split}
+\label{eq,gemres.1}
 \end{equation}
 The solution can be written as
 \begin{equation}
@@ -82,7 +83,7 @@ Now, we need to solve $H^{-1}$, we can do this by applying rotation matrix, defi
 \end{array}\right)\right. }_{D=k}
 \end{split}
 \end{equation}
-\textbf{Note that $c_0^*$ and $s_0^*$ is necessary to keep unitary. (which seems not necessary?)} So that
+\textbf{Note that $c_0^*$ and $s_0^*$ is necessary to keep unitary. ($s_0^*$ seems not necessary? we only need to keep the length of $g$ unchanged)} So that
 \begin{equation}
 \begin{split}
 &0=g-Hy\to 0=J_0g-J_0Hy\\
@@ -199,3 +200,5 @@ Note that, the first step, the modified Gram-Schmidt step will produce more and 
 \caption{GMRES(m)}
 \end{algorithm}
 where $RotateH(k)$ and ${\bf x}=SolveY(k)$ is described in Algorithms.~\ref{alg.GEMRES.RotateH} and \ref{alg.GEMRES.SolveY}.
+
+
