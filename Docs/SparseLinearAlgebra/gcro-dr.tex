@@ -80,13 +80,13 @@ Finally, the problem in GMRES Eq.~(\ref{eq,gemres.1}) is changed as
 \frac{1}{\|{\bf u}_1\|} & 0 & 0 & 0 \\
 0 & \frac{1}{\|{\bf u}_2\|} & 0 & 0 \\
 \ldots & \ldots & \ldots & \ldots \\
-0 & 0 & 0 & \frac{1}{\|{\bf u}_k\|} \\ 
+0 & 0 & 0 & \frac{1}{\|{\bf u}_k\|} \\
 \end{array}\right) \in \mathbb{C}^{n\times k}\\
 &V^{(1)}_m=(U_k, V_{m-k})\in \mathbb{C}^{n\times m}\\
 &V^{(2)}_{m+1}=(C_k, V_{m-k+1})\in \mathbb{C}^{n\times (m+1)}\\
 &H'=\left(\begin{array}{cc}
 D_k & B_{m-k} \\
-0 & H_{m-k} 
+0 & H_{m-k}
 \end{array}\right) \in \mathbb{C}^{(m+1)\times m}\\
 &AV^{(1)}_m=V^{(2)}_{m+1}H'\\
 \end{split}
@@ -104,7 +104,7 @@ From Eq.~(\ref{eq.gcrodr.1}), we find
 
 \subsubsection{\label{sec:deflationsubspace}The choice of deflation subspace}
 
-In the above, we have assumed $P_k\in \mathbb{C}^{m\times k}$ is already known. Now we concentrate on this part. 
+In the above, we have assumed $P_k\in \mathbb{C}^{m\times k}$ is already known. Now we concentrate on this part.
 
 Let $A\in \mathbb{C}^{n\times n},V\in \mathbb{C}^{n\times k}$, \textbf{If $V$ is formed as orthogonal normal basis of subspace $S$}, then, if $(\lambda, w\in \mathbb{C}^m)$ is eigen-pair of $V^{\dagger}AV$, $(\lambda, u=V^{\dagger}w\in \mathbb{C}^n)$ is eigen-pair of $A$.
 
@@ -212,7 +212,7 @@ For the $\mathbb{C}^{(m+1)\times k}$ matrix, we use standard Gram-Schmidt for mu
             \Comment {pallial for each $j$}
             \State {${\bf q}_{i + 1}={\bf q}_{i + 1}-\frac{r[ji]}{r[jj]}{\bf q}_{j}$}
             \Comment {Atomic add}
-        \EndFor    
+        \EndFor
     \EndIf
 \EndFor
 \For{$i=0$ to $k-1$}
@@ -236,5 +236,5 @@ Then, we need to calculate $R^{-1}$ where $R$ is a upper triangular matrix, this
 
 \Return ${\bf u}[k]={\bf y}[k]$.
 \end{algorithmic}
-\caption{$U_k=\tilde{Y}_k R^{-1}$}
+\caption{Solving $R{\bf x}={\bf y}$}
 \end{algorithm}

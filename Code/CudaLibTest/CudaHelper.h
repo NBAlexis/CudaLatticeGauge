@@ -69,6 +69,21 @@ float StopTimer(unsigned long long uiStart)
     return ((std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) - uiStart) * 0.001f;
 }
 
+__device__ static __inline__ cuComplex cuCsqrtf(const cuComplex& c)
+{
+    float fRadius = sqrt(c.x*c.x+c.y*c.y);
+    float fCosA = c.x / fRadius;
+    cuComplex out;
+    out.x = sqrt(0.5f * fRadius * (fCosA + 1.0f));
+    out.y = sqrt(0.5f * fRadius * (1.0f - fCosA));
+    if (c.y < 0.0f)
+    {
+        out.y = -1.0f * out.y;
+    }
+
+    return out;
+}
+
 #endif //#ifndef _CUDAHELP_H_
 
 //=============================================================================

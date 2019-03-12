@@ -29,10 +29,15 @@
 \indexentry{preconditioner|hyperpage}{26}
 \indexentry{deflation|hyperpage}{27}
 \indexentry{GCRO-DR|hyperpage}{27}
+\indexentry{Ritz eigen-vector|hyperpage}{28}
 \indexentry{REV|hyperpage}{28}
+\indexentry{harmonic Ritz eigen vector|hyperpage}{28}
+\indexentry{singular value decomposition|hyperpage}{28}
 \indexentry{SVD|hyperpage}{28}
-\indexentry{Lanczos|hyperpage}{29}
-\indexentry{divide-and-conquer|hyperpage}{29}
+\indexentry{generalized eigen-value problem|hyperpage}{29}
+\indexentry{GEV|hyperpage}{29}
+\indexentry{Hessenberg matrix|hyperpage}{29}
+\indexentry{Householder reduction|hyperpage}{29}
 \indexentry{plaquette energy|hyperpage}{32}
 \indexentry{meson|hyperpage}{32}
 \indexentry{correlator|hyperpage}{32}

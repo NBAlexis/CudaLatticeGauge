@@ -59,7 +59,7 @@ extern "C" {
     __device__ static __inline__ CLGComplex __cuCsqrtf(const CLGComplex& c)
     {
         Real fRadius = _cuCabsf(c);
-        Real fCosA = __div(c.x, _cuCabsf(c));
+        Real fCosA = __div(c.x, fRadius);
         CLGComplex out;
         out.x = _sqrt(F(0.5) * fRadius * (fCosA + F(1.0)));
         out.y = _sqrt(F(0.5) * fRadius * (F(1.0) - fCosA));

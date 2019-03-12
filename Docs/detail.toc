@@ -26,8 +26,8 @@
 \contentsline {subsubsection}{\numberline {3.4.1}Brief introduction to deflation preconditioner}{26}{subsubsection.3.4.1}
 \contentsline {subsubsection}{\numberline {3.4.2}GCRO-DR}{27}{subsubsection.3.4.2}
 \contentsline {subsubsection}{\numberline {3.4.3}The choice of deflation subspace}{28}{subsubsection.3.4.3}
-\contentsline {subsubsection}{\numberline {3.4.4}Eigne solver}{29}{subsubsection.3.4.4}
-\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{29}{subsubsection.3.4.5}
+\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{29}{subsubsection.3.4.4}
+\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{30}{subsubsection.3.4.5}
 \contentsline {section}{\numberline {4}Measurement}{32}{section.4}
 \contentsline {subsection}{\numberline {4.1}Plaquette Energy}{32}{subsection.4.1}
 \contentsline {subsection}{\numberline {4.2}Meson Correlator}{32}{subsection.4.2}

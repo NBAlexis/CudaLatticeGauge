@@ -1,7 +1,7 @@
 #include "CudaHelper.h"
 
 #define _MAXD 50
-#define _XD 5
+#define _XD 10
 #define _YD 5
 #define _ZD 4
 
@@ -500,6 +500,45 @@ __global__ void _kernelTruncateMatrixMult_LND(
             atomicAdd(&res[x * midDim + y].x, toAdd.x);
             atomicAdd(&res[x * midDim + y].y, toAdd.y);
         }
+    }
+}
+
+__global__ void _kernelCopyMatrix(cuComplex* mtr, const cuComplex* __restrict__ orignal, const int* __restrict__ decomp, int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    if (x < decomp[0] && y < decomp[0])
+    {
+        mtr[x * decomp[0] + y] = orignal[x * dx + y];
+    }
+}
+
+__global__ void _kernelCopyMatrixH(cuComplex* mtr, 
+    const cuComplex* __restrict__ orignal, 
+    int dx1, 
+    int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    if (x < dx1 && y < dx1)
+    {
+        mtr[x * dx1 + y] = orignal[x * dx + y];
+    }
+}
+
+/**
+* thread.xy = lx,ly
+*/
+__global__ void _kernelCopyMatrixXY(cuComplex* mtr, const cuComplex* __restrict__ orignal, int lx, int ly, int newdy, int olddy)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    if (x < lx && y < ly)
+    {
+        mtr[x * newdy + y] = orignal[x * olddy + y];
     }
 }
 
@@ -1026,6 +1065,20 @@ void HouseHolderDecomp(cuComplex* U, cuComplex* tmpU, cuComplex* tmpM, cuComplex
     }
 }
 
+void HouseHolderDecompSimple(cuComplex* T, cuComplex* tmpU, cuComplex* tmpM, int dx)
+{
+    dim3 block1(1, 1, 1);
+    dim3 block2(dx, 1, 1);
+    dim3 thread1(dx, dx, 1);
+
+    for (int i = 0; i < dx - 2; ++i)
+    {
+        _kernelOneStepHouseHolder << <block1, thread1 >> > (tmpU, T, i, dx);
+        _kernelTruncateMatrixMult_L << <block2, thread1 >> > (tmpM, tmpU, T, i + 1, dx);
+        _kernelTruncateMatrixMult_R << <block2, thread1 >> > (T, tmpM, tmpU, i + 1, dx);
+    }
+}
+
 void TestHouseHolder()
 {
     cuComplex h1ij[_XD * _XD];
@@ -1196,6 +1249,36 @@ void HouseHolderQR(cuComplex* Q, cuComplex* R, const cuComplex* T, cuComplex* tm
     }
 }
 
+void HouseHolderQRThin(cuComplex* Q,
+    cuComplex* R, 
+    const cuComplex* T, 
+    cuComplex* tmpR,
+    cuComplex* tmpQ, 
+    cuComplex* tmpQ2,
+    cuComplex* tmpM, int dx, int dy)
+{
+    dim3 block1(1, 1, 1);
+    dim3 block2(dx, 1, 1);
+    dim3 thread1(dx, dy, 1);
+    dim3 thread2(dx, dx, 1);
+
+    _kernelInitialZero << <block1, thread2 >> > (tmpR, dx);
+    _kernelCopyMatrixXY << <block1, thread1 >> > (tmpR, T, dx, dy, dx, dy);
+    _kernelInitialOne << <block1, thread2 >> > (tmpQ2, dx);
+    for (int i = 0; i < dx - 1; ++i)
+    {
+        _kernelOneStepHouseHolderQR << <block1, thread2 >> > (tmpQ, tmpR, i, dx);
+
+        _kernelTruncateMatrixMult_L << <block2, thread2 >> > (tmpM, tmpQ, tmpR, i, dx);
+        checkCudaErrors(cudaMemcpy(tmpR, tmpM, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToDevice));
+
+        _kernelTruncateMatrixMult_R << <block2, thread2 >> > (tmpM, tmpQ2, tmpQ, i, dx);
+        checkCudaErrors(cudaMemcpy(tmpQ2, tmpM, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToDevice));
+    }
+    _kernelCopyMatrixXY << <block1, thread1 >> > (R, tmpR, dy, dy, dy, dx);
+    _kernelCopyMatrixXY << <block1, thread1 >> > (Q, tmpQ2, dx, dy, dy, dx);
+}
+
 void TestHouseHolderQRDecomposition()
 {
     cuComplex h1ij[_XD * _XD];
@@ -1203,10 +1286,13 @@ void TestHouseHolderQRDecomposition()
     cuComplex r1ij[_XD * _XD];
     cuComplex res1ij[_XD * _XD];
 
-    for (int i = 0; i < _XD * _XD; ++i)
+    for (int x = 0; x < _XD; ++x)
     {
-        h1ij[i].x = (rand() % 11 - 5) / 5.0f;
-        h1ij[i].y = (rand() % 11 - 5) / 5.0f;
+        for (int y = 0; y < _XD; ++y)
+        {
+            h1ij[x * _XD + y].x = (rand() % 11 - 5) / 5.0f;
+            h1ij[x * _XD + y].y = (rand() % 11 - 5) / 5.0f;
+        }
     }
 
     cuComplex* deviceH1 = NULL;
@@ -1239,6 +1325,63 @@ void TestHouseHolderQRDecomposition()
     PrintMatrix(q1ij, _XD, _XD);
     PrintMatrix(r1ij, _XD, _XD);
     PrintMatrix(res1ij, _XD, _XD);
+
+    checkCudaErrors(cudaFree(deviceH1));
+    checkCudaErrors(cudaFree(deviceRES1));
+    checkCudaErrors(cudaFree(deviceQ1));
+    checkCudaErrors(cudaFree(deviceR1));
+}
+
+void TestHouseHolderQRDecomposition2()
+{
+    cuComplex h1ij[_XD * _YD];
+    cuComplex q1ij[_XD * _YD];
+    cuComplex r1ij[_YD * _YD];
+    cuComplex res1ij[_XD * _YD];
+
+    for (int x = 0; x < _XD; ++x)
+    {
+        for (int y = 0; y < _YD; ++y)
+        {
+            h1ij[x * _YD + y].x = (rand() % 11 - 5) / 5.0f;
+            h1ij[x * _YD + y].y = (rand() % 11 - 5) / 5.0f;
+        }
+    }
+
+    cuComplex* deviceH1 = NULL;
+    cuComplex* deviceQ1 = NULL;
+    cuComplex* deviceR1 = NULL;
+    cuComplex* deviceTmpR = NULL;
+    cuComplex* deviceTmpQ = NULL;
+    cuComplex* deviceTmpQ2 = NULL;
+    cuComplex* deviceTmpM = NULL;
+    cuComplex* deviceRES1 = NULL;
+
+    checkCudaErrors(cudaMalloc((void**)&deviceH1, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceRES1, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceQ1, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpR, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpQ, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpQ2, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpM, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceR1, sizeof(cuComplex) * _YD * _YD));
+    checkCudaErrors(cudaMemcpy(deviceH1, h1ij, sizeof(cuComplex) * _XD * _YD, cudaMemcpyHostToDevice));
+
+    HouseHolderQRThin(deviceQ1, deviceR1, deviceH1, deviceTmpR, deviceTmpQ, deviceTmpQ2, deviceTmpM, _XD, _YD);
+
+    dim3 block1(_XD, 1, 1);
+    dim3 thread1(_XD, _YD, 1);
+    _kernelSmallMatrixMult_NN << <block1, thread1 >> > (deviceRES1, deviceQ1, deviceR1, _YD, _YD);
+
+    //test res
+    checkCudaErrors(cudaMemcpy(q1ij, deviceQ1, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(r1ij, deviceR1, sizeof(cuComplex) * _YD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(res1ij, deviceRES1, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+
+    PrintMatrix(h1ij, _XD, _YD);
+    PrintMatrix(q1ij, _XD, _YD);
+    PrintMatrix(r1ij, _YD, _YD);
+    PrintMatrix(res1ij, _XD, _YD);
 
     checkCudaErrors(cudaFree(deviceH1));
     checkCudaErrors(cudaFree(deviceRES1));
@@ -1541,6 +1684,42 @@ __global__ void _kernelRayleighShift(cuComplex* m, cuComplex* c, int dim)
     m[i * dim + i] = cuCsubf(m[i * dim + i], c[0]);
 }
 
+__global__ void _kernelWilkinsonShift(cuComplex* m, cuComplex* c, int dim)
+{
+    int i = threadIdx.x;
+    if (0 == i)
+    {
+        //d
+        c[0] = m[dim * dim - 1];
+
+        //bc
+        cuComplex omega = cuCmulf(m[dim * dim - dim - 1], m[dim * dim - 2]);
+
+        float fOmegaSq = omega.x * omega.x + omega.y * omega.y;
+        if (fOmegaSq > 0.00001f)
+        {
+            //(d-a)/2
+            cuComplex xi = make_cuComplex(
+                0.5f * (c[0].x - m[dim * dim - dim - 2].x),
+                0.5f * (c[0].y - m[dim * dim - dim - 2].y));
+            //sqrt(((d-a)/2)^2 + bc)
+            cuComplex eta = cuCsqrtf(cuCaddf(cuCmulf(xi, xi), omega));
+            if (xi.x * eta.x + xi.y * eta.y < 0.0f)
+            {
+                c[0] = cuCsubf(c[0], cuCdivf(omega, cuCsubf(eta, xi)));
+            }
+            else
+            {
+                c[0] = cuCaddf(c[0], cuCdivf(omega, cuCaddf(eta, xi)));
+            }
+        }
+    }
+
+    __syncthreads();
+
+    m[i * dim + i] = cuCsubf(m[i * dim + i], c[0]);
+}
+
 __global__ void _kernelCheckMatrix(cuComplex* mtr, int* decomp, int dx, float fCrit)
 {
     decomp[0] = dx;
@@ -1561,16 +1740,7 @@ __global__ void _kernelCheckMatrix(cuComplex* mtr, int* decomp, int dx, float fC
     printf("decomp %d \n", decomp[0]);
 }
 
-__global__ void _kernelCopyMatrix(cuComplex* mtr, cuComplex* orignal, int* decomp, int dx)
-{
-    int x = threadIdx.x;
-    int y = threadIdx.y;
 
-    if (x < decomp[0] && y < decomp[0])
-    {
-        mtr[x * decomp[0] + y] = orignal[x * dx + y];
-    }
-}
 
 /**
 * thread = (dx, dy, 1)
@@ -1617,7 +1787,7 @@ __global__ void _kernelUpdateT(
             }
             else
             {
-                tmpMatrix[x * dimEnd + y] = T[x * dx + y];
+                tmpMatrix[x * dx + y] = T[x * dx + y];
                 T[x * dx + y] = make_cuComplex(0.0f, 0.0f);
             }
         }
@@ -1626,7 +1796,7 @@ __global__ void _kernelUpdateT(
 
         if (y >= dimEnd)
         {
-            cuComplex toAdd = cuCmulf(cuConjf(Q[n * dimEnd + x]), tmpMatrix[n * dimEnd + y]);
+            cuComplex toAdd = cuCmulf(cuConjf(Q[n * dimEnd + x]), tmpMatrix[n * dx + y]);
             atomicAdd(&T[x * dx + y].x, toAdd.x);
             atomicAdd(&T[x * dx + y].y, toAdd.y);
         }
@@ -1636,6 +1806,9 @@ __global__ void _kernelUpdateT(
 /**
 * thread = (dx, dy, 1)
 * block = (decomp, 1, 1)
+*
+* Q Z
+* where
 *
 * left = U 0 ^+
 *        0 1 
@@ -1675,14 +1848,14 @@ __global__ void _kernelUpdateU(
 
     if (x < dimEnd)
     {
-        cuComplex toAdd = cuCmulf(cuConjf(left[n * midDim + x]), right[n * midDim + y]);
+        cuComplex toAdd = cuCmulf(cuConjf(left[n * dimEnd + x]), right[n * midDim + y]);
 
         atomicAdd(&res[x * midDim + y].x, toAdd.x);
         atomicAdd(&res[x * midDim + y].y, toAdd.y);
     }
 }
 
-void QRIterateRayleighShift(
+void QRIterate(
     const cuComplex* H, 
     cuComplex* U, 
     cuComplex* T, 
@@ -1699,8 +1872,6 @@ void QRIterateRayleighShift(
     dim3 block2(dx, 1, 1);
     dim3 thread1(dx, dx, 1);
     int endindex[1];
-
-    cuComplex test[_XD * _XD];
 
     checkCudaErrors(cudaMemcpy(T, H, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToDevice));
     for (int i = 0; i < iCrit; ++i)
@@ -1723,7 +1894,7 @@ void QRIterateRayleighShift(
         dim3 newblock2(endindex[0], 1, 1);
         dim3 thread0(endindex[0], 1, 1);
         dim3 newthread1(endindex[0], endindex[0], 1);
-        _kernelRayleighShift << <block1, thread0 >> > (tmpM1, tmpDeviceFloat, endindex[0]);
+        _kernelWilkinsonShift << <block1, thread0 >> > (tmpM1, tmpDeviceFloat, endindex[0]);
 
         //QR decompose
         //QRFactorization(Q, R, tmpM1, endindex[0], endindex[0]);
@@ -1736,19 +1907,6 @@ void QRIterateRayleighShift(
 
         _kernelMatrixAddConstant << <block1, thread0 >> > (tmpM1, tmpDeviceFloat, endindex[0]);
 
-        //printf("t=\n");
-        //checkCudaErrors(cudaMemcpy(test, T, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToHost));
-        //PrintMatrix(test, dx, dx);
-
-        //printf("q=\n");
-        //checkCudaErrors(cudaMemcpy(test, Q, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToHost));
-        //PrintMatrix(test, dx, dx);
-
-        //printf("r=\n");
-        //checkCudaErrors(cudaMemcpy(test, R, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToHost));
-        //PrintMatrix(test, dx, dx);
-
-
         //Update T
         //R not used again, so use it as tmp
         _kernelUpdateT << <newblock2, thread1 >> > (T, tmpM1, R, Q, tmpDecomp, dx);
@@ -1756,6 +1914,64 @@ void QRIterateRayleighShift(
         //Update U
         _kernelUpdateU << <newblock2, thread1 >> > (tmpM1, Q, U, tmpDecomp, dx);
         checkCudaErrors(cudaMemcpy(U, tmpM1, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToDevice));
+    }
+}
+
+void QRIterateSimple(
+    cuComplex* T,
+    cuComplex* Q,
+    cuComplex* R,
+    cuComplex* tmpM1,
+    cuComplex* tmpM2,
+    cuComplex* tmpM3,
+    cuComplex* tmpDeviceFloat,
+    int* tmpDecomp,
+    int dx, float fCrit, int iCrit)
+{
+    dim3 block1(1, 1, 1);
+    dim3 block2(dx, 1, 1);
+    dim3 thread1(dx, dx, 1);
+    int endindex[1];
+
+    checkCudaErrors(cudaMemcpy(tmpM1, T, sizeof(cuComplex) * dx * dx, cudaMemcpyDeviceToDevice));
+
+    int iLastDim = dx;
+    for (int i = 0; i < iCrit; ++i)
+    {
+        //find decomp
+        _kernelCheckMatrix << <1, 1 >> > (tmpM1, tmpDecomp, iLastDim, fCrit);
+
+        checkCudaErrors(cudaMemcpy(endindex, tmpDecomp, sizeof(int), cudaMemcpyDeviceToHost));
+        if (endindex[0] < iLastDim)
+        {
+            //copy matrix
+            dim3 threadCopy1(iLastDim, iLastDim, 1);
+            _kernelCopyMatrixH << <block1, threadCopy1 >> > (T, tmpM1, dx, iLastDim);
+            if (1 == endindex[0])
+            {
+                //finished
+                return;
+            }
+
+            iLastDim = endindex[0];
+            dim3 threadCopy2(iLastDim, iLastDim, 1);
+            _kernelCopyMatrixH << <block1, thread1 >> > (tmpM1, T, iLastDim, dx);
+        }
+
+        //shift
+        //T = T - sigma I, tmpDeviceFloat[0] = sigma
+        dim3 newblock2(iLastDim, 1, 1);
+        dim3 thread0(iLastDim, 1, 1);
+        dim3 newthread1(iLastDim, iLastDim, 1);
+        _kernelWilkinsonShift << <block1, thread0 >> > (tmpM1, tmpDeviceFloat, iLastDim);
+
+        //QR decompose
+        HouseHolderQR(Q, R, tmpM1, tmpM2, tmpM3, iLastDim);
+
+        //Update H
+        //T = R Q + sigma I
+        _kernelSmallMatrixMult_NN << <newblock2, newthread1 >> > (tmpM1, R, Q, iLastDim, iLastDim);
+        _kernelMatrixAddConstant << <block1, thread0 >> > (tmpM1, tmpDeviceFloat, iLastDim);
     }
 }
 
@@ -1819,7 +2035,7 @@ void TestQRIterate()
 
     checkCudaErrors(cudaMemcpy(u0ij, deviceU1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
 
-    QRIterateRayleighShift(deviceT1, deviceU1, deviceT2, 
+    QRIterate(deviceT1, deviceU1, deviceT2, 
         devicetmp1, devicetmp2, devicetmp3, devicetmp4, devicetmp5, deviceTmpFloat, deviceBlockDecomp,
         _XD, 0.000000001f, 100);
 
@@ -1836,16 +2052,511 @@ void TestQRIterate()
     printf("h=\n");
     PrintMatrix(h1ij, _XD, _XD);
 
-    printf("u0=\n");
-    PrintMatrix(u0ij, _XD, _XD);
+    //printf("u0=\n");
+    //PrintMatrix(u0ij, _XD, _XD);
     //PrintMatrix(u1ij, _XD, _XD);
 
-    printf("t1=\n");
-    PrintMatrix(t1ij, _XD, _XD);
+    //printf("t1=\n");
+    //PrintMatrix(t1ij, _XD, _XD);
     printf("t2=\n");
     PrintMatrix(t2ij, _XD, _XD);
     printf("res=\n");
     PrintMatrix(res1ij, _XD, _XD);
+}
+
+void TestQRIterateSimple()
+{
+    cuComplex h1ij[_XD * _XD];
+    cuComplex u0ij[_XD * _XD];
+    cuComplex u1ij[_XD * _XD];
+    cuComplex t1ij[_XD * _XD];
+    cuComplex t2ij[_XD * _XD];
+    cuComplex res1ij[_XD * _XD];
+
+    for (int i = 0; i < _XD * _XD; ++i)
+    {
+        h1ij[i].x = (rand() % 11 - 5) / 5.0f;
+        h1ij[i].y = (rand() % 11 - 5) / 5.0f;
+        if ((i / _XD) == (i % _XD))
+        {
+            u1ij[i].x = 1.0f;
+            u1ij[i].y = 0.0f;
+        }
+        else
+        {
+            u1ij[i].x = 0.0f;
+            u1ij[i].y = 0.0f;
+        }
+    }
+
+    cuComplex* deviceH1 = NULL;
+    cuComplex* deviceU1 = NULL;
+    cuComplex* deviceT1 = NULL;
+    cuComplex* deviceT2 = NULL;
+    cuComplex* devicetmp1 = NULL;
+    cuComplex* devicetmp2 = NULL;
+    cuComplex* devicetmp3 = NULL;
+    cuComplex* devicetmp4 = NULL;
+    cuComplex* devicetmp5 = NULL;
+    cuComplex* deviceRES1 = NULL;
+    cuComplex* deviceTmpFloat = NULL;
+    int* deviceBlockDecomp = NULL;
+
+
+    checkCudaErrors(cudaMalloc((void**)&deviceH1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceU1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceT1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceT2, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&devicetmp1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&devicetmp2, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&devicetmp3, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&devicetmp4, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&devicetmp5, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceRES1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpFloat, sizeof(cuComplex)));
+    checkCudaErrors(cudaMalloc((void**)&deviceBlockDecomp, sizeof(int) * 1));
+
+    checkCudaErrors(cudaMemcpy(deviceH1, h1ij, sizeof(cuComplex) * _XD * _XD, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(deviceU1, u1ij, sizeof(cuComplex) * _XD * _XD, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(deviceT1, deviceH1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToDevice));
+
+    HouseHolderDecomp(deviceU1, devicetmp1, devicetmp2, deviceT1, _XD);
+
+    checkCudaErrors(cudaMemcpy(u0ij, deviceU1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+
+    QRIterateSimple(deviceT1,
+        devicetmp1, devicetmp2, devicetmp3, devicetmp4, devicetmp5, deviceTmpFloat, deviceBlockDecomp,
+        _XD, 0.000000001f, 100);
+
+    //dim3 block1(_XD, 1, 1);
+    //dim3 thread1(_XD, _XD, 1);
+    //_kernelSmallMatrixMult_DN << <block1, thread1 >> > (devicetmp1, deviceU1, deviceT2, _XD, _XD);
+    //_kernelSmallMatrixMult_NN << <block1, thread1 >> > (deviceRES1, devicetmp1, deviceU1, _XD, _XD);
+
+    checkCudaErrors(cudaMemcpy(u1ij, deviceU1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(t1ij, deviceT1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+    //checkCudaErrors(cudaMemcpy(t2ij, deviceT2, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+    //checkCudaErrors(cudaMemcpy(res1ij, deviceRES1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+
+    printf("h=\n");
+    PrintMatrix(h1ij, _XD, _XD);
+
+    //printf("u0=\n");
+    //PrintMatrix(u0ij, _XD, _XD);
+    //PrintMatrix(u1ij, _XD, _XD);
+
+    //printf("t1=\n");
+    //PrintMatrix(t1ij, _XD, _XD);
+    printf("t2=\n");
+    PrintMatrix(t1ij, _XD, _XD);
+    //printf("res=\n");
+    //PrintMatrix(res1ij, _XD, _XD);
+}
+
+#pragma endregion
+
+#pragma region Back Shift
+
+__global__ void _kernelOneLineReduceBS(cuComplex* y, const cuComplex* __restrict__ R, int i, int dk, int dx)
+{
+    int j = threadIdx.x + i + 1; //j=i+1 to dx
+    int n = threadIdx.y;
+
+    if (j < dx)
+    {
+        cuComplex toAdd = cuCmulf(R[i * dx + j], y[j * dk + n]);
+        atomicAdd(&y[i * dk + n].x, -toAdd.x);
+        atomicAdd(&y[i * dk + n].y, -toAdd.y);
+    }
+    
+    __syncthreads();
+
+    if (i + 1 == j)
+    {
+        y[i * dk + n] = cuCdivf(y[i * dk + n], R[i * dx + i]);
+    }
+}
+
+void SolveY(cuComplex* deviceY, const cuComplex* deviceR, int dk, int dx)
+{
+    dim3 block(1, 1, 1);
+
+    for (int i = dx - 1; i >= 0; --i)
+    {
+        if (i == dx - 1)
+        {
+            dim3 thread(1, dk, 1);
+            _kernelOneLineReduceBS << <block, thread >> > (deviceY, deviceR, i, dk, dx);
+        }
+        else
+        {
+            dim3 thread(dx - i - 1, dk, 1);
+            _kernelOneLineReduceBS << <block, thread >> > (deviceY, deviceR, i, dk, dx);
+        }
+    }
+}
+
+void TestSolveY()
+{
+    cuComplex rij[_XD * _XD];
+    cuComplex yij[_XD * _YD];
+    cuComplex resij[_XD * _YD];
+    for (int x = 0; x < _XD; ++x)
+    {
+        for (int y = 0; y < _XD; ++y)
+        {
+            if (y >= x)
+            {
+                rij[x * _XD + y].x = (rand() % 11 - 5) / 5.0f;
+                rij[x * _XD + y].y = (rand() % 11 - 5) / 5.0f;
+            }
+            else
+            {
+                rij[x * _XD + y].x = 0.0f;
+                rij[x * _XD + y].y = 0.0f;
+            }
+
+            if (y < _YD)
+            {
+                yij[x * _YD + y].x = (rand() % 11 - 5) / 5.0f;
+                yij[x * _YD + y].y = (rand() % 11 - 5) / 5.0f;
+            }
+        }
+    }
+
+    cuComplex* deviceR = NULL;
+    cuComplex* deviceY = NULL;
+    cuComplex* deviceYres = NULL;
+    cuComplex* deviceRES1 = NULL;
+
+    checkCudaErrors(cudaMalloc((void**)&deviceR, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceY, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceYres, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceRES1, sizeof(cuComplex) * _XD * _YD));
+
+    checkCudaErrors(cudaMemcpy(deviceR, rij, sizeof(cuComplex) * _XD * _XD, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(deviceY, yij, sizeof(cuComplex) * _XD * _YD, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(deviceYres, yij, sizeof(cuComplex) * _XD * _YD, cudaMemcpyHostToDevice));
+
+    SolveY(deviceYres, deviceR, _YD, _XD);
+
+    dim3 block1(_XD, 1, 1);
+    dim3 thread1(_XD, _YD, 1);
+    _kernelSmallMatrixMult_NN << <block1, thread1 >> > (deviceRES1, deviceR, deviceYres, _XD, _YD);
+
+    checkCudaErrors(cudaMemcpy(resij, deviceRES1, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+
+    PrintMatrix(rij, _XD, _XD);
+    PrintMatrix(yij, _XD, _YD);
+    PrintMatrix(resij, _XD, _YD);
+}
+
+#pragma endregion
+
+#pragma region Solve Eigen Vector
+
+__global__ void _kernelSortEigenValues(const cuComplex* __restrict__ R,
+    cuComplex* outV, float* tmpF, int* tmpO, int k, int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    if (0 == x)
+    {
+        tmpF[y] = R[y * dx + y].x * R[y * dx + y].x + R[y * dx + y].y * R[y * dx + y].y;
+        tmpO[y] = 0;
+    }
+
+    __syncthreads();
+
+    if (x != y)
+    {
+        if (tmpF[x] < tmpF[y])
+        {
+            atomicAdd(&tmpO[y], 1);
+        }
+    }
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        if (tmpO[y] < k)
+        {
+            outV[tmpO[y]] = R[y * dx + y];
+        }
+    }
+}
+
+__global__ void _kernelDaggerVector(cuComplex* y, const cuComplex* __restrict__ Q, int dx)
+{
+    int j = threadIdx.x;
+    y[j] = cuConjf(Q[j * dx]);
+}
+
+__global__ void _kernelInverseIterateShift(cuComplex* A, const cuComplex* __restrict__ outV, int k, int dx)
+{
+    int x = threadIdx.x;
+    A[x * dx + x] = cuCsubf(A[x * dx + x], outV[k]);
+}
+
+__global__ void _kernelErrorCheck(float* outE, cuComplex* v, const cuComplex* __restrict__ A, int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    __shared__ float length;
+    __shared__ cuComplex afterMult[_MAXD];
+
+    if (0 == x && 0 == y)
+    {
+        length = 0.0f;
+    }
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        atomicAdd(&length, v[y].x * v[y].x + v[y].y * v[y].y);
+        afterMult[y] = make_cuComplex(0.0f, 0.0f);
+    }
+
+    __syncthreads();
+    
+    if (0 == x && 0 == y)
+    {
+        length = sqrt(length);
+    }
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        v[y].x = v[y].x / length;
+        v[y].y = v[y].y / length;
+    }
+
+    __syncthreads();
+
+    cuComplex toAdd = cuCmulf(A[x * dx + y], v[y]);
+    atomicAdd(&afterMult[x].x, toAdd.x);
+    atomicAdd(&afterMult[x].y, toAdd.y);
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        atomicAdd(outE, afterMult[y].x * afterMult[y].x + afterMult[y].y * afterMult[y].y);
+    }
+}
+
+__global__ void _kernelMatrixMultV_Dagger(const cuComplex* __restrict__ M, cuComplex* v, int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+
+    __shared__ cuComplex afterMult[_MAXD];
+
+    if (0 == x)
+    {
+        afterMult[y] = make_cuComplex(0.0f, 0.0f);
+    }
+
+    __syncthreads();
+
+    cuComplex toAdd = cuCmulf(cuConjf(M[y * dx + x]), v[y]);
+    atomicAdd(&afterMult[x].x, toAdd.x);
+    atomicAdd(&afterMult[x].y, toAdd.y);
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        v[y] = afterMult[y];
+    }
+}
+
+__global__ void _kernelNormVectors(cuComplex* v, int dx)
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+    __shared__ float fAmp[_MAXD];
+    if (0 == x)
+    {
+        fAmp[y] = 0.0f;
+    }
+
+    __syncthreads();
+
+    atomicAdd(&fAmp[y], v[y * dx + x].x * v[y * dx + x].x + v[y * dx + x].y * v[y * dx + x].y);
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        fAmp[y] = sqrt(fAmp[y]);
+    }
+
+    v[y * dx + x].x = v[y * dx + x].x / fAmp[y];
+    v[y * dx + x].y = v[y * dx + x].y / fAmp[y];
+}
+
+void EigenValueProblem(
+    cuComplex* H, 
+    cuComplex* outEigenValue, 
+    cuComplex* outEigenVector, 
+    cuComplex* tmpM1, //dm x dm
+    cuComplex* tmpM2, //dm x dm
+    cuComplex* tmpM3, //dm x dm
+    cuComplex* tmpM4, //dm x dm
+    cuComplex* tmpM5, //dm x dm
+    cuComplex* tmpM6, //dm x dm
+    cuComplex* tmpV,  //dm x 1
+    cuComplex* tmpShift, //at least 2
+    float*     tmpF,     //at least dm
+    int*       tmpI,     //at least dm
+    float fCrit,
+    int iMaxIterate,
+    int dm, int dk)
+{
+    checkCudaErrors(cudaMemcpy(tmpM1, H, sizeof(cuComplex) * dm * dm, cudaMemcpyDeviceToDevice));
+    HouseHolderDecompSimple(tmpM1, tmpM2, tmpM3, dm);
+    QRIterateSimple(tmpM1,
+        tmpM2, tmpM3, tmpM4, tmpM5, tmpM6, tmpShift, tmpI,
+        dm, fCrit, iMaxIterate);
+
+    dim3 block1(1, 1, 1);
+    dim3 thread1(dm, dm, 1);
+    dim3 thread2(dm, 1, 1);
+
+    //cuComplex test[_XD * _XD];
+    //checkCudaErrors(cudaMemcpy(test, tmpM1, sizeof(cuComplex) * _XD * _XD, cudaMemcpyDeviceToHost));
+    //PrintMatrix(test, _XD, _XD);
+
+    _kernelSortEigenValues << <block1, thread1 >> > (tmpM1, outEigenValue, tmpF, tmpI, dk, dm);
+    //checkCudaErrors(cudaMemcpy(test, outEigenValue, sizeof(cuComplex) * dk, cudaMemcpyDeviceToHost));
+    //PrintMatrix(test, 1, dk);
+
+    for (int i = 0; i < dk; ++i)
+    {
+        //Inverse Iterate
+        checkCudaErrors(cudaMemcpy(tmpM1, H, sizeof(cuComplex) * dm * dm, cudaMemcpyDeviceToDevice));
+        _kernelInverseIterateShift << <block1, thread2 >> > (tmpM1, outEigenValue, i, dm);
+
+        HouseHolderQR(tmpM2, tmpM3, tmpM1, tmpM4, tmpM5, dm);
+
+        //q=tmpM2, r=tmpM3
+        _kernelDaggerVector << <block1, thread2 >> > (tmpV, tmpM2, dm);
+
+        SolveY(tmpV, tmpM3, 1, dm);
+
+        // One Iteration is enough!
+        //float fErr[1];
+
+        //for (int j = 0; j < iMaxIterate; ++j)
+        //{
+        //    fErr[0] = 0.0f;
+        //    checkCudaErrors(cudaMemcpy(tmpF, fErr, sizeof(float), cudaMemcpyHostToDevice));
+
+        //    _kernelErrorCheck << <block1, thread1 >> > (tmpF, tmpV, tmpM1, dm);
+
+        //    checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(float), cudaMemcpyDeviceToHost));
+
+        //    printf("error now = %f\n\n", fErr[0]);
+
+        //    if (fErr[0] < fCrit)
+        //    {
+        //        break;
+        //    }
+
+        //    _kernelMatrixMultV_Dagger << <block1, thread1 >> > (tmpM2, tmpV, dm);
+        //    SolveY(tmpV, tmpM3, 1, dm);
+        //}
+
+        checkCudaErrors(cudaMemcpy(outEigenVector + dm * i, tmpV, sizeof(cuComplex) * dm, cudaMemcpyDeviceToDevice));
+    }
+
+    //If Only one iteration, normalize at final
+    dim3 thread3(dm, dk, 1);
+    _kernelNormVectors << <block1, thread3 >> > (outEigenVector, dm);
+}
+
+
+void TestEigenProblem()
+{
+    cuComplex hij[_XD * _XD];
+    cuComplex vij[_XD * _YD];
+    cuComplex eij[_YD];
+
+    for (int x = 0; x < _XD; ++x)
+    {
+        for (int y = 0; y < _XD; ++y)
+        {
+            hij[x * _XD + y].x = (rand() % 11 - 5) / 5.0f;
+            hij[x * _XD + y].y = (rand() % 11 - 5) / 5.0f;
+        }
+    }
+
+    cuComplex* deviceH = NULL;
+    cuComplex* deviceV = NULL;
+    cuComplex* deviceE = NULL;
+    cuComplex* deviceTmpV = NULL;
+    cuComplex* deviceM1 = NULL;
+    cuComplex* deviceM2 = NULL;
+    cuComplex* deviceM3 = NULL;
+    cuComplex* deviceM4 = NULL;
+    cuComplex* deviceM5 = NULL;
+    cuComplex* deviceM6 = NULL;
+    cuComplex* deviceShift = NULL;
+    float* deviceF = NULL;
+    int* deviceI = NULL;
+
+    checkCudaErrors(cudaMalloc((void**)&deviceH, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceV, sizeof(cuComplex) * _XD * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceE, sizeof(cuComplex) * _YD));
+    checkCudaErrors(cudaMalloc((void**)&deviceTmpV, sizeof(cuComplex) * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM1, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM2, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM3, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM4, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM5, sizeof(cuComplex) * _XD * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceM6, sizeof(cuComplex) * _XD * _XD));
+
+    checkCudaErrors(cudaMalloc((void**)&deviceShift, sizeof(cuComplex)));
+    checkCudaErrors(cudaMalloc((void**)&deviceF, sizeof(cuComplex) * _XD));
+    checkCudaErrors(cudaMalloc((void**)&deviceI, sizeof(cuComplex) * _XD));
+
+    checkCudaErrors(cudaMemcpy(deviceH, hij, sizeof(cuComplex) * _XD * _XD, cudaMemcpyHostToDevice));
+
+    EigenValueProblem(
+        deviceH,
+        deviceE,
+        deviceV,
+
+        deviceM1,
+        deviceM2,
+        deviceM3,
+        deviceM4,
+        deviceM5,
+        deviceM6,
+
+        deviceTmpV,
+
+        deviceShift,
+        deviceF,
+        deviceI,
+        0.000000001f,
+        100,
+        _XD, _YD
+    );
+
+    checkCudaErrors(cudaMemcpy(vij, deviceV, sizeof(cuComplex) * _XD * _YD, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(eij, deviceE, sizeof(cuComplex) * _YD, cudaMemcpyDeviceToHost));
+
+    PrintMatrix(hij, _XD, _XD);
+    PrintMatrix(vij, _YD, _XD);
+    PrintMatrix(eij, 1, _YD);
+
 }
 
 #pragma endregion
@@ -1853,10 +2564,13 @@ void TestQRIterate()
 int main()
 {
     //TestHouseHolderQRDecomposition();
-
+    //printf("=============\n");
+    //TestHouseHolderQRDecomposition2();
     //printf("=============\n");
     //TestQRFactorization_B();
-    TestQRIterate();
+    //TestQRIterate();
+    //TestQRIterateSimple();
+    TestEigenProblem();
 
     return 0;
 }
