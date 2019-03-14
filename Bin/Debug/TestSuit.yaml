@@ -57,6 +57,22 @@ TestDebug:
 
     TestAccuracy : 0.0015
 
+TestSmallMatrix:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+
+    ##10x10x10 blocks, each with 16x16x4 threads, each thread loop for 200 times
+    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
+    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
+    HostSample : 1000
+
+    TestAccuracy : 0.0015
+
 TestRandomSchrage:
 
     Dim : 4

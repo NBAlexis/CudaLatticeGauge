@@ -160,6 +160,7 @@ Tested that Householder reduction is faster than symmetric or unsymmetric Lanczo
 
 \textbf{Note that this might be not true when the matrix is huge, and Hessenberg reduction is not a full reduction. In our case, we concentrate on matrix with $5<m<50$. Tested when about $7<m<30$ ($30 \times 30 \approx 1024$ is the maximum thread count on test machine), Householder is faster.}
 
+Also, as tested, the quality of QR factorization affects the QR iteration very much. At the same time, compared with QR iteration, the QR factorization is relatively cheap, so we also use Householder to do the QR factorization.
 
 
 \subsubsection{\label{sec:implementationgcrodr}Implementation of GCRO-DR}

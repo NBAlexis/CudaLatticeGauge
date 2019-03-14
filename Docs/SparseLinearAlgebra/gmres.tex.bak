@@ -66,7 +66,7 @@ Or, to solve an equation in $k$ dimension
 \end{split}
 \end{equation}
 
-Now, we need to solve $H^{-1}$, we can do this by applying rotation matrix, defining
+Now, we need to solve $H^{-1}$, we can do this by applying rotation matrix, defining (This is called \index{Givens rotation}\textbf{})
 \begin{equation}
 \begin{split}
 &J_0=
@@ -154,7 +154,7 @@ The algorithm is
 \begin{algorithmic}
 \For{$i=k-1$ to $0$}
     \For{$j=i+1$ to $k-1$}
-        \State $g[j]-=h[i,j]\times y[j]$
+        \State $g[i]-=h[i,j]\times y[j]$
     \EndFor
     \State $y[i] = g[i] / h[i,i]$
 \EndFor

@@ -86,6 +86,15 @@ UINT TestOperators(CParameters& )
     return uiErrors;
 }
 
+
+UINT TestSmallMatrix(CParameters&)
+{
+    CLinearAlgebraHelper::TestSmallMatrix();
+    return 0;
+}
+
+__REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
+
 __REGIST_TEST(TestOperators, Misc, TestOperators);
 
 

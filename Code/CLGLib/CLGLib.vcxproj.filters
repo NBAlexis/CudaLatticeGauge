@@ -257,6 +257,9 @@
     <ClInclude Include="Update\Continous\CIntegratorNestedForceGradient.h">
       <Filter>Update\Continous</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -366,6 +369,9 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu">
       <Filter>Measurement\GaugeSmearing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu">
+      <Filter>Tools\Math</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

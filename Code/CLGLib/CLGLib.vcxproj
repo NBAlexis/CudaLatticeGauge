@@ -73,6 +73,7 @@
     <ClInclude Include="Tools\Data\THashMap.h" />
     <ClInclude Include="Tools\Data\MemStack.h" />
     <ClInclude Include="Tools\EnumGather.h" />
+    <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
@@ -129,6 +130,7 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
+    <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
     </CudaCompile>
