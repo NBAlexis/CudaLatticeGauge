@@ -93,6 +93,11 @@ Hussam Al~Daas et. al.
   \href{https://hal.inria.fr/hal-01886546}{Available at:
   https://hal.inria.fr/hal-01886546}.
 
+\bibitem{matrixcomputation}
+Charles F. Van~Loan Gene H.~Golub.
+\newblock {Matrix computations}.
+\newblock 1996.
+
 \bibitem{aipde}
 Weinan~E Jiequn~Han, Arnulf~Jentzen.
 \newblock \href{http://dx.doi.org/10.1073/pnas.1718942115}{{Solving

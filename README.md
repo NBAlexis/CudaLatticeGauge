@@ -16,7 +16,9 @@ This is important because when connecting an additional displayer, the speed is 
 
 See detailed.pdf for more.
 
-Please bug report to yangjichong@fudan.edu.cn
+Please report bug to yangjichong@fudan.edu.cn
+
+Thank you ^_^
 
 =================== All ==========================
 

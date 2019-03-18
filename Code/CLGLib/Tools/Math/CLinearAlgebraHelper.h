@@ -35,8 +35,12 @@ public:
         checkCudaErrors(cudaMemcpy(tmp, device, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToHost));
         PrintMatrix(tmp, dx, dy);
     }
+
     static void InitialZero(CLGComplex* deviceMatrix, UINT dx, UINT dy);
+    void InitialZeroHost(CLGComplex* hostMatrix, UINT dx, UINT dy);
+
     static void InitialOne(CLGComplex* deviceMatrix, UINT dx);
+    void InitialOneHost(CLGComplex* hostMatrix, UINT dx);
 
     /**
     * Note: the dimmesions of left, right, middle, is after dagger!
@@ -48,6 +52,13 @@ public:
         const CLGComplex* left, 
         const CLGComplex* right, 
         UINT dLeft, UINT dMid, UINT dRight, 
+        UBOOL bLeftDagger, UBOOL bRightDagger);
+
+    void SmallMatrixMultHost(
+        CLGComplex * hostRes,
+        const CLGComplex* left,
+        const CLGComplex* right,
+        UINT dLeft, UINT dMid, UINT dRight,
         UBOOL bLeftDagger, UBOOL bRightDagger);
 
     /**
@@ -64,18 +75,64 @@ public:
         UINT dDim, UINT uiStart, UINT uiEnd,
         UBOOL bLeft, UBOOL bLeftDagger, UBOOL bRightDagger);
 
+    void BlockMatrixMultHost(
+        CLGComplex * hostRes,
+        const CLGComplex* left,
+        const CLGComplex* right,
+        UINT dDim, UINT uiStart, UINT uiEnd,
+        UBOOL bLeft, UBOOL bLeftDagger, UBOOL bRightDagger);
+
     /**
     * Only implement the left upper corner copy.
     */
     static void BlockCopy(CLGComplex* deviceDest, const CLGComplex* deviceSrc,
         UINT lengthX, UINT lengthY, UINT dimDest, UINT dimSrc);
 
+    void BlockCopyHost(CLGComplex* hostDest, const CLGComplex* hostSrc,
+        UINT lengthX, UINT lengthY, UINT dimDest, UINT dimSrc);
+
+    void Transpose(CLGComplex* deviceMatrix, UINT dx, UINT dy);
+
+    void TransposeHost(CLGComplex* hostMatrix, UINT dx, UINT dy);
+
 #pragma endregion
 
     void QRFactorization(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT uiDim);
     void ThinQRFactorization(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT dx, UINT dy);
-    static void SolveY(CLGComplex* deviceY, const CLGComplex* deviceR, UINT dk, UINT dx);
+    static void SolveY(CLGComplex* Y, const CLGComplex* R, UINT dk, UINT dx);
+
+    void RotateHenssenberg(CLGComplex* H, CLGComplex* B, UINT dmH);
+    void RotateHenssenbergHost(CLGComplex* H, CLGComplex* B, UINT dmH);
+
+    void QRFactorizationHost(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT uiDim);
+    void ThinQRFactorizationHost(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT dx, UINT dy);
+    void SolveYHost(CLGComplex* Y, const CLGComplex* R, UINT dk, UINT dx);
+
+    /**
+    * For deflation preconditioner, after the first step after GMRES, we already have a upper triangular.
+    * Note that, for all eigen solver, do NOT support identical eigen-values
+    */
+    void UpperTriangularEigenVectors(
+        const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector, 
+        UINT dm, UINT dk);
+
+    void UpperTriangularEigenVectorsHost(
+        const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
+        UINT dm, UINT dk);
+
     void EigenValueProblem(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector, 
+        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+
+    /**
+    * For H is already Hessenberg
+    */
+    void EigenValueProblemHessenberg(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
+        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+
+    void EigenValueProblemHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
+        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+
+    void EigenValueProblemHessenbergHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
         UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
 
     void GeneralizedEigenValueProblem(
@@ -84,9 +141,17 @@ public:
         CLGComplex* outEigenVector,
         UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
 
-    UINT m_uiDim;
+    void GeneralizedEigenValueProblemHost(
+        CLGComplex* A, CLGComplex* B,
+        CLGComplex* outEigenValue,
+        CLGComplex* outEigenVector,
+        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+
+    UINT GetMaxDim() const { return m_uiDim; }
 
 protected:
+
+    UINT m_uiDim;
 
     void Henssenberg(CLGComplex* T, UINT dx);
     void QRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.00000000001), UINT iCrit = 100);

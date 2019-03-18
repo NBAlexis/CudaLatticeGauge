@@ -114,11 +114,20 @@
       eprint         = "1512.03812"
 }
 
-@article{forcegradient3,
-      author         = "Dmitry Shcherbakov et. al.",
-      title          = "{Adapted nested force-gradient integrators: the Schwinger model case}",
-      year           = "2015",
-      eprint         = "1512.03812"
+@article{deflation,
+      author         = "Hussam Al Daas et. al.",
+      title          = "{Recycling Krylov subspaces and reducing deflation subspaces for solving sequence of linear systems}",
+      year           = "2018",
+      journal        = "RR-9206, Inria Paris",
+      url            = "https://hal.inria.fr/hal-01886546"
+}
+
+@article{matrixcomputation,
+      author         = "Hussam Al Daas et. al.",
+      title          = "{Recycling Krylov subspaces and reducing deflation subspaces for solving sequence of linear systems}",
+      year           = "2018",
+      journal        = "RR-9206, Inria Paris",
+      url            = "https://hal.inria.fr/hal-01886546"
 }
 
 %======================================================================================

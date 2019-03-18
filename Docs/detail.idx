@@ -20,6 +20,8 @@
 \indexentry{solver|hyperpage}{20}
 \indexentry{Krylov subspace|hyperpage}{20}
 \indexentry{GMRES|hyperpage}{20}
+\indexentry{Givens rotation|hyperpage}{22}
+\indexentry{backward substitution|hyperpage}{23}
 \indexentry{GCR|hyperpage}{24}
 \indexentry{GCRO-DR|hyperpage}{26}
 \indexentry{GMRES-MDR|hyperpage}{26}
@@ -37,22 +39,28 @@
 \indexentry{generalized eigen-value problem|hyperpage}{29}
 \indexentry{GEV|hyperpage}{29}
 \indexentry{Hessenberg matrix|hyperpage}{29}
-\indexentry{Householder reduction|hyperpage}{29}
-\indexentry{plaquette energy|hyperpage}{32}
-\indexentry{meson|hyperpage}{32}
-\indexentry{correlator|hyperpage}{32}
-\indexentry{source|hyperpage}{34}
-\indexentry{point source|hyperpage}{34}
-\indexentry{pseudofermions|hyperpage}{35}
-\indexentry{point source|hyperpage}{35}
-\indexentry{reciprocal space|hyperpage}{35}
-\indexentry{gauge smearing|hyperpage}{37}
-\indexentry{low mode|hyperpage}{37}
-\indexentry{exceptional configurations|hyperpage}{37}
-\indexentry{gauge smoothing|hyperpage}{37}
-\indexentry{APE smearing|hyperpage}{37}
-\indexentry{staple|hyperpage}{38}
-\indexentry{stout|hyperpage}{38}
-\indexentry{APE stout|hyperpage}{38}
-\indexentry{gauge fixing|hyperpage}{38}
-\indexentry{extend sources|hyperpage}{38}
+\indexentry{Householder reflection|hyperpage}{29}
+\indexentry{QR factorization|hyperpage}{30}
+\indexentry{Shifted QR iteration|hyperpage}{31}
+\indexentry{Inverse power iteration|hyperpage}{31}
+\indexentry{backward substitution|hyperpage}{32}
+\indexentry{generalized eigen-value problem|hyperpage}{33}
+\indexentry{forward substitution|hyperpage}{34}
+\indexentry{plaquette energy|hyperpage}{35}
+\indexentry{meson|hyperpage}{35}
+\indexentry{correlator|hyperpage}{35}
+\indexentry{source|hyperpage}{37}
+\indexentry{point source|hyperpage}{37}
+\indexentry{pseudofermions|hyperpage}{38}
+\indexentry{point source|hyperpage}{38}
+\indexentry{reciprocal space|hyperpage}{38}
+\indexentry{gauge smearing|hyperpage}{40}
+\indexentry{low mode|hyperpage}{40}
+\indexentry{exceptional configurations|hyperpage}{40}
+\indexentry{gauge smoothing|hyperpage}{40}
+\indexentry{APE smearing|hyperpage}{40}
+\indexentry{staple|hyperpage}{41}
+\indexentry{stout|hyperpage}{41}
+\indexentry{APE stout|hyperpage}{41}
+\indexentry{gauge fixing|hyperpage}{41}
+\indexentry{extend sources|hyperpage}{41}

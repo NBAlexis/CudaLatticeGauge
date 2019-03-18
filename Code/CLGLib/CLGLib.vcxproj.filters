@@ -260,6 +260,9 @@
     <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverGCRODR.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -372,6 +375,9 @@
     </CudaCompile>
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu">
       <Filter>Tools\Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

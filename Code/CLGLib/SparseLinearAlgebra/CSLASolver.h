@@ -13,13 +13,6 @@
 
 __BEGIN_NAMESPACE
 
-__DEFINE_ENUM(ESLASolverType,
-    ESST_BiCGstab,
-    ESST_Max,
-
-    ESST_ForceDWORD = 0x7fffffff,
-    )
-
 class CLGAPI CSLASolver : public CBase
 {
 public:
@@ -42,8 +35,20 @@ public:
     * For those solvers using a trial start solution
     * Since phi is unchanged, and U is changed slowly, the solution will also change slowly
     * Therefor, use the last solution as a trial start solution is a good idea
+    *
+    * Note: Make sure pFiledX is changed at last, it might be same as pFieldB
+    *
     */
-    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart = NULL) = 0;
+    virtual UBOOL Solve(CField* pFieldX, 
+        const CField* pFieldB, 
+        const CFieldGauge* pGaugeFeild, 
+        EFieldOperator uiM, 
+        const CField* pStart = NULL) = 0;
+
+    /**
+    * Some Solvers will benifit from a seqence of simulation. (For example GCRODR)
+    */
+    virtual void OnNewTrajectory() {}
 
     class CLatticeData* m_pOwner;
     virtual CCString GetInfos(const CCString &tab) const { return tab + _T("##The solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n"); }

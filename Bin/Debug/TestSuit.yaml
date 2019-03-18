@@ -540,7 +540,7 @@ TestSolverGCR:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
-TestSolverBiCGStabLowMode:
+TestSolverGMRESLowMode:
 
     Dim : 4
     Dir : 4
@@ -550,8 +550,7 @@ TestSolverBiCGStabLowMode:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 6
-
+    ExpectedErr : 0.1
     FermionFieldCount : 1
 
     ## For D operator, we must have a gauge field
@@ -572,80 +571,25 @@ TestSolverBiCGStabLowMode:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Hopping : 0.125
+        Hopping : 0.1249
 
         FieldId : 2
 
-        PoolNumber : 8
-
-    Solver:
-
-        SolverName : CSLASolverBiCGStab
-        SolverForFieldId : 2
-        ## Check Accuracy every DiviationStep steps
-        DiviationStep : 10
-        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
-        MaxStep : 10
-        ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
-        Restart : 3
-        ## 0 is recommanded
-        AbsoluteAccuracy : 1
-
-TestSolverGMRESLowMode:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-
-    FermionFieldCount : 1
-
-    ## For D operator, we must have a gauge field
-    Gauge:
-	
-        ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_ReadFromFile
-		
-        GaugeFileType : EFFT_CLGBin
-
-        GaugeFileName : LowMode.con_
-		
-
-    FermionField1:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionWilsonSquareSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        Hopping : 0.1355
-
-        FieldId : 2
-
-        PoolNumber : 15
+        PoolNumber : 35
 
     Solver:
 
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MaxDim : 10
+        MaxDim : 50
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.00000001
-        Restart : 5
+        Restart : 30
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
-TestSolverGCRLowMode:
+TestSolverGCRODRLowMode:
 
     Dim : 4
     Dir : 4
@@ -655,8 +599,7 @@ TestSolverGCRLowMode:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ExponentialPrecision : 6
-
+    ExpectedErr : 0.1
     FermionFieldCount : 1
 
     ## For D operator, we must have a gauge field
@@ -666,7 +609,7 @@ TestSolverGCRLowMode:
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_Identity
 		
 
     FermionField1:
@@ -677,26 +620,26 @@ TestSolverGCRLowMode:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Hopping : 0.1
+        Hopping : 0.1249
 
         FieldId : 2
 
-        PoolNumber : 25
+        PoolNumber : 35
 
     Solver:
 
-        SolverName : CSLASolverGCR
+        SolverName : CSLASolverGCRODR
         SolverForFieldId : 2
-        MaxDim : 10
-        ## Iterate can be larger than MaxDim to truncate, but a restart seems much better
-        Iterate : 10
-        DiviationStep : 10
+        ## Check Accuracy every DiviationStep steps
+        MDim : 20
+        KDim : 10
+        DeflateSpace : EEDT_REV
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.00000001
-        ## For this solver, restart quickly is better
-        Restart : 50
+        Restart : 30
         ## 0 is recommanded
         AbsoluteAccuracy : 1
+
 
 TestFermionUpdator:
 

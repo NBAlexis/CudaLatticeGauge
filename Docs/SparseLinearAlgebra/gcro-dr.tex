@@ -150,18 +150,175 @@ Note that the second line of REV and SVD, that is a \index{generalized eigen-val
 
 \subsubsection{\label{sec:eigenSolver}Eigen solver}
 
+The eigen solver is implemented following Ref.~\cite{matrixcomputation}.
+
 There are many strategies. The most common algorithm is to transform a matrix to a \index{Hessenberg matrix}\textbf{Hessenberg matrix}.
 
 \begin{itemize}
-  \item \index{Householder reduction}Householder reduction
+  \item \index{Householder reflection}Householder reflection
 \end{itemize}
 
-Tested that Householder reduction is faster than symmetric or unsymmetric Lanczos method when the matrix is large. On the other hand, for a Hermitian matrix, Householder can also produce Hermitian tri-diagonal matrix.
+Tested that householder reduction is faster than symmetric or unsymmetric Lanczos method when the matrix is large. On the other hand, for a Hermitian matrix, Householder can also produce Hermitian tri-diagonal matrix.
 
 \textbf{Note that this might be not true when the matrix is huge, and Hessenberg reduction is not a full reduction. In our case, we concentrate on matrix with $5<m<50$. Tested when about $7<m<30$ ($30 \times 30 \approx 1024$ is the maximum thread count on test machine), Householder is faster.}
 
 Also, as tested, the quality of QR factorization affects the QR iteration very much. At the same time, compared with QR iteration, the QR factorization is relatively cheap, so we also use Householder to do the QR factorization.
 
+The householder reduction is to insert zeros into a vector, which can be briefly written as
+\begin{equation}
+\begin{split}
+&{\bf v}=\left(\begin{array}{c} x_1+e^{i \arg{x_1}}|{\bf x}|\\x_2\\ \ldots \\ x_n\end{array}\right),\;\;U=\mathbb{I}-\frac{2{\bf v}{\bf v}^{\dagger}}{{\bf v}^{\dagger}{\bf v}},\;\;U\left(\begin{array}{c} x_1\\x_2\\ \ldots \\ x_n\end{array}\right)=\left(\begin{array}{c} \frac{|x_1|}{x_1^*}|{\bf x}|\\0\\ \ldots \\ 0\end{array}\right),
+\end{split}
+\end{equation}
+
+Note that $U$ is at the same time unitary and Hermitian. Since it is unitary, it can be used as \index{QR factorization}QR factorization, $A=QR$ where $Q$ is unitary and $R$ is upper triangular, and to transform a matrix to Henssenberg matrix $A=U^{\dagger}HU$, where $U$ is unitary and $H$ is upper Henssenberg matrix.
+
+The algorithm is not listed, the procedure can be written as
+\begin{equation}
+\begin{split}
+&A_0=U_0^{\dagger}U_0A_0=U_0^{\dagger}A_1,\;U_0A_0= \left(\mathbb{I}-\frac{2{\bf v}{\bf v}^{\dagger}}{{\bf v}^{\dagger}{\bf v}}\right)A_0=A_1=\left(\begin{array}{cccc}
++ & + & + & + \\ 0 & + & + & + \\ 0 & + & + & + \\ 0 & + & + & +\end{array}\right)\\
+&A_0=U_0^{\dagger}U_1^{\dagger}U_1A_1,\; U_1A_1=\left(\begin{array}{cc}\mathbb{I}_1 & 0 \\ 0 & \mathbb{I}-\frac{2{\bf v}{\bf v}^{\dagger}}{{\bf v}^{\dagger}{\bf v}} \end{array}\right)A_1=A_2=\left(\begin{array}{cccc}
++ & + & + & + \\ 0 & + & + & + \\ 0 & 0 & + & + \\ 0 & 0 & + & +\end{array}\right)\\
+&A_0=U_0^{\dagger}U_1^{\dagger}U_2^{\dagger}R,\; R=U_2A_2=\left(\begin{array}{cc}\mathbb{I}_2 & 0 \\ 0 & \mathbb{I}-\frac{2{\bf v}{\bf v}^{\dagger}}{{\bf v}^{\dagger}{\bf v}} \end{array}\right)A_2=R=\left(\begin{array}{cccc}
++ & + & + & + \\ 0 & + & + & + \\ 0 & 0 & + & + \\ 0 & 0 & 0 & +\end{array}\right)\\
+\end{split}
+\end{equation}
+
+Similarly, note that if only insert zeroes from the second row
+\begin{equation}
+\begin{split}
+&UA=\left(\begin{array}{cc}\mathbb{I}_1 & 0 \\ 0 & \mathbb{I}-\frac{2{\bf v}{\bf v}^{\dagger}}{{\bf v}^{\dagger}{\bf v}} \end{array}\right)A=\left(\begin{array}{cccc}
++ & + & + & + \\ + & + & + & + \\ 0 & + & + & + \\ 0 & + & + & +\end{array}\right)\\
+\end{split}
+\end{equation}
+then
+\begin{equation}
+\begin{split}
+&UAU^{\dagger}=UA\left(\begin{array}{cc}\mathbb{I}_1 & 0 \\ 0 & @ \end{array}\right)=\left(\begin{array}{cccc}
++ & + & + & + \\ + & + & + & + \\ 0 & + & + & + \\ 0 & + & + & +\end{array}\right)\left(\begin{array}{cc}\mathbb{I}_1 & 0 \\ 0 & @ \end{array}\right)=\left(\begin{array}{cccc}
++ & +@ & +@ & +@ \\ + & +@ & +@ & +@ \\ 0 & +@ & +@ & +@ \\ 0 & +@ & +@ & +@\end{array}\right)
+\end{split}
+\end{equation}
+So that it is kept Hensenberg.
+
+\begin{itemize}
+  \item \index{Shifted QR iteration}Shifted QR iteration
+\end{itemize}
+
+Let $A=U_0^{\dagger}H_0U_0$ where $H$ is a Henssenberg matrix, then, let $H_0=U_1R$, it can be shown that $H_1=RU_1=U_1^{\dagger}(U_1R)U_1$ is still a Henssenberg.
+
+Also, $H=U_1H_1U_1^{\dagger}$, so $A=(U_0^{\dagger}U_1)H_1(U_1^{\dagger}U_0)$.
+
+So, $H_1$ has same eigen-value as $A$.
+
+Apart from that, $H_i$ can approach a upper triangular matrix. It is noted that, if the QR factorization is performed to a shifted matrix $H-\sigma I$, where $\sigma$ is an approximate eigen-value of $H$, it will converge much fast.
+
+In CLGLib, we use Wilkinson shift, which is the eigen-value of the right-bottom $2\times 2$ irreducible matrix, and is the one closer to the right-bottom corner element. It can be written as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$H$ is not a triangular}
+    \State{$\sigma$ be the eigen-value of the $2\times 2$ matrix of right-bottom matrix which is closer to the right bottom element.}
+    \State{$QR=H-\sigma I$}
+    \State{$H'=RQ+\sigma I$}
+    \If { $H_{n-1,n}\approx 0$}
+        \State {Reduce to a $n-1$ Henssenberg matrix problem.}
+    \EndIf
+\EndFor
+
+\end{algorithmic}
+\caption{Shifted QR Iteration}
+\end{algorithm}
+
+Once the upper triangular matrix is obtained, the eigen-values are just the diagonal elements.
+
+\begin{itemize}
+  \item \index{Inverse power iteration}Inverse power iteration
+\end{itemize}
+
+Once the eigen-values are obtained, one can calculate the approximate eigen-vector correspond the the eigen-value using inverse power iteration. The inverse power iteration performs well with the original matrix $A$.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State {${\bf v}$ is a normalized vector.}
+\For{$\|(A-\sigma I){\bf v}\|>\epsilon$}
+    \State{$QR=(A-\sigma I)$}
+    \State{${\bf v}=R^{-1}Q^{\dagger}{\bf v}$}
+    \State{${\bf v}={\bf v}/\|{\bf v}\|$}
+\EndFor
+
+\end{algorithmic}
+\caption{Inverse power Iteration}
+\end{algorithm}
+
+The $R$ is upper triangular, so $R^{-1}$ is just a modification of Algorithm.~\ref{alg.GEMRES.SolveY}.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=k-1$ to $0$}
+    \For{$j=i+1$ to $k-1$}
+        \State ${\bf y}[i]-=r[i,j] {\bf y}[j]$
+    \EndFor
+    \State ${\bf y}[i] = {\bf y}[i] / r[i,i]$
+\EndFor
+
+\Return ${\bf u}[k]={\bf y}[k]$.
+\end{algorithmic}
+\caption{\label{alg.backsub}\index{backward substitution}Backward substitution}
+\end{algorithm}
+
+\begin{itemize}
+  \item Eigen vector of upper triangular matrix
+\end{itemize}
+
+The inverse power iteration is incompatible with upper triangular matrix, because $R-\lambda I$ is singular, for the inverse power iteration, $R-\lambda I$ is only nearly singular, however, for a upper triangular, it is almost exactly a singular. Although one can shift the eigen value a little bit, but one can also obtain eigen vector exactly. by the procedure below.
+
+Suppose
+\begin{equation}
+\begin{split}
+\left(\begin{array}{ccccc}
+r_{1,1}-\lambda_k & \ldots & r_{1,k-1} \\
+                0 & \ldots & \ldots    \\
+                0 &      0 & r_{k-1,k-1}-\lambda _k
+\end{array}\right)
+\left(\begin{array}{c} x_1 \\ \ldots \\ x_{k-1} \end{array}\right)=\left(\begin{array}{c} y_1 \\ \ldots \\ y_{k-1} \end{array}\right)
+\end{split}
+\end{equation}
+$(R-\lambda _k \mathbb{I}){\bf x} = 0$ can be written as
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{ccccc}
+r_{1,1}-\lambda_k & \ldots & r_{1,k-1}   & r_{1,k}   & \ldots \\
+      0 & \ldots & \ldots      & \ldots    & \ldots \\
+      0 &      0 & r_{k-1,k-1}-\lambda _k & r_{k-1,k} & \ldots \\
+      0 &      0 & 0           & 0         & \ldots \\
+      0 &      0 & 0           & 0         & \ldots \\
+\end{array}\right)
+\left(\begin{array}{c} x_1 \\ \ldots \\ x_{k-1} \\ 1 \\ 0 \\ \ldots \end{array}\right)=
+\left(\begin{array}{c} y_1+r_{1,k} \\ \ldots \\ y_{k-1}+r_{k-1,k} \\ 0 \\ \ldots \end{array}\right)=0
+\end{split}
+\end{equation}
+leads to the equation
+\begin{equation}
+\begin{split}
+\left(\begin{array}{ccccc}
+r_{1,1}-\lambda_k & \ldots & r_{1,k-1} \\
+                0 & \ldots & \ldots    \\
+                0 &      0 & r_{k-1,k-1}-\lambda _k
+\end{array}\right)
+\left(\begin{array}{c} x_1 \\ \ldots \\ x_{k-1} \end{array}\right)=\left(\begin{array}{c} -r_{1,k} \\ \ldots \\ -r_{k-1,k} \end{array}\right)
+\end{split}
+\end{equation}
+which can be solved using backward shift, i.e. Algorithm.~\ref{alg.backsub}.
+
+\begin{itemize}
+  \item \index{generalized eigen-value problem}Generalized eigen-value problem
+\end{itemize}
+
+The generalized eigen-value problem can be transformed to a eigen-value problem
+\begin{equation}
+\begin{split}
+&A{\bf v}=\lambda B{\bf v} \Rightarrow B=QR \Rightarrow R^{-1}Q^{\dagger}A {\bf v}=\lambda {\bf v}
+\end{split}
+\end{equation}
 
 \subsubsection{\label{sec:implementationgcrodr}Implementation of GCRO-DR}
 
@@ -169,7 +326,7 @@ Now, we concentrate on the implementation of GCRO-DR. First of all, we need to k
 \begin{algorithm}[H]
 \begin{algorithmic}
 \For{$i=0$ to $k-1$}
-    \State{${\bf x}={\bf x}-\left({\bf b}_k^{\dagger}{\bf v}\right){\bf a}_k$}
+    \State{${\bf x}={\bf x}-\left({\bf b}_k^{\dagger}{\bf x}\right){\bf a}_k$}
 \EndFor
 
 \Return $\bf x$
@@ -184,9 +341,9 @@ The second thing is QR decompose of $\mathbb{C}^{n\times k}$ and $\mathbb{C}^{(m
     \State $y_i=Ay_i$
 \EndFor
 \State ${\bf v}^{(0)}\:=y_0/\|{\bf y}_0\|$
-\For{$i=0$ to $k-2$}
+\For{$i=0$ to $k-1$}
     \State ${\bf w}\:={\bf y}_{i+1}$
-    \For{$j=0$ to $i+1$}
+    \For{$j=i+1$ to $k-1$}
         \State $c={{\bf v}^{(j)}}^*\cdot {\bf w}$
         \State ${\bf w}-=c{\bf v}^{(j)}$
         \State $r[j,i]=c$
@@ -199,43 +356,9 @@ The second thing is QR decompose of $\mathbb{C}^{n\times k}$ and $\mathbb{C}^{(m
 \caption{modified Gram-Schmidt for QR factorization decompose of $A\tilde{Y}_k$}
 \end{algorithm}
 
-For the $\mathbb{C}^{(m+1)\times k}$ matrix, we use standard Gram-Schmidt for multi-thread since usually both $k$ and $m$ are small.
-\begin{algorithm}[H]
-\begin{algorithmic}
-\State {${\bf q}[k]=hp[m,k]$}
-\For{$i=0$ to $k-1$}
-    \For {$j\le i$}
-        \Comment {pallial for each $j$}
-        \State {$r[ji]={\bf q}_j^{\dagger}{\bf q}_i$}
-    \EndFor
-    \If {$i < k - 1$}
-        \For {$j\le i$}
-            \Comment {pallial for each $j$}
-            \State {${\bf q}_{i + 1}={\bf q}_{i + 1}-\frac{r[ji]}{r[jj]}{\bf q}_{j}$}
-            \Comment {Atomic add}
-        \EndFor
-    \EndIf
-\EndFor
-\For{$i=0$ to $k-1$}
-    \State ${\bf q}_i={\bf q}_i/r[ii]$
-\EndFor
-
-\Return {$Q=({\bf q}_1,\ldots, {\bf q}_{k-1})$, $R=r[i,j]$.}
-\end{algorithmic}
-\caption{classical Gram-Schmidt for QR factorization decompose of $HP_k$}
-\end{algorithm}
-
-Then, we need to calculate $R^{-1}$ where $R$ is a upper triangular matrix, this is nothing but a modification of Algorithm.~\ref{alg.GEMRES.SolveY}.
-\begin{algorithm}[H]
-\begin{algorithmic}
-\For{$i=k-1$ to $0$}
-    \For{$j=i+1$ to $k-1$}
-        \State ${\bf y}[i]-=r[i,j] {\bf y}[j]$
-    \EndFor
-    \State ${\bf y}[i] = {\bf y}[i] / r[i,i]$
-\EndFor
-
-\Return ${\bf u}[k]={\bf y}[k]$.
-\end{algorithmic}
-\caption{Solving $R{\bf x}={\bf y}$}
-\end{algorithm}
+Finally we have to calculate $YR^{-1}$. This is a \index{forward substitution}forward substitution.
+\begin{equation}
+\begin{split}
+&U=YR^{-1},\;\; UR=Y,\;\;R^{T}U^{T}=Y^T\;\;U^{T}=\left(R^{T}\right)^{-1}Y^T.\\
+\end{split}
+\end{equation}

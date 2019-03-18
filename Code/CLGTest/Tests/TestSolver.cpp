@@ -9,10 +9,12 @@
 
 #include "CLGTest.h"
 
-UINT TestSolver(CParameters& )
+UINT TestSolver(CParameters& params)
 {
     UINT uiError = 0;
     Real fMaxError = F(0.000001);
+    params.FetchValueReal(_T("ExpectedErr"), fMaxError);
+
     CField* pField = appGetLattice()->GetFieldById(2);
     CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
     //Real fLength = _cuCabsf(pFermion->Dot(pFermion));
@@ -98,11 +100,9 @@ __REGIST_TEST(TestSolver, Solver, TestSolverGMRES);
 
 __REGIST_TEST(TestSolver, Solver, TestSolverGCR);
 
-//__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
+__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
 
-//__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
-
-//__REGIST_TEST(TestSolver, Solver, TestSolverGCRLowMode);
+__REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode);
 
 //=============================================================================
 // END OF FILE

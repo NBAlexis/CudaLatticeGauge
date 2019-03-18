@@ -149,7 +149,7 @@ After the rotation, $g[k]$ is the residue. If it is small enough, the last step 
 &y[k-1]=\frac{g[k-1]}{h[k-1,k-1]}.\;y[k-2]=\frac{1}{h[k-2,k-2]}\left(g[k-2]-h[k-2,k-1]y[k-1]\right),\ldots\\
 \end{split}
 \end{equation}
-The algorithm is
+The algorithm is \index{backward substitution}backward substitution
 \begin{algorithm}[H]
 \begin{algorithmic}
 \For{$i=k-1$ to $0$}

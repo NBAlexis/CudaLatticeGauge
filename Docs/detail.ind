@@ -1,15 +1,16 @@
 \begin{theindex}
 
-  \item APE smearing, \hyperpage{37}
-  \item APE stout, \hyperpage{38}
+  \item APE smearing, \hyperpage{39}
+  \item APE stout, \hyperpage{40}
 
   \indexspace
 
+  \item backward substitution, \hyperpage{23}, \hyperpage{32}
   \item BiCGStab, \hyperpage{13}
 
   \indexspace
 
-  \item correlator, \hyperpage{32}
+  \item correlator, \hyperpage{34}
 
   \indexspace
 
@@ -18,8 +19,8 @@
   \indexspace
 
   \item equilibrium, \hyperpage{16}
-  \item exceptional configurations, \hyperpage{37}
-  \item extend sources, \hyperpage{38}
+  \item exceptional configurations, \hyperpage{39}
+  \item extend sources, \hyperpage{40}
 
   \indexspace
 
@@ -29,21 +30,28 @@
 
   \indexspace
 
-  \item gauge fixing, \hyperpage{38}
-  \item gauge smearing, \hyperpage{37}
-  \item gauge smoothing, \hyperpage{37}
+  \item gauge fixing, \hyperpage{40}
+  \item gauge smearing, \hyperpage{39}
+  \item gauge smoothing, \hyperpage{39}
   \item GCR, \hyperpage{24}
   \item GCRO-DR, \hyperpage{26, 27}
+  \item generalized eigen-value problem, \hyperpage{29}, \hyperpage{32}
+  \item GEV, \hyperpage{29}
+  \item Givens rotation, \hyperpage{22}
   \item GMRES, \hyperpage{20}
   \item GMRES-MDR, \hyperpage{26}
 
   \indexspace
 
+  \item harmonic Ritz eigen vector, \hyperpage{28}
+  \item Hessenberg matrix, \hyperpage{29}
   \item hmc, \hyperpage{6}
+  \item Householder reflection, \hyperpage{29}
 
   \indexspace
 
   \item Integrator, \hyperpage{9}
+  \item Inverse power iteration, \hyperpage{31}
 
   \indexspace
 
@@ -54,11 +62,11 @@
   \item Langevin equation, \hyperpage{7}
   \item leap frog, \hyperpage{15}
   \item link index, \hyperpage{4}
-  \item low mode, \hyperpage{26}, \hyperpage{37}
+  \item low mode, \hyperpage{26}, \hyperpage{39}
 
   \indexspace
 
-  \item meson, \hyperpage{32}
+  \item meson, \hyperpage{34}
   \item Metropolis, \hyperpage{16}
   \item molecular dynamics, \hyperpage{7}
   \item multi-rate integrator, \hyperpage{18}
@@ -73,21 +81,30 @@
 
   \indexspace
 
-  \item plaquette energy, \hyperpage{32}
-  \item point source, \hyperpage{34, 35}
+  \item plaquette energy, \hyperpage{34}
+  \item point source, \hyperpage{36, 37}
   \item preconditioner, \hyperpage{26}
-  \item pseudofermions, \hyperpage{6}, \hyperpage{35}
+  \item pseudofermions, \hyperpage{6}, \hyperpage{37}
 
   \indexspace
 
-  \item reciprocal space, \hyperpage{35}
+  \item QR factorization, \hyperpage{30}
 
   \indexspace
 
+  \item reciprocal space, \hyperpage{37}
+  \item REV, \hyperpage{28}
+  \item Ritz eigen-vector, \hyperpage{28}
+
+  \indexspace
+
+  \item Shifted QR iteration, \hyperpage{31}
+  \item singular value decomposition, \hyperpage{28}
   \item site index, \hyperpage{4}
   \item solver, \hyperpage{13}, \hyperpage{20}
-  \item source, \hyperpage{34}
-  \item staple, \hyperpage{9}, \hyperpage{38}
-  \item stout, \hyperpage{38}
+  \item source, \hyperpage{36}
+  \item staple, \hyperpage{9}, \hyperpage{40}
+  \item stout, \hyperpage{40}
+  \item SVD, \hyperpage{28}
 
 \end{theindex}

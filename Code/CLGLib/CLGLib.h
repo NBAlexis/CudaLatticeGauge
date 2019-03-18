@@ -119,6 +119,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
 #include "SparseLinearAlgebra/CSolverGMRES.h"
 #include "SparseLinearAlgebra/CSolverGCR.h"
+#include "SparseLinearAlgebra/CSolverGCRODR.h"
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"

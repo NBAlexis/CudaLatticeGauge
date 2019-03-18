@@ -62,6 +62,7 @@
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverGCRODR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
@@ -130,6 +131,7 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
