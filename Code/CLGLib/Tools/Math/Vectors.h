@@ -464,6 +464,7 @@ extern "C" {
         {
             deviceSU3Vector m_d[4];
             CLGComplex m_me[12];
+            Real m_rme[24];
         };
         //deviceSU3Vector m_d[4];
     };

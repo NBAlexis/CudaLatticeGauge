@@ -93,9 +93,55 @@ UINT TestSmallMatrix(CParameters&)
     return 0;
 }
 
+UINT TestQuickAxpy(CParameters&)
+{
+    CFieldFermionWilsonSquareSU3* pF0 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF0->GetCopy());
+    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF0->GetCopy());
+    CFieldFermionWilsonSquareSU3* pF3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF0->GetCopy());
+    CFieldFermionWilsonSquareSU3* pF4 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF0->GetCopy());
+
+    CTimer timer1;
+    timer1.Start();
+    for (UINT i = 0; i < 20; ++i)
+    {
+        pF2->ScalarMultply(F(2.0)); //f2 = 2f0
+        pF1->AxpyPlus(pF2); //f1 = f1+f2 = 3f0
+        pF2->ScalarMultply(F(0.8)); //f2 = 0.8f2 = 1.6f0
+        pF1->AxpyMinus(pF2); //f1 = f1-f2 = 3f0-1.6f0=1.4f0
+        pF1->Axpy(F(-0.5), pF2); //f1 = f1 - 0.5f2 = 1.4f0 - 0.8f0 = 0.6f0
+        pF1->Axpy(_make_cuComplex(F(0.25), F(0.0)), pF2); //f1 = f1+0.25f2=0.6f0+0.4f0 = f0
+        pF1->CopyTo(pF2);
+    }
+    pF1->AxpyMinus(pF0);
+    CLGComplex res = pF1->Dot(pF1);
+    timer1.Stop();
+    appGeneral(_T("res = %f %f  t=%f (ms)\n"), res.x, res.y, timer1.Elapsed());
+
+    CTimer timer2;
+    timer2.Start();
+    for (UINT i = 0; i < 20; ++i)
+    {
+        pF4->ScalarMultply1(F(2.0)); //f2 = 2f0
+        pF3->AxpyPlus1(pF4); //f1 = f1+f2 = 3f0
+        pF4->ScalarMultply1(F(0.8)); //f2 = 0.8f2 = 1.6f0
+        pF3->AxpyMinus1(pF4); //f1 = f1-f2 = 3f0-1.6f0=1.4f0
+        pF3->Axpy1(F(-0.5), pF4); //f1 = f1 - 0.5f2 = 1.4f0 - 0.8f0 = 0.6f0
+        pF3->Axpy1(_make_cuComplex(F(0.25), F(0.0)), pF4); //f1 = f1+0.25f2=0.6f0+0.4f0 = f0
+        pF3->CopyTo(pF4);
+    }
+    pF3->AxpyMinus1(pF0);
+    res = pF3->Dot1(pF3);
+    timer2.Stop();
+    appGeneral(_T("res = %f %f  t=%f (ms)\n"), res.x, res.y, timer2.Elapsed());
+    return 0;
+}
+
 __REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators);
+
+__REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
 
 //=============================================================================

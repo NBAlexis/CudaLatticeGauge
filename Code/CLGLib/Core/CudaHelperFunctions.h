@@ -31,9 +31,11 @@
 //#include <device_functions.h>
 
 #if _CLG_USE_LAUNCH_BOUND
+#define _CLG_LAUNCH_BOUND_(n)  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD, n)
 #define _CLG_LAUNCH_BOUND  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD, 1)
 #define _CLG_LAUNCH_BOUND_SINGLE __launch_bounds__(1, 1)
 #else
+#define _CLG_LAUNCH_BOUND_(n)
 #define _CLG_LAUNCH_BOUND
 #define _CLG_LAUNCH_BOUND_SINGLE
 #endif

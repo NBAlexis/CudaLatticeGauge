@@ -71,7 +71,7 @@ void CLinearAlgebraHelper::TestSmallMatrix()
     CLGComplex aij[testDim1 * testDim1]; //test gev
     CLGComplex bij[testDim1 * testDim1]; //test gev
     CLGComplex tij[testDim1 * testDim1]; //test triangular
-    CLGComplex hesij[testDim1 * testDim1]; //test hessenberg
+    CLGComplex hesij[testDim1 * testDim1]; //test hessenberg eigen value
     CLGComplex heij[(testDim1 - 1) * testDim1];
     CLGComplex yij[testDim1];
     CLGComplex res1[testDim1 * testDim1];
@@ -142,7 +142,8 @@ void CLinearAlgebraHelper::TestSmallMatrix()
             }
         }
 
-        if (x < (testDim1 - 1))
+        //if (x < (testDim1 - 1))
+        if (0 == x)
         {
             yij[x] = _make_cuComplex((rand() % 101 - 50) / 50.0f, (rand() % 101 - 50) / 50.0f);
         }
@@ -677,6 +678,15 @@ _kernelMatrixTranspose(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT 
     tmpM[y * dx + x] = m[x * dy + y];
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMatrixDagger(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT dx, UINT dy)
+{
+    UINT x = threadIdx.x;
+    UINT y = threadIdx.y;
+
+    tmpM[y * dx + x] = _cuConjf(m[x * dy + y]);
+}
+
 void CLinearAlgebraHelper::Transpose(CLGComplex* deviceMatrix, UINT dx, UINT dy)
 {
     if (dx > m_uiDim || dy > m_uiDim)
@@ -696,6 +706,25 @@ void CLinearAlgebraHelper::Transpose(CLGComplex* deviceMatrix, UINT dx, UINT dy)
     sTmpMRes.Free();
 }
 
+void CLinearAlgebraHelper::Dagger(CLGComplex* deviceMatrix, UINT dx, UINT dy)
+{
+    if (dx > m_uiDim || dy > m_uiDim)
+    {
+        appCrucial(_T("Cannot deal with matrix larger than %d!\n"), m_uiDim);
+        return;
+    }
+
+    STmpMatrix sTmpMRes = GetTmpMatrix();
+    CLGComplex* tmpMRes = sTmpMRes.m_pMatrix;
+
+    dim3 block(1, 1, 1);
+    dim3 thread(dx, dy, 1);
+    _kernelMatrixDagger << <block, thread >> > (deviceMatrix, tmpMRes, dx, dy);
+    checkCudaErrors(cudaMemcpy(deviceMatrix, tmpMRes, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToDevice));
+
+    sTmpMRes.Free();
+}
+
 void CLinearAlgebraHelper::TransposeHost(CLGComplex* hostMatrix, UINT dx, UINT dy)
 {
     if (dx > m_uiDim || dy > m_uiDim)
@@ -708,6 +737,23 @@ void CLinearAlgebraHelper::TransposeHost(CLGComplex* hostMatrix, UINT dx, UINT d
     CLGComplex* tmpMRes = sTmpMRes.m_pMatrix;
     checkCudaErrors(cudaMemcpy(tmpMRes, hostMatrix, sizeof(CLGComplex) * dx * dy, cudaMemcpyHostToDevice));
     Transpose(tmpMRes, dx, dy);
+    checkCudaErrors(cudaMemcpy(hostMatrix, tmpMRes, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToHost));
+
+    sTmpMRes.Free();
+}
+
+void CLinearAlgebraHelper::DaggerHost(CLGComplex* hostMatrix, UINT dx, UINT dy)
+{
+    if (dx > m_uiDim || dy > m_uiDim)
+    {
+        appCrucial(_T("Cannot deal with matrix larger than %d!\n"), m_uiDim);
+        return;
+    }
+
+    STmpMatrix sTmpMRes = GetTmpMatrix();
+    CLGComplex* tmpMRes = sTmpMRes.m_pMatrix;
+    checkCudaErrors(cudaMemcpy(tmpMRes, hostMatrix, sizeof(CLGComplex) * dx * dy, cudaMemcpyHostToDevice));
+    Dagger(tmpMRes, dx, dy);
     checkCudaErrors(cudaMemcpy(hostMatrix, tmpMRes, sizeof(CLGComplex) * dx * dy, cudaMemcpyDeviceToHost));
 
     sTmpMRes.Free();
@@ -1242,6 +1288,7 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
         _kernelMatrixAddConstant << <block, thread >> > (tmpT, tmpShift, iLastDim);
     }
 
+    appCrucial(_T("QRITeration not converge!!\n"));
     sTmpQ.Free();
     sTmpR.Free();
     sTmpT.Free();
@@ -1269,6 +1316,40 @@ _kernelSortEigenValues(const CLGComplex* __restrict__ R,
     if (x != y)
     {
         if (tmpF[x] < tmpF[y])
+        {
+            atomicAdd(&tmpO[y], 1);
+        }
+    }
+
+    __syncthreads();
+
+    if (0 == x)
+    {
+        if (tmpO[y] < k)
+        {
+            outV[tmpO[y]] = R[y * dx + y];
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSortEigenValuesBig(const CLGComplex* __restrict__ R,
+    CLGComplex* outV, Real* tmpF, INT* tmpO, UINT k, UINT dx)
+{
+    UINT x = threadIdx.x;
+    UINT y = threadIdx.y;
+
+    if (0 == x)
+    {
+        tmpF[y] = R[y * dx + y].x * R[y * dx + y].x + R[y * dx + y].y * R[y * dx + y].y;
+        tmpO[y] = 0;
+    }
+
+    __syncthreads();
+
+    if (x != y)
+    {
+        if (tmpF[x] > tmpF[y])
         {
             atomicAdd(&tmpO[y], 1);
         }
@@ -1380,7 +1461,7 @@ void CLinearAlgebraHelper::EigenValueProblem(
     CLGComplex* H,
     CLGComplex* outEigenValue,
     CLGComplex* outEigenVector,
-    UINT dm, UINT dk,
+    UINT dm, UINT dk, UBOOL bSmall,
     Real fEigenCrit,
     UINT iMaxEigenIterate,
     Real fCrit,
@@ -1412,7 +1493,14 @@ void CLinearAlgebraHelper::EigenValueProblem(
     dim3 thread1(dm, dm, 1);
     dim3 thread2(dm, 1, 1);
 
-    _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    if (bSmall)
+    {
+        _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
+    else
+    {
+        _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
 
     for (UINT i = 0; i < dk; ++i)
     {
@@ -1468,7 +1556,7 @@ void CLinearAlgebraHelper::EigenValueProblem(
 
 void CLinearAlgebraHelper::EigenValueProblemHessenberg(
     CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-    UINT dm, UINT dk, Real fEigenCrit, UINT iMaxEigenIterate,
+    UINT dm, UINT dk, UBOOL bSmall, Real fEigenCrit, UINT iMaxEigenIterate,
     Real fQRCrit, UINT iMaxIterate)
 {
     if (dm > m_uiDim || dk > dm)
@@ -1496,7 +1584,14 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
     dim3 thread1(dm, dm, 1);
     dim3 thread2(dm, 1, 1);
 
-    _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    if (bSmall)
+    {
+        _kernelSortEigenValues << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
+    else
+    {
+        _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
 
     for (UINT i = 0; i < dk; ++i)
     {
@@ -1683,7 +1778,7 @@ _kernelFinalNorm(
 
 void CLinearAlgebraHelper::UpperTriangularEigenVectors(
     const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-    UINT dm, UINT dk)
+    UINT dm, UINT dk, UBOOL bSmall)
 {
     if (dm > m_uiDim || dk > dm)
     {
@@ -1696,7 +1791,14 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectors(
     dim3 thread2(dm, 1, 1);
     dim3 thread3(dm, dk, 1);
 
-    _kernelSortEigenValues << <block, thread1 >> > (upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    if (bSmall)
+    {
+        _kernelSortEigenValues << <block, thread1 >> > (upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
+    else
+    {
+        _kernelSortEigenValuesBig << <block, thread1 >> > (upperTriangular, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
+    }
     _kernelExchangeOrders << <block, thread3 >>> (m_pDeviceIntBuffer);
     INT orders[_kMaxSmallDim];
     checkCudaErrors(cudaMemcpy(orders, m_pDeviceIntBuffer, sizeof(INT) * dk, cudaMemcpyDeviceToHost));
@@ -1748,7 +1850,7 @@ void CLinearAlgebraHelper::GeneralizedEigenValueProblem(
     CLGComplex* B,
     CLGComplex* outEigenValue,
     CLGComplex* outEigenVector,
-    UINT dm, UINT dk,
+    UINT dm, UINT dk, UBOOL bSmall,
     Real fEigenCrit,
     UINT iMaxEigenIterate,
     Real fCrit,
@@ -1772,7 +1874,7 @@ void CLinearAlgebraHelper::GeneralizedEigenValueProblem(
     sTmpQ.Free();
     sTmpR.Free();
 
-    EigenValueProblem(B, outEigenValue, outEigenVector, dm, dk, fEigenCrit, iMaxEigenIterate, fCrit, iMaxIterate);
+    EigenValueProblem(B, outEigenValue, outEigenVector, dm, dk, bSmall, fEigenCrit, iMaxEigenIterate, fCrit, iMaxIterate);
 }
 
 #pragma endregion
@@ -1828,11 +1930,9 @@ _kernelLeftGivenHessenberg(UINT i, UINT j,
     {
         CLGComplex h00 = A[(i - 1) * dm + j];
         CLGComplex h10 = A[i * dm + j];
-        Real fDemon = __div(F(1.0), _sqrt(h00.x * h00.x + h00.y * h00.y + h10.x * h10.x + h10.y * h10.y));
-        c0.x = h00.x * fDemon;
-        c0.y = h00.y * fDemon;
-        s0.x = h10.x * fDemon;
-        s0.y = h10.y * fDemon;
+        Real fDemon = __div(F(1.0), _sqrt(__cuCabsSqf(h00) + __cuCabsSqf(h10)));
+        c0 = cuCmulf_cr(h00, fDemon);
+        s0 = cuCmulf_cr(h10, fDemon);
         c0h = _cuConjf(c0);
         s0h = _cuConjf(s0);
 
@@ -2069,7 +2169,7 @@ void CLinearAlgebraHelper::SolveYHost(CLGComplex* Y, const CLGComplex* R, UINT d
 
 void CLinearAlgebraHelper::UpperTriangularEigenVectorsHost(
     const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-    UINT dm, UINT dk)
+    UINT dm, UINT dk, UBOOL bSmall)
 {
     if (dm > m_uiDim || dk > m_uiDim)
     {
@@ -2086,7 +2186,7 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectorsHost(
 
     checkCudaErrors(cudaMemcpy(tmpT, upperTriangular, sizeof(CLGComplex) * dm * dm, cudaMemcpyHostToDevice));
 
-    UpperTriangularEigenVectors(tmpT, tmpE, tmpV, dm, dk);
+    UpperTriangularEigenVectors(tmpT, tmpE, tmpV, dm, dk, bSmall);
 
     checkCudaErrors(cudaMemcpy(outEigenValue, tmpE, sizeof(CLGComplex) * dk, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(outEigenVector, tmpV, sizeof(CLGComplex) * dm * dk, cudaMemcpyDeviceToHost));
@@ -2097,7 +2197,7 @@ void CLinearAlgebraHelper::UpperTriangularEigenVectorsHost(
 }
 
 void CLinearAlgebraHelper::EigenValueProblemHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-    UINT dm, UINT dk, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
+    UINT dm, UINT dk, UBOOL bSmall, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
 {
     if (dm > m_uiDim || dk > m_uiDim)
     {
@@ -2114,7 +2214,7 @@ void CLinearAlgebraHelper::EigenValueProblemHost(CLGComplex* H, CLGComplex* outE
 
     checkCudaErrors(cudaMemcpy(tmpT, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyHostToDevice));
 
-    EigenValueProblem(tmpT, tmpE, tmpV, dm, dk, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
+    EigenValueProblem(tmpT, tmpE, tmpV, dm, dk, bSmall, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
 
     checkCudaErrors(cudaMemcpy(outEigenValue, tmpE, sizeof(CLGComplex) * dk, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(outEigenVector, tmpV, sizeof(CLGComplex) * dm * dk, cudaMemcpyDeviceToHost));
@@ -2125,7 +2225,7 @@ void CLinearAlgebraHelper::EigenValueProblemHost(CLGComplex* H, CLGComplex* outE
 }
 
 void CLinearAlgebraHelper::EigenValueProblemHessenbergHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-    UINT dm, UINT dk, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
+    UINT dm, UINT dk, UBOOL bSmall, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
 {
     if (dm > m_uiDim || dk > m_uiDim)
     {
@@ -2142,7 +2242,7 @@ void CLinearAlgebraHelper::EigenValueProblemHessenbergHost(CLGComplex* H, CLGCom
 
     checkCudaErrors(cudaMemcpy(tmpT, H, sizeof(CLGComplex) * dm * dm, cudaMemcpyHostToDevice));
 
-    EigenValueProblemHessenberg(tmpT, tmpE, tmpV, dm, dk, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
+    EigenValueProblemHessenberg(tmpT, tmpE, tmpV, dm, dk, bSmall, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
 
     checkCudaErrors(cudaMemcpy(outEigenValue, tmpE, sizeof(CLGComplex) * dk, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(outEigenVector, tmpV, sizeof(CLGComplex) * dm * dk, cudaMemcpyDeviceToHost));
@@ -2156,7 +2256,7 @@ void CLinearAlgebraHelper::GeneralizedEigenValueProblemHost(
     CLGComplex* A, CLGComplex* B,
     CLGComplex* outEigenValue,
     CLGComplex* outEigenVector,
-    UINT dm, UINT dk, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
+    UINT dm, UINT dk, UBOOL bSmall, Real fEigenCrit, UINT iMaxEigenIter, Real fQRCrit, UINT iMaxIterate)
 {
     if (dm > m_uiDim || dk > m_uiDim)
     {
@@ -2176,7 +2276,7 @@ void CLinearAlgebraHelper::GeneralizedEigenValueProblemHost(
     checkCudaErrors(cudaMemcpy(tmpA, A, sizeof(CLGComplex) * dm * dm, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaMemcpy(tmpB, B, sizeof(CLGComplex) * dm * dm, cudaMemcpyHostToDevice));
 
-    GeneralizedEigenValueProblem(tmpA, tmpB, tmpE, tmpV, dm, dk, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
+    GeneralizedEigenValueProblem(tmpA, tmpB, tmpE, tmpV, dm, dk, bSmall, fEigenCrit, iMaxEigenIter, fQRCrit, iMaxIterate);
 
     checkCudaErrors(cudaMemcpy(outEigenValue, tmpE, sizeof(CLGComplex) * dk, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(outEigenVector, tmpV, sizeof(CLGComplex) * dm * dk, cudaMemcpyDeviceToHost));

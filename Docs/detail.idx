@@ -31,36 +31,37 @@
 \indexentry{preconditioner|hyperpage}{26}
 \indexentry{deflation|hyperpage}{27}
 \indexentry{GCRO-DR|hyperpage}{27}
-\indexentry{Ritz eigen-vector|hyperpage}{28}
-\indexentry{REV|hyperpage}{28}
-\indexentry{harmonic Ritz eigen vector|hyperpage}{28}
-\indexentry{singular value decomposition|hyperpage}{28}
-\indexentry{SVD|hyperpage}{28}
+\indexentry{Ritz eigen-vector|hyperpage}{29}
+\indexentry{REV|hyperpage}{29}
+\indexentry{harmonic Ritz eigen vector|hyperpage}{29}
+\indexentry{singular value decomposition|hyperpage}{29}
+\indexentry{SVD|hyperpage}{29}
 \indexentry{generalized eigen-value problem|hyperpage}{29}
 \indexentry{GEV|hyperpage}{29}
 \indexentry{Hessenberg matrix|hyperpage}{29}
 \indexentry{Householder reflection|hyperpage}{29}
 \indexentry{QR factorization|hyperpage}{30}
 \indexentry{Shifted QR iteration|hyperpage}{31}
-\indexentry{Inverse power iteration|hyperpage}{31}
-\indexentry{backward substitution|hyperpage}{32}
+\indexentry{Inverse power iteration|hyperpage}{32}
+\indexentry{backward substitution|hyperpage}{33}
 \indexentry{generalized eigen-value problem|hyperpage}{33}
 \indexentry{forward substitution|hyperpage}{34}
-\indexentry{plaquette energy|hyperpage}{35}
-\indexentry{meson|hyperpage}{35}
-\indexentry{correlator|hyperpage}{35}
-\indexentry{source|hyperpage}{37}
-\indexentry{point source|hyperpage}{37}
-\indexentry{pseudofermions|hyperpage}{38}
-\indexentry{point source|hyperpage}{38}
-\indexentry{reciprocal space|hyperpage}{38}
-\indexentry{gauge smearing|hyperpage}{40}
-\indexentry{low mode|hyperpage}{40}
-\indexentry{exceptional configurations|hyperpage}{40}
-\indexentry{gauge smoothing|hyperpage}{40}
-\indexentry{APE smearing|hyperpage}{40}
-\indexentry{staple|hyperpage}{41}
-\indexentry{stout|hyperpage}{41}
-\indexentry{APE stout|hyperpage}{41}
-\indexentry{gauge fixing|hyperpage}{41}
-\indexentry{extend sources|hyperpage}{41}
+\indexentry{GCRO-DR|hyperpage}{35}
+\indexentry{plaquette energy|hyperpage}{37}
+\indexentry{meson|hyperpage}{37}
+\indexentry{correlator|hyperpage}{37}
+\indexentry{source|hyperpage}{39}
+\indexentry{point source|hyperpage}{39}
+\indexentry{pseudofermions|hyperpage}{40}
+\indexentry{point source|hyperpage}{40}
+\indexentry{reciprocal space|hyperpage}{40}
+\indexentry{gauge smearing|hyperpage}{42}
+\indexentry{low mode|hyperpage}{42}
+\indexentry{exceptional configurations|hyperpage}{42}
+\indexentry{gauge smoothing|hyperpage}{42}
+\indexentry{APE smearing|hyperpage}{42}
+\indexentry{staple|hyperpage}{43}
+\indexentry{stout|hyperpage}{43}
+\indexentry{APE stout|hyperpage}{43}
+\indexentry{gauge fixing|hyperpage}{43}
+\indexentry{extend sources|hyperpage}{43}

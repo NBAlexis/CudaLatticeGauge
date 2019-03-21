@@ -48,8 +48,18 @@ public:
     virtual void Axpy(const CLGComplex& a, const CField* x);
     virtual void ScalarMultply(const CLGComplex& a);
     virtual void ScalarMultply(Real a);
-
     virtual CLGComplex Dot(const CField* other) const;
+
+    //=================================
+    //It is tested, although, the DEBUG Mode, this is faster
+    //But the RELEASE Mode, the above version is faster.
+    void AxpyPlus1(const CField* x);
+    void AxpyMinus1(const CField* x);
+    void Axpy1(Real a, const CField* x);
+    void Axpy1(const CLGComplex& a, const CField* x);
+    void ScalarMultply1(const CLGComplex& a);
+    void ScalarMultply1(Real a);
+    CLGComplex Dot1(const CField* other) const;
 
     //pGauge must be gauge SU3
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
@@ -74,7 +84,23 @@ public:
 protected:
 
     Real m_fKai;
+    Real* m_tmpBuffer2;
 
+};
+
+class CLGAPI CFieldMatrixOperationWilsonSquareSU3 : public CFieldMatrixOperation
+{
+public:
+    CFieldMatrixOperationWilsonSquareSU3();
+    ~CFieldMatrixOperationWilsonSquareSU3();
+    
+    //real left = (res,left)
+    virtual void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY);
+
+    deviceWilsonVectorSU3** m_pResBuffer;
+    deviceWilsonVectorSU3** m_pLeftBuffer;
+    deviceWilsonVectorSU3** m_pHostResBuffer;
+    deviceWilsonVectorSU3** m_pHostLeftBuffer;
 };
 
 __END_NAMESPACE

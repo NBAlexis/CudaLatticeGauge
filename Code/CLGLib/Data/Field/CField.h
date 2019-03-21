@@ -231,6 +231,15 @@ public:
     THashMap<UINT, CField*> m_pCachedFieldMaps;
 };
 
+class CLGAPI CFieldMatrixOperation
+{
+public:
+    enum {_kFieldMatrixMaxDim = 32 };
+    static CFieldMatrixOperation* Create(EFieldType ef);
+
+    virtual void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY) = 0;
+};
+
 __END_NAMESPACE
 
 #endif //#ifndef _CFIELD_H_

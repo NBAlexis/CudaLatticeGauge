@@ -75,9 +75,19 @@
 dim3 block(_HC_DecompX, _HC_DecompY, _HC_DecompZ); \
 dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
 
+#define preparethreadE(element_count) \
+dim3 block(_HC_DecompX * element_count, _HC_DecompY, _HC_DecompZ); \
+dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
+
 
 #define intokernal \
 UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); 
+
+
+#define intokernalE(element_count)\
+UINT blockIdxX = blockIdx.x / element_count;\
+UINT elementIdx = blockIdx.x % element_count; \
+UINT uiSiteIndex = ((threadIdx.x + blockIdxX * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z));
 
 #define intokernaldir \
 UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); \

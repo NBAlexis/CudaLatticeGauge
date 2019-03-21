@@ -540,6 +540,60 @@ TestSolverGCR:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+TestSolverGCRODR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+	
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 25
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 5
+        KDim : 2
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 10
+        DeflateSpace : EEDT_HEV
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 5
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
 TestSolverGMRESLowMode:
 
     Dim : 4
@@ -582,10 +636,10 @@ TestSolverGMRESLowMode:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MaxDim : 50
+        MaxDim : 15
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.00000001
-        Restart : 30
+        Restart : 100
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
@@ -631,12 +685,14 @@ TestSolverGCRODRLowMode:
         SolverName : CSLASolverGCRODR
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MDim : 20
-        KDim : 10
+        MDim : 12
+        KDim : 4
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 10
         DeflateSpace : EEDT_REV
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
-        Restart : 30
+        Accuracy : 0.0000000001
+        Restart : 100
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
@@ -1260,6 +1316,84 @@ TestOperators:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 40
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 10
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.000000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+TestQuickAxpy:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [32, 32, 32, 16]
     LatticeIndex : EIndexType_Square
     LatticeBoundary : EBC_TorusSquare
     ThreadAutoDecompose : 1

@@ -12,6 +12,8 @@
 
 #include "CLGLib_Private.h"
 
+#define _QUICK_AXPY_BLOCK 2
+
 __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CFieldFermionWilsonSquareSU3)
@@ -52,6 +54,15 @@ _kernelAxpyPlusFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex]);
 }
 
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelAxpyPlusQuick(
+    deviceWilsonVectorSU3 * pMe,
+    const deviceWilsonVectorSU3 * __restrict__ pOther)
+{
+    intokernalE(24);
+    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx];
+}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyMinusFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
@@ -59,6 +70,15 @@ _kernelAxpyMinusFermionWilsonSquareSU3(
 {
     intokernal;
     pMe[uiSiteIndex].Sub(pOther[uiSiteIndex]);
+}
+
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelAxpyMinusQuick(
+    deviceWilsonVectorSU3 * pMe,
+    const deviceWilsonVectorSU3 * __restrict__ pOther)
+{
+    intokernalE(24);
+    pMe[uiSiteIndex].m_rme[elementIdx] -= pOther[uiSiteIndex].m_rme[elementIdx];
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -70,6 +90,17 @@ _kernelAxpyComplexFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
 }
 
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelAxpyComplexQuick(
+    deviceWilsonVectorSU3 * pMe,
+    const deviceWilsonVectorSU3 * __restrict__ pOther, CLGComplex a)
+{
+    intokernalE(12);
+    pMe[uiSiteIndex].m_me[elementIdx] = 
+        _cuCaddf(pMe[uiSiteIndex].m_me[elementIdx], 
+            _cuCmulf(a, pOther[uiSiteIndex].m_me[elementIdx]));
+}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyRealFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 * pMe, 
@@ -77,6 +108,15 @@ _kernelAxpyRealFermionWilsonSquareSU3(
 {
     intokernal;
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulRealC(a));
+}
+
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelAxpyRealQuick(
+    deviceWilsonVectorSU3 * pMe,
+    const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
+{
+    intokernalE(24);
+    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx] * a;
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -89,6 +129,17 @@ _kernelDotFermionWilsonSquareSU3(
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
 }
 
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelDotQuick(
+    const deviceWilsonVectorSU3 * __restrict__ pMe,
+    const deviceWilsonVectorSU3 * __restrict__ pOther, Real* x, Real* y)
+{
+    intokernalE(12);
+    CLGComplex toAdd = _cuCmulf(_cuConjf(pMe[uiSiteIndex].m_me[elementIdx]), pOther[uiSiteIndex].m_me[elementIdx]);
+    atomicAdd(x, toAdd.x);
+    atomicAdd(y, toAdd.y);
+}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyComplex(
     deviceWilsonVectorSU3 * pMe, 
@@ -98,6 +149,15 @@ _kernelScalarMultiplyComplex(
     pMe[uiSiteIndex].MulComp(a);
 }
 
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelScalarQuick(
+    deviceWilsonVectorSU3 * pMe,
+    CLGComplex a)
+{
+    intokernalE(12);
+    pMe[uiSiteIndex].m_me[elementIdx] = _cuCmulf(pMe[uiSiteIndex].m_me[elementIdx], a);
+}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyReal(
     deviceWilsonVectorSU3 * pMe, 
@@ -105,6 +165,15 @@ _kernelScalarMultiplyReal(
 {
     intokernal;
     pMe[uiSiteIndex].MulReal(a);
+}
+
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelScalarQuickReal(
+    deviceWilsonVectorSU3 * pMe,
+    Real a)
+{
+    intokernalE(24);
+    pMe[uiSiteIndex].m_rme[elementIdx] *= a;
 }
 
 /**
@@ -346,14 +415,19 @@ _kernelMakePointSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite, B
 
 #pragma endregion
 
-CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() : CFieldFermion(), m_fKai(F(0.125))
+CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() 
+    : CFieldFermion()
+    , m_fKai(F(0.125))
+    , m_tmpBuffer2(NULL)
 {
     checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount));
+    checkCudaErrors(cudaMalloc((void**)&m_tmpBuffer2, sizeof(Real) * 2));
 }
 
 CFieldFermionWilsonSquareSU3::~CFieldFermionWilsonSquareSU3()
 {
     checkCudaErrors(__cudaFree(m_pDeviceData));
+    checkCudaErrors(cudaFree(m_tmpBuffer2));
 }
 
 /**
@@ -431,6 +505,93 @@ void CFieldFermionWilsonSquareSU3::CopyTo(CField* U) const
     pField->m_byFieldId = m_byFieldId;
     pField->m_fKai = m_fKai;
 }
+
+#pragma region Quick Axpys (Although this is faster in debug mode, this is not fast in release Mode)
+
+void CFieldFermionWilsonSquareSU3::AxpyPlus1(const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+
+    preparethreadE(24);
+    _kernelAxpyPlusQuick << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+}
+
+void CFieldFermionWilsonSquareSU3::AxpyMinus1(const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+
+    preparethreadE(24);
+    _kernelAxpyMinusQuick << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+}
+
+void CFieldFermionWilsonSquareSU3::Axpy1(Real a, const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+
+    preparethreadE(24);
+    _kernelAxpyRealQuick << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::Axpy1(const CLGComplex& a, const CField* x)
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+
+    preparethreadE(12);
+    _kernelAxpyComplexQuick << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::ScalarMultply1(const CLGComplex& a)
+{
+    preparethreadE(12);
+    _kernelScalarQuick << <block, threads >> >(m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::ScalarMultply1(Real a)
+{
+    preparethreadE(24);
+    _kernelScalarQuickReal << <block, threads >> >(m_pDeviceData, a);
+}
+
+CLGComplex CFieldFermionWilsonSquareSU3::Dot1(const CField* x) const
+{
+    if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return _make_cuComplex(0, 0);
+    }
+    const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
+
+    Real tmp[] = { F(0.0), F(0.0) };
+    checkCudaErrors(cudaMemcpy(m_tmpBuffer2, tmp, sizeof(Real) * 2, cudaMemcpyHostToDevice));
+    preparethreadE(12);
+    _kernelDotQuick << <block, threads >> > 
+        (m_pDeviceData, pField->m_pDeviceData, m_tmpBuffer2, m_tmpBuffer2 + 1);
+    checkCudaErrors(cudaMemcpy(tmp, m_tmpBuffer2, sizeof(Real) * 2, cudaMemcpyDeviceToHost));
+
+    return _make_cuComplex(tmp[0], tmp[1]);
+}
+
+#pragma endregion
 
 void CFieldFermionWilsonSquareSU3::AxpyPlus(const CField* x)
 {
@@ -839,6 +1000,112 @@ CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }
+
+#pragma region Field Matrix Operation
+
+CFieldMatrixOperationWilsonSquareSU3::CFieldMatrixOperationWilsonSquareSU3()
+{
+    m_pHostResBuffer = (deviceWilsonVectorSU3**)malloc(sizeof(deviceWilsonVectorSU3*) * _kFieldMatrixMaxDim);
+    m_pHostLeftBuffer = (deviceWilsonVectorSU3**)malloc(sizeof(deviceWilsonVectorSU3*) * _kFieldMatrixMaxDim);
+    checkCudaErrors(cudaMalloc((void**)&m_pResBuffer, sizeof(deviceWilsonVectorSU3*) * _kFieldMatrixMaxDim));
+    checkCudaErrors(cudaMalloc((void**)&m_pLeftBuffer, sizeof(deviceWilsonVectorSU3*) * _kFieldMatrixMaxDim));
+}
+
+CFieldMatrixOperationWilsonSquareSU3::~CFieldMatrixOperationWilsonSquareSU3()
+{
+    free(m_pHostResBuffer);
+    free(m_pHostLeftBuffer);
+
+    checkCudaErrors(cudaFree(m_pResBuffer));
+    checkCudaErrors(cudaFree(m_pLeftBuffer));
+}
+
+/**
+* Assume m >= k
+* V=(vk[0], ... , vk[k - 1])
+* W=(vk[0], ... , vk[k - 1], vmk[0], ..., vmk[m-k-1])
+*
+* V(v1,v2,...,vk) = W(w1,w2,...,wm) (m11, ..., m1k)
+*                                   (..., ..., ...)
+*                                   (mm1, ..., mmk)
+* I think this is expansive... the FLOP of Ax is about 100n, but this has m x k x n
+*/
+__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+_kernelMatrixMultiply(
+    deviceWilsonVectorSU3 ** pRes,
+    deviceWilsonVectorSU3 ** pLeft,
+    const CLGComplex * __restrict__ pMatrix,
+    UINT uiDimX, UINT uiDimY) //x=m,y=k
+{
+    intokernalE(12);
+
+    CLGComplex result[CFieldMatrixOperation::_kFieldMatrixMaxDim];
+
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        result[i] = _make_cuComplex(F(0.0), F(0.0));
+        for (UINT j = 0; j < uiDimX; ++j)
+        {
+            result[i] = _cuCaddf(result[i], _cuCmulf(
+                j < uiDimY ? 
+                  pRes[j][uiSiteIndex].m_me[elementIdx]
+                : pLeft[j - uiDimY][uiSiteIndex].m_me[elementIdx],
+                pMatrix[j * uiDimY + i]
+            ));
+        }
+    }
+
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        pRes[i][uiSiteIndex].m_me[elementIdx] = result[i];
+    }
+}
+
+/**
+* Assume m >= k
+* V=(vk[0], ... , vk[k - 1])
+* W=(vk[0], ... , vk[k - 1], vmk[0], ..., vmk[m-k-1])
+*
+* v1 = (m11, ..., m1m)  w1
+* ..   (..., ..., ...)  ..
+* vk   (mk1, ..., mkm)  wk
+*                       wk+1
+*                       ...
+*                       wm
+*/
+
+void CFieldMatrixOperationWilsonSquareSU3::VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY)
+{
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        CFieldFermionWilsonSquareSU3* pF = dynamic_cast<CFieldFermionWilsonSquareSU3*>(res[i]);
+        if (NULL == pF)
+        {
+            appCrucial(_T("CFieldMatrixOperationWilsonSquareSU3 only work with CFieldFermionWilsonSquareSU3!\n"));
+            return;
+        }
+        m_pHostResBuffer[i] = pF->m_pDeviceData;
+    }
+
+    for (UINT i = 0; i < uiDimX - uiDimY; ++i)
+    {
+        const CFieldFermionWilsonSquareSU3* pF = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(left[i]);
+        if (NULL == pF)
+        {
+            appCrucial(_T("CFieldMatrixOperationWilsonSquareSU3 only work with CFieldFermionWilsonSquareSU3!\n"));
+            return;
+        }
+        m_pHostLeftBuffer[i] = pF->m_pDeviceData;
+    }
+
+    checkCudaErrors(cudaMemcpy(m_pResBuffer, m_pHostResBuffer, sizeof(deviceWilsonVectorSU3*) * uiDimY, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(m_pLeftBuffer, m_pHostLeftBuffer, sizeof(deviceWilsonVectorSU3*) * (uiDimX - uiDimY), cudaMemcpyHostToDevice));
+
+    preparethreadE(12);
+    _kernelMatrixMultiply << <block, threads >> > (m_pResBuffer, m_pLeftBuffer, deviceMatrix, uiDimX, uiDimY);
+}
+
+#pragma endregion
 
 __END_NAMESPACE
 

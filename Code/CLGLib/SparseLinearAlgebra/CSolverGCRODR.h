@@ -15,6 +15,7 @@ __BEGIN_NAMESPACE
 
 __DEFINE_ENUM(EEigenDeflationType,
     EEDT_REV,
+    EEDT_HEV,
     EEDT_SVD,
     );
 
@@ -45,30 +46,6 @@ public:
 
 protected:
 
-    /**
-    * x = x +- AB+ x
-    */
-    void AxpyABdagger(class CField* x, const TArray<class CField*>& lstA, const TArray<class CField*>& lstB, UBOOL bPlusOrMinus, UINT uiK);
-
-    /**
-    * Assume m >= k
-    * V=(vk[0], ... , vk[k - 1])
-    * W=(vk[0], ... , vk[k - 1], vmk[0], ..., vmk[m-k-1])
-    *
-    * V(v1,v2,...,vk) = W(w1,w2,...,wm) (m11, ..., m1k)
-    *                                   (..., ..., ...)
-    *                                   (mm1, ..., mmk)
-    *
-    *  VectorMultiplyMatrix is for Yk = V Pk, uiMDim = m and Ck = W Q, uiMDim = m + 1
-    */
-    void VectorMultiplyMatrix(
-        //TArray<class CField*>& resultV, 
-        const TArray<class CField*>& lstYorC, 
-        //const TArray<class CField*>& lstVmk, 
-        CLGComplex* hostMatrix, UINT uiMDim);
-    //void MatrixMultiplyVector(TArray<class CField*>& resultV, const TArray<class CField*>& lstVk, const TArray<class CField*>& lstVmk, CLGComplex* hostMatrix);
-
-    // YR-1
     void FieldSolveY(TArray<class CField*>& resultY, const CLGComplex* R, UINT uiDim);
 
     void QRFactorAY(const class CFieldGauge* pGaugeField, EFieldOperator uiM);
@@ -77,9 +54,10 @@ protected:
 
     void FindPk2();
 
-    void GenerateCUFirstTime(CField* pX, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
+    void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
     void GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES);
     void NormUkAndSetD();
+    void OrthognalXR(CField* pX, CField* pR, CField* pTmp);
 
     void GetPooledFields(const class CField* pFieldB);
     void ReleasePooledFields();
@@ -87,13 +65,14 @@ protected:
     /**
     * m_pHostHmGm set
     */
-    void FirstTimeGMERESSolve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM);
+    void FirstTimeGMERESSolve(CField* pFieldX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM);
 
     class CLinearAlgebraHelper* m_pHelper;
 
     UINT m_uiReStart;
     UINT m_uiMDim;
     UINT m_uiKDim;
+    UINT m_uiRecalcuateR;
     Real m_fAccuracy;
     UBOOL m_bHasYk;
 
@@ -105,8 +84,6 @@ protected:
     TArray<class CField*> m_lstC;
     //number = k
     TArray<class CField*> m_lstU;
-    //number = k
-    TArray<class CField*> m_lstTmp;
 
     class CField* GetV(UINT uiIndex) 
     {
@@ -134,6 +111,7 @@ protected:
     CLGComplex* m_pDeviceALeft;
     CLGComplex* m_pDeviceA;
     CLGComplex* m_pDeviceB;
+    CLGComplex* m_pDeviceTmpQ;
 
     //(m+1)xm
     CLGComplex* m_pHostHmGm;
@@ -151,6 +129,9 @@ protected:
 
     Real m_fBeta;
     Real m_fDiviation;
+    CLGComplex m_cLastDiviation;
+
+    class CFieldMatrixOperation* m_pFieldMatrix;
 };
 
 __END_NAMESPACE

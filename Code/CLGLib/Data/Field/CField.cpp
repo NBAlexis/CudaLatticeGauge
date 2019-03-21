@@ -32,6 +32,17 @@ CFieldFermion::CFieldFermion() : CField()
     m_uiSiteCount = _HC_Volumn;
 }
 
+CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
+{
+    if (ef == EFT_FermionWilsonSquareSU3)
+    {
+        return new CFieldMatrixOperationWilsonSquareSU3();
+    }
+
+    appCrucial(_T("Matrix operation for field type %s not implemented!\n"), __ENUM_TO_STRING(EFieldType, ef).c_str());
+    return NULL;
+}
+
 __END_NAMESPACE
 
 //=============================================================================

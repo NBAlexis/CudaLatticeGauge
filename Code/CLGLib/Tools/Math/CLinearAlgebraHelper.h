@@ -92,8 +92,9 @@ public:
         UINT lengthX, UINT lengthY, UINT dimDest, UINT dimSrc);
 
     void Transpose(CLGComplex* deviceMatrix, UINT dx, UINT dy);
-
     void TransposeHost(CLGComplex* hostMatrix, UINT dx, UINT dy);
+    void Dagger(CLGComplex* deviceMatrix, UINT dx, UINT dy);
+    void DaggerHost(CLGComplex* hostMatrix, UINT dx, UINT dy);
 
 #pragma endregion
 
@@ -114,38 +115,38 @@ public:
     */
     void UpperTriangularEigenVectors(
         const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector, 
-        UINT dm, UINT dk);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE);
 
     void UpperTriangularEigenVectorsHost(
         const CLGComplex* upperTriangular, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE);
 
     void EigenValueProblem(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector, 
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     /**
     * For H is already Hessenberg
     */
     void EigenValueProblemHessenberg(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     void EigenValueProblemHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     void EigenValueProblemHessenbergHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     void GeneralizedEigenValueProblem(
         CLGComplex* A, CLGComplex* B,
         CLGComplex* outEigenValue,
         CLGComplex* outEigenVector,
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     void GeneralizedEigenValueProblemHost(
         CLGComplex* A, CLGComplex* B,
         CLGComplex* outEigenValue,
         CLGComplex* outEigenVector,
-        UINT dm, UINT dk, Real fEigenCrit = F(0.000000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.0000000000001), UINT iMaxIterate = 200);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = F(0.000001), UINT iMaxEigenIter = 20, Real fQRCrit = F(0.000000000001), UINT iMaxIterate = 1000);
 
     UINT GetMaxDim() const { return m_uiDim; }
 
@@ -154,7 +155,7 @@ protected:
     UINT m_uiDim;
 
     void Henssenberg(CLGComplex* T, UINT dx);
-    void QRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.00000000001), UINT iCrit = 100);
+    void QRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.000000000001), UINT iCrit = 1000);
 
     struct CLGAPI STmpMatrix
     {

@@ -33,21 +33,26 @@ Now, considering $A\in \mathbb{C}^{n\times n}$ and a matrix $Z\in \mathbb{C}^{n\
 so
 \begin{equation}
 \begin{split}
-&Ax=b \Rightarrow \left(A-ZZ^{\dagger}A\right)x+ZT^{-1}Z^{\dagger}Ax=b-ZZ^{\dagger}b + ZT^{-1}Z^{\dagger}b\\
+&Ax=b \Rightarrow \left(\mathbb{I}+Z\left(T^{-1}-\mathbb{I}\right)Z^{\dagger}\right)Ax= \left(\mathbb{I}+Z\left(T^{-1}-\mathbb{I}\right)Z^{\dagger}\right)b\\
+&\Rightarrow \left(A-ZZ^{\dagger}A\right)x+ZT^{-1}Z^{\dagger}Ax=b-ZZ^{\dagger}b + ZT^{-1}Z^{\dagger}b\\
 \end{split}
+\label{eq.gcrodr.precondition}
 \end{equation}
 
-Note that $ZZ^{\dagger}\in \mathbb{C}^{n\times n}$ is not unitary matrix. $T\in \mathbb{C}^{k\times k}$ is a small matrix. And then, one can solve
+Note that $ZZ^{\dagger}\in \mathbb{C}^{n\times n}$ is not identity matrix (\textbf{also not a unitary matrix, but is an Hermitian matrix}). $T\in \mathbb{C}^{k\times k}$ is a small matrix. And then, one can solve
 \begin{equation}
 \begin{split}
-&ZT^{-1}Z^{\dagger}Ax=ZT^{-1}Z^{\dagger}b \Rightarrow x=ZT^{-1}Z^{\dagger}b\\
+&ZT^{-1}Z^{\dagger}Ax=ZT^{-1}Z^{\dagger}b ,\;\;\textcolor[rgb]{0,0,1}{Z^{\dagger}A=TZ^{\dagger}}\\
+&ZT^{-1}\textcolor[rgb]{0,0,1}{TZ^{\dagger}}x=ZT^{-1}Z^{\dagger}b \\
+&x=ZT^{-1}Z^{\dagger}b\\
 \end{split}
+\label{eq.gcrod.exactsolution}
 \end{equation}
 exactly, while solving $\left(A-ZZ^{\dagger}A\right)x=b-ZZ^{\dagger}b$ by iteration methods such as GMRES.
 
 This is the so-called \textbf{subspace deflation}\index{deflation}.
 
-\subsubsection{\label{sec:gcrodr}\index{GCRO-DR}GCRO-DR}
+\subsubsection{\label{sec:gcrodr}\index{GCRO-DR}Brief intro to GCRO-DR}
 
 Start from Eq.~(\ref{eq,gemres.1}). Assume after the first-step GMRES, we have the orthogonal-normal basis $v_i$ which can be written as a matrix $V_m\in \mathbb{C}^{n\times m},V_{m+1}\in \mathbb{C}^{n\times (m+1)},H\in \mathbb{C}^{(m+1)\times m}$. On the other hand, will be introduced later, we have a set of deflation vectors, or a matrix $P_k\in \mathbb{C}^{\textcolor[rgb]{0,0,1}{m}\times k}$, such that
 \begin{equation}
@@ -107,6 +112,14 @@ From Eq.~(\ref{eq.gcrodr.1}), we find
 In the above, we have assumed $P_k\in \mathbb{C}^{m\times k}$ is already known. Now we concentrate on this part.
 
 Let $A\in \mathbb{C}^{n\times n},V\in \mathbb{C}^{n\times k}$, \textbf{If $V$ is formed as orthogonal normal basis of subspace $S$}, then, if $(\lambda, w\in \mathbb{C}^m)$ is eigen-pair of $V^{\dagger}AV$, $(\lambda, u=V^{\dagger}w\in \mathbb{C}^n)$ is eigen-pair of $A$.
+
+\begin{equation}
+\begin{split}
+&H_mp_i=\lambda _i p_i,\;\;H_m=V_m^{\dagger}AV_m\\
+&A\left(V_mp_i\right)=V_mH_mp_i=\lambda _i \left(V_mp_i\right)\\
+\end{split}
+\label{eq.gcrodr.subdeflation}
+\end{equation}
 
 Therefor, \textcolor[rgb]{0,0,1}{\textbf{$P_k$ is a matrix with $k$ rows, and each row is a eigen-vector of $H_m$ ( $H_m$ denoting the first $m$ row of $H_{m+1}$)}}, then, $VP_k$ is a matrix with $k$ rows such that each row is a eigen-vector of $A$ (approximately since $AV\approx VH \Rightarrow H \approx V^{\dagger}AV$).
 
@@ -362,3 +375,93 @@ Finally we have to calculate $YR^{-1}$. This is a \index{forward substitution}fo
 &U=YR^{-1},\;\; UR=Y,\;\;R^{T}U^{T}=Y^T\;\;U^{T}=\left(R^{T}\right)^{-1}Y^T.\\
 \end{split}
 \end{equation}
+
+\subsubsection{\label{sec:impgcrodr}\index{GCRO-DR}Implement of GCRO-DR}
+
+The GCRO-DR has four different phases
+\begin{enumerate}
+  \item Start of the trajectory, use GMRES to solve the first time.
+  \item Continue the trajectory, use the last deflation space to form a new deflation space.
+  \item First GCRO-DR step.
+  \item Restart.
+\end{enumerate}
+
+The first step is GMRES, which can be briefly written as
+\begin{equation}
+\begin{split}
+&AV_m=V_{m+1}H_{m+1}\\
+\end{split}
+\end{equation}
+Using $V_{m}^{\dagger}AV_m\approx H_m$ and Eq.~(\ref{eq.gcrodr.subdeflation}), we solve the eigen vectors of $H_m$ denoting as a matrix $P_{m,k}$, $V_mP_{m,k}\in \mathbb{C}^{m\times k}$ are $k$ approximate eigen-vectors of $A$, denoting as $Y_k\in \mathbb{C}^{n\times k}$.
+
+Now we need to project out the subspace $Y_kT^{-1}Y_k^{\dagger} A x= Y_kT^{-1}Y_k^{\dagger}b$, where $T=Y_k^{\dagger} A Y_k$. Let
+\begin{equation}
+\begin{split}
+&QR=AY_k,\;\;C_k=Q\in \mathbb{C}^{n\times k},\;\;U_k=Y_kR^{-1}\in \mathbb{C}^{n\times k}.\\
+&AU_k=AY_kR^{-1}=QRR^{-1}=Q=C_k\\
+&T^{-1}=\left(Y_k^{\dagger} A Y_k\right)^{-1}=\left(Y_k^{\dagger} C_k R\right)^{-1}=R^{-1}\left(Y_k^{\dagger} C_k\right)^{-1}\\
+\end{split}
+\end{equation}
+Also if $Y_k$ are eigen-vectors
+\begin{equation}
+\begin{split}
+&AY_k\approx Y_k\Lambda,\;\;\Lambda = \left(\begin{array}{cccc}
+\lambda _1 & 0 & \ldots & 0 \\
+0 & \lambda _2 & \ldots & 0 \\
+\ldots & \ldots & \ldots & \ldots \\
+0 & \ldots & 0 & \lambda_k \\
+\end{array}\right)\\
+\end{split}
+\end{equation}
+Note that $Y_k\Lambda $ is also QR factorization of $AY_k$, so
+\begin{equation}
+\begin{split}
+&Y_k\approx C_k,\;\;\left(Y_k^{\dagger}C_k\right)^{-1}Y_k^{\dagger}\approx C_k^{\dagger}\\
+\end{split}
+\end{equation}
+so Using Eq.~(\ref{eq.gcrod.exactsolution}), so
+\begin{equation}
+\begin{split}
+&x_d=Y_kT^{-1}Y_k^{\dagger}r_0=Y_kR^{-1}\left(Y_k^{\dagger}C_k\right)^{-1}Y_k^{\dagger}r_0\approx U_kC_k^{\dagger}r_0\\
+\end{split}
+\label{eq.gcrod.exactsolution2}
+\end{equation}
+
+If we denote the solution of $A(x+x_0)=b$, let $r_0=b-Ax_0$, we are solving $Ax=r_0$. It has same solution as preconditioned equation, i.e., Eq.~(\ref{eq.gcrodr.precondition})
+\begin{equation}
+\begin{split}
+&\left(\mathbb{I}-Y_kY_k^{\dagger}\right)Ax+Y_kT^{-1}Y_k^{\dagger}Ax=\left(\mathbb{I}-Y_kY_k^{\dagger}\right)r_0+Y_kT^{-1}Y_k^{\dagger}r_0\\
+&A_1=\left(\mathbb{I}-Y_kY_k^{\dagger}\right)A,\;\;A_2=Y_kT^{-1}Y_k^{\dagger}A\\
+&Z_1=\left(\mathbb{I}-Y_kY_k^{\dagger}\right),\;\;Z_2=Y_kT^{-1}Y_k^{\dagger}\\
+\end{split}
+\end{equation}
+Using $Z_1A_2=Z_2A_1=Z_1Z_2=Z_2Z_1=0$, we can use $Z_{1,2}$ to project out two equations
+\begin{equation}
+\begin{split}
+&x=x_1+x_d\\
+&A_1x_1=Z_1r_0,\;\;A_2x_d=Z_2r_0\\
+\end{split}
+\end{equation}
+where the solution of $A_2x_d=Z_2r_0$ is just Eq.~(\ref{eq.gcrod.exactsolution2}). The remaining equation is
+
+\begin{equation}
+\begin{split}
+&x_1=x-x_d,\\
+&x_1=x-U_kC_k^{\dagger}r_0\\
+&\left(\mathbb{I}-Y_kY_k^{\dagger}\right)Ax_1=r_1=r_0-Y_kY_k^{\dagger}r_0\\
+\end{split}
+\end{equation}
+
+\paragraph{First GCRO-DR step}
+
+\begin{equation}
+\begin{split}
+&G(H_my-y_0)=0\\
+&(GH_my-Gy_0)=0\\
+&H_m\left((GH_m)^{-1}(Gy_0)\right)=(Gy_0)_{m+1}\\
+\end{split}
+\end{equation}
+
+\paragraph{Restart GCRO-DR step}
+
+\paragraph{Continue the trajectory}
