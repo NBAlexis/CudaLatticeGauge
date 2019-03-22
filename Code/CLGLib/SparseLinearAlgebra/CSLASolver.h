@@ -13,6 +13,15 @@
 
 __BEGIN_NAMESPACE
 
+__DEFINE_ENUM(ESolverPhase,
+    ESP_StartTrajectory,
+    ESP_InTrajectory,
+    ESP_EndTrajectory,
+    ESP_Once,
+
+    ESP_ForceDWORD = 0x7fffffff,
+)
+
 class CLGAPI CSLASolver : public CBase
 {
 public:

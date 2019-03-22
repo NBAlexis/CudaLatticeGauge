@@ -19,13 +19,16 @@ CSLASolverGMRES::CSLASolverGMRES()
     , m_uiMaxDim(20)
     , m_fAccuracy(F(0.000001))
     , m_fBeta(F(0.0))
+    , m_pHelper(NULL)
+    , m_bUseCudaForSmallMatrix(FALSE)
 {
-
+    
 }
 
 CSLASolverGMRES::~CSLASolverGMRES()
 {
     ReleaseBuffers();
+    appSafeDelete(m_pHelper);
 }
 
 void CSLASolverGMRES::Configurate(const CParameters& param)
@@ -42,6 +45,17 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     {
         appCrucial(_T("Max Dim must >= 5 and <= 100, set to default (20)"));
         m_uiMaxDim = 20;
+    }
+
+    iValue = 0;
+    if (param.FetchValueINT(_T("UseCudaForSmallMatrix"), iValue))
+    {
+        m_bUseCudaForSmallMatrix = (0 != iValue);
+    }
+
+    if (m_bUseCudaForSmallMatrix && m_uiMaxDim < CLinearAlgebraHelper::_kMaxSmallDim)
+    {
+        m_pHelper = new CLinearAlgebraHelper(m_uiMaxDim + 1);
     }
 
     if (param.FetchValueINT(_T("Restart"), iValue))
@@ -79,7 +93,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
 
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pR = m_lstVectors[0];//appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
 
     //use it to estimate relative error
     Real fBLength = F(1.0);
@@ -109,7 +123,6 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         pX->CopyTo(pR); //x0 need to be preserved
         pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
-        pR->CopyTo(m_lstVectors[0]);
         m_fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
         m_lstVectors[0]->ScalarMultply(F(1.0) / m_fBeta);  //v[0] = (b - A x0).normalize
         for (UINT j = 0; j < m_uiMaxDim; ++j)
@@ -135,9 +148,11 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
                 pW->CopyTo(m_lstVectors[j + 1]);
             }
         }
-        RotateH(m_uiMaxDim);
+        //RotateH(m_uiMaxDim);
+        RotateH();
         fLastDiavation = __cuCabsSqf(m_g[m_uiMaxDim]);
-        SolveY(m_uiMaxDim);
+        //SolveY(m_uiMaxDim);
+        SolveY();
         for (UINT j = 0; j < m_uiMaxDim; ++j)
         {
             pX->Axpy(m_y[j], m_lstVectors[j]);
@@ -150,7 +165,6 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
 
             pX->Return();
             pW->Return();
-            pR->Return();
             for (UINT k = 0; k < m_uiMaxDim; ++k)
             {
                 m_lstVectors[k]->Return();
@@ -166,7 +180,6 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
 
     pX->Return();
     pW->Return();
-    pR->Return();
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
         m_lstVectors[i]->Return();
@@ -175,11 +188,18 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
     return FALSE;
 }
 
-void CSLASolverGMRES::RotateH(UINT uiHeisenbergDim)
+void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
 {
+    if (NULL != m_pHelper)
+    {
+        m_pHelper->InitialZeroHost(m_g, m_uiMaxDim + 1, 1);
+        m_g[0] = _make_cuComplex(m_fBeta, F(0.0));
+        m_pHelper->RotateHenssenbergHost(m_h, m_g, m_uiMaxDim);
+        return;
+    }
     //======================= reset g ==================
     m_g[0] = _make_cuComplex(m_fBeta, F(0.0));
-    for (UINT i = 0; i < uiHeisenbergDim; ++i)
+    for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
         UINT ii = HIndex(i, i);
         UINT i1i = HIndex(i + 1, i);
@@ -189,7 +209,7 @@ void CSLASolverGMRES::RotateH(UINT uiHeisenbergDim)
         CLGComplex cs_h = _cuConjf(cs);
         CLGComplex sn_h = _cuConjf(sn);
 
-        for (UINT j = i; j < uiHeisenbergDim; ++j)
+        for (UINT j = i; j < m_uiMaxDim; ++j)
         {
             UINT ij = HIndex(i, j);
             UINT i1j = HIndex(i + 1, j);
@@ -205,16 +225,22 @@ void CSLASolverGMRES::RotateH(UINT uiHeisenbergDim)
     }
 }
 
-void CSLASolverGMRES::SolveY(UINT uiHeisenbergDim)
+void CSLASolverGMRES::SolveY(/*UINT uiHeisenbergDim*/)
 {
-    INT iHeisenbergDim = static_cast<INT>(uiHeisenbergDim);
-    for (INT i = iHeisenbergDim - 1; i > -1; --i)
+    if (NULL != m_pHelper)
+    {
+        memcpy(m_y, m_g, sizeof(CLGComplex) * m_uiMaxDim);
+        m_pHelper->SolveYHost(m_y, m_h, 1, m_uiMaxDim);
+        return;
+    }
+    INT iHeisenbergDim = static_cast<INT>(m_uiMaxDim);
+    for (INT i = m_uiMaxDim - 1; i > -1; --i)
     {
         for (INT j = i + 1; j < iHeisenbergDim; ++j)
         {
             m_g[i] = _cuCsubf(m_g[i], _cuCmulf(m_h[HIndex(i, j)], m_y[j]));
         }
-        m_y[i] = cuCdivf(m_g[i], m_h[HIndex(i,i)]);
+        m_y[i] = _cuCdivf(m_g[i], m_h[HIndex(i,i)]);
     }
 }
 

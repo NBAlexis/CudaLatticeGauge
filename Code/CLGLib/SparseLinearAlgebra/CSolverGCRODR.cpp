@@ -224,6 +224,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         pX->CopyTo(pFieldX);
         pX->Return();
         pR->Return();
+        pW->Return();
         ReleasePooledFields();
         return TRUE;
     }
@@ -240,6 +241,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         
         //vk+1=r0/|r0|
         pR->CopyTo(GetW(m_uiKDim));
+        m_fDiviation = _hostsqrt(pR->Dot(pR).x);
         GetW(m_uiKDim)->ScalarMultply(F(1.0) / m_fDiviation);
         //Arnoldi
         for (UINT j = m_uiKDim; j < m_uiMDim; ++j)
@@ -293,6 +295,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             pX->Axpy(m_pHostY[j], GetV(j));
         }
 
+        //v[0] are still used in Eigen-Value problem, so we use pW instead
         if (0 != i && 0 == (i % m_uiRecalcuateR))
         {
             //============== This is the accurate result, though, slower and not stable =================
@@ -325,6 +328,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             pX->CopyTo(pFieldX);
             pX->Return();
             pR->Return();
+            pW->Return();
             ReleasePooledFields();
             return TRUE;
         }
@@ -335,6 +339,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
     pX->CopyTo(pFieldX);
     pX->Return();
     pR->Return();
+    pW->Return();
     ReleasePooledFields();
     return FALSE;
 }
@@ -706,10 +711,6 @@ void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField*
 
     //Uk = Uk R-1
     FieldSolveY(m_lstU, m_pHostTmpR, m_uiKDim);
-    //for (UINT i = 0; i < m_uiKDim; ++i)
-    //{
-    //    m_lstTmp[i]->CopyTo(m_lstU[i]);
-    //}
 
     //CField* v0 = m_lstV[0];
 

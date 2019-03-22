@@ -13,6 +13,8 @@ __BEGIN_NAMESPACE
 
 Real CLGAPI CCommonData::m_fBeta = 0;
 Real CLGAPI CCommonData::m_fKai = 0;
+UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
+UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 
 __global__ void 
 _CLG_LAUNCH_BOUND_SINGLE

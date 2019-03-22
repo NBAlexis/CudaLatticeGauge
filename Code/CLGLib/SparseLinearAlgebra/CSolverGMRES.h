@@ -33,20 +33,23 @@ public:
 
 protected:
 
-    void RotateH(UINT uiK);
-    void SolveY(UINT uiHeisenbergDim);
-    static inline UINT HIndex(UINT x /*0-k*/, UINT y /*0-(k-1)*/) { return y + x * _kMaxStep; }
+    void RotateH(/*UINT uiK*/);
+    void SolveY(/*UINT uiHeisenbergDim*/);
+    inline UINT HIndex(UINT x /*0-k*/, UINT y /*0-(k-1)*/) { return y + x * m_uiMaxDim; }
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;
     Real m_fAccuracy;
     Real m_fBeta;
+    UBOOL m_bUseCudaForSmallMatrix;
 
     CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];
     CLGComplex m_y[_kMaxStep];
     CLGComplex m_g[_kMaxStep + 1];
 
     TArray<class CField*> m_lstVectors;
+
+    class CLinearAlgebraHelper* m_pHelper;
 };
 
 __END_NAMESPACE

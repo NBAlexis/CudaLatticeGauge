@@ -260,6 +260,9 @@ public:
 
     static Real m_fBeta;
     static Real m_fKai;
+
+    static UBOOL m_bStoreStaple;
+    static UBOOL m_bStoreLastSolution;
 };
 
 __END_NAMESPACE

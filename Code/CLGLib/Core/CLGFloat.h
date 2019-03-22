@@ -27,6 +27,7 @@
 #define _hostexp exp
 #define _hostsqrt sqrt
 
+#define _atan2 atan2
 #define _make_cuComplex make_cuDoubleComplex
 #define _cuCaddf cuCadd
 #define _cuCmulf cuCmul
@@ -66,6 +67,7 @@
 #define _hostexp expf
 #define _hostsqrt sqrtf
 
+#define _atan2 atan2f
 #define _make_cuComplex make_cuComplex
 #define _cuCaddf cuCaddf
 #define _cuCmulf cuCmulf
@@ -80,6 +82,7 @@
 #endif
 
 //They are not defined in GCC, so we define them explicitly
+#define _CLG_FLT_MIN_ 1E-22F   //When smaller than this, sqrt, divide is very bad
 
 #define _CLG_FLT_DECIMAL_DIG  9                       // # of decimal digits of rounding precision
 #define _CLG_FLT_DIG          6                       // # of decimal digits of precision

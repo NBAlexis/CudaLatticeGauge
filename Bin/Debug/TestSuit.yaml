@@ -479,6 +479,8 @@ TestSolverGMRES:
 
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
+        ## cuda is even slower
+        UseCudaForSmallMatrix : 0
         ## Check Accuracy every DiviationStep steps
         MaxDim : 10
         ## Can NOT be too small, otherwise, will never reached..
@@ -583,13 +585,13 @@ TestSolverGCRODR:
         SolverName : CSLASolverGCRODR
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MDim : 5
-        KDim : 2
+        MDim : 6
+        KDim : 3
         ## If QR Iteration all converge, it is no need to do so
-        RecalculateR : 10
-        DeflateSpace : EEDT_HEV
+        RecalculateR : 20
+        DeflateSpace : EEDT_SVD
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
+        Accuracy : 0.0004
         Restart : 5
         ## 0 is recommanded
         AbsoluteAccuracy : 1
@@ -636,10 +638,10 @@ TestSolverGMRESLowMode:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MaxDim : 15
+        MaxDim : 50
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.00000001
-        Restart : 100
+        Restart : 10
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
@@ -685,14 +687,14 @@ TestSolverGCRODRLowMode:
         SolverName : CSLASolverGCRODR
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MDim : 12
+        MDim : 16
         KDim : 4
         ## If QR Iteration all converge, it is no need to do so
-        RecalculateR : 10
+        RecalculateR : 5
         DeflateSpace : EEDT_REV
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000000001
-        Restart : 100
+        Accuracy : 0.000001
+        Restart : 30
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
