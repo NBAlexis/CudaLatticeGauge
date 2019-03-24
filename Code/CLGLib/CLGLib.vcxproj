@@ -64,6 +64,7 @@
     <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGCRODR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverGMRESMDR.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
@@ -93,6 +94,7 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp" />

@@ -196,6 +196,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("ExponentialPrecision"), 0);
     m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
+    __FetchIntWithDefault(_T("CacheStaple"), 1);
+    CCommonData::m_bStoreStaple = (0 != iVaules);
+
+    __FetchIntWithDefault(_T("CacheSolution"), 1);
+    CCommonData::m_bStoreLastSolution = (0 != iVaules);
+
     __FetchIntWithDefault(_T("ActionListLength"), 0);
     m_InitialCache.constIntegers[ECI_ActionListLength] = static_cast<UINT>(iVaules);
 

@@ -34,25 +34,25 @@ void CIntegratorNestedOmelyan::Evaluate()
 
     Real fHalfEstep = F(0.5) * m_fEStep;
     appDetailed("  Omelyan sub step 0\n");
-    UpdatePF(m_f2Lambda * fHalfEstep);
+    UpdatePF(m_f2Lambda * fHalfEstep, ESP_StartTrajectory);
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
         NestedEvaluate(FALSE);
-        UpdatePF(m_fEStep * (F(1.0) - m_f2Lambda));
+        UpdatePF(m_fEStep * (F(1.0) - m_f2Lambda), ESP_InTrajectory);
         
 
         if (uiStep < m_uiStepCount)
         {
             NestedEvaluate(FALSE);
             appDetailed("  Omelyan sub step %d\n", uiStep);
-            UpdatePF(m_fEStep * m_f2Lambda);
+            UpdatePF(m_fEStep * m_f2Lambda, ESP_InTrajectory);
         }
         else
         {
             NestedEvaluate(TRUE);
             appDetailed("  Omelyan last step %d\n", uiStep);
-            UpdatePF(m_f2Lambda * fHalfEstep);
+            UpdatePF(m_f2Lambda * fHalfEstep, ESP_EndTrajectory);
         }
     }
 

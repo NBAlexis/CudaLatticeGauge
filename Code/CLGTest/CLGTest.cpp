@@ -201,7 +201,9 @@ int main(int argc, char * argv[])
                         }
                     }
                     timer.Stop();
-                    appGeneral(_T("Run all %s test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), keys[i].c_str(), uiPassed, category[sKey]->Num(), uiError, timer.Elapsed() * 0.001f);
+                    appGeneral(_T("Run all %s test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), 
+                        keys[i].c_str(), uiPassed, category[keys[i]]->Num(),
+                        uiError, timer.Elapsed() * 0.001f);
                     break;
                     //bExcuted = TRUE;
                 }

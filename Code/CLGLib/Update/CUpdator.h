@@ -53,12 +53,32 @@ public:
             return F(0.0);
         }
 
+        if (1 == m_lstHDiff.Num())
+        {
+            return abs(m_lstHDiff[0]);
+        }
+
         Real fAdd = F(0.0);
         for (INT i = 0; i < m_lstHDiff.Num(); ++i)
         {
             fAdd += (m_lstHDiff[i] * m_lstHDiff[i]);
         }
-        return fAdd / m_lstHDiff.Num();
+        return _hostsqrt(fAdd / (m_lstHDiff.Num() - 1));
+    }
+
+    Real GetHValue() const
+    {
+        if (0 == m_lstH.Num())
+        {
+            return F(0.0);
+        }
+
+        Real fAdd = F(0.0);
+        for (INT i = 0; i < m_lstH.Num(); ++i)
+        {
+            fAdd += m_lstH[i];
+        }
+        return fAdd / m_lstH.Num();
     }
 
 protected:
@@ -69,6 +89,7 @@ protected:
     CCString m_sConfigurationPrefix;
     UBOOL m_bTestHDiff;
     TArray<Real> m_lstHDiff;
+    TArray<Real> m_lstH;
 };
 
 __END_NAMESPACE

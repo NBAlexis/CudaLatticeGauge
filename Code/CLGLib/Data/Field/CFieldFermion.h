@@ -35,7 +35,8 @@ public:
     /**
     * Calculate force can fail due to solver
     */
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const = 0;
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, 
+        CFieldGauge* pCachedForce, ESolverPhase ePhase) const = 0;
 
     virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
     {

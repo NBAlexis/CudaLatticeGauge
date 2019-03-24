@@ -13,15 +13,6 @@
 
 __BEGIN_NAMESPACE
 
-__DEFINE_ENUM(ESolverPhase,
-    ESP_StartTrajectory,
-    ESP_InTrajectory,
-    ESP_EndTrajectory,
-    ESP_Once,
-
-    ESP_ForceDWORD = 0x7fffffff,
-)
-
 class CLGAPI CSLASolver : public CBase
 {
 public:
@@ -52,12 +43,8 @@ public:
         const CField* pFieldB, 
         const CFieldGauge* pGaugeFeild, 
         EFieldOperator uiM, 
+        ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) = 0;
-
-    /**
-    * Some Solvers will benifit from a seqence of simulation. (For example GCRODR)
-    */
-    virtual void OnNewTrajectory() {}
 
     class CLatticeData* m_pOwner;
     virtual CCString GetInfos(const CCString &tab) const { return tab + _T("##The solver should be irrelevant to configurations\n") + tab + _T("Name : Do_Not_Care\n"); }

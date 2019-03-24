@@ -48,7 +48,12 @@ __BEGIN_NAMESPACE
 extern "C" {
 #endif /* __cplusplus */
 
+#if _CLG_DOUBLEFLOAT
+    //alignas 256 will crash ptax, so we manully align
+    struct /*alignas(__SU3MATRIX_ALIGN)*/ deviceSU3
+#else
     struct alignas(__SU3MATRIX_ALIGN) deviceSU3
+#endif
     {
         __device__ deviceSU3()
         {

@@ -707,16 +707,19 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
         m_fLength = Dot(this).x;
     }
     //cache a inverse DDdagger field
-    CFieldCache* pCache = appGetLattice()->m_pFieldCache;
-    CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
-    if (NULL == pField)
+    if (CCommonData::m_bStoreLastSolution)
     {
-        pField = GetCopy();
-        pCache->CacheField(CFieldCache::CachedInverseDDdaggerField, pField);
-    }
-    else
-    {
-        CopyTo(pField);
+        CFieldCache* pCache = appGetLattice()->m_pFieldCache;
+        CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
+        if (NULL == pField)
+        {
+            pField = GetCopy();
+            pCache->CacheField(CFieldCache::CachedInverseDDdaggerField, pField);
+        }
+        else
+        {
+            CopyTo(pField);
+        }
     }
 }
 
@@ -856,7 +859,11 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
     return appGetFermionSolver()->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
 }
 
-UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const
+UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
+    const CFieldGauge* pGauge, 
+    CFieldGauge* pForce, 
+    CFieldGauge* pCachedForce,
+    ESolverPhase ePhase) const
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -884,7 +891,10 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
 
     CField * pDDaggerPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
     CField * pDPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
-    CField * pCachedField = appGetLattice()->m_pFieldCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
+    CField * pCachedField = CCommonData::m_bStoreLastSolution ? 
+        appGetLattice()->m_pFieldCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField)
+       : NULL;
+
     if (NULL == pDDaggerPhi || EFT_FermionWilsonSquareSU3 != pDDaggerPhi->GetFieldType()
      || NULL == pDPhi || EFT_FermionWilsonSquareSU3 != pDPhi->GetFieldType())
     {
@@ -902,7 +912,9 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(const CFieldGauge* pGauge, CF
     CFieldFermionWilsonSquareSU3* pDDaggerPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDDaggerPhi);
     CFieldFermionWilsonSquareSU3* pDPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDPhi);
     //if (!pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3))
-    if (!appGetFermionSolver()->Solve(pDDaggerPhiWilson, this, pGaugeSU3, EFO_F_DDdagger, pCachedField))
+    if (!appGetFermionSolver()->Solve(
+        pDDaggerPhiWilson, this, pGaugeSU3, 
+        EFO_F_DDdagger, ePhase, pCachedField))
     {
         appCrucial(_T("Sparse Linear Solver failed...\n"));
         pDDaggerPhi->Return();

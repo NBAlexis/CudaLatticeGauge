@@ -218,7 +218,11 @@ extern "C" {
         CLGComplex m_ve[3];
     };
 
+#if _CLG_DOUBLEFLOAT
+    struct deviceWilsonVectorSU3
+#else
     struct alignas(__WILSONVECTOR_ALIGN) deviceWilsonVectorSU3
+#endif
     {
     public:
         __device__ deviceWilsonVectorSU3() { ; }
@@ -463,10 +467,14 @@ extern "C" {
         union
         {
             deviceSU3Vector m_d[4];
+#if _CLG_DOUBLEFLOAT
+            CLGComplex m_me[16];
+            Real m_rme[32];
+#else
             CLGComplex m_me[12];
             Real m_rme[24];
+#endif
         };
-        //deviceSU3Vector m_d[4];
     };
 
 #if defined(__cplusplus)

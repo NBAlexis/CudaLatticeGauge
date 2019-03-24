@@ -81,8 +81,28 @@
 
 #endif
 
+#if _CLG_DOUBLEFLOAT
+
+#define _CLG_FLT_MIN_ 1E-50   //When smaller than this, sqrt, divide will become nan
+
+#define _CLG_FLT_DECIMAL_DIG  17                      // # of decimal digits of rounding precision
+#define _CLG_FLT_DIG          15                      // # of decimal digits of precision
+#define _CLG_FLT_EPSILON      2.2204460492503131e-016 // smallest such that 1.0+DBL_EPSILON != 1.0
+#define _CLG_FLT_HAS_SUBNORM  1                       // type does support subnormal numbers
+#define _CLG_FLT_MANT_DIG     53                      // # of bits in mantissa
+#define _CLG_FLT_MAX          1.7976931348623158e+308 // max value
+#define _CLG_FLT_MAX_10_EXP   308                     // max decimal exponent
+#define _CLG_FLT_MAX_EXP      1024                    // max binary exponent
+#define _CLG_FLT_MIN          2.2250738585072014e-308 // min positive value
+#define _CLG_FLT_MIN_10_EXP   (-307)                  // min decimal exponent
+#define _CLG_FLT_MIN_EXP      (-1021)                 // min binary exponent
+#define _CLG_FLT_RADIX        2                       // exponent radix
+#define _CLG_FLT_TRUE_MIN     4.9406564584124654e-324 // min positive value
+
+#else
+
 //They are not defined in GCC, so we define them explicitly
-#define _CLG_FLT_MIN_ 1E-22F   //When smaller than this, sqrt, divide is very bad
+#define _CLG_FLT_MIN_ 1E-22F   //When smaller than this, sqrt, divide will become nan
 
 #define _CLG_FLT_DECIMAL_DIG  9                       // # of decimal digits of rounding precision
 #define _CLG_FLT_DIG          6                       // # of decimal digits of precision
@@ -100,6 +120,7 @@
 #define _CLG_FLT_RADIX        2                       // exponent radix
 #define _CLG_FLT_TRUE_MIN     1.401298464e-45F        // min positive value
 
+#endif
 
 //Those are constants we are using
 

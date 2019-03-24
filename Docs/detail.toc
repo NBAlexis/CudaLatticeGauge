@@ -26,28 +26,27 @@
 \contentsline {subsubsection}{\numberline {3.4.1}Brief introduction to deflation preconditioner}{26}{subsubsection.3.4.1}
 \contentsline {subsubsection}{\numberline {3.4.2}Brief intro to GCRO-DR}{27}{subsubsection.3.4.2}
 \contentsline {subsubsection}{\numberline {3.4.3}The choice of deflation subspace}{28}{subsubsection.3.4.3}
-\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{29}{subsubsection.3.4.4}
-\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{34}{subsubsection.3.4.5}
-\contentsline {subsubsection}{\numberline {3.4.6}Implement of GCRO-DR}{35}{subsubsection.3.4.6}
-\contentsline {paragraph}{First GCRO-DR step}{36}{paragraph*.1}
-\contentsline {paragraph}{Restart GCRO-DR step}{36}{paragraph*.2}
-\contentsline {paragraph}{Continue the trajectory}{36}{paragraph*.3}
-\contentsline {section}{\numberline {4}Measurement}{37}{section.4}
-\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{37}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Meson Correlator}{37}{subsection.4.2}
-\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{37}{subsubsection.4.2.1}
-\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{37}{subsubsection.4.2.2}
-\contentsline {subsubsection}{\numberline {4.2.3}Sources}{39}{subsubsection.4.2.3}
-\contentsline {subsubsection}{\numberline {4.2.4}Gauge smearing}{42}{subsubsection.4.2.4}
-\contentsline {subsection}{\numberline {4.3}Extend sources and gauge fixing}{43}{subsection.4.3}
-\contentsline {subsubsection}{\numberline {4.3.1}Extend sources}{43}{subsubsection.4.3.1}
-\contentsline {subsubsection}{\numberline {4.3.2}Gauge fixing}{43}{subsubsection.4.3.2}
-\contentsline {section}{\numberline {5}Programming}{44}{section.5}
-\contentsline {subsection}{\numberline {5.1}cuda}{44}{subsection.5.1}
-\contentsline {subsubsection}{\numberline {5.1.1}blocks and threads}{44}{subsubsection.5.1.1}
-\contentsline {subsubsection}{\numberline {5.1.2}device member function}{44}{subsubsection.5.1.2}
-\contentsline {subsubsection}{\numberline {5.1.3}device virtual member function}{47}{subsubsection.5.1.3}
-\contentsline {section}{\numberline {6}Testing}{50}{section.6}
-\contentsline {subsection}{\numberline {6.1}random number}{50}{subsection.6.1}
-\contentsline {section}{\numberline {7}Applications}{51}{section.7}
-\contentsline {subsection}{\numberline {7.1}Sample Producer}{51}{subsection.7.1}
+\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{30}{subsubsection.3.4.4}
+\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{35}{subsubsection.3.4.5}
+\contentsline {subsubsection}{\numberline {3.4.6}Implement of GCRO-DR}{36}{subsubsection.3.4.6}
+\contentsline {subsubsection}{\numberline {3.4.7}Implement of GMRES-MDR}{38}{subsubsection.3.4.7}
+\contentsline {subsubsection}{\numberline {3.4.8}Test of GCRO-DR and GMRES-MDR}{38}{subsubsection.3.4.8}
+\contentsline {section}{\numberline {4}Measurement}{39}{section.4}
+\contentsline {subsection}{\numberline {4.1}Plaquette Energy}{39}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Meson Correlator}{39}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Meson Wave Function}{39}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Meson Correlator}{39}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Sources}{41}{subsubsection.4.2.3}
+\contentsline {subsubsection}{\numberline {4.2.4}Gauge smearing}{44}{subsubsection.4.2.4}
+\contentsline {subsection}{\numberline {4.3}Extend sources and gauge fixing}{45}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Extend sources}{45}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Gauge fixing}{45}{subsubsection.4.3.2}
+\contentsline {section}{\numberline {5}Programming}{46}{section.5}
+\contentsline {subsection}{\numberline {5.1}cuda}{46}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}blocks and threads}{46}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}device member function}{46}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}device virtual member function}{49}{subsubsection.5.1.3}
+\contentsline {section}{\numberline {6}Testing}{52}{section.6}
+\contentsline {subsection}{\numberline {6.1}random number}{52}{subsection.6.1}
+\contentsline {section}{\numberline {7}Applications}{53}{section.7}
+\contentsline {subsection}{\numberline {7.1}Sample Producer}{53}{subsection.7.1}

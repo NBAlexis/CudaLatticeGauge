@@ -64,7 +64,7 @@ void CSLASolverBiCGStab::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart)
+UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     //CField* pB = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);

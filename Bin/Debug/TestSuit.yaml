@@ -1052,6 +1052,140 @@ TestFermionUpdatorNestedForceGradient:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+TestFermionUpdatorOmelyanGCRODR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.535
+    CacheStaple : 0
+    CacheSolution : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 25
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 18
+        KDim : 2
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 25
+        DeflateSpace : EEDT_SVD
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.015
+        Restart : 20
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestFermionUpdatorOmelyanGMRESMDR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : EIndexType_Square
+    LatticeBoundary : EBC_TorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.535
+    CacheStaple : 0
+    CacheSolution : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 25
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRESMDR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 18
+        KDim : 2
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 25
+        DeflateSpace : EEDT_SVD
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.02
+        Restart : 20
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
 TestFermionUpdatorLargeScale:
 
     ## For 32x32x32x32 lattice
@@ -1067,7 +1201,13 @@ TestFermionUpdatorLargeScale:
     ## Random Number = 16Mb
     ## Total > 5GB(Maximum avialiab of this computer is 4.9GB...)
     ## AllocateBuffer : 4.9
-    ## Will test 32x32x32x32 on GTX1070 someday
+
+    ## The H can be as large as 2E7, 
+    ## but the max error of substraction of Single Float point can be 1E-7 (1.192092896e-07F)
+    ## So we only check the accept rate and expect plaqutte
+    ## This parameters with [32, 32, 16, 16] and Double Float is tested, 
+    ## When equilibrium, H_diff ~ 0.25, 
+
     Dim : 4
     Dir : 4
     LatticeLength : [32, 32, 32, 16]
@@ -1077,24 +1217,30 @@ TestFermionUpdatorLargeScale:
     LatticeIndex : EIndexType_Square
     LatticeBoundary : EBC_TorusSquare
     RandomType : ER_Schrage
+    RandomSeedType : ERST_Timestamp
     RandomSeed : 1234567
     ExponentialPrecision : 0
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
+    Updates : 5
+    ##For 8x8x8x8, this is 0.17
     ExpectedRes : 0.17
 
-    Updator:
+    ##CacheStaple : 0
+    ##CacheSolution : 0
 
-        ## UpdatorType = { CHMC }
+    Updator:
         UpdatorType : CHMC
 
-        Metropolis : 1
-        
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
+        ## The H can be as large as 2E7, 
+        ## but the max error of substraction of Single Float point can be 1E-7
+        ## So we only check the expect plaqutte, and average H_diff / H
+        Metropolis : 0
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 6
+        NestedStep : 8
 
     Gauge:
 	
@@ -1116,7 +1262,7 @@ TestFermionUpdatorLargeScale:
 
         FieldId : 2
 
-        PoolNumber : 16
+        PoolNumber : 17
 
         Period : [1, 1, 1, -1]
 
@@ -1124,13 +1270,20 @@ TestFermionUpdatorLargeScale:
 
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
-        ## Check Accuracy every DiviationStep steps
-        MaxDim : 10
-        ## Can NOT be too small, otherwise, will never reached..
+        MaxDim : 12
         Accuracy : 0.000001
         Restart : 10
-        ## 0 is recommanded
         AbsoluteAccuracy : 1
+
+        ##SolverName : CSLASolverGMRESMDR
+        ##SolverForFieldId : 2
+        ##MDim : 10
+        ##KDim : 2
+        ##RecalculateR : 25
+        ##DeflateSpace : EEDT_SVD
+        ##Accuracy : 0.0001
+        ##Restart : 10
+        ##AbsoluteAccuracy : 1
 
     Action1:
    
@@ -1141,7 +1294,6 @@ TestFermionUpdatorLargeScale:
 
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
-        ## MultiStep : 2
 
     Measure1:
 

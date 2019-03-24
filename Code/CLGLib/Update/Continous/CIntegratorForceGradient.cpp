@@ -34,7 +34,7 @@ void CIntegratorForceGradient::Evaluate()
     Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
-    UpdateP(f1Over6Estep, FALSE);
+    UpdateP(f1Over6Estep, FALSE, ESP_StartTrajectory);
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
@@ -46,14 +46,14 @@ void CIntegratorForceGradient::Evaluate()
         for (INT i = 0; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_InTrajectory);
             checkCudaErrors(cudaDeviceSynchronize());
         }
 
         m_pGaugeField->CopyTo(m_pUPrime);
         m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
 
-        UpdateP(f2Over3Estep, FALSE);
+        UpdateP(f2Over3Estep, FALSE, ESP_InTrajectory);
 
         //restore U
         m_pUPrime->CopyTo(m_pGaugeField);
@@ -62,12 +62,12 @@ void CIntegratorForceGradient::Evaluate()
         if (uiStep < m_uiStepCount)
         {
             appDetailed("  Force Gradient sub step %d\n", uiStep);
-            UpdateP(f1Over3Estep, FALSE);
+            UpdateP(f1Over3Estep, FALSE, ESP_InTrajectory);
         }
         else
         {
             appDetailed("  Force Gradient last step %d\n", uiStep);
-            UpdateP(f1Over6Estep, TRUE);
+            UpdateP(f1Over6Estep, TRUE, ESP_EndTrajectory);
         }
     }
 

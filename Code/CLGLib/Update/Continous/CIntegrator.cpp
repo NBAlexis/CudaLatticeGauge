@@ -48,9 +48,16 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     m_pMomentumField->m_pOwner = pLattice;
     m_pMomentumField->InitialField(EFIT_Zero);
 
-    m_pStapleField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
-    m_pStapleField->m_pOwner = pLattice;
-    m_pStapleField->InitialField(EFIT_Zero);
+    if (CCommonData::m_bStoreStaple)
+    {
+        m_pStapleField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
+        m_pStapleField->m_pOwner = pLattice;
+        m_pStapleField->InitialField(EFIT_Zero);
+    }
+    else
+    {
+        m_pStapleField = NULL;
+    }
 }
 
 void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
@@ -93,7 +100,7 @@ void CIntegrator::UpdateU(Real fStep)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
+void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
 {
     // recalc force
     m_pForceField->Zero();
@@ -102,12 +109,12 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL);
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL, ePhase);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
     //P = P + e F
-    m_bStapleCached = bCacheStaple;
+    m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
     m_pMomentumField->Axpy(fStep, m_pForceField);
     checkCudaErrors(cudaDeviceSynchronize());
 }
@@ -164,7 +171,7 @@ CCString CNestedIntegrator::GetNestedInfo(const CCString & sTab) const
     return sTab + _T("Nested : ") + appIntToString(static_cast<INT>(m_uiNestedStep)) + _T("\n");
 }
 
-void CNestedIntegrator::UpdatePF(Real fStep)
+void CNestedIntegrator::UpdatePF(Real fStep, ESolverPhase ePhase)
 {
     // recalc force
     m_pForceField->Zero();
@@ -173,7 +180,7 @@ void CNestedIntegrator::UpdatePF(Real fStep)
     for (INT i = 1; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ePhase);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
@@ -188,11 +195,11 @@ void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
     m_pForceField->Zero();
     checkCudaErrors(cudaDeviceSynchronize());
 
-    m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, bCacheStaple ? m_pStapleField : NULL);
+    m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, bCacheStaple ? m_pStapleField : NULL, ESP_Once);
     checkCudaErrors(cudaDeviceSynchronize());
 
     //P = P + e F
-    m_bStapleCached = bCacheStaple;
+    m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
     m_pMomentumField->Axpy(fStep, m_pForceField);
     checkCudaErrors(cudaDeviceSynchronize());
 }

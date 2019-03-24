@@ -20,7 +20,6 @@ CSLASolverGCRODR::CSLASolverGCRODR()
     , m_uiMDim(10)
     , m_uiKDim(5)
     , m_fAccuracy(F(0.000001))
-    , m_bHasYk(FALSE)
     , m_fBeta(F(0.0))
     , m_fDiviation(F(0.0))
     , m_eDeflationType(EEDT_SVD)
@@ -44,6 +43,7 @@ CSLASolverGCRODR::CSLASolverGCRODR()
     , m_pHostTmpQ(NULL)
     , m_pHostTmpR(NULL)
     , m_pHostTmpGPk(NULL)
+    , m_pHostZeroMatrix(NULL)
 
     , m_pFieldMatrix(NULL)
     , m_uiRecalcuateR(5)
@@ -136,13 +136,17 @@ void CSLASolverGCRODR::AllocateBuffers(const CField* pFieldB)
     m_pHostTmpQ = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiKDim);
     m_pHostTmpR = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiKDim * m_uiKDim);
     m_pHostTmpGPk = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiKDim);
+    m_pHostZeroMatrix = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
 
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
         CField* pVectors = pFieldB->GetCopy();
         m_lstU.AddItem(pVectors);
     }
-
+    for (UINT i = 0; i < m_uiMDim * (m_uiMDim + 1); ++i)
+    {
+        m_pHostZeroMatrix[i] = _make_cuComplex(F(0.0), F(0.0));
+    }
     m_pFieldMatrix = CFieldMatrixOperation::Create(pFieldB->GetFieldType());
 }
 
@@ -174,10 +178,11 @@ void CSLASolverGCRODR::ReleaseBuffers()
         free(m_pHostTmpQ);
         free(m_pHostTmpR);
         free(m_pHostTmpGPk);
+        free(m_pHostZeroMatrix);
     }
 }
 
-UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pFieldGauge, EFieldOperator uiM, const CField* pStart)
+UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pFieldGauge, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     //use it to estimate relative error
     Real fBLength = F(1.0);
@@ -189,7 +194,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
 
     //set initial gauss x0 = b or pStart
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
-    CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
+    CField* pR = m_lstV[0];//appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pW = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
 
     if (NULL == pStart)
@@ -203,19 +208,20 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
 
     //The informations:
     //Is it the first time of trajectory? (Do we have Yk?)
-    if (m_bHasYk)
+    if (ESP_InTrajectory == ePhase || ESP_EndTrajectory == ePhase)
     {
         GenerateCUFirstTime(pX, pR, pFieldB, pFieldGauge, uiM);
     }
     else
     {
-        FirstTimeGMERESSolve(pX, pR, pFieldB, pFieldGauge, uiM);
+        FirstTimeGMERESSolve(pX, pW, pFieldB, pFieldGauge, uiM);
 
         //We have m_pHostHmGm set
         //No matter whether converge, we need Yk for next time solve
         FindPk1();
         //If converge, we no need to update Ck
         GenerateCU(m_fDiviation >= m_fAccuracy * fBLength, TRUE); 
+        pW->CopyTo(pR);
     }
 
     if (m_fDiviation < m_fAccuracy * fBLength)
@@ -223,7 +229,6 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         appParanoiac(_T("-- GCRODR::Finish afeter First GMRES(or CU step) step ----\n"));
         pX->CopyTo(pFieldX);
         pX->Return();
-        pR->Return();
         pW->Return();
         ReleasePooledFields();
         return TRUE;
@@ -240,7 +245,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         NormUkAndSetD();
         
         //vk+1=r0/|r0|
-        pR->CopyTo(GetW(m_uiKDim));
+        //pR->CopyTo(GetW(m_uiKDim));
         m_fDiviation = _hostsqrt(pR->Dot(pR).x);
         GetW(m_uiKDim)->ScalarMultply(F(1.0) / m_fDiviation);
         //Arnoldi
@@ -276,14 +281,18 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             vjp1->ScalarMultply(F(1.0) / fWNorm);
         }
 
-        //=============== This is almost accurate =============
-        //m_pHelper->InitialZeroHost(m_pHostY, m_uiMDim + 1, 1);
-        //m_pHostY[m_uiKDim] = _make_cuComplex(m_fDiviation, F(0.0));
+        //pW is not in use now, we use pW as pR
+        pR->CopyTo(pW);
+        pW->ScalarMultply(m_fDiviation);
 
-        for (UINT j = 0; j <= m_uiMDim; ++j)
-        {
-            m_pHostY[j] = GetW(j)->Dot(pR);
-        }
+        //=============== This is almost accurate =============
+        memcpy(m_pHostY, m_pHostZeroMatrix, sizeof(CLGComplex) * (m_uiMDim + 1));
+        m_pHostY[m_uiKDim] = _make_cuComplex(m_fDiviation, F(0.0));
+
+        //for (UINT j = 0; j <= m_uiMDim; ++j)
+        //{
+        //    m_pHostY[j] = GetW(j)->Dot(pR);
+        //}
         
         memcpy(m_pHostHmGmToRotate, m_pHostHmGm, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
 
@@ -296,13 +305,13 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         }
 
         //v[0] are still used in Eigen-Value problem, so we use pW instead
-        if (0 != i && 0 == (i % m_uiRecalcuateR))
+        if (0 != m_uiRecalcuateR && 0 != i && 0 == (i % m_uiRecalcuateR))
         {
             //============== This is the accurate result, though, slower and not stable =================
-            pX->CopyTo(pR);
-            pR->ApplyOperator(uiM, pFieldGauge, EOCT_Minus); //x0 = -A x0
-            pR->AxpyPlus(pFieldB); //x0 = b-Ax0
-            m_cLastDiviation = pR->Dot(pR);
+            pX->CopyTo(pW);
+            pW->ApplyOperator(uiM, pFieldGauge, EOCT_Minus); //x0 = -A x0
+            pW->AxpyPlus(pFieldB); //x0 = b-Ax0
+            m_cLastDiviation = pW->Dot(pW);
             m_fDiviation = _hostsqrt(m_cLastDiviation.x);
         }
         else
@@ -312,33 +321,36 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             m_pHelper->SmallMatrixMultHost(m_pHostY, m_pHostHmGm, m_pHostY, m_uiMDim + 1, m_uiMDim, 1, FALSE, FALSE);
             for (UINT j = 0; j < m_uiMDim + 1; ++j)
             {
-                pR->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
+                pW->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
             }
-            m_cLastDiviation = pR->Dot(pR);
+            m_cLastDiviation = pW->Dot(pW);
             m_fDiviation = _hostsqrt(m_cLastDiviation.x);
         }
 
         FindPk2();
         //If converge, we no need to update Ck
-        GenerateCU(m_fDiviation >= m_fAccuracy * fBLength, FALSE);
+        if (m_fDiviation >= m_fAccuracy * fBLength || ESP_EndTrajectory != ePhase)
+        {
+            //If is end trajectory, no need to update both Uk and Ck
+            GenerateCU(m_fDiviation >= m_fAccuracy * fBLength, FALSE);
+        }
 
         if (m_fDiviation < m_fAccuracy * fBLength)
         {
             appParanoiac(_T("-- GCRODR::Finish afeter %d step, divation = %1.15f ----\n"), i, m_fDiviation);
             pX->CopyTo(pFieldX);
             pX->Return();
-            pR->Return();
             pW->Return();
             ReleasePooledFields();
             return TRUE;
         }
         appParanoiac(_T("-- GCRODR::Solve operator: After %d step |residue|=%1.15f ----\n"), i, m_fDiviation);
+        pW->CopyTo(pR);
     }
 
     appParanoiac(_T("GCRODR::Solve failed: last divation |residue| = %8.15f\n"), m_fDiviation);
     pX->CopyTo(pFieldX);
     pX->Return();
-    pR->Return();
     pW->Return();
     ReleasePooledFields();
     return FALSE;
@@ -358,7 +370,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
     v0->AxpyPlus(pFieldB); //x0 = b-Ax0
     m_fBeta = _hostsqrt(v0->Dot(v0).x);
     v0->ScalarMultply(F(1.0) / m_fBeta);  //v[0] = (b - A x0).normalize
-    m_pHelper->InitialZeroHost(m_pHostHmGm, m_uiMDim + 1, m_uiMDim);
+    memcpy(m_pHostHmGm, m_pHostZeroMatrix, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
 
     //Arnoldi
     for (UINT j = 0; j < m_uiMDim; ++j)
@@ -386,7 +398,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         vjp1->ScalarMultply(F(1.0) / fWNorm);
     }
 
-    m_pHelper->InitialZeroHost(m_pHostY, m_uiMDim + 1, 1);
+    memcpy(m_pHostY, m_pHostZeroMatrix, sizeof(CLGComplex) * (m_uiMDim + 1));
     m_pHostY[0] = _make_cuComplex(m_fBeta, F(0.0));
 
     memcpy(m_pHostHmGmToRotate, m_pHostHmGm, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
@@ -399,20 +411,26 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
     }
 
     //================ This is not accurate enough =============
-    //m_pHelper->SmallMatrixMultHost(m_pHostY, m_pHostHmGm, m_pHostY, m_uiMDim + 1, m_uiMDim, 1, FALSE, FALSE);
-    //m_pHostY[0].x -= m_fBeta;
-    //pR->Zero();
-    //for (UINT j = 0; j < m_uiMDim + 1; ++j)
-    //{ 
-    //    pR->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
-    //}
-    //m_cLastDiviation = pR->Dot(pR);
-    //m_fDiviation = _hostsqrt(m_cLastDiviation.x);
-    pX->CopyTo(pR);
-    pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
-    pR->AxpyPlus(pFieldB); //x0 = b-Ax0
-    m_cLastDiviation = pR->Dot(pR);
-    m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+    if (m_uiRecalcuateR > 1)
+    {
+        m_pHelper->SmallMatrixMultHost(m_pHostY, m_pHostHmGm, m_pHostY, m_uiMDim + 1, m_uiMDim, 1, FALSE, FALSE);
+        m_pHostY[0].x -= m_fBeta;
+        pR->Zero();
+        for (UINT j = 0; j < m_uiMDim + 1; ++j)
+        {
+            pR->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
+        }
+        m_cLastDiviation = pR->Dot(pR);
+        m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+    }
+    else
+    {
+        pX->CopyTo(pR);
+        pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
+        pR->AxpyPlus(pFieldB); //x0 = b-Ax0
+        m_cLastDiviation = pR->Dot(pR);
+        m_fDiviation = _hostsqrt(m_cLastDiviation.x);
+    }
 
     appParanoiac(_T("-- GCRODR::Solve operator: After Fisrt GMRES step |residue|=%1.12f ----\n"), m_fDiviation);
 }
@@ -597,7 +615,7 @@ void CSLASolverGCRODR::FindPk2()
         checkCudaErrors(cudaMemcpy(m_pDeviceALeft, m_pHostALeft, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim, cudaMemcpyHostToDevice));
         m_pHelper->SmallMatrixMult(m_pDeviceA, m_pDeviceHmGm, m_pDeviceALeft, m_uiMDim, m_uiMDim + 1, m_uiMDim, TRUE, FALSE);
         m_pHelper->SmallMatrixMult(m_pDeviceB, m_pDeviceHmGm, m_pDeviceHmGm, m_uiMDim, m_uiMDim + 1, m_uiMDim, TRUE, FALSE);
-        m_pHelper->GeneralizedEigenValueProblem(m_pDeviceA, m_pDeviceB, m_pDeviceEigenValue, m_pDevicePk, m_uiMDim, m_uiKDim, FALSE, F(0.0001), 50U, F(0.00000001), 2000U);
+        m_pHelper->GeneralizedEigenValueProblem(m_pDeviceA, m_pDeviceB, m_pDeviceEigenValue, m_pDevicePk, m_uiMDim, m_uiKDim, FALSE);
     }
     else if (EEDT_SVD == m_eDeflationType)
     {
@@ -727,7 +745,7 @@ void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField*
 */
 void CSLASolverGCRODR::NormUkAndSetD()
 {
-    m_pHelper->InitialZeroHost(m_pHostHmGm, m_uiMDim + 1, m_uiMDim);
+    memcpy(m_pHostHmGm, m_pHostZeroMatrix, sizeof(CLGComplex) * (m_uiMDim + 1) * m_uiMDim);
 
     for (UINT i = 0; i < m_uiKDim; ++i)
     {

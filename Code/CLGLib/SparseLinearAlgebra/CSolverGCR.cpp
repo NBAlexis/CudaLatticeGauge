@@ -77,7 +77,7 @@ void CSLASolverGCR::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart)
+UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     TArray<CField*> pP;
     TArray<CField*> pAP;

@@ -57,7 +57,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSLASolver.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverBiCGstab.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGCR.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGCRODR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRES.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/CYAMLParser.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CBitFlag.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CCString.h
@@ -68,6 +70,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/THashMap.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/MemStack.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/EnumGather.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/GammaMatrix.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CudaComplexFunction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.h
@@ -93,10 +96,12 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.cpp
@@ -114,6 +119,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Platform/CFile.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/CYAMLParser.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverBiCGstab.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGCRODR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CCString.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Tracer.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CHMC.cpp

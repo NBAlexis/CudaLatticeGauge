@@ -6,9 +6,10 @@ Testing on GTX-1060 (6G), WIN10
 
 Using GMRES with 10 orthrognal basis, maximum supported (32 x 32 x 32 x 16)
 For the release built
-One trajectory with 50 Omelyan sub-steps cost about 470-490 secs
-(The speed is related with kappa and beta, 470secs is tested using kappa=0.1355 and beta=2.5, 
-GMRES with 10 orthrognal basis will converge with about 3 restarts)
+One trajectory with 6/48 Multi-rate approximate Force-gradiant steps cost about 230 secs
+
+(The speed is related with kappa and beta, it is tested using kappa=0.1355 and beta=2.5, 
+GMRES with 10 orthrognal basis will converge with about 4 restarts)
 
 It is tested on a Notebook with two GPUs, Intel(R) HD Graphic 630 for dispalyer and GTX1060 for calculation.
 
@@ -22,7 +23,7 @@ Thank you ^_^
 
 =================== All ==========================
 
-Note: It is necessary to update the drivers!
+Note: It is necessary to update the drivers for graphic card to support CUDA 10!
 
 =================== WIN8 =========================
 

@@ -36,12 +36,12 @@ public:
     virtual void AllocateBuffers(const CField* pField);
     virtual void ReleaseBuffers();
 
-    virtual void OnNewTrajectory() { m_bHasYk = FALSE; }
     virtual UBOOL Solve(
         CField* pFieldX, 
         const CField* pFieldB, 
         const CFieldGauge* pGaugeFeild, 
         EFieldOperator uiM, 
+        ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL);
 
 protected:
@@ -54,7 +54,7 @@ protected:
 
     void FindPk2();
 
-    void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
+    virtual void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
     void GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES);
     void NormUkAndSetD();
     void OrthognalXR(CField* pX, CField* pR, CField* pTmp);
@@ -74,7 +74,6 @@ protected:
     UINT m_uiKDim;
     UINT m_uiRecalcuateR;
     Real m_fAccuracy;
-    UBOOL m_bHasYk;
 
     EEigenDeflationType m_eDeflationType;
 
@@ -126,6 +125,8 @@ protected:
     CLGComplex* m_pHostTmpR;
     //(m+1)xk
     CLGComplex* m_pHostTmpGPk;
+
+    CLGComplex* m_pHostZeroMatrix;
 
     Real m_fBeta;
     Real m_fDiviation;

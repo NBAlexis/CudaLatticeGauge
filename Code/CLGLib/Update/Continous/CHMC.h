@@ -21,7 +21,7 @@ class CLGAPI CHMC : public CUpdator
 
 public:
 
-    CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE) { ; }
+    CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE) {  }
     ~CHMC();
     virtual UINT Update(UINT iSteps, UBOOL bMeasure);
     virtual Real CalculateEnergy() { return 0.0f; }

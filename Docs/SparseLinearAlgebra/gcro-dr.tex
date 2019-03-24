@@ -127,6 +127,8 @@ The first GMRES cycle will generate $H_m$ (denoting the first $m$ row of $H_{m+1
 
 By Ref.~\cite{deflation}, there are three strategies, \index{Ritz eigen-vector}\index{REV}Ritz eigen-vector~(REV), \index{harmonic Ritz eigen vector}harmonic Ritz eigen vector~(HEV) and \index{singular value decomposition}\index{SVD}singular value decomposition~(SVD). Either it is $REV>HEV>SVD$ or $SVD>HEV>REV$, so we only list REV and SVD here.
 
+\textcolor[rgb]{0,0,1}{Note that $\tilde{U}_k$ is the normalized $U_k$, $H_{m+1}$ means the $H_{m+1}$ of GMRES procedure, and ${H'_{m+1}}$ means ${H'_{m+1}}$ obtained in GCRO-DR procedure, $H_{m}$ and ${H'_{m}}$ means the upper $m$ rows of $H_{m+1}$ and ${H'_{m+1}}$.}
+
 \begin{itemize}
   \item REV
 \end{itemize}
@@ -138,6 +140,21 @@ The $k$ small eigen value of $m$, such that $m$ is
 \left\{\begin{array}{l}
 H_m\omega = \theta \omega,\\
 \left(\begin{array}{cc} \tilde{U}_k^{\dagger}C_k & \tilde{U}_k^{\dagger}V_{m-k+1} \\ 0 & (I_{m-k},0)\end{array}\right) H'_{m+1}\omega = \theta \left(\begin{array}{cc} \tilde{U}_k^{\dagger}\tilde{U}_{k}  & \tilde{U}_k^{\dagger}V_{m-k} \\ V_{m-k}^{\dagger}\tilde{U}_k & I_{m-k}\end{array}\right)\omega,
+\end{array}\right.
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item HEV
+\end{itemize}
+
+The $k$ \textbf{larger} eigen value of $m$, such that $m$ is
+
+\begin{equation}
+\begin{split}
+\left\{\begin{array}{l}
+{H_{m}}^{\dagger}\omega = \theta {H_{m+1}}^{\dagger}{H_{m+1}}\omega,\\
+{H'_{m+1}}^{\dagger}\left(\begin{array}{cc} C_k^{\dagger}\tilde{U}_k  & 0 \\ V_{m-k+1}^{\dagger}\tilde{U}_k  & \left(\begin{array}{c}I_{m-k} \\ 0\end{array}\right)\end{array}\right)\omega = \theta {H'_{m+1}}^{\dagger}{H'_{m+1}}\omega,
 \end{array}\right.
 \end{split}
 \end{equation}
@@ -159,7 +176,7 @@ H_m^{\dagger}H_m\omega = \theta \omega,\\
 
 Although $H_m$ is usually a small matrix, we still need to known how to calculate the eigen-value and eigen-vectors.
 
-Note that the second line of REV and SVD, that is a \index{generalized eigen-value problem}\index{GEV}\textbf{generalized eigen-value problem~(GEV)}.
+Note that the second line of REV and SVD, and both line of HEV, that is a \index{generalized eigen-value problem}\index{GEV}\textbf{generalized eigen-value problem~(GEV)}.
 
 \subsubsection{\label{sec:eigenSolver}Eigen solver}
 
@@ -244,6 +261,41 @@ In CLGLib, we use Wilkinson shift, which is the eigen-value of the right-bottom 
 \end{algorithm}
 
 Once the upper triangular matrix is obtained, the eigen-values are just the diagonal elements.
+
+\begin{itemize}
+  \item \index{Implicit shifted QR iteration}Implicit shifted QR iteration
+\end{itemize}
+
+The \index{Implicit shifted QR iteration}\textbf{Implicit shifted QR iteration} sometimes also called \index{Double shifted QR iteration}\textbf{Double shifted QR iteration} or \index{Francis QR iteration}\textbf{Double shifted QR iteration}.
+
+The details are not listed here, it uses Householder to chase the zero to the bottom and right, it is a little bit better convergent, and is said to be more stable. It can be written as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$T$ a Hessenberg matrix with $n\geq 3$. (In the case of $n=2$, the eigen-value can be directly obtained.)}
+    \State{$H$ a irreducible Hessenberg matrix with $n\geq 3$. $T=\left(\begin{array}{ccc} + & + & + \\ 0 & H & + \\ 0 & 0 & + \end{array}\right)$}
+    \Comment {In the case of $n=2$, the eigen-value can be directly obtained.}
+    \State{$H_{2\times 2}$ be the $2\times 2$ matrix of right-bottom matrix. $s={\rm tr}(H_{2\times 2})$ and $t=\det (H_{2\times 2})$}
+    \State{$x=H_{1,1}(H_{1,1}-s)+H_{1,2}H_{2,1}+t$}
+    \State{$y=H_{2,1}(H_{1,1}+H_{2,2}-s)$}
+    \State{$z=H_{2,1}H_{3,2}$}        
+    \State{$H'=RQ+\sigma I$}
+    \For { $k=0$ to $n-3$}
+        \State {$h$ be Householder matrix to zero ${\bf v}=(x,y,z)^T\to (|{\bf v}|,0,0)^T$.}
+        \State {$q=\max (1,k)$, $H(k+1:k+3,q:n)=h H(k+1:k+3,q:n)$.}
+        \State {$r=\min (k+4,n)$, $H(1:4,k+1:k+3)=H(1:4,k+1:k+3)h^{\dagger}$.}        
+        \Comment {Note that $h^{\dagger}=h$}
+        \State {$x=H(k+2,k+1),y=H(k+3,k+1)$}
+        \If { $k<n-3$ }
+            \State {$z=H(k+4,k+1)$}        
+        \EndIf
+    \EndFor
+    \State {$h$ be Householder matrix to zero ${\bf v}=(x,y)^T\to (|{\bf v}|,0)^T$.}
+    \State {$H(n-1:n,n-2:n)=h H(n-1:n,n-2:n)$, $H(1:n,n-1:n)=H(1:n,n-1:n)h^{\dagger}$.}
+\EndFor
+
+\end{algorithmic}
+\caption{Implicit shifted QR iteration}
+\end{algorithm}
 
 \begin{itemize}
   \item \index{Inverse power iteration}Inverse power iteration
@@ -378,90 +430,77 @@ Finally we have to calculate $YR^{-1}$. This is a \index{forward substitution}fo
 
 \subsubsection{\label{sec:impgcrodr}\index{GCRO-DR}Implement of GCRO-DR}
 
-The GCRO-DR has four different phases
+We present pseudo-code of GCRO-DR can be found in Ref.~\cite{deflation}. The only difference is that we always make sure $C_k$ and $V_{m-k+1}$ are orthogonal to each other. It can be written as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\If {$U_k$ is defined from solving a previous linear system}
+    \State { Let $[Q,R]=AU_k$ be QR decomposition or $AU_k$. }
+    \State { $C_k=Q$. }
+    \State { $U_k=U_kR^{-1}$. }
+    \State { ${\bf r}^{(0)}=A{\bf x}^{(0)}-{\bf b}$}
+\Else
+    \State {Perform GMRES to get $W_{m+1}=\left(C_k,V_{m-k+1}\right)$}
+    \State {Update ${\bf x}^{(0)},{\bf r}^{(0)}$ as ${\bf x}^{(0)}={\bf x}^{(0)}+V_my,{\bf r}^{(0)}=V_{m+1}(\beta {\bf e}_1-H_{m+1} y)$, which is in fact part of GMRES.}
+    \State {Compute eigen-vector problem and obtain $P_k\in \mathbb{C}^{m\times k}$. }    
+    \State { $U_k=V_mP_k$ }    
+    \State { Let $[Q,R]=H_{m+1}P_k$ be QR decomposition. }
+    \State { $C_k=V_{m+1}Q$ }    
+    \State { $U_k=U_kR^{-1}$ }            
+\EndIf
+\For { $\hat{i}=1$ to $r$}
+    \Comment {restart $r$ times. }
+    \State { ${\bf x}^{(i-1)}={\bf x}^{(i-1)}+U_kC_k^{\dagger}{\bf r}^{(i-1)}$}
+    \State { ${\bf r}^{(i-1)}={\bf r}^{(i-1)}-C_kC_k^{\dagger}{\bf r}^{(i-1)}$}
+    \State { Reset $H_{m+1}=0$. $W_{m+1}(k)=V_{m-k+1}(0)={\bf r}^{(i)}/\|{\bf r}^{(i)}\|$.}
+    \State { $H_{m+1}(k,k)=1/\|U_k\|$, normalize $U_k$.}
+    \State { Perform Arnoldi procedure on matrix $(1-CC^{\dagger})A$, to obtain $V_{m-k+1}$, and set $H_{k:m+1,k:m}$. And $H_{0:k,m}=C_k^{\dagger}AV_{m-k}$. $\hat{V}=(U_k,V_{m-k})$ and $W_{m+1}=(C_k, V_{m-k+1})$. }
+    \State {Solve $\arg \;\min \; \left\|\|r\|{\bf e}_k - H_{m+1}y\right\|$.}
+    \State {${\bf x}^{(i)}={\bf x}^{(i-1)}+\hat{V}_my,\;\;{\bf r}^{(i)}={\bf r}^{(i-1)}-W_{m+1}H_{m+1}y)$.}
+    \Comment {Check the error here. If reach the criterion, return.}
+    \State {Compute eigen-vector problem and obtain $P_k\in \mathbb{C}^{m\times k}$. }
+    \State { $U_k=V_mP_k$ }
+    \State { Let $[Q,R]=H_{m+1}P_k$ be QR decomposition. }
+    \State { $C_k=V_{m+1}Q$ }
+    \State { $U_k=U_kR^{-1}$ }      
+\EndFor
+\end{algorithmic}
+\caption{GCRO-DR}
+\end{algorithm}
+
+\subsubsection{\label{sec:impgmresmdr}\index{GMRES-MDR}Implement of GMRES-MDR}
+
+The GMRES-MDR is almost the same as GCRO-DR, except for $3$ things.
+
 \begin{enumerate}
-  \item Start of the trajectory, use GMRES to solve the first time.
-  \item Continue the trajectory, use the last deflation space to form a new deflation space.
-  \item First GCRO-DR step.
-  \item Restart.
+  \item It set a threshold on eigen-values to decrease $k$ if a larger $k$ is not necessary.
+  \item It check the speed of convergence to switch between REV and SVD.
+  \item At first iteration, if $U_k$ is defined, it use another algorithm to obtain $U_k$ and $C_k$.
 \end{enumerate}
 
-The first step is GMRES, which can be briefly written as
-\begin{equation}
-\begin{split}
-&AV_m=V_{m+1}H_{m+1}\\
-\end{split}
-\end{equation}
-Using $V_{m}^{\dagger}AV_m\approx H_m$ and Eq.~(\ref{eq.gcrodr.subdeflation}), we solve the eigen vectors of $H_m$ denoting as a matrix $P_{m,k}$, $V_mP_{m,k}\in \mathbb{C}^{m\times k}$ are $k$ approximate eigen-vectors of $A$, denoting as $Y_k\in \mathbb{C}^{n\times k}$.
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State {$[Q,R]=U_k$}
+\If {REV}
+\State {$Q^{\dagger}AQ \omega = \theta \omega$}
+\EndIf
+\If {HEV}
+\State {$Q^{\dagger}A^{\dagger}AQ \omega = \theta Q^{\dagger}A^{\dagger}Q\omega$}
+\EndIf
+\If {SVD}
+\State {$Q^{\dagger}A^{\dagger}AQ \omega = \theta^2 \omega$}
+\EndIf
+\State {$U_k=Q\omega _k$}
+\end{algorithmic}
+\caption{First iteration of GMRES-MDR if $U_k$ is defined.}
+\end{algorithm}
 
-Now we need to project out the subspace $Y_kT^{-1}Y_k^{\dagger} A x= Y_kT^{-1}Y_k^{\dagger}b$, where $T=Y_k^{\dagger} A Y_k$. Let
-\begin{equation}
-\begin{split}
-&QR=AY_k,\;\;C_k=Q\in \mathbb{C}^{n\times k},\;\;U_k=Y_kR^{-1}\in \mathbb{C}^{n\times k}.\\
-&AU_k=AY_kR^{-1}=QRR^{-1}=Q=C_k\\
-&T^{-1}=\left(Y_k^{\dagger} A Y_k\right)^{-1}=\left(Y_k^{\dagger} C_k R\right)^{-1}=R^{-1}\left(Y_k^{\dagger} C_k\right)^{-1}\\
-\end{split}
-\end{equation}
-Also if $Y_k$ are eigen-vectors
-\begin{equation}
-\begin{split}
-&AY_k\approx Y_k\Lambda,\;\;\Lambda = \left(\begin{array}{cccc}
-\lambda _1 & 0 & \ldots & 0 \\
-0 & \lambda _2 & \ldots & 0 \\
-\ldots & \ldots & \ldots & \ldots \\
-0 & \ldots & 0 & \lambda_k \\
-\end{array}\right)\\
-\end{split}
-\end{equation}
-Note that $Y_k\Lambda $ is also QR factorization of $AY_k$, so
-\begin{equation}
-\begin{split}
-&Y_k\approx C_k,\;\;\left(Y_k^{\dagger}C_k\right)^{-1}Y_k^{\dagger}\approx C_k^{\dagger}\\
-\end{split}
-\end{equation}
-so Using Eq.~(\ref{eq.gcrod.exactsolution}), so
-\begin{equation}
-\begin{split}
-&x_d=Y_kT^{-1}Y_k^{\dagger}r_0=Y_kR^{-1}\left(Y_k^{\dagger}C_k\right)^{-1}Y_k^{\dagger}r_0\approx U_kC_k^{\dagger}r_0\\
-\end{split}
-\label{eq.gcrod.exactsolution2}
-\end{equation}
+We only implement the third because the first two can be tunable by parameters.
 
-If we denote the solution of $A(x+x_0)=b$, let $r_0=b-Ax_0$, we are solving $Ax=r_0$. It has same solution as preconditioned equation, i.e., Eq.~(\ref{eq.gcrodr.precondition})
-\begin{equation}
-\begin{split}
-&\left(\mathbb{I}-Y_kY_k^{\dagger}\right)Ax+Y_kT^{-1}Y_k^{\dagger}Ax=\left(\mathbb{I}-Y_kY_k^{\dagger}\right)r_0+Y_kT^{-1}Y_k^{\dagger}r_0\\
-&A_1=\left(\mathbb{I}-Y_kY_k^{\dagger}\right)A,\;\;A_2=Y_kT^{-1}Y_k^{\dagger}A\\
-&Z_1=\left(\mathbb{I}-Y_kY_k^{\dagger}\right),\;\;Z_2=Y_kT^{-1}Y_k^{\dagger}\\
-\end{split}
-\end{equation}
-Using $Z_1A_2=Z_2A_1=Z_1Z_2=Z_2Z_1=0$, we can use $Z_{1,2}$ to project out two equations
-\begin{equation}
-\begin{split}
-&x=x_1+x_d\\
-&A_1x_1=Z_1r_0,\;\;A_2x_d=Z_2r_0\\
-\end{split}
-\end{equation}
-where the solution of $A_2x_d=Z_2r_0$ is just Eq.~(\ref{eq.gcrod.exactsolution2}). The remaining equation is
+\subsubsection{\label{sec:testofgcrodr}Test of GCRO-DR and GMRES-MDR}
 
-\begin{equation}
-\begin{split}
-&x_1=x-x_d,\\
-&x_1=x-U_kC_k^{\dagger}r_0\\
-&\left(\mathbb{I}-Y_kY_k^{\dagger}\right)Ax_1=r_1=r_0-Y_kY_k^{\dagger}r_0\\
-\end{split}
-\end{equation}
+It is tested that, for both GCRO-DR and GMRES-MDR are suitable for the low-mode case.
 
-\paragraph{First GCRO-DR step}
+We run with unitary gauge and $\kappa = 0.1249$. ($\kappa_c=0.125$). GCRO-DR with $m=16$ and $k=4$ will run even faster than $dim=50$ GMRES.
 
-\begin{equation}
-\begin{split}
-&G(H_my-y_0)=0\\
-&(GH_my-Gy_0)=0\\
-&H_m\left((GH_m)^{-1}(Gy_0)\right)=(Gy_0)_{m+1}\\
-\end{split}
-\end{equation}
+\textbf{However, if it is not the low-mode case, GMRES is faster.}
 
-\paragraph{Restart GCRO-DR step}
-
-\paragraph{Continue the trajectory}

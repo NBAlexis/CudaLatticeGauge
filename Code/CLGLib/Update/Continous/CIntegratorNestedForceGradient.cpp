@@ -40,7 +40,7 @@ void CIntegratorNestedForceGradient::Evaluate()
     Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
-    UpdatePF(f1Over6Estep);
+    UpdatePF(f1Over6Estep, ESP_StartTrajectory);
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
@@ -52,14 +52,14 @@ void CIntegratorNestedForceGradient::Evaluate()
         for (INT i = 1; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_InTrajectory);
             checkCudaErrors(cudaDeviceSynchronize());
         }
 
         m_pGaugeField->CopyTo(m_pUPrime);
         m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
 
-        UpdatePF(f2Over3Estep);
+        UpdatePF(f2Over3Estep, ESP_InTrajectory);
 
         //restore U
         m_pUPrime->CopyTo(m_pGaugeField);
@@ -69,13 +69,13 @@ void CIntegratorNestedForceGradient::Evaluate()
         {
             NestedEvaluate(FALSE);
             appDetailed("  Force Gradient sub step %d\n", uiStep);
-            UpdatePF(f1Over3Estep);
+            UpdatePF(f1Over3Estep, ESP_InTrajectory);
         }
         else
         {
             NestedEvaluate(TRUE);
             appDetailed("  Force Gradient last step %d\n", uiStep);
-            UpdatePF(f1Over6Estep);
+            UpdatePF(f1Over6Estep, ESP_EndTrajectory);
         }
     }
 
@@ -100,7 +100,7 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
         // middle step
         m_pForceField->Zero();
         checkCudaErrors(cudaDeviceSynchronize());
-        m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL);
+        m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_Once);
 
         m_pGaugeField->CopyTo(m_pUPrime);
         m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);

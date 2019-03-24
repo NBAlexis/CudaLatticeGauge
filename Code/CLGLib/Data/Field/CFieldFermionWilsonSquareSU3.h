@@ -71,7 +71,8 @@ public:
     virtual void ApplyGamma(EGammaMatrix eGamma);
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge* pCachedForce) const;
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, 
+        CFieldGauge* pCachedForce, ESolverPhase ePhase) const;
     virtual void InitialAsSource(const SFermionSource& sourceData);
     virtual void SaveToFile(const CCString &fileName) const;
     virtual BYTE* CopyDataOut(UINT &uiSize) const;

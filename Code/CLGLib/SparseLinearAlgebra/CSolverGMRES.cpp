@@ -82,7 +82,7 @@ void CSLASolverGMRES::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, const CField* pStart)
+UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     assert(0 == m_lstVectors.Num());
     for (UINT i = 0; i < m_uiMaxDim; ++i)

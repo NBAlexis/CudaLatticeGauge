@@ -42,7 +42,7 @@ public:
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
     void OnFinishTrajectory(UBOOL bAccepted);
     void Prepare(UBOOL bLastAccepted, UINT uiStep);
-    void UpdateP(Real fStep, UBOOL bCacheStaple);
+    void UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase);
     void UpdateU(Real fStep);
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
     virtual CCString GetInfos(const CCString& sTab) const = 0;
@@ -83,7 +83,9 @@ public:
     virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
     CCString GetNestedInfo(const CCString & sTab) const;
 
-    void UpdatePF(Real fStep);
+    void UpdatePF(Real fStep, ESolverPhase ePhase);
+
+    //Gauge force is irrelevant from solver
     void UpdatePG(Real fStep, UBOOL bCacheStaple);
 
 protected:

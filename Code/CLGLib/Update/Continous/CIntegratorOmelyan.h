@@ -31,23 +31,23 @@ public:
     {
         Real fHalfEstep = F(0.5) * m_fEStep;
         appDetailed("  Omelyan sub step 0\n");
-        UpdateP(m_f2Lambda * fHalfEstep, FALSE);
+        UpdateP(m_f2Lambda * fHalfEstep, FALSE, ESP_StartTrajectory);
 
         for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
         {
             UpdateU(fHalfEstep);
-            UpdateP(m_fEStep * (F(1.0) - m_f2Lambda), FALSE);
+            UpdateP(m_fEStep * (F(1.0) - m_f2Lambda), FALSE, ESP_InTrajectory);
             UpdateU(fHalfEstep);
 
             if (uiStep < m_uiStepCount)
             {
                 appDetailed("  Omelyan sub step %d\n", uiStep);
-                UpdateP(m_fEStep * m_f2Lambda, FALSE);
+                UpdateP(m_fEStep * m_f2Lambda, FALSE, ESP_InTrajectory);
             }
             else
             {
                 appDetailed("  Omelyan last step %d\n", uiStep);
-                UpdateP(m_f2Lambda * fHalfEstep, TRUE);
+                UpdateP(m_f2Lambda * fHalfEstep, TRUE, ESP_EndTrajectory);
             }
         }
 

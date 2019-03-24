@@ -46,14 +46,14 @@ UINT TestUpdator(CParameters& sParam)
 
     UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.01\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 45)
     {
         ++uiError;
     }
 
-    if (fHDiff > F(0.01))
+    if (fHDiff > F(0.1))
     {
         ++uiError;
     }

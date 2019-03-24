@@ -21,7 +21,7 @@ void CIntegratorNestedLeapFrog::Evaluate()
         _FAIL_EXIT;
     }
     Real fHalfPstep = F(0.5) * m_fEStep;
-    UpdatePF(fHalfPstep);
+    UpdatePF(fHalfPstep, ESP_StartTrajectory);
     appDetailed("  leap frog sub step 0\n");
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
@@ -29,13 +29,13 @@ void CIntegratorNestedLeapFrog::Evaluate()
         if (uiStep < m_uiStepCount)
         {
             NestedEvaluate(FALSE);
-            UpdatePF(m_fEStep);
+            UpdatePF(m_fEStep, ESP_InTrajectory);
             appDetailed("  leap frog sub step %d\n", uiStep);
         }
         else
         {
             NestedEvaluate(TRUE);
-            UpdatePF(fHalfPstep);
+            UpdatePF(fHalfPstep, ESP_EndTrajectory);
             appDetailed("  leap frog last step %d\n", uiStep);
         }
     }

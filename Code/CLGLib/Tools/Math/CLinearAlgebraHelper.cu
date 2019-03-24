@@ -1653,15 +1653,15 @@ _kernelStepK_1(
         house[2] = xyz[2];
         _deviceThreeHouseHolder(house[0], house[1], house[2]);
         //u [i * 3 + j] = h[j]* h[i]
-        um[0] = cuCmulf(cuConjf(house[0]), house[0]);
-        um[1] = cuCmulf(cuConjf(house[1]), house[0]);
-        um[2] = cuCmulf(cuConjf(house[2]), house[0]);
-        um[3] = cuCmulf(cuConjf(house[0]), house[1]);
-        um[4] = cuCmulf(cuConjf(house[1]), house[1]);
-        um[5] = cuCmulf(cuConjf(house[2]), house[1]);
-        um[6] = cuCmulf(cuConjf(house[0]), house[2]);
-        um[7] = cuCmulf(cuConjf(house[1]), house[2]);
-        um[8] = cuCmulf(cuConjf(house[2]), house[2]);
+        um[0] = _cuCmulf(_cuConjf(house[0]), house[0]);
+        um[1] = _cuCmulf(_cuConjf(house[1]), house[0]);
+        um[2] = _cuCmulf(_cuConjf(house[2]), house[0]);
+        um[3] = _cuCmulf(_cuConjf(house[0]), house[1]);
+        um[4] = _cuCmulf(_cuConjf(house[1]), house[1]);
+        um[5] = _cuCmulf(_cuConjf(house[2]), house[1]);
+        um[6] = _cuCmulf(_cuConjf(house[0]), house[2]);
+        um[7] = _cuCmulf(_cuConjf(house[1]), house[2]);
+        um[8] = _cuCmulf(_cuConjf(house[2]), house[2]);
 
         //u[i * 3 + i] -= 1
         um[0].x = um[0].x - F(1.0);
@@ -2050,14 +2050,14 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDaggerVector(CLGComplex* y, const CLGComplex* __restrict__ Q, UINT dx)
 {
     UINT j = threadIdx.x;
-    y[j] = cuConjf(Q[j * dx]);
+    y[j] = _cuConjf(Q[j * dx]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInverseIterateShift(CLGComplex* A, const CLGComplex* __restrict__ outV, UINT k, UINT dx)
 {
     UINT x = threadIdx.x;
-    A[x * dx + x] = cuCsubf(A[x * dx + x], outV[k]);
+    A[x * dx + x] = _cuCsubf(A[x * dx + x], outV[k]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -2130,7 +2130,7 @@ _kernelErrorCheck(Real* outE, CLGComplex* v, const CLGComplex* __restrict__ A, U
 
     __syncthreads();
 
-    cuComplex toAdd = cuCmulf(A[x * dx + y], v[y]);
+    CLGComplex toAdd = _cuCmulf(A[x * dx + y], v[y]);
     atomicAdd(&afterMult[x].x, toAdd.x);
     atomicAdd(&afterMult[x].y, toAdd.y);
 
@@ -2190,10 +2190,10 @@ void CLinearAlgebraHelper::EigenValueProblem(
     {
         _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
-
+#if _CLG_QRIterate_Update_EigenValue
     CLGComplex res[1];
     res[0] = _make_cuComplex(F(0.0), F(0.0));
-
+#endif
     for (UINT i = 0; i < dk; ++i)
     {
         //Inverse Iterate
@@ -2299,8 +2299,10 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
     {
         _kernelSortEigenValuesBig << <block, thread1 >> > (tmpH, outEigenValue, m_pDeviceFloatBuffer, m_pDeviceIntBuffer, dk, dm);
     }
+#if _CLG_QRIterate_Update_EigenValue
     CLGComplex res[1];
     res[0] = _make_cuComplex(F(0.0), F(0.0));
+#endif
     for (UINT i = 0; i < dk; ++i)
     {
         //Inverse Iterate

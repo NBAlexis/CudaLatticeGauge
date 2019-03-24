@@ -51,12 +51,12 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     for (UINT i = 0; i < iSteps; ++i)
     {
         m_pIntegrator->Prepare(bAccepted, i);
-        if (m_bMetropolis)
+        if (m_bMetropolis || m_bTestHDiff)
         {
             fEnergy = m_pIntegrator->GetEnergy(TRUE);
         }
         m_pIntegrator->Evaluate();
-        if (m_bMetropolis)
+        if (m_bMetropolis || m_bTestHDiff)
         {
             fEnergyNew = m_pIntegrator->GetEnergy(FALSE);
         }
@@ -64,19 +64,26 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         Real diff_H = F(1.0);
         Real rand = F(0.0);
 
-        if (m_bMetropolis)
+        if (m_bMetropolis || m_bTestHDiff)
         {
             Real fDiff = fEnergy - fEnergyNew;
             if (m_bTestHDiff)
             {
                 m_lstHDiff.AddItem(fDiff);
+                m_lstH.AddItem(fEnergy);
             }
             //Metropolis
-            appDetailed(_T(" HMC: step = %d, H_dff = %f\n"),
+            appDetailed(_T(" HMC: step = %d, H_dff = %f (%f - %f)\n"),
                 i + 1, 
-                fDiff);
-            diff_H = _hostexp(fDiff);  // Delta H (SA)
-            rand = GetRandomReal();
+                fDiff,
+                fEnergy,
+                fEnergyNew);
+
+            if (!m_bTestHDiff)
+            {
+                diff_H = _hostexp(fDiff);  // Delta H (SA)
+                rand = GetRandomReal();
+            }
         }
 
         if (rand <= diff_H)

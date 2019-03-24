@@ -263,6 +263,9 @@
     <ClInclude Include="SparseLinearAlgebra\CSolverGCRODR.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverGMRESMDR.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -329,6 +332,10 @@
     <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
+    <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -375,9 +382,6 @@
     </CudaCompile>
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu">
       <Filter>Tools\Math</Filter>
-    </CudaCompile>
-    <CudaCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
-      <Filter>SparseLinearAlgebra</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

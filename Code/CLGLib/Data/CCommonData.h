@@ -99,6 +99,17 @@ __DEFINE_ENUM(EFieldType,
 
     )
 
+
+__DEFINE_ENUM(ESolverPhase,
+    ESP_StartTrajectory,
+    ESP_InTrajectory,
+    ESP_EndTrajectory,
+    ESP_Once,
+
+    ESP_ForceDWORD = 0x7fffffff,
+    )
+
+
 #if defined(__cplusplus)
     extern "C" {
 #endif /* __cplusplus */

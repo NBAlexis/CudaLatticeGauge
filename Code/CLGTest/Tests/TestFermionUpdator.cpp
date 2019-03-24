@@ -38,7 +38,7 @@ UINT TestFermionUpdator(CParameters& sParam)
     
 #if !_CLG_DEBUG
     Real fRes = pMeasure->m_fLastRealResult;
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+    appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.01))
     {
@@ -47,14 +47,14 @@ UINT TestFermionUpdator(CParameters& sParam)
 
     UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    appGeneral(_T("accept (%d/60) : expected >= 50. HDiff = %f : expected < 0.08\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/60) : expected >= 50. HDiff = %f : expected < 0.3\n (exp(-0.3) is 74%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 50)
     {
         ++uiError;
     }
 
-    if (fHDiff > F(0.08))
+    if (fHDiff > F(0.3))
     {
         ++uiError;
     }
@@ -64,6 +64,10 @@ UINT TestFermionUpdator(CParameters& sParam)
 }
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGCRODR);
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGMRESMDR);
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan);
 
@@ -137,8 +141,46 @@ __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingA
 
 UINT TestFermionUpdatorL(CParameters& sParam)
 {
-    appGetLattice()->m_pUpdator->Update(1, TRUE);
-    return 0;
+    Real fExpected = F(0.17);
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+    CMeasurePlaqutteEnergy* pMeasure = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    if (NULL == pMeasure)
+    {
+        return 1;
+    }
+
+    INT updates = 3;
+    sParam.FetchValueINT(_T("Updates"), updates);
+
+    if (updates > 10 || updates < 3)
+    {
+        updates = 3;
+    }
+    appGetLattice()->m_pUpdator->Update(1, FALSE);
+
+    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
+    pMeasure->Reset();
+    appGetLattice()->m_pUpdator->Update(static_cast<UINT>(updates - 1), TRUE);
+
+    Real fRes = pMeasure->m_fLastRealResult;
+    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    Real fH = appGetLattice()->m_pUpdator->GetHValue();
+
+    appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
+    UINT uiError = 0;
+    if (appAbs(fRes - fExpected) > F(0.01))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("H = %f, HDiff = %1.8f : expected < 3E-7 H\nThe error can be 1E-7 H, which > 1, so here we do NOT use 0.3 to judge.\n"), fH, fHDiff);
+
+    if (fHDiff > F(0.0000003) * fH)
+    {
+        ++uiError;
+    }
+
+    return uiError;
 }
 
 #if !_CLG_DEBUG
