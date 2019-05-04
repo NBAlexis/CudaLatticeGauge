@@ -18,9 +18,9 @@ ShowParameterContent : 0
 ## LatticeLength : [8, 8, 8, 8]
 
 ## LatticeIndex { EIndexType_Square }
-## LatticeIndex : EIndexType_Square
+## LatticeIndex : CIndexSquare
 ## LatticeBoundary = { EBC_TorusSquare }
-## LatticeBoundary : EBC_TorusSquare
+## LatticeBoundary : CBoundaryConditionTorusSquare
 
 ## Threads decompose
 ## Note: ThreadAutoDecompose = 1, will decompose using MaxThread of GPU, or else ThreadAutoDecompose = 0 will use decomposex,y,z
@@ -215,8 +215,8 @@ TestUpdatorLeapFrog:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -254,12 +254,11 @@ TestUpdatorLeapFrog:
         MeasureName : CMeasurePlaqutteEnergy
 
 TestUpdatorOmelyan:
-
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -302,8 +301,8 @@ TestUpdatorForceGradient:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -339,8 +338,8 @@ TestFileIOBridgePPText:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -363,8 +362,8 @@ TestFileIOBridgePPBin:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -388,8 +387,8 @@ TestSolverBiCGStab:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -440,8 +439,8 @@ TestSolverGMRES:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -494,8 +493,8 @@ TestSolverGCR:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -547,8 +546,8 @@ TestSolverGCRODR:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -601,8 +600,8 @@ TestSolverGMRESLowMode:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -650,8 +649,8 @@ TestSolverGCRODRLowMode:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -704,8 +703,8 @@ TestFermionUpdator:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -775,8 +774,8 @@ TestFermionUpdatorOmelyan:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -826,8 +825,8 @@ TestFermionUpdatorForceGradient:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -877,8 +876,8 @@ TestFermionUpdatorNestedLeapFrog:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -937,8 +936,8 @@ TestFermionUpdatorNestedOmelyan:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -997,8 +996,8 @@ TestFermionUpdatorNestedForceGradient:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1057,8 +1056,8 @@ TestFermionUpdatorOmelyanGCRODR:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1124,8 +1123,8 @@ TestFermionUpdatorOmelyanGMRESMDR:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1214,8 +1213,8 @@ TestFermionUpdatorLargeScale:
     ##LatticeLength : [32, 32, 32, 32]
     ##ThreadAutoDecompose : 0
     ##ThreadDecompose : [8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     RandomType : ER_Schrage
     RandomSeedType : ERST_Timestamp
     RandomSeed : 1234567
@@ -1304,8 +1303,8 @@ TestFermionUpdatorWithMesonCorrelator:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1387,8 +1386,8 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 16]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1470,8 +1469,8 @@ TestOperators:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1541,15 +1540,14 @@ TestOperators:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
-
 
 TestQuickAxpy:
 
     Dim : 4
     Dir : 4
     LatticeLength : [32, 32, 32, 16]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1620,195 +1618,13 @@ TestQuickAxpy:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-TestGaugeSmearingAPEStout:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 1
-    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
-    ExpectedResR : 0.616
-
-    Updator:
-
-        ## UpdatorType = { CHMC }
-        UpdatorType : CHMC
-
-        Metropolis : 1
-        
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 1
-        IntegratorStep : 15
-
-    Gauge:
-	
-        ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-		
-    FermionField1:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionWilsonSquareSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        Hopping : 0.1355
-
-        FieldId : 2
-
-        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
-        ## = 6 + MaxDim of GMRES
-        PoolNumber : 16
-
-        ## Still have problem here
-        Period : [1, 1, 1, -1]
-
-    Solver:
-
-        SolverName : CSLASolverGMRES
-        SolverForFieldId : 2
-        ## Check Accuracy every DiviationStep steps
-        MaxDim : 10
-        ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00001
-        Restart : 30
-        ## 0 is recommanded
-        AbsoluteAccuracy : 1
-
-    Action1:
-   
-        ActionName : CActionGaugePlaquette
-        Beta : 5.2
-
-    Action2:
-
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-        ## MultiStep : 2
-
-    Measure1:
-
-        MeasureName : CMeasureMesonCorrelator
-        GammaMatrix : [ UNITY ]
-        FieldId : 2
-
-    GaugeSmearing :
-
-        SmearingName : CGaugeSmearingAPEStout
-        RhoS : 0.1
-        RhoT : 0.0
-        Iterate : 1
-
-TestGaugeSmearingAPEProj:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 1
-    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
-    ExpectedResR : 0.616
-
-    Updator:
-
-        ## UpdatorType = { CHMC }
-        UpdatorType : CHMC
-
-        Metropolis : 1
-        
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 1
-        IntegratorStep : 15
-
-    Gauge:
-	
-        ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-		
-    FermionField1:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionWilsonSquareSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        Hopping : 0.1355
-
-        FieldId : 2
-
-        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
-        ## = 6 + MaxDim of GMRES
-        PoolNumber : 16
-
-        ## Still have problem here
-        Period : [1, 1, 1, -1]
-
-    Solver:
-
-        SolverName : CSLASolverGMRES
-        SolverForFieldId : 2
-        ## Check Accuracy every DiviationStep steps
-        MaxDim : 10
-        ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00001
-        Restart : 30
-        ## 0 is recommanded
-        AbsoluteAccuracy : 1
-
-    Action1:
-   
-        ActionName : CActionGaugePlaquette
-        Beta : 5.2
-
-    Action2:
-
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-        ## MultiStep : 2
-
-    Measure1:
-
-        MeasureName : CMeasureMesonCorrelator
-        GammaMatrix : [ UNITY ]
-        FieldId : 2
-
-    GaugeSmearing :
-
-        SmearingName : CGaugeSmearingAPEProj
-        Alpha : 0.3
-        ProjIterate : 6
-        Iterate : 1
-
 TestGammaMatrixSpeed:
 
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -1844,8 +1660,8 @@ TestSaveConfiguration:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 0
@@ -1879,8 +1695,8 @@ TestSaveConfigurationLowMode:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ##ThreadAutoDecompose : 0
     ##ThreadDecompose : [8, 8, 8]
     RandomType : ER_Schrage
@@ -1953,6 +1769,56 @@ TestSaveConfigurationLowMode:
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
         ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+TestDirichletBoundary:
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+		
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 3
 
     Measure1:
 

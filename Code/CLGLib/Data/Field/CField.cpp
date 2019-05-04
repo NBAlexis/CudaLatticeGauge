@@ -28,8 +28,8 @@ void CField::Return()
 
 CFieldFermion::CFieldFermion() : CField()
 {
-    m_uiLinkeCount = _HC_Volumn * _HC_Dir;
-    m_uiSiteCount = _HC_Volumn;
+    m_uiLinkeCount = _HC_Volume * _HC_Dir;
+    m_uiSiteCount = _HC_Volume;
 }
 
 CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)

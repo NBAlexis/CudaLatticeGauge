@@ -16,13 +16,22 @@ __BEGIN_NAMESPACE
 //((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z))
 //#define __thread_id ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z))
 
-enum { kContentLength = 1024, };
+enum 
+{
+    kContentLength = 1024, _kMaxFieldCount = 8,
+};
 
 extern __constant__ UINT _constIntegers[kContentLength];
 extern __constant__ Real _constFloats[kContentLength];
 
+/**
+* Note that, the pointers are copyied here. So the virtual functions should not be used!
+*/
+extern __constant__ class CField* __fieldPointers[_kMaxFieldCount];
+extern __constant__ class CFieldBoundary* __boundaryFieldPointers[_kMaxFieldCount];
+
 extern __constant__ class CRandom* __r;
-extern __constant__ class CIndex* __idx;
+extern __constant__ class CIndexData* __idx;
 
 __DEFINE_ENUM(EGammaMatrix,
     UNITY,
@@ -62,8 +71,8 @@ enum EConstIntId
     ECI_Ly,
     ECI_Lz,
     ECI_Lt,
-    ECI_Volumn,
-    ECI_Volumn_xyz,
+    ECI_Volume,
+    ECI_Volume_xyz,
     ECI_PlaqutteCount,
     ECI_LinkCount,
     ECI_MultX,
@@ -98,6 +107,7 @@ class CLGAPI CCudaHelper
 {
 public:
     CCudaHelper()
+        : m_pDevicePtrIndexData(NULL)
     {
         memset(m_ConstIntegers, 0, sizeof(UINT) * kContentLength);
         memset(m_ConstFloats, 0, sizeof(Real) * kContentLength);
@@ -126,9 +136,14 @@ public:
 
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
-    void SetDeviceIndex(class CIndex** ppIdx) const;
+    void SetDeviceIndex(class CIndexData* ppIdx) const;
+
+    class CIndexData* m_pDevicePtrIndexData;
+
     //we never need gamma matrix on host, so this is purely hiden in device
     void CreateGammaMatrix() const;
+
+    void SetFieldPointers();
 
     /**ret[0] = max thread count, ret[1,2,3] = max thread for x,y,z per block*/
     static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
@@ -144,9 +159,28 @@ public:
 
     void ReleaseTemeraryBuffers()
     {
+        if (NULL != m_pDevicePtrIndexData)
+        {
+            checkCudaErrors(cudaFree(m_pDevicePtrIndexData));
+        }
+
         checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
         checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
         //checkCudaErrors(cudaFree(m_pIndexBuffer));
+
+        for (UINT i = 0; i < _kMaxFieldCount; ++i)
+        {
+            if (NULL != m_deviceFieldPointers[i])
+            {
+                checkCudaErrors(cudaFree(m_deviceFieldPointers[i]));
+                m_deviceFieldPointers[i] = NULL;
+            }
+            if (NULL != m_deviceBoundaryFieldPointers[i])
+            {
+                checkCudaErrors(cudaFree(m_deviceBoundaryFieldPointers[i]));
+                m_deviceBoundaryFieldPointers[i] = NULL;
+            }
+        }
     }
 
     CLGComplex ThreadBufferSum(CLGComplex * pDeviceBuffer);
@@ -155,6 +189,8 @@ public:
     //struct SIndex* m_pIndexBuffer;
     CLGComplex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
+    class CField * m_deviceFieldPointers[_kMaxFieldCount];
+    class CFieldBoundary * m_deviceBoundaryFieldPointers[_kMaxFieldCount];
 
     //thread per grid ( = volumn)
     UINT m_uiThreadCount;

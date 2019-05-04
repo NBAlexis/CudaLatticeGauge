@@ -14,11 +14,14 @@ __BEGIN_NAMESPACE
 __constant__ UINT _constIntegers[kContentLength];
 __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
-__constant__ CIndex* __idx;
+__constant__ CIndexData* __idx;
 //why we create Dirac gamma matrix?
 //__constant__ gammaMatrix __diracGamma[EGM_MAX];
 __constant__ gammaMatrix __chiralGamma[EGM_MAX];
 __constant__ deviceSU3 __SU3Generators[9];
+
+__constant__ CField* __fieldPointers[_kMaxFieldCount];
+__constant__ CFieldBoundary* __boundaryFieldPointers[_kMaxFieldCount];
 
 #pragma region Kernels
 
@@ -42,20 +45,21 @@ __global__ void
 _CLG_LAUNCH_BOUND_SINGLE
 _kernelDebugFunction()
 {
-    deviceSU3 a = deviceSU3::makeSU3Random(1);
-    deviceSU3 b = deviceSU3::makeSU3Random(2);
-    a.Add(b);
-    CLGComplex res0 = deviceSU3::Determinent(a.m_me);
-    printf("det = %f %f\n", res0.x, res0.y);
-    a.DebugPrint();
+    ULONGLONG test[4];
+    test[0] = 0;
+    test[1] = 0;
+    test[2] = 0;
+    test[3] = 0;
+    ((SIndex*)&test[2])->m_uiSiteIndex = 1;
+    ((SIndex*)&test[2])->m_byDir = 1;
 
-    a.Proj(6);
-    
-    CLGComplex res1 = deviceSU3::Determinent(a.m_me);
-    a.DaggerMul(a);
+    printf("testres %lld\n", test[0]);
+    printf("testres %lld\n", test[1]);
+    printf("testres %lld\n", test[2]);
+    printf("testres %lld\n", test[3]);
 
-    printf("det = %f %f\n", res1.x, res1.y);
-    a.DebugPrint();
+    printf("testres %d\n", ((SIndex*)&test[2])->m_uiSiteIndex);
+    printf("testres %lld\n", ((SIndex*)&test[2])->m_ullData);
 }
 
 __global__ void 
@@ -432,9 +436,48 @@ void CCudaHelper::CreateGammaMatrix() const
     checkCudaErrors(cudaFree(pSU3));
 }
 
-void CCudaHelper::SetDeviceIndex(class CIndex** ppIdx) const
+void CCudaHelper::SetDeviceIndex(class CIndexData* pIdx) const
 {
-    checkCudaErrors(cudaMemcpyToSymbol(__idx, ppIdx, sizeof(CIndex*)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDevicePtrIndexData, sizeof(CIndexData)));
+    checkCudaErrors(cudaMemcpy(m_pDevicePtrIndexData, pIdx, sizeof(CIndexData), cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpyToSymbol(__idx, &m_pDevicePtrIndexData, sizeof(CIndexData*)));
+}
+
+void CCudaHelper::SetFieldPointers()
+{
+    for (BYTE i = 0; i < _kMaxFieldCount; ++i)
+    {
+        CField * pField = appGetLattice()->GetFieldById(i);
+        if (NULL == pField)
+        {
+            m_deviceFieldPointers[i] = NULL;
+        }
+        else
+        {
+            UINT uiSize = pField->GetClass()->GetSize();
+            CField* pDeviceField = NULL;
+            checkCudaErrors(cudaMalloc((void**)&pDeviceField, static_cast<size_t>(uiSize)));
+            checkCudaErrors(cudaMemcpy(pDeviceField, pField, static_cast<size_t>(uiSize), cudaMemcpyHostToDevice));
+            m_deviceFieldPointers[i] = pDeviceField;
+        }
+
+        CFieldBoundary * pBoundaryField = appGetLattice()->GetBoundaryFieldById(i);
+        if (NULL == pBoundaryField)
+        {
+            m_deviceBoundaryFieldPointers[i] = NULL;
+        }
+        else
+        {
+            UINT uiSize = pBoundaryField->GetClass()->GetSize();
+            CFieldBoundary* pDeviceBoundaryField = NULL;
+            checkCudaErrors(cudaMalloc((void**)&pDeviceBoundaryField, static_cast<size_t>(uiSize)));
+            checkCudaErrors(cudaMemcpy(pDeviceBoundaryField, pBoundaryField, static_cast<size_t>(uiSize), cudaMemcpyHostToDevice));
+            m_deviceBoundaryFieldPointers[i] = pDeviceBoundaryField;
+        }
+    }
+
+    checkCudaErrors(cudaMemcpyToSymbol(__fieldPointers, m_deviceFieldPointers, sizeof(CField*) * _kMaxFieldCount));
+    checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundary*) * _kMaxFieldCount));
 }
 
 TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()

@@ -17,7 +17,7 @@ __DEFINE_ENUM(EFermionSource,
     EFS_Point,
 )
 
-struct CLGAPI SFermionSource
+struct SFermionSource
 {
     EFermionSource m_eSourceType;
     SSmallInt4 m_sSourcePoint;
@@ -87,6 +87,9 @@ public:
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
+
+    virtual UBOOL IsGaugeField() const { return FALSE; }
+    virtual UBOOL IsFermionField() const { return TRUE; }
 
 protected:
 

@@ -30,9 +30,12 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionDirichlet.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/CCommonData.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundary.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
@@ -89,6 +92,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.cu
@@ -151,6 +157,7 @@ include_directories(${PROJECT_SOURCE_DIR}/CLGTest)
 add_executable(CLGTest 
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.h
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestBoundary.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestConfigurationFileIO.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGammaMatrixSpeed.cpp

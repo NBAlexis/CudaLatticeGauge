@@ -16,35 +16,6 @@ Real CLGAPI CCommonData::m_fKai = 0;
 UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
 UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 
-__global__ void 
-_CLG_LAUNCH_BOUND_SINGLE
-_kernelDeletePtrs(CIndex * pdeviceIndex)
-{
-    if (NULL != pdeviceIndex)
-    {
-        delete pdeviceIndex;
-    }
-}
-
-__global__ void 
-_CLG_LAUNCH_BOUND_SINGLE
-_kernelGetPlaqLengthCount(BYTE* deviceData)
-{
-    BYTE length, countPersite, countPerLink;
-    __idx->_deviceGetPlaqutteCountLength(length, countPersite, countPerLink);
-
-    deviceData[0] = length;
-    deviceData[1] = countPersite;
-    deviceData[2] = countPerLink;
-}
-
-__global__ void
-_CLG_LAUNCH_BOUND_SINGLE
-_kernelSetBondaryCondition(BYTE byFieldId, SBoundCondition bc)
-{
-    __idx->m_pBoundaryCondition->SetFieldSpecificBc(byFieldId, bc);
-}
-
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
 * m_uiLatticeDecompose[3,4,5] is the threads in blocks
@@ -55,7 +26,7 @@ CLatticeData::CLatticeData()
     , m_pUpdator(NULL)
 
     , m_pDeviceRandom(NULL)
-    , m_pDeviceIndex(NULL)
+    , m_pIndex(NULL)
 
     , m_pFermionSolver(NULL)
     , m_pMeasurements(NULL)
@@ -65,11 +36,8 @@ CLatticeData::CLatticeData()
 
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
-    , m_uiIndexType(0)
-    , m_uiBoundaryConditionType(0)
 {
-    m_pFieldCache = new CFieldCache();
-    m_pIndexCache = new CIndexCache();
+    m_pFieldCache = new CFieldCache();    
 }
 
 CLatticeData::~CLatticeData()
@@ -84,10 +52,9 @@ CLatticeData::~CLatticeData()
         appSafeDelete(m_pActionList[i]);
     }
 
-    if (NULL != m_pDeviceIndex)
+    if (NULL != m_pIndex)
     {
-        _kernelDeletePtrs << <1, 1 >> > (m_pDeviceIndex);
-        m_pDeviceIndex = NULL;
+        appSafeDelete(m_pIndex);
     }
     if (NULL != m_pDeviceRandom)
     {
@@ -99,6 +66,13 @@ CLatticeData::~CLatticeData()
     {
         appSafeDelete(m_pOtherFields[i]);
     }
+    m_pOtherFields.RemoveAll();
+
+    for (INT i = 0; i < m_pAllBoundaryFields.Num(); ++i)
+    {
+        appSafeDelete(m_pAllBoundaryFields[i]);
+    }
+    m_pAllBoundaryFields.RemoveAll();
 
     for (INT i = 0; i < m_pFieldPools.Num(); ++i)
     {
@@ -176,26 +150,26 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
     }
 }
 
-void CLatticeData::GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
-{
-    BYTE * deviceData;
-    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(BYTE) * 3));
-
-    _kernelGetPlaqLengthCount << <1, 1 >> > (deviceData);
-
-    BYTE hostData[3];
-
-    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(BYTE) * 3, cudaMemcpyDeviceToHost));
-    checkCudaErrors(cudaFree(deviceData));
-
-    plaqLength = hostData[0];
-    countPerSite = hostData[1];
-    countPerLink = hostData[2];
-}
+//void CLatticeData::GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
+//{
+//    BYTE * deviceData;
+//    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(BYTE) * 3));
+//
+//    _kernelGetPlaqLengthCount << <1, 1 >> > (deviceData);
+//
+//    BYTE hostData[3];
+//
+//    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(BYTE) * 3, cudaMemcpyDeviceToHost));
+//    checkCudaErrors(cudaFree(deviceData));
+//
+//    plaqLength = hostData[0];
+//    countPerSite = hostData[1];
+//    countPerLink = hostData[2];
+//}
 
 void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc)
 {
-    _kernelSetBondaryCondition << <1, 1 >> > (byFieldId, bc);
+    m_pIndex->m_pBoundaryCondition->SetFieldSpecificBc(byFieldId, bc);
 }
 
 CCString CLatticeData::GetInfos(const CCString& sTab) const
@@ -208,9 +182,9 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("RandomSeed : %d\n"), m_uiRandomSeed);
     sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("IndexType : %s\n"), __ENUM_TO_STRING(EIndexType, static_cast<EIndexType>(m_uiIndexType)).c_str());
+    sInfos.Format(_T("IndexType : %s\n"), NULL == m_pIndex ? _T("None") : m_pIndex->GetClass()->GetName());
     sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("BoundaryCondition : %s\n"), __ENUM_TO_STRING(EBoundaryCondition, static_cast<EBoundaryCondition>(m_uiBoundaryConditionType)).c_str());
+    sInfos.Format(_T("BoundaryCondition : %s\n"), (NULL == m_pIndex || NULL == m_pIndex->m_pBoundaryCondition) ? _T("None") : m_pIndex->m_pBoundaryCondition->GetClass()->GetName());
     sRet = sRet + sTab + sInfos;
     if (NULL != m_pFermionSolver)
     {

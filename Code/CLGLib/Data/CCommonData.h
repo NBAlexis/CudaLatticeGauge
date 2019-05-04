@@ -16,8 +16,6 @@
 //DC for device constant
 //HC for host constant
 
-enum { _kMaxFieldCount = 8, };
-
 #define _DC_Dim (_constIntegers[ECI_Dim])
 #define _HC_Dim (appGetCudaHelper()->m_ConstIntegers[ECI_Dim])
 
@@ -33,10 +31,10 @@ enum { _kMaxFieldCount = 8, };
 #define _DC_Lt (_constIntegers[ECI_Lt])
 #define _HC_Lt (appGetCudaHelper()->m_ConstIntegers[ECI_Lt])
 
-#define _DC_Volumn (_constIntegers[ECI_Volumn])
-#define _HC_Volumn (appGetCudaHelper()->m_ConstIntegers[ECI_Volumn])
-#define _DC_Volumn_xyz (_constIntegers[ECI_Volumn_xyz])
-#define _HC_Volumn_xyz (appGetCudaHelper()->m_ConstIntegers[ECI_Volumn_xyz])
+#define _DC_Volume (_constIntegers[ECI_Volume])
+#define _HC_Volume (appGetCudaHelper()->m_ConstIntegers[ECI_Volume])
+#define _DC_Volume_xyz (_constIntegers[ECI_Volume_xyz])
+#define _HC_Volume_xyz (appGetCudaHelper()->m_ConstIntegers[ECI_Volume_xyz])
 
 #define _DC_MultX (_constIntegers[ECI_MultX])
 #define _HC_MultX (appGetCudaHelper()->m_ConstIntegers[ECI_MultX])
@@ -88,7 +86,14 @@ enum { _kMaxFieldCount = 8, };
 
 __BEGIN_NAMESPACE
 
-enum { kMaxFieldCount = 8, kMaxActionCount = 8 };
+inline class CCudaHelper* appGetCudaHelper();
+
+enum 
+{
+    kMaxFieldCount = 8, 
+    kMaxActionCount = 8, 
+    kMaxPlaqutteCache = 32,
+};
 
 __DEFINE_ENUM(EFieldType,
 
@@ -110,6 +115,10 @@ __DEFINE_ENUM(ESolverPhase,
     )
 
 
+#define _SSMALLINT4(intd) ((SSmallInt4*)(&intd))
+
+#define _CSSMALLINT4(intd) ((const SSmallInt4*)(&intd))
+
 #if defined(__cplusplus)
     extern "C" {
 #endif /* __cplusplus */
@@ -118,7 +127,16 @@ __DEFINE_ENUM(ESolverPhase,
     {
         __device__ SSmallInt4() {}
 
-        SBYTE x, y, z, w;
+        union
+        {
+            UINT m_uiData;
+            SBYTE m_byData4[4];
+            struct 
+            {
+                SBYTE x, y, z, w;
+            };
+        };
+        
     };
 #if defined(__cplusplus)
 }
@@ -189,13 +207,21 @@ __device__ __inline__ static SSmallInt4 __deviceFatIndexToInt4(UINT fatIndex)
 //at most 8 tags
 enum
 {
-    _kDagger            = 0x01,
-    _kOpposite          = 0x02,
+    _kDaggerOrOpposite  = 0x01,
+    _kDirichlet         = 0x02,
 };
+
+#define _SINDEX(longlongdata) ((SIndex*)&longlongdata)
+#define _CSINDEX(longlongdata) ((const SIndex*)&longlongdata)
 
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
+
+    typedef struct
+    {
+        ULONGLONG m_data[kMaxPlaqutteCache];
+    } SCachedIndexArray;
 
     struct alignas(8) SIndex
     {
@@ -235,19 +261,29 @@ extern "C" {
             printf("%s(xyzt:%d,%d,%d,%d)_(%x)%s\n", NeedToOpposite() ? "-" : "", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
         }
 
-        __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (_kDagger & m_byTag); }
-        __device__ __inline__ UBOOL NeedToOpposite() const { return 0 != (_kOpposite & m_byTag); }
-        __device__ __inline__ UBOOL NeedBoundaryField() const { return 0 != m_byBoundaryFieldId; }
+        __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (_kDaggerOrOpposite & m_byTag); }
+        __device__ __inline__ UBOOL NeedToOpposite() const { return 0 != (_kDaggerOrOpposite & m_byTag); }
+        __device__ __inline__ UBOOL IsDirichlet() const { return 0 != (_kDirichlet & m_byTag); }
 
-        UINT m_uiSiteIndex;
-        BYTE m_byDir;
-        BYTE m_byTag;
-        BYTE m_byBoundaryFieldId;
+        union 
+        {
+            ULONGLONG m_ullData;
 
-        /**
-        * For miscellaneous usage
-        */
-        BYTE m_byReginId;
+            struct
+            {
+                UINT m_uiSiteIndex;
+                BYTE m_byDir;
+                BYTE m_byTag;
+
+                //NOTE, THIS IS NOT USING (AND SHOULD NOT BE USED)
+                BYTE m_byBoundaryFieldId;
+
+                /**
+                * For miscellaneous usage
+                */
+                BYTE m_byReginId;
+            };
+        };
     };
 
 #if defined(__cplusplus)

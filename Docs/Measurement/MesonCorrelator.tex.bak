@@ -62,7 +62,7 @@ Then we can multiply gamma matrix back
 \end{split}
 \end{equation}
 
-The trace is for both color and spinor space. 
+The trace is for both color and spinor space.
 
 \begin{itemize}
   \item iso-singlet
@@ -85,7 +85,7 @@ Usually, one need to know the observable in momentum space, which is
 \end{equation}
 where $\Lambda _3$ denotes the spatial lattice.
 
-For hadron spectroscopy, 
+For hadron spectroscopy,
 \begin{equation}
 \begin{split}
 &\tilde{C}({\bf p},n_t;{\bf 0}, 0)\propto \exp\left(-an_tE_0({\bf p})\right)\times \left(1+\mathcal{O}\left(e^{-an_t\Delta E}\right)\right)
@@ -136,7 +136,7 @@ In the last line, $:,c_2,:,s_2$ denote one column of the $12\times 12$ matrix, a
 In matrix form it is
 \begin{equation}
 \begin{split}
-&\left(\begin{array}{c} D^{-1}_{1,cs} \\ D^{-1}_{2,cs} \\ D^{-1}_{3,cs} \\ \ldots \\ D^{-1}_{10,cs}\\ D^{-1}_{11,cs} \\ D^{-1}_{12,cs_2}\end{array}\right)=\left(\begin{array}{ccccccc} 
+&\left(\begin{array}{c} D^{-1}_{1,cs} \\ D^{-1}_{2,cs} \\ D^{-1}_{3,cs} \\ \ldots \\ D^{-1}_{10,cs}\\ D^{-1}_{11,cs} \\ D^{-1}_{12,cs_2}\end{array}\right)=\left(\begin{array}{ccccccc}
 D^{-1}_{1,1} & D^{-1}_{1,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{1,cs}} & \ldots &  D^{-1}_{1,11} & D^{-1}_{1,12} \\
 D^{-1}_{2,1} & D^{-1}_{2,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{2,cs}} & \ldots &  D^{-1}_{2,11} & D^{-1}_{2,12} \\
 D^{-1}_{3,1} & D^{-1}_{3,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{3,cs}} & \ldots &  D^{-1}_{3,11} & D^{-1}_{3,12} \\
@@ -182,7 +182,7 @@ Note that, for $k_i=0$, we need \textbf{even} number of length at spatial direct
 We can write $D^{-1}$ in the form of $4\times 4$ matrices, with elements as $3\times 3$ matrices, as
 \begin{equation}
 \begin{split}
-&D^{-1}=\left(\begin{array}{cccc} 
+&D^{-1}=\left(\begin{array}{cccc}
 U_{11} & U_{12} & U_{13} & U_{14} \\
 U_{21} & U_{22} & U_{23} & U_{24} \\
 U_{31} & U_{32} & U_{33} & U_{34} \\
@@ -271,5 +271,49 @@ So, we have two cases, one for $p(1)=1$, and one for $p(1)\neq 1$
 \end{equation}
 
 
+\subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
 
+In HMC with fermions, the computer power is consumed mainly in solving the $D^{-1}$. The small eigenvalues of the $D$ operator is the main reason to slow down the solver, which is the so called \index{low mode}\textbf{low mode} or \index{exceptional configurations}\textbf{exceptional configurations}.
+
+Gauge smearing (\index{gauge smoothing}gauge smoothing) is one of the method to ease the problem by replacing the original configuration with a gauge equivalent but easier configuration. There are several different smearing methods. In CLGLib, only two are implemented.
+
+\begin{itemize}
+  \item \index{APE smearing}APE
+\end{itemize}
+
+It use
+\begin{equation}
+\begin{split}
+&U_{\mu}'=\mathcal{P}\left((1-\alpha)U_{\mu} + \frac{\alpha}{6}\Sigma _{\mu}\right)
+\end{split}
+\end{equation}
+where $\Sigma _{\mu}$ is the \index{staple}staple, (see Eq.~(\ref{eq.plaqutteEnergy.staple})). In CLGLib, staples are cached. After smoothing, $\mathcal{P}$ is a projection project to result to $SU(3)$ and can be approximated as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State $U =U / \sqrt{tr(U^{\dagger}U / 3)}$
+\For{$i=0$ to $r$}
+\Comment {iterate r times}
+    \State{$x = U \left(\frac{3}{2}-\frac{1}{2}U^{\dagger}U\right)$}
+    \State{$U = \left(1-\frac{i}{3}{\rm Im}(\det(x))\right)x$}
+\EndFor
+
+\Return $U$
+\end{algorithmic}
+\caption{$\mathcal{P}(U)$ approximately}
+\end{algorithm}
+
+Usually, iterate for $4$ times, it can archive $\mathcal{\alpha}$ accuracy.
+
+\begin{itemize}
+  \item \index{stout}\index{APE stout}APE stout
+\end{itemize}
+
+In this approach, it construct a $SU(3)$ candidate directly by the staples. (Therefor, no need to project). Using
+
+\begin{equation}
+\begin{split}
+&\Omega _{\mu}=\rho _{\mu} \Sigma _{\mu} U_{\mu}^{\dagger},\;Q_{\mu}=\left\{\Omega_{\mu}\right\}_{TA},\;U_{\mu}'=\exp (Q_{\mu}) U_{\mu}\\
+\end{split}
+\end{equation}
+where $\rho_{\mu}$ is usually set to be $\rho_{1,2,3}=\rho,\rho_{4}=0$. Note that, there is no sum over $\mu$ in the above equation. Also, note that, $\exp$ is not accurate unless $\rho$ is small enough, however, one can iterate the smearing for a few sub-steps.
 

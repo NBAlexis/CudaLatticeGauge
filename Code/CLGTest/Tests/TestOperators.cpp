@@ -29,9 +29,9 @@ UINT TestOperators(CParameters& )
     CLGComplex dot3 = pF1->Dot(pF2);
     CLGComplex dot4 = pF2->Dot(pF1);
     appGeneral(_T("Estimator f1.f1 = (%f %f); f2.f2 = (%f %f); f1.f2 = (%f %f); f2.f1 = (%f %f)\n"),
-        dot1.x / (12 * _HC_Volumn), dot1.y, dot2.x / (12 * _HC_Volumn), dot2.y, dot3.x / (12 * _HC_Volumn), dot3.y / (12 * _HC_Volumn), dot4.x / (12 * _HC_Volumn), dot4.y / (12 * _HC_Volumn));
+        dot1.x / (12 * _HC_Volume), dot1.y, dot2.x / (12 * _HC_Volume), dot2.y, dot3.x / (12 * _HC_Volume), dot3.y / (12 * _HC_Volume), dot4.x / (12 * _HC_Volume), dot4.y / (12 * _HC_Volume));
 
-    if (appAbs(1.0f - dot1.x / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(1.0f - dot1.x / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }
@@ -39,7 +39,7 @@ UINT TestOperators(CParameters& )
     {
         ++uiErrors;
     }
-    if (appAbs(1.0f - dot2.x / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(1.0f - dot2.x / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }
@@ -47,19 +47,19 @@ UINT TestOperators(CParameters& )
     {
         ++uiErrors;
     }
-    if (appAbs(dot3.x / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(dot3.x / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot3.y / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(dot3.y / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot4.x / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(dot4.x / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }
-    if (appAbs(dot4.y / (12 * _HC_Volumn)) > 0.01f)
+    if (appAbs(dot4.y / (12 * _HC_Volume)) > 0.01f)
     {
         ++uiErrors;
     }

@@ -49,6 +49,9 @@
     <Filter Include="Measurement\GaugeSmearing">
       <UniqueIdentifier>{dafabea5-5d56-4811-9ee3-15d3fee27451}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Field\BoundaryField">
+      <UniqueIdentifier>{d2abb76d-ad2f-4a4a-874a-fc8432db4a3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tools\Timer.h">
@@ -111,9 +114,6 @@
       <Filter>Data\Action</Filter>
     </ClInclude>
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h">
-      <Filter>Data\Boundary</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h">
       <Filter>Data\Boundary</Filter>
     </ClInclude>
     <ClInclude Include="Data\Lattice\CIndexSquare.h">
@@ -266,6 +266,21 @@
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRESMDR.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.h">
+      <Filter>Data\Boundary</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Lattice\CIndexData.h">
+      <Filter>Data\Lattice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -356,14 +371,8 @@
     <CudaCompile Include="Core\CudaHelper.cu">
       <Filter>Core</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Lattice\CIndex.cu">
-      <Filter>Data\Lattice</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu">
       <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Boundary\CBoundaryCondition.cu">
-      <Filter>Data\Boundary</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <Filter>Data\Lattice</Filter>
@@ -382,6 +391,15 @@
     </CudaCompile>
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu">
       <Filter>Tools\Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.cu">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu">
+      <Filter>Data\Boundary</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

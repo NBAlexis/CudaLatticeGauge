@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CIndexSquare)
+
 /**
 * manipulate site
 */
@@ -70,27 +72,22 @@ SSmallInt4 _deviceMoveSquareSite(SSmallInt4 ret, SBYTE dir)
 
 class CLGAPI CIndexSquare : public CIndex
 {
+    __CLGDECLARE_CLASS(CIndexSquare)
+
 public:
-    __device__ CIndexSquare(class deviceBoundaryCondition * devicePtr) : CIndex(devicePtr) { ; }
+    CIndexSquare() : CIndex() { }
 
     /**
-    * To be discarded..
-    * 
+    * To bake the index array, the volumn is \prod _i (li + 2 * depth)
+    * So we need to re calculate the thread decompose.
+    * For simplicity, we just decompse using threadIdx.x and blockIdx.x
+    * The return value is thread per block
     */
-    __device__ virtual void _deviceGetPlaquttesAtLink(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiLinkIndex, BYTE st = kSpaceTime) const;
-    __device__ virtual void _deviceGetPlaquttesAtSite(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiSiteIndex, BYTE st = kSpaceTime) const;
-    __device__ virtual void _deviceGetPlaquttesAtLinkAll(SIndex* retV, UINT uiLinkIndex) const;
-    __device__ virtual void _deviceGetPlaquttesAtSiteAll(SIndex* retV, UINT uiSiteIndex) const;
+    static UINT GetDecompose(UINT volumn);
 
-    __device__ virtual void _deviceGetPlaqutteCountLength(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
-    {
-        plaqLength = 4;
-        countPerSite = static_cast<BYTE>(_DC_Dim * (_DC_Dim - 1) / 2);
-        countPerLink = static_cast<BYTE>(2 * (_DC_Dim - 1));
-    }
-
-    __device__ virtual SIndex _deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, SBYTE uiWalkDir) const;
-    __device__ virtual SIndex _deviceGaugeIndexWalk(UINT uiSiteIndex, SBYTE uiWalkDir) const;
+    virtual void BakeAllIndexBuffer(class CIndexData* pData);
+    virtual void BakePlaquttes(class CIndexData* pData, BYTE byFieldId);
+    virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId);
 };
 
 __END_NAMESPACE

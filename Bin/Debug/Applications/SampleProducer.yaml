@@ -8,8 +8,8 @@ ShowParameterContent : 0
 Dim : 4
 Dir : 4
 LatticeLength : [8, 8, 8, 16]
-LatticeIndex : EIndexType_Square
-LatticeBoundary : EBC_TorusSquare
+LatticeIndex : CIndexSquare
+LatticeBoundary : CBoundaryConditionTorusSquare
 RandomType : ER_Schrage
 RandomSeedType : ERST_Timestamp
 RandomSeed : 7654321
@@ -31,8 +31,8 @@ BuildGauge:
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 16]
-    LatticeIndex : EIndexType_Square
-    LatticeBoundary : EBC_TorusSquare
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     RandomType : ER_Schrage
     RandomSeedType : ERST_Timestamp
     RandomSeed : 7654321

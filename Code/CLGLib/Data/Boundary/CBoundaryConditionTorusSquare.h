@@ -13,20 +13,19 @@
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CBoundaryConditionTorusSquare : public deviceBoundaryCondition
+__CLG_REGISTER_HELPER_HEADER(CBoundaryConditionTorusSquare)
+
+class CLGAPI CBoundaryConditionTorusSquare : public CBoundaryCondition
 {
+    __CLGDECLARE_CLASS(CBoundaryConditionTorusSquare)
 
 public:
 
-    __device__ CBoundaryConditionTorusSquare();
+    CBoundaryConditionTorusSquare();
 
-    __device__ virtual SIndex _devcieGetMappedIndex(const SSmallInt4 &site, const SIndex &fromsite) const;
+    virtual void BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const;
 
-    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const SSmallInt4 &site, const SIndex &fromsite) const;
-
-    __device__ virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
-
-    SSmallInt4 m_FermionBC[_kMaxFieldCount];
+    virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
 };
 
 __END_NAMESPACE

@@ -1,0 +1,592 @@
+\subsection{\label{sec:RotatingFrame}Rotating Frame}
+
+The matrix element can be written as
+\begin{equation}
+\begin{split}
+&\mathcal{M}=\int \mathcal{D}(A_{\mu}\psi)\exp \left(i\int d^4x \mathcal{L}\right)
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\mathcal{L}=\bar{\psi}\left(i\slashed {D}-m\right)\psi-\frac{1}{4}\left(F^a_{\mu\nu}\right)^2\\
+&D_{\mu}=\partial _{\mu}\textcolor[rgb]{1,0,0}{+}ig_{YM}\sum _a T_aA^a_{\mu}\\
+\end{split}
+\end{equation}
+The first few steps are as usual, defining
+\begin{equation}
+\begin{split}
+&A_{\mu}=g_{YM}\sum _a T_aA^a_{\mu},\;\;F_{\mu\nu}=\partial _{\mu}A_{\nu}-\partial _{\nu}A_{\mu}+i[A_{\mu},A_{\nu}]\\
+\end{split}
+\end{equation}
+using ${\rm tr}[T_iT_j]=\frac{1}{2}\delta _{ij}$
+\begin{equation}
+\begin{split}
+&F_{\mu\nu}=g_{YM}\sum _aT^a F^a_{\mu\nu}\\
+&\frac{1}{4}\left(F^a_{\mu\nu}\right)^2=\frac{1}{2g_{YM}^2}{\rm tr}\left[F_{\mu\nu}^2\right]\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\mathcal{L}=\bar{\psi}\left(i\slashed {D}-m\right)\psi-\frac{1}{2g_{YM}^2}{\rm tr}\left[F_{\mu\nu}^2\right]\\
+&D_{\mu}=\partial _{\mu}+iA_{\mu}\\
+\end{split}
+\end{equation}
+
+For rotational frame, the metric and frame can be defined as
+\begin{equation}
+\begin{split}
+&h_{\mu\nu}=\left(\begin{array}{cccc} 1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right)\\
+&g_{\mu\nu}=\left(\begin{array}{cccc} 1-r^2\Omega^2 & y\Omega & -x\Omega & 0 \\ y\Omega & -1 & 0 & 0 \\ -x\Omega & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-g_{\mu\nu}}=1\\
+&e_0=(1,y\Omega,-x\Omega,0)\\
+&e_1=(0,1,0,0)\\
+&e_2=(0,0,1,0)\\
+&e_3=(0,0,0,1)\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:RotatingGaugeAction}The rotating gauge action}
+
+Considering the case of pure gauge, the action can be written as
+\begin{equation}
+\begin{split}
+&\mathcal{L}_G=-\sqrt{\det (-g_{\alpha \beta})}\frac{1}{2g_{YM}^2}g^{\mu\nu}g^{\rho\sigma }{\rm tr}[F_{\mu\rho}F_{\nu\sigma}]\\
+&=-\frac{1}{2g_{YM}^2}\left(\sum _{ijkl=0}^3 h_{ij}h_{kl}{\rm tr}[F_{ik}F_{jl}]+2\Omega^2 {\rm tr}\left[(x F_{01}+y F_{02})^2+r^2 F_{03}^2\right]\right.\\
+&\left.-4\Omega\left(x {\rm tr}[F_{01}F_{12}]+y {\rm tr}[F_{02}F_{12}]+y {\rm tr}[F_{03}F_{13}]-x {\rm tr}[F_{03}F_{23}]\right)\right)
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Wick rotation of gauge action
+\end{itemize}
+
+The Wick rotation
+\begin{equation}
+\begin{split}
+&t\to -i\tau,\;\;\Omega \to i\Omega ,\;\;A_{\mu}\to (iA_0,A_1,A_2,A_3),\;\;F_{0i}\to iF_{0i}\\
+\end{split}
+\end{equation}
+and substitute $x=(t,x,y,z)\to x_E=(x,y,z,\tau)$. After Wick rotation, we are expecting
+\begin{equation}
+\begin{split}
+&\exp(-S_G)=\exp (i\int d^4 x \mathcal{L}_G)
+\end{split}
+\end{equation}
+the result is
+\begin{equation}
+\begin{split}
+&-S_G=i\int d^4 x\mathcal{L}_G\\
+&S_G=\int d^4 x_E \frac{1}{2g_{YM}^2}\left(\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]+2\Omega^2 {\rm tr}\left[(x F_{14}+y F_{24})^2+r^2 F_{34}^2\right]\right.\\
+&\left.+4\Omega\left(x {\rm tr}[F_{14}F_{12}]+y {\rm tr}[F_{24}F_{12}]+y {\rm tr}[F_{34}F_{13}]-x {\rm tr}[F_{34}F_{23}]\right)\right)
+\end{split}
+\end{equation}
+
+Therefor $S_G$ is real. The $\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]$ is the gauge action in rest frame.
+
+\begin{itemize}
+  \item Discretization of gauge action
+\end{itemize}
+
+The discretized version can be derived using compact gauge group
+\begin{equation}
+\begin{split}
+&U_{\mu}(x)=\exp (i a A_{\mu}(x)),\;\;U_{-\mu}(x)=U_{\mu}^{-1}(x-\mu).
+\end{split}
+\end{equation}
+
+As usual,
+\begin{equation}
+\begin{split}
+&U_{\mu, \nu}(n)\equiv U_{\mu}(n)U_{\nu}(n+a\mu)U^{-1}_{\mu}(n+a\nu)U^{-1}_{\nu}(n)=\exp (ia^2 F_{\mu\nu}+\mathcal{O}(a^3)).\\
+&{\rm Re}\left[U_{\mu \nu}(n)\right]=\mathbb{I}_{N_c\times N_c}-\frac{a^4}{2}F_{\mu\nu}^2+\mathcal{O}(a^6)\\
+&\frac{1}{2g_{YM}^2}\sum _{\mu\neq \nu}{\rm tr}[F_{\mu\nu}^2]=\frac{1}{a^4g_{YM}^2}\sum _{\mu\neq \nu}{\rm Retr}\left[1-U_{\mu \nu}(n)\right]=\frac{2}{a^4g_{YM}^2}\sum _{\mu> \nu}{\rm Retr}\left[1-U_{\mu \nu}(n)\right]
+\end{split}
+\end{equation}
+
+For those plaquette with coordinate as coefficients, we use the average of plaquette
+\begin{equation}
+\begin{split}
+&\bar{U}_{\mu, \nu}(n)\equiv \frac{1}{4}\left(U_{\mu, \nu}(n)+U_{-\mu ,\nu}(n)+U_{\mu, -\nu}(n)+U_{-\mu, -\nu}(n)\right)\\
+&{\rm Retr}[\bar{U}_{\mu, \nu}(n)]=N_c-\frac{a^4}{2}{\rm tr}[F_{\mu\nu}^2]+\mathcal{O}(a^6),\;\;\frac{1}{2g_{YM}^2}{\rm tr}[F_{\mu\nu}^2]=\frac{2}{a^4g_{YM}^2}\frac{1}{2}{\rm Retr}[1-\bar{U}_{\mu, \nu}(n)]\\
+\end{split}
+\end{equation}
+
+The remaining are those has the form ${\rm tr}[F_{ab}F_{bc}]$, using
+\begin{equation}
+\begin{split}
+&U_{\mu\nu}^{-1}(n)=U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)U^{-1}_{\mu}(n)=U_{\nu\mu}(n)=\exp (-ia^2 F_{\mu\nu})+\mathcal{O}(a^6)\\
+&U_{a,b}(n)(U_{b,c}(n)-U_{c,b}(n))=\exp (-ia^2 (F_{ab}+F_{bc}))-\exp (-ia^2 (F_{ab}-F_{bc}))\\
+&\frac{1}{2}{\rm Re}\left[U_{a,b}(n)(U_{c,b}(n)-U_{b,c}(n))\right]=a^4F_{ab}F_{bc}+\mathcal{O}(a^6)\\
+\end{split}
+\end{equation}
+Note that $b$ is not summed.
+
+We can have a more symmetric form to use
+\begin{equation}
+\begin{split}
+&U_{c,b}(n)=U_{b,-c}(n)+\mathcal{O}(a^4)\\
+\end{split}
+\end{equation}
+then it is a chair-type.
+\begin{equation}
+\begin{split}
+&\frac{1}{2}{\rm Re}\left[U_{a,b}(n)(U_{b,-c}(n)-U_{b,c}(n))\right]=a^4F_{ab}F_{bc}+\mathcal{O}(a^6)\\
+\end{split}
+\end{equation}
+Similarly, we can use the average of chairs, and define
+\begin{equation}
+\begin{split}
+&V_{\mu\nu\sigma}=\frac{1}{8}\left((U_{\mu,\nu}-U_{-\mu,\nu})(U_{\nu,\sigma}-U_{\nu,-\sigma})+(U_{\mu,-\nu}-U_{-\mu,-\nu})(U_{-\nu,\sigma}-U_{-\nu,-\sigma})\right)\\
+&{\rm Retr}[V_{\mu\nu\rho}]=-a^4{\rm tr}\left[F_{\mu\nu}F_{\nu\rho}\right]+\mathcal{O}(a^6),\;\;\frac{1}{2g_{YM}^2}{\rm tr}\left[F_{\mu\nu}F_{\nu\rho}\right]=-\frac{2}{a^4g_{YM}^2}\frac{1}{4}{\rm Retr}[V_{\mu\nu\rho}]\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Finial result of gauge action
+\end{itemize}
+
+The discretized and Wick rotated gauge action is
+\begin{equation}
+\begin{split}
+&S_G=\frac{2}{a^4g_{YM}^2}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{14}(n)]+y^2{\rm Retr}[1-\bar{U}_{24}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]+xy{\rm Retr}[V_{142}]\right)\\
+&=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{14}(n)]+y^2{\rm Retr}[1-\bar{U}_{24}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]+xy{\rm Retr}[V_{142}]\right)\\
+\end{split}
+\end{equation}
+with $\frac{\beta}{N_c} \equiv \frac{2}{a^4g_{YM}^2}$.
+
+\subsubsection{\label{sec:RotatingFermionAction}Rotating Fermion action}
+
+\begin{equation}
+\begin{split}
+&D_R=\left[i\gamma ^{\mu}\left((\partial _{\mu}+ieA_{\mu})-\frac{i}{4}\sigma ^{ij}w_{\mu ij}\right)-m\right]
+\end{split}
+\end{equation}
+
+with
+\begin{equation}
+\begin{split}
+&w_{\mu ij}=g_{\alpha \beta}e_i^{\alpha}(\partial _{\mu}e_j^{\beta}+\Gamma ^{\beta}_{\mu\nu}e_j^{\nu})\\
+&\Gamma ^{\beta}_{\mu\nu}=\frac{1}{2}g^{\beta \alpha}\left(\frac{\partial g _{\alpha \mu}}{\partial x ^{\nu}}+\frac{\partial g _{\alpha \nu}}{\partial x ^{\mu}}-\frac{\partial g_{\mu\nu}}{\partial x^{\alpha}}\right)\\
+&\sigma ^{ij}=\frac{i}{2}[\gamma ^i,\gamma ^j]\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&\frac{i}{4}\sigma ^{ij}w_{\mu ij}=\left(\frac{i}{2}\Omega \sigma ^{12},0,0,0\right)\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&D_R=\left[i\gamma ^x (\partial _x+ieA_x)+i\gamma ^y (\partial _y+ieA_y)+i\gamma ^z (\partial _z+ieA_z)+i\gamma ^t (\partial _t+ieA_t-\frac{i}{2}\Omega \sigma ^{12})-m\right]\\
+\end{split}
+\end{equation}
+
+using $\gamma ^{\mu}=\gamma ^i e_i^{\mu}$, it is
+\begin{equation}
+\begin{split}
+&D_R=\left[i(\gamma ^1+y\Omega \gamma^0) (\partial _x+ieA_x)+i(\gamma ^2-x\Omega \gamma^0) (\partial _y+ieA_y)+i\gamma ^3 (\partial _z+ieA_z)\right.\\
+&\left.+i\gamma ^0 (\partial _t+ieA_t-\frac{i}{2}\Omega \sigma ^{12})-m\right]\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item The Wick rotation of Fermion action
+\end{itemize}
+
+The Wick rotation
+\begin{equation}
+\begin{split}
+&t\to -i\tau,\;\;\gamma _i^{M}\to i\gamma _i^{E},\;\;\gamma _4=\gamma _0,\;\;\gamma _5=\gamma _1\gamma _2\gamma _3\gamma _4,\;\;A_t\to i A_{\tau},\;\;\partial _t\to i\partial _{\tau},\;\;\Omega \to i\Omega
+\end{split}
+\end{equation}
+where the superscript of gamma matrix stands for Minkowski or Euclidian. So
+\begin{equation}
+\begin{split}
+&D_R=-\left[(\gamma _1+y\Omega \gamma_4) (\partial _x+ieA_x)+(\gamma _2-x\Omega \gamma_4) (\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)\right.\\
+&\left.+\gamma _4 (\partial _{\tau}+ieA_{\tau}-\frac{i}{2}\Omega \sigma ^{12})+m\right]\\
+&=-\left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
+&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)-\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right]\\
+\end{split}
+\end{equation}
+And
+\begin{equation}
+\begin{split}
+&-S_F=i\int d^4 x \sqrt{-g_{\alpha \beta}}\bar{\psi } D_R \psi\\
+&S_F=\int d^4 x_E \bar{\psi } \left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
+&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)-\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right] \psi\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item The discretization of Fermion action
+\end{itemize}
+
+The naive discretization yields
+\begin{equation}
+\begin{split}
+&\partial _{\mu}\psi(n) =\frac{\psi (n+a\mu)-\psi (n-a\mu)}{2a}\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&U_{\mu}(n)=\exp(iaA_{\mu})\approx 1+iaA_{\mu}(n),\;\;U^{-1}_{\mu}(n)\approx 1-iaA_{\mu}(n)\\
+&iA_{\mu}(n)=\frac{2iaA_{\mu}(n)}{2a}\approx \frac{(U_{\mu}(n)-1)-(U^{-1}_{\mu}(n)-1)}{2a}\approx \frac{(U_{\mu}(n)-1)-(U_{-\mu}(n)-1)}{2a}\\
+&iA_{\mu}(n)\psi(n)= \frac{(U_{\mu}(n)-1)\psi(n+a\mu)-(U_{-\mu}(n)-1)\psi(n-a\mu)}{2a}+\mathcal{O}(a)\\
+\end{split}
+\end{equation}
+Therefor
+\begin{equation}
+\begin{split}
+&(\partial _{\mu}+iA_{\mu})\psi(n)= \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a}+\mathcal{O}(a)\\
+\end{split}
+\end{equation}
+
+The Wilson term is
+\begin{equation}
+\begin{split}
+&W\psi (n)= -\sum _{\mu}\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi(n)}{2a}\\
+\end{split}
+\end{equation}
+considering the rotation, we add a modified Wilson term as
+\begin{equation}
+\begin{split}
+&W_R\psi (n)= -\sum _{\mu}\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi(n)}{2a}\\
+&-y\Omega \frac{U_{x}(n)\psi(n+ax)+U_{-x}(n)\psi(n-ax)-2\psi(n)}{2a}\\
+&+x\Omega \frac{U_{y}(n)\psi(n+ay)+U_{-y}(n)\psi(n-ay)-2\psi(n)}{2a}
+\end{split}
+\end{equation}
+Similar as the Wilson term, the last two terms also decouples when approaching the continuum limit. And the Wilson-Dirac operator becomes
+\begin{equation}
+\begin{split}
+&S_F=\sum _{n,m}\bar{\psi }(n) D_W(n|m) \psi(m)\\
+&D_W(n|m)=\left(m+\frac{4}{a}+\frac{y\Omega}{a}-\frac{x\Omega}{a}\right)\delta _{n,m}-\sum _{\mu}\frac{(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}}{2a}\\
+&-y\Omega \frac{(1-\gamma _4)U_{x}(n)\delta _{n+ax,m}+(1+\gamma _4)U_{-x}(n)\delta _{n-ax,m}}{2a}\\
+&+x\Omega \frac{(1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}}{2a} -\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
+\end{split}
+\end{equation}
+Note that,
+\begin{equation}
+\begin{split}
+&\left(U(1)\delta _{n+1,m,n=1,m=2}\right)^{\dagger}=U^{\dagger}(1)\delta _{n,m+1,n=2,m=1}=U^{\dagger}(m)\delta _{n,m+1}\;or\;U^{\dagger}(n-1)\delta _{n-1,m}\\
+&\left(U_{\mu}(n)\delta _{n+a\mu,m}\right)^{\dagger}=U_{\mu}^{-1}(n-a\mu)\delta _{n,m+a\mu}=U_{-\mu}(n)\delta _{n-a\mu,m}\\
+\end{split}
+\end{equation}
+Let's check whether the periodic condition for gauge field or infinite lattice volume is necessary
+\begin{equation}
+\begin{split}
+&\sum _{n=1,2,3,m=1,2,3}\left(U_{\mu}(n)\delta _{n+1,m}+U_{-\mu}(n)\delta _{n-1,m}\right)^{\dagger}=\left(U_{\mu}(1)\right)^{\dagger}+\left(U_{\mu}(2)\right)^{\dagger}+\left(U_{-\mu}(2)\right)^{\dagger}+\left(U_{-\mu}(3)\right)^{\dagger}\\
+&=U_{\mu}^{-1}(2-1)+U^{-1}_{\mu}(3-1)+\left(U^{-1}_{\mu}(1)\right)^{\dagger}+\left(U^{-1}_{\mu}(2)\right)^{\dagger}\\
+&=U_{-\mu}(2)+U_{-\mu}(3)+U_{\mu}(1)+U_{\mu}(2)\\
+&=\sum _{n=1,2,3,m=1,2,3}\left(U_{\mu}(n)\delta _{n+1,m}+U_{-\mu}(n)\delta _{n-1,m}\right)
+\end{split}
+\end{equation}
+So we can conclude \textcolor[rgb]{0,0,1}{The $\gamma _5$-hermiticity is kept with arbitrary boundary condition and finite volume.}
+
+\textcolor[rgb]{0,0,1}{Both the naive discretization and the Wilson term satisfy the $\gamma _5$-hermiticity (separately).}
+\begin{equation}
+\begin{split}
+&\gamma _5 \gamma _{\nu}\gamma _5=-\gamma _{\nu},\;\;\gamma _{\mu}^{\dagger}=\gamma _{\nu},\;\;\gamma _5^2=1\\
+&\sum _{n,m}\left(\gamma _{\nu}U_{\mu}(n)\delta _{n+a\mu,m}-\gamma _{\nu}U_{-\mu}(n)\delta _{n,m+a\mu}\right)^{\dagger}=\sum _{n,m}\left(\gamma _5\gamma _{\nu}\gamma _5U_{\mu}(n)\delta _{n+a\mu,m}-\gamma _5\gamma _{\nu}\gamma _5U_{-\mu}(n)\delta _{n-a\mu,m}\right)\\
+&\sum _{n,m}\left(U_{\mu}(n)\delta _{n+a\mu,m}+U_{-\mu}(n)\delta _{n,m+a\mu}\right)^{\dagger}=\sum _{n,m}\left(\gamma _5^2U_{\mu}(n)\delta _{n+a\mu,m}+\gamma _5^2U_{-\mu}(n)\delta _{n-a\mu,m}\right)\\
+\end{split}
+\end{equation}
+Apart from that
+\begin{equation}
+\begin{split}
+&\left(\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\right)^{\dagger}=\gamma _5 \frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m} \gamma _5\\
+\end{split}
+\end{equation}
+Therefor, the new Wilson-Dirac operator is also $\gamma _5$-hermiticity.
+
+\begin{itemize}
+  \item The doubler problem
+\end{itemize}
+
+Note that the naive action and Wilson term both satisfy the $\gamma _5$-hermiticity, the traditional Wilson term will also lead to a $\gamma _5$-hermiticity fermion action, with
+\begin{equation}
+\begin{split}
+&D_W(n|m)=\left(m+\frac{4}{a}\right)\delta _{n,m}-\sum _{\mu}\frac{(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}}{2a}\\
+&+y\Omega \frac{\gamma _4U_{x}(n)\delta _{n+ax,m}-\gamma _4U_{-x}(n)\delta _{n-ax,m}}{2a}-x\Omega \frac{\gamma _4U_{y}(n)\delta _{n+ay,m}-\gamma _4U_{-y}(n)\delta _{n-ay,m}}{2a} -\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
+\end{split}
+\end{equation}
+This action also does not suffer from the doubler problem.
+
+\begin{itemize}
+  \item The final action of fermions
+\end{itemize}
+
+As usual, we define the hopping parameter as $\kappa = \frac{1}{2am+8}$, then rescale the fermion field, the action is
+\begin{equation}
+\begin{split}
+&S_F=\sum _{n,m}\bar{\psi }(n) D_W(n|m) \psi(m)\\
+&D_W(n|m)=\left(1+2\kappa(y-x)\Omega\right)\delta _{n,m}-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}\right)\\
+&-\kappa y\Omega \left((1-\gamma _4)U_{x}(n)\delta _{n+ax,m}+(1+\gamma _4)U_{-x}(n)\delta _{n-ax,m}\right)\\
+&+\kappa x\Omega \left((1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}\right) -\kappa i\gamma _4a\Omega \sigma ^{12}\delta _{n,m}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:TheFinalActionOfRotation}The final action of rotation}
+
+Defining $\frac{\beta}{N_c} \equiv \frac{2}{a^4g_{YM}^2}$, $\kappa \equiv \frac{1}{2am+8}$, $\hat{\mu}\equiv \frac{\mu}{a}$, $\hat{\Omega}\equiv a\Omega$, we have
+\begin{equation}
+\begin{split}
+&Z=\exp (-S_G-S_F)\\
+\end{split}
+\end{equation}
+with
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&S_G=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\hat{\Omega}\left(\hat{x}{\rm Retr}[V_{412}+V_{432}]-\hat{y}{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\hat{\Omega}^2(\hat{x}^2{\rm Retr}[1-\bar{U}_{14}(n)]+\hat{y}^2{\rm Retr}[1-\bar{U}_{24}(n)]+(\hat{x}^2+\hat{y}^2){\rm Retr}[1-\bar{U}_{34}(n)]+\hat{x}\hat{y}{\rm Retr}[V_{142}]\right)\\
+&U_{\mu, \nu}(n)\equiv U_{\mu}(n)U_{\nu}(n+a\hat{\mu})U^{-1}_{\mu}(n+a\hat{\nu})U^{-1}_{\nu}(n)\\
+&\bar{U}_{\mu, \nu}(n)\equiv \frac{1}{4}\left(U_{\mu, \nu}(n)+U_{-\mu ,\nu}(n)+U_{\mu, -\nu}(n)+U_{-\mu, -\nu}(n)\right)\\
+&V_{\mu\nu\sigma}(n)=\frac{1}{8}\left((U_{\mu,\nu}(n)-U_{-\mu,\nu}(n))(U_{\nu,\sigma}(n)-U_{\nu,-\sigma}(n))\right.\\
+&\left.+(U_{\mu,-\nu}(n)-U_{-\mu,-\nu}(n))(U_{-\nu,\sigma}(n)-U_{-\nu,-\sigma}(n))\right)\\
+\end{split}
+\end{equation}
+}
+and
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
+&D(n|m)=\left(1+2\kappa(\hat{y}-\hat{x})\hat{\Omega}-i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
+&-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
+&-\kappa \hat{y}\hat{\Omega} \left((1-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(1+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
+&+\kappa \hat{x}\hat{\Omega} \left((1-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(1+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
+\end{split}
+\end{equation}
+}
+such that $\gamma _5 D \gamma _5=D^{\dagger}$.
+
+\subsubsection{\label{sec:ForceFromGaugeAction}The force from gauge action}
+
+\begin{equation}
+\begin{split}
+&U_{\mu, \nu}(n)= U_{\mu}(n)U_{\nu}(n+a\mu)U^{-1}_{\mu}(n+a\nu)U^{-1}_{\nu}(n).\;\;U^{\dagger}_{\mu, \nu}(n)=U^{-1}_{\mu, \nu}(n)\\
+&U^{-1}_{\mu, \nu}(n)=U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)U^{-1}_{\mu}(n)=U_{\nu, \mu}(n).\\
+&{\rm tr}[U_{\nu, \mu}(n)]= {\rm tr}\left[U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)U^{-1}_{\mu}(n)\right].\\
+&{\rm tr}[U_{-\mu, \nu}(n)]= {\rm tr}\left[U_{\nu}(n-a\mu)U^{-1}_{-\mu}(n+a\nu+a\mu-a\mu)U^{-1}_{\nu}(n)U_{-\mu}(n)\right]\\
+&={\rm tr}\left[U_{\nu}(n-a\mu)U_{\mu}(n+a\nu-a\mu)U^{-1}_{\nu}(n)U^{-1}_{\mu}(n-a\mu)\right]={\rm tr}[U_{\nu, \mu}(n-a\mu)]={\rm tr}[U^{\dagger}_{\mu, \nu}(n-a\mu)]\\
+&{\rm tr}[U_{\mu, -\nu}(n)]={\rm tr}[U^{\dagger}_{-\nu, \mu}(n)]=({\rm tr}[U_{-\nu, \mu}(n)])^*=({\rm tr}[U_{\mu, \nu}(n-a\nu)])^*={\rm tr}[U^{\dagger}_{\mu, \nu}(n-a\nu)]\\
+&{\rm tr}[U_{-\mu, -\nu}(n)]={\rm tr}[U_{\mu, \nu}(n-a\mu-a\nu)]
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&{\rm Retr}[\bar{U}_{\mu, \nu}(n)]=\frac{1}{4}{\rm Retr}[U_{\mu\nu}(n)+U_{\mu\nu}(n-a\mu)+U_{\mu\nu}(n-a\nu)+U_{\mu\nu}(n-a\mu-a\nu)]\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\sum _n f(n){\rm Retr}[1-\bar{U}_{\mu, \nu}(n)]=\sum _n\frac{f(n)+f(n+a\mu)+f(n+a\nu)+f(n+a\mu+a\nu)}{4}{\rm Retr}[1-U_{\mu\nu}(n)]\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&\sum _n \hat{\Omega}^2\hat{x}^2{\rm Retr}[1-\bar{U}_{1, 4}(n)]=\sum _n\hat{\Omega}^2\frac{2\hat{x}^2+2\hat{x}+1}{2}{\rm Retr}[1-U_{1,4}(n)]\\
+&\sum _n \hat{\Omega}^2\hat{y}^2{\rm Retr}[1-\bar{U}_{2, 4}(n)]=\sum _n\hat{\Omega}^2\frac{2\hat{y}^2+2\hat{y}+1}{2}{\rm Retr}[1-U_{2,4}(n)]\\
+&\sum _n \hat{\Omega}^2(\hat{x}^2+\hat{y}^2){\rm Retr}[1-\bar{U}_{3, 4}(n)]=\sum _n\hat{\Omega}^2(\hat{x}^2+\hat{y}^2){\rm Retr}[1-U_{3,4}(n)]\\
+\end{split}
+\end{equation}
+Using
+\begin{equation}
+\begin{split}
+&{\rm Retr}[U_{\mu,\nu}(n-a\nu)]={\rm Retr}[U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)U^{-1}_{\mu}(n)U^{-1}_{\nu}(n-a\nu)]\\
+&={\rm Retr}[U_{\nu}(n-a\nu)U_{\mu}(n)U^{-1}_{\nu}(n+a\mu-a\nu)U^{-1}_{\mu}(n-a\nu)]\\
+&={\rm Retr}[U_{\mu}(n)U^{-1}_{\nu}(n+a\mu-a\nu)U^{-1}_{\mu}(n-a\nu)U_{\nu}(n-a\nu)]\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&\sum _ng(n){\rm Retr}[1-U_{\mu,\nu}(n)]=N\times N_c-\sum _n {\rm Retr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
+&\Sigma _{\mu,i}(n,\nu)=g_i(n)U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)+g_i(n-a\nu)U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)\\
+\end{split}
+\end{equation}
+The product is just same as the definition of staples. However, there are two differences, (i) there is a coefficient function for each term of the sum. (ii) there is no sum over $\nu$.
+
+The following is usual, with the new definition of the staple, one have
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=-\frac{\beta}{2N_c}\left\{U_{\mu}(n)\Sigma _{\mu,i}^{\dagger}(n,\nu)\right\}_{TA}
+\end{split}
+\end{equation}
+with $i=1,2,3$ and
+\begin{equation}
+\begin{split}
+&g_1(n)=\frac{\Omega^2(2x^2+2x+1)}{2},\;\;g_2(n)=\frac{\Omega ^2 (2y^2+2y+1)}{2},\;\;g_3(n)=\Omega ^2 (x^2+y^2),\\
+&F_{\mu=1,2,3}(n)=-\frac{\beta}{2N_c}\left\{U_{\mu}(n)\Sigma _{\mu,\mu}^{\dagger}(n,4)\right\}_{TA}\\
+&F_{4}(n)=-\frac{\beta}{2N_c}\left\{U_{4}(n)\sum _{i=1,2,3}\Sigma _{4,i}^{\dagger}(n,i)\right\}_{TA}\\
+\end{split}
+\end{equation}
+
+Now we consider the force of $V$
+\begin{equation}
+\begin{split}
+&V_{\mu\nu\sigma}=\frac{1}{8}\left(U_{\mu,\nu}U_{\nu,\sigma}+U_{-\mu,\nu}U_{\nu,-\sigma}+U_{\mu,-\nu}U_{-\nu,\sigma}+U_{-\mu,-\nu}U_{-\nu,-\sigma}\right.\\
+&\left.-U_{\mu,\nu}U_{\nu,-\sigma}-U_{-\mu,\nu}U_{\nu,\sigma}-U_{\mu,-\nu}U_{-\nu,-\sigma}-U_{-\mu,-\nu}U_{-\nu,\sigma}\right)\\
+\end{split}
+\end{equation}
+Using
+\begin{equation}
+\begin{split}
+&{\rm Retr}[U_{\mu,\nu}U_{\nu,\sigma}]={\rm Retr}[U_{\sigma,\nu}U_{\nu,\mu}],\;\;{\rm Retr}[U_{\mu,\nu}U_{\nu,-\sigma}]={\rm Retr}[U_{-\sigma,\nu}U_{\nu,\mu}]
+\end{split}
+\end{equation}
+one have
+\begin{equation}
+\begin{split}
+&{\rm Retr}[V_{\mu\nu\rho}]={\rm Retr}[V_{\rho\nu\mu}]
+\end{split}
+\end{equation}
+So we only need to calculate $\frac{\partial }{\partial \omega _{\mu}}V_{\mu\nu\rho}$ and $\frac{\partial }{\partial \omega _{\nu}}V_{\mu\nu\rho}$.
+
+One can find
+\begin{equation}
+\begin{split}
+&\sum _n{\rm Retr}[g(n)V_{\mu\nu\rho}(n)]\to S[U_{\mu}(n)]={\rm Retr}[U_{\mu}(n)M(n)]
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&M(n)=\frac{1}{8}\left((g(n)+g(n+a\nu))U_{\nu}(n+a\mu)U_{\mu}^{-1}(n+a\nu)U_{\rho}(n+a\nu)U_{\nu}^{-1}(n+a\rho)U_{\rho}^{-1}(n)\right.\\
+&\left.+(g(n)+g(n-a\nu))U^{-1}_{\nu}(n+a\mu-a\nu)U_{\mu}^{-1}(n-a\nu)U_{\rho}(n-a\nu)U_{\nu}(n-a\nu+a\rho)U_{\rho}^{-1}(n)\right.\\
+&\left.+(g(n+a\mu-a\nu)+g(n+a\mu))U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}^{-1}(n+a\mu-a\rho-a\nu)\right.\\
+&\left.\times U_{\rho}(n+a\mu-a\rho-a\nu)U^{-1}_{\mu}(n-a\nu)U_{\nu}(n-a\nu)\right.\\
+&\left.+(g(n+a\mu+a\nu)+g(n+a\mu))U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}(n+a\mu-a\rho)\right.\\
+&\left.\times U_{\rho}(n+a\mu-a\rho+a\nu)U_{\mu}^{-1}(n+a\nu)U_{\nu}^{-1}(n)\right.\\
+&\left.-(g(n+a\mu)+g(n+a\mu+a\nu))U_{\rho}(n+a\mu)U_{\nu}(n+a\mu+a\rho)U_{\rho}^{-1}(n+a\mu+a\nu)U_{\mu}^{-1}(n+a\nu)U_{\nu}^{-1}(n)\right.\\
+&\left.-(g(n+a\mu)+g(n+a\mu-a\nu))U_{\rho}(n+a\mu)U_{\nu}^{-1}(n+a\mu+a\rho-a\nu)\right.\\
+&\left.\times U_{\rho}^{-1}(n+a\mu-a\nu)U_{\mu}^{-1}(n-a\nu)U_{\nu}(n-a\nu)\right.\\
+&\left.-(g(n)+g(n+a\nu))U_{\nu}(n+a\mu)U_{\mu}^{-1}(n+a\nu)U_{\rho}^{-1}(n+a\nu-a\rho)U_{\nu}^{-1}(n-a\rho)U_{\rho}(n-a\rho)\right.\\
+&\left.-(g(n)+g(n-a\nu))U_{\nu}^{-1}(n+a\mu-a\nu)U_{\mu}^{-1}(n-a\nu)U_{\rho}^{-1}(n-a\nu-a\rho)U_{\nu}(n-a\nu-a\rho)U_{\rho}(n-a\rho)\right)
+\end{split}
+\end{equation}
+It can be simplified as
+\begin{equation}
+\begin{split}
+&M(n)=\frac{1}{8}\left((g(n)+g(n+a\nu))U_{\nu}(n+a\mu)U_{\mu}^{-1}(n+a\nu)S_1\right.\\
+&\left.+(g(n)+g(n-a\nu))U^{-1}_{\nu}(n+a\mu-a\nu)U_{\mu}^{-1}(n-a\nu)S_2\right.\\
+&\left.+(g(n+a\mu)+g(n+a\mu+a\nu))S_3U_{\mu}^{-1}(n+a\nu)U_{\nu}^{-1}(n)\right.\\
+&\left.+(g(n+a\mu)+g(n+a\mu-a\nu))S_4U^{-1}_{\mu}(n-a\nu)U_{\nu}(n-a\nu)\right)\\
+&S_1=U_{\rho}(n+a\nu)U_{\nu}^{-1}(n+a\rho)U_{\rho}^{-1}(n)-U_{\rho}^{-1}(n+a\nu-a\rho)U_{\nu}^{-1}(n-a\rho)U_{\rho}(n-a\rho)\\
+&S_2=U_{\rho}(n-a\nu)U_{\nu}(n-a\nu+a\rho)U_{\rho}^{-1}(n)-U_{\rho}^{-1}(n-a\nu-a\rho)U_{\nu}(n-a\nu-a\rho)U_{\rho}(n-a\rho)\\
+&S_3=U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}(n+a\mu-a\rho)U_{\rho}(n+a\mu-a\rho+a\nu)\\
+&-U_{\rho}(n+a\mu)U_{\nu}(n+a\mu+a\rho)U_{\rho}^{-1}(n+a\mu+a\nu)\\
+&S_4=U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}^{-1}(n+a\mu-a\rho-a\nu)U_{\rho}(n+a\mu-a\rho-a\nu)\\
+&-U_{\rho}(n+a\mu)U_{\nu}^{-1}(n+a\mu+a\rho-a\nu)U_{\rho}^{-1}(n+a\mu-a\nu)
+\end{split}
+\end{equation}
+Similarly, one also have
+\begin{equation}
+\begin{split}
+&\sum _n{\rm Retr}[g(n)V_{\mu\nu\rho}(n)]\to S[U_{\nu}(n)]={\rm Retr}[U_{\nu}(n)N(n)]
+\end{split}
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+&N(n)=\frac{1}{8}\left\{(g(n+a\mu)+g(n+a\nu+a\mu))U_{\mu}(n+a\nu)T_1U_{\mu}^{-1}(n)\right.\\
+&\left.+(g(n-a\mu)+g(n+a\nu-a\mu))U_{\mu}^{-1}(n+a\nu-a\mu)T_2U_{\mu}(n-a\mu)\right.\\
+&\left.+(g(n+a\rho)+g(n+a\nu+a\rho))U_{\rho}(n+a\nu)T_3U_{\rho}^{-1}(n)\right.\\
+&\left.+(g(n-a\rho)+g(n+a\nu-a\rho))U_{\rho}^{-1}(n+a\nu-a\rho)T_4U_{\rho}(n-a\rho)\right\},\\
+&T_1=U_{\rho}^{-1}(n+a\nu+a\mu-a\rho)U_{\nu}^{-1}(n+a\mu-a\rho)U_{\rho}(n+a\mu-a\rho)\\
+&-U_{\rho}(n+a\nu+a\mu)U_{\nu}^{-1}(n+a\mu+a\rho)U_{\rho}^{-1}(n+a\mu),\\
+&T_2=U_{\rho}(n+a\nu-a\mu)U_{\nu}^{-1}(n-a\mu+a\rho)U_{\rho}^{-1}(n-a\mu)\\
+&-U_{\rho}^{-1}(n+a\nu-a\mu-a\rho)U_{\nu}^{-1}(n-a\mu-a\rho)U_{\rho}(n-a\mu-a\rho),\\
+&T_3=U_{\mu}^{-1}(n+a\nu+a\rho-a\mu)U_{\nu}^{-1}(n+a\rho-a\mu)U_{\mu}(n+a\rho-a\mu)\\
+&-U_{\mu}(n+a\nu+a\rho)U_{\nu}^{-1}(n+a\mu+a\rho)U_{\mu}^{-1}(n+a\rho),\\
+&T_4=U_{\mu}(n+a\nu-a\rho)U_{\nu}^{-1}(n-a\rho+a\mu)U_{\mu}^{-1}(n-a\rho)\\
+&-U_{\mu}^{-1}(n+a\nu-a\mu-a\rho)U_{\nu}^{-1}(n-a\mu-a\rho)U_{\mu}(n-a\mu-a\rho),\\
+\end{split}
+\end{equation}
+
+One can further reduce the dagger operation by defining
+\begin{equation}
+\begin{split}
+&S[U_{\mu}(n)]={\rm Retr}[U_{\mu}(n)M^{\dagger}(n)],\;\; S[U_{\nu}(n)]={\rm Retr}[U_{\nu}(n)N^{\dagger}(n)]
+\end{split}
+\end{equation}
+with
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&M(n)=\frac{1}{8}\left((g(n)+g(n+a\nu))S_1U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)\right.\\
+&\left.+(g(n)+g(n-a\nu))S_2U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)\right.\\
+&\left.+(g(n+a\mu)+g(n+a\mu+a\nu))U_{\nu}(n)U_{\mu}(n+a\nu)S_3\right.\\
+&\left.+(g(n+a\mu)+g(n+a\mu-a\nu))U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)S_4\right)\\
+&S_1=U_{\rho}(n)U_{\nu}(n+a\rho)U^{-1}_{\rho}(n+a\nu)-U^{-1}_{\rho}(n-a\rho)U_{\nu}(n-a\rho)U_{\rho}(n+a\nu-a\rho)\\
+&S_2=U_{\rho}(n)U^{-1}_{\nu}(n-a\nu+a\rho)U^{-1}_{\rho}(n-a\nu)-U^{-1}_{\rho}(n-a\rho)U^{-1}_{\nu}(n-a\nu-a\rho)U_{\rho}(n-a\nu-a\rho)\\
+&S_3=U^{-1}_{\rho}(n+a\mu-a\rho+a\nu)U^{-1}_{\nu}(n+a\mu-a\rho)U_{\rho}(n+a\mu-a\rho)\\
+&-U_{\rho}(n+a\mu+a\nu)U^{-1}_{\nu}(n+a\mu+a\rho)U^{-1}_{\rho}(n+a\mu)\\
+&S_4=U^{-1}_{\rho}(n+a\mu-a\rho-a\nu)U_{\nu}(n+a\mu-a\rho-a\nu)U_{\rho}(n+a\mu-a\rho)\\
+&-U_{\rho}(n+a\mu-a\nu)U_{\nu}(n+a\mu+a\rho-a\nu)U^{-1}_{\rho}(n+a\mu)
+\end{split}
+\end{equation}
+}
+and
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&N(n)=\frac{1}{8}(N(\mu,\rho)(n)+N(\rho,\mu)(n))\\
+&N(\mu,\rho)(n)=\left\{(g(n+a\mu)+g(n+a\nu+a\mu))U_{\mu}(n)T_1U^{-1}_{\mu}(n+a\nu)\right.\\
+&\left.+(g(n-a\mu)+g(n+a\nu-a\mu))U^{-1}_{\mu}(n-a\mu)T_2U_{\mu}(n+a\nu-a\mu)\right\},\\
+&T_1=U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}(n+a\mu-a\rho)U_{\rho}(n+a\nu+a\mu-a\rho)\\
+&-U_{\rho}(n+a\mu)U_{\nu}(n+a\mu+a\rho)U^{-1}_{\rho}(n+a\nu+a\mu),\\
+&T_2=U_{\rho}(n-a\mu)U_{\nu}(n-a\mu+a\rho)U^{-1}_{\rho}(n+a\nu-a\mu)\\
+&-U^{-1}_{\rho}(n-a\mu-a\rho)U_{\nu}(n-a\mu-a\rho)U_{\rho}(n+a\nu-a\mu-a\rho),\\
+\end{split}
+\end{equation}
+}
+
+\subsubsection{\label{sec:TheForceFromFermionAction}The force from fermion action}
+
+The first step is to shift the second term to factorize $U_{\mu}(n)$ out
+\begin{equation}
+\begin{split}
+&\sum _{m,n}g(n)(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}=\sum _{m,n}g(n)(1+\gamma _{\mu})U_{\mu}^{-1}(n-a\mu)\delta _{n-a\mu,m}\\
+&=\sum _{m,n}g(n+a\mu)(1+\gamma _{\mu})U_{\mu}^{-1}(n)\delta _{n,m}\\
+\end{split}
+\end{equation}
+It is more convenient to split the $D$ operator as (note that for $yU_x$, $g(n)=y$, and $g(n)=g(n+x)$, $xU_y$ is similar.)
+\begin{equation}
+\begin{split}
+&M^a=\left\{(1-\gamma _{\mu})T^aU_{\mu}\delta _{x_L,(x+\mu)_R}-(1+\gamma _{\mu})U_{\mu}^{-1}T^a\delta _{(x+\mu)_L,x_R}\right\}\\
+&-y\Omega\delta _{\mu,x}\left\{(1-\gamma _4)T^aU_{\mu}\delta _{x_L,(x+\mu)_R}-(1+\gamma _4)U_{\mu}^{-1}T^a\delta _{(x+\mu)_L,x_R}\right\}\\
+&+x\Omega\delta _{\mu,y}\left\{(1-\gamma _4)T^aU_{\mu}\delta _{x_L,(x+\mu)_R}-(1+\gamma _4)U_{\mu}^{-1}T^a\delta _{(x+\mu)_L,x_R}\right\}\\
+&F_{pf}=2i\kappa \sum _a {\rm Im}\left[\left(\phi _1 ^{\dagger} M_a \phi _2\right)\right] T_a\\
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\phi _1=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right),\;\;\phi _2=\hat{D}^{\dagger}\phi _1,\\
+\end{split}
+\end{equation}
+similarly, with
+\begin{equation}
+\begin{split}
+&\phi_{L1}(n)=\phi _1(n),\;\;\phi _{R1}(n)=\left\{(1-\gamma _{\mu})+\left(x\Omega \delta _{\mu,y}-y\Omega \delta_{\mu,x}\right)(1-\gamma _4)\right\}\phi _2(n+\mu),\\
+&\phi_{L2}(n)=\phi _1(n+\mu),\;\;\phi _{R1}(n)=\left\{(1+\gamma _{\mu})+\left(x\Omega \delta _{\mu,y}-y\Omega \delta_{\mu,x}\right)(1+\gamma _4)\right\}\phi _2(n),\\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+&F^{pf}_{\mu}(n)=\kappa \left.\left\{U_{\mu}(n)\left(\phi _{R1}\phi _{L1}^{\dagger}+\phi _{R2}\phi _{L2}^{\dagger}\right)\right\}\right|_{TA}
+\end{split}
+\end{equation}
+
+Note that \textbf{Both the force from gauge and fermion actions are kept anti-hermitian traceless.}
+

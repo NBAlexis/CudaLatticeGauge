@@ -56,13 +56,18 @@ protected:
 
     SCLGLibManangerInitialCache m_InitialCache;
 
+    //==================================
+    //Create
+
     //Required
     void InitialLatticeAndConstant(class CParameters& params);
     void InitialRandom(class CParameters& params);
 
     //Optional
     void CreateGaugeField(class CParameters& params);
+    void CreateGaugeBoundaryField(class CParameters& params);
     void CreateFermionFields(class CParameters& params);
+    void CreateFermionBoundaryField(class CParameters& params);
     void CreateIndexAndBoundary(class CParameters& params);
     void CreateActionList(class CParameters& params);
     void CreateUpdator(class CParameters& params);
@@ -70,6 +75,11 @@ protected:
     void CreateSolver(class CParameters& params);
     void CreateGaugeSmearing(class CParameters& params);
 
+    //==================================
+    //Cache
+
+    //Requared
+    void InitialIndexBuffer();
 };
 
 extern CLGAPI CCLGLibManager GCLGManager;

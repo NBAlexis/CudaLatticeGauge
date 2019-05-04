@@ -11,256 +11,325 @@
 
 __BEGIN_NAMESPACE
 
-/**
-* For square lattice, we assume dimenssion = direction
-* bdir, mu: bond direction, or link direction
-* pdir, nu: plaqutte direction, the second bond direction
-*
-* Forward
-*      c
-*    +-<-+
-*  d |   | b ^
-*    *->-+
-*      a
-*  a = [site][b_dir]
-*  b = [site+b_dir][p_dir]
-*  c = [site+p_dir][b_dir]^-1
-*  d = [site][p_dir]^-1
-*      a
-*    *-<-+
-*  d |   | b ^
-*    +->-+
-*      c
-*  a = [site][b_dir]^-1
-*  d = [site-p_dir][p_dir]^-1
-*  c = [site-p_dir][b_dir]
-*  b = [site-p_dir+b_dir][p_dir]
-*  
-*  Here we use Staple
-*    [site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
-*  + [site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
-*  The return, int2(x = linkIndex; |y| - 1 = fieldIndex, 0 if it is not boundary, sign of y is for inverse)  
-*/
-__device__ void CIndexSquare::_deviceGetPlaquttesAtLink(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiLinkIndex, BYTE st) const
+__CLGIMPLEMENT_CLASS(CIndexSquare)
+
+#pragma region device Functions
+
+static __device__ __inline__ SSmallInt4 _deviceCoordMoving(const SSmallInt4& sFrom, BYTE i)
 {
-    BYTE uiDim = _DC_Dim;
-
-    //for square, dir should equal to dim
-    //assert(uiDim == _DC_Dir);
-
-    count = 2 * (uiDim - 1);
-    plaqutteLength = 4; //for square
-
-    //For square lattice, we assume dimenssion = number of direction
-    UINT uiSiteIndex = uiLinkIndex / uiDim;
-    UINT uiLinkDir = uiLinkIndex % uiDim;
-    BYTE uiMaxDim = (0 == (st & CIndex::kTime)) ? 3 : 4;
-    BYTE uiMinDim = (0 == (st & CIndex::kSpace)) ? 3 : 0;
-
-    //Note, 2D is z, t
-    //3D is y, z, t
-    //4D is x, y, z, t
-    //so i = 4 - dim to 3, (for example, dim = 2, it is 2, 3; dim = 4, it is 0, 1, 2, 3).
-    if (uiMinDim < 4 - uiDim)
-    {
-        uiMinDim = 4 - uiDim;
-    }
-
-    //uiLinkIndex is bdir
-    //i is pdir
-    BYTE iListIndex = 0;
-    for (BYTE i = uiMinDim; i < uiMaxDim; ++i)
-    {
-        if (i != uiLinkDir)
-        {
-            SSmallInt4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
-
-            //=============================================
-            //add forward
-            //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
-            retV[iListIndex] = SIndex(uiSiteIndex, i);
-            ++iListIndex;
-
-            SSmallInt4 fsite = _deviceMoveSquareSite(xyzt, i + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 1]);
-            retV[iListIndex].m_byDir = uiLinkDir;
-            ++iListIndex;
-
-            fsite = _deviceMoveSquareSite(xyzt, uiLinkDir + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-
-            //=============================================
-            //add backward
-            //[site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
-            fsite = _deviceMoveSquareSite(xyzt, -(i + 1));
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 3]);
-            retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-
-            retV[iListIndex] = SIndex(retV[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
-            ++iListIndex;
-
-            fsite = _deviceMoveSquareSite(fsite, uiLinkDir + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = i;
-            ++iListIndex;
-        }
-    }
-
-    //assert(count * 3 == iListIndex);
+    SBYTE offset = i < _DC_Dir ? 1 : -1;
+    SSmallInt4 ret = sFrom;
+    ret.m_byData4[i < _DC_Dir ? (4 - _DC_Dir + i) : (4 - _DC_Dir * 2 + i)] += offset;
+    return ret;
 }
 
-__device__ void CIndexSquare::_deviceGetPlaquttesAtSite(SIndex* retV, BYTE& count, BYTE& plaqutteLength, UINT uiSiteIndex, BYTE st) const
+static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, UINT* pSmallData)
 {
-    BYTE uiDim = _DC_Dim;
-
-    //for square, dir should equal to dim
-    assert(uiDim == _DC_Dir);
-
-    count = uiDim * (uiDim - 1) / 2;
-    plaqutteLength = 4; //for square
-
-    BYTE uiMaxDim = (0 == (st & CIndex::kTime)) ? 3 : 4;
-    
-    BYTE iListIndex = 0;
-    for (BYTE uiLink = 0; uiLink < uiMaxDim; ++uiLink)
-    {
-        BYTE uiMinDim = (0 == (st & CIndex::kSpace)) ? 3 : uiLink + 1;
-        for (BYTE uiPlaq = uiMinDim; uiPlaq < uiMaxDim; ++uiPlaq)
-        {
-            SSmallInt4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
-
-            retV[iListIndex] = SIndex(uiSiteIndex, uiLink);
-            ++iListIndex;
-
-            SSmallInt4 movedSite = _deviceMoveSquareSite(xyzt, uiLink + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(movedSite, retV[iListIndex - 1]);
-            retV[iListIndex].m_byDir = uiPlaq;
-            ++iListIndex;
-
-            movedSite = _deviceMoveSquareSite(xyzt, uiPlaq + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(movedSite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = uiLink;
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-
-            retV[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-        }
-    }
-
-    assert(count * 4 == iListIndex);
+    return sSite.x * pSmallData[CIndexData::kMultX] 
+         + sSite.y * pSmallData[CIndexData::kMultY] 
+         + sSite.z * pSmallData[CIndexData::kMultZ] 
+         + sSite.w;
 }
 
-__device__ void CIndexSquare::_deviceGetPlaquttesAtLinkAll(SIndex* retV, UINT uiLinkIndex) const
+#pragma endregion
+
+#pragma region Kernels
+
+__global__ void _CLG_LAUNCH_BOUND_SINGLE
+_kernalBakeSmallData(UINT* pDeviceData)
 {
-    BYTE uiDim = _DC_Dim;
+    pDeviceData[CIndexData::kMultX] = (_DC_Ly + 2 * CIndexData::kCacheIndexEdge)
+        * (_DC_Lz + 2 * CIndexData::kCacheIndexEdge) 
+        * (_DC_Lt + 2 * CIndexData::kCacheIndexEdge);
+    pDeviceData[CIndexData::kMultY] = (_DC_Lz + 2 * CIndexData::kCacheIndexEdge)
+        * (_DC_Lt + 2 * CIndexData::kCacheIndexEdge);
+    pDeviceData[CIndexData::kMultZ] = _DC_Lt + 2 * CIndexData::kCacheIndexEdge;
+    pDeviceData[CIndexData::kPlaqLengthIdx] = 4;
+    pDeviceData[CIndexData::kPlaqPerSiteIdx] = _DC_Dim * (_DC_Dim - 1) / 2;
+    pDeviceData[CIndexData::kPlaqPerLinkIdx] = 2 * (_DC_Dim - 1);
+}
 
-    UINT uiSiteIndex = uiLinkIndex / uiDim;
-    UINT uiLinkDir = uiLinkIndex % uiDim;
+__global__ void _CLG_LAUNCH_BOUND
+_kernalBakeWalkingTable(UINT* pDeviceData, uint3 mods)
+{
+    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+    SSmallInt4 coord;
+    coord.x = static_cast<SBYTE>(idxAll / mods.x);
+    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y);
+    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z);
+    coord.w = static_cast<SBYTE>(idxAll % mods.z);
 
-    //uiLinkIndex is bdir
-    //i is pdir
-    BYTE iListIndex = 0;
-    for (BYTE i = 0; i < uiDim; ++i)
+    for (BYTE i = 0; i < 2 * _DC_Dir; ++i)
     {
-        if (i != uiLinkDir)
-        {
-            SSmallInt4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
+        SSmallInt4 movingCoord = _deviceCoordMoving(coord, i);
+        if (movingCoord.x < 0) movingCoord.x = 0;
+        if (movingCoord.y < 0) movingCoord.y = 0;
+        if (movingCoord.z < 0) movingCoord.z = 0;
+        if (movingCoord.w < 0) movingCoord.w = 0;
+        if (movingCoord.x >= _DC_Lx + 2 * CIndexData::kCacheIndexEdge) movingCoord.x = _DC_Lx + 2 * CIndexData::kCacheIndexEdge - 1;
+        if (movingCoord.y >= _DC_Ly + 2 * CIndexData::kCacheIndexEdge) movingCoord.y = _DC_Ly + 2 * CIndexData::kCacheIndexEdge - 1;
+        if (movingCoord.z >= _DC_Lz + 2 * CIndexData::kCacheIndexEdge) movingCoord.z = _DC_Lz + 2 * CIndexData::kCacheIndexEdge - 1;
+        if (movingCoord.w >= _DC_Lt + 2 * CIndexData::kCacheIndexEdge) movingCoord.w = _DC_Lt + 2 * CIndexData::kCacheIndexEdge - 1;
 
-            //=============================================
-            //add forward
-            //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
-            retV[iListIndex] = SIndex(uiSiteIndex, i);
-            ++iListIndex;
-
-            SSmallInt4 fsite = _deviceMoveSquareSite(xyzt, i + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 1]);
-            retV[iListIndex].m_byDir = uiLinkDir;
-            ++iListIndex;
-
-            fsite = _deviceMoveSquareSite(xyzt, uiLinkDir + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-
-            //=============================================
-            //add backward
-            //[site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
-            fsite = _deviceMoveSquareSite(xyzt, -(i + 1));
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 3]);
-            retV[iListIndex].m_byDir = i;
-            retV[iListIndex].m_byTag = _kDagger;
-            ++iListIndex;
-
-            retV[iListIndex] = SIndex(retV[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
-            ++iListIndex;
-
-            fsite = _deviceMoveSquareSite(fsite, uiLinkDir + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(fsite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = i;
-            ++iListIndex;
-        }
+        pDeviceData[idxAll * 2 * _DC_Dir + i] = movingCoord.x * mods.x + movingCoord.y * mods.y + movingCoord.z * mods.z + movingCoord.w;
     }
 }
 
-__device__ void CIndexSquare::_deviceGetPlaquttesAtSiteAll(SIndex* retV, UINT uiSiteIndex) const
+__global__ void _CLG_LAUNCH_BOUND
+_kernalBakeMappingTable(SIndex* pDeviceData, uint3 mods)
 {
-    BYTE uiDim = _DC_Dim;
-    BYTE iListIndex = 0;
+    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+    SSmallInt4 coord;
+    coord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    coord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
+
+    if (coord.x >= 0 && coord.x < _DC_Lx
+     && coord.y >= 0 && coord.y < _DC_Ly
+     && coord.z >= 0 && coord.z < _DC_Lz
+     && coord.w >= 0 && coord.w < _DC_Lt)
+    {
+        UINT uiSiteIndex = _deviceGetSiteIndex(coord);
+        pDeviceData[idxAll] = SIndex(uiSiteIndex);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelBakePlaqIndexAtSite(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+{
+    intokernalInt4;
+
+    UINT uiDim = _DC_Dim;
+    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+
+    //24
+    UINT iListIndex = uiSiteIndex 
+        * (pSmallDataTable[CIndexData::kPlaqPerSiteIdx] 
+         * pSmallDataTable[CIndexData::kPlaqLengthIdx]);
+
     for (BYTE uiLink = 0; uiLink < uiDim; ++uiLink)
     {
         for (BYTE uiPlaq = uiLink + 1; uiPlaq < uiDim; ++uiPlaq)
         {
-            SSmallInt4 xyzt = __deviceSiteIndexToInt4(uiSiteIndex);
-
-            retV[iListIndex] = SIndex(uiSiteIndex, uiLink);
+            pResult[iListIndex] = SIndex(uiSiteIndex, uiLink);
             ++iListIndex;
 
-            SSmallInt4 movedSite = _deviceMoveSquareSite(xyzt, uiLink + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(movedSite, retV[iListIndex - 1]);
-            retV[iListIndex].m_byDir = uiPlaq;
+            //start ----> uiLink
+            UINT movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiLink)];
+            pResult[iListIndex] = pMappingTable[movedSite];
+            pResult[iListIndex].m_byDir = uiPlaq;
             ++iListIndex;
 
-            movedSite = _deviceMoveSquareSite(xyzt, uiPlaq + 1);
-            retV[iListIndex] = m_pBoundaryCondition->_devcieGetMappedIndex(movedSite, retV[iListIndex - 2]);
-            retV[iListIndex].m_byDir = uiLink;
-            retV[iListIndex].m_byTag = _kDagger;
+            //start ----> uiPlaq
+            movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiPlaq)];
+            pResult[iListIndex] = pMappingTable[movedSite];
+            pResult[iListIndex].m_byDir = uiLink;
+            pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
             ++iListIndex;
 
-            retV[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            retV[iListIndex].m_byTag = _kDagger;
+            pResult[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
+            pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
             ++iListIndex;
         }
     }
 }
 
-/**
-* virtual, cannot inline
-*/
-__device__ SIndex CIndexSquare::_deviceFermionIndexWalk(BYTE uiFieldId, UINT uiSiteIndex, SBYTE iWalkDir) const
+__global__ void _CLG_LAUNCH_BOUND
+_kernelBakePlaqIndexAtLink(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
 {
-    SSmallInt4 fromSite = __deviceSiteIndexToInt4(uiSiteIndex);
-    SIndex sFromSite = SIndex(uiSiteIndex);
-    SSmallInt4 siteInt4 = _deviceMoveSquareSite(fromSite, iWalkDir);
-    return m_pBoundaryCondition->_devcieGetFermionMappedIndex(uiFieldId, siteInt4, sFromSite);
+    intokernalInt4;
+
+    UINT uiDim = _DC_Dim;
+    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    
+    for (UINT uiLinkDir = 0; uiLinkDir < uiDim; ++uiLinkDir)
+    {
+        UINT uiLinkIndex = uiSiteIndex * uiDim + uiLinkDir;
+
+        UINT iListIndex = uiLinkIndex
+            * (pSmallDataTable[CIndexData::kPlaqPerLinkIdx]
+            * (pSmallDataTable[CIndexData::kPlaqLengthIdx] - 1));
+
+        for (BYTE i = 0; i < uiDim; ++i)
+        {
+            if (i != uiLinkDir)
+            {
+                //=============================================
+                //add forward
+                //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
+                pResult[iListIndex] = SIndex(uiSiteIndex, i);
+                ++iListIndex;
+
+                //start ---> i
+                UINT movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + i)];
+                pResult[iListIndex] = pMappingTable[movedSite];
+                pResult[iListIndex].m_byDir = uiLinkDir;
+                ++iListIndex;
+
+                //start ---> uiLinkDir
+                movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiLinkDir)];
+                pResult[iListIndex] = pMappingTable[movedSite];
+                pResult[iListIndex].m_byDir = i;
+                pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+                ++iListIndex;
+
+                //=============================================
+                //add backward
+                //[site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
+                //i <---- start
+                movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + i];
+                pResult[iListIndex] = pMappingTable[movedSite];
+                pResult[iListIndex].m_byDir = i;
+                pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+                ++iListIndex;
+
+                //
+                pResult[iListIndex] = SIndex(pResult[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
+                ++iListIndex;
+
+                //last ----> uiLinkDir
+                movedSite = pWalkingTable[movedSite * 2 * uiDim + (uiDim + uiLinkDir)];
+                pResult[iListIndex] = pMappingTable[movedSite];
+                pResult[iListIndex].m_byDir = i;
+                ++iListIndex;
+            }
+        }
+    }
 }
 
 /**
-* virtual, cannot inline
+* gaugemove[linkIndex] = gauge[uiSite - linkIndex]_{linkIndex}
 */
-__device__ SIndex CIndexSquare::_deviceGaugeIndexWalk(UINT uiSiteIndex, SBYTE iWalkDir) const
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCacheGaugeMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
 {
-    SSmallInt4 fromSite = __deviceSiteIndexToInt4(uiSiteIndex);
-    SIndex sFromSite = SIndex(uiSiteIndex);
-    SSmallInt4 siteInt4 = _deviceMoveSquareSite(fromSite, iWalkDir);
-    return m_pBoundaryCondition->_devcieGetMappedIndex(siteInt4, sFromSite);
+    intokernalInt4;
+
+    UINT uiDir = _DC_Dir;
+    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    for (UINT i = 0; i < uiDir; ++i)
+    {
+        pCached[uiSiteIndex * uiDir + i] = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i]];
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCacheFermionMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+{
+    intokernalInt4;
+
+    UINT uiDir = _DC_Dir;
+    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    for (UINT i = 0; i < uiDir; ++i)
+    {
+        //first element is right, second element is left.
+        pCached[(uiSiteIndex * uiDir + i) * 2] 
+            = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i + uiDir]];
+        pCached[(uiSiteIndex * uiDir + i) * 2 + 1]
+            = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i]];
+    }
+}
+
+#pragma endregion
+
+UINT CIndexSquare::GetDecompose(UINT volumn)
+{
+    TArray<UINT> factors = _getFactors(volumn);
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    UINT maxThreadPerBlock = deviceConstraints[0];
+
+    UINT uiMax = 1;
+    for (INT i = 0; i < factors.Num(); ++i)
+    {
+        if (factors[i] <= maxThreadPerBlock && factors[i] > uiMax)
+        {
+            uiMax = factors[i];
+        }
+    }
+    
+    return uiMax;
+}
+
+void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
+{
+    uint4 biggerLattice;
+    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+    uint3 biggerLatticeMod;
+
+    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    UINT threadPerSite = GetDecompose(uiVolumn);
+    dim3 threads(threadPerSite, 1, 1);
+    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+    biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.z = biggerLattice.w;
+
+    pData->m_uiPlaqutteLength = 4;
+    pData->m_uiPlaqutteCountPerSite = static_cast<BYTE>(_HC_Dim * (_HC_Dim - 1) / 2);
+    pData->m_uiPlaqutteCountPerLink = static_cast<BYTE>(2 * (_HC_Dim - 1));
+
+    //bake small data
+    _kernalBakeSmallData << <1, 1 >> > (pData->m_pSmallData);
+    //bake walking index
+    _kernalBakeWalkingTable << <blocks, threads >> > (pData->m_pWalkingTable, biggerLatticeMod);
+
+    //bake index mappings
+    for (BYTE i = 1; i < kMaxFieldCount; ++i)
+    {
+        if (NULL != appGetLattice()->GetFieldById(i))
+        {
+            checkCudaErrors(cudaMalloc((void**)&pData->m_pIndexPositionToSIndex[i], sizeof(SIndex)
+                * (_HC_Lx + 2 * CIndexData::kCacheIndexEdge) * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge) * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge)
+                ));
+
+            //bake map index
+            _kernalBakeMappingTable << <blocks, threads >> > (pData->m_pIndexPositionToSIndex[i], biggerLatticeMod);
+
+            //bake boundary condition
+            m_pBoundaryCondition->BakeEdgePoints(i, pData->m_pIndexPositionToSIndex[i]);
+        }
+    }
+
+    //bake region id table
+    m_pBoundaryCondition->BakeRegionTable(pData->m_byRegionTable);
+
+    //copy the mapping table to device
+    checkCudaErrors(cudaMalloc((void**)&pData->m_pDeviceIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount));
+    checkCudaErrors(cudaMemcpy(pData->m_pDeviceIndexPositionToSIndex, pData->m_pIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount, cudaMemcpyHostToDevice));
+}
+
+void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
+{
+    //If Has Gauge field
+    if (NULL != appGetLattice()->GetFieldById(byFieldId))
+    {
+        preparethread;
+
+        checkCudaErrors(cudaMalloc((void**)&pData->m_pPlaqutteCache, sizeof(SIndex) * _HC_Volume * (_HC_Dim * (_HC_Dim - 1) / 2) * 4));
+        checkCudaErrors(cudaMalloc((void**)&pData->m_pStappleCache, sizeof(SIndex) * _HC_Volume * _HC_Dim * (2 * (_HC_Dim - 1)) * 3));
+
+        //bake plaqutte per site
+        _kernelBakePlaqIndexAtSite << <block, threads >> > (pData->m_pPlaqutteCache, pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+
+        //bake plaqutte per link
+        _kernelBakePlaqIndexAtLink << <block, threads >> > (pData->m_pStappleCache, pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+    }
+}
+
+void CIndexSquare::BakeMoveIndex(CIndexData* pData, BYTE byFieldId)
+{
+    preparethread;
+
+    checkCudaErrors(cudaMalloc((void**)&pData->m_pGaugeMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir));
+    checkCudaErrors(cudaMalloc((void**)&pData->m_pFermionMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir * 2));
+
+    _kernelCacheGaugeMove << <block, threads >> > (pData->m_pGaugeMoveCache[byFieldId], pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[1], pData->m_pSmallData);
+    _kernelCacheFermionMove << <block, threads >> > (pData->m_pFermionMoveCache[byFieldId], pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
 }
 
 __END_NAMESPACE

@@ -35,9 +35,12 @@
     <ClInclude Include="Data\Action\CActionGauge.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
-    <ClInclude Include="Data\Boundary\CBoundaryConditionDirichlet.h" />
+    <ClInclude Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h" />
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
@@ -47,6 +50,7 @@
     <ClInclude Include="Data\Field\CFieldGaugeZ2.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
     <ClInclude Include="Data\Lattice\CIndex.h" />
+    <ClInclude Include="Data\Lattice\CIndexData.h" />
     <ClInclude Include="Data\Lattice\CIndexSquare.h" />
     <ClInclude Include="Data\Lattice\CLatticeData.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
@@ -115,10 +119,10 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Data\Action\CActionFermionWilsonNf2.cpp" />
-    <CudaCompile Include="Data\Boundary\CBoundaryCondition.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
     <ClCompile Include="Data\Field\CField.cpp" />
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu" />
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.cu" />
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldGauge.cu" />
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
@@ -128,7 +132,6 @@
     <ClCompile Include="Measurement\CMeasurePlaqutteEnergy.cpp" />
     <ClCompile Include="Platform\CFile.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
-    <CudaCompile Include="Data\Lattice\CIndex.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />

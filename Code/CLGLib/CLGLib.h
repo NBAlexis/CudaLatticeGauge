@@ -84,6 +84,16 @@ dim3 threads(_HC_DecompLx, _HC_DecompLy, _HC_DecompLz);
 UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); 
 
 
+#define intokernalInt4 \
+SSmallInt4 sSite4; \
+UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
+sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx); \
+sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx); \
+sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); \
+sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z); \
+UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w; 
+
+
 #define intokernalE(element_count)\
 UINT blockIdxX = blockIdx.x / element_count;\
 UINT elementIdx = blockIdx.x % element_count; \
@@ -105,9 +115,14 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"
 #include "Data/Boundary/CBoundaryConditionTorusSquare.h"
+#include "Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h"
 #include "Data/Lattice/CIndex.h"
 #include "Data/Lattice/CIndexSquare.h"
+#include "Data/Lattice/CIndexData.h"
 #include "Data/Lattice/CLatticeData.h"
+
+//=======================================================
+//Field
 #include "Data/Field/CField.h"
 
 #include "Data/Field/CFieldGauge.h"
@@ -120,6 +135,12 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
 #include "Data/Field/CFieldFermion.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3.h"
+
+#include "Data/Field/BoundaryField/CFieldBoundary.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
+
+//=====================================================
 
 #include "Data/Action/CAction.h"
 #include "Data/Action/CActionGaugePlaquette.h"

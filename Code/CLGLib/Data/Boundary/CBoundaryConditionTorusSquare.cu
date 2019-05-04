@@ -12,140 +12,88 @@
 
 __BEGIN_NAMESPACE
 
-__device__ CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : deviceBoundaryCondition()
+__CLGIMPLEMENT_CLASS(CBoundaryConditionTorusSquare)
+
+#pragma region kernels
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernalBakeEdgeTorusBoundary(
+    SSmallInt4 bc, 
+    SIndex* pDeviceData, 
+    uint3 mods)
+{
+    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+    SSmallInt4 coord;
+    coord.x = static_cast<SBYTE>(idxAll / mods.x);
+    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y);
+    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z);
+    coord.w = static_cast<SBYTE>(idxAll % mods.z);
+
+    SSmallInt4 realCoord = coord;
+    realCoord.x -= CIndexData::kCacheIndexEdge;
+    realCoord.y -= CIndexData::kCacheIndexEdge;
+    realCoord.z -= CIndexData::kCacheIndexEdge;
+    realCoord.w -= CIndexData::kCacheIndexEdge;
+
+    SBYTE signchange = 1;
+    for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
+    {
+        if (realCoord.m_byData4[uiDir] < 0)
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+            signchange = signchange * bc.m_byData4[uiDir];
+        }
+        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+        {
+            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+            signchange = signchange * bc.m_byData4[uiDir];
+        }
+    }
+
+    UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
+    pDeviceData[idxAll] = SIndex(uiSiteIndex);
+    pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
+}
+
+#pragma endregion
+
+CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondition()
 {
     for (UINT i = 0; i < _kMaxFieldCount; ++i)
     {
-        m_FermionBC[i].x = 1;
-        m_FermionBC[i].y = 1;
-        m_FermionBC[i].z = 1;
-        m_FermionBC[i].w = 1;
+        m_FieldBC[i].x = 1;
+        m_FieldBC[i].y = 1;
+        m_FieldBC[i].z = 1;
+        m_FieldBC[i].w = -1;
     }
+    m_FieldBC[0].w = 1;
+    m_FieldBC[1].w = 1;
 }
 
-__device__ 
-SIndex CBoundaryConditionTorusSquare::_devcieGetMappedIndex(const SSmallInt4 &site, const SIndex &fromsite) const
-{
-    UINT x, y, z, t;
-    BYTE byOldRegion = fromsite.m_byReginId;
-    
-    if (site.x < 0)
-    {
-        x = _DC_Lx - 1;
-        byOldRegion = (byOldRegion & /*1110*/0x0E) | ((~byOldRegion) & 0x01);
-    }
-    else if (site.x >= _DC_Lx)
-    {
-        x = 0;
-        byOldRegion = (byOldRegion & /*1110*/0x0E) | ((~byOldRegion) & 0x01);
-    }
-    else 
-    {
-        x = site.x;
-    }
-
-    if (site.y < 0)
-    {
-        y = _DC_Ly - 1;
-        byOldRegion = (byOldRegion & /*1101*/0x0D) | ((~byOldRegion) & 0x02);
-    }
-    else if (site.y >= _DC_Ly)
-    {
-        y = 0;
-        byOldRegion = (byOldRegion & /*1101*/0x0D) | ((~byOldRegion) & 0x02);
-    }
-    else
-    {
-        y = site.y;
-    }
-
-    if (site.z < 0)
-    {
-        z = _DC_Lz - 1;
-        byOldRegion = (byOldRegion & /*1011*/0x0B) | ((~byOldRegion) & 0x04);
-    }
-    else if (site.z >= _DC_Lz)
-    {
-        z = 0;
-        byOldRegion = (byOldRegion & /*1011*/0x0B) | ((~byOldRegion) & 0x04);
-    }
-    else
-    {
-        z = site.z;
-    }
-
-    if (site.w < 0)
-    {
-        t = _DC_Lt - 1;
-        byOldRegion = (byOldRegion & /*0111*/0x07) | ((~byOldRegion) & 0x08);
-    }
-    else if (site.w >= _DC_Lt)
-    {
-        t = 0;
-        byOldRegion = (byOldRegion & /*0111*/0x07) | ((~byOldRegion) & 0x08);
-    }
-    else
-    {
-        t = site.w;
-    }
-
-    return SIndex(x * _DC_MultX
-                + y * _DC_MultY
-                + z * _DC_MultZ
-                + t, //index
-        0, //dir
-        0, //tag
-        0, //field
-        byOldRegion); //region
-}
-
-/**
-* Torus do not have boundary fields
-*/
-__device__ 
-SIndex CBoundaryConditionTorusSquare::_devcieGetFermionMappedIndex(BYTE byFieldId, const SSmallInt4 &site, const SIndex &fromsite) const
-{
-    SIndex ret = _devcieGetMappedIndex(site, fromsite);
-
-    //region is (bbbb)
-    //For example, the boundary condition is anti-periodic on t-direction
-    //If it is from a region (0000)
-    //And the result is (1000)
-    //It means it go to a minus-t region, and need a opposite
-    //On the other hand, if it is from a region (1000)
-    //And the result is (0000)
-    //It means it go back from the minus-t region to normal one
-    //So whether need to opposite, is decided whether the t-bit is 1
-    SBYTE retOpposite = 1;
-    if (m_FermionBC[byFieldId].x < 0 && (0 != (ret.m_byReginId & 0x01)))
-    {
-        retOpposite = -1;
-    }
-    if (m_FermionBC[byFieldId].y < 0 && (0 != (ret.m_byReginId & 0x02)))
-    {
-        retOpposite = retOpposite * -1;
-    }
-    if (m_FermionBC[byFieldId].z < 0 && (0 != (ret.m_byReginId & 0x04)))
-    {
-        retOpposite = retOpposite * -1;
-    }
-    if (m_FermionBC[byFieldId].w < 0 && (0 != (ret.m_byReginId & 0x08)))
-    {
-        retOpposite = retOpposite * -1;
-    }
-
-    if (retOpposite < 0)
-    {
-        ret.m_byTag = _kOpposite;
-    }
-    return ret;
-}
-
-__device__ void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
+void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
 {
     assert(byFieldId < _kMaxFieldCount);
+    m_FieldBC[byFieldId] = bc.m_sPeriodic;
+}
 
-    m_FermionBC[byFieldId] = bc.m_sPeriodic;
+void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const
+{
+    uint4 biggerLattice;
+    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+    uint3 biggerLatticeMod;
+
+    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+    dim3 threads(threadPerSite, 1, 1);
+    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+    biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.z = biggerLattice.w;
+
+    _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, biggerLatticeMod);
 }
 
 __END_NAMESPACE

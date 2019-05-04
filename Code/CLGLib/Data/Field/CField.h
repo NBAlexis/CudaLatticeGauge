@@ -120,6 +120,9 @@ public:
 
     virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
 
+    virtual UBOOL IsGaugeField() const { return FALSE; }
+    virtual UBOOL IsFermionField() const { return FALSE; }
+
 #pragma endregion
 
     class CLatticeData* m_pOwner;

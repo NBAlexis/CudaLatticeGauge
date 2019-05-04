@@ -273,6 +273,8 @@ So, we have two cases, one for $p(1)=1$, and one for $p(1)\neq 1$
 
 \subsubsection{\label{Gauge_Smearing}\index{gauge smearing}Gauge smearing}
 
+\textbf{\textcolor[rgb]{1,0,0}{Note: I think I did NOT understand gauge smearing correctly, will go back to this after staggered fermion being implemented.}}
+
 In HMC with fermions, the computer power is consumed mainly in solving the $D^{-1}$. The small eigenvalues of the $D$ operator is the main reason to slow down the solver, which is the so called \index{low mode}\textbf{low mode} or \index{exceptional configurations}\textbf{exceptional configurations}.
 
 Gauge smearing (\index{gauge smoothing}gauge smoothing) is one of the method to ease the problem by replacing the original configuration with a gauge equivalent but easier configuration. There are several different smearing methods. In CLGLib, only two are implemented.

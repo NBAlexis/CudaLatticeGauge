@@ -15,13 +15,13 @@ UINT TestFileIO(CParameters& sParam)
     Real fExpected = F(0.625129946974942);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
-    Real fPlaqutteEneregy = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volumn);
+    Real fPlaqutteEneregy = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume);
 
     CFieldGaugeSU3* pStable = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     CFieldGaugeSU3* pForce = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
 
     appGetLattice()->m_pGaugeField->CalculateForceAndStaple(pForce, pStable, F(1.0) / F(3.0));
-    Real fPlaqutteEneregy2 = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volumn);
+    Real fPlaqutteEneregy2 = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume);
 
     appGeneral(_T("Plaqutte Energy (expected:0.625129946974942)= %1.10f and %1.10f\n"), F(1.0) - fPlaqutteEneregy, F(1.0) - fPlaqutteEneregy2);
 
@@ -60,7 +60,7 @@ UINT TestFileIOCLG(CParameters& sParam)
     CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
-    CLGComplex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volumn * _HC_Dir));
+    CLGComplex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
     CLGComplex res2 = pNewFermion->Dot(pNewFermion);
 

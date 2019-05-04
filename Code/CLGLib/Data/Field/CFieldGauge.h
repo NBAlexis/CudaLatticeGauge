@@ -60,6 +60,9 @@ public:
 
     virtual void CopyTo(CField* U) const;
 
+    virtual UBOOL IsGaugeField() const { return TRUE; }
+    virtual UBOOL IsFermionField() const { return FALSE; }
+
 protected:
 
     UINT m_uiLinkeCount;

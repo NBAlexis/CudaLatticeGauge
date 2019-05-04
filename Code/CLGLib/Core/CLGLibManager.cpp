@@ -47,6 +47,8 @@ void CCLGLibManager::SetupLog(CParameters &params)
     appGeneral(_T("============================== Log Start =============================\n\n"));
 }
 
+#pragma region Creates
+
 void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
 {
     INT iVaules = 0;
@@ -89,8 +91,8 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);
     m_InitialCache.constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
     m_InitialCache.constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
-    m_InitialCache.constIntegers[ECI_Volumn] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
-    m_InitialCache.constIntegers[ECI_Volumn_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
+    m_InitialCache.constIntegers[ECI_Volume] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
+    m_InitialCache.constIntegers[ECI_Volume_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultY] = static_cast<UINT>(intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_MultZ] = static_cast<UINT>(intValues[3]);
@@ -100,8 +102,8 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     latticeDim.AddItem(intValues[2]); //z
     latticeDim.AddItem(intValues[3]); //t
 
-    m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
-    m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volumn] * m_InitialCache.constIntegers[ECI_Dir];
+    m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
+    m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir];
 
     m_InitialCache.constFloats[ECF_InverseSqrtLink16] = F(1.0) / _sqrt(F(16.0) * m_InitialCache.constIntegers[ECI_LinkCount]);
     
@@ -237,7 +239,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
-    m_pCudaHelper->AllocateTemeraryBuffers(_HC_Volumn);
+    m_pCudaHelper->AllocateTemeraryBuffers(_HC_Volume);
 
 #pragma endregion
 
@@ -297,13 +299,41 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
     }
     pGauge->InitialOtherParameters(params);
 
-    m_pLatticeData->m_pGaugeField = pGauge;
-    m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
-    if (NULL != m_pLatticeData->m_pDeviceIndex)
+    TArray<INT> periodic;
+    if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
-        m_pLatticeData->m_pIndexCache->CachePlaquttes();
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        m_pLatticeData->SetFieldBoundaryCondition(0, bc);
     }
 
+    m_pLatticeData->m_pGaugeField = pGauge;
+    m_pLatticeData->m_pFieldMap.SetAt(1, pGauge);
+
+    appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
+}
+
+void CCLGLibManager::CreateGaugeBoundaryField(class CParameters& params)
+{
+    CCString sValues;
+
+    CCString sGaugeClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldBoundaryGaugeSU3"));
+    sGaugeClassName = sValues;
+
+    CBase* pGaugeField = appCreate(sGaugeClassName);
+    CFieldBoundary* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldBoundary*>(pGaugeField)) : NULL;
+
+    if (NULL == pGauge)
+    {
+        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
+    }
+    pGauge->InitialField(params);
+
+    m_pLatticeData->m_pBoundaryFieldMap.SetAt(1, pGauge);
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 }
 
@@ -356,10 +386,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
         bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
     }
-    if (NULL != m_pLatticeData->m_pDeviceIndex)
-    {
-        m_pLatticeData->m_pIndexCache->CacheFermion(byFieldId);
-    }
+
     __FetchIntWithDefault(_T("PoolNumber"), 0);
     if (iVaules > 0)
     {
@@ -369,64 +396,41 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
 }
 
+void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params)
+{
+
+}
+
 void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
 {
     //INT iVaules = 0;
     CCString sValues;
 
-    __FetchStringWithDefault(_T("LatticeBoundary"), _T("EBC_TorusSquare"));
+    __FetchStringWithDefault(_T("LatticeBoundary"), _T("CBoundaryConditionTorusSquare"));
 
-    UINT sizeBufferHost[1];
-    sizeBufferHost[0] = 0;
-    UINT* sizeBuffer;
-    checkCudaErrors(cudaMalloc((void**)&sizeBuffer, sizeof(UINT)));
-    checkCudaErrors(cudaMemcpy(sizeBuffer, sizeBufferHost, sizeof(UINT), cudaMemcpyHostToDevice));
+    CBoundaryCondition * pBc = dynamic_cast<CBoundaryCondition *>(appCreate(sValues));
 
-    EBoundaryCondition eBC = __STRING_TO_ENUM(EBoundaryCondition, sValues);
-    deviceBoundaryCondition ** devicePtrBC;
-    checkCudaErrors(cudaMalloc((void**)&devicePtrBC, sizeof(deviceBoundaryCondition *)));
-
-    _cCreateBC((void**)devicePtrBC, sizeBuffer, eBC);
-    checkCudaErrors(cudaMemcpy(sizeBufferHost, sizeBuffer, sizeof(UINT), cudaMemcpyDeviceToHost));
-    UINT iBoundaryClassSize = sizeBufferHost[0];
-
-    if (0 == iBoundaryClassSize)
+    if (NULL == pBc)
     {
         appCrucial(_T("Create Boundary Condition failed! %s"), sValues.c_str());
         _FAIL_EXIT;
     }
 
-    __FetchStringWithDefault(_T("LatticeIndex"), _T("EIndexType_Square"));
-    EIndexType eIT = __STRING_TO_ENUM(EIndexType, sValues);
+    __FetchStringWithDefault(_T("LatticeIndex"), _T("CIndexSquare"));
 
-    CIndex ** devicePtrIndex;
-    checkCudaErrors(cudaMalloc((void**)&devicePtrIndex, sizeof(CIndex *)));
-    sizeBufferHost[0] = 0;
-    checkCudaErrors(cudaMemcpy(sizeBuffer, sizeBufferHost, sizeof(UINT), cudaMemcpyHostToDevice));
-    _cCreateIndex((void**)devicePtrIndex, devicePtrBC, sizeBuffer, eIT);
-    checkCudaErrors(cudaMemcpy(sizeBufferHost, sizeBuffer, sizeof(UINT), cudaMemcpyDeviceToHost));
-    UINT indexClassSize = sizeBufferHost[0];
-
-    if (0 == indexClassSize)
+    CIndex * pIndex = dynamic_cast<CIndex *>(appCreate(sValues));
+    if (NULL == pIndex)
     {
-        appCrucial(_T("Create Index Failed!!!: %s"), sValues.c_str());
+        appCrucial(_T("Create Index failed! %s"), sValues.c_str());
         _FAIL_EXIT;
     }
-
-    //Now, we need to copy the content of ptr to lattice
-    CIndex* ppIndexHost[1];
-    checkCudaErrors(cudaMemcpy(ppIndexHost, devicePtrIndex, sizeof(CIndex**), cudaMemcpyDeviceToHost));
-    m_pLatticeData->m_pDeviceIndex = ppIndexHost[0];
-    m_pCudaHelper->SetDeviceIndex(devicePtrIndex);
-
-    checkCudaErrors(cudaFree(sizeBuffer));
-    checkCudaErrors(cudaFree(devicePtrBC));
-    checkCudaErrors(cudaFree(devicePtrIndex));
+    pIndex->SetBoundaryCondition(pBc);
+    m_pLatticeData->m_pIndex = pIndex;
 
     appGeneral(_T("Create the index %s\n"), sValues.c_str());
 
-    m_pLatticeData->m_uiIndexType = static_cast<UINT>(eIT);
-    m_pLatticeData->m_uiBoundaryConditionType = static_cast<UINT>(eBC);
+    //Index Cache
+    m_pLatticeData->m_pIndexCache = new CIndexData();
 }
 
 void CCLGLibManager::CreateActionList(class CParameters& params)
@@ -563,6 +567,33 @@ void CCLGLibManager::CreateGaugeSmearing(class CParameters& params)
     }
 }
 
+#pragma endregion
+
+#pragma region Caches
+
+void CCLGLibManager::InitialIndexBuffer()
+{
+    m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
+    if (NULL != m_pLatticeData->m_pGaugeField)
+    {
+        assert(1 == m_pLatticeData->m_pGaugeField->m_byFieldId);
+
+        m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, 1);
+
+        for (BYTE i = 2; i < kMaxFieldCount; ++i)
+        {
+            if (NULL != m_pLatticeData->GetFieldById(i))
+            {
+                m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
+            }
+        }
+    }
+
+    m_pCudaHelper->SetDeviceIndex(m_pLatticeData->m_pIndexCache);
+}
+
+#pragma endregion
+
 UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 {
     m_pCudaHelper = new CCudaHelper();
@@ -592,6 +623,12 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
         CreateGaugeField(gauge);
+    }
+
+    if (params.Exist(_T("GaugeBoundary")))
+    {
+        CParameters gaugeboundary = params.GetParameter(_T("GaugeBoundary"));
+        CreateGaugeBoundaryField(gaugeboundary);
     }
 
     if (m_InitialCache.constIntegers[ECI_FermionFieldLength] > 0)
@@ -635,6 +672,13 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CreateMeasurement(params);
     }
+
+    //=============================================
+    // at last, fill the field pointers
+    // and copy the index data to device
+    InitialIndexBuffer();
+
+    m_pCudaHelper->SetFieldPointers();
 
     checkCudaErrors(cudaDeviceSynchronize());
     cudaError_t cudaEr = cudaGetLastError();

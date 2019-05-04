@@ -51,7 +51,7 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
         fBeta = fBeta / F(3.0);
     }
     m_fBetaOverN = fBeta;
-    m_uiPlaqutteCount = _HC_Volumn * (_HC_Dir - 1) * (_HC_Dir - 2);
+    m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 }
 
 void CActionGaugePlaquette::SetBeta(Real fBeta)

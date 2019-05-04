@@ -153,7 +153,7 @@ _kernelCalculateCorrelatorSU3(
     //change it to t * v_xyz + xyz
     UINT uiXYZ = uiSiteIndex / _DC_Lt;
     UINT uiT = uiSiteIndex % _DC_Lt;
-    correlatorRes[uiT * _DC_Volumn_xyz + uiXYZ] = res;
+    correlatorRes[uiT * _DC_Volume_xyz + uiXYZ] = res;
 }
 
 #pragma endregion
@@ -195,7 +195,7 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     }
 
     m_uiLt = _HC_Lt;
-    m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volumn));
+    m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
     m_uiResoultCount = 0;
 }
 
@@ -250,7 +250,7 @@ void CMeasureMesonCorrelator::Report()
 void CMeasureMesonCorrelator::Reset()
 {
     m_uiLt = _HC_Lt;
-    m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volumn));
+    m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
     m_uiResoultCount = 0;
     m_lstResults.RemoveAll();
 }
@@ -331,7 +331,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
         Real* sumSpatial = (Real*)appAlloca(sizeof(Real) * m_uiLt);
         for (UINT j = 0; j < m_uiLt; ++j)
         {
-            sumSpatial[j] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + j * _HC_Volumn_xyz, _HC_Volumn_xyz);
+            sumSpatial[j] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + j * _HC_Volume_xyz, _HC_Volume_xyz);
             appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, "), j, sumSpatial[j], _hostlog10(appAbs(sumSpatial[j])));
         }
         appParanoiac(_T("\n"));

@@ -16,49 +16,52 @@ __BEGIN_NAMESPACE
 
 __DEFINE_ENUM(EBoundaryCondition,
     EBC_TorusSquare,
+    EBC_TorusAndDirichlet,
     EBC_Max,
     EBC_ForceDWORD = 0x7fffffff,
     )
 
 
-extern "C" 
-{ 
-    extern void _cCreateBC(void** devicePtr, UINT* size, EBoundaryCondition eBC); 
+struct SBoundCondition
+{
+    SBoundCondition() {}
 
-    struct SBoundCondition
+    union
     {
-        __host__ __device__ SBoundCondition() {}
-
         SSmallInt4 m_sPeriodic;
-        void* m_pBCFieldDevicePtr[8];
+        INT m_iPeriodic;
     };
-}
 
-//Device virtual function must be create on device
-//NOTE: For thoes class which has to create on device, NOT support factory yet.
-class CLGAPI deviceBoundaryCondition
+    void* m_pBCFieldDevicePtr[8];
+};
+
+
+class CLGAPI CBoundaryCondition : public CBase
 {
 public:
 
-    __device__ deviceBoundaryCondition()
+    CBoundaryCondition()
     {
         
     }
 
-    /**
-    * The first index is the site index, the second index is index of field, it is 0 if it is not on boundary
-    */
-    __device__ virtual SIndex _devcieGetMappedIndex(const SSmallInt4 &site, const SIndex &fromsite) const = 0;
-
-    /**
-    * There are multiple fermion fields, thus might have multiple boundary fermion fields, so a field ID is required
-    */
-    __device__ virtual SIndex _devcieGetFermionMappedIndex(BYTE byFieldId, const SSmallInt4 &site, const SIndex &fromsite) const = 0;
+    virtual void BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const = 0;
 
     /**
     * For example, set field Id of BC or set anti-periodic condition
     */
-    __device__ virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) = 0;
+    virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) = 0;
+
+    virtual void BakeRegionTable(UINT* deviceTable) const {}
+
+protected:
+
+    /**
+    * 0 For Dirichlet, 1 and -1 for periodic and anti-periodic
+    * Note that the gauge field id is 1
+    */
+    SSmallInt4 m_FieldBC[_kMaxFieldCount];
+
 };
 
 __END_NAMESPACE

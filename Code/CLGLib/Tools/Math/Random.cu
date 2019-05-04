@@ -134,7 +134,7 @@ CRandom::~CRandom()
 //Initial XORWOW only support 512 threads per block
 void CRandom::InitialStatesXORWOW(UINT )
 {
-    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volume * (_HC_Dir + 1)));
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 512;
     TArray<UINT> latticeDim;
@@ -150,7 +150,7 @@ void CRandom::InitialStatesXORWOW(UINT )
 //Initial Philox only support 256 threads per block
 void CRandom::InitialStatesPhilox(UINT )
 {
-    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volume * (_HC_Dir + 1)));
 
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 256;
@@ -168,7 +168,7 @@ void CRandom::InitialStatesPhilox(UINT )
 //Initial MRG only support 256 threads per block
 void CRandom::InitialStatesMRG(UINT )
 {
-    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volume * (_HC_Dir + 1)));
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 256;
     TArray<UINT> latticeDim;
@@ -186,15 +186,15 @@ void CRandom::InitialStatesSobol32(UINT )
     //support only 20000 dimensions, so using _HC_Volumn instead
     m_uiFatIdDivide = _HC_Dir + 1;
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesSobol32,
-        sizeof(curandStateSobol32) * _HC_Volumn));
+        sizeof(curandStateSobol32) * _HC_Volume));
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobolDirVec,
-        sizeof(curandDirectionVectors32_t) * _HC_Volumn));
+        sizeof(curandDirectionVectors32_t) * _HC_Volume));
 
     //int[32]
     curandDirectionVectors32_t *hostVectors32;
     CURAND_CALL(curandGetDirectionVectors32(&hostVectors32, CURAND_DIRECTION_VECTORS_32_JOEKUO6));
     checkCudaErrors(cudaMemcpy(m_pDeviceSobolDirVec, hostVectors32, 
-        _HC_Volumn * sizeof(curandDirectionVectors32_t),
+        _HC_Volume * sizeof(curandDirectionVectors32_t),
         cudaMemcpyHostToDevice));
 
     preparethread;
@@ -205,18 +205,18 @@ void CRandom::InitialStatesScrambledSobol32(UINT )
 {
     m_uiFatIdDivide = _HC_Dir + 1;
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesScrambledSobol32,
-        sizeof(curandStateScrambledSobol32) * _HC_Volumn));
+        sizeof(curandStateScrambledSobol32) * _HC_Volume));
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobolDirVec,
-        sizeof(curandDirectionVectors32_t) * _HC_Volumn));
+        sizeof(curandDirectionVectors32_t) * _HC_Volume));
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSobelConsts,
-        sizeof(UINT) * _HC_Volumn));
+        sizeof(UINT) * _HC_Volume));
 
     curandDirectionVectors32_t *hostVectors32;
     CURAND_CALL(curandGetDirectionVectors32(&hostVectors32, CURAND_SCRAMBLED_DIRECTION_VECTORS_32_JOEKUO6));
     checkCudaErrors(cudaMemcpy(
         m_pDeviceSobolDirVec, 
         hostVectors32, 
-        _HC_Volumn * sizeof(curandDirectionVectors32_t),
+        _HC_Volume * sizeof(curandDirectionVectors32_t),
         cudaMemcpyHostToDevice));
 
     UINT * hostScrambleConstants32;
@@ -224,7 +224,7 @@ void CRandom::InitialStatesScrambledSobol32(UINT )
     checkCudaErrors(cudaMemcpy(
         m_pDeviceSobelConsts, 
         hostScrambleConstants32, 
-        _HC_Volumn * sizeof(UINT), 
+        _HC_Volume * sizeof(UINT), 
         cudaMemcpyHostToDevice));
 
     preparethread;
@@ -233,7 +233,7 @@ void CRandom::InitialStatesScrambledSobol32(UINT )
 
 void CRandom::InitialTableSchrage(UINT )
 {
-    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volumn * (_HC_Dir + 1)));
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceSeedTable, sizeof(UINT) * _HC_Volume * (_HC_Dir + 1)));
     preparethread;
     _kernalAllocateSeedTable << <block, threads >> > (m_pDeviceSeedTable);
 }

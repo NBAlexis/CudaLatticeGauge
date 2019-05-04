@@ -14,7 +14,7 @@ __BEGIN_NAMESPACE
 
 CFieldGauge::CFieldGauge()
     : CField()
-    , m_uiLinkeCount(_HC_Volumn * _HC_Dir)
+    , m_uiLinkeCount(_HC_Volume * _HC_Dir)
 {
 
 }
