@@ -40,6 +40,7 @@ public:
 
     virtual void Zero() { InitialField(EFIT_Zero); }
     virtual void Indentity() { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
+    virtual void FixBoundary();
 
     //This is Axpy(1.0f, x)
     virtual void AxpyPlus(const CField* x);
@@ -103,6 +104,20 @@ public:
     deviceWilsonVectorSU3** m_pHostResBuffer;
     deviceWilsonVectorSU3** m_pHostLeftBuffer;
 };
+
+#pragma region device functions
+
+//static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3(
+//    const deviceWilsonVectorSU3* __restrict__ pBuffer,
+//    const SIndex& idx,
+//    BYTE byFieldId)
+//{
+//    return idx.IsDirichlet() ?
+//        ((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(idx)]
+//        : pBuffer[idx.m_uiSiteIndex];
+//}
+
+#pragma endregion
 
 __END_NAMESPACE
 

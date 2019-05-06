@@ -17,18 +17,18 @@ __CLGIMPLEMENT_CLASS(CIndexSquare)
 
 static __device__ __inline__ SSmallInt4 _deviceCoordMoving(const SSmallInt4& sFrom, BYTE i)
 {
-    SBYTE offset = i < _DC_Dir ? 1 : -1;
+    SBYTE offset = i < _DC_Dir ? -1 : 1;
     SSmallInt4 ret = sFrom;
     ret.m_byData4[i < _DC_Dir ? (4 - _DC_Dir + i) : (4 - _DC_Dir * 2 + i)] += offset;
     return ret;
 }
 
-static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, UINT* pSmallData)
+static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, const UINT* __restrict__ pSmallData)
 {
-    return sSite.x * pSmallData[CIndexData::kMultX] 
-         + sSite.y * pSmallData[CIndexData::kMultY] 
-         + sSite.z * pSmallData[CIndexData::kMultZ] 
-         + sSite.w;
+    return (sSite.x + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultX]
+         + (sSite.y + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultY]
+         + (sSite.z + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultZ]
+         + (sSite.w + CIndexData::kCacheIndexEdge);
 }
 
 #pragma endregion
@@ -96,7 +96,10 @@ _kernalBakeMappingTable(SIndex* pDeviceData, uint3 mods)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelBakePlaqIndexAtSite(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+_kernelBakePlaqIndexAtSite(SIndex* pResult, 
+    const UINT* __restrict__ pWalkingTable, 
+    const SIndex* __restrict__ pMappingTable, 
+    const UINT* __restrict__ pSmallDataTable)
 {
     intokernalInt4;
 
@@ -125,18 +128,21 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappin
             movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiPlaq)];
             pResult[iListIndex] = pMappingTable[movedSite];
             pResult[iListIndex].m_byDir = uiLink;
-            pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+            pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
             ++iListIndex;
 
             pResult[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+            pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
             ++iListIndex;
         }
     }
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelBakePlaqIndexAtLink(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+_kernelBakePlaqIndexAtLink(SIndex* pResult, 
+    const UINT* __restrict__ pWalkingTable,
+    const SIndex* __restrict__ pMappingTable,
+    const UINT* __restrict__ pSmallDataTable)
 {
     intokernalInt4;
 
@@ -171,7 +177,7 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappin
                 movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiLinkDir)];
                 pResult[iListIndex] = pMappingTable[movedSite];
                 pResult[iListIndex].m_byDir = i;
-                pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+                pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
                 ++iListIndex;
 
                 //=============================================
@@ -181,7 +187,7 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappin
                 movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + i];
                 pResult[iListIndex] = pMappingTable[movedSite];
                 pResult[iListIndex].m_byDir = i;
-                pResult[iListIndex].m_byTag = _kDaggerOrOpposite;
+                pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
                 ++iListIndex;
 
                 //
@@ -202,7 +208,10 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult, UINT* pWalkingTable, SIndex* pMappin
 * gaugemove[linkIndex] = gauge[uiSite - linkIndex]_{linkIndex}
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelCacheGaugeMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+_kernelCacheGaugeMove(SIndex* pCached, 
+    const UINT* __restrict__ pWalkingTable,
+    const SIndex* __restrict__ pMappingTable,
+    const UINT* __restrict__ pSmallDataTable)
 {
     intokernalInt4;
 
@@ -215,7 +224,10 @@ _kernelCacheGaugeMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTabl
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelCacheFermionMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTable, UINT* pSmallDataTable)
+_kernelCacheFermionMove(SIndex* pCached, 
+    const UINT* __restrict__ pWalkingTable,
+    const SIndex* __restrict__ pMappingTable,
+    const UINT* __restrict__ pSmallDataTable)
 {
     intokernalInt4;
 
@@ -223,10 +235,11 @@ _kernelCacheFermionMove(SIndex* pCached, UINT* pWalkingTable, SIndex* pMappingTa
     UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
     for (UINT i = 0; i < uiDir; ++i)
     {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, i);
         //first element is right, second element is left.
-        pCached[(uiSiteIndex * uiDir + i) * 2] 
+        pCached[linkIndex * 2]
             = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i + uiDir]];
-        pCached[(uiSiteIndex * uiDir + i) * 2 + 1]
+        pCached[linkIndex * 2 + 1]
             = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i]];
     }
 }
@@ -237,7 +250,7 @@ UINT CIndexSquare::GetDecompose(UINT volumn)
 {
     TArray<UINT> factors = _getFactors(volumn);
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
-    UINT maxThreadPerBlock = deviceConstraints[0];
+    UINT maxThreadPerBlock = deviceConstraints[1]; //we only use 1 dimension, so it is the constraint of blockDim.x
 
     UINT uiMax = 1;
     for (INT i = 0; i < factors.Num(); ++i)

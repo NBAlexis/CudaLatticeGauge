@@ -125,6 +125,7 @@
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldGauge.cu" />
+    <CudaCompile Include="Data\Lattice\CIndexData.cu" />
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <FileType>Document</FileType>
     </CudaCompile>

@@ -150,22 +150,20 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
     }
 }
 
-//void CLatticeData::GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink)
-//{
-//    BYTE * deviceData;
-//    checkCudaErrors(cudaMalloc((void**)&deviceData, sizeof(BYTE) * 3));
-//
-//    _kernelGetPlaqLengthCount << <1, 1 >> > (deviceData);
-//
-//    BYTE hostData[3];
-//
-//    checkCudaErrors(cudaMemcpy(hostData, deviceData, sizeof(BYTE) * 3, cudaMemcpyDeviceToHost));
-//    checkCudaErrors(cudaFree(deviceData));
-//
-//    plaqLength = hostData[0];
-//    countPerSite = hostData[1];
-//    countPerLink = hostData[2];
-//}
+void CLatticeData::FixAllFieldBoundary()
+{
+    if (m_pIndex->NeedToFixBoundary())
+    {
+        for (UINT i = 0; i < kMaxFieldCount; ++i)
+        {
+            CField* pField = GetFieldById(i);
+            if (NULL != pField)
+            {
+                pField->FixBoundary();
+            }
+        }
+    }
+}
 
 void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc)
 {

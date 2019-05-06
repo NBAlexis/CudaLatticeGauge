@@ -95,13 +95,28 @@ public:
         checkCudaErrors(cudaFree(m_pDeviceIndexPositionToSIndex));
     }
 
+    __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx) const
+    {
+        SSmallInt4 coord;
+        coord.x = static_cast<SBYTE>(uiBigIdx / m_pSmallData[kMultX]) - CIndexData::kCacheIndexEdge;
+        coord.y = static_cast<SBYTE>((uiBigIdx % m_pSmallData[kMultX]) / m_pSmallData[kMultY]) - CIndexData::kCacheIndexEdge;
+        coord.z = static_cast<SBYTE>((uiBigIdx % m_pSmallData[kMultY]) / m_pSmallData[kMultZ]) - CIndexData::kCacheIndexEdge;
+        coord.w = static_cast<SBYTE>(uiBigIdx % m_pSmallData[kMultZ]) - CIndexData::kCacheIndexEdge;
+        return coord;
+    }
+
     __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& inSite) const
     {
-        return inSite.x * m_pSmallData[CIndexData::kMultX]
-             + inSite.y * m_pSmallData[CIndexData::kMultY]
-             + inSite.z * m_pSmallData[CIndexData::kMultZ]
-             + inSite.w;
+        return (inSite.x + CIndexData::kCacheIndexEdge) * m_pSmallData[CIndexData::kMultX]
+             + (inSite.y + CIndexData::kCacheIndexEdge) * m_pSmallData[CIndexData::kMultY]
+             + (inSite.z + CIndexData::kCacheIndexEdge) * m_pSmallData[CIndexData::kMultZ]
+             + (inSite.w + CIndexData::kCacheIndexEdge);
     } 
+
+    __device__ __inline__ SIndex _deviceGetMappingIndex(const SSmallInt4& inSite, BYTE byFieldId) const
+    {
+        return m_pDeviceIndexPositionToSIndex[byFieldId][_deviceGetBigIndex(inSite)];
+    }
 
     __device__ __inline__ SIndex _deviceIndexWalk(
         BYTE byFieldId, 
@@ -121,7 +136,7 @@ public:
     __device__ void _deviceIndexWalkChain(
         BYTE byFieldId, 
         const SSmallInt4& inSite,
-        const SBYTE* uiWalkDir, 
+        const SBYTE* __restrict__ uiWalkDir, 
         SIndex* res, 
         BYTE byCount) const
     {
@@ -143,10 +158,9 @@ public:
         return NULL == m_byRegionTable ? 0 : m_byRegionTable[site.m_byReginId];
     }
 
-    __device__ void DebugPrintWalkingTable()
-    {
+    static void DebugPrintWalkingTable();
 
-    }
+    static void DebugPlaqutteTable();
 
     //=============================================================
     //Small Data

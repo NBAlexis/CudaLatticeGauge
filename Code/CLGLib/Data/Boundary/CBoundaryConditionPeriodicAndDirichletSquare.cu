@@ -40,43 +40,48 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     uint3 mods)
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-    SSmallInt4 coord;
-    coord.x = static_cast<SBYTE>(idxAll / mods.x);
-    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y);
-    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z);
-    coord.w = static_cast<SBYTE>(idxAll % mods.z);
-
-    SSmallInt4 realCoord = coord;
-    realCoord.x -= CIndexData::kCacheIndexEdge;
-    realCoord.y -= CIndexData::kCacheIndexEdge;
-    realCoord.z -= CIndexData::kCacheIndexEdge;
-    realCoord.w -= CIndexData::kCacheIndexEdge;
+    
+    SSmallInt4 realCoord;
+    realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
+    
+    SSmallInt4 orig = realCoord;
 
     SBYTE signchange = 1;
     BYTE byRegionId = 0;
     for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
     {
-        if (realCoord.m_byData4[uiDir] < 0)
+        if (realCoord.m_byData4[uiDir] <= 0)
         {
-            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+            if (realCoord.m_byData4[uiDir] < 0)
+            {
+                realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+            }
+            
             if (0 == bc.m_byData4[uiDir])
             {
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
             }
-            else
+            else if (realCoord.m_byData4[uiDir] < 0)
             {
                 signchange = signchange * bc.m_byData4[uiDir];
             }
             
         }
-        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir] - 1)
         {
-            realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+            if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+            {
+                realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+            }
+            
             if (0 == bc.m_byData4[uiDir])
             {
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
             }
-            else
+            else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
             {
                 signchange = signchange * bc.m_byData4[uiDir];
             }
@@ -89,6 +94,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     pDeviceData[idxAll].m_byReginId = byRegionId;
     if (0 != byRegionId)
     {
+        //printf("We have dirichlet bc %d %d %d %d\n", orig.x, orig.y, orig.z, orig.w);
         pDeviceData[idxAll].m_byTag |= _kDirichlet;
     }
 }
@@ -99,8 +105,8 @@ CBoundaryConditionPeriodicAndDirichletSquare::CBoundaryConditionPeriodicAndDiric
 {
     for (UINT i = 0; i < _kMaxFieldCount; ++i)
     {
-        m_FieldBC[i].x = 1;
-        m_FieldBC[i].y = 1;
+        m_FieldBC[i].x = 0;
+        m_FieldBC[i].y = 0;
         m_FieldBC[i].z = 1;
         m_FieldBC[i].w = -1;
     }
@@ -127,6 +133,9 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeEdgePoints(BYTE byFieldId
     UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
     dim3 threads(threadPerSite, 1, 1);
     dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+
+    //appGeneral(_T("block=%d, %d, %d, thread= %d, %d, %d\n"), blocks.x, blocks.y, blocks.z, threads.x, threads.y, threads.z);
+
     biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
@@ -138,7 +147,7 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeRegionTable(UINT* deviceT
 {
     UINT regionTable[256];
 
-    for (BYTE i = 0; i <= 255; ++i)
+    for (UINT i = 0; i < 256; ++i)
     {
         regionTable[i] = 0;
         if (0 != (i & byXLeft))

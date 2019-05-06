@@ -45,17 +45,18 @@ TestDebug:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [6, 6, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
 
-    ##10x10x10 blocks, each with 16x16x4 threads, each thread loop for 200 times
-    PiDecomp: [10, 10, 10, 16, 16, 4, 200]
-    GaussianDecomp: [3, 2, 2, 16, 16, 4, 100]
-    HostSample : 1000
-
-    TestAccuracy : 0.0015
+    Gauge:
+	
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
 
 TestSmallMatrix:
 
@@ -1776,15 +1777,17 @@ TestSaveConfigurationLowMode:
 
 
 TestDirichletBoundary:
+
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 8]
+    LatticeLength : [6, 6, 4, 8]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ActionListLength : 1
+    ActionListLength : 2
+    FermionFieldCount : 1
     MeasureListLength : 1
     ExpectedRes : 0.2064
 
@@ -1798,7 +1801,7 @@ TestDirichletBoundary:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 30
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -1814,11 +1817,37 @@ TestDirichletBoundary:
     GaugeBoundary:
 
         FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
 		
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 3
+        Beta : 5
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
 
     Measure1:
 

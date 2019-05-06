@@ -401,5 +401,8 @@
     <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu">
       <Filter>Data\Boundary</Filter>
     </CudaCompile>
+    <CudaCompile Include="Data\Lattice\CIndexData.cu">
+      <Filter>Data\Lattice</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

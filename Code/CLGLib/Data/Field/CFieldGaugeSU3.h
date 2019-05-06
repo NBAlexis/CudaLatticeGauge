@@ -63,6 +63,7 @@ public:
     virtual void Axpy(const CLGComplex& a, const CField* x);
     virtual void ScalarMultply(const CLGComplex& a);
     virtual void ScalarMultply(Real a);
+    virtual void FixBoundary();
 
 #pragma endregion
 
@@ -80,6 +81,21 @@ protected:
 
     void SetByArray(Real* array);
 };
+
+//#pragma region device functions
+//
+//static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3(
+//    const deviceSU3* __restrict__ pBuffer,
+//    const SIndex& idx)
+//{
+//    return idx.IsDirichlet() ?
+//        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
+//            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+//        ]
+//        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+//}
+//
+//#pragma endregion
 
 __END_NAMESPACE
 

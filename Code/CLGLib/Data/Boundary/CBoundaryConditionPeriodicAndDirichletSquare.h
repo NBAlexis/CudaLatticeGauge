@@ -3,6 +3,9 @@
 // 
 // DESCRIPTION:
 // This is the periodic boundary and Dirichlet condition
+// For Dirichlet boundary, we set the boundary to fixed values before evaluation
+// That is because, if we only get element values from fixed values, the Hamitonian will changed (not adiabat)
+// Therefor, the Metropolis step will fail.
 //
 // REVISION:
 //  [04/20/2019 nbale]
@@ -41,7 +44,7 @@ public:
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
 
     virtual void BakeRegionTable(UINT* deviceTable) const;
-
+    virtual UBOOL NeedToFixBoundary() const { return TRUE; }
 };
 
 __END_NAMESPACE

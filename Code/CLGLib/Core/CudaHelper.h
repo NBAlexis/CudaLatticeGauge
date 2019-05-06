@@ -154,7 +154,10 @@ public:
 
     #pragma region global temperary buffers
 
-    //make sure this is called after thread is partioned
+    /**
+    * The buffer size is NOT thread count of a block, but thread count of a grid
+    * make sure this is called after thread is partitioned
+    */
     void AllocateTemeraryBuffers(UINT uiThreadCount);
 
     void ReleaseTemeraryBuffers()

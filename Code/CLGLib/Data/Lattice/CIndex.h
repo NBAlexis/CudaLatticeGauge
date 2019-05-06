@@ -44,13 +44,18 @@ class CLGAPI CIndex : public CBase
 {
 public:
 
-    CIndex() : m_pBoundaryCondition(NULL) {  }
+    CIndex() : m_pBoundaryCondition(NULL), m_bNeedToFixBoundary(FALSE) {  }
     ~CIndex()
     {
         appSafeDelete(m_pBoundaryCondition);
     }
 
-    void SetBoundaryCondition(class CBoundaryCondition * pBc) { m_pBoundaryCondition = pBc; }
+    void SetBoundaryCondition(class CBoundaryCondition * pBc) 
+    { 
+        m_pBoundaryCondition = pBc; 
+        m_bNeedToFixBoundary = pBc->NeedToFixBoundary();
+    }
+
     /**
     * Now the functional of the Index is data-based.
     * All index walking thing is cached here
@@ -67,7 +72,10 @@ public:
     */
     virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) = 0;
 
+    UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
+
     class CBoundaryCondition * m_pBoundaryCondition;
+    UBOOL m_bNeedToFixBoundary;
 };
 
 

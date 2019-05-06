@@ -53,6 +53,7 @@ public:
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) = 0;
 
     virtual void BakeRegionTable(UINT* deviceTable) const {}
+    virtual UBOOL NeedToFixBoundary() const { return FALSE; }
 
 protected:
 

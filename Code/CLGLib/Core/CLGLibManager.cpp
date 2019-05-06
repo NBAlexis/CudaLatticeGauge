@@ -334,7 +334,7 @@ void CCLGLibManager::CreateGaugeBoundaryField(class CParameters& params)
     pGauge->InitialField(params);
 
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(1, pGauge);
-    appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
+    appGeneral(_T("Create the boundary gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 }
 
 void CCLGLibManager::CreateFermionFields(class CParameters& params)
@@ -398,7 +398,24 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
 
 void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params)
 {
+    CCString sValues;
+    INT iVaules;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldBoundaryWilsonSquareSU3"));
+    CCString sFieldClassName = sValues;
 
+    CBase* pBCField = appCreate(sFieldClassName);
+    CFieldBoundary* pBC = (NULL != pBCField) ? (dynamic_cast<CFieldBoundary*>(pBCField)) : NULL;
+
+    if (NULL == pBC)
+    {
+        appCrucial(_T("Unable to create the boundary fermion field! with name %s!"), sFieldClassName.c_str());
+    }
+    pBC->InitialField(params);
+
+    __FetchIntWithDefault(_T("FieldId"), -1);
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
+    appGeneral(_T("Create the boundary fermion field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
 }
 
 void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
@@ -641,6 +658,13 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             {
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
                 CreateFermionFields(fermionField);
+            }
+
+            sFermionSubParamName.Format(_T("BoundaryFermionField%d"), i);
+            if (params.Exist(sFermionSubParamName))
+            {
+                CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
+                CreateFermionBoundaryField(bcfermionField);
             }
         }
     }

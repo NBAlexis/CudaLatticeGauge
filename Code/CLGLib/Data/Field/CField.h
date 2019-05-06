@@ -79,6 +79,7 @@ public:
 
     virtual void Zero() = 0;
     virtual void Indentity() = 0;
+    virtual void FixBoundary() = 0;
 
     //This is Axpy(1.0f, x)
     virtual void AxpyPlus(const CField* x) = 0;

@@ -253,6 +253,7 @@ _kernelDFermionWilsonSquareSU3(
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         SIndex x_m_mu_Gauge = pGaugeMove[linkIndex]; //__idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        
         SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
         SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1]; //__idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, -(idir + 1));
 
@@ -413,6 +414,18 @@ _kernelMakePointSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite, B
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelFixBoundaryWilsonSU3(deviceWilsonVectorSU3* pDeviceData, BYTE byFieldId)
+{
+    intokernalInt4;
+
+    SIndex idx = __idx->_deviceGetMappingIndex(sSite4, byFieldId);
+    if (idx.IsDirichlet())
+    {
+        pDeviceData[uiSiteIndex] = ((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(idx)];
+    }
+}
+
 #pragma endregion
 
 CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() 
@@ -436,6 +449,7 @@ CFieldFermionWilsonSquareSU3::~CFieldFermionWilsonSquareSU3()
 void CFieldFermionWilsonSquareSU3::InitialField(EFieldInitialType eInitialType)
 {
     preparethread;
+
     _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, eInitialType);
 }
 
@@ -963,6 +977,14 @@ void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceD
         appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
         break;
     }
+}
+
+void CFieldFermionWilsonSquareSU3::FixBoundary()
+{
+    appDetailed(_T("CFieldFermionWilsonSquareSU3::FixBoundary()\n"));
+
+    preparethread;
+    _kernelFixBoundaryWilsonSU3 << <block, threads >> >(m_pDeviceData, m_byFieldId);
 }
 
 void CFieldFermionWilsonSquareSU3::SetKai(Real fKai)

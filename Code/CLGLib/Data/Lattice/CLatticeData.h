@@ -28,6 +28,8 @@ public:
     //void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);
     void SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc);
+    void FixAllFieldBoundary();
+
     CCString GetInfos(const CCString& sTab) const;
 
     class CRandom* m_pRandom;

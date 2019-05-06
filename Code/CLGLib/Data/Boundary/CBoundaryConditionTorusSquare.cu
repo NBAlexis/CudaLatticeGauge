@@ -23,17 +23,11 @@ _kernalBakeEdgeTorusBoundary(
     uint3 mods)
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-    SSmallInt4 coord;
-    coord.x = static_cast<SBYTE>(idxAll / mods.x);
-    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y);
-    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z);
-    coord.w = static_cast<SBYTE>(idxAll % mods.z);
-
-    SSmallInt4 realCoord = coord;
-    realCoord.x -= CIndexData::kCacheIndexEdge;
-    realCoord.y -= CIndexData::kCacheIndexEdge;
-    realCoord.z -= CIndexData::kCacheIndexEdge;
-    realCoord.w -= CIndexData::kCacheIndexEdge;
+    SSmallInt4 realCoord;
+    realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
     SBYTE signchange = 1;
     for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)

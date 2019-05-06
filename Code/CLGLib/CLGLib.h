@@ -124,8 +124,10 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 //=======================================================
 //Field
 #include "Data/Field/CField.h"
+#include "Data/Field/BoundaryField/CFieldBoundary.h"
 
 #include "Data/Field/CFieldGauge.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
 #include "Data/Field/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldGaugeZ2.h"
 
@@ -134,11 +136,9 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 //#include "Data/Field/CFieldSpin.h"
 
 #include "Data/Field/CFieldFermion.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3.h"
 
-#include "Data/Field/BoundaryField/CFieldBoundary.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
 
 //=====================================================
 
