@@ -1789,7 +1789,7 @@ TestDirichletBoundary:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.2064
+    ExpectedRes : 0.405
 
     Updator:
 
@@ -1801,7 +1801,7 @@ TestDirichletBoundary:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 30
+        IntegratorStep : 35
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -1836,7 +1836,7 @@ TestDirichletBoundary:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         MaxDim : 20
-        Accuracy : 0.0001
+        Accuracy : 0.00001
         Restart : 20
         AbsoluteAccuracy : 1
 

@@ -11,7 +11,7 @@
 
 UINT TestBoundary(CParameters& sParam)
 {
-    Real fExpected = F(0.2064);
+    Real fExpected = F(0.405);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
     //we calculate staple energy from beta = 1 - 6
@@ -29,26 +29,26 @@ UINT TestBoundary(CParameters& sParam)
     //pAction->SetBeta(F(3.0));
 
     //Equilibration
-    appGetLattice()->m_pUpdator->Update(10, FALSE);
+    appGetLattice()->m_pUpdator->Update(5, FALSE);
 
     //Measure
     pMeasure->Reset();
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
-    appGetLattice()->m_pUpdator->Update(40, TRUE);
+    appGetLattice()->m_pUpdator->Update(20, TRUE);
 
     Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
     UINT uiError = 0;
-    if (appAbs(fRes - fExpected) > F(0.005))
+    if (appAbs(fRes - fExpected) > F(0.02))
     {
         ++uiError;
     }
 
     UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/25) : expected >= 23. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
-    if (uiAccept < 45)
+    if (uiAccept < 23)
     {
         ++uiError;
     }
@@ -61,7 +61,7 @@ UINT TestBoundary(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestBoundary, Boundary, TestDirichletBoundary);
+__REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
 
 
 //=============================================================================
