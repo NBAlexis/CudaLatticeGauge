@@ -281,6 +281,9 @@
     <ClInclude Include="Data\Lattice\CIndexData.h">
       <Filter>Data\Lattice</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -403,6 +406,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Lattice\CIndexData.cu">
       <Filter>Data\Lattice</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu">
+      <Filter>Data\Action</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

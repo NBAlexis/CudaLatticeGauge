@@ -145,6 +145,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Data/Action/CAction.h"
 #include "Data/Action/CActionGaugePlaquette.h"
 #include "Data/Action/CActionFermionWilsonNf2.h"
+#include "Data/Action/CActionGaugePlaquetteRotating.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"

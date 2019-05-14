@@ -1852,3 +1852,75 @@ TestDirichletBoundary:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+TestRotation:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [5, 5, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    ExpectedRes : 0.81
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+	
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1355
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+		
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5
+        Omega : 0.5
+        ## Index start from 0, so length = 5 means 0,1,2,3,4, the center is 2
+        Center : [2, 2, 0, 0]
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

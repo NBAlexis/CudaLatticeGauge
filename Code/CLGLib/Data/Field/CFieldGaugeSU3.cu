@@ -35,7 +35,11 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
     deviceSU3 id = deviceSU3::makeSU3Id();
     deviceSU3 zero = deviceSU3::makeSU3Zero();
 
-    gaugeSU3KernelFuncionStart
+    intokernalInt4;
+    BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         switch (eInitialType)
         {
@@ -56,7 +60,15 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
         break;
         case EFIT_RandomGenerator:
         {
-            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(uiSiteIndex, idir + 1));
+            if (__idx->m_pDeviceIndexPositionToSIndex[1]
+                [__idx->_deviceGetBigIndex(sSite4)].IsDirichlet())
+            {
+                pDevicePtr[uiLinkIndex] = zero;
+            }
+            else
+            {
+                pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(uiSiteIndex, idir + 1));
+            }
         }
         break;
         case EFIT_SumGenerator:
@@ -70,8 +82,7 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
         }
         break;
         }
-
-    gaugeSU3KernelFuncionEnd
+    }
 }
 
 __global__ void _CLG_LAUNCH_BOUND

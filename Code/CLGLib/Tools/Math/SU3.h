@@ -480,6 +480,19 @@ extern "C" {
             m_me[8] = _cuCaddf(m_me[8], right.m_me[8]);
         }
 
+        __device__ __inline__ void AddDagger(const deviceSU3& right)
+        {
+            m_me[0] = _cuCaddf(m_me[0], _cuConjf(right.m_me[0]));
+            m_me[1] = _cuCaddf(m_me[1], _cuConjf(right.m_me[3]));
+            m_me[2] = _cuCaddf(m_me[2], _cuConjf(right.m_me[6]));
+            m_me[3] = _cuCaddf(m_me[3], _cuConjf(right.m_me[1]));
+            m_me[4] = _cuCaddf(m_me[4], _cuConjf(right.m_me[4]));
+            m_me[5] = _cuCaddf(m_me[5], _cuConjf(right.m_me[7]));
+            m_me[6] = _cuCaddf(m_me[6], _cuConjf(right.m_me[2]));
+            m_me[7] = _cuCaddf(m_me[7], _cuConjf(right.m_me[5]));
+            m_me[8] = _cuCaddf(m_me[8], _cuConjf(right.m_me[8]));
+        }
+
         __device__ __inline__ void Sub(const deviceSU3& right)
         {
             m_me[0] = _cuCsubf(m_me[0], right.m_me[0]);
@@ -491,6 +504,19 @@ extern "C" {
             m_me[6] = _cuCsubf(m_me[6], right.m_me[6]);
             m_me[7] = _cuCsubf(m_me[7], right.m_me[7]);
             m_me[8] = _cuCsubf(m_me[8], right.m_me[8]);
+        }
+
+        __device__ __inline__ void SubDagger(const deviceSU3& right)
+        {
+            m_me[0] = _cuCsubf(m_me[0], _cuConjf(right.m_me[0]));
+            m_me[1] = _cuCsubf(m_me[1], _cuConjf(right.m_me[3]));
+            m_me[2] = _cuCsubf(m_me[2], _cuConjf(right.m_me[6]));
+            m_me[3] = _cuCsubf(m_me[3], _cuConjf(right.m_me[1]));
+            m_me[4] = _cuCsubf(m_me[4], _cuConjf(right.m_me[4]));
+            m_me[5] = _cuCsubf(m_me[5], _cuConjf(right.m_me[7]));
+            m_me[6] = _cuCsubf(m_me[6], _cuConjf(right.m_me[2]));
+            m_me[7] = _cuCsubf(m_me[7], _cuConjf(right.m_me[5]));
+            m_me[8] = _cuCsubf(m_me[8], _cuConjf(right.m_me[8]));
         }
 
         __device__ __inline__ void AddReal(Real right)

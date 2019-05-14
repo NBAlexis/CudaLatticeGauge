@@ -31,6 +31,7 @@
     <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
     <ClCompile Include="Tests\TestOperators.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
+    <ClCompile Include="Tests\TestRotation.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
     <ClCompile Include="Tests\TestSU3Generator.cpp" />
     <ClCompile Include="Tests\TestUpdator.cpp" />

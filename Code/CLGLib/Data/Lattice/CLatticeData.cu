@@ -156,7 +156,7 @@ void CLatticeData::FixAllFieldBoundary()
     {
         for (UINT i = 0; i < kMaxFieldCount; ++i)
         {
-            CField* pField = GetFieldById(i);
+            CField* pField = GetFieldById(static_cast<BYTE>(i));
             if (NULL != pField)
             {
                 pField->FixBoundary();

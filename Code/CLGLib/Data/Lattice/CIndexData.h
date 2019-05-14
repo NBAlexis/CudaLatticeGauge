@@ -118,40 +118,89 @@ public:
         return m_pDeviceIndexPositionToSIndex[byFieldId][_deviceGetBigIndex(inSite)];
     }
 
-    __device__ __inline__ SIndex _deviceIndexWalk(
-        BYTE byFieldId, 
-        const SSmallInt4& inSite, 
-        SBYTE uiWalkDir) const
-    {
-        //walking
-        return m_pDeviceIndexPositionToSIndex[byFieldId]
-            [m_pWalkingTable
-                [
-                _deviceGetBigIndex(inSite) * 2 * _DC_Dir 
-                + (uiWalkDir > 0) ? (uiWalkDir - 1) : (_DC_Dir - uiWalkDir - 1)
-                ]
-            ];
-    }
+    //====================================================
+    //Directly using m_pDeviceIndexPositionToSIndex
+    //====================================================
+    //__device__ __inline__ SIndex _deviceIndexWalk(
+    //    BYTE byFieldId, const SSmallInt4& inSite, SBYTE uiWalkDir) const
+    //{
+    //    //walking
+    //    return m_pDeviceIndexPositionToSIndex[byFieldId]
+    //        [_deviceIndexWalkBI(byFieldId, _deviceGetBigIndex(inSite), uiWalkDir)];
+    //}
 
-    __device__ void _deviceIndexWalkChain(
-        BYTE byFieldId, 
-        const SSmallInt4& inSite,
-        const SBYTE* __restrict__ uiWalkDir, 
-        SIndex* res, 
-        BYTE byCount) const
-    {
-        //map to Index Position
-        UINT idxPos = _deviceGetBigIndex(inSite);
-        for (BYTE i = 0; i < byCount; ++i)
-        {
-            BYTE dirNow = uiWalkDir[i];
-            //walking
-            dirNow = (dirNow > 0) ? (dirNow - 1) : static_cast<BYTE>(_DC_Dir - dirNow - 1);
-            idxPos = m_pWalkingTable[idxPos * 2 * _DC_Dir + dirNow];
-            //return a SIndex
-            res[i] = m_pDeviceIndexPositionToSIndex[byFieldId][idxPos];
-        }
-    }
+    //__device__ __inline__ SIndex _deviceIndexWalkDouble(
+    //    BYTE byFieldId, const SSmallInt4& inSite,
+    //    SBYTE uiWalkDir1, SBYTE uiWalkDir2) const
+    //{
+    //    //walking
+    //    UINT uiMoved = m_pWalkingTable
+    //        [
+    //            _deviceGetBigIndex(inSite) * 2 * _DC_Dir
+    //            + (uiWalkDir1 > 0) ? (uiWalkDir1 - 1) : (_DC_Dir - uiWalkDir1 - 1)
+    //        ];
+    //    uiMoved = m_pWalkingTable
+    //        [
+    //            uiMoved * 2 * _DC_Dir
+    //            + (uiWalkDir2 > 0) ? (uiWalkDir2 - 1) : (_DC_Dir - uiWalkDir2 - 1)
+    //        ];
+
+    //    return m_pDeviceIndexPositionToSIndex[byFieldId]
+    //        [_deviceIndexWalkDoubleBI(
+    //            byFieldId, 
+    //            _deviceGetBigIndex(inSite), 
+    //            uiWalkDir1, 
+    //            uiWalkDir2
+    //        )];
+    //}
+
+    //__device__ __inline__ UINT _deviceIndexWalkBI(
+    //    BYTE byFieldId, UINT uiBigIndex,
+    //    SBYTE uiWalkDir) const
+    //{
+    //    //walking
+    //    return m_pWalkingTable
+    //        [
+    //            uiBigIndex * 2 * _DC_Dir
+    //            + (uiWalkDir > 0) ? (uiWalkDir - 1) : (_DC_Dir - uiWalkDir + 1)
+    //        ];
+    //}
+
+    //__device__ __inline__ UINT _deviceIndexWalkDoubleBI(
+    //    BYTE byFieldId, UINT uiBigIndex,
+    //    SBYTE uiWalkDir1, SBYTE uiWalkDir2) const
+    //{
+    //    //walking
+    //    UINT uiMoved = m_pWalkingTable
+    //        [
+    //            uiBigIndex * 2 * _DC_Dir
+    //            + (uiWalkDir1 > 0) ? (uiWalkDir1 - 1) : (_DC_Dir - uiWalkDir1 + 1)
+    //        ];
+    //    return m_pWalkingTable
+    //        [
+    //            uiMoved * 2 * _DC_Dir
+    //            + (uiWalkDir2 > 0) ? (uiWalkDir2 - 1) : (_DC_Dir - uiWalkDir2 + 1)
+    //        ];
+    //}
+
+    //__device__ void _deviceIndexWalkChain(
+    //    BYTE byFieldId, const SSmallInt4& inSite,
+    //    const SBYTE* __restrict__ uiWalkDir, 
+    //    SIndex* res, 
+    //    BYTE byCount) const
+    //{
+    //    //map to Index Position
+    //    UINT idxPos = _deviceGetBigIndex(inSite);
+    //    for (BYTE i = 0; i < byCount; ++i)
+    //    {
+    //        BYTE dirNow = uiWalkDir[i];
+    //        //walking
+    //        dirNow = (dirNow > 0) ? (dirNow - 1) : static_cast<BYTE>(_DC_Dir - dirNow + 1);
+    //        idxPos = m_pWalkingTable[idxPos * 2 * _DC_Dir + dirNow];
+    //        //return a SIndex
+    //        res[i] = m_pDeviceIndexPositionToSIndex[byFieldId][idxPos];
+    //    }
+    //}
 
     __device__ __inline__ UINT _devcieExchangeBoundaryFieldSiteIndex(const SIndex &site) const
     {

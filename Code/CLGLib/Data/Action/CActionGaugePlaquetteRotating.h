@@ -1,28 +1,26 @@
 //=============================================================================
-// FILENAME : CActionGaugePlaquette.h
+// FILENAME : CActionGaugePlaquetteRotating.h
 // 
 // DESCRIPTION:
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
 //
 // REVISION:
-//  [12/4/2018 nbale]
+//  [05/07/2019 nbale]
 //=============================================================================
 
-#ifndef _CACTIONGAUGEPLAQUETTE_H_
-#define _CACTIONGAUGEPLAQUETTE_H_
+#ifndef _CACTIONGAUGEPLAQUETTE_ROTATING_H_
+#define _CACTIONGAUGEPLAQUETTE_ROTATING_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CActionGaugePlaquette)
+__CLG_REGISTER_HELPER_HEADER(CActionGaugePlaquetteRotating)
 
-class CLGAPI CActionGaugePlaquette : public CAction
+class CLGAPI CActionGaugePlaquetteRotating : public CAction
 {
-    __CLGDECLARE_CLASS(CActionGaugePlaquette)
+    __CLGDECLARE_CLASS(CActionGaugePlaquetteRotating)
 public:
-    /**
-    * Make sure this is called after lattice and fields are created.
-    */
-    CActionGaugePlaquette();
+
+    CActionGaugePlaquetteRotating();
 
     virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable);
     virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
@@ -33,7 +31,11 @@ public:
     virtual CCString GetInfos(const CCString &tab) const;
 
     void SetBeta(Real fBeta);
-    Real GetEnergyPerPlaqutte() const;
+    void SetOmega(Real fOmega) { m_fOmega = fOmega; }
+    //Real GetEnergyPerPlaqutte() const;
+
+    Real m_fOmega;
+    SSmallInt4 m_sCenter;
 
 protected:
 
@@ -45,7 +47,7 @@ protected:
 
 __END_NAMESPACE
 
-#endif //#ifndef _CACTIONGAUGEPLAQUETTE_H_
+#endif //#ifndef _CACTIONGAUGEPLAQUETTE_ROTATING_H_
 
 //=============================================================================
 // END OF FILE

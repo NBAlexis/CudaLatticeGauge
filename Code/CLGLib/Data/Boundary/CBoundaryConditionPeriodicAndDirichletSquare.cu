@@ -3,6 +3,7 @@
 // 
 // DESCRIPTION:
 // This is the periodic boundary condition
+// 
 //
 // REVISION:
 //  [12/5/2018 nbale]
@@ -47,7 +48,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
     realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
     
-    SSmallInt4 orig = realCoord;
+    //SSmallInt4 orig = realCoord;
 
     SBYTE signchange = 1;
     BYTE byRegionId = 0;
@@ -59,7 +60,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             {
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
             }
-            
+
             if (0 == bc.m_byData4[uiDir])
             {
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
@@ -68,7 +69,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             {
                 signchange = signchange * bc.m_byData4[uiDir];
             }
-            
+
         }
         else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir] - 1)
         {
@@ -76,7 +77,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             {
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             }
-            
+
             if (0 == bc.m_byData4[uiDir])
             {
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
