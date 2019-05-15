@@ -1786,10 +1786,13 @@ TestDirichletBoundary:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+    ##ActionListLength : 1
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.405
+    ExpectedRes : 0.435
+    ##Important, do not calculate energy using staple for Dirichlet
+    CacheStaple : 0 
 
     Updator:
 
@@ -1801,7 +1804,7 @@ TestDirichletBoundary:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 35
+        IntegratorStep : 25
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -1844,6 +1847,7 @@ TestDirichletBoundary:
    
         ActionName : CActionGaugePlaquette
         Beta : 5
+        Using4Plaqutte : 1
 
     Action2:
         ActionName : CActionFermionWilsonNf2

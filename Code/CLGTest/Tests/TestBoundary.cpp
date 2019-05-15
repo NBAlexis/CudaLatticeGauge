@@ -11,7 +11,7 @@
 
 UINT TestBoundary(CParameters& sParam)
 {
-    Real fExpected = F(0.405);
+    Real fExpected = F(0.435);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
     //we calculate staple energy from beta = 1 - 6
@@ -37,7 +37,7 @@ UINT TestBoundary(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(20, TRUE);
 
     Real fRes = pMeasure->m_fLastRealResult;
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+    appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.02))
     {

@@ -39,12 +39,14 @@ public:
 
     CBoundaryConditionPeriodicAndDirichletSquare();
 
-    virtual void BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const;
+    virtual void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const;
 
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
 
     virtual void BakeRegionTable(UINT* deviceTable) const;
-    virtual UBOOL NeedToFixBoundary() const { return TRUE; }
+
+    //It is only neccessary when simulating with holes or inpuries
+    //virtual UBOOL NeedToFixBoundary() const { return TRUE; }
 };
 
 __END_NAMESPACE

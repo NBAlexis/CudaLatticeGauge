@@ -45,7 +45,7 @@ public:
         
     }
 
-    virtual void BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const = 0;
+    virtual void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const = 0;
 
     /**
     * For example, set field Id of BC or set anti-periodic condition

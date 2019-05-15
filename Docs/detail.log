@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  18 APR 2019 18:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  14 MAY 2019 23:43
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1406,43 +1406,43 @@ Overfull \hbox (11.53699pt too wide) in paragraph at lines 136--137
 (Applications/RotatingFrame.tex [53
 
 ] [54] [55] [56] [57]
-Overfull \hbox (2.78526pt too wide) detected at line 272
+Overfull \hbox (2.78526pt too wide) detected at line 274
 []
  []
 
 [58]
-Overfull \hbox (8.27637pt too wide) detected at line 298
+Overfull \hbox (8.27637pt too wide) detected at line 300
 []
  []
 
 
-Overfull \hbox (22.72751pt too wide) detected at line 317
+Overfull \hbox (22.72751pt too wide) detected at line 319
 []
  []
 
 [59] [60]
-Overfull \hbox (18.00261pt too wide) detected at line 393
+Overfull \hbox (18.00261pt too wide) detected at line 395
 []
  []
 
 
-Overfull \hbox (31.96808pt too wide) detected at line 416
+Overfull \hbox (31.96808pt too wide) detected at line 418
 []
  []
 
 [61]
-Overfull \hbox (18.94774pt too wide) detected at line 476
+Overfull \hbox (18.94774pt too wide) detected at line 478
 []
  []
 
 [62] [63] [64]
-Overfull \hbox (0.11786pt too wide) in paragraph at lines 591--592
+Overfull \hbox (0.11786pt too wide) in paragraph at lines 595--596
 []\OT1/cmr/m/n/10.53937 Note that \OT1/cmr/bx/n/10.53937 Both the force from ga
 uge and fermion ac-tions are kept anti-hermitian
  []
 
-) (Applications/SampleProducer.tex [65]) [66] (detail.ind<<c1956.cmap>><<c1961.
-cmap>> [67
+[65]) (Applications/SampleProducer.tex) [66] (detail.ind<<c1956.cmap>><<c1961.c
+map>> [67
 
 
 ] [68
@@ -1488,10 +1488,10 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 170.
  ) 
 Here is how much of TeX's memory you used:
- 28736 strings out of 492976
- 476514 string characters out of 3141819
- 971135 words of memory out of 3000000
- 31584 multiletter control sequences out of 15000+200000
+ 28740 strings out of 492976
+ 476575 string characters out of 3141819
+ 971151 words of memory out of 3000000
+ 31587 multiletter control sequences out of 15000+200000
  555195 words of font info for 109 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
  44i,33n,63p,836b,1989s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1517,9 +1517,9 @@ KTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmtt10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.
 pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><D:/CTEX/MiKTe
 X/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (70 pages, 668792 bytes).
+Output written on detail.pdf (70 pages, 669973 bytes).
 PDF statistics:
- 1457 PDF objects out of 1728 (max. 8388607)
- 549 named destinations out of 1000 (max. 500000)
+ 1460 PDF objects out of 1728 (max. 8388607)
+ 550 named destinations out of 1000 (max. 500000)
  501 words of extra memory for PDF output out of 10000 (max. 10000000)
 

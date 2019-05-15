@@ -88,6 +88,16 @@ public:
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
 
+#pragma region real operators
+
+    /**
+    * It seems no need to create a "Foprt" class like Bridge++
+    */
+    //virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, UBOOL bDagger);
+    //virtual void DerivateDOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer);
+
+#pragma endregion
+
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return TRUE; }
 

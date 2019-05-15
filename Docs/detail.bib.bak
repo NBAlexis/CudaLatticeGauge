@@ -123,11 +123,9 @@
 }
 
 @article{matrixcomputation,
-      author         = "Hussam Al Daas et. al.",
-      title          = "{Recycling Krylov subspaces and reducing deflation subspaces for solving sequence of linear systems}",
-      year           = "2018",
-      journal        = "RR-9206, Inria Paris",
-      url            = "https://hal.inria.fr/hal-01886546"
+      author         = "Gene H. Golub, Charles F. Van Loan",
+      title          = "{Matrix computations}",
+      year           = "1996",
 }
 
 %======================================================================================

@@ -19,15 +19,16 @@ __CLGIMPLEMENT_CLASS(CBoundaryConditionTorusSquare)
 __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeEdgeTorusBoundary(
     SSmallInt4 bc, 
+    const SSmallInt4* __restrict__ pMapping,
     SIndex* pDeviceData, 
     uint3 mods)
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-    SSmallInt4 realCoord;
-    realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
-    realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
-    realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
-    realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
+    SSmallInt4 realCoord(pMapping[idxAll]);
+    //realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    //realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
     SBYTE signchange = 1;
     for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
@@ -70,7 +71,7 @@ void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBo
     m_FieldBC[byFieldId] = bc.m_sPeriodic;
 }
 
-void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const
+void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
     uint4 biggerLattice;
     biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
@@ -87,7 +88,7 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, SIndex* devic
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
 
-    _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, biggerLatticeMod);
+    _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
 __END_NAMESPACE

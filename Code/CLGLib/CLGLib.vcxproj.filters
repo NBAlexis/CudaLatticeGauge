@@ -182,9 +182,6 @@
     <ClInclude Include="Data\Action\CActionFermion.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Action\CActionGauge.h">
-      <Filter>Data\Action</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Math\Vectors.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
@@ -410,5 +407,6 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionFermionWilsonNf2Rotating.cu" />
   </ItemGroup>
 </Project>

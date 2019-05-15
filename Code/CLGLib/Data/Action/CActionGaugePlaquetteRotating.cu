@@ -1448,6 +1448,13 @@ CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
     sRet = tab + _T("Name : CActionGaugePlaquetteRotating\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
+    CCString sCenter;
+    sCenter.Format(_T("Center: [%d, %d, %d, %d]\n")
+        , static_cast<INT>(m_sCenter.x)
+        , static_cast<INT>(m_sCenter.y)
+        , static_cast<INT>(m_sCenter.z)
+        , static_cast<INT>(m_sCenter.w));
+    sRet = sRet + tab + sCenter;
     return sRet;
 }
 

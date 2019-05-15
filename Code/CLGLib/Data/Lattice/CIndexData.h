@@ -37,6 +37,7 @@ public:
     CIndexData()
         : m_pSmallData(NULL)
         , m_pWalkingTable(NULL)
+        , m_pMappingTable(NULL)
         , m_pPlaqutteCache(NULL)
         , m_pStappleCache(NULL)
         , m_byRegionTable(NULL)
@@ -46,6 +47,9 @@ public:
             * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge) 
             * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge)
             * _HC_Dir * 2));
+        checkCudaErrors(cudaMalloc((void**)&m_pMappingTable, sizeof(SSmallInt4)
+            * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
+            * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge) ));
 
         //region id is a byte, so max is 256
         checkCudaErrors(cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
@@ -61,6 +65,7 @@ public:
     {
         checkCudaErrors(cudaFree(m_pSmallData));
         checkCudaErrors(cudaFree(m_pWalkingTable));
+        checkCudaErrors(cudaFree(m_pMappingTable));
         checkCudaErrors(cudaFree(m_byRegionTable));
 
         if (NULL != m_pPlaqutteCache)
@@ -119,7 +124,7 @@ public:
     }
 
     //====================================================
-    //Directly using m_pDeviceIndexPositionToSIndex
+    // Directly using m_pDeviceIndexPositionToSIndex
     //====================================================
     //__device__ __inline__ SIndex _deviceIndexWalk(
     //    BYTE byFieldId, const SSmallInt4& inSite, SBYTE uiWalkDir) const
@@ -219,6 +224,7 @@ public:
     //extend site * dir * 2
     //cached the neighbours of a site, cached as a index of m_pWalkingTable[index]
     UINT* m_pWalkingTable;
+    SSmallInt4* m_pMappingTable;
 
     //extend site position to SIndex mapping (i.e. m_pIndexPositionToSIndex[index])
     SIndex* m_pIndexPositionToSIndex[kMaxFieldCount];

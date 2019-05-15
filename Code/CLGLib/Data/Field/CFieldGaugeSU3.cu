@@ -55,6 +55,20 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
         break;
         case EFIT_Random:
         {
+            //=======================================
+            //When we first initialize it, we do not known about boundary condition
+            //SIndex sidx = __idx->m_pDeviceIndexPositionToSIndex[1][__idx->_deviceGetBigIndex(sSite4)];
+            //if (sidx.IsDirichlet())
+            //{
+            //    pDevicePtr[_deviceGetLinkIndex(uiSiteIndex, idir)] = ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData
+            //        [
+            //            __idx->_devcieExchangeBoundaryFieldSiteIndex(sidx) * _DC_Dir + sidx.m_byDir
+            //        ];
+            //}
+            //else
+            //{
+            //    pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
+            //}
             pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
         }
         break;
@@ -193,8 +207,14 @@ _kernelStapleAtSiteSU3CacheIndex(
         //there are 6 staples, each is sum of two plaquttes
         for (int i = 0; i < plaqCount; ++i)
         {
+            BYTE diricCount = 0;
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.IsDirichlet())
+            {
+                ++diricCount;
+            }
+            //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
 
             if (first.NeedToDagger())
             {
@@ -204,7 +224,12 @@ _kernelStapleAtSiteSU3CacheIndex(
             for (int j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.IsDirichlet())
+                {
+                    ++diricCount;
+                }
+                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -215,7 +240,11 @@ _kernelStapleAtSiteSU3CacheIndex(
                     toAdd.Mul(toMul);
                 }
             }
-            res.Add(toAdd);
+            if (diricCount < plaqLength - 1)
+            {
+                //If 3 of the edges are Dirichlet, the plaqutte dose NOT exist.
+                res.Add(toAdd);
+            }
         }
         if (NULL != pStapleData)
         {
@@ -255,8 +284,14 @@ _kernelCalculateOnlyStaple(
         //there are 6 staples, each is sum of two plaquttes
         for (int i = 0; i < plaqCount; ++i)
         {
+            BYTE diricCount = 0;
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.IsDirichlet())
+            {
+                ++diricCount;
+            }
+            //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
 
             if (first.NeedToDagger())
             {
@@ -266,7 +301,13 @@ _kernelCalculateOnlyStaple(
             for (int j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.IsDirichlet())
+                {
+                    ++diricCount;
+                }
+                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+
                 if (nextlink.NeedToDagger())
                 {
                     toAdd.MulDagger(toMul);
@@ -276,7 +317,11 @@ _kernelCalculateOnlyStaple(
                     toAdd.Mul(toMul);
                 }
             }
-            res.Add(toAdd);
+            if (diricCount < plaqLength - 1)
+            {
+                //If 3 of the edges are Dirichlet, the plaqutte dose NOT exist.
+                res.Add(toAdd);
+            }
         }
         pStapleData[linkIndex] = res;
     }
@@ -297,7 +342,9 @@ _kernelPlaqutteEnergySU3CacheIndex(
     for (BYTE i = 0; i < plaqCount; ++i)
     {
         SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
-        deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+        //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
@@ -306,7 +353,8 @@ _kernelPlaqutteEnergySU3CacheIndex(
         for (BYTE j = 1; j < plaqLength; ++j)
         {
             first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -340,7 +388,6 @@ _kernelPlaqutteEnergyUsingStableSU3(
     intokernaldir;
 
     Real resThisThread = F(0.0);
-    SIndex plaquttes[kMaxPlaqutteCache];
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);

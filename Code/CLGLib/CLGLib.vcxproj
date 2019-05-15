@@ -32,7 +32,6 @@
     <ClInclude Include="Data\Action\CAction.h" />
     <ClInclude Include="Data\Action\CActionFermion.h" />
     <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
-    <ClInclude Include="Data\Action\CActionGauge.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />

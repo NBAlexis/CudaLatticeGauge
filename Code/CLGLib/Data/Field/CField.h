@@ -21,6 +21,7 @@ __DEFINE_ENUM(EFieldInitialType,
     EFIT_RandomGenerator,
     EFIT_SumGenerator, //for testing use only
     EFIT_RandomGaussian,
+    EFIT_RandomGaussianHMC, //for Dirchlet boundary condition
 
     EFIT_ReadFromFile,
 

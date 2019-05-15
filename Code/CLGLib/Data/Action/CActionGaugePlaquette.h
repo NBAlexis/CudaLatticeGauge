@@ -33,13 +33,16 @@ public:
     virtual CCString GetInfos(const CCString &tab) const;
 
     void SetBeta(Real fBeta);
-    Real GetEnergyPerPlaqutte() const;
+    //Real GetEnergyPerPlaqutte() const;
 
 protected:
 
     Real m_fLastEnergy;
     Real m_fNewEnergy;
     Real m_fBetaOverN;
+
+    //Not using it
+    UBOOL m_bUsing4PlaqutteEnergy;
     UINT m_uiPlaqutteCount;
 };
 

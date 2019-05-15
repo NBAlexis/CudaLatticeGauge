@@ -38,23 +38,25 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeEdgePeriodicDirichletBoundary(
     SSmallInt4 bc,
     SIndex* pDeviceData,
+    const SSmallInt4* __restrict__ pMapping,
     uint3 mods)
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
     
-    SSmallInt4 realCoord;
-    realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
-    realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
-    realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
-    realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
+    SSmallInt4 realCoord(pMapping[idxAll]);
+    //realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    //realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
     
     //SSmallInt4 orig = realCoord;
 
     SBYTE signchange = 1;
     BYTE byRegionId = 0;
+    UBOOL bBoundary = FALSE;
     for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
     {
-        if (realCoord.m_byData4[uiDir] <= 0)
+        if (realCoord.m_byData4[uiDir] < 0)
         {
             if (realCoord.m_byData4[uiDir] < 0)
             {
@@ -63,6 +65,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
 
             if (0 == bc.m_byData4[uiDir])
             {
+                bBoundary = TRUE;
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
             }
             else if (realCoord.m_byData4[uiDir] < 0)
@@ -71,7 +74,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             }
 
         }
-        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir] - 1)
+        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1)
         {
             if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
             {
@@ -80,6 +83,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
 
             if (0 == bc.m_byData4[uiDir])
             {
+                bBoundary = TRUE;
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
             }
             else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
@@ -93,8 +97,10 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     pDeviceData[idxAll] = SIndex(uiSiteIndex);
     pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
     pDeviceData[idxAll].m_byReginId = byRegionId;
-    if (0 != byRegionId)
+
+    if (bBoundary)
     {
+        assert(0 != byRegionId);
         //printf("We have dirichlet bc %d %d %d %d\n", orig.x, orig.y, orig.z, orig.w);
         pDeviceData[idxAll].m_byTag |= _kDirichlet;
     }
@@ -121,7 +127,7 @@ void CBoundaryConditionPeriodicAndDirichletSquare::SetFieldSpecificBc(BYTE byFie
     m_FieldBC[byFieldId] = bc.m_sPeriodic;
 }
 
-void CBoundaryConditionPeriodicAndDirichletSquare::BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const
+void CBoundaryConditionPeriodicAndDirichletSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
     uint4 biggerLattice;
     biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
@@ -141,7 +147,7 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeEdgePoints(BYTE byFieldId
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
 
-    _kernalBakeEdgePeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, biggerLatticeMod);
+    _kernalBakeEdgePeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, deviceMappingTable, biggerLatticeMod);
 }
 
 void CBoundaryConditionPeriodicAndDirichletSquare::BakeRegionTable(UINT* deviceTable) const

@@ -98,6 +98,12 @@ Charles F. Van~Loan Gene H.~Golub.
 \newblock {Matrix computations}.
 \newblock 1996.
 
+\bibitem{rotation}
+Y.~Hirono A.~Yamamoto.
+\newblock \href{http://dx.doi.org/10.1103/PhysRevLett.111.081601}{{Lattice QCD
+  in rotating frames}}.
+\newblock {\em Phys. Rev. Lett.}, 111:081601, 2013.
+
 \bibitem{aipde}
 Weinan~E Jiequn~Han, Arnulf~Jentzen.
 \newblock \href{http://dx.doi.org/10.1073/pnas.1718942115}{{Solving

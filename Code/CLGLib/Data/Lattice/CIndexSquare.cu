@@ -76,7 +76,7 @@ _kernalBakeWalkingTable(UINT* pDeviceData, uint3 mods)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernalBakeMappingTable(SIndex* pDeviceData, uint3 mods)
+_kernalBakeMappingTable(SSmallInt4* pDeviceData, uint3 mods)
 {
     UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
     SSmallInt4 coord;
@@ -85,14 +85,7 @@ _kernalBakeMappingTable(SIndex* pDeviceData, uint3 mods)
     coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
     coord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
-    if (coord.x >= 0 && coord.x < _DC_Lx
-     && coord.y >= 0 && coord.y < _DC_Ly
-     && coord.z >= 0 && coord.z < _DC_Lz
-     && coord.w >= 0 && coord.w < _DC_Lt)
-    {
-        UINT uiSiteIndex = _deviceGetSiteIndex(coord);
-        pDeviceData[idxAll] = SIndex(uiSiteIndex);
-    }
+    pDeviceData[idxAll] = coord;
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -192,6 +185,10 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult,
 
                 //
                 pResult[iListIndex] = SIndex(pResult[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
+                if (pResult[iListIndex - 1].IsDirichlet())
+                {
+                    pResult[iListIndex].m_byTag |= _kDirichlet;
+                }
                 ++iListIndex;
 
                 //last ----> uiLinkDir
@@ -301,10 +298,10 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
                 ));
 
             //bake map index
-            _kernalBakeMappingTable << <blocks, threads >> > (pData->m_pIndexPositionToSIndex[i], biggerLatticeMod);
+            _kernalBakeMappingTable << <blocks, threads >> > (pData->m_pMappingTable, biggerLatticeMod);
 
             //bake boundary condition
-            m_pBoundaryCondition->BakeEdgePoints(i, pData->m_pIndexPositionToSIndex[i]);
+            m_pBoundaryCondition->BakeEdgePoints(i, pData->m_pMappingTable, pData->m_pIndexPositionToSIndex[i]);
         }
     }
 

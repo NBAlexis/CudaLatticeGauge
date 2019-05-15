@@ -43,11 +43,11 @@ public:
 
 #pragma region HMC
 
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const;
-    virtual void CalculateOnlyStaple(CFieldGauge* pStable) const;
+    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const;
+    virtual void CalculateOnlyStaple(CFieldGauge* pStaple) const;
     virtual void MakeRandomGenerator();
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const;
-    virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const;
+    virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const;
     virtual Real CalculateKinematicEnergy() const;
 
 #pragma endregion
@@ -82,20 +82,32 @@ protected:
     void SetByArray(Real* array);
 };
 
-//#pragma region device functions
-//
-//static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3(
-//    const deviceSU3* __restrict__ pBuffer,
-//    const SIndex& idx)
-//{
-//    return idx.IsDirichlet() ?
-//        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
-//            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
-//        ]
-//        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
-//}
-//
-//#pragma endregion
+#pragma region device functions
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3(
+    const deviceSU3* __restrict__ pBuffer,
+    const SIndex& idx)
+{
+    return idx.IsDirichlet() ?
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+        ]
+        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+}
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3Dir(
+    const deviceSU3* __restrict__ pBuffer,
+    const SIndex& idx,
+    BYTE byDir)
+{
+    return idx.IsDirichlet() ?
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + byDir
+        ]
+        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, byDir)];
+}
+
+#pragma endregion
 
 __END_NAMESPACE
 

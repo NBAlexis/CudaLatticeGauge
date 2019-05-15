@@ -23,7 +23,7 @@ public:
 
     CBoundaryConditionTorusSquare();
 
-    virtual void BakeEdgePoints(BYTE byFieldId, SIndex* deviceBuffer) const;
+    virtual void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const;
 
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
 };

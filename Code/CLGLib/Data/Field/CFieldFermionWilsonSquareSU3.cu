@@ -177,14 +177,15 @@ _kernelScalarQuickReal(
 }
 
 /**
-*
+* Initialize
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialFermionWilsonSquareSU3(
     deviceWilsonVectorSU3 *pDevicePtr, 
+    BYTE byFieldId,
     EFieldInitialType eInitialType)
 {
-    intokernal;
+    intokernalInt4;
 
     switch (eInitialType)
     {
@@ -201,6 +202,20 @@ _kernelInitialFermionWilsonSquareSU3(
     case EFIT_RandomGaussian:
     {
         pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
+    }
+    break;
+    case EFIT_RandomGaussianHMC:
+    {
+        UINT bigIdx = __idx->_deviceGetBigIndex(sSite4);
+        SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][bigIdx];
+        if (sIdx.IsDirichlet())
+        {
+            pDevicePtr[uiSiteIndex] = ((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(sIdx)];
+        }
+        else
+        {
+            pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
+        }
     }
     break;
     default:
@@ -252,19 +267,22 @@ _kernelDFermionWilsonSquareSU3(
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex]; //__idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
+        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
         
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1]; //__idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, -(idir + 1));
+        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
+        //deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, x_m_mu_Gauge, idir);
         x_m_mu_Gauge_element.Dagger();
 
-        deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
-        deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];
+        //deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
+        //deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];
+        deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
+        deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
 
         if (bDDagger)
         {
@@ -361,8 +379,12 @@ _kernelDWilsonForceSU3(
 
         //SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
         SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
-        deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-        deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+
+        //deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+        //deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+        deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
+        deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
+
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
 
         deviceWilsonVectorSU3 right1(x_p_mu_Right);
@@ -450,7 +472,7 @@ void CFieldFermionWilsonSquareSU3::InitialField(EFieldInitialType eInitialType)
 {
     preparethread;
 
-    _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, eInitialType);
+    _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
 }
 
 void CFieldFermionWilsonSquareSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFieldType)
@@ -707,7 +729,8 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
     preparethread;
     _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (
         pPooled->m_pDeviceData,
-        EFIT_RandomGaussian);
+        m_byFieldId,
+        EFIT_RandomGaussianHMC);
     _kernelDFermionWilsonSquareSU3 << <block, threads >> > (
         pPooled->m_pDeviceData,
         pFieldSU3->m_pDeviceData,

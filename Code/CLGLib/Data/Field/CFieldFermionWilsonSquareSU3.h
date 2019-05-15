@@ -107,15 +107,15 @@ public:
 
 #pragma region device functions
 
-//static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3(
-//    const deviceWilsonVectorSU3* __restrict__ pBuffer,
-//    const SIndex& idx,
-//    BYTE byFieldId)
-//{
-//    return idx.IsDirichlet() ?
-//        ((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(idx)]
-//        : pBuffer[idx.m_uiSiteIndex];
-//}
+static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3(
+    const deviceWilsonVectorSU3* __restrict__ pBuffer,
+    const SIndex& idx,
+    BYTE byFieldId)
+{
+    return idx.IsDirichlet() ?
+        ((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(idx)]
+        : pBuffer[idx.m_uiSiteIndex];
+}
 
 #pragma endregion
 
