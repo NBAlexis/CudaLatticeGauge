@@ -88,6 +88,7 @@ public:
     virtual void BakeAllIndexBuffer(class CIndexData* pData);
     virtual void BakePlaquttes(class CIndexData* pData, BYTE byFieldId);
     virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId);
+    virtual UINT GetPlaqutteCount() const;
 };
 
 __END_NAMESPACE

@@ -38,6 +38,7 @@ public:
         : m_pSmallData(NULL)
         , m_pWalkingTable(NULL)
         , m_pMappingTable(NULL)
+        , m_pBondInfoTable(NULL)
         , m_pPlaqutteCache(NULL)
         , m_pStappleCache(NULL)
         , m_byRegionTable(NULL)
@@ -50,6 +51,11 @@ public:
         checkCudaErrors(cudaMalloc((void**)&m_pMappingTable, sizeof(SSmallInt4)
             * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
             * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge) ));
+
+        checkCudaErrors(cudaMalloc((void**)&m_pBondInfoTable, sizeof(BYTE)
+            * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
+            * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge)
+            * _HC_Dir));
 
         //region id is a byte, so max is 256
         checkCudaErrors(cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
@@ -67,6 +73,7 @@ public:
         checkCudaErrors(cudaFree(m_pWalkingTable));
         checkCudaErrors(cudaFree(m_pMappingTable));
         checkCudaErrors(cudaFree(m_byRegionTable));
+        checkCudaErrors(cudaFree(m_pBondInfoTable));
 
         if (NULL != m_pPlaqutteCache)
         {
@@ -121,6 +128,11 @@ public:
     __device__ __inline__ SIndex _deviceGetMappingIndex(const SSmallInt4& inSite, BYTE byFieldId) const
     {
         return m_pDeviceIndexPositionToSIndex[byFieldId][_deviceGetBigIndex(inSite)];
+    }
+
+    __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byDir)
+    {
+        return (m_pBondInfoTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
     }
 
     //====================================================
@@ -207,6 +219,11 @@ public:
     //    }
     //}
 
+    __device__ __inline__ UINT _devcieExchangeBoundaryFieldSiteIndexBI(BYTE byField, UINT bigIdx) const
+    {
+        return NULL == m_byRegionTable ? 0 : m_byRegionTable[m_pDeviceIndexPositionToSIndex[byField][bigIdx].m_byReginId];
+    }
+
     __device__ __inline__ UINT _devcieExchangeBoundaryFieldSiteIndex(const SIndex &site) const
     {
         return NULL == m_byRegionTable ? 0 : m_byRegionTable[site.m_byReginId];
@@ -225,6 +242,7 @@ public:
     //cached the neighbours of a site, cached as a index of m_pWalkingTable[index]
     UINT* m_pWalkingTable;
     SSmallInt4* m_pMappingTable;
+    BYTE* m_pBondInfoTable;
 
     //extend site position to SIndex mapping (i.e. m_pIndexPositionToSIndex[index])
     SIndex* m_pIndexPositionToSIndex[kMaxFieldCount];

@@ -46,7 +46,9 @@ public:
     virtual void BakeRegionTable(UINT* deviceTable) const;
 
     //It is only neccessary when simulating with holes or inpuries
-    //virtual UBOOL NeedToFixBoundary() const { return TRUE; }
+    virtual UBOOL NeedToFixBoundary() const { return TRUE; }
+
+    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const;
 };
 
 __END_NAMESPACE

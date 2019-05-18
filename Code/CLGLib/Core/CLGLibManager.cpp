@@ -229,7 +229,8 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
         {
             CCString sFieldName;
             gauge.FetchStringValue(_T("FieldName"), sFieldName);
-            if (sFieldName == _T("CFieldGaugeSU3"))
+            if (sFieldName == _T("CFieldGaugeSU3")
+             || sFieldName == _T("CFieldGaugeSU3D"))
             {
                 m_InitialCache.constIntegers[ECI_SUN] = 3;
             }
@@ -701,8 +702,8 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     // at last, fill the field pointers
     // and copy the index data to device
     InitialIndexBuffer();
-
     m_pCudaHelper->SetFieldPointers();
+    m_pLatticeData->FixAllFieldBoundary();
 
     checkCudaErrors(cudaDeviceSynchronize());
     cudaError_t cudaEr = cudaGetLastError();

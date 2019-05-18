@@ -53,6 +53,12 @@ public:
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) = 0;
 
     virtual void BakeRegionTable(UINT* deviceTable) const {}
+
+    /**
+    * The bondary condition of the bonds(links) sometimes should be different from the sites.
+    */
+    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const = 0;
+
     virtual UBOOL NeedToFixBoundary() const { return FALSE; }
 
 protected:

@@ -50,6 +50,20 @@ _kernalBakeEdgeTorusBoundary(
     pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
 }
 
+/**
+* Nothing to write, just initial as 0
+*/
+__global__ void _CLG_LAUNCH_BOUND
+_kernalBakeBondInfo_Torus(BYTE* pDeviceData)
+{
+    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+    for (UINT i = 0; i < _DC_Dir; ++i)
+    {
+        pDeviceData[idxAll * _DC_Dir + i] = 0;
+    }
+}
+
+
 #pragma endregion
 
 CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondition()
@@ -89,6 +103,22 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallI
     biggerLatticeMod.z = biggerLattice.w;
 
     _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
+}
+
+void CBoundaryConditionTorusSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable) const
+{
+    uint4 biggerLattice;
+    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+
+    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+    dim3 threads(threadPerSite, 1, 1);
+    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+
+    _kernalBakeBondInfo_Torus << <blocks, threads >> > (deviceTable);
 }
 
 __END_NAMESPACE

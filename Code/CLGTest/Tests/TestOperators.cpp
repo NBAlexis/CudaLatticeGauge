@@ -137,11 +137,41 @@ UINT TestQuickAxpy(CParameters&)
     return 0;
 }
 
+UINT TestDirichletDOperator(CParameters&)
+{
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    pGauge->FixBoundary();
+    pF1->PrepareForHMC(pGauge);
+    pF1->CopyTo(pF2);
+    
+    //pF1->D(appGetLattice()->m_pGaugeField);
+    //pF1->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
+    //pF1->AxpyMinus(pF2);
+    //pF1->DebugPrintMe();
+
+    pF1->ApplyOperator(EFO_F_DDdagger, appGetLattice()->m_pGaugeField);
+    pF1->DebugPrintMe();
+    appGeneral(_T("\n=======================\n"));
+    pF1->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
+    pF1->DebugPrintMe();
+    appGeneral(_T("\n=======================\n"));
+    pF1->AxpyMinus(pF2);
+    pF1->DebugPrintMe();
+    Real fLengthOfDPhi = pF1->Dot(pF1).x;
+    appGeneral(_T("\n=========== %f ===========\n"), fLengthOfDPhi);
+
+    return 0;
+}
+
 __REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators);
 
 __REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
+
+__REGIST_TEST(TestDirichletDOperator, Misc, TestDirichletBoundaryOperator);
 
 
 //=============================================================================

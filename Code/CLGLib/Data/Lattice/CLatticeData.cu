@@ -158,7 +158,7 @@ void CLatticeData::FixAllFieldBoundary()
         {
             CField* pField = GetFieldById(static_cast<BYTE>(i));
             //only need to fix gauge, because fermion field do not change
-            if (NULL != pField && pField->IsGaugeField()) 
+            if (NULL != pField) 
             {
                 pField->FixBoundary();
             }

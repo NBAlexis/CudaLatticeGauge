@@ -281,6 +281,12 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGaugeSU3D.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -347,8 +353,10 @@
     <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp">
       <Filter>Update\Continous</Filter>
     </ClCompile>
-    <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,6 +415,11 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionFermionWilsonNf2Rotating.cu" />
+    <CudaCompile Include="Data\Field\CFieldGaugeSU3D.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3D.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

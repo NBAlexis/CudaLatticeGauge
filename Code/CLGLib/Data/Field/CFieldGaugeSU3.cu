@@ -35,8 +35,7 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
     deviceSU3 id = deviceSU3::makeSU3Id();
     deviceSU3 zero = deviceSU3::makeSU3Zero();
 
-    intokernalInt4;
-    BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    intokernaldir;
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -55,34 +54,12 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
         break;
         case EFIT_Random:
         {
-            //=======================================
-            //When we first initialize it, we do not known about boundary condition
-            //SIndex sidx = __idx->m_pDeviceIndexPositionToSIndex[1][__idx->_deviceGetBigIndex(sSite4)];
-            //if (sidx.IsDirichlet())
-            //{
-            //    pDevicePtr[_deviceGetLinkIndex(uiSiteIndex, idir)] = ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData
-            //        [
-            //            __idx->_devcieExchangeBoundaryFieldSiteIndex(sidx) * _DC_Dir + sidx.m_byDir
-            //        ];
-            //}
-            //else
-            //{
-            //    pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
-            //}
             pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
         }
         break;
         case EFIT_RandomGenerator:
         {
-            if (__idx->m_pDeviceIndexPositionToSIndex[1]
-                [__idx->_deviceGetBigIndex(sSite4)].IsDirichlet())
-            {
-                pDevicePtr[uiLinkIndex] = zero;
-            }
-            else
-            {
-                pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(uiSiteIndex, idir + 1));
-            }
+            pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3RandomGenerator(_deviceGetFatIndex(uiSiteIndex, idir + 1));
         }
         break;
         case EFIT_SumGenerator:
@@ -207,14 +184,8 @@ _kernelStapleAtSiteSU3CacheIndex(
         //there are 6 staples, each is sum of two plaquttes
         for (int i = 0; i < plaqCount; ++i)
         {
-            BYTE diricCount = 0;
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            if (first.IsDirichlet())
-            {
-                ++diricCount;
-            }
-            //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
 
             if (first.NeedToDagger())
             {
@@ -224,12 +195,7 @@ _kernelStapleAtSiteSU3CacheIndex(
             for (int j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                if (nextlink.IsDirichlet())
-                {
-                    ++diricCount;
-                }
-                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
 
                 if (nextlink.NeedToDagger())
                 {
@@ -240,11 +206,7 @@ _kernelStapleAtSiteSU3CacheIndex(
                     toAdd.Mul(toMul);
                 }
             }
-            if (diricCount < plaqLength - 1)
-            {
-                //If 3 of the edges are Dirichlet, the plaqutte dose NOT exist.
-                res.Add(toAdd);
-            }
+            res.Add(toAdd);
         }
         if (NULL != pStapleData)
         {
@@ -284,14 +246,8 @@ _kernelCalculateOnlyStaple(
         //there are 6 staples, each is sum of two plaquttes
         for (int i = 0; i < plaqCount; ++i)
         {
-            BYTE diricCount = 0;
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            if (first.IsDirichlet())
-            {
-                ++diricCount;
-            }
-            //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
 
             if (first.NeedToDagger())
             {
@@ -301,12 +257,7 @@ _kernelCalculateOnlyStaple(
             for (int j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                if (nextlink.IsDirichlet())
-                {
-                    ++diricCount;
-                }
-                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
 
                 if (nextlink.NeedToDagger())
                 {
@@ -317,11 +268,7 @@ _kernelCalculateOnlyStaple(
                     toAdd.Mul(toMul);
                 }
             }
-            if (diricCount < plaqLength - 1)
-            {
-                //If 3 of the edges are Dirichlet, the plaqutte dose NOT exist.
-                res.Add(toAdd);
-            }
+            res.Add(toAdd);
         }
         pStapleData[linkIndex] = res;
     }
@@ -342,8 +289,7 @@ _kernelPlaqutteEnergySU3CacheIndex(
     for (BYTE i = 0; i < plaqCount; ++i)
     {
         SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
-        //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
 
         if (first.NeedToDagger())
         {
@@ -353,8 +299,7 @@ _kernelPlaqutteEnergySU3CacheIndex(
         for (BYTE j = 1; j < plaqLength; ++j)
         {
             first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
-            //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -417,6 +362,7 @@ _kernelExpMultSU3RealQ(
         pU[linkIndex] = expP;
     }
 }
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelExpMultSU3Real(
     const deviceSU3 * __restrict__ pMyDeviceData,
@@ -513,28 +459,6 @@ _kernelSetConfigurationSU3(
 
     //pDeviceData[uiLinkIndex].DebugPrint();
     gaugeSU3KernelFuncionEnd
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelFixBoundarySU3(deviceSU3 * pDeviceData)
-{
-    intokernalInt4;
-
-    SIndex idx = __idx->_deviceGetMappingIndex(sSite4, 1);
-    if (idx.IsDirichlet())
-    {
-        UINT uiDir = _DC_Dir;
-
-        for (UINT idir = 0; idir < uiDir; ++idir)
-        {
-            pDeviceData[_deviceGetLinkIndex(uiSiteIndex, idir)] = ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData
-            [
-                __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
-            ];
-        }
-
-        //printf("%d, %d, %d, %d\n", sSite4.x, sSite4.y, sSite4.z, sSite4.w);
-    }
 }
 
 #pragma endregion
@@ -882,14 +806,6 @@ CLGComplex CFieldGaugeSU3::Dot(const CField* other) const
     preparethread;
     _kernelDotSU3 << < block, threads >> > (m_pDeviceData, pUField->m_pDeviceData, _D_ComplexThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
-}
-
-void CFieldGaugeSU3::FixBoundary()
-{
-    appDetailed(_T("CFieldGaugeSU3::FixBoundary()\n"));
-
-    preparethread;
-    _kernelFixBoundarySU3 << <block, threads >> > (m_pDeviceData);
 }
 
 void CFieldGaugeSU3::CopyTo(CField* pTarget) const

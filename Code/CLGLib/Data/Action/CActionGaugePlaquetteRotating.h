@@ -2,7 +2,9 @@
 // FILENAME : CActionGaugePlaquetteRotating.h
 // 
 // DESCRIPTION:
-// This is the class for all fields, gauge, fermion and spin fields are inherent from it
+// This is the class for rotating guage action
+// Open boundary condition (identity Dirichlet boundary condition) is assumed 
+// 
 //
 // REVISION:
 //  [05/07/2019 nbale]

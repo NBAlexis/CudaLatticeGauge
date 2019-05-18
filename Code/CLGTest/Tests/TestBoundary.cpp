@@ -11,7 +11,7 @@
 
 UINT TestBoundary(CParameters& sParam)
 {
-    Real fExpected = F(0.435);
+    Real fExpected = F(0.565);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
     //we calculate staple energy from beta = 1 - 6

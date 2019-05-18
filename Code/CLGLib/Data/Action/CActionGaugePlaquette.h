@@ -42,7 +42,7 @@ protected:
     Real m_fBetaOverN;
 
     //Not using it
-    UBOOL m_bUsing4PlaqutteEnergy;
+    //UBOOL m_bUsing4PlaqutteEnergy;
     UINT m_uiPlaqutteCount;
 };
 

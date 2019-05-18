@@ -21,7 +21,6 @@ __DEFINE_ENUM(EFieldInitialType,
     EFIT_RandomGenerator,
     EFIT_SumGenerator, //for testing use only
     EFIT_RandomGaussian,
-    EFIT_RandomGaussianHMC, //for Dirchlet boundary condition
 
     EFIT_ReadFromFile,
 
@@ -80,7 +79,7 @@ public:
 
     virtual void Zero() = 0;
     virtual void Indentity() = 0;
-    virtual void FixBoundary() = 0;
+    virtual void FixBoundary() {}
 
     //This is Axpy(1.0f, x)
     virtual void AxpyPlus(const CField* x) = 0;

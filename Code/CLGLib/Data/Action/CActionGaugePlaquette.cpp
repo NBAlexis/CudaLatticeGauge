@@ -16,7 +16,7 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquette)
 
 CActionGaugePlaquette::CActionGaugePlaquette()
     : CAction()
-    , m_bUsing4PlaqutteEnergy(FALSE)
+    //, m_bUsing4PlaqutteEnergy(FALSE)
     , m_uiPlaqutteCount(0)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
@@ -54,14 +54,14 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
     m_fBetaOverN = fBeta;
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
-    INT iUsing4Plaq = 0;
-    if (param.FetchValueINT(_T("Using4Plaqutte"), iUsing4Plaq))
-    {
-        if (1 == iUsing4Plaq)
-        {
-            m_bUsing4PlaqutteEnergy = TRUE;
-        }
-    }
+    //INT iUsing4Plaq = 0;
+    //if (param.FetchValueINT(_T("Using4Plaqutte"), iUsing4Plaq))
+    //{
+    //    if (1 == iUsing4Plaq)
+    //    {
+    //        m_bUsing4PlaqutteEnergy = TRUE;
+    //    }
+    //}
 }
 
 void CActionGaugePlaquette::SetBeta(Real fBeta)

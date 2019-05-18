@@ -26,6 +26,8 @@ public:
     virtual void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const;
 
     virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
+
+    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const;
 };
 
 __END_NAMESPACE

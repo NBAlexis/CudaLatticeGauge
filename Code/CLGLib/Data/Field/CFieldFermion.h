@@ -93,8 +93,9 @@ public:
     /**
     * It seems no need to create a "Foprt" class like Bridge++
     */
-    //virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, UBOOL bDagger);
-    //virtual void DerivateDOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer);
+    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;
+    virtual void DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const = 0;
 
 #pragma endregion
 

@@ -62,7 +62,11 @@
 #define _HC_ThreadCountPerBlock (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCountPerBlock])
 
 #define _HC_SUN (appGetCudaHelper()->m_ConstIntegers[ECI_SUN])
+
+//Remember not to make plaqutte count device, 
+//Because the plaqutte count can be figured out after boundary condition (so not a constant)
 #define _HC_PlaqutteCount (appGetCudaHelper()->m_ConstIntegers[ECI_PlaqutteCount])
+
 #define _HC_LinkCount (appGetCudaHelper()->m_ConstIntegers[ECI_LinkCount])
 #define _HC_ThreadConstraint (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaint])
 #define _HC_SummationDecompose (appGetCudaHelper()->m_ConstIntegers[ECI_SummationDecompose])

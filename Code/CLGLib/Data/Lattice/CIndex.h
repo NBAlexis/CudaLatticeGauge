@@ -72,6 +72,11 @@ public:
     */
     virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) = 0;
 
+    /**
+    * Call this after BakePlaquttes
+    */
+    virtual UINT GetPlaqutteCount() const = 0;
+
     UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
 
     class CBoundaryCondition * m_pBoundaryCondition;
