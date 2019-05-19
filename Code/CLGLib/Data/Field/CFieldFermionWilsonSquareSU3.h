@@ -71,8 +71,7 @@ public:
     virtual void ApplyGamma(EGammaMatrix eGamma);
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
 
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, 
-        CFieldGauge* pCachedForce, ESolverPhase ePhase) const;
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const;
     virtual void InitialAsSource(const SFermionSource& sourceData);
     virtual void SaveToFile(const CCString &fileName) const;
     virtual BYTE* CopyDataOut(UINT &uiSize) const;
@@ -82,7 +81,7 @@ public:
 
     virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
-    virtual void DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
+    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
 
     deviceWilsonVectorSU3 * m_pDeviceData;
 

@@ -35,8 +35,7 @@ public:
     /**
     * Calculate force can fail due to solver
     */
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, 
-        CFieldGauge* pCachedForce, ESolverPhase ePhase) const = 0;
+    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
 
     virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
     {
@@ -95,7 +94,7 @@ public:
     */
     virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;
-    virtual void DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const = 0;
+    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const = 0;
 
 #pragma endregion
 

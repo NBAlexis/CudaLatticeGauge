@@ -152,7 +152,6 @@ _kernelDWilsonForceSU3(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    deviceSU3* pCachedForce,
     Real fKai,
     BYTE byFieldId)
 {
@@ -197,10 +196,6 @@ _kernelDWilsonForceSU3(
         }
 
         pForce[linkIndex].Add(forceOfThisLink);
-        if (NULL != pCachedForce)
-        {
-            pCachedForce[linkIndex] = forceOfThisLink;
-        }
     }
 }
 
@@ -231,10 +226,9 @@ void CFieldFermionWilsonSquareSU3::DOperator(void* pTargetBuffer, const void* pB
 
 }
 
-void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
-    deviceSU3* pForceChacheSU3 = NULL == pCacheForce ? NULL : (deviceSU3*)pCacheForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
     const deviceWilsonVectorSU3* pDphiBuffer = (deviceWilsonVectorSU3*)pDphi;
     const deviceWilsonVectorSU3* pDDphiBuffer = (deviceWilsonVectorSU3*)pDDphi;
@@ -246,7 +240,6 @@ void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, void* pCacheF
         pGauge,
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         pForceSU3,
-        pForceChacheSU3,
         m_fKai, m_byFieldId);
 }
 
@@ -901,7 +894,6 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
 UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
     const CFieldGauge* pGauge, 
     CFieldGauge* pForce, 
-    CFieldGauge* pCachedForce,
     ESolverPhase ePhase) const
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
@@ -914,19 +906,9 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
         return FALSE;
     }
-    if (NULL != pCachedForce && EFT_GaugeSU3 != pCachedForce->GetFieldType())
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
-        return FALSE;
-    }
 
     const CFieldGaugeSU3 * pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3 * pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
-    CFieldGaugeSU3 * pCacheForceForceSU3 = NULL;
-    if (NULL != pCachedForce)
-    {
-        pCacheForceForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pCachedForce);
-    }
 
     CField * pDDaggerPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
     CField * pDPhi = appGetLattice()->GetPooledFieldById(m_byFieldId);
@@ -970,8 +952,11 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
         pDDaggerPhiWilson->CopyTo(pCachedField);
     }
     pDPhiWilson->Ddagger(pGaugeSU3);
-    DerivateDOperator(pForceSU3->m_pDeviceData, NULL == pCacheForceForceSU3 ? NULL : pCacheForceForceSU3->m_pDeviceData, 
-        pDPhiWilson->m_pDeviceData, pDDaggerPhiWilson->m_pDeviceData, pGaugeSU3->m_pDeviceData);
+    DerivateDOperator(
+        pForceSU3->m_pDeviceData, 
+        pDPhiWilson->m_pDeviceData, 
+        pDDaggerPhiWilson->m_pDeviceData, 
+        pGaugeSU3->m_pDeviceData);
 
     pDDaggerPhi->Return();
     pDPhi->Return();

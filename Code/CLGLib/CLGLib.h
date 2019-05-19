@@ -140,6 +140,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3D.h"
+#include "Data/Field/CFieldFermionWilsonSquareSU3DR.h"
 
 
 //=====================================================

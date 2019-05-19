@@ -1776,87 +1776,6 @@ TestSaveConfigurationLowMode:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-TestDirichletBoundaryOperator:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [4, 4, 4, 4]
-    LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-    ##ActionListLength : 1
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 1
-    ExpectedRes : 0.435
-    ##Important, do not calculate energy using staple for Dirichlet
-    CacheStaple : 0 
-
-    Updator:
-
-        ## UpdatorType = { CHMC }
-        UpdatorType : CHMC
-
-        Metropolis : 1
-
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
-        IntegratorStepLength : 1
-        IntegratorStep : 25
-        Omelyan2Lambda : 0.38636665500756728
-
-    Gauge:
-	
-        ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-
-        Period : [0, 0, 1, 1]
-
-    GaugeBoundary:
-
-        FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-
-        FieldName : CFieldFermionWilsonSquareSU3D
-        FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1355
-        FieldId : 2
-        PoolNumber : 26
-        Period : [0, 0, 1, -1]
-
-    BoundaryFermionField1:
-
-        FieldName : CFieldBoundaryWilsonSquareSU3
-        FieldId : 2
-		
-    Solver:
-        SolverName : CSLASolverGMRES
-        SolverForFieldId : 2
-        MaxDim : 20
-        Accuracy : 0.00001
-        Restart : 20
-        AbsoluteAccuracy : 1
-
-    Action1:
-   
-        ActionName : CActionGaugePlaquette
-        Beta : 5
-        Using4Plaqutte : 1
-
-    Action2:
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-
-    Measure1:
-
-        MeasureName : CMeasurePlaqutteEnergy
-
 TestDirichletBoundary:
 
     Dim : 4
@@ -1948,10 +1867,10 @@ TestRotation:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ActionListLength : 1
-    FermionFieldCount : 0
+    ActionListLength : 2
+    FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.665
+    ExpectedRes : 0.675
     CacheStaple : 0
 
     Updator:
@@ -1983,12 +1902,17 @@ TestRotation:
 
     FermionField1:
 
-        FieldName : CFieldFermionWilsonSquareSU3
+        FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
         Hopping : 0.1355
         FieldId : 2
         PoolNumber : 26
         Period : [0, 0, 1, -1]
+        Omega : 0.1
+        ## Index start from 0, so length = 5 means 0,1,2,3,4, the center is 2
+        Center : [2, 2, 0, 0]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 0
 
     BoundaryFermionField1:
 
@@ -2007,6 +1931,15 @@ TestRotation:
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
 
+    Solver:
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.00001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+

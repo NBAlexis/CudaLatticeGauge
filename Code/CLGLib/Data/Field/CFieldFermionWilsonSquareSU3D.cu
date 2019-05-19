@@ -162,7 +162,6 @@ _kernelDWilsonForceSU3_D(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    deviceSU3* pCachedForce,
     Real fKai,
     BYTE byFieldId)
 {
@@ -187,10 +186,7 @@ _kernelDWilsonForceSU3_D(
             x_p_mu_Fermion.IsDirichlet()
          || sSite.IsDirichlet())
         {
-            if (NULL != pCachedForce)
-            {
-                pCachedForce[linkIndex] = deviceSU3::makeSU3Zero();
-            }
+            //continue;
         }
         else
         {
@@ -200,10 +196,11 @@ _kernelDWilsonForceSU3_D(
             //SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
              // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
-                                                                 //deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-                                                                 //deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
-            deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
-            deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
+            //all not on surface
+            deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+            deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+            //deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
+            //deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
 
             deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
@@ -227,10 +224,6 @@ _kernelDWilsonForceSU3_D(
             }
 
             pForce[linkIndex].Add(forceOfThisLink);
-            if (NULL != pCachedForce)
-            {
-                pCachedForce[linkIndex] = forceOfThisLink;
-            }
         }
     }
 }
@@ -262,10 +255,9 @@ void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* p
 
 }
 
-void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
-    deviceSU3* pForceChacheSU3 = NULL == pCacheForce ? NULL : (deviceSU3*)pCacheForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
     const deviceWilsonVectorSU3* pDphiBuffer = (deviceWilsonVectorSU3*)pDphi;
     const deviceWilsonVectorSU3* pDDphiBuffer = (deviceWilsonVectorSU3*)pDDphi;
@@ -277,7 +269,6 @@ void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, void* pCache
         pGauge,
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         pForceSU3,
-        pForceChacheSU3,
         m_fKai, m_byFieldId);
 }
 

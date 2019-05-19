@@ -287,6 +287,9 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -419,6 +422,9 @@
       <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3D.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DR.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

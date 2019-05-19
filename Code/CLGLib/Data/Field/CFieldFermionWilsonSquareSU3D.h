@@ -28,7 +28,7 @@ public:
     virtual void PrepareForHMC(const CFieldGauge* pGauge);
     virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
-    virtual void DerivateDOperator(void* pForce, void* pCacheForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
+    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
     virtual CCString GetInfos(const CCString &tab) const;
 
     //No need to rewrite them, once D operator and Random Gaussian make sure boundary

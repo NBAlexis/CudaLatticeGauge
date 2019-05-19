@@ -43,6 +43,7 @@
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h" />
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3D.h" />
     <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
@@ -128,6 +129,7 @@
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3D.cu" />
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DR.cu" />
     <CudaCompile Include="Data\Field\CFieldGauge.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeSU3D.cu" />
     <CudaCompile Include="Data\Lattice\CIndexData.cu" />

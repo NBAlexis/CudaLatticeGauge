@@ -149,18 +149,18 @@ UINT TestDirichletDOperator(CParameters&)
     //pF1->D(appGetLattice()->m_pGaugeField);
     //pF1->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
     //pF1->AxpyMinus(pF2);
-    //pF1->DebugPrintMe();
+    pF1->DebugPrintMe();
 
-    pF1->ApplyOperator(EFO_F_DDdagger, appGetLattice()->m_pGaugeField);
-    pF1->DebugPrintMe();
-    appGeneral(_T("\n=======================\n"));
-    pF1->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
-    pF1->DebugPrintMe();
-    appGeneral(_T("\n=======================\n"));
-    pF1->AxpyMinus(pF2);
-    pF1->DebugPrintMe();
-    Real fLengthOfDPhi = pF1->Dot(pF1).x;
-    appGeneral(_T("\n=========== %f ===========\n"), fLengthOfDPhi);
+    //pF1->ApplyOperator(EFO_F_DDdagger, appGetLattice()->m_pGaugeField);
+    //pF1->DebugPrintMe();
+    //appGeneral(_T("\n=======================\n"));
+    //pF1->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
+    //pF1->DebugPrintMe();
+    //appGeneral(_T("\n=======================\n"));
+    //pF1->AxpyMinus(pF2);
+    //pF1->DebugPrintMe();
+    //Real fLengthOfDPhi = pF1->Dot(pF1).x;
+    //appGeneral(_T("\n=========== %f ===========\n"), fLengthOfDPhi);
 
     return 0;
 }
@@ -171,7 +171,7 @@ __REGIST_TEST(TestOperators, Misc, TestOperators);
 
 __REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
-//__REGIST_TEST(TestDirichletDOperator, Misc, TestDirichletBoundaryOperator);
+//__REGIST_TEST(TestDirichletDOperator, Misc, TestRotationOperator);
 
 
 //=============================================================================

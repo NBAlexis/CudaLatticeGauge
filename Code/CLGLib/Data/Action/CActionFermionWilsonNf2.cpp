@@ -43,9 +43,9 @@ void CActionFermionWilsonNf2::PrepareForHMC(const CFieldGauge* pGauge, UINT )
 /**
 * To make it constant, we need to build a few temp fields outside this class
 */
-UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge *, ESolverPhase ePhase) const
+UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge * /*staple*/, ESolverPhase ePhase) const
 {
-    return m_pFerimionField->CalculateForce(pGauge, pForce, NULL, ePhase);
+    return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
 }
 
 Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
