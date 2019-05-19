@@ -11,7 +11,7 @@
 
 UINT TestRotation(CParameters& sParam)
 {
-    Real fExpected = F(0.81);
+    Real fExpected = F(0.665);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
     //we calculate staple energy from beta = 1 - 6

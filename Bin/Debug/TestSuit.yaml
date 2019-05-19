@@ -1951,7 +1951,7 @@ TestRotation:
     ActionListLength : 1
     FermionFieldCount : 0
     MeasureListLength : 1
-    ExpectedRes : 0.81
+    ExpectedRes : 0.665
     CacheStaple : 0
 
     Updator:
@@ -1970,7 +1970,7 @@ TestRotation:
     Gauge:
 	
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random

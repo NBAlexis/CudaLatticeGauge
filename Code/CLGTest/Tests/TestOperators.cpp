@@ -171,7 +171,7 @@ __REGIST_TEST(TestOperators, Misc, TestOperators);
 
 __REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
-__REGIST_TEST(TestDirichletDOperator, Misc, TestDirichletBoundaryOperator);
+//__REGIST_TEST(TestDirichletDOperator, Misc, TestDirichletBoundaryOperator);
 
 
 //=============================================================================
