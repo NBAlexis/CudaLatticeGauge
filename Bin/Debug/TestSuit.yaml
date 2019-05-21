@@ -1861,7 +1861,7 @@ TestRotation:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [5, 5, 4, 8]
+    LatticeLength : [6, 6, 6, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -1869,8 +1869,8 @@ TestRotation:
     RandomSeed : 1234567
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 1
-    ExpectedRes : 0.675
+    MeasureListLength : 3
+    ExpectedRes : 0.69
     CacheStaple : 0
 
     Updator:
@@ -1904,15 +1904,15 @@ TestRotation:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1355
+        Hopping : 0.1583
         FieldId : 2
         PoolNumber : 26
         Period : [0, 0, 1, -1]
-        Omega : 0.1
-        ## Index start from 0, so length = 5 means 0,1,2,3,4, the center is 2
-        Center : [2, 2, 0, 0]
+        Omega : 0.06
+        ## Index start from 0, so length = 6 means 1,2,3,4,5 are none zero, the center is 3
+        Center : [3, 3, 0, 0]
         ## Default to use Naive discretization (which is faster)
-        Naive : 0
+        Naive : 1
 
     BoundaryFermionField1:
 
@@ -1922,10 +1922,9 @@ TestRotation:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5
-        Omega : 0.5
-        ## Index start from 0, so length = 5 means 0,1,2,3,4, the center is 2
-        Center : [2, 2, 0, 0]
+        Beta : 5.9
+        Omega : 0.06
+        Center : [3, 3, 0, 0]
 
     Action2:
         ActionName : CActionFermionWilsonNf2
@@ -1943,3 +1942,17 @@ TestRotation:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+    Measure2:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+        Center : [3, 3, 0, 0]
+
+    Measure3:
+
+        MeasureName : CMeasureAMomentumJF
+        FieldId : 2
+        ShowResult : 1
+        Naive : 1
+        Center : [3, 3, 3, 3]

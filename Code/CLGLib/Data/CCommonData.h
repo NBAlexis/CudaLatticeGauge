@@ -129,8 +129,8 @@ __DEFINE_ENUM(ESolverPhase,
     //instead of int4
     struct CLGAPI alignas(4) SSmallInt4
     {
-        __device__ SSmallInt4() {}
-        __device__ SSmallInt4(SBYTE inx, SBYTE iny, SBYTE inz, SBYTE inw) : x(inx), y(iny), z(inz), w(inw) {}
+        __device__ __host__ SSmallInt4() {}
+        __device__ __host__ SSmallInt4(SBYTE inx, SBYTE iny, SBYTE inz, SBYTE inw) : x(inx), y(iny), z(inz), w(inw) {}
 
         union
         {

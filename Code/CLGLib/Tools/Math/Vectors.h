@@ -215,6 +215,11 @@ extern "C" {
         __device__ __inline__ deviceSU3Vector MulCompC(const CLGComplex& other) const { deviceSU3Vector ret(*this); ret.MulComp(other); return ret; }
         __device__ __inline__ deviceSU3Vector MulZ4C(BYTE z4) const { deviceSU3Vector ret(*this); ret.MulZ4(z4); return ret; }
 
+        __device__ __inline__ CLGComplex Sum() const
+        {
+            return _cuCaddf(m_ve[0], _cuCaddf(m_ve[1], m_ve[2]));
+        }
+
         CLGComplex m_ve[3];
     };
 
@@ -463,6 +468,11 @@ extern "C" {
         __device__ __inline__ deviceWilsonVectorSU3 MulRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.MulReal(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulCompC(const CLGComplex& other) const { deviceWilsonVectorSU3 ret(*this); ret.MulComp(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulZ4C(BYTE z4) const { deviceWilsonVectorSU3 ret(*this); ret.MulZ4(z4); return ret; }
+
+        __device__ __inline__ CLGComplex Sum() const
+        {
+            return _cuCaddf(_cuCaddf(m_d[0].Sum(), m_d[1].Sum()), _cuCaddf(m_d[2].Sum(), m_d[3].Sum()));
+        }
 
         union
         {

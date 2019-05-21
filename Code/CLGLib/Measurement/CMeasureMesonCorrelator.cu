@@ -162,9 +162,7 @@ __CLGIMPLEMENT_CLASS(CMeasureMesonCorrelator)
 
 void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_pLatticeData = pLatticeData;
-    m_byId = byId;
+    CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     //find the fermion field id and gamma
     INT iValue = 0;

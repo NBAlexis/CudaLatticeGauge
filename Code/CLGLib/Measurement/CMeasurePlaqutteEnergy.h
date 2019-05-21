@@ -20,12 +20,6 @@ class CLGAPI CMeasurePlaqutteEnergy : public CMeasure
     __CLGDECLARE_CLASS(CMeasurePlaqutteEnergy)
 public:
     CMeasurePlaqutteEnergy() : CMeasure() {}
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) 
-    { 
-        m_pOwner = pOwner; 
-        m_pLatticeData = pLatticeData;
-        m_byId = byId; 
-    }
 
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     virtual void Average(UINT uiConfigurationCount);

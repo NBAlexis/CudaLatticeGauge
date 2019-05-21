@@ -57,8 +57,10 @@
     <ClInclude Include="Data\Lattice\CIndexSquare.h" />
     <ClInclude Include="Data\Lattice\CLatticeData.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
+    <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasurementManager.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
+    <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
@@ -141,7 +143,9 @@
     <ClCompile Include="Platform\CFile.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
+    <CudaCompile Include="Measurement\CMeasureAMomentumJF.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
+    <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />

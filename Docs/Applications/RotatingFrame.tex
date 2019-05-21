@@ -368,7 +368,7 @@ and
 }
 such that $\gamma _5 D \gamma _5=D^{\dagger}$.
 
-or
+or (As in Ref.~\cite{rotation}, the naive discretization is used.)
 \textcolor[rgb]{0,0,0.8}{
 \begin{equation}
 \begin{split}
@@ -380,6 +380,8 @@ or
 \end{split}
 \end{equation}
 }
+
+On the other hand, the $i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}$ term can also be modified.
 
 \subsubsection{\label{sec:ForceFromGaugeAction}The force from gauge action}
 
@@ -607,3 +609,73 @@ similarly, with
 
 Note that \textbf{Both the force from gauge and fermion actions are kept anti-hermitian traceless.}
 
+\subsubsection{\label{sec:AngularMomentum}The angular momentum}
+
+The angular momentum operator is defined as
+\begin{equation}
+\begin{split}
+&J\equiv \left.\frac{\delta \mathcal{L}}{\delta \Omega}\right|_{\Omega = 0}\\
+&=J_G+J_{FL}+J_{FS}\\
+&J_G=\frac{\beta}{N_c}\sum _n \left(\hat{x}{\rm Retr}[V_{412}(n)+V_{432}(n)]-\hat{y}{\rm Retr}[V_{421}(n)+V_{431}(n)]\right)\\
+&J_{FL}=\bar{\psi}\left\{-\kappa \hat{y}\left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\right.\\
+&+\left.\hat{x}\left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\right\}\\
+&=\kappa \bar{\psi}\gamma _4 (\hat{y}D_x-xD_y)\psi,\\
+&J_{FS}=-i\kappa \bar{\psi} \gamma _4 \sigma ^{12} \psi.\\
+\end{split}
+\end{equation}
+
+The measurement of $\langle J_G \rangle$ is straightforward. The measurement of $J_{FL}$ and $J_{FS}$ are inertia mass densities of quark-antiquark pairs. So, for the $u-\bar{u}$ pair. On the other hand, $J$ is \textbf{NOT} a local operator. $\langle J_F(n|m) \rangle$ can be written as (in the spinor space, where $a,b$ are spinor indices)
+\begin{equation}
+\begin{split}
+&\langle J_F(n|m) \rangle=\langle \bar{u}(n) O(n|m) u(m) \rangle\\
+&=\sum _{a,b} O_{a,b}(n|m) \langle \bar{u}_a(n)  u_b(m) \rangle = -\sum _{a,b} O_{a,b}(n|m) \langle   u_b(m) \bar{u}_a(n)\rangle \\
+&=-\sum _{a,b} O_{a,b}(n|m) D^{-1}(m|n)_{b,a}=-{\rm tr}_{c,s}\left[O(n|m) D^{-1}(m|n)\right]\\
+\end{split}
+\end{equation}
+So the definition of local angular momentum density should be
+\begin{equation}
+\begin{split}
+&\langle J_F(n) \rangle=-\sum _{a,b,m} O_{a,b}(n|m) D^{-1}(m|n)_{b,a}=-{\rm tr}_{c,s,m}\left[O(n|m) D^{-1}(m|n)\right]\\
+\end{split}
+\end{equation}
+
+So, we need to calculate $\sum _n O(m_0|n)D^{-1}(n|m_0)$ as a matrix in color and spinor space. It can be done by introduce the source
+\begin{equation}
+\begin{split}
+&\phi ^{S}_{m_0,c_2,s_2}(m)_{c,s}=\delta (m-m_0)\delta (c-c_2)\delta (s-s_2)\\
+\end{split}
+\end{equation}
+and $D^{-1}(n|m_0)_{c,s}$ as a vector $\vec{v}(n)$ can be written as
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{c} D^{-1}_{1,cs}(n) \\ D^{-1}_{2,cs}(n) \\ D^{-1}_{3,cs}(n) \\ \ldots \\ D^{-1}_{10,cs}(n)\\ D^{-1}_{11,cs}(n) \\ D^{-1}_{12,cs_2}(n)\end{array}\right)=\left(\begin{array}{ccccccc}
+D^{-1}_{1,1} & D^{-1}_{1,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{1,cs}(n|m_0)} & \ldots &  D^{-1}_{1,11} & D^{-1}_{1,12} \\
+D^{-1}_{2,1} & D^{-1}_{2,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{2,cs}(n|m_0)} & \ldots &  D^{-1}_{2,11} & D^{-1}_{2,12} \\
+D^{-1}_{3,1} & D^{-1}_{3,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{3,cs}(n|m_0)} & \ldots &  D^{-1}_{3,11} & D^{-1}_{3,12} \\
+\ldots & \ldots & \ldots & \ldots & \ldots &  \ldots & \ldots \\
+D^{-1}_{10,1} & D^{-1}_{0,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{10,cs}(n|m_0)} & \ldots &  D^{-1}_{10,11} & D^{-1}_{10,12} \\
+D^{-1}_{11,1} & D^{-1}_{11,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{11,cs}(n|m_0)} & \ldots &  D^{-1}_{11,11} & D^{-1}_{11,12} \\
+D^{-1}_{12,1} & D^{-1}_{12,2} & \ldots & \textcolor[rgb]{1,0,0}{D^{-1}_{12,cs}(n|m_0)} & \ldots &  D^{-1}_{12,11} & D^{-1}_{12,12} \\
+ \end{array}\right)\left(\begin{array}{c} 0\\ \ldots \\ 0 \\ 1 _{idx=cs,x=m_0}\\ 0 \\ \ldots \\ 0 \end{array}\right)
+\end{split}
+\end{equation}
+and $\sum _n O(m|n)D^{-1}(n|m_0)_{c,s}$ as a vector $\vec{v}(m)$ can be written as
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{c} OD^{-1}_{1,cs}(m) \\ OD^{-1}_{2,cs}(m)  \\ \ldots  \\ OD^{-1}_{11,cs}(m) \\ OD^{-1}_{12,cs_2}(m) \end{array}\right)=\left(\begin{array}{ccccc}
+O_{1,1} & O_{1,2} & \ldots &  O_{1,11} & O_{1,12} \\
+O_{2,1} & O_{2,2} & \ldots &  O_{2,11} & O_{2,12} \\
+O_{3,1} & O_{3,2} & \ldots &  O_{3,11} & O_{3,12} \\
+\ldots & \ldots & \ldots &  \ldots & \ldots \\
+O_{10,1} & O_{0,2} & \ldots & O_{10,11} & O_{10,12} \\
+O_{11,1} & O_{11,2} & \ldots & O_{11,11} & O_{11,12} \\
+O_{12,1} & O_{12,2} & \ldots &  O_{12,11} & O_{12,12} \\
+ \end{array}\right)\left(\begin{array}{c} D^{-1}_{1,cs} \\ D^{-1}_{2,cs} \\ \ldots \\ D^{-1}_{11,cs} \\ D^{-1}_{12,cs_2}\end{array}\right)
+\end{split}
+\end{equation}
+And the trace is just
+\begin{equation}
+\begin{split}
+&\sum _{i=1}^{12}(OD^{-1})_{i,i}(n)
+\end{split}
+\end{equation}
