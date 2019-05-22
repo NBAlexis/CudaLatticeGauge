@@ -27,8 +27,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionWilsonNf2.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
@@ -37,6 +37,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3.h
@@ -45,11 +48,14 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeZ2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndex.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurementManager.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearing.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.h
@@ -91,15 +97,20 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexData.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndex.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.cu
@@ -163,6 +174,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGammaMatrixSpeed.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestOperators.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRandom.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRotation.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSU3Generator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestUpdator.cpp

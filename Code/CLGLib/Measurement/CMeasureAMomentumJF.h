@@ -32,6 +32,7 @@ public:
         , m_uiConfigurationCount(0)
         , m_bShowResult(TRUE)
         , m_bNaive(TRUE)
+        , m_bExponential(FALSE)
     {
     }
 
@@ -56,6 +57,7 @@ protected:
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
     UBOOL m_bNaive;
+    UBOOL m_bExponential;
 };
 
 __END_NAMESPACE

@@ -225,10 +225,10 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     if (m_bShowResult)
     {
         checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferOneConfig, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
-        appGeneral(_T(" === Angular Momentum JG of site x=%d ======\n"), m_sCenter.x);
-        for (UINT i = 0; i < _HC_Ly; ++i)
+        appGeneral(_T(" === Angular Momentum JG of site y=%d ======\n"), m_sCenter.y);
+        for (UINT i = 1; i < _HC_Lx; ++i)
         {
-            appGeneral(_T("%d=%1.6f  "), i, m_pHostDataBuffer[m_sCenter.x * _HC_Ly + i]);
+            appGeneral(_T("%d=%1.6f  "), i, m_pHostDataBuffer[i * _HC_Ly + m_sCenter.y]);
         }
         appGeneral(_T("\n"));
     }
@@ -244,11 +244,11 @@ void CMeasureAMomentumJG::Report()
 {
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
     appGeneral(_T("\n=========== Angular Momentum JG of sites ==========\n"), m_sCenter.x);
-    for (UINT i = 1; i < _HC_Lx; ++i)
+    for (UINT i = 1; i < _HC_Ly; ++i)
     {
-        for (UINT j = 1; j < _HC_Ly; ++j)
+        for (UINT j = 1; j < _HC_Lx; ++j)
         {
-            appGeneral(_T("(%d,%d)=%1.6f  "), i, j, m_pHostDataBuffer[i * _HC_Ly + j]);
+            appGeneral(_T("(%d,%d)=%1.6f  "), j, i, m_pHostDataBuffer[j * _HC_Ly + i]);
         }
         appGeneral(_T("\n"));
     }

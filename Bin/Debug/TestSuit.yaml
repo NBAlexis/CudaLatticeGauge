@@ -1913,6 +1913,7 @@ TestRotation:
         Center : [3, 3, 0, 0]
         ## Default to use Naive discretization (which is faster)
         Naive : 1
+        Exponential : 1
 
     BoundaryFermionField1:
 
@@ -1956,3 +1957,4 @@ TestRotation:
         ShowResult : 1
         Naive : 1
         Center : [3, 3, 3, 3]
+        Exponential : 1

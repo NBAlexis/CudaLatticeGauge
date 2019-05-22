@@ -26,6 +26,7 @@ public:
         : CFieldFermionWilsonSquareSU3D()
         , m_fOmega(F(0.1))
         , m_bNaive(TRUE)
+        , m_bExponential(FALSE)
     {
     }
 
@@ -39,6 +40,7 @@ public:
     Real m_fOmega;
     SSmallInt4 m_sCenter;
     UBOOL m_bNaive;
+    UBOOL m_bExponential;
 };
 
 __END_NAMESPACE

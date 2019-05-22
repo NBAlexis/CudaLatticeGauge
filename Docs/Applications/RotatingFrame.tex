@@ -40,7 +40,7 @@ For rotational frame, the metric and frame can be defined as
 \begin{equation}
 \begin{split}
 &h_{\mu\nu}=\left(\begin{array}{cccc} 1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right)\\
-&g_{\mu\nu}=\left(\begin{array}{cccc} 1-r^2\Omega^2 & y\Omega & -x\Omega & 0 \\ y\Omega & -1 & 0 & 0 \\ -x\Omega & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-g_{\mu\nu}}=1\\
+&g_{\mu\nu}=\left(\begin{array}{cccc} 1-r^2\Omega^2 & \textcolor[rgb]{1,0,0}{+}y\Omega & \textcolor[rgb]{1,0,0}{-}x\Omega & 0 \\ y\Omega & -1 & 0 & 0 \\ -x\Omega & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-g_{\mu\nu}}=1\\
 &e_0=(1,y\Omega,-x\Omega,0)\\
 &e_1=(0,1,0,0)\\
 &e_2=(0,0,1,0)\\
@@ -192,7 +192,7 @@ using $\gamma ^{\mu}=\gamma ^i e_i^{\mu}$, it is
 \begin{equation}
 \begin{split}
 &D_R=\left[i(\gamma ^1+y\Omega \gamma^0) (\partial _x+ieA_x)+i(\gamma ^2-x\Omega \gamma^0) (\partial _y+ieA_y)+i\gamma ^3 (\partial _z+ieA_z)\right.\\
-&\left.+i\gamma ^0 (\partial _t+ieA_t-\frac{i}{2}\Omega \sigma ^{12})-m\right]\\
+&\left.+i\gamma ^0 (\partial _t+ieA_t\textcolor[rgb]{1,0,0}{-}\frac{i}{2}\Omega \sigma ^{12})-m\right]\\
 \end{split}
 \end{equation}
 
@@ -212,7 +212,7 @@ where the superscript of gamma matrix stands for Minkowski or Euclidian. So
 &D_R=-\left[(\gamma _1+y\Omega \gamma_4) (\partial _x+ieA_x)+(\gamma _2-x\Omega \gamma_4) (\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)\right.\\
 &\left.+\gamma _4 (\partial _{\tau}+ieA_{\tau}-\frac{i}{2}\Omega \sigma ^{12})+m\right]\\
 &=-\left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
-&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)-\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right]\\
+&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)\textcolor[rgb]{1,0,0}{-}\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right]\\
 \end{split}
 \end{equation}
 And
@@ -333,9 +333,56 @@ As usual, we define the hopping parameter as $\kappa = \frac{1}{2am+8}$, then re
 \end{split}
 \end{equation}
 
+\subsubsection{\label{sec:ExponentialChemicalPotential}The exponential chemical potential}
+
+On the other hand, the $i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}$ term can also be modified. The $\sigma ^{12}$ term can be considered as a chemical potential ($\bar{\psi}\gamma _0 \psi$ and then do the Wick rotation $\gamma _0\to \gamma _4$. The sign is after Wick rotation and relative to the mass term)
+\begin{equation}
+\begin{split}
+&\mu  \bar{\psi} \gamma _4 \psi,\;\;\mu = \textcolor[rgb]{1,0,0}{-}\frac{i\Omega}{2}\sigma ^{12}
+\end{split}
+\end{equation}
+and discritized as
+\begin{equation}
+\begin{split}
+&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(e^{\mu a}\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{-\mu a}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)\\
+&=-\kappa \left(e^{-\frac{ia\Omega \sigma ^{12}}{2}}\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{\frac{ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
+\end{split}
+\end{equation}
+\textcolor[rgb]{1,0,0}{It looks not satisfy the $\gamma _5$ -hermiticity.} However, using $\left(\sigma ^{12}\right)^2=1$, it is in fact
+\begin{equation}
+\begin{split}
+&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(\left(\textcolor[rgb]{0,0,1}{1}-\frac{ia\Omega \sigma ^{12}}{2}\right)\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} +\left(\textcolor[rgb]{0,0,1}{1}+\frac{ia\Omega \sigma ^{12}}{2}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
+\end{split}
+\end{equation}
+The $1$ in $\textcolor[rgb]{0,0,1}{1}\pm \frac{ia\Omega \sigma ^{12}}{2}$ is the usual $D_{\tau}$. So the additional term is in fact
+\begin{equation}
+\begin{split}
+&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)
+\end{split}
+\end{equation}
+The $U_{\tau}$ is in fact added to keep gauge symmetry, originally it is
+\begin{equation}
+\begin{split}
+&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)\delta _{n,n+t} +(\gamma _4+1) \delta _{n-t,n}\right)\\
+&\approx -\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)\delta _{n,n} +(\gamma _4+1) \delta _{n,n}\right)\\
+&=-\kappa \gamma _4 ia\Omega \sigma ^{12}
+\end{split}
+\end{equation}
+which go back to the $\sigma ^{12}$ term.
+
+We still check the $\gamma _5$-hermiticity, using
+\begin{equation}
+\begin{split}
+&\sum _{n=1,2,3,m=1,2,3}\left(U_{\mu}(n)\delta _{n+1,m}+U_{-\mu}(n)\delta _{n-1,m}\right)^{\dagger}=\sum _{n=1,2,3,m=1,2,3}\left(U_{\mu}(n)\delta _{n+1,m}+U_{-\mu}(n)\delta _{n-1,m}\right)\\
+&\gamma _5 \gamma _4 \gamma _5 = -\gamma _4^{\dagger}\\
+&\gamma _5 \frac{ia\Omega \sigma ^{12}}{2} \gamma _5 = -\left(\frac{ia\Omega \sigma ^{12}}{2}\right)^{\dagger}\\
+\end{split}
+\end{equation}
+It is $\gamma _5$-hermite.
+
 \subsubsection{\label{sec:TheFinalActionOfRotation}The final action of rotation}
 
-Defining $\frac{\beta}{N_c} \equiv \frac{2}{a^4g_{YM}^2}$, $\kappa \equiv \frac{1}{2am+8}$, $\hat{\mu}\equiv \frac{\mu}{a}$, $\hat{\Omega}\equiv a\Omega$, we have
+Defining $\frac{\beta}{N_c} \equiv \frac{2}{a^4g_{YM}^2}$, $\kappa \equiv \frac{1}{2am+8}$, $\hat{\mu}\equiv \frac{\mu}{a}$, $\hat{\Omega}\equiv a\Omega$, (here $\mu=x,y,z,t$ is the coordinate) we have
 \begin{equation}
 \begin{split}
 &Z=\exp (-S_G-S_F)\\
@@ -381,7 +428,19 @@ or (As in Ref.~\cite{rotation}, the naive discretization is used.)
 \end{equation}
 }
 
-On the other hand, the $i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}$ term can also be modified.
+If using the exponential spin coupling term it is
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
+&D(n|m)=\delta _{n,m}-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
+&-\kappa \hat{y}\hat{\Omega} \left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
+&+\kappa \hat{x}\hat{\Omega} \left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
+&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)\\
+\end{split}
+\end{equation}
+}
+
 
 \subsubsection{\label{sec:ForceFromGaugeAction}The force from gauge action}
 

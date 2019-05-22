@@ -219,11 +219,117 @@ _kernel_FS(
     deviceWilsonVectorSU3 right_element(pSources[uiCS][uiSiteIndex]);
     deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12].MulWilsonC(right_element));
     term3 = __chiralGamma[GAMMA4].MulWilsonC(term3);
-    term3.MulComp(_make_cuComplex(F(0.0), F(-0.5)));
+    term3.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
 
     //Note that, it is not res[byArrayIdx] = result
     //It is res[c,s] = delta_{cc}delta_ss result[c,s]
     res[byArrayIdx].m_d[uiS].m_ve[uiC] = term3.m_d[uiS].m_ve[uiC];
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND_(12)
+_kernel_FS_Exponential(
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    deviceWilsonVectorSU3** pSources,
+    SSmallInt4 sSite4,
+    BYTE byArrayIdx,
+    BYTE byFieldId,
+    deviceWilsonVectorSU3* res)
+{
+    //s * 3 + c
+    UINT uiC = threadIdx.x;
+    UINT uiS = threadIdx.y;
+    UINT uiCS = uiS * 3 + uiC;
+
+    UINT uiSiteIndex = _deviceGetSiteIndex(sSite4);
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    if (sIdx.IsDirichlet())
+    {
+        res[byArrayIdx] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+        return;
+    }
+
+    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    CLGComplex coeff_m = _make_cuComplex(F(0.0), -F(0.5));
+    CLGComplex coeff_p = _make_cuComplex(F(0.0), F(0.5));
+
+    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+
+    //idir = mu
+    //=========================
+    //get things
+
+    //x, mu
+    BYTE idir = 3;
+    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    //Assuming periodic
+    //get U(x,mu), U^{dagger}(x-mu), 
+    //deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    x_m_mu_Gauge_element.Dagger();
+
+    deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pSources[uiCS], x_p_mu_Fermion, byFieldId);
+    deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pSources[uiCS], x_m_mu_Fermion, byFieldId);
+
+    //hopping terms
+
+    //U(x,mu) phi(x+ mu)
+    //U(x,mu) phi(x+ mu)
+    deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        //the sign is opppsite as "y Omega" term same as "x Omega", which is 
+        //0.5 i k omega sigma12 (1 - gamma4)
+        //u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
+        u_phi_x_p_m.MulComp(coeff_p);
+        u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+        result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
+    }
+    else
+    {
+        //the sign is opppsite as "y Omega" term same as "x Omega", which is 
+        //-0.5 i k omega sigma12 (1 - gamma4)
+        //u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
+        u_phi_x_p_m.MulComp(coeff_m);
+        u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+        result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
+    }
+
+    //U^{dagger}(x-mu) phi(x-mu)
+    deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        //the sign is same as "y Omega" term opposite as "x Omega", which is 
+        //-0.5 i k omega sigma12 (1 + gamma4)
+        //u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
+        u_dagger_phi_x_m_m.MulComp(coeff_m);
+        u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+        result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+    else
+    {
+        //the sign is same as "y Omega" term opposite as "x Omega", which is 
+        //0.5 i k omega sigma12 (1 + gamma4)
+        //u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
+        u_dagger_phi_x_m_m.MulComp(coeff_p);
+        u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+        result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+
+    //Note that, it is not res[byArrayIdx] = result
+    //It is res[c,s] = delta_{cc}delta_ss result[c,s]
+    res[byArrayIdx].m_d[uiS].m_ve[uiC] = result.m_d[uiS].m_ve[uiC];
 }
 
 /**
@@ -234,6 +340,7 @@ _CLG_LAUNCH_BOUND_(128)
 _kernel_Trace_JFLS(
     const deviceWilsonVectorSU3* __restrict__ pOperator,
     CLGComplex* pResLine,
+    Real fKappa,
     UINT uiCount)
 {
     Real fConfigCount = static_cast<Real>(uiCount);
@@ -242,7 +349,7 @@ _kernel_Trace_JFLS(
     UINT uiIdx = threadIdx.x;
     pResLine[uiIdx] = _cuCaddf(
         cuCmulf_cr(pResLine[uiIdx], fFactor1),
-        cuCmulf_cr(pOperator[uiIdx].Sum(), fFactor2));
+        cuCmulf_cr(pOperator[uiIdx].Sum(), fFactor2 * fKappa));
 }
 
 __global__ void
@@ -312,6 +419,10 @@ void CMeasureAMomentumJF::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     iValue = 1;
     param.FetchValueINT(_T("Naive"), iValue);
     m_bNaive = iValue != 0;
+
+    iValue = 1;
+    param.FetchValueINT(_T("Exponential"), iValue);
+    m_bExponential = iValue != 0;
 }
 
 void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
@@ -382,13 +493,29 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 m_pOperatorDataL
                 );
 
-        _kernel_FS << <_blocks, _thread1 >> > (
-            ppDevicePtr,
-            sourceSite,
-            static_cast<BYTE>(i - 1),
-            m_byFieldId,
-            m_pOperatorDataS
-            );
+        if (m_bExponential)
+        {
+            _kernel_FS_Exponential << <_blocks, _thread1 >> > (
+                pGaugeSU3->m_pDeviceData,
+                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                ppDevicePtr,
+                sourceSite,
+                static_cast<BYTE>(i - 1),
+                m_byFieldId,
+                m_pOperatorDataS
+                );
+        }
+        else
+        {
+            _kernel_FS << <_blocks, _thread1 >> > (
+                ppDevicePtr,
+                sourceSite,
+                static_cast<BYTE>(i - 1),
+                m_byFieldId,
+                m_pOperatorDataS
+                );
+        }
 
         checkCudaErrors(cudaFree(ppDevicePtr));
         for (UINT j = 0; j < 12; ++j)
@@ -399,8 +526,9 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     ++m_uiConfigurationCount;
     dim3 _thread2(_HC_Lx - 1, 1, 1);
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, m_uiConfigurationCount);
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, m_uiConfigurationCount);
+    Real fKappa = CCommonData::m_fKai;
+    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa, m_uiConfigurationCount);
+    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa, m_uiConfigurationCount);
 
     if (m_bShowResult)
     {
