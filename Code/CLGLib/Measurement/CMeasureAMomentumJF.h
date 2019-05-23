@@ -58,6 +58,7 @@ protected:
     UBOOL m_bShowResult;
     UBOOL m_bNaive;
     UBOOL m_bExponential;
+    TArray<Real> m_lstAllRes;
 };
 
 __END_NAMESPACE

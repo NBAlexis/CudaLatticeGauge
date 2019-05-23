@@ -22,7 +22,7 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumJF)
 * res[c,s] is Dy on source[c,s]
 */
 __global__ void
-_CLG_LAUNCH_BOUND_(12)
+_CLG_LAUNCH_(12, 1)
 _kernel_XDy_yDx(
     const deviceSU3* __restrict__ pGauge,
     deviceWilsonVectorSU3** pSources,
@@ -194,7 +194,7 @@ _kernel_XDy_yDx(
 }
 
 __global__ void
-_CLG_LAUNCH_BOUND_(12)
+_CLG_LAUNCH_(12, 1)
 _kernel_FS(
     deviceWilsonVectorSU3** pSources,
     SSmallInt4 sSite4,
@@ -227,7 +227,7 @@ _kernel_FS(
 }
 
 __global__ void
-_CLG_LAUNCH_BOUND_(12)
+_CLG_LAUNCH_(12, 1)
 _kernel_FS_Exponential(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
@@ -336,27 +336,14 @@ _kernel_FS_Exponential(
 *
 */
 __global__ void
-_CLG_LAUNCH_BOUND_(128)
+_CLG_LAUNCH_(128, 1)
 _kernel_Trace_JFLS(
     const deviceWilsonVectorSU3* __restrict__ pOperator,
     CLGComplex* pResLine,
-    Real fKappa,
-    UINT uiCount)
+    Real fKappa)
 {
-    Real fConfigCount = static_cast<Real>(uiCount);
-    Real fFactor1 = (fConfigCount - F(1.0)) / fConfigCount;
-    Real fFactor2 = F(1.0) / fConfigCount;
     UINT uiIdx = threadIdx.x;
-    pResLine[uiIdx] = _cuCaddf(
-        cuCmulf_cr(pResLine[uiIdx], fFactor1),
-        cuCmulf_cr(pOperator[uiIdx].Sum(), fFactor2 * fKappa));
-}
-
-__global__ void
-_CLG_LAUNCH_BOUND_(128)
-_kernel_Zero_JFSL(CLGComplex* pResLine)
-{
-    pResLine[threadIdx.x] = _make_cuComplex(F(0.0), F(0.0));
+    pResLine[uiIdx] = cuCmulf_cr(pOperator[uiIdx].Sum(), fKappa);
 }
 
 #pragma endregion
@@ -527,12 +514,42 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     ++m_uiConfigurationCount;
     dim3 _thread2(_HC_Lx - 1, 1, 1);
     Real fKappa = CCommonData::m_fKai;
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa, m_uiConfigurationCount);
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa, m_uiConfigurationCount);
+    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa);
+    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa);
 
     if (m_bShowResult)
     {
-        Report();
+        appGeneral(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
+        appGeneral(_T(" ----------- Orbital ------------- \n"));
+    }
+    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+    for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    {
+        m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+        if (m_bShowResult)
+        {
+            appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+        }
+    }
+
+    if (m_bShowResult)
+    {
+        appGeneral(_T("\n\n ----------- Spin ------------- \n"));
+    }
+    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+    for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    {
+        m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+        if (m_bShowResult)
+        {
+            appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+        }
+    }
+    if (m_bShowResult)
+    {
+        appGeneral(_T("\n\n ================================================ \n\n"));
     }
 }
 
@@ -543,24 +560,73 @@ void CMeasureAMomentumJF::Average(UINT )
 
 void CMeasureAMomentumJF::Report()
 {
-    appGeneral(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
-    appGeneral(_T(" ----------- Orbital ------------- \n"));
-    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+    assert(m_uiConfigurationCount * (_HC_Lx - 1) * 2 == static_cast<UINT>(m_lstAllRes.Num()));
+    TArray<Real> tmpSum;
 
-    for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    appGeneral(_T("\n\n==========================================================================\n"));
+    appGeneral(_T("==================== Angular Momentum (%d con)============================\n"), m_uiConfigurationCount);
+    appGeneral(_T("==========================================================================\n"));
+    appGeneral(_T("\n ----------- Orbital ------------- \n"));
+
+    appGeneral(_T("{\n"));
+    for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+        appGeneral(_T("{"));
+        for (UINT j = 0; j < _HC_Lx - 1; ++j)
+        {
+            appGeneral(_T("%2.12f, "), m_lstAllRes[(i * 2) * (_HC_Lx - 1) + j]);
+            if (0 == i)
+            {
+                tmpSum.AddItem(m_lstAllRes[(i * 2) * (_HC_Lx - 1) + j]);
+            }
+            else
+            {
+                tmpSum[j] += m_lstAllRes[(i * 2) * (_HC_Lx - 1) + j];
+            }
+        }
+        appGeneral(_T("},\n"));
     }
+    appGeneral(_T("}\n"));
 
+    appGeneral(_T("\n ----------- Orbital average ------------- \n"));
+    for (UINT j = 0; j < _HC_Lx - 1; ++j)
+    {
+        appGeneral(_T("%2.12f, "), tmpSum[j] / m_uiConfigurationCount);
+    }
+    tmpSum.RemoveAll();
+
+    appGeneral(_T("\n -------------------------------------------- \n"));
     appGeneral(_T("\n\n ----------- Spin ------------- \n"));
-    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
 
-    for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    appGeneral(_T("{\n"));
+    for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+        appGeneral(_T("{"));
+        for (UINT j = 0; j < _HC_Lx - 1; ++j)
+        {
+            appGeneral(_T("%2.12f, "), m_lstAllRes[(i * 2 + 1) * (_HC_Lx - 1) + j]);
+            if (0 == i)
+            {
+                tmpSum.AddItem(m_lstAllRes[(i * 2 + 1) * (_HC_Lx - 1) + j]);
+            }
+            else
+            {
+                tmpSum[j] += m_lstAllRes[(i * 2 + 1) * (_HC_Lx - 1) + j];
+            }
+        }
+        appGeneral(_T("},\n"));
     }
+    appGeneral(_T("}\n"));
 
-    appGeneral(_T("\n\n ================================================ \n\n"));
+    appGeneral(_T("\n ----------- Spin average ------------- \n"));
+    for (UINT j = 0; j < _HC_Lx - 1; ++j)
+    {
+        appGeneral(_T("%2.12f, "), tmpSum[j] / m_uiConfigurationCount);
+    }
+    tmpSum.RemoveAll();
+
+    appGeneral(_T("\n==========================================================================\n"));
+    appGeneral(_T("==========================================================================\n\n"));
 }
 
 void CMeasureAMomentumJF::Reset()
@@ -568,9 +634,7 @@ void CMeasureAMomentumJF::Reset()
     m_uiConfigurationCount = 0;
     dim3 _blocks(1, 1, 1);
     dim3 _thread(_HC_Lx - 1, 1, 1);
-
-    _kernel_Zero_JFSL << <_blocks, _thread >> > (m_pDeviceDataBufferS);
-    _kernel_Zero_JFSL << <_blocks, _thread >> > (m_pDeviceDataBufferL);
+    m_lstAllRes.RemoveAll();
 }
 
 __END_NAMESPACE

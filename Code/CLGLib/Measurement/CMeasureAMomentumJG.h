@@ -30,11 +30,6 @@ static void _AverageXYPlane(Real* pDeviceRes);
 */
 static void _ZeroXYPlane(Real* pDeviceRes);
 
-/**
-* array[x, y] = (array[x, y] * (N-1) + oneconfiguration[x, y]) / N
-*/
-static void _AverageXYPlaneOverConf(Real* pDeviceRes, const Real* __restrict__ pDeviceResOneConfig, UINT uiConfigCount);
-
 class CLGAPI CMeasureAMomentumJG : public CMeasure
 {
     __CLGDECLARE_CLASS(CMeasureAMomentumJG)
@@ -42,7 +37,6 @@ public:
     CMeasureAMomentumJG() 
         : CMeasure()
         , m_pHostDataBuffer(NULL)
-        , m_pDeviceDataBuffer(NULL) 
         , m_pDeviceDataBufferOneConfig(NULL)
         , m_byFieldId(1)
         , m_uiConfigurationCount(0)
@@ -61,12 +55,12 @@ public:
 protected:
 
     Real * m_pHostDataBuffer;
-    Real * m_pDeviceDataBuffer;
     Real * m_pDeviceDataBufferOneConfig;
     SSmallInt4 m_sCenter;
     BYTE m_byFieldId;
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
+    TArray<Real> m_lstRes;
 };
 
 __END_NAMESPACE
