@@ -68,7 +68,17 @@ _kernelAdd4PlaqutteTermSU3(
     Real betaOverN, Real fOmegaSq,
     Real* results)
 {
-    intokernalInt4;
+    //intokernalInt4;
+    SSmallInt4 sSite4;
+    UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    UINT _iz_idx = (threadIdx.y + blockIdx.y * blockDim.y);
+
+    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx);
+    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx);
+    sSite4.z = static_cast<SBYTE>(_iz_idx / 3);
+    sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z);
+    UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
+    BYTE idx0 = _iz_idx % 3;
 
     UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
@@ -80,12 +90,13 @@ _kernelAdd4PlaqutteTermSU3(
     //  3: 23
     //  4: 24
     //  5: 34
-    
-    Real resThisThread = F(0.0);
+    //0->2, 1->4, 2->5
+    BYTE idx = (2 == idx0) ? 5 : ((idx0 + 1) * 2);
+
+    //Real resThisThread = F(0.0);
 
     //========================================
-    //find plaqutte 1-4
-    BYTE idx = 2;
+    //find plaqutte 1-4, or 2-4, or 3-4
     SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
     deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
     if (first.NeedToDagger())
@@ -105,57 +116,9 @@ _kernelAdd4PlaqutteTermSU3(
             toAdd.Mul(toMul);
         }
     }
-    resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceFi(sCenterSite, uiN, 0, 0, 3);
 
-    //========================================
-    //find plaqutte 2-4
-    idx = 4;
-    first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    toAdd = _deviceGetGaugeBCSU3(pDeviceData, first);
-    if (first.NeedToDagger())
-    {
-        toAdd.Dagger();
-    }
-    for (BYTE j = 1; j < plaqLength; ++j)
-    {
-        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
-        if (first.NeedToDagger())
-        {
-            toAdd.MulDagger(toMul);
-        }
-        else
-        {
-            toAdd.Mul(toMul);
-        }
-    }
-    resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceFi(sCenterSite, uiN, 1, 1, 3);
+    atomicAdd(&results[uiSiteIndex], betaOverN * fOmegaSq * (F(3.0) - toAdd.ReTr()) * _deviceFi(sCenterSite, uiN, idx0, idx0, 3));
 
-    //========================================
-    //find plaqutte 3-4
-    idx = 5;
-    first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    toAdd = _deviceGetGaugeBCSU3(pDeviceData, first);
-    if (first.NeedToDagger())
-    {
-        toAdd.Dagger();
-    }
-    for (BYTE j = 1; j < plaqLength; ++j)
-    {
-        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
-        if (first.NeedToDagger())
-        {
-            toAdd.MulDagger(toMul);
-        }
-        else
-        {
-            toAdd.Mul(toMul);
-        }
-    }
-    resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceFi(sCenterSite, uiN, 2, 2, 3);
-
-    results[uiSiteIndex] = resThisThread * betaOverN * fOmegaSq;
 }
 
 
@@ -255,7 +218,7 @@ _kernelAddChairTermSU3_Term5(
 * 
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelAddForce4PlaqutteTermSU3(
+_kernelAddForce4PlaqutteTermSU3_XYZ(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -264,12 +227,11 @@ _kernelAddForce4PlaqutteTermSU3(
     intokernalInt4;
 
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    UINT uiDir = _DC_Dir;
 
     betaOverN = betaOverN * F(-0.5);
     deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
 
-    for (UINT idir = 0; idir < uiDir; ++idir)
+    for (UINT idir = 0; idir < 3; ++idir)
     {
         if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
         {
@@ -277,29 +239,47 @@ _kernelAddForce4PlaqutteTermSU3(
         }
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        if (3 != idir)
-        {
-            //mu = idir, nu = 4, i = mu
-            deviceSU3 stap(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(stap);
-            force.Ta();
-            force.MulReal(betaOverN);
-            pForceData[linkIndex].Add(force);
-        }
-        else// if (3 == idir)
-        {
-            //mu = idir, nu = i = sum _1-3
-            deviceSU3 stap(_deviceStapleTerm4(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0));
-            stap.Add(_deviceStapleTerm4(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 1));
-            stap.Add(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 2, 2));
-            deviceSU3 force(pDeviceData[linkIndex]);
-            force.MulDagger(stap);
-            force.Ta();
-            force.MulReal(betaOverN);
-            pForceData[linkIndex].Add(force);
-        }
+        //mu = idir, nu = 4, i = mu
+        deviceSU3 stap(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
+        deviceSU3 force(pDeviceData[linkIndex]);
+        force.MulDagger(stap);
+        force.Ta();
+        force.MulReal(betaOverN);
+        pForceData[linkIndex].Add(force);
     }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForce4PlaqutteTermSU3_T(
+    const deviceSU3 * __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3 *pForceData,
+    Real betaOverN, Real fOmegaSq)
+{
+    intokernalInt4;
+
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //UINT uiDir = _DC_Dir;
+
+    betaOverN = betaOverN * F(-0.5);
+    deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+
+    BYTE idir = 3;
+    if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+    {
+        return;
+    }
+    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    //mu = idir, nu = i = sum _1-3
+    deviceSU3 stap(_deviceStapleTerm4(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0));
+    stap.Add(_deviceStapleTerm4(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 1));
+    stap.Add(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 2, 2));
+    deviceSU3 force(pDeviceData[linkIndex]);
+    force.MulDagger(stap);
+    force.Ta();
+    force.MulReal(betaOverN);
+    pForceData[linkIndex].Add(force);
 }
 
 /**
@@ -841,7 +821,10 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
 
     preparethread;
 
-    _kernelAddForce4PlaqutteTermSU3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForce4PlaqutteTermSU3_XYZ << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+    _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
     _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
@@ -921,7 +904,11 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     //    m_fOmega * m_fOmega,
     //    _D_RealThreadBuffer);
 
-    _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
+    appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
+
+    dim3 block2 = block;
+    block2.y = block.y * 3;
+    _kernelAdd4PlaqutteTermSU3 << <block2, threads >> > (
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
             m_sCenter,

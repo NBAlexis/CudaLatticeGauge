@@ -789,11 +789,11 @@ _kernelDWilsonForceSU3_DR_T(
     //first term has same sign as _Y function (-1)
     if (x_p_mu_Fermion.NeedToOpposite())
     {
-        x_p_mu_Right.MulComp(fkOmegaM);
+        x_p_mu_Right.MulComp(fkOmegaP);
     }
     else
     {
-        x_p_mu_Right.MulComp(fkOmegaP);
+        x_p_mu_Right.MulComp(fkOmegaM);
     }
     x_p_mu_Right.Sub(gamma4.MulWilsonC(x_p_mu_Right));
     x_p_mu_Right = sigma12.MulWilsonC(x_p_mu_Right);
@@ -803,11 +803,11 @@ _kernelDWilsonForceSU3_DR_T(
     //second term has same sign as _X function (+1)
     if (x_p_mu_Fermion.NeedToOpposite())
     {
-        x_Right.MulComp(fkOmegaP);
+        x_Right.MulComp(fkOmegaM);
     }
     else
     {
-        x_Right.MulComp(fkOmegaM);
+        x_Right.MulComp(fkOmegaP);
     }
     x_Right.Add(gamma4.MulWilsonC(x_Right));
     x_Right = sigma12.MulWilsonC(x_Right);

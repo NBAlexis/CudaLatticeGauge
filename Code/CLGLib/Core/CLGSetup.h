@@ -34,7 +34,7 @@
 #define _CLG_DOUBLEFLOAT 0
 
 //_CLG_USE_LAUNCH_BOUND = 0 or 1.
-//NOTE: For release version, the if the regcount required is out-numbered, there is NO error message!
+//NOTE: If the regcount required is out-numbered, sometimes, there is NO error message!
 //So, either be sure to build with _CLG_USE_LAUNCH_BOUND = 1, or reduce the thread count
 //reduce the thread count is expansive, so _CLG_USE_LAUNCH_BOUND = 1 is recommanded
 //It's better to complie using the maximum thread per block of the device of the computer.

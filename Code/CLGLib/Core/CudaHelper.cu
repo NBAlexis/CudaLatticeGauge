@@ -69,6 +69,20 @@ _kernelDebugFunctionForSites()
     //printf("%d\n", uiSiteIndex);
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelThreadBufferZeroReal(Real * arr, Real initial)
+{
+    intokernal;
+    arr[uiSiteIndex] = initial;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelThreadBufferZeroComplex(CLGComplex * arr, CLGComplex initial)
+{
+    intokernal;
+    arr[uiSiteIndex] = initial;
+}
+
 __global__ void 
 _CLG_LAUNCH_BOUND
 _kernelReduceReal(Real* arr, UINT uiJump, UINT uiMax)
@@ -537,6 +551,18 @@ CLGComplex CCudaHelper::ThreadBufferSum(CLGComplex * pDeviceBuffer)
 Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
 {
     return ReduceRealWithThreadCount(pDeviceBuffer);
+}
+
+void CCudaHelper::ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial)
+{
+    preparethread;
+    _kernelThreadBufferZeroComplex<<<block, threads>>>(pDeviceBuffer, cInitial);
+}
+
+void CCudaHelper::ThreadBufferZero(Real * pDeviceBuffer, Real fInitial)
+{
+    preparethread;
+    _kernelThreadBufferZeroReal << <block, threads >> >(pDeviceBuffer, fInitial);
 }
 
 Real CCudaHelper::ReduceReal(Real* deviceBuffer, UINT uiLength)
