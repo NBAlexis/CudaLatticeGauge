@@ -18,6 +18,11 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/RotatingReproduce.yaml"), params);
 #endif
 
+    INT iBeforeEquib = 5;
+    params.FetchValueINT(_T("BeforeEquvibStep"), iBeforeEquib);
+    INT iAfterEquib = 200;
+    params.FetchValueINT(_T("EquvibStep"), iAfterEquib);
+
     appSetupLog(params);
     if (!appInitialCLG(params))
     {
@@ -40,7 +45,7 @@ int main(int argc, char * argv[])
     appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < 5)
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
     {
         appGetLattice()->m_pUpdator->Update(1, FALSE);
     }
@@ -48,7 +53,7 @@ int main(int argc, char * argv[])
     pJG->Reset();
     pJF->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < 200)
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
         appGetLattice()->m_pUpdator->Update(1, TRUE);
     }
@@ -57,10 +62,109 @@ int main(int argc, char * argv[])
 
 
     appGeneral(_T("2 run: Omega = 0.02.\n"));
+
+    pGauageAction->SetOmega(F(0.02));
+    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, FALSE);
+    }
+
+    pJG->Reset();
+    pJF->Reset();
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, TRUE);
+    }
+    pJG->Report();
+    pJF->Report();
+
     appGeneral(_T("3 run: Omega = 0.04.\n"));
+
+    pGauageAction->SetOmega(F(0.04));
+    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, FALSE);
+    }
+
+    pJG->Reset();
+    pJF->Reset();
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, TRUE);
+    }
+    pJG->Report();
+    pJF->Report();
+
     appGeneral(_T("4 run: Omega = 0.06.\n"));
+
+    pGauageAction->SetOmega(F(0.06));
+    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, FALSE);
+    }
+
+    pJG->Reset();
+    pJF->Reset();
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, TRUE);
+    }
+    pJG->Report();
+    pJF->Report();
+
     appGeneral(_T("5 run: Omega = 0.08.\n"));
+
+    pGauageAction->SetOmega(F(0.08));
+    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, FALSE);
+    }
+
+    pJG->Reset();
+    pJF->Reset();
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, TRUE);
+    }
+    pJG->Report();
+    pJF->Report();
+
     appGeneral(_T("6 run: Omega = 0.10.\n"));
+
+    pGauageAction->SetOmega(F(0.1));
+    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, FALSE);
+    }
+
+    pJG->Reset();
+    pJF->Reset();
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+    {
+        appGetLattice()->m_pUpdator->Update(1, TRUE);
+    }
+    pJG->Report();
+    pJF->Report();
 
     appQuitCLG();
     return 0;

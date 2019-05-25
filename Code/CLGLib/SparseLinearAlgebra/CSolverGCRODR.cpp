@@ -19,9 +19,8 @@ CSLASolverGCRODR::CSLASolverGCRODR()
     , m_uiReStart(3)
     , m_uiMDim(10)
     , m_uiKDim(5)
+    , m_uiRecalcuateR(5)
     , m_fAccuracy(F(0.000001))
-    , m_fBeta(F(0.0))
-    , m_fDiviation(F(0.0))
     , m_eDeflationType(EEDT_SVD)
 
     , m_pDeviceHm(NULL)
@@ -32,8 +31,10 @@ CSLASolverGCRODR::CSLASolverGCRODR()
     , m_pDeviceALeft(NULL)
     , m_pDeviceA(NULL)
     , m_pDeviceB(NULL)
+    , m_pDeviceTmpQ(NULL)
 
     , m_pHostHmGm(NULL)
+    , m_pHostHmGmToRotate(NULL)
 
     , m_pHostY(NULL)
 
@@ -42,11 +43,15 @@ CSLASolverGCRODR::CSLASolverGCRODR()
     , m_pHostPk(NULL)
     , m_pHostTmpQ(NULL)
     , m_pHostTmpR(NULL)
+
     , m_pHostTmpGPk(NULL)
     , m_pHostZeroMatrix(NULL)
 
+    , m_fBeta(F(0.0))
+    , m_fDiviation(F(0.0))
+
     , m_pFieldMatrix(NULL)
-    , m_uiRecalcuateR(5)
+    
 {
 
 }

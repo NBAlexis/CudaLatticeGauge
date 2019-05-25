@@ -33,7 +33,11 @@ BYTE* CFileSystem::ReadAllBytes(const TCHAR* sFilename, UINT& size)
     size = fileSize;
     fseek(fp, 0, SEEK_SET);
     BYTE* ret = (BYTE*)malloc(fileSize);
-    (void)fread(ret, 1, fileSize, fp);
+#if defined(__GNUC__)
+    size_t notusing __attribute__((unused)) = fread(ret, 1, fileSize, fp);
+#else
+    fread(ret, 1, fileSize, fp);
+#endif
     fclose(fp);
     return ret;
 }
@@ -65,7 +69,13 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
     UINT fileSize = static_cast<UINT>(ftell(fp));
     fseek(fp, 0, SEEK_SET);
     BYTE* file_data = (BYTE*)malloc(fileSize + sizeof(TCHAR));
-    (void)fread(file_data, 1, fileSize, fp);
+
+    //cast to void dose not help
+#if defined(__GNUC__)
+    size_t notusing __attribute__((unused)) = fread(file_data, 1, fileSize, fp);
+#else
+    fread(file_data, 1, fileSize, fp);
+#endif
     fclose(fp);
 
     file_data[fileSize] = 0;
