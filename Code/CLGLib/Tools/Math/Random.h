@@ -70,8 +70,8 @@ public:
     */
     CRandom(UINT uiSeed, ERandom er) 
         : m_eRandomType(er)
-        , m_uiHostSeed(uiSeed)
         , m_uiFatIdDivide(1)
+        , m_uiHostSeed(uiSeed)
     { 
         switch (er)
         {

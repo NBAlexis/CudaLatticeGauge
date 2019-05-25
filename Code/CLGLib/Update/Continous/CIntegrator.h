@@ -27,14 +27,16 @@ public:
     CIntegrator() 
         : m_uiStepCount(1)
         , m_fEStep(0)
+        , m_bStapleCached(FALSE)
+        , m_fUpdateResultEnery(F(0.0))
         , m_pOwner(NULL)
         , m_pLattice(NULL)
         , m_pGaugeField(NULL)
         , m_pForceField(NULL)
         , m_pMomentumField(NULL)
         , m_pStapleField(NULL)
-        , m_bStapleCached(FALSE)
-    { ; }
+        
+    {  }
 
     ~CIntegrator();
 
@@ -49,12 +51,16 @@ public:
     void FinishEvaluate();
 
 protected:
-
-    UBOOL m_bStapleCached;
-    Real m_fEStep;
+    
     UINT m_uiStepCount;
+    Real m_fEStep;
+    UBOOL m_bStapleCached;
 
     Real m_fUpdateResultEnery;
+
+    class CHMC* m_pOwner;
+    CLatticeData* m_pLattice;
+    TArray<class CAction*> m_lstActions;
 
 public:
 
@@ -63,11 +69,7 @@ public:
     CFieldGauge* m_pMomentumField;
     CFieldGauge* m_pStapleField;
 
-protected:
 
-    class CHMC* m_pOwner;
-    CLatticeData* m_pLattice;
-    TArray<class CAction*> m_lstActions;
 };
 
 class CLGAPI CNestedIntegrator : public CIntegrator

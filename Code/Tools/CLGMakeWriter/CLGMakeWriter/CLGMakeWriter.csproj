@@ -6,4 +6,8 @@
     <StartupObject>CLGMakeWriter.Program</StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="CMakeLists.txt" />
+  </ItemGroup>
+
 </Project>

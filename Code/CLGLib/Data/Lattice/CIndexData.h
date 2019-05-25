@@ -36,12 +36,12 @@ public:
 
     CIndexData()
         : m_pSmallData(NULL)
+        , m_byRegionTable(NULL)
         , m_pWalkingTable(NULL)
         , m_pMappingTable(NULL)
         , m_pBondInfoTable(NULL)
         , m_pPlaqutteCache(NULL)
         , m_pStappleCache(NULL)
-        , m_byRegionTable(NULL)
     {
         checkCudaErrors(cudaMalloc((void**)&m_pSmallData, sizeof(UINT) * kCacheIndexSmallDataCount));
         checkCudaErrors(cudaMalloc((void**)&m_pWalkingTable, sizeof(UINT)

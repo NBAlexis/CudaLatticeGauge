@@ -24,9 +24,9 @@ class CLGAPI CCudaBuffer
 public:
     CCudaBuffer() 
         : m_pDevicePtr(NULL)
-        , m_bUseBuffer(FALSE)
         , m_ulTotal(0)
         , m_ulFree(0)
+        , m_bUseBuffer(FALSE)
     {
 
     }

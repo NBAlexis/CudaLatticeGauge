@@ -90,9 +90,6 @@ public:
     typedef UINT(*_pfHash)(ARG_KEY key);
     typedef UBOOL(*_pfCompare)(ARG_KEY key1, ARG_KEY key2);
 
-    _pfHash m_pHashFunction;
-    _pfCompare m_pCompareFunction;
-
     //----------------------------------------------------------------------------------------------------------
     // Construction and Destruction
     THashMap(_pfHash pfHash = NULL, _pfCompare pfCompare = NULL, INT HashTableSize = kTMapDefaultHashTableSize)
@@ -314,6 +311,13 @@ protected:
     UINT	m_nHashTableSize;
     INT		m_nCount;
     CCMapMemStack m_MemStack;
+
+public:
+
+    _pfHash m_pHashFunction;
+    _pfCompare m_pCompareFunction;
+
+protected:
 
     //------------------------------------------------------------------------------------------------------------
     //Implement Helpers

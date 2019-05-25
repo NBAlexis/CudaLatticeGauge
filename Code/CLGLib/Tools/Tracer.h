@@ -34,8 +34,8 @@ class CLGAPI CTracer
 public:
     CTracer(void)
         : m_eLevel(CRUCIAL)
-        , m_pStdStream(NULL)
         , m_pStream(NULL)
+        , m_pStdStream(NULL)
     {
         Initial(CRUCIAL);
     }
