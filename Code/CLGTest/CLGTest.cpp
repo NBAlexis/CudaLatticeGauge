@@ -105,13 +105,13 @@ int main(int argc, char * argv[])
         }
     }
 
-    INT inputNumber = -1;
+    //INT inputNumber = -1;
     ListAllTests(category);
     while (TRUE)
     {
         COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  p - Print Device info\n");
         //ListAllTests(category);
-        inputNumber = -1;
+        //inputNumber = -1;
         std::string name;
         std::getline(std::cin, name);
         CCString sRes(name.c_str());

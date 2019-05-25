@@ -238,6 +238,7 @@ public:
 class CLGAPI CFieldMatrixOperation
 {
 public:
+    virtual ~CFieldMatrixOperation() {}
     enum {_kFieldMatrixMaxDim = 32 };
     static CFieldMatrixOperation* Create(EFieldType ef);
 

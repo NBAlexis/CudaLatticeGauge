@@ -25,11 +25,11 @@ namespace CLGMakeWriter
             sContent += "# This is our code file dir\n";
             sContent += "set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)\n";
 
-            sContent += "add_compile_options(\" -O3\")\n";
-            sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas\")\n";
+            sContent += "# Flags\n";
+            sContent += "set(CMAKE_CUDA_FLAGS \"${CMAKE_CUDA_FLAGS} -O3\")\n";
+            sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
             sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-            sContent += "MESSAGE(\"CUDA_NVCC_FLAGS flag = ${CUDA_NVCC_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";
 
@@ -65,6 +65,10 @@ set_target_properties( CLGLib
 
             sContent += "\n\ntarget_link_libraries(CLGLib -lcurand)\n\n";
 
+
+            sContent += "# To enable the double, the minimum arch is 6.0\n";
+            sContent += "target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_61,code=sm_61>)\n\n";
+
             #endregion
 
             #region Add CLGTest
@@ -74,7 +78,6 @@ set_target_properties( CLGLib
             sContent += "\n\n\n# ==================== \n# CLGTest \n# =================\n\n";
 
             sContent += "include_directories(${PROJECT_SOURCE_DIR}/CLGTest)\n";
-            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
 
             sContent += "add_executable(CLGTest \n    ";
             foreach (string sFileName in slgTest.m_lstAllHeaderFiles)

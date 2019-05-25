@@ -10,11 +10,11 @@ set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 # This is our code file dir
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
-add_compile_options(" -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas")
+# Flags
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow")
 add_definitions(-D_UBUNTU)
 add_definitions(-D_CLG_DOUBLEFLOAT=1)
-MESSAGE("CUDA_NVCC_FLAGS flag = ${CUDA_NVCC_FLAGS}")
 MESSAGE("CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}")
 MESSAGE("CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}")
 
@@ -162,6 +162,9 @@ set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 target_link_libraries(CLGLib -lcurand)
+
+# To enable the double, the minimum arch is 6.0
+target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_61,code=sm_61>)
 
 
 

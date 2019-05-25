@@ -17,10 +17,10 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquette)
 CActionGaugePlaquette::CActionGaugePlaquette()
     : CAction()
     //, m_bUsing4PlaqutteEnergy(FALSE)
-    , m_uiPlaqutteCount(0)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
+    , m_uiPlaqutteCount(0)
 {
 }
 

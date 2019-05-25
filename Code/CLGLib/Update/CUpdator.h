@@ -29,6 +29,7 @@ public:
     CUpdator() 
         : m_pOwner(NULL)
         , m_uiUpdateCall(0)
+        , m_iAcceptedConfigurationCount(0)
         , m_bSaveConfigurations(FALSE)
         , m_bTestHDiff(FALSE) 
         , m_bReport(TRUE)
@@ -46,7 +47,7 @@ public:
 
     void SetConfigurationCount(UINT uiCount) { m_iAcceptedConfigurationCount = uiCount; }
     UINT GetConfigurationCount() const { return m_iAcceptedConfigurationCount; }
-    void OnConfigurationAccepted();
+    //void OnConfigurationAccepted();
     void SaveConfiguration(UINT uiUpdateStep);
 
     void SetTestHdiff(UBOOL bTestHDiff) 
@@ -94,9 +95,9 @@ protected:
     UINT m_uiUpdateCall;
     UINT m_iAcceptedConfigurationCount;
     UBOOL m_bSaveConfigurations;
+    UBOOL m_bTestHDiff;
     UBOOL m_bReport;
     CCString m_sConfigurationPrefix;
-    UBOOL m_bTestHDiff;
     TArray<Real> m_lstHDiff;
     TArray<Real> m_lstH;
 };
