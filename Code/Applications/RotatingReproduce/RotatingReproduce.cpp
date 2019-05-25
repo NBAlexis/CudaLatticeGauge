@@ -18,10 +18,12 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/RotatingReproduce.yaml"), params);
 #endif
 
-    INT iBeforeEquib = 5;
-    params.FetchValueINT(_T("BeforeEquvibStep"), iBeforeEquib);
-    INT iAfterEquib = 200;
-    params.FetchValueINT(_T("EquvibStep"), iAfterEquib);
+    INT iVaule = 5;
+    params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
+    UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    iVaule = 200;
+    params.FetchValueINT(_T("EquvibStep"), iVaule);
+    UINT iAfterEquib = static_cast<UINT>(iVaule);
 
     appSetupLog(params);
     if (!appInitialCLG(params))

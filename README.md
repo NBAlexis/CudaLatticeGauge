@@ -35,7 +35,8 @@ NOTE: if CUDA is not installed, the curand64_100.dll file is necessary.
 
 =================== Ubuntu ========================
 
-For Ubuntu: (almost finished, not sure about whether the nvcc flag is correct)
+NOTE: The Linux environment is the run-time environment for us. 
+So the default is DOUBLE-precision float, and architecture compute_61,sm_61.
 
 put
 
