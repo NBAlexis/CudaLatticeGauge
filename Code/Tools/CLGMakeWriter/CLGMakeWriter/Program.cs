@@ -28,6 +28,10 @@ namespace CLGMakeWriter
             string projCLGTestFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj" });
             string projCLGTestFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj.filters" });
 
+            string projRotatingPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce" });
+            string projRotatingFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/RotatingReproduce.vcxproj" });
+            //string projRotatingFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/CLGTest.vcxproj.filters" });
+
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -37,6 +41,14 @@ namespace CLGMakeWriter
                 Console.WriteLine("Failed...path incorrect...");
                 return;
             }
+
+            if (!File.Exists(projRotatingFilePath))
+            {
+                Console.WriteLine("Failed...cannot find rotating project...");
+                return;
+            }
+
+
             List<string> applicationProjFiles = new List<string>();
             List<string> applicationProjDirs = new List<string>();
 
@@ -49,6 +61,7 @@ namespace CLGMakeWriter
             CMakeWritter writer = new CMakeWritter();
             Dictionary<string, CProjFile> apps = new Dictionary<string, CProjFile>();
             apps.Add("CLGTest", new CProjFile(projCLGTestFilePath, projCLGTestPath));
+            apps.Add("RotatingReproduce", new CProjFile(projRotatingFilePath, projRotatingPath));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 

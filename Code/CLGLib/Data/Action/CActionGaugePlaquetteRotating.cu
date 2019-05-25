@@ -785,6 +785,7 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     Real fOmega = 0.1f;
     param.FetchValueReal(_T("Omega"), fOmega);
     m_fOmega = fOmega;
+    CCommonData::m_fOmega = fOmega;
 
     TArray<INT> centerArray;
     param.FetchValueArrayINT(_T("Center"), centerArray);
@@ -795,6 +796,7 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
         m_sCenter.z = static_cast<SBYTE>(centerArray[2]);
         m_sCenter.w = static_cast<SBYTE>(centerArray[3]);
     }
+    CCommonData::m_sCenter = m_sCenter;
 }
 
 void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
@@ -953,6 +955,18 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 //{
 //    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 //}
+
+void CActionGaugePlaquetteRotating::SetOmega(Real fOmega) 
+{ 
+    m_fOmega = fOmega; 
+    CCommonData::m_fOmega = fOmega;
+}
+
+void CActionGaugePlaquetteRotating::SetCenter(const SSmallInt4 &newCenter) 
+{
+    m_sCenter = newCenter;
+    CCommonData::m_sCenter = newCenter;
+}
 
 CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
 {

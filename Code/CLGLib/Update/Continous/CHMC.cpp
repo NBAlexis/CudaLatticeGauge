@@ -32,6 +32,10 @@ void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
     params.FetchValueINT(_T("SaveConfiguration"), iSave);
     m_bSaveConfigurations = (0 != iSave);
 
+    INT iReport = 1;
+    params.FetchValueINT(_T("ReportMeasure"), iReport);
+    m_bReport = (0 != iReport);
+
     if (m_bSaveConfigurations)
     {
         m_sConfigurationPrefix = _T("Untitled");
@@ -117,7 +121,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     
-    m_pOwner->OnUpdatorFinished(bMeasure);
+    m_pOwner->OnUpdatorFinished(bMeasure, m_bReport);
     return m_iAcceptedConfigurationCount;
 }
 

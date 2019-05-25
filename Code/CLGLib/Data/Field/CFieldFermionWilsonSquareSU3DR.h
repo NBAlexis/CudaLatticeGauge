@@ -24,7 +24,6 @@ public:
 
     CFieldFermionWilsonSquareSU3DR() 
         : CFieldFermionWilsonSquareSU3D()
-        , m_fOmega(F(0.1))
         , m_bNaive(TRUE)
         , m_bExponential(FALSE)
     {
@@ -37,8 +36,6 @@ public:
     virtual void InitialOtherParameters(CParameters& params);
     virtual CCString GetInfos(const CCString &tab) const;
 
-    Real m_fOmega;
-    SSmallInt4 m_sCenter;
     UBOOL m_bNaive;
     UBOOL m_bExponential;
 };

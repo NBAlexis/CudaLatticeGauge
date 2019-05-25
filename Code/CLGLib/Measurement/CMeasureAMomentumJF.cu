@@ -254,8 +254,6 @@ _kernel_FS_Exponential(
 
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
     gammaMatrix sigma12 = __chiralGamma[SIGMA12];
-    CLGComplex coeff_m = _make_cuComplex(F(0.0), -F(0.5));
-    CLGComplex coeff_p = _make_cuComplex(F(0.0), F(0.5));
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -287,49 +285,20 @@ _kernel_FS_Exponential(
     //U(x,mu) phi(x+ mu)
     //U(x,mu) phi(x+ mu)
     deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
-    if (x_p_mu_Fermion.NeedToOpposite())
-    {
-        //the sign is opppsite as "y Omega" term same as "x Omega", which is 
-        //0.5 i k omega sigma12 (1 - gamma4)
-        //u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
-        u_phi_x_p_m.MulComp(coeff_p);
-        u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-        result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
-    }
-    else
-    {
-        //the sign is opppsite as "y Omega" term same as "x Omega", which is 
-        //-0.5 i k omega sigma12 (1 - gamma4)
-        //u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
-        u_phi_x_p_m.MulComp(coeff_m);
-        u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-        result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
-    }
+    u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+    //only sin part
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? F(0.5) : - F(0.5)));
 
-    //U^{dagger}(x-mu) phi(x-mu)
     deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
-    if (x_m_mu_Fermion.NeedToOpposite())
-    {
-        //the sign is same as "y Omega" term opposite as "x Omega", which is 
-        //-0.5 i k omega sigma12 (1 + gamma4)
-        //u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
-        u_dagger_phi_x_m_m.MulComp(coeff_m);
-        u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-        result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
-    }
-    else
-    {
-        //the sign is same as "y Omega" term opposite as "x Omega", which is 
-        //0.5 i k omega sigma12 (1 + gamma4)
-        //u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
-        u_dagger_phi_x_m_m.MulComp(coeff_p);
-        u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-        result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
-    }
+    u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? -F(0.5) : F(0.5)));
+    
+    u_phi_x_p_m.Add(u_dagger_phi_x_m_m);
+    u_phi_x_p_m = sigma12.MulWilsonC(u_phi_x_p_m);
 
     //Note that, it is not res[byArrayIdx] = result
     //It is res[c,s] = delta_{cc}delta_ss result[c,s]
-    res[byArrayIdx].m_d[uiS].m_ve[uiC] = result.m_d[uiS].m_ve[uiC];
+    res[byArrayIdx].m_d[uiS].m_ve[uiC] = u_phi_x_p_m.m_d[uiS].m_ve[uiC];
 }
 
 /**
@@ -384,17 +353,6 @@ void CMeasureAMomentumJF::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
 
     Reset();
 
-    //get center
-    TArray<INT> centerArray;
-    param.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        m_sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        m_sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        m_sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        m_sCenter.w = static_cast<SBYTE>(centerArray[3]);
-    }
-
     INT iValue = 1;
     param.FetchValueINT(_T("FieldId"), iValue);
     m_byFieldId = static_cast<BYTE>(iValue);
@@ -439,9 +397,9 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         deviceWilsonVectorSU3* pDevicePtr[12];
         SSmallInt4 sourceSite;
         sourceSite.x = static_cast<SBYTE>(i);
-        sourceSite.y = m_sCenter.y;
-        sourceSite.z = m_sCenter.z;
-        sourceSite.w = m_sCenter.w;
+        sourceSite.y = CCommonData::m_sCenter.y;
+        sourceSite.z = CCommonData::m_sCenter.z;
+        sourceSite.w = CCommonData::m_sCenter.w;
         for (BYTE s = 0; s < 4; ++s)
         {
             for (BYTE c = 0; c < 3; ++c)
@@ -473,7 +431,7 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
                 sourceSite,
-                m_sCenter,
+                CCommonData::m_sCenter,
                 static_cast<BYTE>(i - 1),
                 m_byFieldId,
                 m_bNaive,
@@ -519,8 +477,8 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     if (m_bShowResult)
     {
-        appGeneral(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
-        appGeneral(_T(" ----------- Orbital ------------- \n"));
+        appDetailed(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
+        appDetailed(_T(" ----------- Orbital ------------- \n"));
     }
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
 
@@ -529,13 +487,13 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
         if (m_bShowResult)
         {
-            appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+            appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
         }
     }
 
     if (m_bShowResult)
     {
-        appGeneral(_T("\n\n ----------- Spin ------------- \n"));
+        appDetailed(_T("\n\n ----------- Spin ------------- \n"));
     }
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
 
@@ -544,12 +502,12 @@ void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
         if (m_bShowResult)
         {
-            appGeneral(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+            appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
         }
     }
     if (m_bShowResult)
     {
-        appGeneral(_T("\n\n ================================================ \n\n"));
+        appDetailed(_T("\n\n ================================================ \n\n"));
     }
 }
 

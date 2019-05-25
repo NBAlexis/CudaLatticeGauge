@@ -134,17 +134,6 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataBufferOneConfig, sizeof(Real) * _HC_Lx * _HC_Ly));
     Reset();
 
-    //get center
-    TArray<INT> centerArray;
-    param.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        m_sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        m_sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        m_sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        m_sCenter.w = static_cast<SBYTE>(centerArray[3]);
-    }
-
     INT iValue = 1;
     param.FetchValueINT(_T("FieldId"), iValue);
     m_byFieldId = static_cast<BYTE>(iValue);
@@ -172,7 +161,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     _kernelCalculateAngularMomentumJG << <block, threads >> > (
         pGaugeSU3->m_pDeviceData, 
         m_pDeviceDataBufferOneConfig,
-        m_sCenter,
+        CCommonData::m_sCenter,
         fBetaOverN,
         m_byFieldId);
 
@@ -183,7 +172,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     if (m_bShowResult)
     {
-        appGeneral(_T(" === Angular Momentum JG of site y=%d ======\n"), m_sCenter.y);
+        appDetailed(_T(" === Angular Momentum JG of site y=%d ======\n"), CCommonData::m_sCenter.y);
     }
     for (UINT i = 1; i < _HC_Ly; ++i)
     {
@@ -197,13 +186,12 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     {
         if (m_bShowResult)
         {
-            appGeneral(_T("%d=%1.6f  "), i, m_pHostDataBuffer[i * _HC_Ly + m_sCenter.y]);
+            appDetailed(_T("%d=%1.6f  "), i, m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
         }
-        m_lstRes.AddItem(m_pHostDataBuffer[i * _HC_Ly + m_sCenter.y]);
     }
     if (m_bShowResult)
     {
-        appGeneral(_T("\n"));
+        appDetailed(_T("\n"));
     }
 
 }
@@ -215,9 +203,10 @@ void CMeasureAMomentumJG::Average(UINT )
 
 void CMeasureAMomentumJG::Report()
 {
-    assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) == static_cast<UINT>(m_lstRes.Num()));
+    assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) 
+        == static_cast<UINT>(m_lstRes.Num()));
     appGeneral(_T("\n===================================================\n"));
-    appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), m_sCenter.x);
+    appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), CCommonData::m_sCenter.x);
     appGeneral(_T("===================================================\n"));
 
     TArray<Real> tmp;

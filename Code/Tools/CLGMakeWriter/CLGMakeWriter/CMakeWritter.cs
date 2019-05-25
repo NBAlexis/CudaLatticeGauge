@@ -86,6 +86,31 @@ set_target_properties( CLGLib
 
             #endregion
 
+            #region Add Application/RotatingReproduce
+
+            CProjFile rotatingProj = excutables["RotatingReproduce"];
+
+            sContent += "\n\n\n# ==================== \n# RotatingReproduce \n# =================\n\n";
+
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)\n";
+            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
+
+            sContent += "add_executable(RotatingReproduce \n    ";
+            foreach (string sFileName in rotatingProj.m_lstAllHeaderFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/" + sFileName + "\n    ";
+            }
+            foreach (string sFileName in rotatingProj.m_lstAllCppFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/" + sFileName + "\n    ";
+            }
+            sContent += ")\n\n";
+
+            sContent += "target_compile_features(RotatingReproduce PUBLIC cxx_std_14)\n";
+            sContent += "target_link_libraries(RotatingReproduce CLGLib)\n";
+
+            #endregion
+
             sContent = sContent.Replace("\r\n", "\n");
             sContent = sContent.Replace("\n\r", "\n");
             sContent = sContent.Replace("\r", "\n");

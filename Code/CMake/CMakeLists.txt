@@ -12,6 +12,11 @@ set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 add_definitions(-D_UBUNTU)
 
+MESSAGE("CXX FLAGS = \n")
+MESSAGE(CMAKE_CXX_FLAGS)
+MESSAGE("\nNVCC FLAGS = \n")
+MESSAGE(CUDA_NVCC_FLAGS )
+
 include_directories(${PROJECT_SOURCE_DIR}/CLGLib)
 add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/CLGLib.h
@@ -182,3 +187,18 @@ add_executable(CLGTest
 
 target_compile_features(CLGTest PUBLIC cxx_std_14)
 target_link_libraries(CLGTest CLGLib)
+
+
+
+# ==================== 
+# RotatingReproduce 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)
+add_executable(RotatingReproduce 
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.h
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.cpp
+    )
+
+target_compile_features(RotatingReproduce PUBLIC cxx_std_14)
+target_link_libraries(RotatingReproduce CLGLib)

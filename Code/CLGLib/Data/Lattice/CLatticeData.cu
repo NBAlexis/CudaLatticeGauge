@@ -11,8 +11,10 @@
 
 __BEGIN_NAMESPACE
 
-Real CLGAPI CCommonData::m_fBeta = 0;
-Real CLGAPI CCommonData::m_fKai = 0;
+Real CLGAPI CCommonData::m_fBeta = F(0.0);
+Real CLGAPI CCommonData::m_fKai = F(0.0);
+Real CLGAPI CCommonData::m_fOmega = F(0.0);
+SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);
 UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
 UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 
@@ -142,11 +144,11 @@ void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGaug
     }
 }
 
-void CLatticeData::OnUpdatorFinished(UBOOL bMeasured)
+void CLatticeData::OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport)
 {
     if (NULL != m_pMeasurements && bMeasured)
     {
-        m_pMeasurements->OnUpdateFinished(TRUE);
+        m_pMeasurements->OnUpdateFinished(bReport);
     }
 }
 

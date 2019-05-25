@@ -1861,7 +1861,7 @@ TestRotation:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [6, 6, 6, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -1910,7 +1910,7 @@ TestRotation:
         Period : [0, 0, 1, -1]
         Omega : 0.06
         ## Index start from 0, so length = 6 means 1,2,3,4,5 are none zero, the center is 3
-        Center : [4, 4, 0, 0]
+        Center : [3, 3, 0, 0]
         ## Default to use Naive discretization (which is faster)
         Naive : 1
         Exponential : 1
@@ -1925,7 +1925,7 @@ TestRotation:
         ActionName : CActionGaugePlaquetteRotating
         Beta : 5.9
         Omega : 0.06
-        Center : [4, 4, 0, 0]
+        Center : [3, 3, 0, 0]
 
     Action2:
         ActionName : CActionFermionWilsonNf2
@@ -1948,7 +1948,7 @@ TestRotation:
         MeasureName : CMeasureAMomentumJG
         FieldId : 1
         ShowResult : 1
-        Center : [4, 4, 0, 0]
+        Center : [3, 3, 0, 0]
 
     Measure3:
 
@@ -1956,5 +1956,5 @@ TestRotation:
         FieldId : 2
         ShowResult : 1
         Naive : 1
-        Center : [4, 4, 4, 4]
+        Center : [3, 3, 3, 3]
         Exponential : 1

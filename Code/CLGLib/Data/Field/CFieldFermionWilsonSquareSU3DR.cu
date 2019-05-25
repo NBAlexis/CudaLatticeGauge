@@ -236,7 +236,7 @@ _kernelDFermionWilsonSquareSU3_DR(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelDFermionWilsonSquareSU3_DR_Exponential(
+_kernelDFermionWilsonSquareSU3_DR_Exponential_0(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
@@ -253,6 +253,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential(
     CLGComplex cCoeff)
 {
     intokernalInt4;
+
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
@@ -261,8 +262,6 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential(
     }
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
     Real fkOmega = fOmega * kai;
     Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fkOmega;
     Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fkOmega;
@@ -284,180 +283,135 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential(
         term3 = gamma5.MulWilsonC(term3);
     }
 
-    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
-
-    //idir = mu, we have x, y and t term but no z term
-    for (UINT idir = 0; idir < 3; ++idir)
+    //==============================
+    //res = [gamma5 (orig - term3 - result) gamma5] * coeff
+    //    = [gamma5 orig gamma5] * coeff - [gamma5 (term3 + result) gamma5] * coeff
+    //    = res0 - [gamma5 (term3 + result) gamma5] * coeff
+    //term3.Add(result);
+    switch (eCoeff)
     {
-        //=========================
-        //get things
-        if (2 == idir)
+    case EOCT_Real:
+        term3.MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        term3.MulComp(cCoeff);
+        break;
+    }
+    pResultData[uiSiteIndex].Sub(term3);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionWilsonSquareSU3_DR_Exponential_X(
+    const deviceWilsonVectorSU3* __restrict__ pDeviceData,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    deviceWilsonVectorSU3* pResultData,
+    Real kai,
+    Real fOmega,
+    SSmallInt4 sCenter,
+    BYTE byFieldId,
+    UBOOL bDDagger,
+    UBOOL bNaive,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    if (sIdx.IsDirichlet())
+    {
+        return;
+    }
+
+    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+
+    Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega * kai;
+    //Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega * kai;
+
+    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    BYTE idir = 0;
+    //idir = mu, we have x, y and t term but no z term
+    //=========================
+    //get things
+
+    //x, mu
+    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    //Assuming periodic
+    //get U(x,mu), U^{dagger}(x-mu), 
+    //deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    x_m_mu_Gauge_element.Dagger();
+
+    deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
+    deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
+
+    if (bDDagger)
+    {
+        x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
+        x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
+    }
+
+    //hopping terms
+
+    //U(x,mu) phi(x+ mu)
+    deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        //- k y Omega x_p_m
+        //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+        u_phi_x_p_m.MulReal(fYkOmega);
+        if (!bNaive)
         {
-            idir = 3;
+            result.Sub(u_phi_x_p_m);
         }
-        //x, mu
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
-
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
-
-        //Assuming periodic
-        //get U(x,mu), U^{dagger}(x-mu), 
-        //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-        x_m_mu_Gauge_element.Dagger();
-
-        deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
-        deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
-
-        if (bDDagger)
+        result.Add(gamma4.MulWilsonC(u_phi_x_p_m));
+    }
+    else
+    {
+        //- k y Omega x_p_m
+        //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+        u_phi_x_p_m.MulReal(fYkOmega);
+        if (!bNaive)
         {
-            x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
-            x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
+            result.Add(u_phi_x_p_m);
         }
+        result.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+    }
 
-        //hopping terms
-
-        //U(x,mu) phi(x+ mu)
-        deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
-        if (x_p_mu_Fermion.NeedToOpposite())
+    //U^{dagger}(x-mu) phi(x-mu)
+    deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        //- k y Omega x_p_m
+        //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+        u_dagger_phi_x_m_m.MulReal(fYkOmega);
+        if (!bNaive)
         {
-            if (0 == idir)
-            {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
-                u_phi_x_p_m.MulReal(fYkOmega);
-                if (!bNaive)
-                {
-                    result.Sub(u_phi_x_p_m);
-                }
-                result.Add(gamma4.MulWilsonC(u_phi_x_p_m));
-            }
-            else if (1 == idir)
-            {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
-                u_phi_x_p_m.MulReal(fXkOmega);
-                if (!bNaive)
-                {
-                    result.Add(u_phi_x_p_m);
-                }
-                result.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-            }
-            else if (3 == idir)
-            {
-                //the sign is opppsite as "y Omega" term same as "x Omega", which is 
-                //0.5 i k omega sigma12 (1 - gamma4)
-                u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
-                u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-                result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
-            }
+            result.Sub(u_dagger_phi_x_m_m);
         }
-        else
+        result.Sub(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+    else
+    {
+        //- k y Omega x_p_m
+        //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+        u_dagger_phi_x_m_m.MulReal(fYkOmega);
+        if (!bNaive)
         {
-            if (0 == idir)
-            {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
-                u_phi_x_p_m.MulReal(fYkOmega);
-                if (!bNaive)
-                {
-                    result.Add(u_phi_x_p_m);
-                }
-                result.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-            }
-            else if (1 == idir)
-            {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
-                u_phi_x_p_m.MulReal(fXkOmega);
-                if (!bNaive)
-                {
-                    result.Sub(u_phi_x_p_m);
-                }
-                result.Add(gamma4.MulWilsonC(u_phi_x_p_m));
-            }
-            else if (3 == idir)
-            {
-                //the sign is opppsite as "y Omega" term same as "x Omega", which is 
-                //-0.5 i k omega sigma12 (1 - gamma4)
-                u_phi_x_p_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
-                u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-                result.Add(sigma12.MulWilsonC(u_phi_x_p_m));
-            }
+            result.Add(u_dagger_phi_x_m_m);
         }
-
-        //U^{dagger}(x-mu) phi(x-mu)
-        deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
-        if (x_m_mu_Fermion.NeedToOpposite())
-        {
-            if (0 == idir)
-            {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
-                u_dagger_phi_x_m_m.MulReal(fYkOmega);
-                if (!bNaive)
-                {
-                    result.Sub(u_dagger_phi_x_m_m);
-                }
-                result.Sub(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-            else if (1 == idir)
-            {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
-                u_dagger_phi_x_m_m.MulReal(fXkOmega);
-                if (!bNaive)
-                {
-                    result.Add(u_dagger_phi_x_m_m);
-                }
-                result.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-            else if (3 == idir)
-            {
-                //the sign is same as "y Omega" term opposite as "x Omega", which is 
-                //-0.5 i k omega sigma12 (1 + gamma4)
-                u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), -fkOmega * F(0.5)));
-                u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-                result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-        }
-        else
-        {
-            if (0 == idir)
-            {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
-                u_dagger_phi_x_m_m.MulReal(fYkOmega);
-                if (!bNaive)
-                {
-                    result.Add(u_dagger_phi_x_m_m);
-                }
-                result.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-            else if (1 == idir)
-            {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
-                u_dagger_phi_x_m_m.MulReal(fXkOmega);
-                if (!bNaive)
-                {
-                    result.Sub(u_dagger_phi_x_m_m);
-                }
-                result.Sub(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-            else if (3 == idir)
-            {
-                //the sign is same as "y Omega" term opposite as "x Omega", which is 
-                //0.5 i k omega sigma12 (1 + gamma4)
-                u_dagger_phi_x_m_m.MulComp(make_cuComplex(F(0.0), fkOmega * F(0.5)));
-                u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-                result.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
-            }
-        }
+        result.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     }
 
     //result = phi(x) - kai sum _mu result
@@ -471,17 +425,280 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential(
     //res = [gamma5 (orig - term3 - result) gamma5] * coeff
     //    = [gamma5 orig gamma5] * coeff - [gamma5 (term3 + result) gamma5] * coeff
     //    = res0 - [gamma5 (term3 + result) gamma5] * coeff
-    term3.Add(result);
+    //term3.Add(result);
     switch (eCoeff)
     {
     case EOCT_Real:
-        term3.MulReal(fCoeff);
+        result.MulReal(fCoeff);
         break;
     case EOCT_Complex:
-        term3.MulComp(cCoeff);
+        result.MulComp(cCoeff);
         break;
     }
-    pResultData[uiSiteIndex].Sub(term3);
+    pResultData[uiSiteIndex].Sub(result);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
+    const deviceWilsonVectorSU3* __restrict__ pDeviceData,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    deviceWilsonVectorSU3* pResultData,
+    Real kai,
+    Real fOmega,
+    SSmallInt4 sCenter,
+    BYTE byFieldId,
+    UBOOL bDDagger,
+    UBOOL bNaive,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    if (sIdx.IsDirichlet())
+    {
+        return;
+    }
+
+    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+
+    //Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega * kai;
+    Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega * kai;
+
+    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    BYTE idir = 1;
+    //idir = mu, we have x, y and t term but no z term
+    //=========================
+    //get things
+
+    //x, mu
+    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    //Assuming periodic
+    //get U(x,mu), U^{dagger}(x-mu), 
+    //deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    x_m_mu_Gauge_element.Dagger();
+
+    deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
+    deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
+
+    if (bDDagger)
+    {
+        x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
+        x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
+    }
+
+    //hopping terms
+
+    //U(x,mu) phi(x+ mu)
+    deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        //+ k x Omega x_p_m
+        //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+        u_phi_x_p_m.MulReal(fXkOmega);
+        if (!bNaive)
+        {
+            result.Add(u_phi_x_p_m);
+        }
+        result.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+    }
+    else
+    {
+        //+ k x Omega x_p_m
+        //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+        u_phi_x_p_m.MulReal(fXkOmega);
+        if (!bNaive)
+        {
+            result.Sub(u_phi_x_p_m);
+        }
+        result.Add(gamma4.MulWilsonC(u_phi_x_p_m));
+    }
+
+    //U^{dagger}(x-mu) phi(x-mu)
+    deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        //+ k x Omega x_p_m
+        //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+        u_dagger_phi_x_m_m.MulReal(fXkOmega);
+        if (!bNaive)
+        {
+            result.Add(u_dagger_phi_x_m_m);
+        }
+        result.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+    else
+    {
+        //+ k x Omega x_p_m
+        //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+        u_dagger_phi_x_m_m.MulReal(fXkOmega);
+        if (!bNaive)
+        {
+            result.Sub(u_dagger_phi_x_m_m);
+        }
+        result.Sub(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+    }
+
+    //result = phi(x) - kai sum _mu result
+    //result.MulReal(kai);
+    if (bDDagger)
+    {
+        result = gamma5.MulWilsonC(result);
+    }
+
+    //==============================
+    //res = [gamma5 (orig - term3 - result) gamma5] * coeff
+    //    = [gamma5 orig gamma5] * coeff - [gamma5 (term3 + result) gamma5] * coeff
+    //    = res0 - [gamma5 (term3 + result) gamma5] * coeff
+    //term3.Add(result);
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        result.MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        result.MulComp(cCoeff);
+        break;
+    }
+    pResultData[uiSiteIndex].Sub(result);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionWilsonSquareSU3_DR_Exponential_T(
+    const deviceWilsonVectorSU3* __restrict__ pDeviceData,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    deviceWilsonVectorSU3* pResultData,
+    Real kai,
+    Real fOmega,
+    SSmallInt4 sCenter,
+    BYTE byFieldId,
+    UBOOL bDDagger,
+    UBOOL bNaive,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    if (sIdx.IsDirichlet())
+    {
+        return;
+    }
+
+    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    Real fhalfOmega = fOmega * F(0.5);
+    BYTE idir = 3;
+    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+
+    //idir = mu, we have x, y and t term but no z term
+    //=========================
+    //get things
+
+    //x, mu
+    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    //Assuming periodic
+    //get U(x,mu), U^{dagger}(x-mu), 
+    //deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    x_m_mu_Gauge_element.Dagger();
+
+    deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
+    deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
+
+    if (bDDagger)
+    {
+        x_p_mu_Fermion_element = gamma5.MulWilsonC(x_p_mu_Fermion_element);
+        x_m_mu_Fermion_element = gamma5.MulWilsonC(x_m_mu_Fermion_element);
+    }
+
+    //hopping terms
+
+    //U(x,mu) phi(x+ mu)
+    deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+    u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
+    deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) - F(1.0)));
+    //sinpart 
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
+
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        //k(cos_m_1 - i sin sigma12)(1-gamma4)
+        result.Sub(cospart);
+    }
+    else
+    {
+        //-k(cos_m_1 - i sin sigma12)(1-gamma4)
+        result.Add(cospart);
+    }
+
+    //U^{dagger}(x-mu) phi(x-mu)
+    deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+
+    u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
+    deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) - F(1.0)));
+    //sinpart 
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
+
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        //-(cos_m_1+isin)(1+gamma4)
+        result.Sub(cospart2);
+    }
+    else
+    {
+        result.Add(cospart2);
+    }
+
+    //result = phi(x) - kai sum _mu result
+    //result.MulReal(kai);
+    if (bDDagger)
+    {
+        result = gamma5.MulWilsonC(result);
+    }
+
+    //==============================
+    //res = [gamma5 (orig - term3 - result) gamma5] * coeff
+    //    = [gamma5 orig gamma5] * coeff - [gamma5 (term3 + result) gamma5] * coeff
+    //    = res0 - [gamma5 (term3 + result) gamma5] * coeff
+    //term3.Add(result);
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        result.MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        result.MulComp(cCoeff);
+        break;
+    }
+    pResultData[uiSiteIndex].Sub(result);
 }
 
 #pragma endregion
@@ -759,8 +976,6 @@ _kernelDWilsonForceSU3_DR_T(
     intokernalInt4;
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    CLGComplex fkOmegaP = _make_cuComplex(F(0.0), F(0.5) * fKai * fOmega);
-    CLGComplex fkOmegaM = _make_cuComplex(F(0.0), -F(0.5) * fKai * fOmega);
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
     gammaMatrix sigma12 = __chiralGamma[SIGMA12];
 
@@ -786,32 +1001,31 @@ _kernelDWilsonForceSU3_DR_T(
 
     deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
+    Real fFac = (x_p_mu_Fermion.NeedToOpposite() ? F(-1.0) : F(1.0)) * fKai;
+    Real fAng = F(0.5) * fOmega;
+    Real fCos = fFac * (_cos(fAng) - F(1.0));
+    Real fSin = fFac * _sin(fAng);
+;
     //first term has same sign as _Y function (-1)
     if (x_p_mu_Fermion.NeedToOpposite())
     {
-        x_p_mu_Right.MulComp(fkOmegaP);
+        fSin = -fSin;
+        fCos = -fCos;
     }
-    else
-    {
-        x_p_mu_Right.MulComp(fkOmegaM);
-    }
+
     x_p_mu_Right.Sub(gamma4.MulWilsonC(x_p_mu_Right));
+    deviceWilsonVectorSU3 x_p_mu_Right_real = x_p_mu_Right.MulRealC(fCos);
+    x_p_mu_Right.MulComp(_make_cuComplex(F(0.0), -fSin));
     x_p_mu_Right = sigma12.MulWilsonC(x_p_mu_Right);
+    x_p_mu_Right_real.Add(x_p_mu_Right);
+    deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, x_p_mu_Right_real);
 
-    deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, x_p_mu_Right);
-
-    //second term has same sign as _X function (+1)
-    if (x_p_mu_Fermion.NeedToOpposite())
-    {
-        x_Right.MulComp(fkOmegaM);
-    }
-    else
-    {
-        x_Right.MulComp(fkOmegaP);
-    }
     x_Right.Add(gamma4.MulWilsonC(x_Right));
+    deviceWilsonVectorSU3 x_Right_real = x_Right.MulRealC(fCos);
+    x_Right.MulComp(_make_cuComplex(F(0.0), fSin));
     x_Right = sigma12.MulWilsonC(x_Right);
-    mid.Add(deviceSU3::makeSU3Contract(x_Right, x_p_mu_Left));
+    x_Right_real.Add(x_Right);
+    mid.Add(deviceSU3::makeSU3Contract(x_Right_real, x_p_mu_Left));
 
     deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
     forceOfThisLink.Ta();
@@ -843,15 +1057,63 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
 
     if (m_bExponential)
     {
-        _kernelDFermionWilsonSquareSU3_DR_Exponential << <block, threads >> > (
+        _kernelDFermionWilsonSquareSU3_DR_Exponential_0 << <block, threads >> > (
             pSource,
             pGauge,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pTarget,
             m_fKai,
-            m_fOmega,
-            m_sCenter,
+            CCommonData::m_fOmega,
+            CCommonData::m_sCenter,
+            m_byFieldId,
+            bDagger,
+            m_bNaive,
+            eOCT,
+            fRealCoeff,
+            cCmpCoeff);
+
+        _kernelDFermionWilsonSquareSU3_DR_Exponential_X << <block, threads >> > (
+            pSource,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            pTarget,
+            m_fKai,
+            CCommonData::m_fOmega,
+            CCommonData::m_sCenter,
+            m_byFieldId,
+            bDagger,
+            m_bNaive,
+            eOCT,
+            fRealCoeff,
+            cCmpCoeff);
+
+        _kernelDFermionWilsonSquareSU3_DR_Exponential_Y << <block, threads >> > (
+            pSource,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            pTarget,
+            m_fKai,
+            CCommonData::m_fOmega,
+            CCommonData::m_sCenter,
+            m_byFieldId,
+            bDagger,
+            m_bNaive,
+            eOCT,
+            fRealCoeff,
+            cCmpCoeff);
+
+        _kernelDFermionWilsonSquareSU3_DR_Exponential_T << <block, threads >> > (
+            pSource,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            pTarget,
+            m_fKai,
+            CCommonData::m_fOmega,
+            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -868,8 +1130,8 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pTarget,
             m_fKai,
-            m_fOmega,
-            m_sCenter,
+            CCommonData::m_fOmega,
+            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -899,7 +1161,10 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            m_sCenter, m_fKai, m_fOmega, m_byFieldId);
+            CCommonData::m_sCenter, 
+            m_fKai, 
+            CCommonData::m_fOmega, 
+            m_byFieldId);
 
         _kernelDWilsonForceSU3_DR_Y_Naive << <block, threads >> > (
             pDphiBuffer,
@@ -907,7 +1172,10 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            m_sCenter, m_fKai, m_fOmega, m_byFieldId);
+            CCommonData::m_sCenter, 
+            m_fKai, 
+            CCommonData::m_fOmega, 
+            m_byFieldId);
     }
     else
     {
@@ -917,7 +1185,10 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            m_sCenter, m_fKai, m_fOmega, m_byFieldId);
+            CCommonData::m_sCenter, 
+            m_fKai, 
+            CCommonData::m_fOmega, 
+            m_byFieldId);
 
         _kernelDWilsonForceSU3_DR_Y << <block, threads >> > (
             pDphiBuffer,
@@ -925,18 +1196,24 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            m_sCenter, m_fKai, m_fOmega, m_byFieldId);
+            CCommonData::m_sCenter, 
+            m_fKai, 
+            CCommonData::m_fOmega, 
+            m_byFieldId);
     }
 
     if (m_bExponential)
     {
-        _kernelDWilsonForceSU3_DR_T << <block, threads >> > (
-            pDphiBuffer,
-            pDDphiBuffer,
-            pGauge,
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-            pForceSU3,
-            m_sCenter, m_fKai, m_fOmega, m_byFieldId);
+        //_kernelDWilsonForceSU3_DR_T << <block, threads >> > (
+        //    pDphiBuffer,
+        //    pDDphiBuffer,
+        //    pGauge,
+        //    appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        //    pForceSU3,
+        //    CCommonData::m_sCenter, 
+        //    m_fKai, 
+        //    CCommonData::m_fOmega, 
+        //    m_byFieldId);
     }
 }
 
@@ -945,20 +1222,6 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
 void CFieldFermionWilsonSquareSU3DR::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionWilsonSquareSU3::InitialOtherParameters(params);
-
-    Real fOmega = 0.1f;
-    params.FetchValueReal(_T("Omega"), fOmega);
-    m_fOmega = fOmega;
-
-    TArray<INT> centerArray;
-    params.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        m_sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        m_sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        m_sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        m_sCenter.w = static_cast<SBYTE>(centerArray[3]);
-    }
 
     INT iNaive = 1;
     params.FetchValueINT(_T("Naive"), iNaive);
@@ -978,8 +1241,6 @@ void CFieldFermionWilsonSquareSU3DR::CopyTo(CField* U) const
     CFieldFermionWilsonSquareSU3DR * pField = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(U);
     if (NULL != pField)
     {
-        pField->m_fOmega = m_fOmega;
-        pField->m_sCenter = m_sCenter;
         pField->m_bNaive = m_bNaive;
         pField->m_bExponential = m_bExponential;
     }
@@ -990,10 +1251,6 @@ CCString CFieldFermionWilsonSquareSU3DR::GetInfos(const CCString &tab) const
     CCString sRet;
     sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DR\n");
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
-    CCString sCenter;
-    sCenter.Format(_T("Center: [%d, %d, %d, %d]\n"), m_sCenter.x, m_sCenter.y, m_sCenter.z, m_sCenter.w);
-    sRet = sRet + tab + sCenter;
     return sRet;
 }
 

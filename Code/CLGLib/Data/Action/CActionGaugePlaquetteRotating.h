@@ -33,7 +33,8 @@ public:
     virtual CCString GetInfos(const CCString &tab) const;
 
     void SetBeta(Real fBeta);
-    void SetOmega(Real fOmega) { m_fOmega = fOmega; }
+    void SetOmega(Real fOmega);
+    void SetCenter(const SSmallInt4 &newCenter);
     //Real GetEnergyPerPlaqutte() const;
 
     Real m_fOmega;

@@ -1,0 +1,100 @@
+## Log options
+## Verbose will always show in stdout
+## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+VerboseLevel : GENERAL
+VerboseOutput : timestamp
+ShowDeviceInformation : 0
+ShowParameterContent : 0
+BeforeEquvibStep : 2
+EquvibStep : 10
+
+Dim : 4
+Dir : 4
+LatticeLength : [16, 16, 16, 16]
+LatticeIndex : CIndexSquare
+LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+ThreadAutoDecompose : 1
+RandomType : ER_Schrage
+RandomSeedType : ERST_Timestamp
+ActionListLength : 2
+FermionFieldCount : 1
+MeasureListLength : 2
+CacheStaple : 0
+
+Updator:
+
+    UpdatorType : CHMC
+    Metropolis : 1
+    ReportMeasure : 0
+
+    ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+    IntegratorType : CIntegratorOmelyan
+    IntegratorStepLength : 1
+    IntegratorStep : 60
+    Omelyan2Lambda : 0.38636665500756728
+
+Gauge:
+    FieldName : CFieldGaugeSU3D
+    FieldInitialType : EFIT_Random
+
+    Period : [0, 0, 1, 1]
+
+GaugeBoundary:
+
+    FieldName : CFieldBoundaryGaugeSU3
+
+FermionField1:
+
+    FieldName : CFieldFermionWilsonSquareSU3DR
+    FieldInitialType : EFIT_RandomGaussian
+    Hopping : 0.1583
+    FieldId : 2
+    PoolNumber : 26
+    Period : [0, 0, 1, -1]
+    Omega : 0.06
+    ## Index start from 0, so length = 6 means 1,2,3,4,5 are none zero, the center is 3
+    Center : [8, 8, 0, 0]
+    ## Default to use Naive discretization (which is faster)
+    Naive : 1
+    Exponential : 1
+
+BoundaryFermionField1:
+
+    FieldName : CFieldBoundaryWilsonSquareSU3
+    FieldId : 2
+		
+Action1:
+   
+    ActionName : CActionGaugePlaquetteRotating
+    Beta : 5.9
+    Omega : 0.06
+    Center : [8, 8, 0, 0]
+
+Action2:
+    ActionName : CActionFermionWilsonNf2
+    FieldId : 2
+
+Solver:
+    SolverName : CSLASolverGMRES
+    SolverForFieldId : 2
+    MaxDim : 20
+    Accuracy : 0.0000001
+    Restart : 100
+    AbsoluteAccuracy : 1
+
+Measure1:
+
+    MeasureName : CMeasureAMomentumJG
+    FieldId : 1
+    ShowResult : 1
+    Center : [8, 8, 0, 0]
+
+Measure2:
+
+    MeasureName : CMeasureAMomentumJF
+    FieldId : 2
+    ShowResult : 1
+    Naive : 1
+    Center : [8, 8, 8, 8]
+    Exponential : 1

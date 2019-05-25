@@ -344,20 +344,31 @@ On the other hand, the $i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}$ term can al
 and discritized as
 \begin{equation}
 \begin{split}
-&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(e^{\mu a}\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{-\mu a}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)\\
-&=-\kappa \left(e^{-\frac{ia\Omega \sigma ^{12}}{2}}\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{\frac{ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
+&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(e^{\mu a}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{-\mu a}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)\\
+&=-\kappa \left(e^{\textcolor[rgb]{1,0,0}{-}\frac{ia\Omega \sigma ^{12}}{2}}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{\textcolor[rgb]{1,0,0}{+}\frac{ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
 \end{split}
 \end{equation}
 \textcolor[rgb]{1,0,0}{It looks not satisfy the $\gamma _5$ -hermiticity.} However, using $\left(\sigma ^{12}\right)^2=1$, it is in fact
 \begin{equation}
 \begin{split}
-&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(\left(\textcolor[rgb]{0,0,1}{1}-\frac{ia\Omega \sigma ^{12}}{2}\right)\bar{\psi}(n)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} +\left(\textcolor[rgb]{0,0,1}{1}+\frac{ia\Omega \sigma ^{12}}{2}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
+&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left[\left(\cos(\frac{a\Omega}{2})-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
+&\left.+\left(\cos(\frac{a\Omega}{2})+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
 \end{split}
 \end{equation}
 The $1$ in $\textcolor[rgb]{0,0,1}{1}\pm \frac{ia\Omega \sigma ^{12}}{2}$ is the usual $D_{\tau}$. So the additional term is in fact
+\textcolor[rgb]{0,0,1}{
 \begin{equation}
 \begin{split}
-&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)
+&-\kappa \left[\left(\cos(\frac{a\Omega}{2})-1-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
+&\left.+\left(\cos(\frac{a\Omega}{2})-1+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
+\end{split}
+\end{equation}
+}
+In the case of $a \ll 1$, it is approximately
+\begin{equation}
+\begin{split}
+&-\kappa \left[\left(-i\frac{a\Omega}{2}\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
+&\left.+\left(i\frac{a\Omega}{2}\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
 \end{split}
 \end{equation}
 The $U_{\tau}$ is in fact added to keep gauge symmetry, originally it is

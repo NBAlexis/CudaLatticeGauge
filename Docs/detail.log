@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  22 MAY 2019 20:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  25 MAY 2019 14:00
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1420,34 +1420,29 @@ Overfull \hbox (22.72751pt too wide) detected at line 319
 []
  []
 
-[59]
-Overfull \hbox (34.57243pt too wide) detected at line 356
-[]
- []
-
-[60] [61] [62]
-Overfull \hbox (18.00261pt too wide) detected at line 469
+[59] [60] [61] [62]
+Overfull \hbox (18.00261pt too wide) detected at line 480
 []
  []
 
 
-Overfull \hbox (31.96808pt too wide) detected at line 492
+Overfull \hbox (31.96808pt too wide) detected at line 503
 []
  []
 
 [63]
-Overfull \hbox (18.94774pt too wide) detected at line 552
+Overfull \hbox (18.94774pt too wide) detected at line 563
 []
  []
 
 [64] [65] [66]
-Overfull \hbox (0.11786pt too wide) in paragraph at lines 669--670
+Overfull \hbox (0.11786pt too wide) in paragraph at lines 680--681
 []\OT1/cmr/m/n/10.53937 Note that \OT1/cmr/bx/n/10.53937 Both the force from ga
 uge and fermion ac-tions are kept anti-hermitian
  []
 
 [67]
-Overfull \hbox (17.9833pt too wide) detected at line 720
+Overfull \hbox (17.9833pt too wide) detected at line 731
 []
  []
 
@@ -1498,8 +1493,8 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 170.
  ) 
 Here is how much of TeX's memory you used:
- 28765 strings out of 492976
- 476948 string characters out of 3141819
+ 28766 strings out of 492976
+ 476962 string characters out of 3141819
  971338 words of memory out of 3000000
  31591 multiletter control sequences out of 15000+200000
  555195 words of font info for 109 fonts, out of 3000000 for 9000
@@ -1527,9 +1522,9 @@ KTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmtt10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.
 pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><D:/CTEX/MiKTe
 X/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (74 pages, 685963 bytes).
+Output written on detail.pdf (74 pages, 686537 bytes).
 PDF statistics:
- 1508 PDF objects out of 1728 (max. 8388607)
- 571 named destinations out of 1000 (max. 500000)
+ 1509 PDF objects out of 1728 (max. 8388607)
+ 572 named destinations out of 1000 (max. 500000)
  517 words of extra memory for PDF output out of 10000 (max. 10000000)
 

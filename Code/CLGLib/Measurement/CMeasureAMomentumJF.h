@@ -52,7 +52,6 @@ protected:
     deviceWilsonVectorSU3* m_pOperatorDataS;
     deviceWilsonVectorSU3* m_pOperatorDataL;
     
-    SSmallInt4 m_sCenter;
     BYTE m_byFieldId;
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;

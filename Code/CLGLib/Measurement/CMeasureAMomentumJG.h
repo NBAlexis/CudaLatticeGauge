@@ -56,7 +56,6 @@ protected:
 
     Real * m_pHostDataBuffer;
     Real * m_pDeviceDataBufferOneConfig;
-    SSmallInt4 m_sCenter;
     BYTE m_byFieldId;
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;

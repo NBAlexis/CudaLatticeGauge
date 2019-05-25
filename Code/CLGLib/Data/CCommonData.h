@@ -315,6 +315,11 @@ public:
 
     static UBOOL m_bStoreStaple;
     static UBOOL m_bStoreLastSolution;
+
+    //Used in rotating frame. Since the fermion fields are copied,
+    //it is convinient to set all parameters at one place
+    static Real m_fOmega;
+    static SSmallInt4 m_sCenter;
 };
 
 __END_NAMESPACE

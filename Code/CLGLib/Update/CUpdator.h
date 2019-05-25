@@ -26,7 +26,15 @@ class CLGAPI CUpdator : public CBase
 {
 public:
 
-    CUpdator() : m_pOwner(NULL), m_uiUpdateCall(0), m_bSaveConfigurations(FALSE), m_bTestHDiff(FALSE) { ; }
+    CUpdator() 
+        : m_pOwner(NULL)
+        , m_uiUpdateCall(0)
+        , m_bSaveConfigurations(FALSE)
+        , m_bTestHDiff(FALSE) 
+        , m_bReport(TRUE)
+    {
+    }
+
     virtual UINT Update(UINT iSteps, UBOOL bMeasure) = 0;
     virtual Real CalculateEnergy() = 0;
 
@@ -86,6 +94,7 @@ protected:
     UINT m_uiUpdateCall;
     UINT m_iAcceptedConfigurationCount;
     UBOOL m_bSaveConfigurations;
+    UBOOL m_bReport;
     CCString m_sConfigurationPrefix;
     UBOOL m_bTestHDiff;
     TArray<Real> m_lstHDiff;
