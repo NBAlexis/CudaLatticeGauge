@@ -25,10 +25,10 @@ namespace CLGMakeWriter
             sContent += "# This is our code file dir\n";
             sContent += "set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)\n";
 
-            sContent += "add_compile_options(\" - O3\")\n";
+            sContent += "add_compile_options(\" -O3\")\n";
             sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
-            sContent += "add_definitions(-D_CLG_DOUBLEFLOAT = 1)\n";
+            sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
             sContent += "MESSAGE(\"CUDA_NVCC_FLAGS flag = ${CUDA_NVCC_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";
