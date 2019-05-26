@@ -29,8 +29,9 @@ namespace CLGMakeWriter
             sContent += "set(CMAKE_CUDA_FLAGS \"${CMAKE_CUDA_FLAGS} -O3\")\n";
             sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
-            sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-            sContent += "MESSAGE(\"Note: double float is enabled, arch is compute61 and sm61.\")\n";
+            sContent += "# to enable double float, add the following line:\n";
+            sContent += "# add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+            sContent += "MESSAGE(\"Note: double float is not enabled, arch is compute61 and sm61.\")\n";
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";
 
