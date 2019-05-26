@@ -132,9 +132,20 @@ public:
             {
                 //Maybe the first initial is not entered?
             }
-
+            static TCHAR timeBuffer[256];
+            if (level <= GENERAL)
+            {
+                appGetTimeNow(timeBuffer, 256);
+                *m_pStdStream << _T("[") << timeBuffer << _T("]");
+                if (NULL != m_pStream)
+                {
+                    *m_pStream << _T("[") << timeBuffer << _T("]");
+#ifdef _CLG_DEBUG
+                    *m_pStream << std::flush;
+#endif
+                }
+            }
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
-
             *m_pStdStream << m_cBuff;
             if (NULL != m_pStream)
             {

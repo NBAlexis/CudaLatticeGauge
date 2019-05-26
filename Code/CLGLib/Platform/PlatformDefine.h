@@ -151,7 +151,10 @@ FORCEINLINE void appGetTimeNow(TCHAR* outchar, UINT buffSize)
 {
     time_t now = time(0);
 #if _CLG_WIN
-    ctime_s(outchar, buffSize, &now);
+    //ctime_s(outchar, buffSize, &now);
+    tm now_tm;
+    gmtime_s(&now_tm, &now);
+    strftime(outchar, buffSize, _T("%d-%m-%Y %H:%M:%S"), &now_tm);
 #else
     tm now_tm = *localtime(&now);
     strftime(outchar, buffSize, "%A %c", &now_tm);

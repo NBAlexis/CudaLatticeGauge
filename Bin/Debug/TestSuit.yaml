@@ -1206,7 +1206,7 @@ TestFermionUpdatorLargeScale:
     ## The H can be as large as 2E7, 
     ## but the max error of substraction of Single Float point can be 1E-7 (1.192092896e-07F)
     ## So we only check the accept rate and expect plaqutte
-    ## This parameters with [32, 32, 16, 16] and Double Float is tested, 
+    ## This parameters with [32, 32, 32, 16] and Double Float is tested (on GTX1080 32^4 and double is possible), 
     ## When equilibrium, H_diff ~ 0.25, 
 
     Dim : 4
@@ -1240,8 +1240,8 @@ TestFermionUpdatorLargeScale:
         Metropolis : 0
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
-        NestedStep : 8
+        IntegratorStep : 8
+        NestedStep : 6
 
     Gauge:
 	
@@ -1272,7 +1272,7 @@ TestFermionUpdatorLargeScale:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
         MaxDim : 12
-        Accuracy : 0.000001
+        Accuracy : 0.00001
         Restart : 10
         AbsoluteAccuracy : 1
 

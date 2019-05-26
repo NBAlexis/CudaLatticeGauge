@@ -161,7 +161,7 @@ public:
         {
             return m_pPool.Pop();
         }
-        appGeneral(_T("Warning: Field Pool Out Number!!!\n"));
+        appDetailed(_T("Warning: Field Pool Out Number!!!\n"));
         CField* newOne = CreateNew();
         return newOne;
     }

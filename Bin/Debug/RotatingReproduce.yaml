@@ -6,12 +6,12 @@ VerboseLevel : GENERAL
 VerboseOutput : timestamp
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 2
-EquvibStep : 10
+BeforeEquvibStep : 5
+EquvibStep : 100
 
 Dim : 4
 Dir : 4
-LatticeLength : [16, 16, 16, 16]
+LatticeLength : [12, 12, 12, 12]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 ThreadAutoDecompose : 1
@@ -29,10 +29,10 @@ Updator:
     ReportMeasure : 0
 
     ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-    IntegratorType : CIntegratorOmelyan
+    IntegratorType : CIntegratorNestedForceGradient
     IntegratorStepLength : 1
-    IntegratorStep : 60
-    Omelyan2Lambda : 0.38636665500756728
+    IntegratorStep : 6
+    NestedStep : 8
 
 Gauge:
     FieldName : CFieldGaugeSU3D

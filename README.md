@@ -36,7 +36,7 @@ NOTE: if CUDA is not installed, the curand64_100.dll file is necessary.
 =================== Ubuntu ========================
 
 NOTE: The Linux environment is the run-time environment for us. 
-So the default is DOUBLE-precision float, and architecture compute_61,sm_61.
+Now the default is DOUBLE-precision float, and architecture compute_61,sm_61.
 
 put
 
@@ -57,6 +57,8 @@ into ~/.bashrc
 (if bashrc is changed, reboot is necessary. This is for cuda include dirs, when building .cu, nvcc can add cuda headers automatically, but when building .cpp files, it is necessary)
 
 cd /Code/CMake
+
+(before make, a "make clean" can be excute to do a re-build)
 
 cmake CMakeLists.txt
 

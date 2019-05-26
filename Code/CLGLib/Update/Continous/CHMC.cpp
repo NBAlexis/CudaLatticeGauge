@@ -78,7 +78,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
                 m_lstH.AddItem(fEnergy);
             }
             //Metropolis
-            appDetailed(_T(" HMC: step = %d, H_dff = %f (%f - %f)\n"),
+            appGeneral(_T(" HMC: step = %d, H_dff = %f (%f - %f)\n"),
                 i + 1, 
                 fDiff,
                 fEnergy,
