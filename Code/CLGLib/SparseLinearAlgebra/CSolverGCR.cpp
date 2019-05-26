@@ -177,7 +177,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
         appParanoiac(_T("CSLASolverGCR::Solve deviation: ---- restart ----. last divation = %f\n"), fLastDiavation);
     }
 
-    appParanoiac(_T("CSLASolverGCR::Solve failed: last divation = %f\n"), fLastDiavation);
+    appGeneral(_T("CSLASolverGCR::Solve failed: last divation = %f\n"), fLastDiavation);
 
     pX->CopyTo(pFieldX);
 

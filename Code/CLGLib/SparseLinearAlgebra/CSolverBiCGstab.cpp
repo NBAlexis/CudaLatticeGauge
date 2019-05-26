@@ -195,7 +195,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     }
 
     //The solver failed.
-    appCrucial(_T("CSLASolverBiCGStab fail to solve!"));
+    appGeneral(_T("CSLASolverBiCGStab fail to solve!"));
 
     pX->CopyTo(pFieldX);
     //pB->Return();

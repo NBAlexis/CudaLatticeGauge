@@ -75,11 +75,23 @@ Action2:
     ActionName : CActionFermionWilsonNf2
     FieldId : 2
 
+##Solver:
+##    SolverName : CSLASolverGMRES
+##    SolverForFieldId : 2
+##    MaxDim : 20
+##    Accuracy : 0.0000001
+##    Restart : 100
+##    AbsoluteAccuracy : 1
+
 Solver:
-    SolverName : CSLASolverGMRES
+
+    SolverName : CSLASolverGCRODR
     SolverForFieldId : 2
-    MaxDim : 20
-    Accuracy : 0.0000001
+    MDim : 15
+    KDim : 3
+    RecalculateR : 25
+    DeflateSpace : EEDT_SVD
+    Accuracy : 0.001
     Restart : 100
     AbsoluteAccuracy : 1
 

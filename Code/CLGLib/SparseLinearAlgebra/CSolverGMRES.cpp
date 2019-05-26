@@ -175,7 +175,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         appParanoiac(_T("CSLASolverGMRES::Solve deviation: ---- restart ----. last divation = %8.15f\n"), fLastDiavation);
     }
 
-    appParanoiac(_T("CSLASolverGMRES::Solve failed: last divation = %8.15f\n"), fLastDiavation);
+    appGeneral(_T("CSLASolverGMRES::Solve failed: last divation = %8.15f\n"), fLastDiavation);
     pX->CopyTo(pFieldX);
 
     pX->Return();

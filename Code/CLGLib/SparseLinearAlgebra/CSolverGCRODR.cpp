@@ -353,7 +353,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         pW->CopyTo(pR);
     }
 
-    appParanoiac(_T("GCRODR::Solve failed: last divation |residue| = %8.15f\n"), m_fDiviation);
+    appGeneral(_T("GCRODR::Solve failed: last divation |residue| = %8.15f\n"), m_fDiviation);
     pX->CopyTo(pFieldX);
     pX->Return();
     pW->Return();
