@@ -2,7 +2,7 @@
 
 lattice gauge simulation with CUDA</br>
 
-Test on laptops using GMRES with 10 orthrognal basis</br>
+Test on laptops using GMRES with 12 orthrognal basis</br>
 One trajectory with 8/48 Multi-rate approximate Force-gradiant steps
 
 +--------------------------+---------------------------+---------------------------+</br>
@@ -21,7 +21,7 @@ One trajectory with 8/48 Multi-rate approximate Force-gradiant steps
 
 For 32x32x32x16, H_diff = 0.32 ( Metropolic accept rate > exp(-0.32) ~ 72.6% )</br>
 (The speed is related with kappa and beta, it is tested using kappa=0.1355 and beta=2.5, 
-GMRES with 10 orthrognal basis will converge with about 4 restarts)
+GMRES with 12 orthrognal basis will converge with about 4 restarts)
 
 The 32x32x32x12 is the maximum size of lattice using float and 3GB GPU.</br>
 For windows, it is tested on a Notebook with two GPUs, Intel(R) HD Graphic for dispalyer and GTX for calculation.</br>
