@@ -28,7 +28,6 @@ public:
         , m_pDeviceDataBufferL(NULL)
         , m_pOperatorDataS(NULL)
         , m_pOperatorDataL(NULL)
-        , m_byFieldId(1)
         , m_uiConfigurationCount(0)
         , m_bShowResult(TRUE)
         , m_bNaive(TRUE)
@@ -40,9 +39,13 @@ public:
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
+    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site);
     virtual void Average(UINT uiConfigurationCount);
     virtual void Report();
     virtual void Reset();
+
+    virtual UBOOL IsGaugeMeasurement() const { return FALSE; }
+    virtual UBOOL IsSourceScanning() const { return TRUE; }
 
 protected:
 
@@ -52,7 +55,6 @@ protected:
     deviceWilsonVectorSU3* m_pOperatorDataS;
     deviceWilsonVectorSU3* m_pOperatorDataL;
     
-    BYTE m_byFieldId;
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
     UBOOL m_bNaive;

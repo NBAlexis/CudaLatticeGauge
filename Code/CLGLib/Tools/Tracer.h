@@ -36,6 +36,7 @@ public:
         : m_eLevel(CRUCIAL)
         , m_pStream(NULL)
         , m_pStdStream(NULL)
+        , m_bLogDate(TRUE)
     {
         Initial(CRUCIAL);
     }
@@ -132,19 +133,23 @@ public:
             {
                 //Maybe the first initial is not entered?
             }
-            static TCHAR timeBuffer[256];
-            if (level <= GENERAL)
+            if (m_bLogDate)
             {
-                appGetTimeNow(timeBuffer, 256);
-                *m_pStdStream << _T("[") << timeBuffer << _T("]");
-                if (NULL != m_pStream)
+                static TCHAR timeBuffer[256];
+                if (level <= GENERAL)
                 {
-                    *m_pStream << _T("[") << timeBuffer << _T("]");
+                    appGetTimeNow(timeBuffer, 256);
+                    *m_pStdStream << _T("[") << timeBuffer << _T("]");
+                    if (NULL != m_pStream)
+                    {
+                        *m_pStream << _T("[") << timeBuffer << _T("]");
 #ifdef _CLG_DEBUG
-                    *m_pStream << std::flush;
+                        *m_pStream << std::flush;
 #endif
+                    }
                 }
             }
+
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
             *m_pStdStream << m_cBuff;
             if (NULL != m_pStream)
@@ -165,12 +170,15 @@ public:
         }
     }
 
+    inline void SetLogDate(UBOOL bLog) { m_bLogDate = bLog; }
+
 private:
 
     EVerboseLevel m_eLevel;
     OSTREAM * m_pStream;
     OSTREAM * m_pStdStream;
     TCHAR m_cBuff[_kTraceBuffSize];
+    UBOOL m_bLogDate;
 };
 
 extern CLGAPI void appInitialTracer(EVerboseLevel eLevel, const CCString& filename = _T("stdout"));
@@ -197,6 +205,11 @@ inline void appSetTracer(EVerboseLevel eLevel, const CCString& filename)
 inline void appFlushLog()
 {
     GTracer.Flush();
+}
+
+inline void appSetLogDate(UBOOL bLog)
+{
+    GTracer.SetLogDate(bLog);
 }
 
 __END_NAMESPACE

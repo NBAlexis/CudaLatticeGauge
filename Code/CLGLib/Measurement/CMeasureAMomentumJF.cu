@@ -372,142 +372,255 @@ void CMeasureAMomentumJF::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
 
 void CMeasureAMomentumJF::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
 {
+    //if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    //{
+    //    appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
+    //    return;
+    //}
+    //const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    //dim3 _blocks(1, 1, 1);
+    //dim3 _thread1(12, 1, 1);
+    //for (UINT i = 1; i < _HC_Lx; ++i)
+    //{
+    //    CFieldFermionWilsonSquareSU3DR* pFermionSources[12];
+    //    for (UINT j = 0; j < 12; ++j)
+    //    {
+    //        pFermionSources[j] = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    //        if (NULL == pFermionSources[j])
+    //        {
+    //            appCrucial(_T("Meson correlator only implemented with Wilson SU3 Dirichlet Rotating\n"));
+    //            _FAIL_EXIT;
+    //        }
+    //    }
+
+    //    deviceWilsonVectorSU3* pDevicePtr[12];
+    //    SSmallInt4 sourceSite;
+    //    sourceSite.x = static_cast<SBYTE>(i);
+    //    sourceSite.y = CCommonData::m_sCenter.y;
+    //    sourceSite.z = CCommonData::m_sCenter.z;
+    //    sourceSite.w = CCommonData::m_sCenter.w;
+    //    for (BYTE s = 0; s < 4; ++s)
+    //    {
+    //        for (BYTE c = 0; c < 3; ++c)
+    //        {
+    //            SFermionSource sourceData;
+    //            sourceData.m_eSourceType = EFS_Point;
+    //            sourceData.m_sSourcePoint = sourceSite;
+    //            sourceData.m_byColorIndex = c;
+    //            sourceData.m_bySpinIndex = s;
+
+    //            pFermionSources[s * 3 + c]->InitialAsSource(sourceData);
+
+    //            if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    //            {
+    //                pFermionSources[s * 3 + c]->m_fLength = pFermionSources[s * 3 + c]->Dot(pFermionSources[s * 3 + c]).x;
+    //            }
+    //            pFermionSources[s * 3 + c]->InverseD(pGaugeSU3);
+    //            pDevicePtr[s * 3 + c] = pFermionSources[s * 3 + c]->m_pDeviceData;
+    //        }
+    //    }
+
+    //    deviceWilsonVectorSU3** ppDevicePtr;
+    //    checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
+    //    checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
+
+    //    _kernel_XDy_yDx << <_blocks, _thread1 >> > (
+    //            pGaugeSU3->m_pDeviceData,
+    //            ppDevicePtr,
+    //            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+    //            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+    //            sourceSite,
+    //            CCommonData::m_sCenter,
+    //            static_cast<BYTE>(i - 1),
+    //            m_byFieldId,
+    //            m_bNaive,
+    //            m_pOperatorDataL
+    //            );
+
+    //    if (m_bExponential)
+    //    {
+    //        _kernel_FS_Exponential << <_blocks, _thread1 >> > (
+    //            pGaugeSU3->m_pDeviceData,
+    //            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+    //            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+    //            ppDevicePtr,
+    //            sourceSite,
+    //            static_cast<BYTE>(i - 1),
+    //            m_byFieldId,
+    //            m_pOperatorDataS
+    //            );
+    //    }
+    //    else
+    //    {
+    //        _kernel_FS << <_blocks, _thread1 >> > (
+    //            ppDevicePtr,
+    //            sourceSite,
+    //            static_cast<BYTE>(i - 1),
+    //            m_byFieldId,
+    //            m_pOperatorDataS
+    //            );
+    //    }
+
+    //    checkCudaErrors(cudaFree(ppDevicePtr));
+    //    for (UINT j = 0; j < 12; ++j)
+    //    {
+    //        pFermionSources[j]->Return();
+    //    }
+    //}
+
+    //++m_uiConfigurationCount;
+    //dim3 _thread2(_HC_Lx - 1, 1, 1);
+    //Real fKappa = CCommonData::m_fKai;
+    //_kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa);
+    //_kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa);
+
+    //if (m_bShowResult)
+    //{
+    //    appDetailed(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
+    //    appDetailed(_T(" ----------- Orbital ------------- \n"));
+    //}
+    //checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+    //for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    //{
+    //    m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+    //    if (m_bShowResult)
+    //    {
+    //        appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+    //    }
+    //}
+
+    //if (m_bShowResult)
+    //{
+    //    appDetailed(_T("\n\n ----------- Spin ------------- \n"));
+    //}
+    //checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+    //for (UINT i = 0; i < _HC_Lx - 1; ++i)
+    //{
+    //    m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+    //    if (m_bShowResult)
+    //    {
+    //        appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+    //    }
+    //}
+    //if (m_bShowResult)
+    //{
+    //    appDetailed(_T("\n\n ================================================ \n\n"));
+    //}
+}
+
+void CMeasureAMomentumJF::SourceSanning(const class CFieldGauge* pGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& sourceSite)
+{
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
-        appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
+        appCrucial(_T("CMeasureAMomentumJF only implemented with gauge SU3!\n"));
         return;
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    if (12 != sources.Num())
+    {
+        appCrucial(_T("Wilson Dirac SU3 need 12 sources!\n"));
+        return;
+    }
+    deviceWilsonVectorSU3* pDevicePtr[12];
+    for (INT i = 0; i < 12; ++i)
+    {
+        CFieldFermionWilsonSquareSU3* fermionfield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(sources[i]);
+        pDevicePtr[i] = fermionfield->m_pDeviceData;
+    }
 
     dim3 _blocks(1, 1, 1);
     dim3 _thread1(12, 1, 1);
-    for (UINT i = 1; i < _HC_Lx; ++i)
+
+    deviceWilsonVectorSU3** ppDevicePtr;
+    checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
+    checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
+    BYTE byArrayIdx = static_cast<BYTE>(sourceSite.x - 1);
+
+    _kernel_XDy_yDx << <_blocks, _thread1 >> > (
+        pGaugeSU3->m_pDeviceData,
+        ppDevicePtr,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        sourceSite,
+        CCommonData::m_sCenter,
+        byArrayIdx,
+        m_byFieldId,
+        m_bNaive,
+        m_pOperatorDataL
+        );
+
+    if (m_bExponential)
     {
-        CFieldFermionWilsonSquareSU3DR* pFermionSources[12];
-        for (UINT j = 0; j < 12; ++j)
+        _kernel_FS_Exponential << <_blocks, _thread1 >> > (
+            pGaugeSU3->m_pDeviceData,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            ppDevicePtr,
+            sourceSite,
+            byArrayIdx,
+            m_byFieldId,
+            m_pOperatorDataS
+            );
+    }
+    else
+    {
+        _kernel_FS << <_blocks, _thread1 >> > (
+            ppDevicePtr,
+            sourceSite,
+            byArrayIdx,
+            m_byFieldId,
+            m_pOperatorDataS
+            );
+    }
+
+    checkCudaErrors(cudaFree(ppDevicePtr));
+
+    if (sourceSite.x == static_cast<SBYTE>(_HC_Lx) - 1)
+    {
+        //all sites calculated
+        ++m_uiConfigurationCount;
+        dim3 _thread2(_HC_Lx - 1, 1, 1);
+        Real fKappa = CCommonData::m_fKai;
+        _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa);
+        _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa);
+
+        if (m_bShowResult)
         {
-            pFermionSources[j] = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-            if (NULL == pFermionSources[j])
+            appDetailed(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
+            appDetailed(_T(" ----------- Orbital ------------- \n"));
+        }
+        checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+        for (UINT i = 0; i < _HC_Lx - 1; ++i)
+        {
+            m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+            if (m_bShowResult)
             {
-                appCrucial(_T("Meson correlator only implemented with Wilson SU3 Dirichlet Rotating\n"));
-                _FAIL_EXIT;
+                appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
             }
         }
 
-        deviceWilsonVectorSU3* pDevicePtr[12];
-        SSmallInt4 sourceSite;
-        sourceSite.x = static_cast<SBYTE>(i);
-        sourceSite.y = CCommonData::m_sCenter.y;
-        sourceSite.z = CCommonData::m_sCenter.z;
-        sourceSite.w = CCommonData::m_sCenter.w;
-        for (BYTE s = 0; s < 4; ++s)
+        if (m_bShowResult)
         {
-            for (BYTE c = 0; c < 3; ++c)
+            appDetailed(_T("\n\n ----------- Spin ------------- \n"));
+        }
+        checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
+
+        for (UINT i = 0; i < _HC_Lx - 1; ++i)
+        {
+            m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
+            if (m_bShowResult)
             {
-                SFermionSource sourceData;
-                sourceData.m_eSourceType = EFS_Point;
-                sourceData.m_sSourcePoint = sourceSite;
-                sourceData.m_byColorIndex = c;
-                sourceData.m_bySpinIndex = s;
-
-                pFermionSources[s * 3 + c]->InitialAsSource(sourceData);
-
-                if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
-                {
-                    pFermionSources[s * 3 + c]->m_fLength = pFermionSources[s * 3 + c]->Dot(pFermionSources[s * 3 + c]).x;
-                }
-                pFermionSources[s * 3 + c]->InverseD(pGaugeSU3);
-                pDevicePtr[s * 3 + c] = pFermionSources[s * 3 + c]->m_pDeviceData;
+                appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
             }
         }
-
-        deviceWilsonVectorSU3** ppDevicePtr;
-        checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
-        checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
-
-        _kernel_XDy_yDx << <_blocks, _thread1 >> > (
-                pGaugeSU3->m_pDeviceData,
-                ppDevicePtr,
-                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                sourceSite,
-                CCommonData::m_sCenter,
-                static_cast<BYTE>(i - 1),
-                m_byFieldId,
-                m_bNaive,
-                m_pOperatorDataL
-                );
-
-        if (m_bExponential)
-        {
-            _kernel_FS_Exponential << <_blocks, _thread1 >> > (
-                pGaugeSU3->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                ppDevicePtr,
-                sourceSite,
-                static_cast<BYTE>(i - 1),
-                m_byFieldId,
-                m_pOperatorDataS
-                );
-        }
-        else
-        {
-            _kernel_FS << <_blocks, _thread1 >> > (
-                ppDevicePtr,
-                sourceSite,
-                static_cast<BYTE>(i - 1),
-                m_byFieldId,
-                m_pOperatorDataS
-                );
-        }
-
-        checkCudaErrors(cudaFree(ppDevicePtr));
-        for (UINT j = 0; j < 12; ++j)
-        {
-            pFermionSources[j]->Return();
-        }
-    }
-
-    ++m_uiConfigurationCount;
-    dim3 _thread2(_HC_Lx - 1, 1, 1);
-    Real fKappa = CCommonData::m_fKai;
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa);
-    _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa);
-
-    if (m_bShowResult)
-    {
-        appDetailed(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
-        appDetailed(_T(" ----------- Orbital ------------- \n"));
-    }
-    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
-
-    for (UINT i = 0; i < _HC_Lx - 1; ++i)
-    {
-        m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
         if (m_bShowResult)
         {
-            appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
+            appDetailed(_T("\n\n ================================================ \n\n"));
         }
-    }
-
-    if (m_bShowResult)
-    {
-        appDetailed(_T("\n\n ----------- Spin ------------- \n"));
-    }
-    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferS, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
-
-    for (UINT i = 0; i < _HC_Lx - 1; ++i)
-    {
-        m_lstAllRes.AddItem(m_pHostDataBuffer[i].x);
-        if (m_bShowResult)
-        {
-            appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, m_pHostDataBuffer[i].x, m_pHostDataBuffer[i].y);
-        }
-    }
-    if (m_bShowResult)
-    {
-        appDetailed(_T("\n\n ================================================ \n\n"));
     }
 }
 
@@ -518,6 +631,8 @@ void CMeasureAMomentumJF::Average(UINT )
 
 void CMeasureAMomentumJF::Report()
 {
+    appSetLogDate(FALSE);
+
     assert(m_uiConfigurationCount * (_HC_Lx - 1) * 2 == static_cast<UINT>(m_lstAllRes.Num()));
     TArray<Real> tmpSum;
 
@@ -585,13 +700,13 @@ void CMeasureAMomentumJF::Report()
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
+
+    appSetLogDate(TRUE);
 }
 
 void CMeasureAMomentumJF::Reset()
 {
     m_uiConfigurationCount = 0;
-    dim3 _blocks(1, 1, 1);
-    dim3 _thread(_HC_Lx - 1, 1, 1);
     m_lstAllRes.RemoveAll();
 }
 

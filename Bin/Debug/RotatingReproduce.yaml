@@ -6,7 +6,7 @@ VerboseLevel : GENERAL
 VerboseOutput : timestamp
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 5
+BeforeEquvibStep : 10
 EquvibStep : 100
 
 Dim : 4
@@ -19,7 +19,7 @@ RandomType : ER_XORWOW
 RandomSeedType : ERST_Timestamp
 ActionListLength : 2
 FermionFieldCount : 1
-MeasureListLength : 2
+MeasureListLength : 4
 CacheStaple : 0
 
 Updator:
@@ -31,8 +31,8 @@ Updator:
     ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
     IntegratorType : CIntegratorNestedForceGradient
     IntegratorStepLength : 1
-    IntegratorStep : 8
-    NestedStep : 8
+    IntegratorStep : 15
+    NestedStep : 6
 
 Gauge:
     FieldName : CFieldGaugeSU3D
@@ -48,14 +48,10 @@ FermionField1:
 
     FieldName : CFieldFermionWilsonSquareSU3DR
     FieldInitialType : EFIT_RandomGaussian
-    Hopping : 0.1583
+    Hopping : 0.1665
     FieldId : 2
     PoolNumber : 26
     Period : [0, 0, 1, -1]
-    Omega : 0.06
-    ## Index start from 0, so length = 6 means 1,2,3,4,5 are none zero, the center is 3
-    Center : [8, 8, 0, 0]
-    ## Default to use Naive discretization (which is faster)
     Naive : 1
     Exponential : 1
 
@@ -67,9 +63,9 @@ BoundaryFermionField1:
 Action1:
    
     ActionName : CActionGaugePlaquetteRotating
-    Beta : 5.9
+    Beta : 5.32144
     Omega : 0.06
-    Center : [8, 8, 0, 0]
+    Center : [8, 8, 8, 8]
 
 Action2:
     ActionName : CActionFermionWilsonNf2
@@ -87,9 +83,9 @@ Solver:
 
     SolverName : CSLASolverGCRODR
     SolverForFieldId : 2
-    MDim : 15
-    KDim : 3
-    RecalculateR : 25
+    MDim : 20
+    KDim : 5
+    RecalculateR : 5
     DeflateSpace : EEDT_SVD
     Accuracy : 0.001
     Restart : 100
@@ -100,7 +96,6 @@ Measure1:
     MeasureName : CMeasureAMomentumJG
     FieldId : 1
     ShowResult : 1
-    Center : [8, 8, 0, 0]
 
 Measure2:
 
@@ -108,5 +103,16 @@ Measure2:
     FieldId : 2
     ShowResult : 1
     Naive : 1
-    Center : [8, 8, 8, 8]
     Exponential : 1
+
+Measure3:
+
+    MeasureName : CMeasureChargeAndCurrents
+    FieldId : 2
+    ShowResult : 1
+
+Measure4:
+
+    MeasureName : CMeasureTopologicChargeXLine
+    FieldId : 2
+    ShowResult : 1

@@ -15,6 +15,7 @@
 #define _CLG_IMPLICITE_QR_SHIFT 1
 //Update eigen-value will not improve the iteration of eigen-vector
 #define _CLG_QRIterate_Update_EigenValue 0
+#define _CLG_QRIterate_MaxIterate (200)
 
 #if _CLG_IMPLICITE_QR_SHIFT
 #define _CLG_DEFAULT_QR_CRIT F(0.00000001)
@@ -145,31 +146,31 @@ public:
         UINT dm, UINT dk, UBOOL bSmall = TRUE);
 
     void EigenValueProblem(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector, 
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     /**
     * For H is already Hessenberg
     */
     void EigenValueProblemHessenberg(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     void EigenValueProblemHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     void EigenValueProblemHessenbergHost(CLGComplex* H, CLGComplex* outEigenValue, CLGComplex* outEigenVector,
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     void GeneralizedEigenValueProblem(
         CLGComplex* A, CLGComplex* B,
         CLGComplex* outEigenValue,
         CLGComplex* outEigenVector,
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     void GeneralizedEigenValueProblemHost(
         CLGComplex* A, CLGComplex* B,
         CLGComplex* outEigenValue,
         CLGComplex* outEigenVector,
-        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = 1000);
+        UINT dm, UINT dk, UBOOL bSmall = TRUE, Real fEigenCrit = _CLG_DEFAULT_QR_VECTOR_CRIT, UINT iMaxEigenIter = _CLG_DEFAULT_QR_VECTOR_ITE, Real fQRCrit = _CLG_DEFAULT_QR_CRIT, UINT iMaxIterate = _CLG_QRIterate_MaxIterate);
 
     UINT GetMaxDim() const { return m_uiDim; }
 
@@ -188,13 +189,13 @@ protected:
     *
     * T is assumed to be Henssenberg
     */
-    void QRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.0000000001), UINT iCrit = 1000);
+    void QRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.0000000001), UINT iCrit = _CLG_QRIterate_MaxIterate);
 
     /**
     * Double shift QRIterate
     * T is assumed to be Henssenberg
     */
-    void FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.00000001), UINT iCrit = 1000);
+    void FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit = F(0.00000001), UINT iCrit = _CLG_QRIterate_MaxIterate);
     void FrancisQRIterateBlock(CLGComplex* T, CLGComplex* tmpXYZ, UINT uiBlockDim);
 
     struct CLGAPI STmpMatrix

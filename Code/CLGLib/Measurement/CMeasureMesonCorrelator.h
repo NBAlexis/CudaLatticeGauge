@@ -23,9 +23,13 @@ public:
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
 
     virtual void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField);
+    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
     virtual void Average(UINT uiConfigurationCount);
     virtual void Report();
     virtual void Reset();
+
+    virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
+    virtual UBOOL IsSourceScanning() const { return FALSE; }
 
 protected:
 
@@ -33,7 +37,6 @@ protected:
 
 public:
 
-    BYTE m_byFermionFieldId;
     UINT m_uiLt;
     Real m_f2OverVolumnSqrt;
     TArray<EGammaMatrix> m_lstGammas;

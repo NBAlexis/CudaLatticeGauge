@@ -31,6 +31,8 @@ protected:
 
     UINT m_iAcceptedConfigurationCount;
     class CLatticeData* m_pOwner;
+
+    THashMap<BYTE, TArray<CMeasure*>> HasSourceScanning() const;
 };
 
 __END_NAMESPACE

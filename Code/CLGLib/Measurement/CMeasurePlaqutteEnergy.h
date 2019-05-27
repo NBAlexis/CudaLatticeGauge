@@ -22,9 +22,13 @@ public:
     CMeasurePlaqutteEnergy() : CMeasure() {}
 
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
+    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
     virtual void Average(UINT uiConfigurationCount);
     virtual void Report();
     virtual void Reset();
+
+    virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
+    virtual UBOOL IsSourceScanning() const { return FALSE; }
 
 protected:
 

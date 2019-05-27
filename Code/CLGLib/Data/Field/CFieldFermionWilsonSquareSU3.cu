@@ -1021,6 +1021,41 @@ BYTE* CFieldFermionWilsonSquareSU3::CopyDataOut(UINT &uiSize) const
     return saveData;
 }
 
+TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const
+{
+    TArray<CFieldFermion*> ret;
+    for (UINT j = 0; j < 12; ++j)
+    {
+        ret.AddItem(dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId)));
+        if (NULL == ret[j])
+        {
+            appCrucial(_T("GetSourcesAtSiteFromPool failed!\n"));
+            _FAIL_EXIT;
+        }
+    }
+
+    for (BYTE s = 0; s < 4; ++s)
+    {
+        for (BYTE c = 0; c < 3; ++c)
+        {
+            SFermionSource sourceData;
+            sourceData.m_eSourceType = EFS_Point;
+            sourceData.m_sSourcePoint = site;
+            sourceData.m_byColorIndex = c;
+            sourceData.m_bySpinIndex = s;
+
+            ret[s * 3 + c]->InitialAsSource(sourceData);
+
+            if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+            {
+                ret[s * 3 + c]->m_fLength = ret[s * 3 + c]->Dot(ret[s * 3 + c]).x;
+            }
+            ret[s * 3 + c]->InverseD(pGauge);
+        }
+    }
+    return ret;
+}
+
 CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
 {
     CCString sRet;

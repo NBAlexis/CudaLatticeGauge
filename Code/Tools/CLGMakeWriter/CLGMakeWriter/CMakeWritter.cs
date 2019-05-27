@@ -6,6 +6,7 @@ namespace CLGMakeWriter
 {
     class CMakeWritter
     {
+        public bool m_bDouble = true;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };
@@ -30,8 +31,17 @@ namespace CLGMakeWriter
             sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
             sContent += "# to enable double float, add the following line:\n";
-            sContent += "# add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-            sContent += "MESSAGE(\"Note: double float is not enabled, arch is compute61 and sm61.\")\n";
+            if (m_bDouble)
+            {
+                sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+                sContent += "MESSAGE(\"Note: double float is enabled, arch is compute61 and sm61.\")\n";
+            }
+            else
+            {
+                sContent += "# add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+                sContent += "MESSAGE(\"Note: double float NOT is enabled, arch is compute61 and sm61.\")\n";
+            }
+            
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";
 

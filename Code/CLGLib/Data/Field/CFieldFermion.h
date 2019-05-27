@@ -86,6 +86,7 @@ public:
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
+    virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const = 0;
 
 #pragma region real operators
 

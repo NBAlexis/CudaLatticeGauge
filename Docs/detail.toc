@@ -57,4 +57,6 @@
 \contentsline {subsubsection}{\numberline {7.1.5}The force from gauge action}{63}{subsubsection.7.1.5}
 \contentsline {subsubsection}{\numberline {7.1.6}The force from fermion action}{67}{subsubsection.7.1.6}
 \contentsline {subsubsection}{\numberline {7.1.7}The angular momentum}{68}{subsubsection.7.1.7}
-\contentsline {subsection}{\numberline {7.2}Sample Producer}{69}{subsection.7.2}
+\contentsline {subsubsection}{\numberline {7.1.8}The Current density and Charge density}{69}{subsubsection.7.1.8}
+\contentsline {subsubsection}{\numberline {7.1.9}The Polyakov loop}{70}{subsubsection.7.1.9}
+\contentsline {subsection}{\numberline {7.2}Sample Producer}{71}{subsection.7.2}

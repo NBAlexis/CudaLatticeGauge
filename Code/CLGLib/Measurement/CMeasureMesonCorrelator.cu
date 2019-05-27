@@ -171,7 +171,7 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     {
         appCrucial(_T("CMeasureMesonCorrelator: must give a fermion field id, but fetch %d"), iValue);
     }
-    m_byFermionFieldId = static_cast<BYTE>(iValue);
+    m_byFieldId = static_cast<BYTE>(iValue);
     TArray<CCString> allGammas;
     param.FetchStringVectorValue(_T("GammaMatrix"), allGammas);
     if (0 == allGammas.Num())
@@ -279,7 +279,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
     CFieldFermionWilsonSquareSU3* pFermionSources[12];
     for (UINT i = 0; i < 12; ++i)
     {
-        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFermionFieldId));
+        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
         if (NULL == pFermionSources[i])
         {
             appCrucial(_T("Meson correlator only implemented with Wilson SU3\n"));

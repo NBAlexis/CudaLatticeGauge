@@ -16,7 +16,12 @@ __BEGIN_NAMESPACE
 class CLGAPI CMeasure : public CBase
 {
 public:
-    CMeasure() : m_pOwner(NULL), m_fLastRealResult(F(0.0)) {}
+    CMeasure() 
+        : m_pOwner(NULL)
+        , m_fLastRealResult(F(0.0))
+        , m_byFieldId(0)
+    {
+    }
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
     {
@@ -26,15 +31,25 @@ public:
     }
 
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) = 0;
+    /**
+    * NOTE: sources will be passed to multiple measures, do NOT change the content!
+    */
+    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) = 0;
     virtual void Average(UINT uiConfigurationCount) = 0;
     virtual void Report() = 0;
     virtual void Reset() = 0;
+
+    virtual UBOOL IsGaugeMeasurement() const = 0;
+    virtual UBOOL IsSourceScanning() const = 0;
+
+    BYTE GetFieldId() const { return m_byFieldId; }
 
 protected:
 
     class CMeasurementManager* m_pOwner;
     class CLatticeData* m_pLatticeData;
     BYTE m_byId;
+    BYTE m_byFieldId;
 
 public:
     //============================================================

@@ -75,6 +75,7 @@ public:
     virtual void InitialAsSource(const SFermionSource& sourceData);
     virtual void SaveToFile(const CCString &fileName) const;
     virtual BYTE* CopyDataOut(UINT &uiSize) const;
+    virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const;
     virtual CCString GetInfos(const CCString &tab) const;
 
     void SetKai(Real fKai);

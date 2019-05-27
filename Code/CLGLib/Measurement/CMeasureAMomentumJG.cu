@@ -203,6 +203,8 @@ void CMeasureAMomentumJG::Average(UINT )
 
 void CMeasureAMomentumJG::Report()
 {
+    appSetLogDate(FALSE);
+
     assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) 
         == static_cast<UINT>(m_lstRes.Num()));
     appGeneral(_T("\n===================================================\n"));
@@ -248,6 +250,8 @@ void CMeasureAMomentumJG::Report()
 
     appGeneral(_T("===================================================\n"));
     appGeneral(_T("===================================================\n"));
+
+    appSetLogDate(TRUE);
 }
 
 void CMeasureAMomentumJG::Reset()

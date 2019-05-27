@@ -1941,7 +1941,7 @@ void CLinearAlgebraHelper::FrancisQRIterate(CLGComplex* T, UINT dx, Real fCrit, 
     INT* tmpDecomp = m_pDeviceIntBuffer;
     CLGComplex * tmpXYZ = m_pDeviceComplexBuffer2;
 
-    for (UINT i = 0; i < iCrit; ++i)
+    for (UINT i = 0; i < iCrit * dx; ++i)
     {
         //find decomp
         _kernelCheckMatrixDoubleShift << <1, 1 >> > (T, tmpDecomp, dx, fCrit);
@@ -2219,7 +2219,7 @@ void CLinearAlgebraHelper::EigenValueProblem(
             //It is normalized in _kernelErrorCheck
             _kernelErrorCheck << <block, thread1 >> > (tmpF, tmpVector, tmpH, dm);
 
-            checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(float), cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(Real), cudaMemcpyDeviceToHost));
 
             if (j == iMaxEigenIterate - 1)
             {
@@ -2327,7 +2327,7 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
 
             _kernelErrorCheck << <block, thread1 >> > (tmpF, tmpVector, tmpH, dm);
 
-            checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(float), cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(fErr, tmpF, sizeof(Real), cudaMemcpyDeviceToHost));
 
             if (j == iMaxEigenIterate - 1)
             {
