@@ -18,8 +18,8 @@ class CLGAPI CMeasure : public CBase
 public:
     CMeasure() 
         : m_pOwner(NULL)
-        , m_fLastRealResult(F(0.0))
         , m_byFieldId(0)
+        , m_fLastRealResult(F(0.0))
     {
     }
 

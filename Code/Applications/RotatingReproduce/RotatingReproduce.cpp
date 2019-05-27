@@ -34,7 +34,10 @@ int main(int argc, char * argv[])
     CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
     CMeasureAMomentumJG * pJG = dynamic_cast<CMeasureAMomentumJG *>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureAMomentumJF * pJF = dynamic_cast<CMeasureAMomentumJF *>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    if (NULL == pGauageAction || NULL == pJG || NULL == pJF)
+    CMeasureChargeAndCurrents * pChargeCurrent = dynamic_cast<CMeasureChargeAndCurrents *>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CMeasureTopologicChargeXLine * pTopo = dynamic_cast<CMeasureTopologicChargeXLine *>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    if (NULL == pGauageAction || NULL == pJG || NULL == pJF
+        || NULL == pChargeCurrent || NULL == pTopo)
     {
         appCrucial(_T("Rotating gauge action or measurement not found!\n"));
         return 1;
@@ -54,6 +57,8 @@ int main(int argc, char * argv[])
     
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -61,7 +66,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
-
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appGeneral(_T("2 run: Omega = 0.02.\n"));
 
@@ -76,6 +82,8 @@ int main(int argc, char * argv[])
 
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -83,6 +91,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appGeneral(_T("3 run: Omega = 0.04.\n"));
 
@@ -97,6 +107,8 @@ int main(int argc, char * argv[])
 
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -104,6 +116,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appGeneral(_T("4 run: Omega = 0.06.\n"));
 
@@ -118,6 +132,8 @@ int main(int argc, char * argv[])
 
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -125,6 +141,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appGeneral(_T("5 run: Omega = 0.08.\n"));
 
@@ -139,6 +157,8 @@ int main(int argc, char * argv[])
 
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -146,6 +166,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appGeneral(_T("6 run: Omega = 0.10.\n"));
 
@@ -160,6 +182,8 @@ int main(int argc, char * argv[])
 
     pJG->Reset();
     pJF->Reset();
+    pChargeCurrent->Reset();
+    pTopo->Reset();
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
     {
@@ -167,6 +191,8 @@ int main(int argc, char * argv[])
     }
     pJG->Report();
     pJF->Report();
+    pChargeCurrent->Report();
+    pTopo->Report();
 
     appQuitCLG();
     return 0;
