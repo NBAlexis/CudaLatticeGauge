@@ -33,7 +33,11 @@ __BEGIN_NAMESPACE
 class CLGAPI CLinearAlgebraHelper
 {
 public:
-    enum { _kMaxSmallDim = 32, };
+    enum 
+    {
+        _kMaxSmallDim = 32, 
+        _kAllocateMatrixNumber = 7,
+    };
 
     CLinearAlgebraHelper(UINT uiDim);
     ~CLinearAlgebraHelper();
@@ -231,6 +235,7 @@ protected:
         STmpMatrix newone(this, m_lstTmpMatrix.Num(), newM);
         newone.m_bUsing = TRUE;
         m_lstTmpMatrix.AddItem(newone);
+        appDetailed(_T("Note: Allocating new matrix!!\n"));
         return newone;
     }
 

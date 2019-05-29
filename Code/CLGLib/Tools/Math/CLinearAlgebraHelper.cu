@@ -34,7 +34,7 @@ CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim)
     checkCudaErrors(cudaMalloc((void**)&m_pOneDeviceC, sizeof(CLGComplex)));
 
     //5 is enough
-    AddTempMatrix(5);
+    AddTempMatrix(_kAllocateMatrixNumber);
 }
 
 CLinearAlgebraHelper::~CLinearAlgebraHelper()
@@ -1865,6 +1865,8 @@ void CLinearAlgebraHelper::QRIterate(CLGComplex* T, UINT dx, Real fCrit, UINT iC
         INT iLength = endindex[1] - endindex[0];
         if (iLength < 2)
         {
+            sTmpQ.Free();
+            sTmpR.Free();
             sTmpT.Free();
             //appParanoiac(_T("(* total iteration = %d *)\n"), i + 1);
             //finished
@@ -2244,7 +2246,7 @@ void CLinearAlgebraHelper::EigenValueProblem(
             SolveY(tmpM, tmpR, 1, dm);
             checkCudaErrors(cudaMemcpy(tmpVector, tmpM, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
         }
-
+        sTmpM.Free();
         checkCudaErrors(cudaMemcpy(outEigenVector + dm * i, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
     }
 
@@ -2352,7 +2354,7 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
             SolveY(tmpM, tmpR, 1, dm);
             checkCudaErrors(cudaMemcpy(tmpVector, tmpM, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
         }
-
+        sTmpM.Free();
         checkCudaErrors(cudaMemcpy(outEigenVector + dm * i, tmpVector, sizeof(CLGComplex) * dm, cudaMemcpyDeviceToDevice));
     }
 

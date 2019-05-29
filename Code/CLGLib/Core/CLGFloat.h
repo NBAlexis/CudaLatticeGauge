@@ -126,6 +126,8 @@
 
 //save some constant memory of cuda?
 #define PI (F(3.141592653589))
+#define PISQ (F(9.8696044010893586188344909998761511353137))
+
 // - 1/4294967296UL
 #define AM (F(0.00000000023283064365386963))
 // - _sqrt(2)

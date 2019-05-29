@@ -23,12 +23,12 @@ __CLG_REGISTER_HELPER_HEADER(CMeasureAMomentumJG)
 /**
 * array[x, y] = array[x, y] / (lz * lt)
 */
-static void _AverageXYPlane(Real* pDeviceRes);
+extern CLGAPI void _AverageXYPlane(Real* pDeviceRes);
 
 /**
 * array[x, y] = 0
 */
-static void _ZeroXYPlane(Real* pDeviceRes);
+extern CLGAPI void _ZeroXYPlane(Real* pDeviceRes);
 
 class CLGAPI CMeasureAMomentumJG : public CMeasure
 {

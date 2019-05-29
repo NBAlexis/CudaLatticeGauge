@@ -791,12 +791,13 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     param.FetchValueArrayINT(_T("Center"), centerArray);
     if (centerArray.Num() > 3)
     {
-        m_sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        m_sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        m_sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        m_sCenter.w = static_cast<SBYTE>(centerArray[3]);
+        SSmallInt4 sCenter;
+        sCenter.x = static_cast<SBYTE>(centerArray[0]);
+        sCenter.y = static_cast<SBYTE>(centerArray[1]);
+        sCenter.z = static_cast<SBYTE>(centerArray[2]);
+        sCenter.w = static_cast<SBYTE>(centerArray[3]);
+        CCommonData::m_sCenter = sCenter;
     }
-    CCommonData::m_sCenter = m_sCenter;
 }
 
 void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
@@ -823,55 +824,55 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
 
     preparethread;
 
-    _kernelAddForce4PlaqutteTermSU3_XYZ << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForce4PlaqutteTermSU3_XYZ << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term1_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term1_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term2_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term2_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term2_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term3_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term3_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term3_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term4_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term4_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term4_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term5_1 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term5_2 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, m_sCenter,
+    _kernelAddForceChairTermSU3_Term5_3 << <block, threads >> >(pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -913,7 +914,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     _kernelAdd4PlaqutteTermSU3 << <block2, threads >> > (
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-            m_sCenter,
+            CCommonData::m_sCenter,
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);
@@ -923,7 +924,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 
     _kernelAddChairTermSU3_Term12 << <block, threads >> > (
         pGaugeSU3->m_pDeviceData,
-        m_sCenter,
+        CCommonData::m_sCenter,
         m_fBetaOverN,
         m_fOmega,
         _D_RealThreadBuffer);
@@ -932,7 +933,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 
     _kernelAddChairTermSU3_Term34 << <block, threads >> > (
         pGaugeSU3->m_pDeviceData,
-        m_sCenter,
+        CCommonData::m_sCenter,
         m_fBetaOverN,
         m_fOmega,
         _D_RealThreadBuffer);
@@ -941,7 +942,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 
     _kernelAddChairTermSU3_Term5 << <block, threads >> > (
         pGaugeSU3->m_pDeviceData,
-        m_sCenter,
+        CCommonData::m_sCenter,
         m_fBetaOverN,
         m_fOmega * m_fOmega,
         _D_RealThreadBuffer);
@@ -964,7 +965,6 @@ void CActionGaugePlaquetteRotating::SetOmega(Real fOmega)
 
 void CActionGaugePlaquetteRotating::SetCenter(const SSmallInt4 &newCenter) 
 {
-    m_sCenter = newCenter;
     CCommonData::m_sCenter = newCenter;
 }
 
@@ -976,10 +976,10 @@ CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
     CCString sCenter;
     sCenter.Format(_T("Center: [%d, %d, %d, %d]\n")
-        , static_cast<INT>(m_sCenter.x)
-        , static_cast<INT>(m_sCenter.y)
-        , static_cast<INT>(m_sCenter.z)
-        , static_cast<INT>(m_sCenter.w));
+        , static_cast<INT>(CCommonData::m_sCenter.x)
+        , static_cast<INT>(CCommonData::m_sCenter.y)
+        , static_cast<INT>(CCommonData::m_sCenter.z)
+        , static_cast<INT>(CCommonData::m_sCenter.w));
     sRet = sRet + tab + sCenter;
     return sRet;
 }

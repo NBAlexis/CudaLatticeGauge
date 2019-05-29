@@ -773,23 +773,41 @@ is measured, such that
 &J_{\tau}=\langle \bar{\psi} \gamma _4 \psi \rangle\\
 \end{split}
 \end{equation}
-we also measure the 
+we also measure the
 \begin{equation}
 \begin{split}
 &J_1=\langle \bar{\psi} \gamma _1 \psi \rangle\\
 &J_2=\langle \bar{\psi} \gamma _2 \psi \rangle\\
 \end{split}
 \end{equation}
-and the topological charge density
-\begin{equation}
-\begin{split}
-&Q_{top}=\frac{1}{2a^3}{\rm tr}_{c,s}[\gamma _5 D]
-\end{split}
-\end{equation}
 and the chiral charge density
 \begin{equation}
 \begin{split}
 &n_5=a^3\langle \bar{\psi} \gamma _4\gamma _5\psi \rangle
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:RotatingTopologicalDensity}The Topological Density}
+
+The topological charge is defined as (\textbf{\textcolor[rgb]{1,0,0}{This might has to be modified in the rotating frame!}})
+\begin{equation}
+\begin{split}
+&Q = \frac{1}{32\pi^2}a^4 \sum _n \epsilon _{\mu\nu\rho\sigma}{\rm tr}\left[C_{\mu\nu}(n)C_{\rho\sigma}(n)\right]\\
+&C_{\mu\nu}(n)={\rm Im}\left[U_{\mu\nu}(n)\right]
+\end{split}
+\end{equation}
+Another definition is
+\begin{equation}
+\begin{split}
+&Q = \frac{1}{32\pi^2}a^4 \sum _n \epsilon _{\mu\nu\rho\sigma}{\rm tr}\left[C^{clover}_{\mu\nu}(n)C^{clover}_{\rho\sigma}(n)\right]\\
+&C^{clover}_{\mu\nu}(n)=\frac{1}{4}{\rm Im}\left[U_{\mu,\nu}(n)+U_{\nu,-\mu}(n)+U_{-\mu,-\nu}(n)+U_{-\nu,\mu}(n)\right]
+\end{split}
+\end{equation}
+
+Note for both $C_{\mu\nu}$ and $C_{\mu\nu}^{clover}$, one have $C_{\mu\nu}=-C_{\nu\mu}$, alone with $\epsilon _{\mu\nu\rho\sigma}$, it doubles the term. Therefor
+\begin{equation}
+\begin{split}
+&\sum \epsilon _{\mu\nu\rho\sigma}{\rm tr}[C_{\mu\nu}(n)C_{\rho\sigma}(n)]=8 \left({\rm tr}[C_{12}(n)C_{34}(n)]-{\rm tr}[C_{13}(n)C_{24}(n)]+{\rm tr}[C_{14}(n)C_{23}(n)]\right)
 \end{split}
 \end{equation}
 

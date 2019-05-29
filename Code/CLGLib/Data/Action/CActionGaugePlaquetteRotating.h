@@ -38,7 +38,6 @@ public:
     //Real GetEnergyPerPlaqutte() const;
 
     Real m_fOmega;
-    SSmallInt4 m_sCenter;
 
 protected:
 

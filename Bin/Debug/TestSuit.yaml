@@ -1869,7 +1869,7 @@ TestRotation:
     RandomSeed : 1234567
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 5
+    MeasureListLength : 6
     ExpectedRes : 0.69
     CacheStaple : 0
 
@@ -1963,6 +1963,12 @@ TestRotation:
 
     Measure5:
 
-        MeasureName : CMeasureTopologicChargeXLine
+        MeasureName : CMeasureTopologicChargeXY
+        FieldId : 2
+        ShowResult : 1
+
+    Measure6:
+
+        MeasureName : CMeasurePolyakovXY
         FieldId : 2
         ShowResult : 1

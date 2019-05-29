@@ -32,6 +32,12 @@ public:
 
     virtual CCString GetInfos(const CCString& sTab) const;
 
+    virtual void ChangeStepCount(UBOOL bGrow)
+    {
+        CNestedIntegrator::ChangeStepCount(bGrow);
+        m_fNestedStepLength = F(0.5) * m_fNestedStepLength;
+    }
+
 protected:
 
     class CFieldGauge * m_pUPrime;

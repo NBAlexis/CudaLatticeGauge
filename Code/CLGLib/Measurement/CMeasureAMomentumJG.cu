@@ -99,7 +99,7 @@ _kernelCalculateAngularMomentumJG(
 /**
 * array[x, y] = array[x, y] / (lz * lt)
 */
-static void _AverageXYPlane(Real* pDeviceRes)
+CLGAPI void _AverageXYPlane(Real* pDeviceRes)
 {
     preparethread;
     _kernelAverageOverZT_XYPlane << <block, threads >> > (pDeviceRes);
@@ -108,7 +108,7 @@ static void _AverageXYPlane(Real* pDeviceRes)
 /**
 * array[x, y] = 0
 */
-static void _ZeroXYPlane(Real* pDeviceRes)
+CLGAPI void _ZeroXYPlane(Real* pDeviceRes)
 {
     preparethread;
     _kernelInitialZero_XYPlane << <block, threads >> > (pDeviceRes);

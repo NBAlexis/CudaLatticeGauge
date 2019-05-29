@@ -171,7 +171,8 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Measurement/CMeasureAMomentumJG.h"
 #include "Measurement/CMeasureAMomentumJF.h"
 #include "Measurement/CMeasureChargeAndCurrents.h"
-#include "Measurement/CMeasureTopologicChargeXLine.h"
+#include "Measurement/CMeasureTopologicChargeXY.h"
+#include "Measurement/CMeasurePolyakovXY.h"
 
 #include "Measurement/CMeasurementManager.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"

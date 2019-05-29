@@ -28,15 +28,12 @@ _kernalAllocateSeedTable(UINT* pDevicePtr)
 __global__ void _CLG_LAUNCH_BOUND
 _kernalInitialXORWOW(curandState * states)
 {
-    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
-
-    UINT uiSeed = _DC_Seed;
-    UINT uiDir = _DC_Dir;
-    for (UINT idir = 0; idir < uiDir + 1; ++idir)
-    {
-        UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
-        curand_init(uiSeed, fatIndex, 0, &states[fatIndex]);
-    }
+    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) 
+        * blockDim.y * gridDim.y * blockDim.z * gridDim.z 
+        + (threadIdx.y + blockIdx.y * blockDim.y) 
+        * blockDim.z * gridDim.z 
+        + (threadIdx.z + blockIdx.z * blockDim.z));
+    curand_init(_DC_Seed, uiSiteIndex, uiSiteIndex, &states[uiSiteIndex]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -134,7 +131,8 @@ CRandom::~CRandom()
 //Initial XORWOW only support 512 threads per block
 void CRandom::InitialStatesXORWOW(UINT )
 {
-    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volume * (_HC_Dir + 1)));
+    m_uiFatIdDivide = _HC_Dir + 1;
+    checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volume));
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
     deviceConstraints[0] = 512;
     TArray<UINT> latticeDim;

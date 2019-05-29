@@ -33,6 +33,11 @@ public:
         , m_bSaveConfigurations(FALSE)
         , m_bTestHDiff(FALSE) 
         , m_bReport(TRUE)
+        , m_bAdaptiveUpdate(FALSE)
+        , m_uiMinStep(5)
+        , m_uiMaxStep(100)
+        , m_fGrowStep(F(-0.3))
+        , m_fReduceStep(F(0.03))
     {
     }
 
@@ -97,6 +102,11 @@ protected:
     UBOOL m_bSaveConfigurations;
     UBOOL m_bTestHDiff;
     UBOOL m_bReport;
+    UBOOL m_bAdaptiveUpdate;
+    UINT m_uiMinStep;
+    UINT m_uiMaxStep;
+    Real m_fGrowStep;
+    Real m_fReduceStep;
     CCString m_sConfigurationPrefix;
     TArray<Real> m_lstHDiff;
     TArray<Real> m_lstH;

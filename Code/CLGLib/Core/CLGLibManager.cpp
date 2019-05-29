@@ -701,7 +701,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CreateMeasurement(params);
     }
-
+    checkCudaErrors(cudaGetLastError());
     //=============================================
     // at last, fill the field pointers
     // and copy the index data to device
@@ -710,11 +710,9 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     m_pLatticeData->FixAllFieldBoundary();
 
     checkCudaErrors(cudaDeviceSynchronize());
-    cudaError_t cudaEr = cudaGetLastError();
-    if (cudaEr != cudaSuccess)
-    {
-        return FALSE;
-    }
+    checkCudaErrors(cudaGetLastError());
+
+    appGeneral(_T("\n =========== Initialized ! ==============\n"));
     return TRUE;
 }
 

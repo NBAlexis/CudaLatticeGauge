@@ -911,6 +911,22 @@ extern "C" {
         }
 
         /**
+        * Return Tr[Im[a].Im[b]] 
+        * It is used in topological charge
+        */
+        __device__ __inline__ static Real TrIm(const deviceSU3& a, const deviceSU3&b)
+        {
+            //0,1,2 * 0,3,6
+            Real ret = a.m_me[0].y * b.m_me[0].y + a.m_me[1].y * b.m_me[3].y + a.m_me[2].y * b.m_me[6].y;
+            //3,4,5 * 1,4,7
+            ret += a.m_me[3].y * b.m_me[1].y + a.m_me[4].y * b.m_me[4].y + a.m_me[5].y * b.m_me[7].y;
+            //6,7,8 * 2,5,8
+            ret += a.m_me[6].y * b.m_me[2].y + a.m_me[7].y * b.m_me[5].y + a.m_me[8].y * b.m_me[8].y;
+
+            return ret;
+        }
+
+        /**
         * return -i(U-U^dagger) = ((-iU)+(-iU)dagger)
         */
         __device__ __inline__ deviceSU3 Im2C() const

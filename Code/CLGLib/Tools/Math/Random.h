@@ -122,6 +122,8 @@ public:
                 }
                 break;
         }
+
+        checkCudaErrors(cudaGetLastError());
     }
 
     ~CRandom();
@@ -145,7 +147,7 @@ public:
                 return 1 - curand_uniform(&(m_pDeviceRandStatesScrambledSobol32[fatIndex / m_uiFatIdDivide]));
             case ER_XORWOW:
             default:
-                return 1 - curand_uniform(&(m_pDeviceRandStatesXORWOW[fatIndex]));
+                return 1 - curand_uniform(&(m_pDeviceRandStatesXORWOW[fatIndex / m_uiFatIdDivide]));
         }
 
         //return 0;

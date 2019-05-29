@@ -63,7 +63,8 @@
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
-    <ClInclude Include="Measurement\CMeasureTopologicChargeXLine.h" />
+    <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
+    <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
@@ -149,7 +150,8 @@
     <CudaCompile Include="Measurement\CMeasureChargeAndCurrents.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
-    <CudaCompile Include="Measurement\CMeasureTopologicChargeXLine.cu" />
+    <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
+    <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />

@@ -8,10 +8,11 @@ ShowDeviceInformation : 0
 ShowParameterContent : 0
 BeforeEquvibStep : 10
 EquvibStep : 100
+LoopCount : 6
 
 Dim : 4
 Dir : 4
-LatticeLength : [12, 12, 12, 12]
+LatticeLength : [6, 6, 6, 6]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 ThreadAutoDecompose : 1
@@ -19,7 +20,7 @@ RandomType : ER_XORWOW
 RandomSeedType : ERST_Timestamp
 ActionListLength : 2
 FermionFieldCount : 1
-MeasureListLength : 4
+MeasureListLength : 5
 CacheStaple : 0
 
 Updator:
@@ -27,12 +28,17 @@ Updator:
     UpdatorType : CHMC
     Metropolis : 1
     ReportMeasure : 0
+    Adaptive : 1
+    MinMaxStep : [3, 50]
+    GrowReduceThreshold : [-0.3, 0.05]
 
     ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-    IntegratorType : CIntegratorNestedForceGradient
+    ## IntegratorType : CIntegratorNestedForceGradient
+    IntegratorType : CIntegratorNestedOmelyan
     IntegratorStepLength : 1
-    IntegratorStep : 15
+    IntegratorStep : 20
     NestedStep : 6
+    Omelyan2Lambda : 0.38636665500756728
 
 Gauge:
     FieldName : CFieldGaugeSU3D
@@ -65,21 +71,18 @@ Action1:
     ActionName : CActionGaugePlaquetteRotating
     Beta : 5.32144
     Omega : 0.06
-    Center : [8, 8, 8, 8]
 
 Action2:
     ActionName : CActionFermionWilsonNf2
     FieldId : 2
 
-##Solver:
-##    SolverName : CSLASolverGMRES
-##    SolverForFieldId : 2
-##    MaxDim : 20
-##    Accuracy : 0.0000001
-##    Restart : 100
-##    AbsoluteAccuracy : 1
-
 Solver:
+    ##SolverName : CSLASolverGMRES
+    ##SolverForFieldId : 2
+    ##MaxDim : 20
+    ##Accuracy : 0.0000001
+    ##Restart : 100
+    ##AbsoluteAccuracy : 1
 
     SolverName : CSLASolverGCRODR
     SolverForFieldId : 2
@@ -113,6 +116,12 @@ Measure3:
 
 Measure4:
 
-    MeasureName : CMeasureTopologicChargeXLine
+    MeasureName : CMeasureTopologicChargeXY
+    FieldId : 2
+    ShowResult : 1
+
+Measure5:
+
+    MeasureName : CMeasurePolyakovXY
     FieldId : 2
     ShowResult : 1

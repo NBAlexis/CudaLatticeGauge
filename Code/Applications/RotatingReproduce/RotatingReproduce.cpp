@@ -25,9 +25,14 @@ int main(int argc, char * argv[])
     params.FetchValueINT(_T("EquvibStep"), iVaule);
     UINT iAfterEquib = static_cast<UINT>(iVaule);
 
+    iVaule = 6;
+    params.FetchValueINT(_T("LoopCount"), iVaule);
+    UINT iLoopCount = static_cast<UINT>(iVaule);
+
     appSetupLog(params);
     if (!appInitialCLG(params))
     {
+        appCrucial(_T("Initial Failed!\n"));
         return 1;
     }
 
@@ -35,164 +40,46 @@ int main(int argc, char * argv[])
     CMeasureAMomentumJG * pJG = dynamic_cast<CMeasureAMomentumJG *>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureAMomentumJF * pJF = dynamic_cast<CMeasureAMomentumJF *>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChargeAndCurrents * pChargeCurrent = dynamic_cast<CMeasureChargeAndCurrents *>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    CMeasureTopologicChargeXLine * pTopo = dynamic_cast<CMeasureTopologicChargeXLine *>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    CMeasureTopologicChargeXY * pTopo = dynamic_cast<CMeasureTopologicChargeXY *>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    CMeasurePolyakovXY * pPolya = dynamic_cast<CMeasurePolyakovXY *>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     if (NULL == pGauageAction || NULL == pJG || NULL == pJF
-        || NULL == pChargeCurrent || NULL == pTopo)
+        || NULL == pChargeCurrent || NULL == pTopo || NULL == pPolya)
     {
         appCrucial(_T("Rotating gauge action or measurement not found!\n"));
         return 1;
     }
     
     appGeneral(_T("Start up.\n"));
-    appGeneral(_T("1 run: Omega = 0.00.\n"));
-
-    pGauageAction->SetOmega(F(0.0));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
     
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+
+    for (UINT i = 0; i < iLoopCount; ++i)
     {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
+        appGeneral(_T("%d run: Omega = 0.00.\n"), i + 1);
+        pGauageAction->SetOmega(F(0.0) * i);
+        appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+        appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+        {
+            appGetLattice()->m_pUpdator->Update(1, FALSE);
+        }
+
+        pJG->Reset();
+        pJF->Reset();
+        pChargeCurrent->Reset();
+        pTopo->Reset();
+        pPolya->Reset();
+        appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
+        {
+            appGetLattice()->m_pUpdator->Update(1, TRUE);
+        }
+        pJG->Report();
+        pJF->Report();
+        pChargeCurrent->Report();
+        pTopo->Report();
+        pPolya->Report();
     }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
-
-    appGeneral(_T("2 run: Omega = 0.02.\n"));
-
-    pGauageAction->SetOmega(F(0.02));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
-
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
-    }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
-
-    appGeneral(_T("3 run: Omega = 0.04.\n"));
-
-    pGauageAction->SetOmega(F(0.04));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
-
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
-    }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
-
-    appGeneral(_T("4 run: Omega = 0.06.\n"));
-
-    pGauageAction->SetOmega(F(0.06));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
-
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
-    }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
-
-    appGeneral(_T("5 run: Omega = 0.08.\n"));
-
-    pGauageAction->SetOmega(F(0.08));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
-
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
-    }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
-
-    appGeneral(_T("6 run: Omega = 0.10.\n"));
-
-    pGauageAction->SetOmega(F(0.1));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, FALSE);
-    }
-
-    pJG->Reset();
-    pJF->Reset();
-    pChargeCurrent->Reset();
-    pTopo->Reset();
-    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-    while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-    {
-        appGetLattice()->m_pUpdator->Update(1, TRUE);
-    }
-    pJG->Report();
-    pJF->Report();
-    pChargeCurrent->Report();
-    pTopo->Report();
 
     appQuitCLG();
     return 0;

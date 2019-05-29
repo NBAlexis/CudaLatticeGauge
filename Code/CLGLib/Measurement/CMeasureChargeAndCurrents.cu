@@ -189,9 +189,9 @@ void CMeasureChargeAndCurrents::Initial(CMeasurementManager* pOwner, CLatticeDat
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
-    m_pHostDataBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * (_HC_Lx - 1) * _kGammaInInterests);
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(CLGComplex) * (_HC_Lx - 1) * _kGammaInInterests));
-    checkCudaErrors(cudaMalloc((void**)&m_pOperatorData, sizeof(deviceWilsonVectorSU3) * (_HC_Lx - 1) * _kGammaInInterests));
+    m_pHostDataBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests);
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceDataBuffer, sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests));
+    checkCudaErrors(cudaMalloc((void**)&m_pOperatorData, sizeof(deviceWilsonVectorSU3) * _HC_Lx * _kGammaInInterests));
 
     Reset();
 
@@ -231,7 +231,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
         CCommonData::m_sCenter,
         CCommonData::m_fKai,
         CCommonData::m_fOmega,
-        static_cast<BYTE>(sourceSite.x - 1),
+        static_cast<BYTE>(sourceSite.x), //array idx
         m_byFieldId,
         //m_pMeasureFunctions,
         m_pOperatorData
@@ -243,13 +243,17 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
     {
         //all sites calculated
         ++m_uiConfigurationCount;
-        dim3 _thread2((_HC_Lx - 1), 1, 1);
+        dim3 _thread2(_HC_Lx, 1, 1);
         _kernel_Trace_Gammas << <_blocks, _thread2 >> > (m_pOperatorData, m_pDeviceDataBuffer);
 
-        checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(CLGComplex) * (_HC_Lx - 1) * _kGammaInInterests, cudaMemcpyDeviceToHost));
-        for (UINT i = 0; i < (_HC_Lx - 1) * _kGammaInInterests; ++i)
+        checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(CLGComplex) * _HC_Lx * _kGammaInInterests, cudaMemcpyDeviceToHost));
+
+        for (UINT j = 0; j < _kGammaInInterests; ++j)
         {
-            m_lstAllRes.AddItem(m_pHostDataBuffer[i]);
+            for (UINT i = 1; i < _HC_Lx; ++i)
+            {
+                m_lstAllRes.AddItem(m_pHostDataBuffer[i * _kGammaInInterests + j]);
+            }
         }
 
         if (m_bShowResult)
@@ -275,7 +279,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
             for (UINT j = 0; j < _kGammaInInterests; ++j)
             {
                 appDetailed(msgs[j]);
-                for (UINT i = 0; i < (_HC_Lx - 1); ++i)
+                for (UINT i = 1; i < _HC_Lx; ++i)
                 {
                     appDetailed(_T("%d=(%1.6f,%1.6f)   "), i, 
                         m_pHostDataBuffer[i * _kGammaInInterests + j].x,
@@ -323,7 +327,7 @@ void CMeasureChargeAndCurrents::Report()
 
     for (UINT n = 0; n < _kGammaInInterests; ++n)
     {
-        appDetailed(msgs[n]);
+        appGeneral(msgs[n]);
 
         appGeneral(_T("\n{\n"));
 
@@ -338,7 +342,7 @@ void CMeasureChargeAndCurrents::Report()
             appGeneral(_T("{"));
             for (UINT i = 0; i < (_HC_Lx - 1); ++i)
             {
-                Real fV = m_pHostDataBuffer[(i * _kGammaInInterests + n)
+                Real fV = m_lstAllRes[(i * _kGammaInInterests + n)
                     + j * _kGammaInInterests * (_HC_Lx - 1)].x;
                 average[i] = average[i] + fV;
                 appGeneral(_T("%2.12f, "), fV);

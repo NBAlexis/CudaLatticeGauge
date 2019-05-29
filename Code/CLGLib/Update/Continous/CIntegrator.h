@@ -49,6 +49,20 @@ public:
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
     virtual CCString GetInfos(const CCString& sTab) const = 0;
     void FinishEvaluate();
+    virtual void ChangeStepCount(UBOOL bGrow) 
+    {
+        if (bGrow)
+        {
+            m_fEStep = m_fEStep * m_uiStepCount / (m_uiStepCount + F(1.0));
+            m_uiStepCount++;
+        }
+        else if (m_uiStepCount > 2)
+        {
+            m_fEStep = m_fEStep * m_uiStepCount / (m_uiStepCount - F(1.0));
+            m_uiStepCount--;
+        }
+    }
+    UINT GetStepCount() const { return m_uiStepCount; }
 
 protected:
     
@@ -89,6 +103,12 @@ public:
 
     //Gauge force is irrelevant from solver
     void UpdatePG(Real fStep, UBOOL bCacheStaple);
+
+    virtual void ChangeStepCount(UBOOL bGrow)
+    {
+        CIntegrator::ChangeStepCount(bGrow);
+        m_fNestedStepLength = m_fEStep / m_uiNestedStep;
+    }
 
 protected:
 
