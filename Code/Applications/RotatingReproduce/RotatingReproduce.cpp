@@ -25,9 +25,13 @@ int main(int argc, char * argv[])
     params.FetchValueINT(_T("EquvibStep"), iVaule);
     UINT iAfterEquib = static_cast<UINT>(iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("LoopStart"), iVaule);
+    UINT iLoopStart = static_cast<UINT>(iVaule);
+
     iVaule = 6;
-    params.FetchValueINT(_T("LoopCount"), iVaule);
-    UINT iLoopCount = static_cast<UINT>(iVaule);
+    params.FetchValueINT(_T("LoopEnd"), iVaule);
+    UINT iLoopEnd = static_cast<UINT>(iVaule);
 
     appSetupLog(params);
     if (!appInitialCLG(params))
@@ -52,10 +56,11 @@ int main(int argc, char * argv[])
     appGeneral(_T("Start up.\n"));
     
 
-    for (UINT i = 0; i < iLoopCount; ++i)
+    for (UINT i = iLoopStart; i < iLoopEnd; ++i)
     {
-        appGeneral(_T("%d run: Omega = 0.00.\n"), i + 1);
-        pGauageAction->SetOmega(F(0.0) * i);
+        Real omega = F(0.02) * i;
+        appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
+        pGauageAction->SetOmega(omega);
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);

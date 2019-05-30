@@ -3,7 +3,7 @@
 ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
 ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
 VerboseLevel : PARANOIAC
-VerboseOutput : timestamp
+VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 0
 

@@ -8,11 +8,12 @@ ShowDeviceInformation : 0
 ShowParameterContent : 0
 BeforeEquvibStep : 10
 EquvibStep : 100
-LoopCount : 6
+LoopStart : 1
+LoopEnd : 6
 
 Dim : 4
 Dir : 4
-LatticeLength : [6, 6, 6, 6]
+LatticeLength : [12, 12, 12, 12]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 ThreadAutoDecompose : 1
