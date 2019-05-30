@@ -186,7 +186,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     {
         if (m_bShowResult)
         {
-            appDetailed(_T("%d=%1.6f  "), i, m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
+            appDetailed(_T("(%d,%d)=%1.6f  "), i, CCommonData::m_sCenter.y, m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
         }
     }
     if (m_bShowResult)
@@ -243,7 +243,7 @@ void CMeasureAMomentumJG::Report()
     {
         for (UINT j = 0; j < _HC_Lx - 1; ++j)
         {
-            appGeneral(_T("(x=%d,y=%d)%2.8f,   "), j, i, tmp[i * (_HC_Lx - 1) + j] / m_uiConfigurationCount);
+            appGeneral(_T("(x=%d,y=%d)%2.8f,   "), j + 1, i + 1, tmp[i * (_HC_Lx - 1) + j] / m_uiConfigurationCount);
         }
         appGeneral(_T("\n"));
     }
