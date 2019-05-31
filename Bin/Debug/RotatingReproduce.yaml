@@ -34,8 +34,8 @@ Updator:
     GrowReduceThreshold : [-0.3, 0.05]
 
     ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-    ## IntegratorType : CIntegratorNestedForceGradient
-    IntegratorType : CIntegratorNestedOmelyan
+    IntegratorType : CIntegratorNestedForceGradient
+    ## IntegratorType : CIntegratorNestedOmelyan
     IntegratorStepLength : 1
     IntegratorStep : 20
     NestedStep : 6
