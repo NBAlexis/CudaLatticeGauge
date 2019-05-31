@@ -14,14 +14,39 @@ __BEGIN_NAMESPACE
 
 void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
 {
+    if (!m_bEverResetted && 0 == m_iAcceptedConfigurationCount)
+    {
+        m_bNeedGaugeSmearing = NeedSmearing();
+    }
+
     ++m_iAcceptedConfigurationCount;
+
+    CFieldGauge* pSmearing = NULL;
+    CFieldGauge* pSmearingStaple = NULL;
+    if (m_bNeedGaugeSmearing && NULL != appGetGaugeSmearing())
+    {
+        //for smearing, we have to use staple
+        pSmearing = dynamic_cast<CFieldGauge*>(pAcceptGauge->GetCopy());
+        if (NULL != pCorrespondingStaple)
+        {
+            pSmearingStaple = dynamic_cast<CFieldGauge*>(pCorrespondingStaple->GetCopy());
+        }
+        else
+        {
+            pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge->GetCopy());
+            pAcceptGauge->CalculateOnlyStaple(pSmearingStaple);
+        }
+        appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
+    }
 
     //gauge measurement
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
         if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsGaugeMeasurement())
         {
-            m_lstAllMeasures[i]->OnConfigurationAccepted(pAcceptGauge, pCorrespondingStaple);
+            m_lstAllMeasures[i]->OnConfigurationAccepted(
+                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple);
         }
     }
 
@@ -41,11 +66,17 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
             sourceSite.w = CCommonData::m_sCenter.w;
 
             CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
-            TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(pAcceptGauge, sourceSite);
+            TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
+                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                sourceSite);
 
             for (INT j = 0; j < measures.Num(); ++j)
             {
-                measures[j]->SourceSanning(pAcceptGauge, pCorrespondingStaple, sources, sourceSite);
+                measures[j]->SourceSanning(
+                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
+                    sources, 
+                    sourceSite);
             }
 
             for (INT j = 0; j < sources.Num(); ++j)
@@ -54,6 +85,9 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
             }
         }
     }
+
+    appSafeDelete(pSmearing);
+    appSafeDelete(pSmearingStaple);
 }
 
 void CMeasurementManager::OnUpdateFinished(UBOOL bReport)
@@ -82,6 +116,24 @@ void CMeasurementManager::Reset()
             m_lstAllMeasures[i]->Reset();
         }
     }
+
+    m_bNeedGaugeSmearing = NeedSmearing();
+    m_bEverResetted = TRUE;
+}
+
+void CMeasurementManager::Report()
+{
+    for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
+    {
+        if (NULL != m_lstAllMeasures[i])
+        {
+            m_lstAllMeasures[i]->Report();
+        }
+    }
+    
+#if !_CLG_DEBUG
+    appFlushLog();
+#endif
 }
 
 CMeasure* CMeasurementManager::GetMeasureById(BYTE byId) const
@@ -112,6 +164,18 @@ THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning() const
         }
     }
     return ret;
+}
+
+UBOOL CMeasurementManager::NeedSmearing() const
+{
+    for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
+    {
+        if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->NeedGaugeSmearing())
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 __END_NAMESPACE

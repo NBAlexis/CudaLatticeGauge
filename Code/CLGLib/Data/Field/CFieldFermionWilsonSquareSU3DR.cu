@@ -1204,16 +1204,16 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
 
     if (m_bExponential)
     {
-        //_kernelDWilsonForceSU3_DR_T << <block, threads >> > (
-        //    pDphiBuffer,
-        //    pDDphiBuffer,
-        //    pGauge,
-        //    appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        //    pForceSU3,
-        //    CCommonData::m_sCenter, 
-        //    m_fKai, 
-        //    CCommonData::m_fOmega, 
-        //    m_byFieldId);
+        _kernelDWilsonForceSU3_DR_T << <block, threads >> > (
+            pDphiBuffer,
+            pDDphiBuffer,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            pForceSU3,
+            CCommonData::m_sCenter, 
+            m_fKai, 
+            CCommonData::m_fOmega, 
+            m_byFieldId);
     }
 }
 
@@ -1225,10 +1225,7 @@ void CFieldFermionWilsonSquareSU3DR::InitialOtherParameters(CParameters& params)
 
     INT iNaive = 1;
     params.FetchValueINT(_T("Naive"), iNaive);
-    if (0 == iNaive)
-    {
-        m_bNaive = FALSE;
-    }
+    m_bNaive = 0 != iNaive;
 
     INT iExponential = 0;
     params.FetchValueINT(_T("Exponential"), iExponential);

@@ -152,9 +152,6 @@ public:
                     if (NULL != m_pStream)
                     {
                         *m_pStream << _T("[") << timeBuffer << _T("]");
-#ifdef _CLG_DEBUG
-                        *m_pStream << std::flush;
-#endif
                     }
                 }
             }

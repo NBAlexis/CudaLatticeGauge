@@ -12,6 +12,14 @@
 UINT TestRotation(CParameters& sParam)
 {
     Real fExpected = F(0.65);
+
+    INT iVaule = 2;
+    sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
+    UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    iVaule = 10;
+    sParam.FetchValueINT(_T("EquvibStep"), iVaule);
+    UINT iAfterEquib = static_cast<UINT>(iVaule);
+
     //sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
     //we calculate staple energy from beta = 1 - 6
@@ -30,19 +38,19 @@ UINT TestRotation(CParameters& sParam)
 
     //Equilibration
 #if _CLG_DEBUG
-    appGetLattice()->m_pUpdator->Update(2, FALSE);
+    appGetLattice()->m_pUpdator->Update(1, FALSE);
 #else
-    appGetLattice()->m_pUpdator->Update(2, FALSE);
+    appGetLattice()->m_pUpdator->Update(iBeforeEquib, FALSE);
 #endif
 
     //Measure
     pMeasure->Reset();
     
-#if _CLG_DEBUG
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
+#if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(3, TRUE);
 #else
-    appGetLattice()->m_pUpdator->Update(3, TRUE);
+    appGetLattice()->m_pUpdator->Update(iAfterEquib, TRUE);
 #endif
 
     Real fRes = pMeasure->m_fLastRealResult;

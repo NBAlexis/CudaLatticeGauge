@@ -6,9 +6,9 @@ VerboseLevel : GENERAL
 VerboseOutput : timestamp
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 10
+BeforeEquvibStep : 15
 EquvibStep : 100
-LoopStart : 1
+LoopStart : 0
 LoopEnd : 6
 
 Dim : 4
@@ -120,9 +120,17 @@ Measure4:
     MeasureName : CMeasureTopologicChargeXY
     FieldId : 2
     ShowResult : 1
+    GaugeSmearing : 1
 
 Measure5:
 
     MeasureName : CMeasurePolyakovXY
     FieldId : 2
     ShowResult : 1
+
+GaugeSmearing:
+
+    SmearingName : CGaugeSmearingAPEProj
+    Alpha : 0.1
+    Iterate : 3
+    ProjIterate : 6

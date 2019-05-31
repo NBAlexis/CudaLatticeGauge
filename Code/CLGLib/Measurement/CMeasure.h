@@ -18,6 +18,7 @@ class CLGAPI CMeasure : public CBase
 public:
     CMeasure() 
         : m_pOwner(NULL)
+        , m_bNeedSmearing(FALSE)
         , m_byFieldId(0)
         , m_fLastRealResult(F(0.0))
     {
@@ -28,9 +29,18 @@ public:
         m_pOwner = pOwner;
         m_pLatticeData = pLatticeData;
         m_byId = byId;
+
+        INT iNeedGaugeSmearing = 0;
+        param.FetchValueINT(_T("GaugeSmearing"), iNeedGaugeSmearing);
+        m_bNeedSmearing = 0 != iNeedGaugeSmearing;
     }
 
+    /**
+    * Accept gauge can be smoothed.
+    * pCorrespondingStaple Might be NULL.
+    */
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) = 0;
+
     /**
     * NOTE: sources will be passed to multiple measures, do NOT change the content!
     */
@@ -41,6 +51,7 @@ public:
 
     virtual UBOOL IsGaugeMeasurement() const = 0;
     virtual UBOOL IsSourceScanning() const = 0;
+    virtual UBOOL NeedGaugeSmearing() const { return m_bNeedSmearing; }
 
     BYTE GetFieldId() const { return m_byFieldId; }
 
@@ -48,6 +59,7 @@ protected:
 
     class CMeasurementManager* m_pOwner;
     class CLatticeData* m_pLatticeData;
+    UBOOL m_bNeedSmearing;
     BYTE m_byId;
     BYTE m_byFieldId;
 

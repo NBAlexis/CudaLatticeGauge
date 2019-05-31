@@ -40,19 +40,7 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
-    CMeasureAMomentumJG * pJG = dynamic_cast<CMeasureAMomentumJG *>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    CMeasureAMomentumJF * pJF = dynamic_cast<CMeasureAMomentumJF *>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    CMeasureChargeAndCurrents * pChargeCurrent = dynamic_cast<CMeasureChargeAndCurrents *>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    CMeasureTopologicChargeXY * pTopo = dynamic_cast<CMeasureTopologicChargeXY *>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CMeasurePolyakovXY * pPolya = dynamic_cast<CMeasurePolyakovXY *>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-    if (NULL == pGauageAction || NULL == pJG || NULL == pJF
-        || NULL == pChargeCurrent || NULL == pTopo || NULL == pPolya)
-    {
-        appCrucial(_T("Rotating gauge action or measurement not found!\n"));
-        return 1;
-    }
-    
+    CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));    
     appGeneral(_T("Start up.\n"));
     
 
@@ -64,28 +52,25 @@ int main(int argc, char * argv[])
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
             appGetLattice()->m_pUpdator->Update(1, FALSE);
         }
 
-        pJG->Reset();
-        pJF->Reset();
-        pChargeCurrent->Reset();
-        pTopo->Reset();
-        pPolya->Reset();
+        appGetLattice()->m_pMeasurements->Reset();
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        CCString sFileName;
+        sFileName.Format(_T("Rotate_00%d"), i);
+        appGetLattice()->m_pUpdator->SetSaveConfiguration(TRUE, sFileName);
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
         {
             appGetLattice()->m_pUpdator->Update(1, TRUE);
         }
-        pJG->Report();
-        pJF->Report();
-        pChargeCurrent->Report();
-        pTopo->Report();
-        pPolya->Report();
+        appGetLattice()->m_pMeasurements->Report();
     }
 
+    appGeneral(_T("\n========= all finished! ==========\n"));
     appQuitCLG();
     return 0;
 }

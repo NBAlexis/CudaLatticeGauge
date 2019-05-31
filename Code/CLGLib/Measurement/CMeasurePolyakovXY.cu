@@ -244,7 +244,7 @@ void CMeasurePolyakovXY::Report()
     }
     appGeneral(_T("}\n"));
 
-    appGeneral(_T("\n ----------- charge density average ------------- \n"));
+    appGeneral(_T("\n ----------- loop density average ------------- \n"));
 
     for (UINT i = 0; i < _HC_Ly - 1; ++i)
     {
@@ -252,7 +252,7 @@ void CMeasurePolyakovXY::Report()
         {
             tmp[i * (_HC_Lx - 1) + j].x = tmp[i * (_HC_Lx - 1) + j].x / m_uiConfigurationCount;
             tmp[i * (_HC_Lx - 1) + j].y = tmp[i * (_HC_Lx - 1) + j].y / m_uiConfigurationCount;
-            appGeneral(_T("(x=%d,y=%d)="), j, i);
+            appGeneral(_T("(x=%d,y=%d)="), j + 1, i + 1);
             LogGeneralComplex(tmp[i * (_HC_Lx - 1) + j]);
         }
         appGeneral(_T("\n"));

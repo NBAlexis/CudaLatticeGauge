@@ -152,7 +152,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         m_pIntegrator->OnFinishTrajectory(bAccepted); //Here we copy the gauge field back
 
         //If rejected, just accept the old configuration and trigger the measure
-        if (bMeasure)
+        if (bMeasure && bAccepted)
         {
             m_pOwner->FixAllFieldBoundary();
             m_pOwner->OnUpdatorConfigurationAccepted(
@@ -171,6 +171,9 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     checkCudaErrors(cudaGetLastError());
     
     m_pOwner->OnUpdatorFinished(bMeasure, m_bReport);
+#if !_CLG_DEBUG
+    appFlushLog();
+#endif
     return m_iAcceptedConfigurationCount;
 }
 

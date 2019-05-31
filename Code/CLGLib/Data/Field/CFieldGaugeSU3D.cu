@@ -175,6 +175,58 @@ _kernelPlaqutteEnergySU3CacheIndex_D(
     //printf("  ---- energy: thread=%d, res=%f\n", uiSiteIndex, results[uiSiteIndex]);
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateOnlyStaple_D(
+    const deviceSU3 * __restrict__ pDeviceData,
+    const SIndex * __restrict__ pCachedIndex,
+    UINT plaqLength, UINT plaqCount,
+    deviceSU3 *pStapleData)
+{
+    intokernaldir;
+
+    //Real test_force = F(0.0);
+    UINT plaqLengthm1 = plaqLength - 1;
+    UINT plaqCountAll = plaqCount * plaqLengthm1;
+
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        deviceSU3 res = deviceSU3::makeSU3Zero();
+
+        //there are 6 staples, each is sum of two plaquttes
+        for (int i = 0; i < plaqCount; ++i)
+        {
+            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+
+            if (first.NeedToDagger())
+            {
+                toAdd.Dagger();
+            }
+
+            for (int j = 1; j < plaqLengthm1; ++j)
+            {
+                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+
+                if (nextlink.NeedToDagger())
+                {
+                    toAdd.MulDagger(toMul);
+                }
+                else
+                {
+                    toAdd.Mul(toMul);
+                }
+            }
+            res.Add(toAdd);
+        }
+        pStapleData[linkIndex] = res;
+    }
+}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelExpMultSU3RealQ_D(
     const deviceSU3 * __restrict__ pMyDeviceData,
@@ -341,6 +393,24 @@ Real CFieldGaugeSU3D::CalculateKinematicEnergy() const
     preparethread;
     _kernelCalculateKinematicEnergySU3_D << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+void CFieldGaugeSU3D::CalculateOnlyStaple(CFieldGauge* pStaple) const
+{
+    if (NULL == pStaple || EFT_GaugeSU3 != pStaple->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: stable field is not SU3");
+        return;
+    }
+    CFieldGaugeSU3* pStapleSU3 = dynamic_cast<CFieldGaugeSU3*>(pStaple);
+
+    preparethread;
+    _kernelCalculateOnlyStaple_D << <block, threads >> > (
+        m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
+        pStapleSU3->m_pDeviceData);
 }
 
 void CFieldGaugeSU3D::ExpMult(Real a, CField* U) const

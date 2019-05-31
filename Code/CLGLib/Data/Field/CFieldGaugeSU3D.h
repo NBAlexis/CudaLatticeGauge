@@ -40,10 +40,7 @@ public:
 #pragma region HMC
 
     virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const;
-    virtual void CalculateOnlyStaple(CFieldGauge* pStaple) const
-    {
-        appCrucial(_T("CalculateOnlyStaple is not supported in CFieldGaugeSU3D!\n"));
-    }
+    virtual void CalculateOnlyStaple(CFieldGauge* pStaple) const;
 
     virtual void MakeRandomGenerator();
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const;

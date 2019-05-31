@@ -95,6 +95,12 @@ public:
         return fAdd / m_lstH.Num();
     }
 
+    void SetSaveConfiguration(UBOOL bSave, const CCString& sPrefix)
+    {
+        m_bSaveConfigurations = bSave;
+        m_sConfigurationPrefix = sPrefix;
+    }
+
 protected:
 
     UINT m_uiUpdateCall;

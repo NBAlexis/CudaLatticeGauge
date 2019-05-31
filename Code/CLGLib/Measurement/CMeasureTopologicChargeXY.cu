@@ -188,7 +188,7 @@ void CMeasureTopologicChargeXY::Report()
     {
         for (UINT j = 0; j < _HC_Lx - 1; ++j)
         {
-            appGeneral(_T("(x=%d,y=%d)%2.8f,   "), j, i, tmp[i * (_HC_Lx - 1) + j] / m_uiConfigurationCount);
+            appGeneral(_T("(x=%d,y=%d)%2.8f,   "), j + 1, i + 1, tmp[i * (_HC_Lx - 1) + j] / m_uiConfigurationCount);
         }
         appGeneral(_T("\n"));
     }
