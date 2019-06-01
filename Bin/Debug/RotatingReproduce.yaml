@@ -3,10 +3,10 @@
 ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
 ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
 VerboseLevel : GENERAL
-VerboseOutput : timestamp
+VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 15
+BeforeEquvibStep : 20
 EquvibStep : 100
 LoopStart : 0
 LoopEnd : 6
@@ -78,21 +78,20 @@ Action2:
     FieldId : 2
 
 Solver:
+    SolverForFieldId : 2
     ##SolverName : CSLASolverGMRES
-    ##SolverForFieldId : 2
-    ##MaxDim : 20
+    ##MaxDim : 30
     ##Accuracy : 0.0000001
     ##Restart : 100
     ##AbsoluteAccuracy : 1
 
     SolverName : CSLASolverGCRODR
-    SolverForFieldId : 2
-    MDim : 20
+    MDim : 26
     KDim : 5
-    RecalculateR : 5
+    RecalculateR : 2
     DeflateSpace : EEDT_SVD
-    Accuracy : 0.001
-    Restart : 100
+    Accuracy : 0.00001
+    Restart : 200
     AbsoluteAccuracy : 1
 
 Measure1:
@@ -130,7 +129,8 @@ Measure5:
 
 GaugeSmearing:
 
-    SmearingName : CGaugeSmearingAPEProj
-    Alpha : 0.1
-    Iterate : 3
+    SmearingName : CGaugeSmearingAPEStout
+    RhoS : 0.1
+    RhoT : 0.1
+    Iterate : 5
     ProjIterate : 6

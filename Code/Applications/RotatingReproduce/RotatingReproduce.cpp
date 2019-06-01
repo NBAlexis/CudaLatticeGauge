@@ -42,17 +42,17 @@ int main(int argc, char * argv[])
 
     CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));    
     appGeneral(_T("Start up.\n"));
+    appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
     
-
     for (UINT i = iLoopStart; i < iLoopEnd; ++i)
     {
+        UINT uiLastAccept = 0;
         Real omega = F(0.02) * i;
         appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
         pGauageAction->SetOmega(omega);
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-        appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
             appGetLattice()->m_pUpdator->Update(1, FALSE);
@@ -60,12 +60,37 @@ int main(int argc, char * argv[])
 
         appGetLattice()->m_pMeasurements->Reset();
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-        CCString sFileName;
-        sFileName.Format(_T("Rotate_00%d"), i);
-        appGetLattice()->m_pUpdator->SetSaveConfiguration(TRUE, sFileName);
+
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
         {
             appGetLattice()->m_pUpdator->Update(1, TRUE);
+            UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
+            if (uiAcce != uiLastAccept)
+            {
+                CCString sFileName;
+                sFileName.Format(_T("Rotate_00%d_%d"), i, uiAcce);
+
+                //=================================
+                //Save info
+                TCHAR buff1[256];
+                TCHAR buff2[256];
+                appGetTimeNow(buff1, 256);
+                appGetTimeUtc(buff2, 256);
+                CCString sInfo;
+                sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
+                    appGetTimeStamp(),
+                    buff1,
+                    buff2);
+                sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
+                appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
+
+                //=================================
+                //Save config
+                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con_"));
+
+
+                uiLastAccept = uiAcce;
+            }
         }
         appGetLattice()->m_pMeasurements->Report();
     }

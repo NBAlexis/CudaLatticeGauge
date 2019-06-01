@@ -601,7 +601,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
     break;
     case EFFT_CLGBin:
     {
-        UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * 18 * m_uiLinkeCount);
+        UINT uiSize = static_cast<UINT>(sizeof(Real) * 18 * m_uiLinkeCount);
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         InitialWithByte(data);
         free(data);
@@ -621,14 +621,14 @@ void CFieldGaugeSU3::InitialWithByte(BYTE* byData)
     {
         for (UINT j = 0; j < 16; ++j)
         {
-            FLOAT oneLink[18];
-            memcpy(oneLink, byData + sizeof(FLOAT) * 18 * i, sizeof(FLOAT) * 18);
+            Real oneLink[18];
+            memcpy(oneLink, byData + sizeof(Real) * 18 * i, sizeof(Real) * 18);
             if (j < 9)
             {
                 readData[i].m_me[j] =
                     _make_cuComplex(
-                        static_cast<Real>(oneLink[2 * j]),
-                        static_cast<Real>(oneLink[2 * j + 1]));
+                        oneLink[2 * j],
+                        oneLink[2 * j + 1]);
             }
             else
             {
@@ -841,17 +841,17 @@ BYTE* CFieldGaugeSU3::CopyDataOut(UINT &uiSize) const
     deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
     checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
     //fuck ofstream
-    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiLinkeCount * 18);
+    uiSize = static_cast<UINT>(sizeof(Real) * m_uiLinkeCount * 18);
     BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
     for (UINT i = 0; i < m_uiLinkeCount; ++i)
     {
-        FLOAT oneLink[18];
+        Real oneLink[18];
         for (UINT j = 0; j < 9; ++j)
         {
-            oneLink[2 * j] = static_cast<FLOAT>(toSave[i].m_me[j].x);
-            oneLink[2 * j + 1] = static_cast<FLOAT>(toSave[i].m_me[j].y);
+            oneLink[2 * j] = static_cast<Real>(toSave[i].m_me[j].x);
+            oneLink[2 * j + 1] = static_cast<Real>(toSave[i].m_me[j].y);
         }
-        memcpy(byToSave + i * sizeof(FLOAT) * 18, oneLink, sizeof(FLOAT) * 18);
+        memcpy(byToSave + i * sizeof(Real) * 18, oneLink, sizeof(Real) * 18);
     }
     free(toSave);
 

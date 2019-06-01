@@ -496,7 +496,7 @@ void CFieldFermionWilsonSquareSU3::InitialFieldWithFile(const CCString& sFileNam
         return;
     }
 
-    UINT uiSize = static_cast<UINT>(sizeof(FLOAT) * 24 * m_uiSiteCount);
+    UINT uiSize = static_cast<UINT>(sizeof(Real) * 24 * m_uiSiteCount);
     BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
     InitialWithByte(data);
     free(data);
@@ -507,15 +507,15 @@ void CFieldFermionWilsonSquareSU3::InitialWithByte(BYTE* byData)
     deviceWilsonVectorSU3* readData = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
     for (UINT i = 0; i < m_uiSiteCount; ++i)
     {
-        FLOAT thisSite[24];
-        memcpy(thisSite, byData + i * sizeof(FLOAT) * 24, sizeof(FLOAT) * 24);
+        Real thisSite[24];
+        memcpy(thisSite, byData + i * sizeof(Real) * 24, sizeof(Real) * 24);
         for (UINT j = 0; j < 4; ++j)
         {
             for (UINT k = 0; k < 3; ++k)
             {
                 readData[i].m_d[j].m_ve[k] = _make_cuComplex(
-                    static_cast<Real>(thisSite[2 * (j * 3 + k)]),
-                    static_cast<Real>(thisSite[2 * (j * 3 + k) + 1]));
+                    thisSite[2 * (j * 3 + k)],
+                    thisSite[2 * (j * 3 + k) + 1]);
             }
         }
     }
@@ -998,21 +998,21 @@ void CFieldFermionWilsonSquareSU3::SaveToFile(const CCString &fileName) const
 BYTE* CFieldFermionWilsonSquareSU3::CopyDataOut(UINT &uiSize) const
 {
     deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
-    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 24);
+    uiSize = static_cast<UINT>(sizeof(Real) * m_uiSiteCount * 24);
     BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
     checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToHost));
     for (UINT i = 0; i < m_uiSiteCount; ++i)
     {
-        FLOAT oneSite[24];
+        Real oneSite[24];
         for (UINT j = 0; j < 4; ++j)
         {
             for (UINT k = 0; k < 3; ++k)
             {
-                oneSite[2 * (j * 3 + k)] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].x);
-                oneSite[2 * (j * 3 + k) + 1] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].y);
+                oneSite[2 * (j * 3 + k)] = static_cast<Real>(toSave[i].m_d[j].m_ve[k].x);
+                oneSite[2 * (j * 3 + k) + 1] = static_cast<Real>(toSave[i].m_d[j].m_ve[k].y);
             }
         }
-        memcpy(saveData + sizeof(FLOAT) * i * 24, oneSite, sizeof(FLOAT) * 24);
+        memcpy(saveData + sizeof(Real) * i * 24, oneSite, sizeof(Real) * 24);
     }
     
     //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
