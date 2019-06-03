@@ -6,9 +6,9 @@ VerboseLevel : GENERAL
 VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 20
+BeforeEquvibStep : 30
 EquvibStep : 100
-LoopStart : 0
+LoopStart : 1
 LoopEnd : 6
 
 Dim : 4
@@ -21,7 +21,7 @@ RandomType : ER_XORWOW
 RandomSeedType : ERST_Timestamp
 ActionListLength : 2
 FermionFieldCount : 1
-MeasureListLength : 5
+MeasureListLength : 1
 CacheStaple : 0
 
 Updator:
@@ -79,18 +79,17 @@ Action2:
 
 Solver:
     SolverForFieldId : 2
-    ##SolverName : CSLASolverGMRES
-    ##MaxDim : 30
-    ##Accuracy : 0.0000001
-    ##Restart : 100
-    ##AbsoluteAccuracy : 1
+    SolverName : CSLASolverGMRES
+    MaxDim : 40
+    Accuracy : 0.00000001
 
-    SolverName : CSLASolverGCRODR
-    MDim : 26
-    KDim : 5
-    RecalculateR : 2
-    DeflateSpace : EEDT_SVD
-    Accuracy : 0.00001
+
+    ##SolverName : CSLASolverGCRODR
+    ##MDim : 26
+    ##KDim : 5
+    ##RecalculateR : 2
+    ##DeflateSpace : EEDT_SVD
+    ##Accuracy : 0.00001
     Restart : 200
     AbsoluteAccuracy : 1
 

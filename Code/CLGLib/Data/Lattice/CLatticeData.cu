@@ -177,11 +177,21 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
     CCString sInfos;
+    BYTE realByte[8];
+    Real testReal = F(-1.2345);
+    memset(realByte, 0, 8);
+    memcpy(realByte, &testReal, sizeof(Real));
+    CCString sRealByte;
+    for (UINT i = 0; i < 8; ++i)
+    {
+        sRealByte += appIntToString(realByte[i]) + _T(", ");
+    }
+
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
     sRet = sTab + sInfos;
     sInfos.Format(_T("Random : %s\n"), __ENUM_TO_STRING(ERandom, static_cast<ERandom>(m_uiRandomType)).c_str());
     sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("sizeof(Real) : %d\n"), sizeof(Real));
+    sInfos.Format(_T("sizeof(Real) : %d and 1.25 is %s\n"), sizeof(Real), sRealByte);
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("RandomSeed : %d\n"), m_uiRandomSeed);
     sRet = sRet + sTab + sInfos;

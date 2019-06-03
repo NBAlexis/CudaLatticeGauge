@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
             if (uiAcce != uiLastAccept)
             {
                 CCString sFileName;
-                sFileName.Format(_T("Rotate_00%d_%d"), i, uiAcce);
+                sFileName.Format(_T("Rotate_00%d_%d"), i * 2, uiAcce);
 
                 //=================================
                 //Save info

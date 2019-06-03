@@ -80,6 +80,17 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
 #endif
     appSetupLog(params);
+
+    BYTE realByte[8];
+    Real testReal = F(-1.2345);
+    memset(realByte, 0, 8);
+    memcpy(realByte, &testReal, sizeof(Real));
+    CCString sRealByte;
+    for (UINT i = 0; i < 8; ++i)
+    {
+        sRealByte += appIntToString(realByte[i]) + _T(", ");
+    }
+    appGeneral(_T(" \n ================= sizeof(Real) : %d and -1.2345 is %s =============\n"), sizeof(Real), sRealByte);
     
     TArray<TestList*> allTests;
     THashMap<CCString, TArray<TestList*>*> category;
