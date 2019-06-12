@@ -10,12 +10,16 @@
 
 #include "CLGLib.h"
 
-__DEFINE_ENUM(ESampleJob,
-    ESJ_BuildGauge,
-    ESJ_BuildSample,
-    ESJ_CheckSample,
-    ESJ_FillSample,
+__DEFINE_ENUM(ERotatingJob,
+    ERJ_AngularMomentum,
+    ERJ_Thermal,
     )
+
+
+extern INT TestAngularMomentum(CParameters& params);
+extern INT TestThermal(CParameters& params);
+
+
 
 //=============================================================================
 // END OF FILE

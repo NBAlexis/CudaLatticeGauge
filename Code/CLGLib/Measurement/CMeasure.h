@@ -43,6 +43,7 @@ public:
 
     /**
     * NOTE: sources will be passed to multiple measures, do NOT change the content!
+    * NOTE: site.x start from 1 to Lx - 1, 0 is not included
     */
     virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) = 0;
     virtual void Average(UINT uiConfigurationCount) = 0;

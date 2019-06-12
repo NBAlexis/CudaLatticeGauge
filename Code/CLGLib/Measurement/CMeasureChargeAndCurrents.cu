@@ -16,6 +16,11 @@ __CLGIMPLEMENT_CLASS(CMeasureChargeAndCurrents)
 
 #pragma region device functions
 
+__device__ void _deviceMeasure0(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+{
+    //do nothing
+}
+
 __device__ void _deviceMeasure1(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA1].MulWilsonC(element);
@@ -81,6 +86,7 @@ __device__ void _deviceMeasure8(const SSmallInt4& site, const SSmallInt4& sCente
 
 __constant__ _deviceMeasureFunc _cMeasureFuncs[CMeasureChargeAndCurrents::_kGammaInInterests] =
 { 
+    _deviceMeasure0,
     _deviceMeasure1,
     _deviceMeasure2,
     _deviceMeasure3,
@@ -95,6 +101,11 @@ __constant__ _deviceMeasureFunc _cMeasureFuncs[CMeasureChargeAndCurrents::_kGamm
 
 #pragma region kernles 
 
+/**
+* blockIdx.x = 0 -> _kGammaInInterests - 1
+* threadIdx.x = 0 -> 11
+* byArrayIdx = 0 -> Lx - 1
+*/
 __global__ void
 _CLG_LAUNCH_(12, 8)
 _kernel_Gammas(
@@ -132,10 +143,11 @@ _kernel_Gammas(
 }
 
 /**
-*
+* blockIdx.x = 0 -> _kGammaInInterests - 1
+* threadIdx.x = 0 -> Lx - 1
 */
 __global__ void
-_CLG_LAUNCH_(32, 8)
+_CLG_LAUNCH_(32, CMeasureChargeAndCurrents::_kGammaInInterests)
 _kernel_Trace_Gammas(
     const deviceWilsonVectorSU3* __restrict__ pOperator,
     CLGComplex* pResLine)
@@ -225,6 +237,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
     checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
     
+    //sourceSite.x = 1 to lx - 1
     _kernel_Gammas << <_blocks, _thread1 >> > (
         ppDevicePtr,
         sourceSite,
@@ -262,6 +275,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
 
             static CCString msgs[_kGammaInInterests] =
             {
+                _T(" ----------- Chiral condensate ------------- \n"),
                 _T(" ----------- J1 ------------- \n"),
                 _T(" ----------- J2 ------------- \n"),
                 _T(" ----------- J3 ------------- \n"),
@@ -312,6 +326,7 @@ void CMeasureChargeAndCurrents::Report()
 
     static CCString msgs[_kGammaInInterests] =
     {
+        _T(" ----------- Chiral condensate ------------- \n"),
         _T(" ----------- J1 ------------- \n"),
         _T(" ----------- J2 ------------- \n"),
         _T(" ----------- J3 ------------- \n"),
@@ -342,8 +357,9 @@ void CMeasureChargeAndCurrents::Report()
             appGeneral(_T("{"));
             for (UINT i = 0; i < (_HC_Lx - 1); ++i)
             {
-                Real fV = m_lstAllRes[(i * _kGammaInInterests + n)
-                    + j * _kGammaInInterests * (_HC_Lx - 1)].x;
+                UINT uiThisSiteThisFunc = n * (_HC_Lx - 1) + i;
+                UINT uiOneConf = _kGammaInInterests * (_HC_Lx - 1);
+                Real fV = m_lstAllRes[uiOneConf * j + uiThisSiteThisFunc].x;
                 average[i] = average[i] + fV;
                 appGeneral(_T("%2.12f, "), fV);
             }

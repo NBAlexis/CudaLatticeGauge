@@ -186,7 +186,10 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     {
         if (m_bShowResult)
         {
-            appDetailed(_T("(%d,%d)=%1.6f  "), i, CCommonData::m_sCenter.y, m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
+            appDetailed(_T("(%d,%d)=%1.6f  "), 
+                i, 
+                CCommonData::m_sCenter.y, 
+                m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
         }
     }
     if (m_bShowResult)
@@ -221,14 +224,15 @@ void CMeasureAMomentumJG::Report()
             appGeneral(_T("{"));
             for (UINT j = 0; j < _HC_Lx - 1; ++j)
             {
-                appGeneral(_T("%1.6f, "), m_lstRes[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j]);
+                UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
+                appGeneral(_T("%1.6f, "), m_lstRes[idx]);
                 if (0 == k)
                 {
-                    tmp.AddItem(m_lstRes[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j]);
+                    tmp.AddItem(m_lstRes[idx]);
                 }
                 else
                 {
-                    tmp[i * (_HC_Lx - 1) + j] += m_lstRes[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j];
+                    tmp[i * (_HC_Lx - 1) + j] += m_lstRes[idx];
                 }
             }
             appGeneral(_T("}, "));

@@ -25,13 +25,14 @@ public:
 
     /**
     * We want to know
+    * just D^-1
     * gamma_1,2,3,4
     * gamma_4 sigma_12
     * gamma_1 -i y Omega gamma_4
     * gamma_2 +i x Omega gamma_4
     * gamma_4 gamma _5
     */
-    enum { _kGammaInInterests = 8, };
+    enum { _kGammaInInterests = 9, };
 
     CMeasureChargeAndCurrents();
     ~CMeasureChargeAndCurrents();

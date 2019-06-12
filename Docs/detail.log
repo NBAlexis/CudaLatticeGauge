@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  29 MAY 2019 11:15
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840) (preloaded format=pdflatex 2018.10.16)  11 JUN 2019 00:09
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1442,7 +1442,7 @@ uge and fermion ac-tions are kept anti-hermitian
  []
 
 [68]
-Overfull \hbox (17.9833pt too wide) detected at line 731
+Overfull \hbox (17.9833pt too wide) detected at line 733
 []
  []
 
@@ -1523,7 +1523,7 @@ KTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/CTEX/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmtt10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.
 pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><D:/CTEX/MiKTe
 X/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on detail.pdf (76 pages, 694209 bytes).
+Output written on detail.pdf (76 pages, 694361 bytes).
 PDF statistics:
  1543 PDF objects out of 1728 (max. 8388607)
  585 named destinations out of 1000 (max. 500000)

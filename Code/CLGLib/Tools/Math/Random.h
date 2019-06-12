@@ -190,6 +190,29 @@ public:
         return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
     }
 
+    __device__ __inline__ CLGComplex _deviceRandomZ4(UINT fatIndex)
+    {
+        BYTE byRandom = static_cast<BYTE>(F(4.0) * _deviceRandomF(fatIndex));
+        if (byRandom >= 4)
+        {
+            byRandom = 4;
+        }
+
+        if (0 == byRandom)
+        {
+            return _make_cuComplex(F(1.0), F(0.0));
+        }
+        else if (1 == byRandom)
+        {
+            return _make_cuComplex(F(0.0), F(1.0));
+        }
+        else if (2 == byRandom)
+        {
+            return _make_cuComplex(-F(1.0), F(0.0));
+        }
+        return _make_cuComplex(F(0.0), -F(1.0));
+    }
+
     __host__ __inline__ Real GetRandomF()
     {
         if (ER_Schrage == m_eRandomType)

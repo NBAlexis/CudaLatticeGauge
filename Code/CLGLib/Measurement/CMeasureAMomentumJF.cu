@@ -590,7 +590,7 @@ void CMeasureAMomentumJF::SourceSanning(const class CFieldGauge* pGauge, const c
         if (m_bShowResult)
         {
             appDetailed(_T("\n\n ==================== Angular Momentum (%d con)============================ \n\n"), m_uiConfigurationCount);
-            appDetailed(_T(" ----------- Orbital ------------- \n"));
+            appDetailed(_T(" ----------- Orbital (with a -1) ------------- \n"));
         }
         checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferL, sizeof(CLGComplex) * (_HC_Lx - 1), cudaMemcpyDeviceToHost));
 
@@ -639,7 +639,7 @@ void CMeasureAMomentumJF::Report()
     appGeneral(_T("\n\n==========================================================================\n"));
     appGeneral(_T("==================== Angular Momentum (%d con)============================\n"), m_uiConfigurationCount);
     appGeneral(_T("==========================================================================\n"));
-    appGeneral(_T("\n ----------- Orbital ------------- \n"));
+    appGeneral(_T("\n ----------- Orbital (with a -1) ------------- \n"));
 
     appGeneral(_T("{\n"));
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)
@@ -661,7 +661,7 @@ void CMeasureAMomentumJF::Report()
     }
     appGeneral(_T("}\n"));
 
-    appGeneral(_T("\n ----------- Orbital average ------------- \n"));
+    appGeneral(_T("\n ----------- Orbital average (with a -1) ------------- \n"));
     for (UINT j = 0; j < _HC_Lx - 1; ++j)
     {
         appGeneral(_T("%2.12f, "), tmpSum[j] / m_uiConfigurationCount);

@@ -18,86 +18,22 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/RotatingReproduce.yaml"), params);
 #endif
 
-    INT iVaule = 5;
-    params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
-    UINT iBeforeEquib = static_cast<UINT>(iVaule);
-    iVaule = 200;
-    params.FetchValueINT(_T("EquvibStep"), iVaule);
-    UINT iAfterEquib = static_cast<UINT>(iVaule);
+    CCString sJob = _T("ERJ_AngularMomentum");
 
-    iVaule = 0;
-    params.FetchValueINT(_T("LoopStart"), iVaule);
-    UINT iLoopStart = static_cast<UINT>(iVaule);
-
-    iVaule = 6;
-    params.FetchValueINT(_T("LoopEnd"), iVaule);
-    UINT iLoopEnd = static_cast<UINT>(iVaule);
-
-    appSetupLog(params);
-    if (!appInitialCLG(params))
+    params.FetchStringValue(_T("RotatingJob"), sJob);
+    ERotatingJob eJob = __STRING_TO_ENUM(ERotatingJob, sJob);
+    INT res = 0;
+    switch (eJob)
     {
-        appCrucial(_T("Initial Failed!\n"));
-        return 1;
+    case ERJ_AngularMomentum:
+        res = TestAngularMomentum(params);
+        break;
+    case ERJ_Thermal:
+        res = TestThermal(params);
+        break;
     }
 
-    CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));    
-    appGeneral(_T("Start up.\n"));
-    appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-    
-    for (UINT i = iLoopStart; i < iLoopEnd; ++i)
-    {
-        UINT uiLastAccept = 0;
-        Real omega = F(0.02) * i;
-        appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
-        pGauageAction->SetOmega(omega);
-        appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-        appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-        while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
-        {
-            appGetLattice()->m_pUpdator->Update(1, FALSE);
-        }
-
-        appGetLattice()->m_pMeasurements->Reset();
-        appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-
-        while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
-        {
-            appGetLattice()->m_pUpdator->Update(1, TRUE);
-            UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
-            if (uiAcce != uiLastAccept)
-            {
-                CCString sFileName;
-                sFileName.Format(_T("Rotate_00%d_%d"), i * 2, uiAcce);
-
-                //=================================
-                //Save info
-                TCHAR buff1[256];
-                TCHAR buff2[256];
-                appGetTimeNow(buff1, 256);
-                appGetTimeUtc(buff2, 256);
-                CCString sInfo;
-                sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
-                    appGetTimeStamp(),
-                    buff1,
-                    buff2);
-                sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
-                appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
-
-                //=================================
-                //Save config
-                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con_"));
-
-
-                uiLastAccept = uiAcce;
-            }
-        }
-        appGetLattice()->m_pMeasurements->Report();
-    }
-
-    appGeneral(_T("\n========= all finished! ==========\n"));
-    appQuitCLG();
-    return 0;
+    return res;
 }
 
 //=============================================================================

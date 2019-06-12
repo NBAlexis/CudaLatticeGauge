@@ -35,7 +35,7 @@
 #define _cuConjf cuConj
 #define _cuCrealf cuCreal
 #define _cuCimagf cuCimag
-#define _cuCabsf cuCimag
+#define _cuCabsf cuCabs
 #define _cuCdivf cuCdiv
 #define F(v) v
 

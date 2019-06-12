@@ -116,6 +116,15 @@ public:
             m_pStream = new OFSTREAM(sRealFile);
             bShowHasFile = TRUE;
         }
+        else if (filename == _T("datetime"))
+        {
+            CCString sRealFile;
+            static TCHAR datetime[256];
+            appGetTimeNow(datetime, 256);
+            sRealFile.Format(_T("%s.log"), datetime);
+            m_pStream = new OFSTREAM(sRealFile);
+            bShowHasFile = TRUE;
+        }
         else
         {
             m_pStream = new OFSTREAM(filename);
