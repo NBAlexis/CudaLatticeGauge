@@ -62,6 +62,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurementManager.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
@@ -132,6 +133,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp
@@ -209,7 +211,9 @@ target_link_libraries(CLGTest CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)
 add_executable(RotatingReproduce 
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.h
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/AngularMomentumTest.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/ThermalTest.cpp
     )
 
 target_compile_features(RotatingReproduce PUBLIC cxx_std_14)
