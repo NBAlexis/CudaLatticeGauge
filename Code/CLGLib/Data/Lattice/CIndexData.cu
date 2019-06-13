@@ -75,7 +75,7 @@ _kernelCalculateLinkCount(
     const UINT* __restrict__ pSmallData
 )
 {
-    intokernalInt4;
+    intokernalOnlyInt4;
     UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     INT uiCount = 0;
@@ -96,7 +96,7 @@ _kernelCalculateSiteCount(
     const UINT* __restrict__ pSmallData
 )
 {
-    intokernalInt4;
+    intokernalOnlyInt4;
     UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     if (!pMappingTable[uiBigIdx].IsDirichlet())

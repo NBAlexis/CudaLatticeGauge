@@ -72,7 +72,7 @@ INT TestThermal(CParameters& params)
         appGeneral(_T("Run for Nt = %d, start baking.\n"), uiNt);
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
 
-        UINT uiLastAccept = 0;
+        //UINT uiLastAccept = 0;
         pGauageAction->SetOmega(F(0.0));
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
@@ -128,8 +128,8 @@ INT TestThermal(CParameters& params)
             CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
             CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
             //===================== Polyakov loop =====================
-            assert(pPL->m_lstLoop.Num() == iConfigNumber);
-            assert(pPL->m_lstLoopDensity.Num() == iConfigNumber * (_HC_Lx - 1) * (_HC_Ly - 1));
+            assert(pPL->m_lstLoop.Num() == static_cast<INT>(iConfigNumber));
+            assert(pPL->m_lstLoopDensity.Num() == static_cast<INT>(iConfigNumber * (_HC_Lx - 1) * (_HC_Ly - 1)));
             for (UINT iconf = 0; iconf < iConfigNumber; ++iconf)
             {
                 polykov.AddItem(_cuCabsf(pPL->m_lstLoop[iconf]));
@@ -144,8 +144,8 @@ INT TestThermal(CParameters& params)
             }
 
             //===================== Chiral condensate =====================
-            assert(pCC->m_lstCondensate.Num() == iConfigNumber);
-            assert(pCaC->m_lstAllRes.Num() == iConfigNumber * (_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests);
+            assert(pCC->m_lstCondensate.Num() == static_cast<INT>(iConfigNumber));
+            assert(pCaC->m_lstAllRes.Num() == static_cast<INT>(iConfigNumber * (_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests));
             for (UINT iconf = 0; iconf < iConfigNumber; ++iconf)
             {
                 chiral.AddItem(_cuCabsf(pCC->m_lstCondensate[iconf]));
@@ -166,7 +166,7 @@ INT TestThermal(CParameters& params)
 
         appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), uiNt);
 
-        assert(polykov.Num() == iConfigNumber * iAfterEquib);
+        assert(polykov.Num() == static_cast<INT>(iConfigNumber * iAfterEquib));
 
         appGeneral(_T("Polyakov={\n"));
         for (UINT i = 0; i < iAfterEquib; ++i)
@@ -232,5 +232,7 @@ INT TestThermal(CParameters& params)
 
         appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
         appQuitCLG();
+
+        return 0;
     }
 }
