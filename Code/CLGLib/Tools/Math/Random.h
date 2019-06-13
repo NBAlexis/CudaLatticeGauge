@@ -193,10 +193,6 @@ public:
     __device__ __inline__ CLGComplex _deviceRandomZ4(UINT fatIndex)
     {
         BYTE byRandom = static_cast<BYTE>(F(4.0) * _deviceRandomF(fatIndex));
-        if (byRandom >= 4)
-        {
-            byRandom = 4;
-        }
 
         if (0 == byRandom)
         {
@@ -291,6 +287,8 @@ __DefineRandomFuncion(Real, GaussF)
 __DefineRandomFuncion(Real, GaussFSqrt2)
 
 __DefineRandomFuncion(CLGComplex, GaussC)
+
+__DefineRandomFuncion(CLGComplex, Z4)
 
 extern CLGAPI Real GetRandomReal();
 

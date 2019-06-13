@@ -77,6 +77,12 @@ public:
     */
     virtual UINT GetPlaqutteCount() const = 0;
 
+    /**
+    * Because of Dirchlet boundary condition, 
+    * when calculate average, we need the real volume
+    */
+    virtual void CalculateSiteCount(class CIndexData* pData) const;
+
     UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
 
     class CBoundaryCondition * m_pBoundaryCondition;

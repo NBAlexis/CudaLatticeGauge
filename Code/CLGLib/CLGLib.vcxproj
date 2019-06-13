@@ -59,6 +59,7 @@
     <ClInclude Include="Measurement\CMeasure.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
+    <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
     <ClInclude Include="Measurement\CMeasurementManager.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Measurement\CMeasureChiralCondensate.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />

@@ -56,6 +56,14 @@ public:
 
     BYTE GetFieldId() const { return m_byFieldId; }
 
+    static void LogGeneralComplex(const CLGComplex& cmp)
+    {
+        appGeneral(_T("%2.12f %s %2.12f I,   "),
+            cmp.x,
+            cmp.y < F(0.0) ? _T("-") : _T("+"),
+            appAbs(cmp.y));
+    }
+
 protected:
 
     class CMeasurementManager* m_pOwner;

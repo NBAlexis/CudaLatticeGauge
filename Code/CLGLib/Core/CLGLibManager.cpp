@@ -610,6 +610,7 @@ void CCLGLibManager::InitialIndexBuffer()
             }
         }
     }
+    m_pLatticeData->m_pIndex->CalculateSiteCount(m_pLatticeData->m_pIndexCache);
 
     m_pCudaHelper->SetDeviceIndex(m_pLatticeData->m_pIndexCache);
 }

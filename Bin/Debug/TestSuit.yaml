@@ -453,19 +453,20 @@ TestSolverGMRES:
     Gauge:
 	
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 		
+        Period : [0, 0, 1, 1]
 
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionWilsonSquareSU3
+        FieldName : CFieldFermionWilsonSquareSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
+        FieldInitialType : EFIT_RandomZ4
 
         Hopping : 0.1
 
@@ -473,7 +474,12 @@ TestSolverGMRES:
 
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [0, 0, 1, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
 
     Solver:
 
@@ -1860,7 +1866,7 @@ TestRotation:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [6, 6, 6, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -1868,7 +1874,7 @@ TestRotation:
     RandomSeed : 1234567
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 6
+    MeasureListLength : 7
     ExpectedRes : 0.69
     CacheStaple : 0
     BeforeEquvibStep : 5
@@ -1882,10 +1888,10 @@ TestRotation:
         Metropolis : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 45
-        Omelyan2Lambda : 0.38636665500756728
+        IntegratorStep : 5
+        NestedStep : 6
 
     Gauge:
 	
@@ -1936,7 +1942,7 @@ TestRotation:
         KDim : 5
         RecalculateR : 5
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.001
+        Accuracy : 0.00001
 
         ##SolverName : CSLASolverGMRES
         ##SolverForFieldId : 2
@@ -1982,6 +1988,12 @@ TestRotation:
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
         ShowResult : 1
+
+    Measure7:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 5
 
     GaugeSmearing:
 

@@ -67,6 +67,48 @@ _kernelDebugPlaqutteTable()
     }
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateLinkCount(
+    INT* res,
+    const BYTE* __restrict__ pBoundInfo,
+    const UINT* __restrict__ pSmallData
+)
+{
+    intokernalInt4;
+    UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
+
+    INT uiCount = 0;
+    for (BYTE byDir = 0; byDir < _DC_Dir; ++byDir)
+    {
+        if (0 == (pBoundInfo[uiBigIdx * _DC_Dir + byDir] & _kDirichlet))
+        {
+            ++uiCount;
+        }
+    }
+    atomicAdd(res, uiCount);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateSiteCount(
+    INT* res,
+    const SIndex* __restrict__ pMappingTable,
+    const UINT* __restrict__ pSmallData
+)
+{
+    intokernalInt4;
+    UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
+
+    if (!pMappingTable[uiBigIdx].IsDirichlet())
+    {
+        atomicAdd(&res[0], 1);
+        if (0 == sSite4.w)
+        {
+            atomicAdd(&res[1], 1);
+        }
+    }
+}
+
 #pragma endregion
 
 
@@ -111,6 +153,47 @@ void CIndexData::DebugPlaqutteTable()
 {
     preparethread;
     _kernelDebugPlaqutteTable << <block, threads >> > ();
+}
+
+void CIndex::CalculateSiteCount(class CIndexData* pData) const
+{
+    INT hostres[2] = { 0, 0 };
+    INT* deviceRes = NULL;
+    checkCudaErrors(cudaMalloc((void**)&deviceRes, sizeof(INT) * 2));
+
+    preparethread;
+
+    for (BYTE i = 1; i < kMaxFieldCount; ++i)
+    {
+        if (NULL != pData->m_pIndexPositionToSIndex[i])
+        {
+            hostres[0] = 0;
+            hostres[1] = 0;
+            checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
+
+            _kernelCalculateSiteCount << <block, threads >> > (deviceRes, pData->m_pIndexPositionToSIndex[i], pData->m_pSmallData);
+            checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
+            pData->m_uiSiteNumber[i] = static_cast<UINT>(hostres[0]);
+
+            if (1 == i)
+            {
+                pData->m_uiSiteXYZT = static_cast<UINT>(hostres[0]);
+                pData->m_uiSiteXYZ = static_cast<UINT>(hostres[1]);
+                appGeneral(_T("============== Real Volume = %d ============\n"), pData->m_uiSiteXYZT);
+                appGeneral(_T("============== Real Spatial Volume = %d ============\n"), pData->m_uiSiteXYZ);
+            }
+        }
+    }
+
+    hostres[0] = 0;
+    hostres[1] = 0;
+    
+    checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
+    _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable, pData->m_pSmallData);
+    checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
+    pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
+    checkCudaErrors(cudaFree(deviceRes));
+    appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
 }
 
 __END_NAMESPACE

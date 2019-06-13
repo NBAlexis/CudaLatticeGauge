@@ -8,18 +8,19 @@ VerboseLevel : GENERAL
 VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 0
-BeforeEquvibStep : 3
+BeforeEquvibStep : 50
 EquvibStep : 10
 LoopStart : 0
 LoopEnd : 6
-OmegaSep : 20
-MaxOmega : 0.1
-MaxNt : 3
+OmegaSep : 300
+MaxOmega : 0.3
+MinNt : 2
+MaxNt : 6
 ConfigNumberEachOmega : 3
 
 Dim : 4
 Dir : 4
-LatticeLength : [6, 6, 6, 6]
+LatticeLength : [12, 12, 12, 12]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 ThreadAutoDecompose : 1
@@ -36,8 +37,8 @@ Updator:
     Metropolis : 1
     ReportMeasure : 0
     Adaptive : 1
-    MinMaxStep : [3, 50]
-    GrowReduceThreshold : [-0.3, 0.05]
+    MinMaxStep : [2, 50]
+    GrowReduceThreshold : [-0.4, 0.02]
 
     ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
     IntegratorType : CIntegratorNestedForceGradient
@@ -85,17 +86,18 @@ Action2:
 
 Solver:
     SolverForFieldId : 2
-    ##SolverName : CSLASolverGMRES
-    ##MaxDim : 40
-    ##Accuracy : 0.00000001
+    SolverName : CSLASolverGMRES
+    MaxDim : 40
+    Accuracy : 0.000000001
 
 
-    SolverName : CSLASolverGCRODR
-    MDim : 26
-    KDim : 5
-    RecalculateR : 2
-    DeflateSpace : EEDT_SVD
-    Accuracy : 0.00001
+    ##SolverName : CSLASolverGCRODR
+    ##MDim : 27
+    ##KDim : 4
+    ##RecalculateR : 10
+    ##DeflateSpace : EEDT_SVD
+    ##Accuracy : 0.00001
+
     Restart : 200
     AbsoluteAccuracy : 1
 
@@ -131,6 +133,12 @@ Measure5:
     MeasureName : CMeasurePolyakovXY
     FieldId : 2
     ShowResult : 1
+
+Measure6:
+
+    MeasureName : CMeasureChiralCondensate
+    FieldId : 2
+    FieldCount : 10
 
 GaugeSmearing:
 

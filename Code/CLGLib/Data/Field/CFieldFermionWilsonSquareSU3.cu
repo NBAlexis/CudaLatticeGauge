@@ -431,6 +431,11 @@ _kernelInitialFermionWilsonSquareSU3(
         pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
     }
     break;
+    case EFIT_RandomZ4:
+    {
+        pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeRandomZ4(_deviceGetFatIndex(uiSiteIndex, 0));
+    }
+    break;
     default:
     {
         printf("Wilson Fermion Field cannot be initialized with this type!");

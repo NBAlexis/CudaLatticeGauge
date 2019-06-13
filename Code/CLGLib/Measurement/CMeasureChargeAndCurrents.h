@@ -57,6 +57,8 @@ protected:
     UBOOL m_bShowResult;
     //_deviceMeasureFunc * m_pMeasureFunctions;
 
+public:
+
     TArray<CLGComplex> m_lstAllRes;
 };
 

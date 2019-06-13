@@ -68,6 +68,15 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ static deviceSU3Vector makeRandomZ4(UINT fatIndex)
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _deviceRandomZ4(fatIndex);
+            ret.m_ve[1] = _deviceRandomZ4(fatIndex);
+            ret.m_ve[2] = _deviceRandomZ4(fatIndex);
+            return ret;
+        }
+
         __device__ __inline__ static deviceSU3Vector makeZeroSU3Vector()
         {
             deviceSU3Vector ret;
@@ -297,6 +306,16 @@ extern "C" {
             ret.m_d[1] = deviceSU3Vector::makeRandomGaussian(fatIndex);
             ret.m_d[2] = deviceSU3Vector::makeRandomGaussian(fatIndex);
             ret.m_d[3] = deviceSU3Vector::makeRandomGaussian(fatIndex);
+            return ret;
+        }
+
+        __device__ __inline__ static deviceWilsonVectorSU3 makeRandomZ4(UINT fatIndex)
+        {
+            deviceWilsonVectorSU3 ret;
+            ret.m_d[0] = deviceSU3Vector::makeRandomZ4(fatIndex);
+            ret.m_d[1] = deviceSU3Vector::makeRandomZ4(fatIndex);
+            ret.m_d[2] = deviceSU3Vector::makeRandomZ4(fatIndex);
+            ret.m_d[3] = deviceSU3Vector::makeRandomZ4(fatIndex);
             return ret;
         }
 

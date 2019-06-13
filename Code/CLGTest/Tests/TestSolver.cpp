@@ -17,7 +17,6 @@ UINT TestSolver(CParameters& params)
 
     CField* pField = appGetLattice()->GetFieldById(2);
     CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
-
     CFieldFermionWilsonSquareSU3* pResult1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
     Real fLengthOfPhi = pResult1->Dot(pResult1).x;
     pResult1->D(appGetLattice()->m_pGaugeField);

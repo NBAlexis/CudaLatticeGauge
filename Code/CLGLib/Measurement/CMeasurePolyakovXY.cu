@@ -25,9 +25,19 @@ _kernelPolyakovLoopOfSite(
 {
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     UINT uiLinkIdx = (uiXYZ * _DC_Lt + uiT + 1) * _DC_Dir - 1;//(uiXYZ * _DC_Lt + uiT) * _DC_Dir + (_DC_Dir - 1);
+
     if (0 == uiT)
     {
-        res[uiXYZ] = pDeviceBuffer[uiLinkIdx];
+        SSmallInt4 site4 = __deviceSiteIndexToInt4(uiXYZ * _DC_Lt + uiT);
+        UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        {
+            res[uiXYZ] = deviceSU3::makeSU3Zero();
+        }
+        else
+        {
+            res[uiXYZ] = pDeviceBuffer[uiLinkIdx];
+        }
     }
     else
     {
@@ -155,8 +165,10 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     {
         appDetailed(_T("\n\n ==================== Polyakov Loop (%d con)============================ \n\n"), m_uiConfigurationCount);
     }
-    res[0].x = res[0].x / _HC_Volume_xyz;
-    res[0].y = res[0].y / _HC_Volume_xyz;
+    
+    UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
+    res[0].x = res[0].x / uiSiteNumber;
+    res[0].y = res[0].y / uiSiteNumber;
     m_lstLoop.AddItem(res[0]);
     if (m_bShowResult)
     {

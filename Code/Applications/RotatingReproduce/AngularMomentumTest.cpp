@@ -79,7 +79,7 @@ INT TestAngularMomentum(CParameters& params)
 
                 //=================================
                 //Save config
-                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con_"));
+                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
 
 
                 uiLastAccept = uiAcce;

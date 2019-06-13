@@ -91,6 +91,26 @@ public:
     virtual UINT GetPlaqutteCount() const;
 };
 
+#pragma region device Functions
+
+static __device__ __inline__ SSmallInt4 _deviceCoordMoving(const SSmallInt4& sFrom, BYTE i)
+{
+    SBYTE offset = i < _DC_Dir ? -1 : 1;
+    SSmallInt4 ret = sFrom;
+    ret.m_byData4[i < _DC_Dir ? (4 - _DC_Dir + i) : (4 - _DC_Dir * 2 + i)] += offset;
+    return ret;
+}
+
+static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, const UINT* __restrict__ pSmallData);
+
+static __device__ __inline__ UBOOL _deviceIsBondDirichlet(const BYTE* __restrict__ pTable,
+    UINT uiBigIdx, BYTE byDir)
+{
+    return (pTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
+}
+
+#pragma endregion
+
 __END_NAMESPACE
 
 #endif //#ifndef _CINDEXSQUARE_H_

@@ -305,6 +305,9 @@
     <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasureChiralCondensate.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -376,6 +379,9 @@
     </ClCompile>
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
       <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="Measurement\CMeasureChiralCondensate.cpp">
+      <Filter>Measurement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

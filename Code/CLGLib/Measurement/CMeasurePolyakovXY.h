@@ -46,14 +46,6 @@ public:
     virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
     virtual UBOOL IsSourceScanning() const { return FALSE; }
 
-    static void LogGeneralComplex(const CLGComplex& cmp)
-    {
-        appGeneral(_T("%2.12f %s %2.12f I,   "), 
-            cmp.x,
-            cmp.y < F(0.0) ? _T("-") : _T("+"),
-            appAbs(cmp.y));
-    }
-
 protected:
 
     CLGComplex* m_pXYHostLoopDensity;
@@ -63,6 +55,9 @@ protected:
 
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
+
+public:
+
     TArray<CLGComplex> m_lstLoop;
     TArray<CLGComplex> m_lstLoopDensity;
 };

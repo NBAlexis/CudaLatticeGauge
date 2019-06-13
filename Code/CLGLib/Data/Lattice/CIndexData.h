@@ -42,6 +42,9 @@ public:
         , m_pBondInfoTable(NULL)
         , m_pPlaqutteCache(NULL)
         , m_pStappleCache(NULL)
+        , m_uiSiteXYZT(1)
+        , m_uiSiteXYZ(1)
+        , m_uiLinkNumber(1)
     {
         checkCudaErrors(cudaMalloc((void**)&m_pSmallData, sizeof(UINT) * kCacheIndexSmallDataCount));
         checkCudaErrors(cudaMalloc((void**)&m_pWalkingTable, sizeof(UINT)
@@ -64,6 +67,8 @@ public:
         memset(m_pIndexPositionToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pGaugeMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pFermionMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
+
+        memset(m_uiSiteNumber, 0, sizeof(UINT) * kMaxFieldCount);
 
     }
 
@@ -261,7 +266,26 @@ public:
     BYTE m_uiPlaqutteLength;
     BYTE m_uiPlaqutteCountPerSite;
     BYTE m_uiPlaqutteCountPerLink;
+
+    //Real size
+    UINT m_uiSiteNumber[kMaxFieldCount];
+    UINT m_uiSiteXYZT;
+    UINT m_uiSiteXYZ;
+    UINT m_uiLinkNumber;
+
 };
+
+#pragma region device functions
+
+static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, const UINT* __restrict__ pSmallData)
+{
+    return (sSite.x + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultX]
+        + (sSite.y + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultY]
+        + (sSite.z + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultZ]
+        + (sSite.w + CIndexData::kCacheIndexEdge);
+}
+
+#pragma endregion
 
 __END_NAMESPACE
 
