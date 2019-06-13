@@ -117,7 +117,7 @@ INT TestThermal(CParameters& params)
 
                     //=================================
                     //Save config
-                    appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con_"));
+                    appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
 
                     iConfigNumberNow = uiAcce;
                 }
