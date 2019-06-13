@@ -90,4 +90,5 @@ INT TestAngularMomentum(CParameters& params)
 
     appGeneral(_T("\n========= all finished! ==========\n"));
     appQuitCLG();
+    return 0;
 }
