@@ -233,6 +233,7 @@ INT TestThermal(CParameters& params)
         appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
         appQuitCLG();
 
-        return 0;
     }
+
+    return 0;
 }
