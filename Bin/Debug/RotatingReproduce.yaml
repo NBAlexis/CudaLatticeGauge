@@ -12,7 +12,7 @@ JobAugular:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 50
+    BeforeEquvibStep : 80
     EquvibStep : 10
     LoopStart : 0
     LoopEnd : 6
@@ -268,4 +268,4 @@ JobThermal:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 400
+        FieldCount : 25
