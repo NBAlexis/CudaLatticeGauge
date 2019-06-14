@@ -157,10 +157,10 @@ public:
                 if (level <= GENERAL)
                 {
                     appGetTimeNow(timeBuffer, 256);
-                    *m_pStdStream << _T("[") << timeBuffer << _T("]");
+                    *m_pStdStream << _T("[") << timeBuffer << "|" << m_sTraceHeader.c_str() << _T("]");
                     if (NULL != m_pStream)
                     {
-                        *m_pStream << _T("[") << timeBuffer << _T("]");
+                        *m_pStream << _T("[") << timeBuffer << "|" << m_sTraceHeader.c_str() << _T("]");
                     }
                 }
             }
@@ -186,6 +186,7 @@ public:
     }
 
     inline void SetLogDate(UBOOL bLog) { m_bLogDate = bLog; }
+    inline void SetLogHeader(const CCString& sHeader) { m_sTraceHeader = sHeader; }
 
 private:
 
@@ -194,6 +195,7 @@ private:
     OSTREAM * m_pStdStream;
     TCHAR m_cBuff[_kTraceBuffSize];
     UBOOL m_bLogDate;
+    CCString m_sTraceHeader;
 };
 
 extern CLGAPI void appInitialTracer(EVerboseLevel eLevel, const CCString& filename = _T("stdout"));
@@ -225,6 +227,11 @@ inline void appFlushLog()
 inline void appSetLogDate(UBOOL bLog)
 {
     GTracer.SetLogDate(bLog);
+}
+
+inline void appSetLogHeader(const CCString& sHeader)
+{
+    GTracer.SetLogHeader(sHeader);
 }
 
 __END_NAMESPACE

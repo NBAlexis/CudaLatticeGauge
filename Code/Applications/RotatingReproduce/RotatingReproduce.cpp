@@ -22,14 +22,21 @@ int main(int argc, char * argv[])
 
     params.FetchStringValue(_T("RotatingJob"), sJob);
     ERotatingJob eJob = __STRING_TO_ENUM(ERotatingJob, sJob);
+
     INT res = 0;
     switch (eJob)
     {
     case ERJ_AngularMomentum:
-        res = TestAngularMomentum(params);
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobAugular"));
+        res = TestAngularMomentum(workingParam1);
+    }
         break;
     case ERJ_Thermal:
-        res = TestThermal(params);
+    {
+        CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
+        res = TestThermal(workingParam2);
+    }
         break;
     }
 

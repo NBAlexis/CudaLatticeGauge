@@ -11,33 +11,28 @@
 
 INT TestThermal(CParameters& params)
 {
-    INT iVaule = 50;
+    INT iVaule = 49;
     params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     UINT iBeforeEquib = static_cast<UINT>(iVaule);
-    iVaule = 200;
+    iVaule = 250;
     params.FetchValueINT(_T("OmegaSep"), iVaule);
     UINT iAfterEquib = static_cast<UINT>(iVaule);
-
     iVaule = 2;
     params.FetchValueINT(_T("MinNt"), iVaule);
     UINT iMinNt = static_cast<UINT>(iVaule);
-
-    iVaule = 8;
+    iVaule = 6;
     params.FetchValueINT(_T("MaxNt"), iVaule);
     UINT iMaxNt = static_cast<UINT>(iVaule);
-
-    iVaule = 5;
-    params.FetchValueINT(_T("ConfigNumberEachOmega"), iVaule);
-    UINT iConfigNumber = static_cast<UINT>(iVaule);
-    
+   
     Real fMaxOmega = F(0.1);
     params.FetchValueReal(_T("MaxOmega"), fMaxOmega);
 
-    iVaule = 5;
-    params.FetchValueINT(_T("MeasureListLength"), iVaule);
-    params.SetStringVaule(_T("MeasureListLength"), appIntToString(iVaule + 1));
-
     appSetupLog(params);
+
+    CCString sFileName;
+    TCHAR buff1[256];
+    TCHAR buff2[256];
+    CCString sInfo;
 
     for (UINT uiNt = iMinNt; uiNt <= iMaxNt; ++uiNt)
     {
@@ -69,7 +64,11 @@ INT TestThermal(CParameters& params)
         }
 
         CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
+        CCString sHeader;
+        sHeader.Format(_T("Nt%d"), uiNt);
+        appSetLogHeader(sHeader);
         appGeneral(_T("Run for Nt = %d, start baking.\n"), uiNt);
+        
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
 
         //UINT uiLastAccept = 0;
@@ -82,7 +81,11 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pUpdator->Update(1, FALSE);
         }
 
-        UINT uiOmega = 1;
+        //=================================
+        //Save config
+        appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+
+        UINT uiOmega = 0;
         Real fSep = fMaxOmega / iAfterEquib;
         while (uiOmega <= iAfterEquib)
         {
@@ -92,22 +95,18 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pMeasurements->Reset();
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
 
-            while (iConfigNumberNow < iConfigNumber)
+            while (iConfigNumberNow < 1)
             {
                 appGetLattice()->m_pUpdator->Update(1, TRUE);
                 UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
                 if (uiAcce != iConfigNumberNow)
                 {
-                    CCString sFileName;
-                    sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce);
+                    sFileName.Format(_T("Rotate_Nt%d_%d"), uiNt, uiOmega);
 
                     //=================================
                     //Save info
-                    TCHAR buff1[256];
-                    TCHAR buff2[256];
                     appGetTimeNow(buff1, 256);
                     appGetTimeUtc(buff2, 256);
-                    CCString sInfo;
                     sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
                         appGetTimeStamp(),
                         buff1,
@@ -124,38 +123,34 @@ INT TestThermal(CParameters& params)
             }
             appGetLattice()->m_pMeasurements->Report();
 
-            CMeasureChargeAndCurrents* pCaC = dynamic_cast<CMeasureChargeAndCurrents*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-            CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-            CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+            CMeasureChargeAndCurrents* pCaC = dynamic_cast<CMeasureChargeAndCurrents*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+            CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+            CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
             //===================== Polyakov loop =====================
-            assert(pPL->m_lstLoop.Num() == static_cast<INT>(iConfigNumber));
-            assert(pPL->m_lstLoopDensity.Num() == static_cast<INT>(iConfigNumber * (_HC_Lx - 1) * (_HC_Ly - 1)));
-            for (UINT iconf = 0; iconf < iConfigNumber; ++iconf)
+            assert(pPL->m_lstLoop.Num() == 1);
+            assert(pPL->m_lstLoopDensity.Num() == static_cast<INT>((_HC_Lx - 1) * (_HC_Ly - 1)));
+
+            //============= polyakov gather =============
+            polykov.AddItem(_cuCabsf(pPL->m_lstLoop[0]));
+            for (UINT iX = 0; iX < _HC_Lx - 1; ++iX)
             {
-                polykov.AddItem(_cuCabsf(pPL->m_lstLoop[iconf]));
-                for (UINT iX = 0; iX < _HC_Lx - 1; ++iX)
-                {
-                    polykovX_nx[iX].AddItem(pPL->m_lstLoopDensity[
-                        iconf * (_HC_Lx - 1) * (_HC_Ly - 1)
-                            + CCommonData::m_sCenter.y * (_HC_Lx - 1)
-                            + iX
-                    ]);
-                }
+                polykovX_nx[iX].AddItem(pPL->m_lstLoopDensity[
+                    //iconf * (_HC_Lx - 1) * (_HC_Ly - 1) +
+                        CCommonData::m_sCenter.y * (_HC_Lx - 1)
+                        + iX
+                ]);
             }
 
             //===================== Chiral condensate =====================
-            assert(pCC->m_lstCondensate.Num() == static_cast<INT>(iConfigNumber));
-            assert(pCaC->m_lstAllRes.Num() == static_cast<INT>(iConfigNumber * (_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests));
-            for (UINT iconf = 0; iconf < iConfigNumber; ++iconf)
+            assert(pCC->m_lstCondensate.Num() == 1);
+            assert(pCaC->m_lstAllRes.Num() == static_cast<INT>((_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests));
+            chiral.AddItem(_cuCabsf(pCC->m_lstCondensate[0]));
+            for (UINT iX = 0; iX < _HC_Lx - 1; ++iX)
             {
-                chiral.AddItem(_cuCabsf(pCC->m_lstCondensate[iconf]));
-                for (UINT iX = 0; iX < _HC_Lx - 1; ++iX)
-                {
-                    chiral_nx[iX].AddItem(pCaC->m_lstAllRes[
-                        iconf * (_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests
-                            + iX
-                    ]);
-                }
+                chiral_nx[iX].AddItem(pCaC->m_lstAllRes[
+                    //iconf * (_HC_Lx - 1) * CMeasureChargeAndCurrents::_kGammaInInterests
+                        + iX
+                ]);
             }
 
             ++uiOmega;
@@ -165,29 +160,21 @@ INT TestThermal(CParameters& params)
         }
 
         appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), uiNt);
-
-        assert(polykov.Num() == static_cast<INT>(iConfigNumber * iAfterEquib));
+        appSetLogDate(FALSE);
+        assert(polykov.Num() == static_cast<INT>(iAfterEquib + 1));
 
         appGeneral(_T("Polyakov={\n"));
-        for (UINT i = 0; i < iAfterEquib; ++i)
+        for (UINT i = 0; i <= iAfterEquib; ++i)
         {
-            appGeneral(_T("{"));
-            for (UINT j = 0; j < iConfigNumber; ++j)
-            {
-                appGeneral(j == (iConfigNumber - 1) ? _T("%2.10f ") : _T("%2.10f, "), polykov[i * iAfterEquib + j]);
-            }
-            appGeneral(i == (iAfterEquib - 1) ? _T("}\n") : _T("},\n"));
+            appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
+                polykov[i]);
         }
         appGeneral(_T("}\n\nChiralCondensate={\n"));
 
-        for (UINT i = 0; i < iAfterEquib; ++i)
+        for (UINT i = 0; i <= iAfterEquib; ++i)
         {
-            appGeneral(_T("{"));
-            for (UINT j = 0; j < iConfigNumber; ++j)
-            {
-                appGeneral(j == (iConfigNumber - 1) ? _T("%2.10f ") : _T("%2.10f, "), chiral[i * iAfterEquib + j]);
-            }
-            appGeneral(i == (iAfterEquib - 1) ? _T("}\n") : _T("},\n"));
+            appGeneral(i == iAfterEquib ? _T("%2.10f\n") : _T("%2.10f,\n"),
+                chiral[i]);
         }
 
         appGeneral(_T("}\n\n"));
@@ -195,18 +182,13 @@ INT TestThermal(CParameters& params)
         for (UINT x = 0; x < _HC_Lx - 1; ++x)
         {
             appGeneral(_T("Polyakov[x=%d]={\n"), x);
-            for (UINT i = 0; i < iAfterEquib; ++i)
+            for (UINT i = 0; i <= iAfterEquib; ++i)
             {
-                appGeneral(_T("{"));
-                for (UINT j = 0; j < iConfigNumber; ++j)
-                {
-                    appGeneral(j == (iConfigNumber - 1) ? _T("%2.10f %s %2.10f I") : _T("%2.10f %s %2.10f I, "), 
-                        polykovX_nx[x][i * iAfterEquib + j].x,
-                        polykovX_nx[x][i * iAfterEquib + j].y < F(0.0) ? _T("-") : _T("+"),
-                        appAbs(polykovX_nx[x][i * iAfterEquib + j].y)
-                    );
-                }
-                appGeneral(i == (iAfterEquib - 1) ? _T("}\n") : _T("},\n"));
+                appGeneral(i == iAfterEquib ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
+                    polykovX_nx[x][i].x,
+                    polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
+                    appAbs(polykovX_nx[x][i].y)
+                );
             }
             appGeneral(_T("}\n\n"));
         }
@@ -214,21 +196,17 @@ INT TestThermal(CParameters& params)
         for (UINT x = 0; x < _HC_Lx - 1; ++x)
         {
             appGeneral(_T("ChiralCondensate[x=%d]={\n"), x);
-            for (UINT i = 0; i < iAfterEquib; ++i)
+            for (UINT i = 0; i <= iAfterEquib; ++i)
             {
-                appGeneral(_T("{"));
-                for (UINT j = 0; j < iConfigNumber; ++j)
-                {
-                    appGeneral(j == (iConfigNumber - 1) ? _T("%2.10f %s %2.10f I") : _T("%2.10f %s %2.10f I, "),
-                        chiral_nx[x][i * iAfterEquib + j].x,
-                        chiral_nx[x][i * iAfterEquib + j].y < F(0.0) ? _T("-") : _T("+"),
-                        appAbs(chiral_nx[x][i * iAfterEquib + j].y)
-                    );
-                }
-                appGeneral(i == (iAfterEquib - 1) ? _T("}\n") : _T("},\n"));
+                appGeneral(i == iAfterEquib ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
+                    chiral_nx[x][i].x,
+                    chiral_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
+                    appAbs(chiral_nx[x][i].y)
+                );
             }
             appGeneral(_T("}\n\n"));
         }
+        appSetLogDate(TRUE);
 
         appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
         appQuitCLG();
