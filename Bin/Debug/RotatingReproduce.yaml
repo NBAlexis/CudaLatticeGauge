@@ -229,7 +229,7 @@ JobThermal:
    
         ActionName : CActionGaugePlaquetteRotating
         Beta : 5.32144
-        Omega : 0.06
+        Omega : 0.0
 
     Action2:
         ActionName : CActionFermionWilsonNf2
