@@ -12,8 +12,8 @@ BeforeEquvibStep : 50
 EquvibStep : 10
 LoopStart : 0
 LoopEnd : 6
-OmegaSep : 300
-MaxOmega : 0.3
+OmegaSep : 150
+MaxOmega : 0.15
 MinNt : 2
 MaxNt : 6
 ConfigNumberEachOmega : 3
@@ -45,7 +45,7 @@ Updator:
     ## IntegratorType : CIntegratorNestedOmelyan
     IntegratorStepLength : 1
     IntegratorStep : 5
-    NestedStep : 6
+    NestedStep : 5
     Omelyan2Lambda : 0.38636665500756728
 
 Gauge:
