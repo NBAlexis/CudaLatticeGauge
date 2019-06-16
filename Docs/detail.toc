@@ -60,4 +60,5 @@
 \contentsline {subsubsection}{\numberline {7.1.8}The Current density and Charge density}{70}{subsubsection.7.1.8}
 \contentsline {subsubsection}{\numberline {7.1.9}The Topological Density}{71}{subsubsection.7.1.9}
 \contentsline {subsubsection}{\numberline {7.1.10}The Polyakov loop}{71}{subsubsection.7.1.10}
-\contentsline {subsection}{\numberline {7.2}Sample Producer}{72}{subsection.7.2}
+\contentsline {subsubsection}{\numberline {7.1.11}The Chiral Condensate}{72}{subsubsection.7.1.11}
+\contentsline {subsection}{\numberline {7.2}Sample Producer}{73}{subsection.7.2}

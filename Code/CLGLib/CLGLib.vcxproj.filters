@@ -380,7 +380,7 @@
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
-    <ClCompile Include="Measurement\CMeasureChiralCondensate.cpp">
+    <ClCompile Include="Measurement\CMeasureChiralCondensate.cu">
       <Filter>Measurement</Filter>
     </ClCompile>
   </ItemGroup>

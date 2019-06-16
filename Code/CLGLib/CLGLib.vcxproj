@@ -107,7 +107,9 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Measurement\CMeasureChiralCondensate.cpp" />
+    <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />

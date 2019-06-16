@@ -162,11 +162,11 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 50
-    OmegaSep : 250
+    BeforeEquvibStep : 130
+    OmegaSep : 320
     MaxOmega : 0.1
     MinNt : 2
-    MaxNt : 6
+    MaxNt : 4
 
     Dim : 4
     Dir : 4
@@ -236,36 +236,30 @@ JobThermal:
         FieldId : 2
 
     Solver:
-        SolverForFieldId : 2
-        SolverName : CSLASolverGMRES
-        MaxDim : 40
-        Accuracy : 0.000000001
+        ##SolverForFieldId : 2
+        ##SolverName : CSLASolverGMRES
+        ##MaxDim : 40
+        ##Accuracy : 0.000000001
 
 
-        ##SolverName : CSLASolverGCRODR
-        ##MDim : 27
-        ##KDim : 4
-        ##RecalculateR : 10
-        ##DeflateSpace : EEDT_SVD
-        ##Accuracy : 0.00001
+        SolverName : CSLASolverGCRODR
+        MDim : 27
+        KDim : 4
+        RecalculateR : 10
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
 
         Restart : 200
         AbsoluteAccuracy : 1
 
     Measure1:
 
-        MeasureName : CMeasureChargeAndCurrents
+        MeasureName : CMeasurePolyakovXY
         FieldId : 2
         ShowResult : 1
 
     Measure2:
 
-        MeasureName : CMeasurePolyakovXY
-        FieldId : 2
-        ShowResult : 1
-
-    Measure3:
-
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 25
+        FieldCount : 100

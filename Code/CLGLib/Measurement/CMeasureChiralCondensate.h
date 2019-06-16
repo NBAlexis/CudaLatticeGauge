@@ -25,7 +25,10 @@ public:
         : CMeasure()
         , m_uiFieldCount(100)
         , m_uiConfigurationCount(0)
+        , m_pDeviceXYBuffer(NULL)
+        , m_pHostXYBuffer(NULL)
     {
+        
     }
 
     ~CMeasureChiralCondensate();
@@ -44,10 +47,13 @@ protected:
     
     UINT m_uiFieldCount;
     UINT m_uiConfigurationCount;
+    CLGComplex* m_pDeviceXYBuffer;
+    CLGComplex* m_pHostXYBuffer;
 
 public:
 
     TArray<CLGComplex> m_lstCondensate;
+    TArray<CLGComplex> m_lstCondensateDensity;
 };
 
 __END_NAMESPACE

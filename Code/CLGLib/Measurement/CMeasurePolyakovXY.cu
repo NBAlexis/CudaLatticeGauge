@@ -26,10 +26,11 @@ _kernelPolyakovLoopOfSite(
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     UINT uiLinkIdx = (uiXYZ * _DC_Lt + uiT + 1) * _DC_Dir - 1;//(uiXYZ * _DC_Lt + uiT) * _DC_Dir + (_DC_Dir - 1);
 
+    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiXYZ * _DC_Lt + uiT);
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
     if (0 == uiT)
     {
-        SSmallInt4 site4 = __deviceSiteIndexToInt4(uiXYZ * _DC_Lt + uiT);
-        UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
         if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
         {
             res[uiXYZ] = deviceSU3::makeSU3Zero();
@@ -41,7 +42,14 @@ _kernelPolyakovLoopOfSite(
     }
     else
     {
-        res[uiXYZ].Mul(pDeviceBuffer[uiLinkIdx]);
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        {
+            res[uiXYZ] = deviceSU3::makeSU3Zero();
+        }
+        else
+        {
+            res[uiXYZ].Mul(pDeviceBuffer[uiLinkIdx]);
+        }
     }
 }
 
@@ -67,7 +75,7 @@ _kernelPolyakovZeroXYPlane(
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
     resXY[uiXY] = _make_cuComplex(F(0.0), F(0.0));
 
-    if (0 == threadIdx.x && 0 == blockIdx.x)
+    if (0 == threadIdx.x && 0 == blockIdx.x && NULL != total)
     {
         total[0] = _make_cuComplex(F(0.0), F(0.0));
     }
@@ -86,6 +94,12 @@ _kernelPolyakovAverageOverZAndSum(
 }
 
 #pragma endregion
+
+CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes)
+{
+    preparethread;
+    _kernelPolyakovZeroXYPlane << <block, threads >> > (pDeviceRes, NULL);
+}
 
 CMeasurePolyakovXY::~CMeasurePolyakovXY()
 {
@@ -174,19 +188,22 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     {
         appDetailed(_T("Loop is %f + %f i\n"), res[0].x, res[0].y);
     }
-    for (UINT i = 1; i < _HC_Ly; ++i)
+
+
+    for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
     {
-        for (UINT j = 1; j < _HC_Lx; ++j)
+        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[
+            i * _HC_Ly + CCommonData::m_sCenter.y]);
+        if (m_bShowResult)
         {
-            m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[j * _HC_Ly + i]);
-            if (m_bShowResult)
-            {
-                appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), j, i, 
-                    m_pXYHostLoopDensity[j * _HC_Ly + i].x,
-                    m_pXYHostLoopDensity[j * _HC_Ly + i].y < F(0.0) ? _T("-") : _T("+"),
-                    appAbs(m_pXYHostLoopDensity[j * _HC_Ly + i].y));
-            }
+            appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+                m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].x,
+                m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y < F(0.0) ? _T("") : _T("+"),
+                appAbs(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y));
         }
+    }
+    if (m_bShowResult)
+    {
         appDetailed(_T("\n"));
     }
 
@@ -204,7 +221,8 @@ void CMeasurePolyakovXY::Average(UINT )
 void CMeasurePolyakovXY::Report()
 {
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
-    assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) == static_cast<UINT>(m_lstLoopDensity.Num()));
+    assert(static_cast<UINT>(m_uiConfigurationCount * CCommonData::m_sCenter.x)
+        == static_cast<UINT>(m_lstLoopDensity.Num()));
 
     appSetLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
@@ -234,41 +252,13 @@ void CMeasurePolyakovXY::Report()
     for (UINT k = 0; k < m_uiConfigurationCount; ++k)
     {
         appGeneral(_T("{"));
-        for (UINT i = 0; i < _HC_Ly - 1; ++i)
+        for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
         {
-            appGeneral(_T("{"));
-            for (UINT j = 0; j < _HC_Lx - 1; ++j)
-            {
-                LogGeneralComplex(m_lstLoopDensity[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j]);
-                if (0 == k)
-                {
-                    tmp.AddItem(m_lstLoopDensity[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j]);
-                }
-                else
-                {
-                    tmp[i * (_HC_Lx - 1) + j].x += m_lstLoopDensity[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j].x;
-                    tmp[i * (_HC_Lx - 1) + j].y += m_lstLoopDensity[k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j].y;
-                }
-            }
-            appGeneral(_T("}, "));
+            LogGeneralComplex(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
         }
         appGeneral(_T("}\n"));
     }
     appGeneral(_T("}\n"));
-
-    appGeneral(_T("\n ----------- loop density average ------------- \n"));
-
-    for (UINT i = 0; i < _HC_Ly - 1; ++i)
-    {
-        for (UINT j = 0; j < _HC_Lx - 1; ++j)
-        {
-            tmp[i * (_HC_Lx - 1) + j].x = tmp[i * (_HC_Lx - 1) + j].x / m_uiConfigurationCount;
-            tmp[i * (_HC_Lx - 1) + j].y = tmp[i * (_HC_Lx - 1) + j].y / m_uiConfigurationCount;
-            appGeneral(_T("(x=%d,y=%d)="), j + 1, i + 1);
-            LogGeneralComplex(tmp[i * (_HC_Lx - 1) + j]);
-        }
-        appGeneral(_T("\n"));
-    }
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
