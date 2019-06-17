@@ -77,10 +77,13 @@ INT TestThermal(CParameters& params)
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+        appGetLattice()->m_pMeasurements->Reset();
+
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
-            appGetLattice()->m_pUpdator->Update(1, FALSE);
+            appGetLattice()->m_pUpdator->Update(1, TRUE);
         }
+        appGetLattice()->m_pMeasurements->Report();
 
         //=================================
         //Save config

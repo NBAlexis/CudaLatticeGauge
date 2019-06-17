@@ -254,6 +254,7 @@ void CMeasurePolyakovXY::Report()
         for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
         {
             LogGeneralComplex(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+            appGeneral(_T("\n"));
         }
         appGeneral(_T("}\n"));
     }

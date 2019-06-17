@@ -243,8 +243,8 @@ JobThermal:
 
 
         SolverName : CSLASolverGCRODR
-        MDim : 27
-        KDim : 4
+        MDim : 26
+        KDim : 5
         RecalculateR : 10
         DeflateSpace : EEDT_SVD
         Accuracy : 0.00001

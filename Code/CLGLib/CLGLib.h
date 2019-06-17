@@ -87,8 +87,8 @@ UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (t
 #define intokernalInt4 \
 SSmallInt4 sSite4; \
 UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
-sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx); \
-sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx); \
+sSite4.x = static_cast<SBYTE> (_ixy / _DC_Ly); \
+sSite4.y = static_cast<SBYTE> (_ixy % _DC_Ly); \
 sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); \
 sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z); \
 UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w; 
@@ -96,8 +96,8 @@ UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
 #define intokernalOnlyInt4 \
 SSmallInt4 sSite4; \
 UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x); \
-sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx); \
-sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx); \
+sSite4.x = static_cast<SBYTE> (_ixy / _DC_Ly); \
+sSite4.y = static_cast<SBYTE> (_ixy % _DC_Ly); \
 sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); \
 sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z); 
 
