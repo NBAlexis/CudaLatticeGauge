@@ -27,6 +27,7 @@ public:
         , m_uiConfigurationCount(0)
         , m_pDeviceXYBuffer(NULL)
         , m_pHostXYBuffer(NULL)
+        , m_bShowResult(FALSE)
     {
         
     }
@@ -49,6 +50,7 @@ protected:
     UINT m_uiConfigurationCount;
     CLGComplex* m_pDeviceXYBuffer;
     CLGComplex* m_pHostXYBuffer;
+    UBOOL m_bShowResult;
 
 public:
 

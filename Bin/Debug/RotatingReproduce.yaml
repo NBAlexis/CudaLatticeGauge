@@ -166,7 +166,7 @@ JobThermal:
     OmegaSep : 320
     MaxOmega : 0.1
     MinNt : 2
-    MaxNt : 4
+    MaxNt : 8
 
     Dim : 4
     Dir : 4
@@ -178,7 +178,7 @@ JobThermal:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 3
+    MeasureListLength : 2
     CacheStaple : 0
 
     Updator:
@@ -256,10 +256,11 @@ JobThermal:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
-        ShowResult : 1
+        ShowResult : 0
 
     Measure2:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 100
+        FieldCount : 200
+        ShowResult : 0

@@ -6,7 +6,7 @@ namespace CLGMakeWriter
 {
     class CMakeWritter
     {
-        public bool m_bDouble = false;
+        public bool m_bDouble = true;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };

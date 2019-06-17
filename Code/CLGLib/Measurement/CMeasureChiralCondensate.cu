@@ -58,6 +58,10 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
     iValue = 1;
     param.FetchValueINT(_T("FieldCount"), iValue);
     m_uiFieldCount = static_cast<UINT>(iValue);
+
+    iValue = 1;
+    param.FetchValueINT(_T("ShowResult"), iValue);
+    m_bShowResult = iValue != 0;
 }
 
 void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
@@ -98,21 +102,29 @@ void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge
     }
 
     checkCudaErrors(cudaMemcpy(m_pHostXYBuffer, m_pDeviceXYBuffer, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
-
-    appDetailed(_T("\n ------ Densisty -----\n"));
+    if (m_bShowResult)
+    {
+        appDetailed(_T("\n ------ Densisty -----\n"));
+    }
+    
     for (UINT i = static_cast<UINT>(CCommonData::m_sCenter.x); i < _HC_Lx; ++i)
     {
         CLGComplex cvalue = m_pHostXYBuffer[i * _HC_Ly + CCommonData::m_sCenter.y];
         cvalue.x = cvalue.x / (m_uiFieldCount * _HC_Lz * _HC_Lt);
         cvalue.y = cvalue.y / (m_uiFieldCount * _HC_Lz * _HC_Lt);
         m_lstCondensateDensity.AddItem(cvalue);
-
-        appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
-            cvalue.x,
-            cvalue.y < F(0.0) ? _T("") : _T("+"),
-            appAbs(cvalue.y));
+        if (m_bShowResult)
+        {
+            appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+                cvalue.x,
+                cvalue.y < F(0.0) ? _T("") : _T("+"),
+                appAbs(cvalue.y));
+        }
     }
-    appDetailed(_T("\n ------ Densisty -----\n"));
+    if (m_bShowResult)
+    {
+        appDetailed(_T("\n ------ Densisty -----\n"));
+    }
 
     pF1->Return();
     pF2->Return();
@@ -137,24 +149,32 @@ void CMeasureChiralCondensate::Report()
     appSetLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
 
-    appGeneral(_T("\n\n==========================================================================\n"));
+    appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==================== Chiral Condensate (%d con)============================\n"), m_uiConfigurationCount);
 
-    appGeneral(_T("\n ----------- each configuration ------------- \n"));
-
-    appGeneral(_T("{"));
-    for (UINT i = 0; i < m_uiConfigurationCount; ++i)
+    if (m_uiConfigurationCount > 1)
     {
-        tmpChargeSum.x += m_lstCondensate[i].x;
-        tmpChargeSum.y += m_lstCondensate[i].y;
-        LogGeneralComplex(m_lstCondensate[i]);
+        appGeneral(_T("\n ----------- each configuration ------------- \n"));
+        appGeneral(_T("{"));
+
+        for (UINT i = 0; i < m_uiConfigurationCount; ++i)
+        {
+            tmpChargeSum.x += m_lstCondensate[i].x;
+            tmpChargeSum.y += m_lstCondensate[i].y;
+            LogGeneralComplex(m_lstCondensate[i]);
+        }
+        appGeneral(_T("}\n"));
+
+        appGeneral(_T("\n ----------- average condensate = %2.12f + %2.12f ------------- \n"),
+            tmpChargeSum.x / m_uiConfigurationCount,
+            tmpChargeSum.y / m_uiConfigurationCount);
     }
-    appGeneral(_T("}\n"));
-
-    appGeneral(_T("\n ----------- average condensate = %2.12f + %2.12f ------------- \n"), 
-        tmpChargeSum.x / m_uiConfigurationCount,
-        tmpChargeSum.y / m_uiConfigurationCount);
-
+    else
+    {
+        appGeneral(_T("\n ----------- average condensate = %2.12f + %2.12f ------------- \n"),
+            m_lstCondensate[0].x,
+            m_lstCondensate[0].y);
+    }
 
     appGeneral(_T("\n ----------- condensate density------------- \n"));
     appGeneral(_T("{\n"));
@@ -169,7 +189,7 @@ void CMeasureChiralCondensate::Report()
     }
     appGeneral(_T("}\n"));
 
-    appGeneral(_T("==========================================================================\n\n"));
+    appGeneral(_T("==========================================================================\n"));
     appSetLogDate(TRUE);
 }
 

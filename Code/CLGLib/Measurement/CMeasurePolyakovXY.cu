@@ -247,7 +247,6 @@ void CMeasurePolyakovXY::Report()
 
     appGeneral(_T("\n ----------- Loop density ------------- \n"));
 
-    TArray<CLGComplex> tmp;
     appGeneral(_T("{\n"));
     for (UINT k = 0; k < m_uiConfigurationCount; ++k)
     {
