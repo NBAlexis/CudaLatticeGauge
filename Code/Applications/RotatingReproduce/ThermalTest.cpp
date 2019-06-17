@@ -52,6 +52,8 @@ INT TestThermal(CParameters& params)
             return 1;
         }
 
+        CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+        CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
         TArray<TArray<CLGComplex>> polykovX_nx;
         TArray<Real> polykov;
         TArray<TArray<Real>> chiral_nx;
@@ -78,12 +80,23 @@ INT TestThermal(CParameters& params)
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
         appGetLattice()->m_pMeasurements->Reset();
-
+        UINT uiAccepCountBeforeE = 0;
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
-            appGetLattice()->m_pUpdator->Update(1, TRUE);
+            UINT uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, FALSE);
+            if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
+            {
+                uiAccepCountBeforeE = uiAccepCountBeforeE2;
+                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            }
         }
-        appGetLattice()->m_pMeasurements->Report();
+        assert(pPL->m_lstLoop.Num() == static_cast<UINT>(iBeforeEquib));
+        appGeneral(_T("\n|<P>|={\n"));
+        for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
+        {
+            appGeneral(_T("%f,\n"), _cuCabsf(pPL->m_lstLoop[i]));
+        }
+        appGeneral(_T("}\n"));
 
         //=================================
         //Save config
@@ -126,9 +139,6 @@ INT TestThermal(CParameters& params)
                 }
             }
             appGetLattice()->m_pMeasurements->Report();
-
-            CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-            CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
             
             //===================== Polyakov loop =====================
             assert(pPL->m_lstLoop.Num() == 1);
