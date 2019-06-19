@@ -163,8 +163,9 @@ JobThermal:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 150
-    EquvibStep : 8
-    OmegaSep : 50
+    EquvibSkip : 2
+    EquvibStep : 20
+    OmegaSep : 20
     MaxOmega : 0.1
     MinNt : 2
     MaxNt : 4
@@ -191,6 +192,13 @@ JobThermal:
     Nt3Polyakov : 0.571731612147
     Nt4FileName : Nt4_532_1665.con_
     Nt4Polyakov : 0.253809180108
+
+    ## Nt2FileName : Nt2_532_q.con_
+    ## Nt2Polyakov : 1.569426765862569
+    ## Nt3FileName : Nt3_532_q.con_
+    ## Nt3Polyakov : 0.597198558965794
+    ## Nt4FileName : Nt4_532_q.con_
+    ## Nt4Polyakov : 0.2981905422566984
 
     Updator:
 

@@ -52,7 +52,7 @@ void CHMC::Initial(class CLatticeData* pOwner, const CParameters& params)
         TArray<INT> minMax;
         if (params.FetchValueArrayINT(_T("MinMaxStep"), minMax))
         {
-            if (minMax.Num() > 1 && minMax[0] > 1 && minMax[1] > minMax[0])
+            if (minMax.Num() > 1 && minMax[0] >= 1 && minMax[1] > minMax[0])
             {
                 m_uiMinStep = static_cast<UINT>(minMax[0]);
                 m_uiMaxStep = static_cast<UINT>(minMax[1]);
