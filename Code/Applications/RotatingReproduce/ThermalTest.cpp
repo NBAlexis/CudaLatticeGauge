@@ -37,6 +37,10 @@ INT TestThermal(CParameters& params)
     params.FetchValueINT(_T("MaxNt"), iVaule);
     UINT iMaxNt = static_cast<UINT>(iVaule);
 
+    CCString sSavePrefix;
+    params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
+    appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
+
     TArray<CCString> sOldFileNames;
     TArray<Real> fOldFilePolyakov;
 
@@ -53,7 +57,7 @@ INT TestThermal(CParameters& params)
         sOldFileNames.AddItem(sFileName);
         fOldFilePolyakov.AddItem(fPolyakov);
 
-        appGeneral(_T("f: %s, p : %f\n"), sFileName.c_str(), fPolyakov);
+        appGeneral(_T("file: %s, |p| : %f\n"), sFileName.c_str(), fPolyakov);
     }
    
     Real fMaxOmega = F(0.1);
@@ -168,7 +172,7 @@ INT TestThermal(CParameters& params)
                 if (uiAcce != iConfigNumberNow)
                 {
                     sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce);
-
+                    sFileName = sSavePrefix + sFileName;
                     //=================================
                     //Save info
                     appGetTimeNow(buff1, 256);
