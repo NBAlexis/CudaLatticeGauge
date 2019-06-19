@@ -11,23 +11,49 @@
 
 INT TestThermal(CParameters& params)
 {
+    appSetupLog(params);
+
     INT iVaule = 99;
     params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     UINT iBeforeEquib = static_cast<UINT>(iVaule);
+
+    iVaule = 6;
+    params.FetchValueINT(_T("EquvibStep"), iVaule);
+    UINT iEquib = static_cast<UINT>(iVaule);
+
     iVaule = 250;
     params.FetchValueINT(_T("OmegaSep"), iVaule);
     UINT iAfterEquib = static_cast<UINT>(iVaule);
+
     iVaule = 2;
     params.FetchValueINT(_T("MinNt"), iVaule);
     UINT iMinNt = static_cast<UINT>(iVaule);
+
     iVaule = 6;
     params.FetchValueINT(_T("MaxNt"), iVaule);
     UINT iMaxNt = static_cast<UINT>(iVaule);
+
+    TArray<CCString> sOldFileNames;
+    TArray<Real> fOldFilePolyakov;
+
+    for (UINT i = iMinNt; i <= iMaxNt; ++i)
+    {
+        CCString sFileName;
+        Real fPolyakov = F(0.0);
+        CCString sFileKeyName;
+        CCString sPolyaKeyName;
+        sFileKeyName.Format(_T("Nt%dFileName"), i);
+        sPolyaKeyName.Format(_T("Nt%dPolyakov"), i);
+        params.FetchStringValue(sFileKeyName, sFileName);
+        params.FetchValueReal(sPolyaKeyName, fPolyakov);
+        sOldFileNames.AddItem(sFileName);
+        fOldFilePolyakov.AddItem(fPolyakov);
+
+        appGeneral(_T("f: %s, p : %f\n"), sFileName, fPolyakov);
+    }
    
     Real fMaxOmega = F(0.1);
     params.FetchValueReal(_T("MaxOmega"), fMaxOmega);
-
-    appSetupLog(params);
 
     CCString sFileName;
     TCHAR buff1[256];
@@ -56,6 +82,7 @@ INT TestThermal(CParameters& params)
         CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
         TArray<TArray<CLGComplex>> polykovX_nx;
         TArray<Real> polykov;
+        TArray<Real> polykovphase;
         TArray<TArray<Real>> chiral_nx;
         TArray<Real> chiral;
         for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
@@ -71,36 +98,54 @@ INT TestThermal(CParameters& params)
         sHeader.Format(_T("Nt%d"), uiNt);
         appSetLogHeader(sHeader);
         appGeneral(_T("Run for Nt = %d, start baking.\n"), uiNt);
-        
-        appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
 
-        //UINT uiLastAccept = 0;
-        pGauageAction->SetOmega(F(0.0));
-        appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
-        appGetLattice()->m_pUpdator->SetConfigurationCount(0);
-        appGetLattice()->m_pMeasurements->Reset();
-        UINT uiAccepCountBeforeE = 0;
-        while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+        //=============== Check oldfiles ==================
+        UBOOL bNeedBake = TRUE;
+        if (!sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
-            UINT uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, FALSE);
-            if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
+            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
+            pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
+            if (fError < F(1E-07))
             {
-                uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                appGeneral(_T("\n ================ Bake using old file =================\n"));
+                bNeedBake = FALSE;
+            }
+            else
+            {
+                appGeneral(_T("\n ================ have the initial file, but not matching.... %f ===========\n"), fError);
             }
         }
-        assert(pPL->m_lstLoop.Num() == static_cast<UINT>(iBeforeEquib));
-        appGeneral(_T("\n|<P>|={\n"));
-        for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
+        
+        if (bNeedBake)
         {
-            appGeneral(_T("%f,\n"), _cuCabsf(pPL->m_lstLoop[i]));
-        }
-        appGeneral(_T("}\n"));
+            appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
 
-        //=================================
-        //Save config
-        appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+            pGauageAction->SetOmega(F(0.0));
+            appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+
+            appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+            appGetLattice()->m_pMeasurements->Reset();
+            UINT uiAccepCountBeforeE = 0;
+            while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
+            {
+                UINT uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, FALSE);
+                if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
+                {
+                    uiAccepCountBeforeE = uiAccepCountBeforeE2;
+                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+            }
+            assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
+            appSetLogDate(FALSE);
+            appGeneral(_T("\n|<P>|={\n"));
+            for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
+            {
+                appGeneral(_T("%f,\n"), _cuCabsf(pPL->m_lstLoop[i]));
+            }
+            appGeneral(_T("}\n"));
+            appSetLogDate(TRUE);
+        }
 
         UINT uiOmega = 0;
         Real fSep = fMaxOmega / iAfterEquib;
@@ -112,28 +157,31 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pMeasurements->Reset();
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
 
-            while (iConfigNumberNow < 1)
+            while (iConfigNumberNow < iEquib)
             {
-                appGetLattice()->m_pUpdator->Update(1, TRUE);
+                appGetLattice()->m_pUpdator->Update(1, (0 == iConfigNumberNow) ? FALSE : TRUE);
                 UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
                 if (uiAcce != iConfigNumberNow)
                 {
-                    sFileName.Format(_T("Rotate_Nt%d_%d"), uiNt, uiOmega);
+                    if (0 != iConfigNumberNow)
+                    {
+                        sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce);
 
-                    //=================================
-                    //Save info
-                    appGetTimeNow(buff1, 256);
-                    appGetTimeUtc(buff2, 256);
-                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
-                        appGetTimeStamp(),
-                        buff1,
-                        buff2);
-                    sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
-                    appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
+                        //=================================
+                        //Save info
+                        appGetTimeNow(buff1, 256);
+                        appGetTimeUtc(buff2, 256);
+                        sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
+                            appGetTimeStamp(),
+                            buff1,
+                            buff2);
+                        sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
+                        appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
 
-                    //=================================
-                    //Save config
-                    appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                        //=================================
+                        //Save config
+                        appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                    }
 
                     iConfigNumberNow = uiAcce;
                 }
@@ -141,24 +189,25 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pMeasurements->Report();
             
             //===================== Polyakov loop =====================
-            assert(pPL->m_lstLoop.Num() == 1);
-            assert(pPL->m_lstLoopDensity.Num() 
+            assert(pPL->m_lstLoop.Num() == iEquib - 1);
+            assert(pPL->m_lstAverageLoopDensity.Num()
                 == static_cast<INT>(CCommonData::m_sCenter.x));
 
             //============= polyakov gather =============
-            polykov.AddItem(_cuCabsf(pPL->m_lstLoop[0]));
+            polykov.AddItem(_cuCabsf(pPL->m_cAverageLoop));
+            polykovphase.AddItem(__cuCargf(pPL->m_cAverageLoop));
             for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
             {
-                polykovX_nx[iX].AddItem(pPL->m_lstLoopDensity[iX]);
+                polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
             }
 
             //===================== Chiral condensate =====================
-            assert(pCC->m_lstCondensate.Num() == 1);
-            assert(pCC->m_lstCondensateDensity.Num() == static_cast<INT>(CCommonData::m_sCenter.x));
-            chiral.AddItem(_cuCabsf(pCC->m_lstCondensate[0]));
+            assert(pCC->m_lstCondensate.Num() == iEquib - 1);
+            assert(pCC->m_lstAverageCondensateDensity.Num() == static_cast<INT>(CCommonData::m_sCenter.x));
+            chiral.AddItem(_cuCabsf(pCC->m_cAverageCondensate));
             for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
             {
-                chiral_nx[iX].AddItem(_cuCabsf(pCC->m_lstCondensateDensity[iX]));
+                chiral_nx[iX].AddItem(_cuCabsf(pCC->m_lstAverageCondensateDensity[iX]));
             }
 
             ++uiOmega;
@@ -176,6 +225,13 @@ INT TestThermal(CParameters& params)
         {
             appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
                 polykov[i]);
+        }
+        appGeneral(_T("}\n\narg(Polyakov)={\n"));
+
+        for (UINT i = 0; i <= iAfterEquib; ++i)
+        {
+            appGeneral(i == iAfterEquib ? _T("%2.10f\n ") : _T("%2.10f,\n"),
+                polykovphase[i]);
         }
         appGeneral(_T("}\n\nChiralCondensate={\n"));
 

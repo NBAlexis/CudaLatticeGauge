@@ -56,6 +56,8 @@ public:
 
     TArray<CLGComplex> m_lstCondensate;
     TArray<CLGComplex> m_lstCondensateDensity;
+    CLGComplex m_cAverageCondensate;
+    TArray<CLGComplex> m_lstAverageCondensateDensity;
 };
 
 __END_NAMESPACE

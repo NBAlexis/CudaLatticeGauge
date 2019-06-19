@@ -163,10 +163,11 @@ JobThermal:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 150
-    OmegaSep : 320
+    EquvibStep : 8
+    OmegaSep : 50
     MaxOmega : 0.1
     MinNt : 2
-    MaxNt : 8
+    MaxNt : 4
 
     Dim : 4
     Dir : 4
@@ -181,6 +182,16 @@ JobThermal:
     MeasureListLength : 2
     CacheStaple : 0
 
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    Nt2FileName : Nt2_532_1665.con_
+    Nt2Polyakov : 1.401374808778
+    Nt3FileName : Nt3_532_1665.con_
+    Nt3Polyakov : 0.571731612147
+    Nt4FileName : Nt4_532_1665.con_
+    Nt4Polyakov : 0.253809180108
+
     Updator:
 
         UpdatorType : CHMC
@@ -192,7 +203,7 @@ JobThermal:
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
-        ## IntegratorType : CIntegratorNestedOmelyan
+        ## IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
         IntegratorStep : 5
         NestedStep : 5
@@ -213,6 +224,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
+        ## Hopping : 0.1575
         Hopping : 0.1665
         FieldId : 2
         PoolNumber : 26
@@ -228,6 +240,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
+        ## Beta : 5.355
         Beta : 5.32144
         Omega : 0.0
 

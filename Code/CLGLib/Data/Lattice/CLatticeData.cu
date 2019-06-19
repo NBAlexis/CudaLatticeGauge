@@ -191,7 +191,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sTab + sInfos;
     sInfos.Format(_T("Random : %s\n"), __ENUM_TO_STRING(ERandom, static_cast<ERandom>(m_uiRandomType)).c_str());
     sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("sizeof(Real) : %d and 1.25 is %s\n"), sizeof(Real), sRealByte.c_str());
+    sInfos.Format(_T("sizeof(Real) : %d and -1.2345 is %s\n"), sizeof(Real), sRealByte.c_str());
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("RandomSeed : %d\n"), m_uiRandomSeed);
     sRet = sRet + sTab + sInfos;

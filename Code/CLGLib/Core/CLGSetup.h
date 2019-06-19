@@ -34,7 +34,7 @@
 //_CLG_DOUBLEFLOAT = 0 or 1. 
 //Note that single float is rarely the problem for accuracy, but much much faster
 #ifndef _CLG_DOUBLEFLOAT
-#define _CLG_DOUBLEFLOAT 0
+#define _CLG_DOUBLEFLOAT 1
 #endif
 
 //_CLG_USE_LAUNCH_BOUND = 0 or 1.

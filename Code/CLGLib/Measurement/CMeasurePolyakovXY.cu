@@ -226,6 +226,7 @@ void CMeasurePolyakovXY::Report()
 
     appSetLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
+    m_lstAverageLoopDensity.RemoveAll();
 
     appGeneral(_T("\n\n==========================================================================\n"));
     appGeneral(_T("==================== Polyakov Loop (%d con)============================\n"), m_uiConfigurationCount);
@@ -243,6 +244,7 @@ void CMeasurePolyakovXY::Report()
 
     tmpChargeSum.x = tmpChargeSum.x / m_uiConfigurationCount;
     tmpChargeSum.y = tmpChargeSum.y / m_uiConfigurationCount;
+    m_cAverageLoop = tmpChargeSum;
     appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f ------------- \n"), _cuCabsf(tmpChargeSum));
 
     appGeneral(_T("\n ----------- Loop density ------------- \n"));
@@ -254,7 +256,21 @@ void CMeasurePolyakovXY::Report()
         for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
         {
             LogGeneralComplex(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
-            appGeneral(_T("\n"));
+
+            if (0 == k)
+            {
+                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+            }
+            else
+            {
+                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+            }
+
+            if (k == m_uiConfigurationCount - 1)
+            {
+                m_lstAverageLoopDensity[i].x = m_lstAverageLoopDensity[i].x / m_uiConfigurationCount;
+                m_lstAverageLoopDensity[i].y = m_lstAverageLoopDensity[i].y / m_uiConfigurationCount;
+            }
         }
         appGeneral(_T("}\n"));
     }

@@ -148,6 +148,7 @@ void CMeasureChiralCondensate::Report()
 
     appSetLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
+    m_lstAverageCondensateDensity.RemoveAll();
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==================== Chiral Condensate (%d con)============================\n"), m_uiConfigurationCount);
@@ -165,15 +166,20 @@ void CMeasureChiralCondensate::Report()
         }
         appGeneral(_T("}\n"));
 
+        tmpChargeSum.x = tmpChargeSum.x / m_uiConfigurationCount;
+        tmpChargeSum.y = tmpChargeSum.y / m_uiConfigurationCount;
         appGeneral(_T("\n ----------- average condensate = %2.12f + %2.12f ------------- \n"),
-            tmpChargeSum.x / m_uiConfigurationCount,
-            tmpChargeSum.y / m_uiConfigurationCount);
+            tmpChargeSum.x, tmpChargeSum.y);
+
+        m_cAverageCondensate = tmpChargeSum;
     }
     else
     {
         appGeneral(_T("\n ----------- average condensate = %2.12f + %2.12f ------------- \n"),
             m_lstCondensate[0].x,
             m_lstCondensate[0].y);
+
+        m_cAverageCondensate = m_lstCondensate[0];
     }
 
     appGeneral(_T("\n ----------- condensate density------------- \n"));
@@ -184,6 +190,21 @@ void CMeasureChiralCondensate::Report()
         for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
         {
             LogGeneralComplex(m_lstCondensateDensity[k * CCommonData::m_sCenter.x + i]);
+
+            if (0 == k)
+            {
+                m_lstAverageCondensateDensity.AddItem(m_lstCondensateDensity[k * CCommonData::m_sCenter.x + i]);
+            }
+            else
+            {
+                m_lstAverageCondensateDensity[i] = _cuCaddf(m_lstAverageCondensateDensity[i], m_lstCondensateDensity[k * CCommonData::m_sCenter.x + i]);
+            }
+
+            if (k == m_uiConfigurationCount - 1)
+            {
+                m_lstAverageCondensateDensity[i].x = m_lstAverageCondensateDensity[i].x / m_uiConfigurationCount;
+                m_lstAverageCondensateDensity[i].y = m_lstAverageCondensateDensity[i].y / m_uiConfigurationCount;
+            }
         }
         appGeneral(_T("},\n"));
     }

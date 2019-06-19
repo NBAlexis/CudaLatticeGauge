@@ -65,6 +65,9 @@ public:
 
     TArray<CLGComplex> m_lstLoop;
     TArray<CLGComplex> m_lstLoopDensity;
+
+    CLGComplex m_cAverageLoop;
+    TArray<CLGComplex> m_lstAverageLoopDensity;
 };
 
 __END_NAMESPACE
