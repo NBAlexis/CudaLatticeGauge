@@ -121,7 +121,8 @@ INT TestThermal(CParameters& params)
             }
             else
             {
-                appGeneral(_T("\n ================ have the initial file, but not matching.... %f ===========\n"), fError);
+                appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"), 
+                    _cuCabsf(pPL->m_lstLoop[0]), fOldFilePolyakov[uiNt - iMinNt], fError);
             }
         }
         
@@ -209,7 +210,7 @@ INT TestThermal(CParameters& params)
             if (NULL != pCC)
             {
                 //===================== Chiral condensate =====================
-                assert(pCC->m_lstCondensate.Num() == iEquib - iEquibSkip);
+                assert(pCC->m_lstCondensate.Num() == static_cast<INT>(iEquib - iEquibSkip));
                 assert(pCC->m_lstAverageCondensateDensity.Num() == static_cast<INT>(CCommonData::m_sCenter.x));
                 chiral.AddItem(_cuCabsf(pCC->m_cAverageCondensate));
                 for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
