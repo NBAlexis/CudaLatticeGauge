@@ -312,7 +312,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
         bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
         bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
         bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
-        m_pLatticeData->SetFieldBoundaryCondition(0, bc);
+        m_pLatticeData->SetFieldBoundaryCondition(1, bc);
     }
 
     m_pLatticeData->m_pGaugeField = pGauge;

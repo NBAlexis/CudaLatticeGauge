@@ -129,8 +129,10 @@ INT TestThermal(CParameters& params)
         if (bNeedBake)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-
-            pGauageAction->SetOmega(F(0.0));
+            if (NULL != pGauageAction)
+            {
+                pGauageAction->SetOmega(F(0.0));
+            }
             appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
@@ -147,10 +149,10 @@ INT TestThermal(CParameters& params)
             }
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
             appSetLogDate(FALSE);
-            appGeneral(_T("\n|<P>|={\n"));
+            appGeneral(_T("\n|<P>|,arg<P>={\n"));
             for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
             {
-                appGeneral(_T("%f,\n"), _cuCabsf(pPL->m_lstLoop[i]));
+                appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
             }
             appGeneral(_T("}\n"));
             appSetLogDate(TRUE);
@@ -161,7 +163,10 @@ INT TestThermal(CParameters& params)
         while (uiOmega <= iAfterEquib)
         {
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
-            pGauageAction->SetOmega(fSep * uiOmega);
+            if (NULL != pGauageAction)
+            {
+                pGauageAction->SetOmega(fSep * uiOmega);
+            }
             UINT iConfigNumberNow = 0;
             appGetLattice()->m_pMeasurements->Reset();
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);

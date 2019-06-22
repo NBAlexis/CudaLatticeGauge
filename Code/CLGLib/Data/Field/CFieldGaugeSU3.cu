@@ -55,6 +55,10 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
         case EFIT_Random:
         {
             pDevicePtr[uiLinkIndex] = deviceSU3::makeSU3Random(_deviceGetFatIndex(uiSiteIndex, idir + 1));
+            //Real fArg = __cuCargf(pDevicePtr[uiLinkIndex].Tr());
+            //pDevicePtr[uiLinkIndex].MulComp(_make_cuComplex(_cos(fArg), -_sin(fArg)));
+            //pDevicePtr[uiLinkIndex].Norm();
+            //printf("arg=%f\n", __cuCargf(pDevicePtr[uiLinkIndex].Tr()));
         }
         break;
         case EFIT_RandomGenerator:

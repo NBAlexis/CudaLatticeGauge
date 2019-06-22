@@ -186,7 +186,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     m_lstLoop.AddItem(res[0]);
     if (m_bShowResult)
     {
-        appDetailed(_T("Loop is %f + %f i\n"), res[0].x, res[0].y);
+        appGeneral(_T("Loop is %f + %f i\n"), res[0].x, res[0].y);
     }
 
 

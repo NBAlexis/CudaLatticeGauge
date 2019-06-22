@@ -162,13 +162,13 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 180
+    BeforeEquvibStep : 200
     EquvibSkip : 1
     EquvibStep : 50
     OmegaSep : 30
     MaxOmega : 0.12
     MinNt : 3
-    MaxNt : 3
+    MaxNt : 6
 
     Dim : 4
     Dir : 4
@@ -206,6 +206,8 @@ JobThermal:
 
     ## Nt2FileName : Nt2_502_17.con_
     ## Nt2Polyakov : 1.3409688185564654
+    ## Nt3FileName : Nt3_502_17.con_
+    ## Nt3Polyakov : 0.03018131019325852
     ## Nt4FileName : Nt4_502_17.con_
     ## Nt4Polyakov : 0.12804770999946194
     ## Nt5FileName : Nt5_502_17.con_
@@ -243,7 +245,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.17
+        Hopping : 0.1575
         FieldId : 2
         PoolNumber : 26
         Period : [0, 0, 1, -1]
@@ -258,7 +260,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.02
+        Beta : 5.355
         Omega : 0.0
 
     Action2:
@@ -269,16 +271,15 @@ JobThermal:
         SolverForFieldId : 2
 
         SolverName : CSLASolverGMRES
-        MaxDim : 16
         Accuracy : 0.000000001
+        MaxDim : 25
 
-
-        ##SolverName : CSLASolverGCRODR
+        ## SolverName : CSLASolverGCRODR
+        ## Accuracy : 0.00001
         MDim : 26
         KDim : 5
         RecalculateR : 10
         DeflateSpace : EEDT_SVD
-        ##Accuracy : 0.00001
 
         Restart : 200
         AbsoluteAccuracy : 1
@@ -287,7 +288,7 @@ JobThermal:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
-        ShowResult : 0
+        ShowResult : 1
 
     Measure2:
 
