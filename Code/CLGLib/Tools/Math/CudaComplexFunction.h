@@ -64,7 +64,9 @@ extern "C" {
         out.x = _sqrt(F(0.5) * fRadius * (fCosA + F(1.0)));
         out.y = _sqrt(F(0.5) * fRadius * (F(1.0) - fCosA));
         // signbit should be false if x.y is negative
-        if (signbit(c.y))
+        //if (signbit(c.y))
+        //    out.y *= -F(1.0);
+        if (c.y >= F(0.0))
             out.y *= -F(1.0);
 
         return out;
