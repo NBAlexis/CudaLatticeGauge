@@ -18,7 +18,7 @@ __BEGIN_NAMESPACE
 
 enum 
 {
-    kContentLength = 1024, _kMaxFieldCount = 8,
+    kContentLength = 256, _kMaxFieldCount = 8,
 };
 
 extern __constant__ UINT _constIntegers[kContentLength];
