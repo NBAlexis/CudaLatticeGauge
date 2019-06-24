@@ -16,7 +16,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-s
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
 add_definitions(-D_CLG_DOUBLEFLOAT=0)
-MESSAGE("Note: double float NOT is enabled, arch is arch=compute_61,code=sm_61.")
+MESSAGE("Note: double float NOT is enabled, arch is compute_61 and sm_61.")
 MESSAGE("CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}")
 MESSAGE("CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}")
 

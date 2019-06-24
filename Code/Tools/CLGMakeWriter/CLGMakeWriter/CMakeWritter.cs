@@ -23,13 +23,25 @@ namespace CLGMakeWriter
         readonly static string[] ArchNames = 
         {
             //GTX 970M
-            "arch=compute_52,code=sm_52",
+            "compute_52",
 
             //GTX 1060, 1070
-            "arch=compute_61,code=sm_61",
+            "compute_61",
 
             //V100
-            "arch=compute_70,code=sm_70",
+            "compute_70",
+        };
+
+        readonly static string[] CodeNames =
+{
+            //GTX 970M
+            "sm_52",
+
+            //GTX 1060, 1070
+            "sm_61",
+
+            //V100
+            "sm_70",
         };
 
         public void WritteTheFile(string sSolDir, CProjFile projFile, Dictionary<string, CProjFile> excutables)
@@ -55,12 +67,12 @@ namespace CLGMakeWriter
             if (m_bDouble)
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-                sContent += string.Format("MESSAGE(\"Note: double float is enabled, arch is {0}.\")\n", ArchNames[(int)m_eArch]);
+                sContent += string.Format("MESSAGE(\"Note: double float is enabled, arch is {0} and {1}.\")\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
             }
             else
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
-                sContent += string.Format("MESSAGE(\"Note: double float NOT is enabled, arch is {0}.\")\n", ArchNames[(int)m_eArch]);
+                sContent += string.Format("MESSAGE(\"Note: double float NOT is enabled, arch is {0} and {1}.\")\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
             }
             
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
@@ -100,7 +112,7 @@ set_target_properties( CLGLib
 
 
             sContent += "# To enable the double, the minimum arch is 6.0\n";
-            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode {0}>)\n\n", ArchNames[(int)m_eArch]);
+            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch={0},code={1}>)\n\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
 
             #endregion
 
