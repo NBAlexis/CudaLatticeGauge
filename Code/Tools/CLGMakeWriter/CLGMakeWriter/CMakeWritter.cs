@@ -23,13 +23,13 @@ namespace CLGMakeWriter
         readonly static string[] ArchNames = 
         {
             //GTX 970M
-            "compute_52,code=sm_52",
+            "arch=compute_52,code=sm_52",
 
             //GTX 1060, 1070
-            "compute_61,code=sm_61",
+            "arch=compute_61,code=sm_61",
 
             //V100
-            "compute_70,code=sm_70",
+            "arch=compute_70,code=sm_70",
         };
 
         public void WritteTheFile(string sSolDir, CProjFile projFile, Dictionary<string, CProjFile> excutables)
@@ -59,7 +59,7 @@ namespace CLGMakeWriter
             }
             else
             {
-                sContent += "# add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+                sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
                 sContent += string.Format("MESSAGE(\"Note: double float NOT is enabled, arch is {0}.\")\n", ArchNames[(int)m_eArch]);
             }
             
@@ -100,7 +100,7 @@ set_target_properties( CLGLib
 
 
             sContent += "# To enable the double, the minimum arch is 6.0\n";
-            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch={0})\n\n", ArchNames[(int)m_eArch]);
+            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode {0}>)\n\n", ArchNames[(int)m_eArch]);
 
             #endregion
 
