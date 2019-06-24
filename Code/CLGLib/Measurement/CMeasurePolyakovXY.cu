@@ -186,7 +186,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     m_lstLoop.AddItem(res[0]);
     if (m_bShowResult)
     {
-        appGeneral(_T("Loop is %f + %f i\n"), res[0].x, res[0].y);
+        appGeneral(_T("Loop is %f + %f I\n"), res[0].x, res[0].y);
     }
 
 
@@ -196,7 +196,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             i * _HC_Ly + CCommonData::m_sCenter.y]);
         if (m_bShowResult)
         {
-            appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+            appGeneral(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
                 m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].x,
                 m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y < F(0.0) ? _T("") : _T("+"),
                 appAbs(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y));
@@ -204,7 +204,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     }
     if (m_bShowResult)
     {
-        appDetailed(_T("\n"));
+        appGeneral(_T("\n"));
     }
 
     if (m_bShowResult)

@@ -4,12 +4,33 @@ using System.IO;
 
 namespace CLGMakeWriter
 {
+
+    enum EArch
+    {
+        EArcSM52,
+        EArcSM61,
+        EArcSM70,
+    }
+
     class CMakeWritter
     {
-        public bool m_bDouble = true;
+        public bool m_bDouble = false;
+        public EArch m_eArch = EArch.EArcSM61;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
+        
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };
+        readonly static string[] ArchNames = 
+        {
+            //GTX 970M
+            "compute_52,code=sm_52",
+
+            //GTX 1060, 1070
+            "compute_61,code=sm_61",
+
+            //V100
+            "compute_70,code=sm_70",
+        };
 
         public void WritteTheFile(string sSolDir, CProjFile projFile, Dictionary<string, CProjFile> excutables)
         {
@@ -34,12 +55,12 @@ namespace CLGMakeWriter
             if (m_bDouble)
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-                sContent += "MESSAGE(\"Note: double float is enabled, arch is compute61 and sm61.\")\n";
+                sContent += string.Format("MESSAGE(\"Note: double float is enabled, arch is {0}.\")\n", ArchNames[(int)m_eArch]);
             }
             else
             {
                 sContent += "# add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-                sContent += "MESSAGE(\"Note: double float NOT is enabled, arch is compute61 and sm61.\")\n";
+                sContent += string.Format("MESSAGE(\"Note: double float NOT is enabled, arch is {0}.\")\n", ArchNames[(int)m_eArch]);
             }
             
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
@@ -79,7 +100,7 @@ set_target_properties( CLGLib
 
 
             sContent += "# To enable the double, the minimum arch is 6.0\n";
-            sContent += "target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_61,code=sm_61>)\n\n";
+            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch={0})\n\n", ArchNames[(int)m_eArch]);
 
             #endregion
 

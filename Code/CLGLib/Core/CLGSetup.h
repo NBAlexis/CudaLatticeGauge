@@ -34,7 +34,11 @@
 //_CLG_DOUBLEFLOAT = 0 or 1. 
 //Note that single float is rarely the problem for accuracy, but much much faster
 #ifndef _CLG_DOUBLEFLOAT
+#if _CLG_DEBUG
+#define _CLG_DOUBLEFLOAT 0
+#else
 #define _CLG_DOUBLEFLOAT 1
+#endif
 #endif
 
 //_CLG_USE_LAUNCH_BOUND = 0 or 1.
@@ -47,7 +51,10 @@
 #else
 #define _CLG_USE_LAUNCH_BOUND 1
 #endif
+
+#ifndef _CLG_LAUNCH_MAX_THREAD
 #define _CLG_LAUNCH_MAX_THREAD 1024
+#endif
 
 
 #endif //#ifndef _CLGSETUP_H_

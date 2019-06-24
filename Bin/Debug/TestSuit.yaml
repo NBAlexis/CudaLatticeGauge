@@ -2001,3 +2001,75 @@ TestRotation:
         Alpha : 0.1
         Iterate : 3
         ProjIterate : 6
+
+
+TestZ3Symmetry:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.5355
+    CacheStaple : 0
+    CacheSolution : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [1, 50]
+        GrowReduceThreshold : [-0.4, 0.02]
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 5
+
+    Gauge:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+		
+    FermionField1:
+        FieldName : CFieldFermionWilsonSquareSU3
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1575
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRESMDR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 20
+        KDim : 2
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.001
+        Restart : 20
+        AbsoluteAccuracy : 1
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.355
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 2
+        ShowResult : 1

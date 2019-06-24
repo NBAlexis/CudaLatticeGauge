@@ -32,6 +32,9 @@
     <ClCompile Include="Tests\TestRotation.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestZ3Symmetry.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />

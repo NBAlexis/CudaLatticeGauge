@@ -162,13 +162,13 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 100
-    EquvibSkip : 1
-    EquvibStep : 50
-    OmegaSep : 30
+    BeforeEquvibStep : 200
+    EquvibSkip : 10
+    EquvibStep : 110
+    OmegaSep : 12
     MaxOmega : 0.12
-    MinNt : 4
-    MaxNt : 6
+    MinNt : 3
+    MaxNt : 8
 
     Dim : 4
     Dir : 4
@@ -245,7 +245,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1665
+        Hopping : 0.17
         FieldId : 2
         PoolNumber : 26
         Period : [0, 0, 1, -1]
@@ -260,7 +260,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.32144
+        Beta : 5.02
         Omega : 0.0
 
     Action2:
@@ -270,12 +270,23 @@ JobThermal:
     Solver:
         SolverForFieldId : 2
 
-        ## SolverName : CSLASolverGMRES
-        ## Accuracy : 0.000000001
-        MaxDim : 25
+        ## SolverName : CSLASolverBiCGStab
+        ## Accuracy : 0.0000001
 
-        SolverName : CSLASolverGCRODR
-        Accuracy : 0.00001
+        DiviationStep : 10
+        MaxStep : 100
+
+        SolverName : CSLASolverGMRES
+        # double
+        # Accuracy : 0.000000001
+        # float
+        Accuracy : 0.000001
+
+        MaxDim : 15
+
+        ## SolverName : CSLASolverGCRODR
+        ## Accuracy : 0.00001
+
         MDim : 26
         KDim : 5
         RecalculateR : 10
@@ -294,5 +305,5 @@ JobThermal:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 100
+        FieldCount : 50
         ShowResult : 0

@@ -12,7 +12,7 @@ We begin with Eq.~(1.85) and Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}.
 &Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\exp \left(-S_G[U]\textcolor[rgb]{1,0,0}{-}\sum _{f=1}^{N_f}\bar{\psi} _f\left(\hat{D}_f\right)\psi _f\right)
 \end{split}
 \end{equation}
-where $\hat{D}_f=D+m_f$. (Note that, there seems a typo in Eq.~(1.85), we have $S_F=\textcolor[rgb]{1,0,0}{+}\bar{\psi}D\psi$, see also Eq.~(5.39) of Ref.~\cite{latticeqcdbook2010} and Eq.~(7.6) of Ref.~\cite{latticeqcdbook1998}, Eq.~(3.75) of Ref.~\cite{latticeqcdbook2017}, etc.)
+where $\hat{D}_f=D+m_f$. (Note that, there seems a typo in Eq.~(1.85) of Ref.~\cite{latticeqcdbook2017} and Eq.~(8.31) of Ref.~\cite{latticeqcdbook2010}, we have $S_F=\textcolor[rgb]{1,0,0}{+}\bar{\psi}D\psi$, see also Eqs.~(5.39) and (8.39) of Ref.~\cite{latticeqcdbook2010} and Eq.~(7.6) of Ref.~\cite{latticeqcdbook1998}, Eq.~(3.75) of Ref.~\cite{latticeqcdbook2017}, etc.)
 
 It can be evaluated as Eq.~(1.86) of Ref.~\cite{latticeqcdbook2017}~(or Eq.~(4.19) of Ref.~\cite{condensedmatterbookAltland}) (Note, there is another minus sign in Eq.~(5.28) of Ref.~\cite{latticeqcdbook2010})
 \begin{equation}
@@ -138,7 +138,7 @@ $S_G$ the action for a particular $U_{\mu}(n)$. $\Sigma$ is the \index{staple}`s
 so
 \begin{equation}
 \begin{split}
-&\frac{\partial}{\partial \omega _a (\mu,n)}S_G=-\frac{\beta}{2N}{\rm Re}{\rm tr}\left[\frac{\partial}{\partial \omega _a}U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]=-\frac{\beta}{2N}{\rm tr}\left[\frac{\partial}{\partial \omega _a}\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)+\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
+&\frac{\partial}{\partial \omega _a (\mu,n)}S_G=-\frac{\beta}{N}{\rm Re}{\rm tr}\left[\frac{\partial}{\partial \omega _a}U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]=-\frac{\beta}{2N}{\rm tr}\left[\frac{\partial}{\partial \omega _a}\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)+\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
 &=-i\frac{\beta}{2N}{\rm tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)T^{\dagger}_aU^{\dagger}_{\mu}(n)\right]=-i\frac{\beta}{2N}{\rm tr}\left[T_a\left(U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)-\Sigma _{\mu}(n)U^{\dagger}_{\mu}(n)\right)\right]\\
 &=\frac{\beta}{N} {\rm Im\;tr}\left[T_aU_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
 \end{split}

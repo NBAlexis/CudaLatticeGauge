@@ -35,6 +35,7 @@
     <ClCompile Include="Tests\TestSolver.cpp" />
     <ClCompile Include="Tests\TestSU3Generator.cpp" />
     <ClCompile Include="Tests\TestUpdator.cpp" />
+    <ClCompile Include="Tests\TestZ3Symmetry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
