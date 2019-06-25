@@ -162,7 +162,7 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 100
+    BeforeEquvibStep : 150
     EquvibSkip : 20
     EquvibStep : 200
     OmegaSep : 10
@@ -247,7 +247,7 @@ JobThermal:
         FieldInitialType : EFIT_RandomGaussian
         Hopping : 0.17
         FieldId : 2
-        PoolNumber : 26
+        PoolNumber : 5
         Period : [0, 0, 1, -1]
         Naive : 1
         Exponential : 1
@@ -260,7 +260,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.02
+        Beta : 5.0
         Omega : 0.0
 
     Action2:
@@ -276,20 +276,20 @@ JobThermal:
         DiviationStep : 10
         MaxStep : 100
 
-        SolverName : CSLASolverGMRES
+        # SolverName : CSLASolverGMRES
         # double
         # Accuracy : 0.000000001
         # float
-        Accuracy : 0.000001
+        # Accuracy : 0.000001
+        # MaxDim = 15 for 5.0(or 5.02) and 0.17
+        # MaxDim : 30
 
-        MaxDim : 15
-
-        ## SolverName : CSLASolverGCRODR
-        ## Accuracy : 0.00001
-
+        SolverName : CSLASolverGCRODR
+        Accuracy : 0.00001
         MDim : 26
         KDim : 5
-        RecalculateR : 10
+
+        RecalculateR : 2
         DeflateSpace : EEDT_SVD
 
         Restart : 200
@@ -299,7 +299,7 @@ JobThermal:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
-        ShowResult : 1
+        ShowResult : 0
 
     Measure2:
 

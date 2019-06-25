@@ -636,24 +636,24 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 
     InitialLatticeAndConstant(params);
     InitialRandom(params);
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("LatticeIndex")))
     {
         CreateIndexAndBoundary(params);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Gauge")))
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
         CreateGaugeField(gauge);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeBoundary")))
     {
         CParameters gaugeboundary = params.GetParameter(_T("GaugeBoundary"));
         CreateGaugeBoundaryField(gaugeboundary);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_FermionFieldLength] > 0)
     {
         for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_FermionFieldLength]; ++i)
@@ -665,39 +665,40 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
                 CreateFermionFields(fermionField);
             }
-
+            checkCudaErrors(cudaGetLastError());
             sFermionSubParamName.Format(_T("BoundaryFermionField%d"), i);
             if (params.Exist(sFermionSubParamName))
             {
                 CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
                 CreateFermionBoundaryField(bcfermionField);
             }
+            checkCudaErrors(cudaGetLastError());
         }
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)
     {
         CreateActionList(params);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Solver")))
     {
         CParameters solver = params.GetParameter(_T("Solver"));
         CreateSolver(solver);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeSmearing")))
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeSmearing"));
         CreateGaugeSmearing(gaugesmearing);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Updator")))
     {
         CParameters updator = params.GetParameter(_T("Updator"));
         CreateUpdator(updator);
     }
-
+    checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_MeasureListLength] > 0)
     {
         CreateMeasurement(params);

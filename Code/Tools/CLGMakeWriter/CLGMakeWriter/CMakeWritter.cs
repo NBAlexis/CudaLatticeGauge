@@ -14,7 +14,7 @@ namespace CLGMakeWriter
 
     class CMakeWritter
     {
-        public bool m_bDouble = false;
+        public bool m_bDouble = true;
         public EArch m_eArch = EArch.EArcSM61;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
@@ -33,7 +33,7 @@ namespace CLGMakeWriter
         };
 
         readonly static string[] CodeNames =
-{
+        {
             //GTX 970M
             "sm_52",
 

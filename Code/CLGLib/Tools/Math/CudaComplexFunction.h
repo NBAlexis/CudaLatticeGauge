@@ -21,7 +21,7 @@ extern "C" {
     /**
     * arg(c)
     */
-    __device__ static __inline__ Real __cuCargf(const CLGComplex& c)
+    __device__ __host__ static __inline__ Real __cuCargf(const CLGComplex& c)
     {
         return _atan2(_cuCimagf(c), _cuCrealf(c));
     }

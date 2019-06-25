@@ -245,7 +245,7 @@ void CMeasurePolyakovXY::Report()
     tmpChargeSum.x = tmpChargeSum.x / m_uiConfigurationCount;
     tmpChargeSum.y = tmpChargeSum.y / m_uiConfigurationCount;
     m_cAverageLoop = tmpChargeSum;
-    appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f ------------- \n"), _cuCabsf(tmpChargeSum));
+    appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f arg(P) = %2.12f ------------- \n"), _cuCabsf(tmpChargeSum), __cuCargf(tmpChargeSum));
 
     appGeneral(_T("\n ----------- Loop density ------------- \n"));
 
