@@ -196,7 +196,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             i * _HC_Ly + CCommonData::m_sCenter.y]);
         if (m_bShowResult)
         {
-            appGeneral(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+            appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
                 m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].x,
                 m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y < F(0.0) ? _T("") : _T("+"),
                 appAbs(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y));

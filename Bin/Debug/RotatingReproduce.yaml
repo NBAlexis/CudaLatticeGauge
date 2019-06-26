@@ -165,14 +165,14 @@ JobThermal:
     BeforeEquvibStep : 150
     EquvibSkip : 20
     EquvibStep : 200
-    OmegaSep : 10
-    MaxOmega : 0.2
+    OmegaSep : 12
+    MaxOmega : 0.12
     MinNt : 3
-    MaxNt : 8
+    MaxNt : 9
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 10, 8]
+    LatticeLength : [12, 12, 12, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -204,14 +204,14 @@ JobThermal:
     ## Nt6FileName : Nt6_532_q.con_
     ## Nt6Polyakov : 0.1429345028641144
 
-    ## Nt2FileName : Nt2_502_17.con_
-    ## Nt2Polyakov : 1.3409688185564654
-    ## Nt3FileName : Nt3_502_17.con_
-    ## Nt3Polyakov : 0.03018131019325852
-    ## Nt4FileName : Nt4_502_17.con_
-    ## Nt4Polyakov : 0.12804770999946194
-    ## Nt5FileName : Nt5_502_17.con_
-    ## Nt5Polyakov : 0.12517811720620411
+    Nt2FileName : Nt2_502_17.con_
+    Nt2Polyakov : 1.3409688185564654
+    Nt3FileName : Nt3_502_17.con_
+    Nt3Polyakov : 0.03018131019325852
+    Nt4FileName : Nt4_502_17.con_
+    Nt4Polyakov : 0.12804770999946194
+    Nt5FileName : Nt5_502_17.con_
+    Nt5Polyakov : 0.12517811720620411
 
     Updator:
 
@@ -260,7 +260,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.0
+        Beta : 5.02
         Omega : 0.0
 
     Action2:
@@ -276,16 +276,16 @@ JobThermal:
         DiviationStep : 10
         MaxStep : 100
 
-        # SolverName : CSLASolverGMRES
+        SolverName : CSLASolverGMRES
         # double
-        # Accuracy : 0.000000001
+        Accuracy : 0.0000000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
-        # MaxDim : 30
+        MaxDim : 20
 
-        SolverName : CSLASolverGCRODR
-        Accuracy : 0.00001
+        # SolverName : CSLASolverGCRODR
+        # Accuracy : 0.00001
         MDim : 26
         KDim : 5
 
@@ -299,11 +299,11 @@ JobThermal:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
-        ShowResult : 0
+        ShowResult : 1
 
     Measure2:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 25
+        FieldCount : 1
         ShowResult : 0
