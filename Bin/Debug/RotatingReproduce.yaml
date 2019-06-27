@@ -162,17 +162,18 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 150
-    EquvibSkip : 20
-    EquvibStep : 200
-    OmegaSep : 12
-    MaxOmega : 0.12
+    BeforeEquvibStep : 80
+    EquvibSkip : 10
+    EquvibStep : 50
+    OmegaSep : 1
+    MaxOmega : 0.21
     MinNt : 3
-    MaxNt : 9
+    MaxNt : 8
+    SavePrefix : 4518_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 12]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -204,14 +205,14 @@ JobThermal:
     ## Nt6FileName : Nt6_532_q.con_
     ## Nt6Polyakov : 0.1429345028641144
 
-    Nt2FileName : Nt2_502_17.con_
-    Nt2Polyakov : 1.3409688185564654
-    Nt3FileName : Nt3_502_17.con_
-    Nt3Polyakov : 0.03018131019325852
-    Nt4FileName : Nt4_502_17.con_
-    Nt4Polyakov : 0.12804770999946194
-    Nt5FileName : Nt5_502_17.con_
-    Nt5Polyakov : 0.12517811720620411
+    ## Nt2FileName : Nt2_502_17.con_
+    ## Nt2Polyakov : 1.3409688185564654
+    ## Nt3FileName : Nt3_502_17.con_
+    ## Nt3Polyakov : 0.03018131019325852
+    ## Nt4FileName : Nt4_502_17.con_
+    ## Nt4Polyakov : 0.12804770999946194
+    ## Nt5FileName : Nt5_502_17.con_
+    ## Nt5Polyakov : 0.12517811720620411
 
     Updator:
 
@@ -245,7 +246,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.17
+        Hopping : 0.18
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -260,7 +261,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.02
+        Beta : 4.5
         Omega : 0.0
 
     Action2:

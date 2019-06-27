@@ -4,3 +4,15 @@
 *.txt
 
 /SampleProducer
+/curand64_10.dll
+/*.pdb
+/*.ipdb
+/*.exp
+/*.iobj
+/SampleProducer.lib
+/SampleProducer.exe
+/RotatingReproducer.lib
+/RotatingReproducer.exe
+/CLGLib.dll
+/CLGTest.exe
+/CLGTest.lib

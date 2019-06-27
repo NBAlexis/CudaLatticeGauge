@@ -3,3 +3,15 @@
 *.con
 *.txt
 
+/*.exp
+/*.ilk
+/*.pdb
+/CLGLib_d.dll
+/CLGTest_d.exe
+/CLGTest_d.lib
+/CudaLibTest_d.exe
+/RotatingReproducer_d.exe
+/SampleProducer_d.exe
+/SampleProducer_d.lib
+/curand64_10.dll
+/RotatingReproducer_d.lib

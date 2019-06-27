@@ -117,7 +117,7 @@ INT TestThermal(CParameters& params)
             if (fError < F(1E-07))
             {
                 appGeneral(_T("\n ================ Bake using old file =================\n"));
-                //bNeedBake = FALSE;
+                bNeedBake = FALSE;
             }
             else
             {
