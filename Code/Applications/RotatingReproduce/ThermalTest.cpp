@@ -37,6 +37,14 @@ INT TestThermal(CParameters& params)
     params.FetchValueINT(_T("MaxNt"), iVaule);
     UINT iMaxNt = static_cast<UINT>(iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SaveStartIndex"), iVaule);
+    UINT iSaveStartIndex = static_cast<UINT>(iVaule);
+
+    iVaule = 0;
+    params.FetchValueINT(_T("OmegaStart"), iVaule);
+    UINT iOmegaStart = static_cast<UINT>(iVaule);
+        
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
@@ -158,7 +166,7 @@ INT TestThermal(CParameters& params)
             appSetLogDate(TRUE);
         }
 
-        UINT uiOmega = 0;
+        UINT uiOmega = iOmegaStart;
         Real fSep = fMaxOmega / iAfterEquib;
         while (uiOmega <= iAfterEquib)
         {
@@ -177,7 +185,7 @@ INT TestThermal(CParameters& params)
                 UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
                 if (uiAcce != iConfigNumberNow)
                 {
-                    sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce);
+                    sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce + iSaveStartIndex);
                     sFileName = sSavePrefix + sFileName;
                     //=================================
                     //Save info

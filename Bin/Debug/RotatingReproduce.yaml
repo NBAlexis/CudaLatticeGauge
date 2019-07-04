@@ -162,18 +162,20 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 80
+    BeforeEquvibStep : 100
     EquvibSkip : 10
     EquvibStep : 50
+    SaveStartIndex : 0
     OmegaSep : 1
-    MaxOmega : 0.21
-    MinNt : 3
-    MaxNt : 8
-    SavePrefix : 4518_
+    OmegaStart : 0
+    MaxOmega : 0.128
+    MinNt : 4
+    MaxNt : 6
+    SavePrefix : 50218_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -181,7 +183,7 @@ JobThermal:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 2
+    MeasureListLength : 1
     CacheStaple : 0
 
     ## ============================================================
@@ -261,7 +263,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.5
+        Beta : 5.02
         Omega : 0.0
 
     Action2:
