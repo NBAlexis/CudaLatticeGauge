@@ -4,3 +4,6 @@
 *.txt
 
 /*.con_
+/CLGTest
+/RotatingReproduce
+/libCLGLib.a
