@@ -69,6 +69,9 @@
 
 #define _HC_LinkCount (appGetCudaHelper()->m_ConstIntegers[ECI_LinkCount])
 #define _HC_ThreadConstraint (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaint])
+#define _HC_ThreadConstraintX (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaintX])
+#define _HC_ThreadConstraintY (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaintY)
+#define _HC_ThreadConstraintZ (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadConstaintZ])
 #define _HC_SummationDecompose (appGetCudaHelper()->m_ConstIntegers[ECI_SummationDecompose])
 
 #define _DC_Seed (_constIntegers[ECI_RandomSeed])

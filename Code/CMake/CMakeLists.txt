@@ -67,6 +67,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearing.h
@@ -125,6 +126,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
@@ -219,3 +221,18 @@ add_executable(RotatingReproduce
 
 target_compile_features(RotatingReproduce PUBLIC cxx_std_14)
 target_link_libraries(RotatingReproduce CLGLib)
+
+
+
+# ==================== 
+# MatchingRho 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/MatchingRho)
+add_executable(MatchingRho 
+    ${PROJECT_SOURCE_DIR}/Applications/MatchingRho/MatchingRho.h
+    ${PROJECT_SOURCE_DIR}/Applications/MatchingRho/MatchingRho.cpp
+    )
+
+target_compile_features(MatchingRho PUBLIC cxx_std_14)
+target_link_libraries(MatchingRho CLGLib)

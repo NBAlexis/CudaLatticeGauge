@@ -1,50 +1,48 @@
 //=============================================================================
-// FILENAME : CMeasurePolyakovXY.h
+// FILENAME : CMeasurePolyakov.h
 // 
 // DESCRIPTION:
-// This is measurement for Polyakov loop
+// This is measurement for Polyakov loop and static quark potential
+// Suitable for translational invarient case
 //
 // REVISION:
-//  [05/29/2019 nbale]
+//  [07/07/2019 nbale]
 //=============================================================================
 
-#ifndef _CMEASUREPOLYAKOVXY_H_
-#define _CMEASUREPOLYAKOVXY_H_
+#ifndef _CMEASUREPOLYAKOV_H_
+#define _CMEASUREPOLYAKOV_H_
 
 __BEGIN_NAMESPACE
 
-/**
-* array[x, y] = 0
-*/
-extern CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes);
 
-/**
-* No need to initial pRes = 0
-*/
-extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes);
+__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakov)
 
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovXY)
-
-class CLGAPI CMeasurePolyakovXY : public CMeasure
+class CLGAPI CMeasurePolyakov : public CMeasure
 {
-    __CLGDECLARE_CLASS(CMeasurePolyakovXY)
+    __CLGDECLARE_CLASS(CMeasurePolyakov)
 
 public:
 
     enum { _kGammaInInterests = 8, };
 
-    CMeasurePolyakovXY()
+    CMeasurePolyakov()
         : CMeasure()
-        , m_pXYHostLoopDensity(NULL)
-        , m_pTmpDeviceSum(NULL)
-        , m_pXYDeviceLoopDensity(NULL)
         , m_pTmpLoop(NULL)
+        , m_pTraceRes(NULL)
+        , m_pTmpDeviceSum(NULL)
+
+        , m_pCorrelator(NULL)
+        , m_pCorrelatorCounter(NULL)
+        , m_pHostCorrelator(NULL)
+        , m_pHostCorrelatorCounter(NULL)
+        , m_uiMaxLengthSq(1)
+
         , m_uiConfigurationCount(0)
-        , m_bShowResult(TRUE)
+        , m_bShowResult(FALSE)
     {
     }
 
-    ~CMeasurePolyakovXY();
+    ~CMeasurePolyakov();
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
@@ -58,26 +56,33 @@ public:
 
 protected:
 
-    CLGComplex* m_pXYHostLoopDensity;
-    CLGComplex* m_pTmpDeviceSum;
-    CLGComplex* m_pXYDeviceLoopDensity;
     deviceSU3* m_pTmpLoop;
+    CLGComplex* m_pTraceRes;
+    CLGComplex* m_pTmpDeviceSum;
+    
+    CLGComplex* m_pCorrelator;
+    UINT* m_pCorrelatorCounter;
+    CLGComplex* m_pHostCorrelator;
+    UINT* m_pHostCorrelatorCounter;
+
+    UINT m_uiMaxLengthSq;
 
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
 
 public:
 
-    TArray<CLGComplex> m_lstLoop;
-    TArray<CLGComplex> m_lstLoopDensity;
+    TArray<UINT> m_lstR;
+    TArray<CLGComplex> m_lstC;
+    TArray<CLGComplex> m_lstAverageLoop;
 
     CLGComplex m_cAverageLoop;
-    TArray<CLGComplex> m_lstAverageLoopDensity;
+    TArray<CLGComplex> m_lstAverageC;
 };
 
 __END_NAMESPACE
 
-#endif //#ifndef _CMEASUREPOLYAKOVXY_H_
+#endif //#ifndef _CMEASUREPOLYAKOV_H_
 
 //=============================================================================
 // END OF FILE

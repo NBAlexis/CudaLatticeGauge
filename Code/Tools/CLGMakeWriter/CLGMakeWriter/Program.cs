@@ -32,6 +32,9 @@ namespace CLGMakeWriter
             string projRotatingFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/RotatingReproduce.vcxproj" });
             //string projRotatingFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/CLGTest.vcxproj.filters" });
 
+            string projMatchingRhoPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho" });
+            string projMatchingRhoFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho/MatchingRho.vcxproj" });
+
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -62,6 +65,7 @@ namespace CLGMakeWriter
             Dictionary<string, CProjFile> apps = new Dictionary<string, CProjFile>();
             apps.Add("CLGTest", new CProjFile(projCLGTestFilePath, projCLGTestPath));
             apps.Add("RotatingReproduce", new CProjFile(projRotatingFilePath, projRotatingPath));
+            apps.Add("MatchingRho", new CProjFile(projMatchingRhoFilePath, projMatchingRhoPath));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 

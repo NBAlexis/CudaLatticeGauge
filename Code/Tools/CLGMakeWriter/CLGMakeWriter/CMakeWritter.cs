@@ -165,6 +165,31 @@ set_target_properties( CLGLib
 
             #endregion
 
+            #region Add Matching
+
+            CProjFile matchingProj = excutables["MatchingRho"];
+
+            sContent += "\n\n\n# ==================== \n# MatchingRho \n# =================\n\n";
+
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/MatchingRho)\n";
+            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
+
+            sContent += "add_executable(MatchingRho \n    ";
+            foreach (string sFileName in matchingProj.m_lstAllHeaderFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/MatchingRho/" + sFileName + "\n    ";
+            }
+            foreach (string sFileName in matchingProj.m_lstAllCppFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/MatchingRho/" + sFileName + "\n    ";
+            }
+            sContent += ")\n\n";
+
+            sContent += "target_compile_features(MatchingRho PUBLIC cxx_std_14)\n";
+            sContent += "target_link_libraries(MatchingRho CLGLib)\n";
+
+            #endregion
+
             sContent = sContent.Replace("\r\n", "\n");
             sContent = sContent.Replace("\n\r", "\n");
             sContent = sContent.Replace("\r", "\n");

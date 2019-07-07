@@ -16,3 +16,6 @@
 /CLGLib.dll
 /CLGTest.exe
 /CLGTest.lib
+/*.con_
+/MatchingRho.exe
+/MatchingRho.lib

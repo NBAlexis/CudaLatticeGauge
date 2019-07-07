@@ -101,6 +101,16 @@ CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes)
     _kernelPolyakovZeroXYPlane << <block, threads >> > (pDeviceRes, NULL);
 }
 
+CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes)
+{
+    dim3 block1(_HC_DecompX, _HC_DecompY, 1);
+    dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
+    for (UINT uiT = 0; uiT < _HC_Lt; ++uiT)
+    {
+        _kernelPolyakovLoopOfSite << <block1, threads1 >> >(pDeviceBuffer, uiT, pRes);
+    }
+}
+
 CMeasurePolyakovXY::~CMeasurePolyakovXY()
 {
     if (NULL != m_pXYHostLoopDensity)
@@ -188,7 +198,6 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     {
         appGeneral(_T("Loop is %f + %f I\n"), res[0].x, res[0].y);
     }
-
 
     for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
     {

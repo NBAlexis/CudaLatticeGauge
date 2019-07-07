@@ -93,6 +93,9 @@ enum EConstIntId
     ECI_MeasureListLength,
     ECI_SUN,
     ECI_ThreadConstaint,
+    ECI_ThreadConstaintX,
+    ECI_ThreadConstaintY,
+    ECI_ThreadConstaintZ,
     ECI_SummationDecompose,
 
     ECI_ForceDWORD = 0x7fffffff,

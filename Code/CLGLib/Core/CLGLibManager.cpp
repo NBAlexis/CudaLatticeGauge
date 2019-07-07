@@ -115,7 +115,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("ThreadAutoDecompose"), 1);
 
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+
+
     m_InitialCache.constIntegers[ECI_ThreadConstaint] = deviceConstraints[0];
+    m_InitialCache.constIntegers[ECI_ThreadConstaintX] = deviceConstraints[1];
+    m_InitialCache.constIntegers[ECI_ThreadConstaintY] = deviceConstraints[2];
+    m_InitialCache.constIntegers[ECI_ThreadConstaintZ] = deviceConstraints[3];
 
     if (0 == iVaules)
     {

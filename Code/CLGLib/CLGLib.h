@@ -173,6 +173,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Measurement/CMeasureChargeAndCurrents.h"
 #include "Measurement/CMeasureTopologicChargeXY.h"
 #include "Measurement/CMeasurePolyakovXY.h"
+#include "Measurement/CMeasurePolyakov.h"
 #include "Measurement/CMeasureChiralCondensate.h"
 
 #include "Measurement/CMeasurementManager.h"

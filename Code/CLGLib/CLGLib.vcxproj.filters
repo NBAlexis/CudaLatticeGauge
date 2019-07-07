@@ -308,6 +308,9 @@
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasurePolyakov.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -379,9 +382,6 @@
     </ClCompile>
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
       <Filter>SparseLinearAlgebra</Filter>
-    </ClCompile>
-    <ClCompile Include="Measurement\CMeasureChiralCondensate.cu">
-      <Filter>Measurement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -461,6 +461,10 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu" />
+    <CudaCompile Include="Measurement\CMeasurePolyakov.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>

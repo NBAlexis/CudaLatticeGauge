@@ -43,6 +43,7 @@ public:
 
     //When a configuration is generated, result[nt] = (result[nt] * N + newresult[nt])/(N+1), N=N+1,
     TArray<TArray<Real>> m_lstResults;
+    TArray<TArray<Real>> m_lstResultsLastConf;
     UINT m_uiResoultCount;
     //This is a complex field at each site
     CLGComplex * m_pDeviceCorrelator;

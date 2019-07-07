@@ -1,0 +1,102 @@
+VerboseLevel : GENERAL
+# VerboseLevel : PARANOIAC
+VerboseOutput : datetime
+ShowDeviceInformation : 0
+ShowParameterContent : 1
+BeforeEquvibStep : 10
+EquvibStep : 30
+SavePrefix : 4518_
+
+Dim : 4
+Dir : 4
+LatticeLength : [8, 8, 10, 20]
+LatticeIndex : CIndexSquare
+LatticeBoundary : CBoundaryConditionTorusSquare
+ThreadAutoDecompose : 1
+RandomType : ER_XORWOW
+RandomSeedType : ERST_Timestamp
+ActionListLength : 2
+FermionFieldCount : 1
+MeasureListLength : 2
+CacheStaple : 1
+
+## ============================================================
+## Initial files
+## ============================================================
+
+
+Updator:
+
+    UpdatorType : CHMC
+    Metropolis : 1
+    ReportMeasure : 0
+    Adaptive : 1
+    MinMaxStep : [1, 50]
+    GrowReduceThreshold : [-0.4, 0.02]
+
+    ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+    IntegratorType : CIntegratorNestedForceGradient
+    ## IntegratorType : CIntegratorForceGradient
+    IntegratorStepLength : 1
+    IntegratorStep : 5
+    NestedStep : 5
+    Omelyan2Lambda : 0.38636665500756728
+
+Gauge:
+
+    FieldName : CFieldGaugeSU3
+    FieldInitialType : EFIT_Random
+
+    Period : [1, 1, 1, 1]
+
+FermionField1:
+
+    FieldName : CFieldFermionWilsonSquareSU3
+    FieldInitialType : EFIT_RandomGaussian
+    Hopping : 0.18
+    FieldId : 2
+    PoolNumber : 5
+    Period : [1, 1, 1, -1]
+
+		
+Action1:
+   
+    ActionName : CActionGaugePlaquette
+    Beta : 4.5
+
+
+Action2:
+    ActionName : CActionFermionWilsonNf2
+    FieldId : 2
+
+Solver:
+    SolverForFieldId : 2
+
+    # SolverName : CSLASolverGMRES
+    # double
+    # Accuracy : 0.0000000001
+    # float
+    # Accuracy : 0.000001
+    # MaxDim = 15 for 5.0(or 5.02) and 0.17
+    MaxDim : 20
+
+    SolverName : CSLASolverGCRODR
+    Accuracy : 0.00001
+    MDim : 26
+    KDim : 5
+    RecalculateR : 2
+    DeflateSpace : EEDT_SVD
+    Restart : 200
+    AbsoluteAccuracy : 1
+
+Measure1:
+
+    MeasureName : CMeasurePolyakov
+    FieldId : 1
+
+Measure2:
+
+    MeasureName : CMeasureMesonCorrelator
+    GammaMatrix : [ UNITY, GAMMA51, GAMMA52, GAMMA53 ]
+    FieldId : 2
+

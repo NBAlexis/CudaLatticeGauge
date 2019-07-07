@@ -219,6 +219,9 @@ void CMeasureMesonCorrelator::Report()
         appGeneral(_T("No Gamma matrix is measured.\n"));
         return;
     }
+
+    appSetLogDate(FALSE);
+
     assert(m_lstResults.Num() == m_lstGammas.Num());
     appGeneral(_T("CMeasureMesonCorrelator final report: Number of configurations = %d\n"), m_uiResoultCount);
     for (INT i = 0; i < m_lstResults.Num(); ++i)
@@ -243,6 +246,8 @@ void CMeasureMesonCorrelator::Report()
         }
         appGeneral(_T("\n"));
     }
+
+    appSetLogDate(TRUE);
 }
 
 void CMeasureMesonCorrelator::Reset()
@@ -251,6 +256,7 @@ void CMeasureMesonCorrelator::Reset()
     m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
     m_uiResoultCount = 0;
     m_lstResults.RemoveAll();
+    m_lstResultsLastConf.RemoveAll();
 }
 
 void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, const CFieldGauge* pStaple)
@@ -342,12 +348,14 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
                 thisGammaResult.AddItem(sumSpatial[j]);
             }
             m_lstResults.AddItem(thisGammaResult);
+            m_lstResultsLastConf.AddItem(thisGammaResult);
         }
         else
         {
             assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
             for (UINT j = 0; j < m_uiLt; ++j)
             {
+                m_lstResultsLastConf[i][j] = sumSpatial[j];
                 m_lstResults[i][j] = 
                     (m_lstResults[i][j] * m_uiResoultCount + sumSpatial[j]) / (m_uiResoultCount + 1);
             }
