@@ -93,6 +93,54 @@ _kernelPolyakovAverageOverZAndSum(
     resXY[uiXY] = cuCdivf_cr(resXY[uiXY], _DC_Lz);
 }
 
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelPolyakovInitialDist(UINT* pCount, CLGComplex* pValue)
+{
+    pCount[threadIdx.x] = 0;
+    pValue[threadIdx.x] = _make_cuComplex(F(0.0), F(0.0));
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelPolyakovMeasureDist(
+    const CLGComplex* __restrict__ traceXY,
+    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
+    UINT* counter, CLGComplex* correlator)
+{
+    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
+    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
+    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
+             + (sCenter.y - uiY) * (sCenter.y - uiY);
+
+    SSmallInt4 sSite4;
+    sSite4.z = sCenter.z;
+    sSite4.w = sCenter.w;
+    sSite4.x = uiX;
+    sSite4.y = uiY;
+    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    {
+        atomicAdd(&counter[uiC], 1);
+        atomicAdd(&correlator[uiC].x, traceXY[uiXY].x);
+        atomicAdd(&correlator[uiC].y, traceXY[uiXY].y);
+    }
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelPolyakovAverageDist(UINT* pCount, CLGComplex* pValue)
+{
+    UINT uiIdx = threadIdx.x;
+    if (pCount[uiIdx] > 0)
+    {
+        pValue[uiIdx].x =
+            pValue[uiIdx].x / static_cast<Real>(pCount[uiIdx]);
+        pValue[uiIdx].y =
+            pValue[uiIdx].y / static_cast<Real>(pCount[uiIdx]);
+    }
+}
+
 #pragma endregion
 
 CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes)
@@ -132,6 +180,26 @@ CMeasurePolyakovXY::~CMeasurePolyakovXY()
     {
         checkCudaErrors(cudaFree(m_pTmpLoop));
     }
+
+    if (NULL != m_pDistributionR)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionR));
+    }
+
+    if (NULL != m_pDistributionP)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionP));
+    }
+
+    if (NULL != m_pHostDistributionR)
+    {
+        free(m_pHostDistributionR);
+    }
+
+    if (NULL != m_pHostDistributionP)
+    {
+        free(m_pHostDistributionP);
+    }
 }
 
 void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -151,6 +219,24 @@ void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
     iValue = 1;
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
+
+    iValue = 1;
+    param.FetchValueINT(_T("MeasureDist"), iValue);
+    m_bMeasureDistribution = iValue != 0;
+
+    if (m_bMeasureDistribution)
+    {
+        //assuming the center is really at center
+        m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
+                 + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
+
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1)));
+
+        m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
+        m_pHostDistributionP = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
+    }
+
 }
 
 void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
@@ -178,6 +264,68 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     _kernelPolyakovTraceOfSiteXY << <block1, threads1 >> >(m_pTmpLoop, m_pXYDeviceLoopDensity);
 
     _kernelPolyakovAverageOverZAndSum << <block2, threads2 >> >(m_pXYDeviceLoopDensity, m_pTmpDeviceSum);
+
+    if (m_bMeasureDistribution)
+    {
+        dim3 block3(m_uiMaxR + 1, 1, 1);
+        dim3 threads3(m_uiMaxR + 1, 1, 1);
+
+        _kernelPolyakovInitialDist<<<block3, threads3 >>>(m_pDistributionR, m_pDistributionP);
+
+        _kernelPolyakovMeasureDist << <block2, threads2 >> >(
+            m_pXYDeviceLoopDensity,
+            CCommonData::m_sCenter,
+            m_uiMaxR,
+            m_byFieldId,
+            m_pDistributionR,
+            m_pDistributionP
+        );
+
+        _kernelPolyakovAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionP);
+
+        //extract res
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionP, m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        if (0 == m_uiConfigurationCount)
+        {
+            assert(0 == m_lstR.Num());
+            assert(0 == m_lstP.Num());
+
+            for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
+            {
+                if (m_pHostDistributionR[uiL] > 0)
+                {
+                    m_lstR.AddItem(uiL);
+                    m_lstP.AddItem(m_pHostDistributionP[uiL]);
+
+                    if (m_bShowResult)
+                    {
+                        appDetailed(_T("C(%f)=%f + %f I\n"),
+                            _hostsqrt(static_cast<Real>(uiL)),
+                            m_pHostDistributionP[uiL].x,
+                            m_pHostDistributionP[uiL].y);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (INT i = 0; i < m_lstR.Num(); ++i)
+            {
+                assert(m_pHostDistributionR[m_lstR[i]] > 0);
+                m_lstP.AddItem(m_pHostDistributionP[m_lstR[i]]);
+
+                if (m_bShowResult)
+                {
+                    appDetailed(_T("C(%f)=%f + %f I\n"),
+                        _hostsqrt(static_cast<Real>(m_lstR[i])),
+                        m_pHostDistributionP[m_lstR[i]].x,
+                        m_pHostDistributionP[m_lstR[i]].y);
+                }
+            }
+        }
+    }
 
     //extract res
     CLGComplex res[1];
@@ -295,6 +443,9 @@ void CMeasurePolyakovXY::Reset()
     m_uiConfigurationCount = 0;
     m_lstLoop.RemoveAll();
     m_lstLoopDensity.RemoveAll();
+
+    m_lstR.RemoveAll();
+    m_lstP.RemoveAll();
 }
 
 __END_NAMESPACE

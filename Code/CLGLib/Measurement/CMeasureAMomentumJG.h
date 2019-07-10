@@ -39,6 +39,15 @@ public:
         , m_pHostDataBuffer(NULL)
         , m_pDeviceDataBufferOneConfig(NULL)
         , m_byFieldId(1)
+
+        , m_pDistributionR(NULL)
+        , m_pDistributionJG(NULL)
+        , m_pHostDistributionR(NULL)
+        , m_pHostDistributionJG(NULL)
+
+        , m_uiMaxR(1)
+        , m_bMeasureDistribution(FALSE)
+
         , m_uiConfigurationCount(0)
         , m_bShowResult(TRUE)
     {
@@ -61,9 +70,23 @@ protected:
     Real * m_pHostDataBuffer;
     Real * m_pDeviceDataBufferOneConfig;
     BYTE m_byFieldId;
+
+    UINT* m_pDistributionR;
+    Real* m_pDistributionJG;
+    UINT* m_pHostDistributionR;
+    Real* m_pHostDistributionJG;
+
+    UINT m_uiMaxR;
+    UBOOL m_bMeasureDistribution;
+
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
     TArray<Real> m_lstRes;
+
+public:
+
+    TArray<UINT> m_lstR;
+    TArray<Real> m_lstJG;
 };
 
 __END_NAMESPACE

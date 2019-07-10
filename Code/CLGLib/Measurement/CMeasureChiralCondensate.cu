@@ -31,6 +31,50 @@ _kernelDotAndGatherXY(
     atomicAdd(&resultXYPlane[uiXY].y, result[uiSiteIndex].y);
 }
 
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelChiralCondensateInitialDist(UINT* pCount, Real* pValue)
+{
+    pCount[threadIdx.x] = 0;
+    pValue[threadIdx.x] = F(0.0);
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelChiralCondensateMeasureDist(
+    const CLGComplex* __restrict__ chiralXY,
+    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
+    UINT* counter, Real* correlator)
+{
+    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
+    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
+    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
+        + (sCenter.y - uiY) * (sCenter.y - uiY);
+
+    SSmallInt4 sSite4;
+    sSite4.z = sCenter.z;
+    sSite4.w = sCenter.w;
+    sSite4.x = uiX;
+    sSite4.y = uiY;
+    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    {
+        atomicAdd(&counter[uiC], 1);
+        atomicAdd(&correlator[uiC], chiralXY[uiXY].x);
+    }
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelChiralAverageDist(UINT* pCount, Real* pValue)
+{
+    UINT uiIdx = threadIdx.x;
+    if (pCount[uiIdx] > 0)
+    {
+        pValue[uiIdx] = pValue[uiIdx] / static_cast<Real>(pCount[uiIdx]);
+    }
+}
+
 #pragma endregion
 
 CMeasureChiralCondensate::~CMeasureChiralCondensate()
@@ -39,6 +83,26 @@ CMeasureChiralCondensate::~CMeasureChiralCondensate()
     {
         checkCudaErrors(cudaFree(m_pDeviceXYBuffer));
         free(m_pHostXYBuffer);
+    }
+
+    if (NULL != m_pDistributionR)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionR));
+    }
+
+    if (NULL != m_pDistributionC)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionC));
+    }
+
+    if (NULL != m_pHostDistributionR)
+    {
+        free(m_pHostDistributionR);
+    }
+
+    if (NULL != m_pHostDistributionC)
+    {
+        free(m_pHostDistributionC);
     }
 }
 
@@ -62,6 +126,23 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
     iValue = 1;
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
+
+    iValue = 1;
+    param.FetchValueINT(_T("MeasureDist"), iValue);
+    m_bMeasureDistribution = iValue != 0;
+
+    if (m_bMeasureDistribution)
+    {
+        //assuming the center is really at center
+        m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
+            + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
+
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionC, sizeof(Real) * (m_uiMaxR + 1)));
+
+        m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
+        m_pHostDistributionC = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+    }
 }
 
 void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
@@ -99,6 +180,68 @@ void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge
         res.x = res.x + thisSum.x / uiVolume;
         res.y = res.y + thisSum.y / uiVolume;
 
+    }
+
+    if (m_bMeasureDistribution)
+    {
+        dim3 block2(_HC_DecompX, 1, 1);
+        dim3 threads2(_HC_DecompLx, 1, 1);
+        dim3 block3(m_uiMaxR + 1, 1, 1);
+        dim3 threads3(m_uiMaxR + 1, 1, 1);
+
+        _kernelChiralCondensateInitialDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionC);
+
+        _kernelChiralCondensateMeasureDist << <block2, threads2 >> >(
+            m_pDeviceXYBuffer,
+            CCommonData::m_sCenter,
+            m_uiMaxR,
+            m_byFieldId,
+            m_pDistributionR,
+            m_pDistributionC
+            );
+
+        _kernelChiralAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionC);
+
+        //extract res
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionC, m_pDistributionC, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        if (0 == m_uiConfigurationCount)
+        {
+            assert(0 == m_lstR.Num());
+            assert(0 == m_lstC.Num());
+
+            for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
+            {
+                if (m_pHostDistributionR[uiL] > 0)
+                {
+                    m_lstR.AddItem(uiL);
+                    m_lstC.AddItem(m_pHostDistributionC[uiL] / (m_uiFieldCount * _HC_Lz * _HC_Lt));
+
+                    if (m_bShowResult)
+                    {
+                        appDetailed(_T("C(%f)=%f, \n"),
+                            _hostsqrt(static_cast<Real>(uiL)),
+                            m_pHostDistributionC[uiL]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (INT i = 0; i < m_lstR.Num(); ++i)
+            {
+                assert(m_pHostDistributionR[m_lstR[i]] > 0);
+                m_lstC.AddItem(m_pHostDistributionC[m_lstR[i]] / (m_uiFieldCount * _HC_Lz * _HC_Lt));
+
+                if (m_bShowResult)
+                {
+                    appDetailed(_T("C(%f)=%f, \n"),
+                        _hostsqrt(static_cast<Real>(m_lstR[i])),
+                        m_pHostDistributionC[m_lstR[i]]);
+                }
+            }
+        }
     }
 
     checkCudaErrors(cudaMemcpy(m_pHostXYBuffer, m_pDeviceXYBuffer, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -219,6 +362,9 @@ void CMeasureChiralCondensate::Reset()
     m_uiConfigurationCount = 0;
     m_lstCondensate.RemoveAll();
     m_lstCondensateDensity.RemoveAll();
+
+    m_lstR.RemoveAll();
+    m_lstC.RemoveAll();
 }
 
 __END_NAMESPACE

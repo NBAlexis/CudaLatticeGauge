@@ -230,7 +230,7 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
                 if (m_bShowResult)
                 {
                     appDetailed(_T("C(%f)=%f + %f I\n"), 
-                        _hostsqrt(uiL), 
+                        _hostsqrt(static_cast<Real>(uiL)),
                         m_pHostCorrelator[uiL].x,
                         m_pHostCorrelator[uiL].y);
                 }
@@ -247,7 +247,7 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
             if (m_bShowResult)
             {
                 appDetailed(_T("C(%f)=%f + %f I\n"),
-                    _hostsqrt(m_lstR[i]),
+                    _hostsqrt(static_cast<Real>(m_lstR[i])),
                     m_pHostCorrelator[m_lstR[i]].x,
                     m_pHostCorrelator[m_lstR[i]].y);
             }
@@ -306,7 +306,7 @@ void CMeasurePolyakov::Report()
     for (INT i = 0; i < m_lstR.Num(); ++i)
     {
         appGeneral(_T("%2.12f%s "), 
-            _hostsqrt(m_lstR[i]), 
+            _hostsqrt(static_cast<Real>(m_lstR[i])),
             (i == m_lstR.Num() - 1) ? _T("") : _T(","));
     }
     appGeneral(_T("}\n"));

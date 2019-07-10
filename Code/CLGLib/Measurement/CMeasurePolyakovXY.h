@@ -39,7 +39,15 @@ public:
         , m_pTmpDeviceSum(NULL)
         , m_pXYDeviceLoopDensity(NULL)
         , m_pTmpLoop(NULL)
+
+        , m_pDistributionR(NULL)
+        , m_pDistributionP(NULL)
+        , m_pHostDistributionR(NULL)
+        , m_pHostDistributionP(NULL)
+
         , m_uiConfigurationCount(0)
+        , m_uiMaxR(1)
+        , m_bMeasureDistribution(FALSE)
         , m_bShowResult(TRUE)
     {
     }
@@ -63,7 +71,17 @@ protected:
     CLGComplex* m_pXYDeviceLoopDensity;
     deviceSU3* m_pTmpLoop;
 
+    //The count of points with x^2+y^2=r^2
+    UINT* m_pDistributionR;
+    //<P>(R^2)
+    CLGComplex* m_pDistributionP;
+
+    UINT* m_pHostDistributionR;
+    CLGComplex* m_pHostDistributionP;
+
     UINT m_uiConfigurationCount;
+    UINT m_uiMaxR;
+    UBOOL m_bMeasureDistribution;
     UBOOL m_bShowResult;
 
 public:
@@ -73,6 +91,9 @@ public:
 
     CLGComplex m_cAverageLoop;
     TArray<CLGComplex> m_lstAverageLoopDensity;
+
+    TArray<UINT> m_lstR;
+    TArray<CLGComplex> m_lstP;
 };
 
 __END_NAMESPACE

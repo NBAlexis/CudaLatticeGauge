@@ -93,6 +93,49 @@ _kernelCalculateAngularMomentumJG(
     atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
 }
 
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelMomentumJGInitialDist(UINT* pCount, Real* pValue)
+{
+    pCount[threadIdx.x] = 0;
+    pValue[threadIdx.x] = F(0.0);
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelMomentumJGMeasureDist(
+    const Real* __restrict__ jgXY,
+    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
+    UINT* counter, Real* correlator)
+{
+    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
+    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
+    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
+             + (sCenter.y - uiY) * (sCenter.y - uiY);
+
+    SSmallInt4 sSite4;
+    sSite4.z = sCenter.z;
+    sSite4.w = sCenter.w;
+    sSite4.x = uiX;
+    sSite4.y = uiY;
+    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    {
+        atomicAdd(&counter[uiC], 1);
+        atomicAdd(&correlator[uiC], jgXY[uiXY]);
+    }
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelMomentumJGAverageDist(UINT* pCount, Real* pValue)
+{
+    UINT uiIdx = threadIdx.x;
+    if (pCount[uiIdx] > 0)
+    {
+        pValue[uiIdx] = pValue[uiIdx] / static_cast<Real>(pCount[uiIdx]);
+    }
+}
 
 #pragma endregion
 
@@ -124,6 +167,26 @@ CMeasureAMomentumJG::~CMeasureAMomentumJG()
     {
         checkCudaErrors(cudaFree(m_pDeviceDataBufferOneConfig));
     }
+
+    if (NULL != m_pDistributionR)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionR));
+    }
+
+    if (NULL != m_pDistributionJG)
+    {
+        checkCudaErrors(cudaFree(m_pDistributionJG));
+    }
+
+    if (NULL != m_pHostDistributionR)
+    {
+        free(m_pHostDistributionR);
+    }
+
+    if (NULL != m_pHostDistributionJG)
+    {
+        free(m_pHostDistributionJG);
+    }
 }
 
 void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -141,6 +204,23 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     iValue = 1;
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
+
+    iValue = 1;
+    param.FetchValueINT(_T("MeasureDist"), iValue);
+    m_bMeasureDistribution = iValue != 0;
+
+    if (m_bMeasureDistribution)
+    {
+        //assuming the center is really at center
+        m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
+                 + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
+
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+        checkCudaErrors(cudaMalloc((void**)&m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1)));
+
+        m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
+        m_pHostDistributionJG = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+    }
 }
 
 void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
@@ -166,6 +246,68 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         m_byFieldId);
 
     _AverageXYPlane(m_pDeviceDataBufferOneConfig);
+
+    if (m_bMeasureDistribution)
+    {
+        dim3 block2(_HC_DecompX, 1, 1);
+        dim3 threads2(_HC_DecompLx, 1, 1);
+        dim3 block3(m_uiMaxR + 1, 1, 1);
+        dim3 threads3(m_uiMaxR + 1, 1, 1);
+
+        _kernelMomentumJGInitialDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionJG);
+
+        _kernelMomentumJGMeasureDist << <block2, threads2 >> >(
+            m_pDeviceDataBufferOneConfig,
+            CCommonData::m_sCenter,
+            m_uiMaxR,
+            m_byFieldId,
+            m_pDistributionR,
+            m_pDistributionJG
+            );
+
+        _kernelMomentumJGAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionJG);
+
+        //extract res
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        if (0 == m_uiConfigurationCount)
+        {
+            assert(0 == m_lstR.Num());
+            assert(0 == m_lstJG.Num());
+
+            for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
+            {
+                if (m_pHostDistributionR[uiL] > 0)
+                {
+                    m_lstR.AddItem(uiL);
+                    m_lstJG.AddItem(m_pHostDistributionJG[uiL]);
+
+                    if (m_bShowResult)
+                    {
+                        appDetailed(_T("JG(%f)=%f, \n"),
+                            _hostsqrt(static_cast<Real>(uiL)),
+                            m_pHostDistributionJG[uiL]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (INT i = 0; i < m_lstR.Num(); ++i)
+            {
+                assert(m_pHostDistributionR[m_lstR[i]] > 0);
+                m_lstJG.AddItem(m_pHostDistributionJG[m_lstR[i]]);
+
+                if (m_bShowResult)
+                {
+                    appDetailed(_T("JG(%f)=%f, \n"),
+                        _hostsqrt(static_cast<Real>(m_lstR[i])),
+                        m_pHostDistributionJG[m_lstR[i]]);
+                }
+            }
+        }
+    }
 
     ++m_uiConfigurationCount;
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferOneConfig, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -262,6 +404,9 @@ void CMeasureAMomentumJG::Reset()
 {
     m_uiConfigurationCount = 0;
     m_lstRes.RemoveAll();
+
+    m_lstR.RemoveAll();
+    m_lstJG.RemoveAll();
 }
 
 __END_NAMESPACE

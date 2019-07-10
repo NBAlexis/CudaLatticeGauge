@@ -13,11 +13,13 @@
 __DEFINE_ENUM(ERotatingJob,
     ERJ_AngularMomentum,
     ERJ_Thermal,
+    ERJ_PolyakovDist,
     )
 
 
 extern INT TestAngularMomentum(CParameters& params);
 extern INT TestThermal(CParameters& params);
+extern INT MeasurePolyakovDist(CParameters& params);
 
 
 

@@ -1,44 +1,47 @@
 //=============================================================================
-// FILENAME : CMeasureChiralCondensate.h
+// FILENAME : CMeasureAMomentumStochastic.h
 // 
 // DESCRIPTION:
 // NOTE: 
 //
 // REVISION:
-//  [05/28/2019 nbale]
+//  [07/10/2019 nbale]
 //=============================================================================
 
-#ifndef _CMEASURECHIRALCONDENSATE_H_
-#define _CMEASURECHIRALCONDENSATE_H_
+#ifndef _CMEASUREAMOMENTUMSTOCHASTIC_H_
+#define _CMEASUREAMOMENTUMSTOCHASTIC_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CMeasureChiralCondensate)
+__CLG_REGISTER_HELPER_HEADER(CMeasureAMomentumStochastic)
 
-class CLGAPI CMeasureChiralCondensate : public CMeasure
+class CLGAPI CMeasureAMomentumStochastic : public CMeasure
 {
-    __CLGDECLARE_CLASS(CMeasureChiralCondensate)
+    __CLGDECLARE_CLASS(CMeasureAMomentumStochastic)
 public:
-    CMeasureChiralCondensate()
+    CMeasureAMomentumStochastic()
         : CMeasure()
         , m_uiFieldCount(100)
         , m_uiConfigurationCount(0)
-        , m_pDeviceXYBuffer(NULL)
-        , m_pHostXYBuffer(NULL)
+        , m_pDeviceXYBufferJL(NULL)
+        , m_pDeviceXYBufferJS(NULL)
+        , m_bExponential(TRUE)
+        , m_bNaive(TRUE)
 
         , m_pDistributionR(NULL)
-        , m_pDistributionC(NULL)
+        , m_pDistributionJL(NULL)
+        , m_pDistributionJS(NULL)
         , m_pHostDistributionR(NULL)
-        , m_pHostDistributionC(NULL)
+        , m_pHostDistributionJL(NULL)
+        , m_pHostDistributionJS(NULL)
 
         , m_uiMaxR(1)
-        , m_bMeasureDistribution(FALSE)
         , m_bShowResult(FALSE)
     {
         
     }
 
-    ~CMeasureChiralCondensate();
+    ~CMeasureAMomentumStochastic();
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
@@ -54,33 +57,32 @@ protected:
     
     UINT m_uiFieldCount;
     UINT m_uiConfigurationCount;
-    CLGComplex* m_pDeviceXYBuffer;
-    CLGComplex* m_pHostXYBuffer;
+    Real* m_pDeviceXYBufferJL;
+    Real* m_pDeviceXYBufferJS;
+
+    UBOOL m_bExponential;
+    UBOOL m_bNaive;
 
     UINT* m_pDistributionR;
-    Real* m_pDistributionC;
+    Real* m_pDistributionJL;
+    Real* m_pDistributionJS;
     UINT* m_pHostDistributionR;
-    Real* m_pHostDistributionC;
+    Real* m_pHostDistributionJL;
+    Real* m_pHostDistributionJS;
 
     UINT m_uiMaxR;
-    UBOOL m_bMeasureDistribution;
     UBOOL m_bShowResult;
 
 public:
 
-    TArray<CLGComplex> m_lstCondensate;
-    TArray<CLGComplex> m_lstCondensateDensity;
-    CLGComplex m_cAverageCondensate;
-    TArray<CLGComplex> m_lstAverageCondensateDensity;
-
-    //c(R)
     TArray<UINT> m_lstR;
-    TArray<Real> m_lstC;
+    TArray<Real> m_lstJL;
+    TArray<Real> m_lstJS;
 };
 
 __END_NAMESPACE
 
-#endif //#ifndef _CMEASURECHIRALCONDENSATE_H_
+#endif //#ifndef _CMEASUREAMOMENTUMSTOCHASTIC_H_
 
 //=============================================================================
 // END OF FILE

@@ -175,6 +175,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Measurement/CMeasurePolyakovXY.h"
 #include "Measurement/CMeasurePolyakov.h"
 #include "Measurement/CMeasureChiralCondensate.h"
+#include "Measurement/CMeasureAMomentumStochastic.h"
 
 #include "Measurement/CMeasurementManager.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"

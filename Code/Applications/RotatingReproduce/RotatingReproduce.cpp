@@ -32,11 +32,17 @@ int main(int argc, char * argv[])
         res = TestAngularMomentum(workingParam1);
     }
         break;
-    case ERJ_Thermal:
-    {
-        CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
-        res = TestThermal(workingParam2);
-    }
+        case ERJ_Thermal:
+        {
+            CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
+            res = TestThermal(workingParam2);
+        }
+        break;
+        case ERJ_PolyakovDist:
+        {
+            CParameters workingParam2 = params.GetParameter(_T("JobPolyakovDist"));
+            res = MeasurePolyakovDist(workingParam2);
+        }
         break;
     }
 
