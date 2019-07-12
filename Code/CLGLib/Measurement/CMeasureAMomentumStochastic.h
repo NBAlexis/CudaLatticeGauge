@@ -36,6 +36,7 @@ public:
         , m_pHostDistributionJS(NULL)
 
         , m_uiMaxR(1)
+        , m_uiEdgeR(1)
         , m_bShowResult(FALSE)
     {
         
@@ -71,6 +72,7 @@ protected:
     Real* m_pHostDistributionJS;
 
     UINT m_uiMaxR;
+    UINT m_uiEdgeR;
     UBOOL m_bShowResult;
 
 public:
@@ -78,6 +80,9 @@ public:
     TArray<UINT> m_lstR;
     TArray<Real> m_lstJL;
     TArray<Real> m_lstJS;
+
+    TArray<Real> m_lstJLAll;
+    TArray<Real> m_lstJLInner;
 };
 
 __END_NAMESPACE

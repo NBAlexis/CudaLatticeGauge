@@ -215,6 +215,8 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
         m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
                  + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
 
+        m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1)));
 
@@ -271,6 +273,10 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
 
+        Real fAverageJGInner = F(0.0);
+        UINT uiInnerPointsInner = 0;
+        Real fAverageJGAll = F(0.0);
+        UINT uiInnerPointsAll = 0;
         if (0 == m_uiConfigurationCount)
         {
             assert(0 == m_lstR.Num());
@@ -282,6 +288,14 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 {
                     m_lstR.AddItem(uiL);
                     m_lstJG.AddItem(m_pHostDistributionJG[uiL]);
+
+                    uiInnerPointsAll += m_pHostDistributionR[uiL];
+                    fAverageJGAll += m_pHostDistributionR[uiL] * m_pHostDistributionJG[uiL];
+                    if (uiL < m_uiEdgeR)
+                    {
+                        uiInnerPointsInner += m_pHostDistributionR[uiL];
+                        fAverageJGInner += m_pHostDistributionR[uiL] * m_pHostDistributionJG[uiL];
+                    }
 
                     if (m_bShowResult)
                     {
@@ -299,6 +313,14 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 assert(m_pHostDistributionR[m_lstR[i]] > 0);
                 m_lstJG.AddItem(m_pHostDistributionJG[m_lstR[i]]);
 
+                uiInnerPointsAll += m_pHostDistributionR[m_lstR[i]];
+                fAverageJGAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJG[m_lstR[i]];
+                if (m_lstR[i] < m_uiEdgeR)
+                {
+                    uiInnerPointsInner += m_pHostDistributionR[m_lstR[i]];
+                    fAverageJGInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJG[m_lstR[i]];
+                }
+
                 if (m_bShowResult)
                 {
                     appDetailed(_T("JG(%f)=%f, \n"),
@@ -307,6 +329,17 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 }
             }
         }
+
+        if (uiInnerPointsAll > 0)
+        {
+            fAverageJGAll = fAverageJGAll / uiInnerPointsAll;
+        }
+        if (uiInnerPointsInner > 0)
+        {
+            fAverageJGInner = fAverageJGInner / uiInnerPointsInner;
+        }
+        m_lstJGAll.AddItem(fAverageJGAll);
+        m_lstJGInner.AddItem(fAverageJGInner);
     }
 
     ++m_uiConfigurationCount;
@@ -407,6 +440,9 @@ void CMeasureAMomentumJG::Reset()
 
     m_lstR.RemoveAll();
     m_lstJG.RemoveAll();
+
+    m_lstJGAll.RemoveAll();
+    m_lstJGInner.RemoveAll();
 }
 
 __END_NAMESPACE

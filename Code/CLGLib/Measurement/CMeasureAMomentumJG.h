@@ -46,6 +46,7 @@ public:
         , m_pHostDistributionJG(NULL)
 
         , m_uiMaxR(1)
+        , m_uiEdgeR(1)
         , m_bMeasureDistribution(FALSE)
 
         , m_uiConfigurationCount(0)
@@ -77,6 +78,7 @@ protected:
     Real* m_pHostDistributionJG;
 
     UINT m_uiMaxR;
+    UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
 
     UINT m_uiConfigurationCount;
@@ -84,6 +86,9 @@ protected:
     TArray<Real> m_lstRes;
 
 public:
+
+    TArray<Real> m_lstJGAll;
+    TArray<Real> m_lstJGInner;
 
     TArray<UINT> m_lstR;
     TArray<Real> m_lstJG;

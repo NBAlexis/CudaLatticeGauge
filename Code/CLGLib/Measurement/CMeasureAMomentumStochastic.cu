@@ -396,6 +396,8 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
     m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
         + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
 
+    m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionJS, sizeof(Real) * (m_uiMaxR + 1)));
@@ -490,6 +492,10 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
     checkCudaErrors(cudaMemcpy(m_pHostDistributionJL, m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(m_pHostDistributionJS, m_pDistributionJS, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
 
+    Real fAverageJLInner = F(0.0);
+    UINT uiInnerPointsJLInner = 0;
+    Real fAverageJLAll = F(0.0);
+    UINT uiInnerPointsJLAll = 0;
     if (0 == m_uiConfigurationCount)
     {
         assert(0 == m_lstR.Num());
@@ -503,6 +509,14 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
                 m_lstR.AddItem(uiL);
                 m_lstJL.AddItem(m_pHostDistributionJL[uiL] * fDivider);
                 m_lstJS.AddItem(m_pHostDistributionJS[uiL] * fDivider);
+
+                uiInnerPointsJLAll += m_pHostDistributionR[uiL];
+                fAverageJLAll += m_pHostDistributionR[uiL] * m_pHostDistributionJL[uiL];
+                if (uiL < m_uiEdgeR)
+                {
+                    uiInnerPointsJLInner += m_pHostDistributionR[uiL];
+                    fAverageJLInner += m_pHostDistributionR[uiL] * m_pHostDistributionJL[uiL];
+                }
 
                 if (m_bShowResult)
                 {
@@ -523,6 +537,14 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
             m_lstJL.AddItem(m_pHostDistributionJL[m_lstR[i]] * fDivider);
             m_lstJS.AddItem(m_pHostDistributionJS[m_lstR[i]] * fDivider);
 
+            uiInnerPointsJLAll += m_pHostDistributionR[m_lstR[i]];
+            fAverageJLAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJL[m_lstR[i]];
+            if (m_lstR[i] < m_uiEdgeR)
+            {
+                uiInnerPointsJLInner += m_pHostDistributionR[m_lstR[i]];
+                fAverageJLInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJL[m_lstR[i]];
+            }
+
             if (m_bShowResult)
             {
                 appDetailed(_T("(%f)JL=%f, JS=%f\n"),
@@ -532,6 +554,21 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
             }
         }
     }
+
+    if (uiInnerPointsJLAll > 0)
+    {
+        fAverageJLAll = fAverageJLAll / uiInnerPointsJLAll;
+    }
+    if (uiInnerPointsJLInner > 0)
+    {
+        fAverageJLInner = fAverageJLInner / uiInnerPointsJLInner;
+    }
+    m_lstJLAll.AddItem(fAverageJLAll * fDivider);
+    m_lstJLInner.AddItem(fAverageJLInner * fDivider);
+
+    pF1->Return();
+    pF2->Return();
+    ++m_uiConfigurationCount;
 }
 
 void CMeasureAMomentumStochastic::Average(UINT )
@@ -590,6 +627,9 @@ void CMeasureAMomentumStochastic::Reset()
     m_lstR.RemoveAll();
     m_lstJL.RemoveAll();
     m_lstJS.RemoveAll();
+
+    m_lstJLAll.RemoveAll();
+    m_lstJLInner.RemoveAll();
 }
 
 __END_NAMESPACE

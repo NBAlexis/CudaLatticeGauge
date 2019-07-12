@@ -47,6 +47,7 @@ public:
 
         , m_uiConfigurationCount(0)
         , m_uiMaxR(1)
+        , m_uiEdgeR(1)
         , m_bMeasureDistribution(FALSE)
         , m_bShowResult(TRUE)
     {
@@ -81,14 +82,16 @@ protected:
 
     UINT m_uiConfigurationCount;
     UINT m_uiMaxR;
+    UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
     UBOOL m_bShowResult;
 
 public:
 
     TArray<CLGComplex> m_lstLoop;
+    TArray<CLGComplex> m_lstLoopInner;
     TArray<CLGComplex> m_lstLoopDensity;
-
+    
     CLGComplex m_cAverageLoop;
     TArray<CLGComplex> m_lstAverageLoopDensity;
 

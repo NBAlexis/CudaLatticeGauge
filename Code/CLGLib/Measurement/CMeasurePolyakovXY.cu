@@ -230,6 +230,8 @@ void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
         m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
                  + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
 
+        m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
@@ -287,6 +289,9 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionP, m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
 
+        CLGComplex cAverageLoopInner = _make_cuComplex(F(0.0), F(0.0));
+        UINT uiInnerPoints = 0;
+
         if (0 == m_uiConfigurationCount)
         {
             assert(0 == m_lstR.Num());
@@ -306,6 +311,12 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
                             m_pHostDistributionP[uiL].x,
                             m_pHostDistributionP[uiL].y);
                     }
+
+                    if (uiL < m_uiEdgeR)
+                    {
+                        uiInnerPoints += m_pHostDistributionR[uiL];
+                        cAverageLoopInner = _cuCaddf(cAverageLoopInner, cuCmulf_cr(m_pHostDistributionP[uiL], m_pHostDistributionR[uiL]));
+                    }
                 }
             }
         }
@@ -316,6 +327,13 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
                 assert(m_pHostDistributionR[m_lstR[i]] > 0);
                 m_lstP.AddItem(m_pHostDistributionP[m_lstR[i]]);
 
+                if (m_lstR[i] < m_uiEdgeR)
+                {
+                    uiInnerPoints += m_pHostDistributionR[m_lstR[i]];
+                    cAverageLoopInner = _cuCaddf(cAverageLoopInner, 
+                        cuCmulf_cr(m_pHostDistributionP[m_lstR[i]], m_pHostDistributionR[m_lstR[i]]));
+                }
+
                 if (m_bShowResult)
                 {
                     appDetailed(_T("C(%f)=%f + %f I\n"),
@@ -325,6 +343,13 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
                 }
             }
         }
+
+        if (uiInnerPoints > 0)
+        {
+            cAverageLoopInner = cuCdivf_cr(cAverageLoopInner, uiInnerPoints);
+        }
+
+        m_lstLoopInner.AddItem(cAverageLoopInner);
     }
 
     //extract res
@@ -442,6 +467,7 @@ void CMeasurePolyakovXY::Reset()
 {
     m_uiConfigurationCount = 0;
     m_lstLoop.RemoveAll();
+    m_lstLoopInner.RemoveAll();
     m_lstLoopDensity.RemoveAll();
 
     m_lstR.RemoveAll();
