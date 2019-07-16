@@ -1917,7 +1917,7 @@ TestRotation:
         Period : [0, 0, 1, -1]
         ## Default to use Naive discretization (which is faster)
         Naive : 1
-        Exponential : 0
+        Exponential : 1
 
     BoundaryFermionField1:
 
@@ -2007,7 +2007,7 @@ TestZ3Symmetry:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [8, 8, 8, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -2071,5 +2071,5 @@ TestZ3Symmetry:
     Measure1:
 
         MeasureName : CMeasurePolyakovXY
-        FieldId : 2
+        FieldId : 1
         ShowResult : 1

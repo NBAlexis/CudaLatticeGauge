@@ -3,13 +3,16 @@ VerboseLevel : GENERAL
 VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 1
-BeforeEquvibStep : 10
-EquvibStep : 50
-SavePrefix : 5016_
+BeforeEquvibStep : 200
+EquvibStep : 1000
+OnlyMeasure : 1
+DoSmearing : 1
+# SavePrefix : 5016_
+SavePrefix : ../../../ThermalCircle/Matching/B50217/50217_
 
 Dim : 4
 Dir : 4
-LatticeLength : [8, 8, 10, 20]
+LatticeLength : [12, 12, 12, 24]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionTorusSquare
 ThreadAutoDecompose : 1
@@ -100,3 +103,10 @@ Measure2:
     GammaMatrix : [ UNITY, GAMMA51, GAMMA52, GAMMA53 ]
     FieldId : 2
 
+GaugeSmearing:
+
+    SmearingName : CGaugeSmearingAPEStout
+    RhoS : 0.1
+    RhoT : 0.1
+    Iterate : 10
+    ProjIterate : 6

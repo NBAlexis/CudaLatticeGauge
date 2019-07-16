@@ -99,6 +99,7 @@ _kernelDFermionWilsonSquareSU3_D(
         deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
         if (x_p_mu_Fermion.NeedToOpposite())
         {
+            //printf("Opposite x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
             result.Sub(u_phi_x_p_m);
 
             //- gammamu U(x,mu) phi(x+ mu)

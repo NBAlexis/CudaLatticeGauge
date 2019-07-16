@@ -54,12 +54,16 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     SBYTE signchange = 1;
     BYTE byRegionId = 0;
     UBOOL bBoundary = FALSE;
+    
     for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
     {
         if (realCoord.m_byData4[uiDir] <= 0)
         {
+            //printf("-- coord[uiDir]=%d --\n", static_cast<INT>(realCoord.m_byData4[uiDir]));
+            UBOOL bPassEdge = FALSE;
             if (realCoord.m_byData4[uiDir] < 0)
             {
+                bPassEdge = TRUE;
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
             }
 
@@ -68,16 +72,19 @@ _kernalBakeEdgePeriodicDirichletBoundary(
                 bBoundary = TRUE;
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
             }
-            else if (realCoord.m_byData4[uiDir] < 0)
+            else if (bPassEdge)
             {
+                //printf("bc=%d\n", static_cast<INT>(bc.m_byData4[uiDir]));
                 signchange = signchange * bc.m_byData4[uiDir];
             }
 
         }
         else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1)
         {
+            UBOOL bPassEdge = FALSE;
             if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
             {
+                bPassEdge = TRUE;
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             }
 
@@ -86,8 +93,9 @@ _kernalBakeEdgePeriodicDirichletBoundary(
                 bBoundary = TRUE;
                 byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
             }
-            else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+            else if (bPassEdge) //realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
             {
+                //printf("bc=%d\n", static_cast<INT>(bc.m_byData4[uiDir]));
                 signchange = signchange * bc.m_byData4[uiDir];
             }
         }
@@ -96,6 +104,10 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
     pDeviceData[idxAll] = SIndex(uiSiteIndex);
     pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
+    //if (signchange < 0)
+    //{
+    //    printf("sign change\n");
+    //}
     pDeviceData[idxAll].m_byReginId = byRegionId;
 
     if (bBoundary)

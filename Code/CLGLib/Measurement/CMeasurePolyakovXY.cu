@@ -24,9 +24,15 @@ _kernelPolyakovLoopOfSite(
     deviceSU3* res)
 {
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
-    UINT uiLinkIdx = (uiXYZ * _DC_Lt + uiT + 1) * _DC_Dir - 1;//(uiXYZ * _DC_Lt + uiT) * _DC_Dir + (_DC_Dir - 1);
+    UINT uiSiteIndex = uiXYZ * _DC_Lt + uiT;
+    UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, _DC_Dir - 1);
+    //(uiSiteIndex + 1) * _DC_Dir - 1;//uiSiteIndex * _DC_Dir + (_DC_Dir - 1);
+    //if (0 == uiXYZ)
+    //{
+    //    printf("t=%d, site=%d, linkidx=%d\n", uiT, uiSiteIndex, uiLinkIdx);
+    //}
 
-    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiXYZ * _DC_Lt + uiT);
+    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
     UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
     if (0 == uiT)
@@ -346,7 +352,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
         if (uiInnerPoints > 0)
         {
-            cAverageLoopInner = cuCdivf_cr(cAverageLoopInner, uiInnerPoints);
+            cAverageLoopInner = cuCdivf_cr_host(cAverageLoopInner, uiInnerPoints);
         }
 
         m_lstLoopInner.AddItem(cAverageLoopInner);
@@ -369,7 +375,12 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     m_lstLoop.AddItem(res[0]);
     if (m_bShowResult)
     {
-        appGeneral(_T("Loop is %f + %f I\n"), res[0].x, res[0].y);
+        appSetLogDate(FALSE);
+        appGeneral(_T("Loop is "));
+        LogGeneralComplex(res[0]);
+        appGeneral(_T("\n"));
+        appSetLogDate(TRUE);
+        //appGeneral(_T("Loop is %f + %f I\n"), res[0].x, res[0].y);
     }
 
     for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)

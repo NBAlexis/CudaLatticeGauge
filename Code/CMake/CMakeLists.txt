@@ -61,6 +61,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurementManager.h
@@ -109,6 +110,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
@@ -215,6 +217,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)
 add_executable(RotatingReproduce 
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.h
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/AngularMomentumTest.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/PolykovDistrib.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/ThermalTest.cpp
     )

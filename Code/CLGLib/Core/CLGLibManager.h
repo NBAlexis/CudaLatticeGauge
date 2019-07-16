@@ -93,6 +93,7 @@ extern UBOOL CLGAPI appInitialCLG(const TCHAR* paramFileName);
 extern UBOOL CLGAPI appInitialCLG(class CParameters& params);
 
 extern void CLGAPI appQuitCLG();
+extern void CLGAPI appFailQuitCLG();
 
 inline class CCudaHelper* appGetCudaHelper()
 {

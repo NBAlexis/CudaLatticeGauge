@@ -44,7 +44,14 @@ INT TestThermal(CParameters& params)
     iVaule = 0;
     params.FetchValueINT(_T("OmegaStart"), iVaule);
     UINT iOmegaStart = static_cast<UINT>(iVaule);
-        
+
+    iVaule = 0;
+    params.FetchValueINT(_T("Additive"), iVaule);
+    UBOOL bAdditive = 0 != iVaule;
+
+    TArray<Real> old_polyakovs;
+    params.FetchValueArrayReal(_T("Polyakovs"), old_polyakovs);
+
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
@@ -117,7 +124,7 @@ INT TestThermal(CParameters& params)
 
         //=============== Check oldfiles ==================
         UBOOL bNeedBake = TRUE;
-        if (!sOldFileNames[uiNt - iMinNt].IsEmpty())
+        if (!bAdditive && !sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
@@ -134,6 +141,11 @@ INT TestThermal(CParameters& params)
             }
         }
         
+        if (bAdditive)
+        {
+            bNeedBake = FALSE;
+        }
+
         if (bNeedBake)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
@@ -171,10 +183,41 @@ INT TestThermal(CParameters& params)
         while (uiOmega <= iAfterEquib)
         {
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
+
             if (NULL != pGauageAction)
             {
                 pGauageAction->SetOmega(fSep * uiOmega);
             }
+
+            if (bAdditive)
+            {
+                Real fPolyaOld = F(0.0);
+                if (old_polyakovs.Num() <= static_cast<INT>(uiOmega))
+                {
+                    appGeneral(_T("\n ================ not have the initial value===========\n"));
+                    appFailQuitCLG();
+                    return 1;
+                }
+                fPolyaOld = old_polyakovs[uiOmega];
+
+                appGetLattice()->m_pMeasurements->Reset();
+                sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex - 1);
+                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+                if (fError < F(1E-07))
+                {
+                    appGeneral(_T("\n ================ using old file start from %d =================\n"), iSaveStartIndex);
+                }
+                else
+                {
+                    appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
+                        _cuCabsf(pPL->m_lstLoop[0]), fPolyaOld, fError);
+                    appFailQuitCLG();
+                    return 1;
+                }
+            }
+
             UINT iConfigNumberNow = 0;
             appGetLattice()->m_pMeasurements->Reset();
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);

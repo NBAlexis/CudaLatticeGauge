@@ -172,7 +172,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pS->CopyTo(pT);
             pT->ApplyOperator(uiM, pGaugeFeild);
 
-            omega = cuCdivf_cr(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt
+            omega = cuCdivf_cr_host(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt
 
             //r(i)=s-omega t
             pS->CopyTo(pR);

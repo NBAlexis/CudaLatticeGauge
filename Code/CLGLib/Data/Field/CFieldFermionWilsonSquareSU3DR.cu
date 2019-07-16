@@ -380,6 +380,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     
     if (x_p_mu_Fermion.NeedToOpposite())
     {
+        //printf("OppositeX x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
         result.Sub(u_phi_x_p_m);
         result.Add(gammaMu.MulWilsonC(u_phi_x_p_m));
         u_phi_x_p_m.MulReal(fYOmega);
@@ -522,6 +523,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     if (x_p_mu_Fermion.NeedToOpposite())
     {
+        //printf("OppositeY x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
         result.Sub(u_phi_x_p_m);
         result.Add(gammaMu.MulWilsonC(u_phi_x_p_m));
         u_phi_x_p_m.MulReal(fXOmega);
@@ -647,6 +649,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     if (x_p_mu_Fermion.NeedToOpposite())
     {
+        //printf("OppositeZ x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
         result.Sub(u_phi_x_p_m);
         //- gammamu U(x,mu) phi(x+ mu)
         result.Add(gammaMu.MulWilsonC(u_phi_x_p_m));
@@ -763,6 +766,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
 
     if (x_p_mu_Fermion.NeedToOpposite())
     {
+        //printf("OppositeT x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
         //k(cos_m_1 - i sin sigma12)(1-gamma4)
         result.Sub(cospart);
     }

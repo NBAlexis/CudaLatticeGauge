@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : GENERAL
 VerboseOutput : datetime
 
@@ -164,19 +164,21 @@ JobThermal:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 150
-    EquvibSkip : 10
-    EquvibStep : 50
-    SaveStartIndex : 0
-    OmegaSep : 1
-    OmegaStart : 0
-    MaxOmega : 0.23
+    EquvibSkip : 1
+    EquvibStep : 51
+    SaveStartIndex : 121
+    OmegaSep : 20
+    OmegaStart : 7
+    MaxOmega : 0.1
     MinNt : 4
-    MaxNt : 6
-    SavePrefix : 4518_
+    MaxNt : 4
+    SavePrefix : 53551575_
+    Additive : 1
+    Polyakovs : [0.18744438270928132, 0.1808467114199737, 0.20291865306346576, 0.19647317060670155, 0.1903433983614705, 0.18389212782558925, 0.22410857920607125, 0.23742614176401192, 0.27744354519137887, 0.2874868961812272, 0.2802826331701138, 0.31831973779365164, 0.3287013197704232, 0.43946939912818594, 0.40755590155369187, 0.422117811275643, 0.40705962081024705, 0.45986440543684404, 0.5360951339461935, 0.5385167788265727, 0.5873327591388651]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 10, 8]
+    LatticeLength : [16, 16, 16, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -249,7 +251,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.18
+        Hopping : 0.1575
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -264,7 +266,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.5
+        Beta : 5.355
         Omega : 0.0
 
     Action2:
@@ -320,21 +322,21 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.5
-    OmegaRange : 0.23
+    GaugeBate : 5.355
+    OmegaRange : 0.1
     StartOmega : 0
-    EndOmega : 23
+    EndOmega : 20
     StartN : 21
-    EndN : 320
+    EndN : 120
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum
     DistributionJob : EDJ_AngularMomentum
     DoSmearing : 0
-    FermionMomentum : 1
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/B55150/Nt4/55150_
+    FermionMomentum : 0
+    SavePrefix : ../../../ThermalCircle/Final150+320xStep/B53551575/Nt4/53551575_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 4]
+    LatticeLength : [16, 16, 16, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -358,7 +360,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.15
+        Hopping : 0.1575
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]

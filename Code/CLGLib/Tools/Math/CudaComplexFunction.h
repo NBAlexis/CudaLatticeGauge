@@ -81,9 +81,14 @@ extern "C" {
         return _make_cuComplex(x.x + y, x.y);
     }
 
-    __device__ __host__ static __inline__ CLGComplex cuCdivf_cr(const CLGComplex& x, Real y)
+    __device__ static __inline__ CLGComplex cuCdivf_cr(const CLGComplex& x, Real y)
     {
         return _make_cuComplex(__div(x.x, y), __div(x.y, y));
+    }
+
+    __host__ static __inline__ CLGComplex cuCdivf_cr_host(const CLGComplex& x, Real y)
+    {
+        return _make_cuComplex(x.x / y, x.y / y);
     }
 
     __device__ __host__ static __inline__ CLGComplex cuCmulf_cr(const CLGComplex& x, Real y)

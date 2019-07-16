@@ -311,23 +311,39 @@ void CMeasurePolyakov::Report()
     }
     appGeneral(_T("}\n"));
 
-    appGeneral(_T("correlator = {\n"));
+    if (m_bShowResult)
+    {
+        appGeneral(_T("correlator = {\n"));
+    }
+    
     for (INT k = 0; k < m_lstR.Num(); ++k)
     {
-        appGeneral(_T("{"));
+        if (m_bShowResult)
+        {
+            appGeneral(_T("{"));
+        }
         CLGComplex averageOfC_R = _make_cuComplex(F(0.0), F(0.0));
         for (UINT i = 0; i < m_uiConfigurationCount; ++i)
         {
-            LogGeneralComplex(m_lstC[i * m_lstR.Num() + k]);
+            if (m_bShowResult)
+            {
+                LogGeneralComplex(m_lstC[i * m_lstR.Num() + k]);
+            }
             averageOfC_R = _cuCaddf(averageOfC_R, m_lstC[i * m_lstR.Num() + k]);
         }
-        appGeneral(_T("},\n"));
+        if (m_bShowResult)
+        {
+            appGeneral(_T("},\n"));
+        }
 
         averageOfC_R.x = averageOfC_R.x / m_uiConfigurationCount;
         averageOfC_R.y = averageOfC_R.y / m_uiConfigurationCount;
         m_lstAverageC.AddItem(averageOfC_R);
     }
-    appGeneral(_T("}\n"));
+    if (m_bShowResult)
+    {
+        appGeneral(_T("}\n"));
+    }
 
     appGeneral(_T("averagecorrelator = {\n"));
     for (INT k = 0; k < m_lstR.Num(); ++k)

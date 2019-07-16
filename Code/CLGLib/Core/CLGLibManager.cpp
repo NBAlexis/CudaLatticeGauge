@@ -756,6 +756,12 @@ void CLGAPI appQuitCLG()
     GCLGManager.Quit(); 
 }
 
+void CLGAPI appFailQuitCLG()
+{
+    GCLGManager.Quit();
+    _FAIL_EXIT;
+}
+
 __END_NAMESPACE
 
 //=============================================================================
