@@ -1866,7 +1866,7 @@ TestRotation:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 6]
+    LatticeLength : [8, 8, 10, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -1877,8 +1877,8 @@ TestRotation:
     MeasureListLength : 7
     ExpectedRes : 0.69
     CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
+    BeforeEquvibStep : 1
+    EquvibStep : 5
 
     Updator:
 
@@ -1911,7 +1911,7 @@ TestRotation:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1583
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 26
         Period : [0, 0, 1, -1]
@@ -1927,8 +1927,8 @@ TestRotation:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.9
-        Omega : 0.5
+        Beta : 5.0
+        Omega : 0.2
 
     Action2:
         ActionName : CActionFermionWilsonNf2

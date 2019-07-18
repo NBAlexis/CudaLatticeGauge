@@ -182,6 +182,8 @@ INT TestThermal(CParameters& params)
         Real fSep = fMaxOmega / iAfterEquib;
         while (uiOmega <= iAfterEquib)
         {
+            sHeader.Format(_T("Nt%dO%d"), uiNt, uiOmega);
+            appSetLogHeader(sHeader);
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
 
             if (NULL != pGauageAction)

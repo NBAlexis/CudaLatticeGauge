@@ -787,7 +787,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
 
     if (x_m_mu_Fermion.NeedToOpposite())
     {
-        //-(cos_m_1+isin)(1+gamma4)
+        //-k(cos_m_1+isin)(1+gamma4)
         result.Sub(cospart2);
     }
     else
@@ -1595,11 +1595,12 @@ _kernelDWilsonForceSU3_DR_T(
     Real fSin = fFac * _sin(fAng);
 ;
     //first term has same sign as _Y function (-1)
-    if (x_p_mu_Fermion.NeedToOpposite())
-    {
-        fSin = -fSin;
-        fCos = -fCos;
-    }
+    //we already use fFac = -1 or 1
+    //if (x_p_mu_Fermion.NeedToOpposite())
+    //{
+    //    fSin = -fSin;
+    //    fCos = -fCos;
+    //}
 
     x_p_mu_Right.Sub(gamma4.MulWilsonC(x_p_mu_Right));
     deviceWilsonVectorSU3 x_p_mu_Right_real = x_p_mu_Right.MulRealC(fCos);

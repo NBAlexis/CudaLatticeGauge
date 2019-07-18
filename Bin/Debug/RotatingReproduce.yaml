@@ -163,22 +163,22 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 150
-    EquvibSkip : 1
-    EquvibStep : 51
-    SaveStartIndex : 121
-    OmegaSep : 20
-    OmegaStart : 7
-    MaxOmega : 0.1
-    MinNt : 4
-    MaxNt : 4
-    SavePrefix : 53551575_
-    Additive : 1
+    BeforeEquvibStep : 100
+    EquvibSkip : 10
+    EquvibStep : 60
+    SaveStartIndex : 0
+    OmegaSep : 23
+    OmegaStart : 1
+    MaxOmega : 0.23
+    MinNt : 6
+    MaxNt : 8
+    SavePrefix : N53551575_
+    Additive : 0
     Polyakovs : [0.18744438270928132, 0.1808467114199737, 0.20291865306346576, 0.19647317060670155, 0.1903433983614705, 0.18389212782558925, 0.22410857920607125, 0.23742614176401192, 0.27744354519137887, 0.2874868961812272, 0.2802826331701138, 0.31831973779365164, 0.3287013197704232, 0.43946939912818594, 0.40755590155369187, 0.422117811275643, 0.40705962081024705, 0.45986440543684404, 0.5360951339461935, 0.5385167788265727, 0.5873327591388651]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 4]
+    LatticeLength : [8, 8, 8, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -192,32 +192,25 @@ JobThermal:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    ## Nt2FileName : Nt2_532_1665.con_
-    ## Nt2Polyakov : 1.401374808778
-    ## Nt3FileName : Nt3_532_1665.con_
-    ## Nt3Polyakov : 0.571731612147
-    ## Nt4FileName : Nt4_532_1665.con_
-    ## Nt4Polyakov : 0.253809180108
+    # 5016
+    Nt4FileName : N5016_Nt4.con
+    Nt4Polyakov : 0.48454420912248297
 
-    ## Nt2FileName : Nt2_532_q.con_
-    ## Nt2Polyakov : 1.569426765862569
-    ## Nt3FileName : Nt3_532_q.con_
-    ## Nt3Polyakov : 0.597198558965794
-    ## Nt4FileName : Nt4_532_q.con_
-    ## Nt4Polyakov : 0.2981905422566984
-    ## Nt5FileName : Nt5_532_q.con_
-    ## Nt5Polyakov : 0.2414973578128302
-    ## Nt6FileName : Nt6_532_q.con_
-    ## Nt6Polyakov : 0.1429345028641144
+    # 55150
+    Nt6FileName : N55150_Nt6.con
+    Nt6Polyakov : 0.4805665256631027
 
-    ## Nt2FileName : Nt2_502_17.con_
-    ## Nt2Polyakov : 1.3409688185564654
-    ## Nt3FileName : Nt3_502_17.con_
-    ## Nt3Polyakov : 0.03018131019325852
-    ## Nt4FileName : Nt4_502_17.con_
-    ## Nt4Polyakov : 0.12804770999946194
-    ## Nt5FileName : Nt5_502_17.con_
-    ## Nt5Polyakov : 0.12517811720620411
+    # 50217
+    # Nt4FileName : N50217_Nt4.con
+    # Nt4Polyakov : 0.49073914322365436
+
+    # 53551575
+    Nt5FileName : N53551575_Nt5.con
+    Nt5Polyakov : 0.38681889077084597
+    Nt7FileName : N53551575_Nt7.con
+    Nt7Polyakov : 0.12253473858166508
+    Nt9FileName : N53551575_Nt9.con
+    Nt9Polyakov : 0.07048695448103985
 
     Updator:
 
@@ -251,7 +244,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1575
+        Hopping : 0.15
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -266,7 +259,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.355
+        Beta : 5.5
         Omega : 0.0
 
     Action2:
@@ -291,14 +284,14 @@ JobThermal:
         MaxDim : 20
 
         SolverName : CSLASolverGCRODR
-        Accuracy : 0.00001
+        Accuracy : 0.0000001
         MDim : 26
         KDim : 5
 
-        RecalculateR : 2
+        RecalculateR : 5
         DeflateSpace : EEDT_SVD
 
-        Restart : 200
+        Restart : 400
         AbsoluteAccuracy : 1
 
     Measure1:
