@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist}
-RotatingJob : ERJ_Thermal
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : GENERAL
 VerboseOutput : datetime
 
@@ -164,21 +164,29 @@ JobThermal:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 100
-    EquvibSkip : 10
-    EquvibStep : 60
-    SaveStartIndex : 0
-    OmegaSep : 23
-    OmegaStart : 1
-    MaxOmega : 0.23
-    MinNt : 6
-    MaxNt : 8
+    EquvibSkip : 1
+    EquvibStep : 40
+    SaveStartIndex : 61
+    OmegaSep : 20
+    OmegaStart : 5
+    MaxOmega : 0.1
+    MinNt : 5
+    MaxNt : 5
     SavePrefix : N53551575_
-    Additive : 0
-    Polyakovs : [0.18744438270928132, 0.1808467114199737, 0.20291865306346576, 0.19647317060670155, 0.1903433983614705, 0.18389212782558925, 0.22410857920607125, 0.23742614176401192, 0.27744354519137887, 0.2874868961812272, 0.2802826331701138, 0.31831973779365164, 0.3287013197704232, 0.43946939912818594, 0.40755590155369187, 0.422117811275643, 0.40705962081024705, 0.45986440543684404, 0.5360951339461935, 0.5385167788265727, 0.5873327591388651]
+    Additive : 1
+
+    # 53551575Nt4 Omega60 
+    # Polyakovs : [0.7631883645116788, 0.8118459888019867, 0.8038000156133291, 0.8085112089840242, 0.8035024063891989, 0.8058693619339026, 0.7961035941151434, 0.8667103476474274, 0.877848606871448, 0.9106615476053999, 0.9094629687651986, 0.9132674941654673, 0.956531256692272, 0.9811401816076729, 1.0099076140384722, 1.0339336795388183, 1.0520049963037232, 1.0782282810185038, 1.0779729132774476, 1.0932795492843526, 1.1149388806172058]
+
+    # 55150Nt6 Omega60
+    # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
+
+    # 53551575Nt5 Omega60 
+    Polyakovs : [0.0, 0.380741381920426, 0.36734490088905625, 0.4190711254902025, 0.42375206764276535, 0.42770863197479353, 0.4406649451294063, 0.47519853875930074, 0.5156114971407512, 0.5623958144750791, 0.5470751524554538, 0.6046101624335859, 0.6246294276915867, 0.6608348992671862, 0.6669355925255004, 0.7046687838711712, 0.7405988138682612, 0.7332413347422516, 0.8015026187889981, 0.7725062576982105, 0.8053944943348079]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 4]
+    LatticeLength : [16, 16, 16, 5]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -193,24 +201,24 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    Nt4FileName : N5016_Nt4.con
-    Nt4Polyakov : 0.48454420912248297
+    # Nt4FileName : N5016_Nt4.con
+    # Nt4Polyakov : 0.48454420912248297
 
     # 55150
-    Nt6FileName : N55150_Nt6.con
-    Nt6Polyakov : 0.4805665256631027
+    # Nt6FileName : N55150_Nt6.con
+    # Nt6Polyakov : 0.4805665256631027
 
     # 50217
     # Nt4FileName : N50217_Nt4.con
     # Nt4Polyakov : 0.49073914322365436
 
     # 53551575
-    Nt5FileName : N53551575_Nt5.con
-    Nt5Polyakov : 0.38681889077084597
-    Nt7FileName : N53551575_Nt7.con
-    Nt7Polyakov : 0.12253473858166508
-    Nt9FileName : N53551575_Nt9.con
-    Nt9Polyakov : 0.07048695448103985
+    # Nt5FileName : N53551575_Nt5.con
+    # Nt5Polyakov : 0.38681889077084597
+    # Nt7FileName : N53551575_Nt7.con
+    # Nt7Polyakov : 0.12253473858166508
+    # Nt9FileName : N53551575_Nt9.con
+    # Nt9Polyakov : 0.07048695448103985
 
     Updator:
 
@@ -244,7 +252,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.15
+        Hopping : 0.1575
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -259,7 +267,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.5
+        Beta : 5.355
         Omega : 0.0
 
     Action2:
@@ -284,7 +292,7 @@ JobThermal:
         MaxDim : 20
 
         SolverName : CSLASolverGCRODR
-        Accuracy : 0.0000001
+        Accuracy : 0.000001
         MDim : 26
         KDim : 5
 
@@ -315,21 +323,21 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.355
-    OmegaRange : 0.1
+    GaugeBate : 5.02
+    OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
-    StartN : 21
-    EndN : 120
+    StartN : 41
+    EndN : 160
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum
-    DistributionJob : EDJ_AngularMomentum
+    DistributionJob : EDJ_Polyakov
     DoSmearing : 0
     FermionMomentum : 0
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/B53551575/Nt4/53551575_
+    SavePrefix : ../../../ThermalCircle/Final150+320xStep/50217/Nt6/N50217_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 4]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -353,7 +361,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1575
+        Hopping : 0.17
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -374,16 +382,16 @@ JobPolyakovDist:
         DiviationStep : 10
         MaxStep : 100
 
-        SolverName : CSLASolverGMRES
+        # SolverName : CSLASolverGMRES
         # double
-        Accuracy : 0.0000000001
+        # Accuracy : 0.0000000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
         MaxDim : 20
 
-        # SolverName : CSLASolverGCRODR
-        # Accuracy : 0.00001
+        SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
         MDim : 26
         KDim : 5
 
@@ -404,7 +412,7 @@ JobPolyakovDist:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2
-        FieldCount : 1
+        FieldCount : 4
         ShowResult : 0
         MeasureDist : 1
 

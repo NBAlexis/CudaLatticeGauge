@@ -250,6 +250,9 @@ INT TestThermal(CParameters& params)
                     iConfigNumberNow = uiAcce;
                 }
             }
+
+#pragma region gather measurements
+
             appGetLattice()->m_pMeasurements->Report();
             
             //===================== Polyakov loop =====================
@@ -276,6 +279,8 @@ INT TestThermal(CParameters& params)
                     chiral_nx[iX].AddItem(_cuCabsf(pCC->m_lstAverageCondensateDensity[iX]));
                 }
             }
+
+#pragma endregion
 
             ++uiOmega;
 

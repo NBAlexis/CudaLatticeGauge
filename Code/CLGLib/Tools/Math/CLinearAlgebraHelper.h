@@ -21,11 +21,19 @@
 #define _CLG_DEFAULT_QR_CRIT F(0.00000001)
 #define _CLG_DEFAULT_QR_VECTOR_CRIT F(0.000001)
 //If after 10 iteration, it is not converged, it is not about to converge
+#if _CLG_DOUBLEFLOAT
+#define _CLG_DEFAULT_QR_VECTOR_ITE 20
+#else
 #define _CLG_DEFAULT_QR_VECTOR_ITE 10
+#endif
 #else
 #define _CLG_DEFAULT_QR_CRIT F(0.0000000001)
 #define _CLG_DEFAULT_QR_VECTOR_CRIT F(0.000001)
+#if _CLG_DOUBLEFLOAT
+#define _CLG_DEFAULT_QR_VECTOR_ITE 20
+#else
 #define _CLG_DEFAULT_QR_VECTOR_ITE 10
+#endif
 #endif
 
 __BEGIN_NAMESPACE

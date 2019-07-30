@@ -1318,7 +1318,7 @@ TestFermionUpdatorWithMesonCorrelator:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.37]
+    ExpectedRes : [-1.35, -2.29, -3.20, -3.81, -3.20, -2.29, -1.35]
 
     Updator:
 
@@ -2007,7 +2007,7 @@ TestZ3Symmetry:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 3]
+    LatticeLength : [12, 12, 12, 24]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -2035,12 +2035,15 @@ TestZ3Symmetry:
 
     Gauge:
         FieldName : CFieldGaugeSU3
-        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_ReadFromFile
+        GaugeFileType : EFFT_CLGBin
+        GaugeFileName : 50216_Matching_1.con_
 		
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1575
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 26
         Period : [1, 1, 1, -1]
@@ -2050,18 +2053,18 @@ TestZ3Symmetry:
         SolverName : CSLASolverGMRESMDR
         SolverForFieldId : 2
         ## Check Accuracy every DiviationStep steps
-        MDim : 20
-        KDim : 2
+        MDim : 26
+        KDim : 5
         RecalculateR : 5
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.001
-        Restart : 20
+        Accuracy : 0.0001
+        Restart : 100
         AbsoluteAccuracy : 1
 
     Action1:
 
         ActionName : CActionGaugePlaquette
-        Beta : 5.355
+        Beta : 5.02
 
     Action2:
 

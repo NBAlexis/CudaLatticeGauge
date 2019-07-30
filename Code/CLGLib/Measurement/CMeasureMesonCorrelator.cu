@@ -269,7 +269,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
 
     CFieldGauge* pCopyGauge = NULL;
     const CFieldGauge* pGaugeField = NULL;
-    if (NULL != appGetGaugeSmearing())
+    if (m_bNeedSmearing && NULL != appGetGaugeSmearing())
     {
         pCopyGauge = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
         CFieldGaugeSU3* pCopyStaple = dynamic_cast<CFieldGaugeSU3*>(pStaple->GetCopy());

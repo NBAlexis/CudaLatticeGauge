@@ -92,6 +92,7 @@ void CGaugeSmearingAPEProj::GaugeSmearing(CFieldGauge* pGauge, CFieldGauge* pSta
     }
     CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pStapleSU3 = dynamic_cast<CFieldGaugeSU3*>(pStaple);
+    appParanoiac(_T("GaugeSmearing : CGaugeSmearingAPEProj\n"));
 
     preparethread;
     for (UINT i = 0; i < m_uiIterate; ++i)

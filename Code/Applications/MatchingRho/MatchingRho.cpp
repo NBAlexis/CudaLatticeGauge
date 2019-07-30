@@ -62,7 +62,8 @@ int main(int argc, char * argv[])
 
     //Themalization
     appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-    appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+    //Initial of the gauge field depends on the .yaml file
+    //appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     appGetLattice()->m_pMeasurements->Reset();
     UINT uiAccepCountBeforeE = 0;
