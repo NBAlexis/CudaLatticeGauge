@@ -13,6 +13,7 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_Polyakov,
     EDJ_Chiral,
     EDJ_AngularMomentum,
+    EDJ_ChiralAndFermionMomentum,
     )
 
 INT MeasurePolyakovDist(CParameters& params)
@@ -42,6 +43,10 @@ INT MeasurePolyakovDist(CParameters& params)
     iVaule = 200;
     params.FetchValueINT(_T("EndN"), iVaule);
     UINT iEndN = static_cast<UINT>(iVaule);
+
+    iVaule = 10;
+    params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
+    UINT iFieldCount = static_cast<UINT>(iVaule);
 
     CCString sValue = _T("EDJ_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
@@ -88,6 +93,15 @@ INT MeasurePolyakovDist(CParameters& params)
 
     appSetLogDate(FALSE);
 
+    CFieldFermionWilsonSquareSU3* pF1 = NULL;
+    CFieldFermionWilsonSquareSU3* pF2 = NULL;
+
+    if (EDJ_ChiralAndFermionMomentum == eJob)
+    {
+        pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    }
+
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
         CCommonData::m_fOmega = fOmega * uiOmega;
@@ -96,6 +110,8 @@ INT MeasurePolyakovDist(CParameters& params)
         pCC->Reset();
         pJG->Reset();
         pJF->Reset();
+        pCC->SetFieldCount(iFieldCount);
+        pJF->SetFieldCount(iFieldCount);
 
         appGeneral(_T("(*"));
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
@@ -128,6 +144,20 @@ INT MeasurePolyakovDist(CParameters& params)
                     if (bJF)
                     {
                         pJF->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    }
+                }
+                break;
+                case EDJ_ChiralAndFermionMomentum:
+                {
+                    for (UINT i = 0; i < iFieldCount; ++i)
+                    {
+                        pF1->InitialField(EFIT_RandomZ4);
+                        pF1->FixBoundary();
+                        pF1->CopyTo(pF2);
+                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+
+                        pCC->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF2, pF1, 0 == i, iFieldCount == i + 1);
+                        pJF->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF2, pF1, 0 == i, iFieldCount == i + 1);
                     }
                 }
                 break;
@@ -434,6 +464,139 @@ INT MeasurePolyakovDist(CParameters& params)
 
                 }
 
+            }
+            break;
+            case EDJ_ChiralAndFermionMomentum:
+            {
+#pragma region Chiral
+
+                //extract result
+                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstC.Num());
+
+                if (uiOmega == iStartOmega)
+                {
+                    appGeneral(_T("cr={"));
+
+                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pCC->m_lstR[i])), (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                        if (pCC->m_lstR[i] < uiMaxL)
+                        {
+                            CCString tobeAdd;
+                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
+                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
+                        }
+                    }
+
+                    appGeneral(_T("};\n"));
+                }
+                else
+                {
+                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+                    {
+                        if (pCC->m_lstR[i] < uiMaxL)
+                        {
+                            CCString tobeAdd;
+                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
+                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
+                        }
+                    }
+                }
+
+                appGeneral(_T("c%d={\n"), uiOmega);
+
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("{"));
+                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), pCC->m_lstC[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                }
+
+                appGeneral(_T("\n};\n"));
+
+#pragma endregion
+
+#pragma region JF
+
+#pragma region JFL
+
+                appGeneral(_T("jfl%d={\n"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("{"));
+                    for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJG->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                }
+                appGeneral(_T("\n};\n"));
+
+                appGeneral(_T("\njfli%d={\n"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("{"));
+                    for (INT i = 1; i < pJF->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJF->m_lstR.Num() + i] / _hostsqrt(pJF->m_lstR[i]), (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                }
+                appGeneral(_T("\n};\n"));
+
+                //================== JL Total ==================
+                appGeneral(_T("jfl$in%d={"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("%2.12f%s"),
+                        pJF->m_lstJLInner[j],
+                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
+                }
+                appGeneral(_T("};\n"));
+
+                appGeneral(_T("jfl$out%d={"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("%2.12f%s"),
+                        pJF->m_lstJLAll[j],
+                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
+                }
+                appGeneral(_T("};\n"));
+
+#pragma endregion
+
+#pragma region JFS
+
+                appGeneral(_T("jfs%d={\n"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("{"));
+                    for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), pJF->m_lstJS[j * pJF->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                }
+                appGeneral(_T("\n};\n"));
+
+                appGeneral(_T("\njfsi%d={\n"), uiOmega);
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    appGeneral(_T("{"));
+                    for (INT i = 1; i < pJF->m_lstR.Num(); ++i)
+                    {
+                        appGeneral(_T("%2.12f%s"), pJF->m_lstJS[j * pJF->m_lstR.Num() + i] / _hostsqrt(pJF->m_lstR[i]), (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                }
+                appGeneral(_T("\n};\n"));
+
+#pragma endregion
+
+#pragma endregion
             }
             break;
         }
@@ -915,12 +1078,273 @@ INT MeasurePolyakovDist(CParameters& params)
             }
         }
         break;
+        case EDJ_ChiralAndFermionMomentum:
+        {
+#pragma region Chiral
+
+            appGeneral(_T("\nc0all={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("c%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("};\n"));
+
+            appGeneral(_T("\nc0allmean={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[c%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n"));
+
+            appGeneral(_T("\nc0allchi={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[c%d*c%d] - Mean[c%d]*Mean[c%d]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n\n"));
+
+#pragma region r times omega
+
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("\ncrw%d=Join["), i);
+                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+                    {
+                        appGeneral(_T("%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("];\n\n"));
+                }
+            }
+
+            appGeneral(_T("\ncrwlist={"));
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[crw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+            appGeneral(_T("\ncrwchilist={"));
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[crw%d*crw%d] - Mean[crw%d]*Mean[crw%d]]}"),
+                        (0 == i ? _T("\n") : _T(",")),
+                        _hostsqrt(i),
+                        i, i, i, i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+#pragma endregion
+
+            appGeneral(_T("\nListLinePlot[{"));
+            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+            {
+                appGeneral(_T("Transpose[c0allmean][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}, PlotRange -> All]\n\n"));
+
+            appGeneral(_T("\nListLinePlot[{"));
+            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+            {
+                appGeneral(_T("Transpose[c0allchi][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}, PlotRange -> All]\n\n"));
+
+#pragma endregion
+
+#pragma region JF
+
+#pragma region JFL
+
+            appGeneral(_T("\njflall={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("jfl%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("};\n"));
+
+            appGeneral(_T("\njflallmean={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[jfl%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n"));
+
+#pragma endregion
+
+#pragma region JFS
+
+            appGeneral(_T("\njfsall={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("jfs%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("};\n"));
+
+            appGeneral(_T("\njfsallmean={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[jfs%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n"));
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region r times omega
+
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+#pragma region JFL
+
+                    appGeneral(_T("\njflrw%d=Join["), i);
+                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+                    {
+                        appGeneral(_T("Transpose[jfl%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("];\n\n"));
+
+                    appGeneral(_T("\njflirw%d=Join["), i);
+                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+                    {
+                        appGeneral(_T("Transpose[jfli%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("];\n\n"));
+
+#pragma endregion
+
+#pragma region JFS
+
+                    appGeneral(_T("\njfsrw%d=Join["), i);
+                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+                    {
+                        appGeneral(_T("Transpose[jfs%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("];\n\n"));
+
+                    appGeneral(_T("\njfsirw%d=Join["), i);
+                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+                    {
+                        appGeneral(_T("Transpose[jfsi%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+                    }
+                    appGeneral(_T("];\n\n"));
+
+#pragma endregion
+                }
+            }
+
+
+#pragma region JFL
+
+            appGeneral(_T("\njflrwlist={"));
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[jflrw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+            appGeneral(_T("\njflirwlist={"));
+            for (INT i = 1; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[jflirw%d]]}"), (1 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+#pragma endregion
+
+#pragma region JFS
+
+            appGeneral(_T("\njfsrwlist={"));
+            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[jfsrw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+            appGeneral(_T("\njfsirwlist={"));
+            for (INT i = 1; i < r_omega_idx.Num(); ++i)
+            {
+                if (r_omega_idx[i].Num() > 0)
+                {
+                    appGeneral(_T("%s{%f, Abs[Mean[jfsirw%d]]}"), (1 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+                }
+            }
+            appGeneral(_T("\n}"));
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region jf in out
+
+            appGeneral(_T("\nListLinePlot[{"));
+            for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
+            {
+                appGeneral(_T("Transpose[jflallmean][[%d]]%s"), i + 1, (i == (pJF->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}, PlotRange -> All]\n\n"));
+
+#pragma region in and out jl
+
+            appGeneral(_T("\njflinallmean={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[jfl$in%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n"));
+
+            appGeneral(_T("\njfloutallmean={"));
+            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+            {
+                appGeneral(_T("Mean[jfl$out%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}\n"));
+
+            appGeneral(_T("\nListLinePlot[{jflinallmean, jfloutallmean}]\n"));
+
+#pragma endregion
+
+            appGeneral(_T("\nListLinePlot[{"));
+            for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
+            {
+                appGeneral(_T("Transpose[jfsallmean][[%d]]%s"), i + 1, (i == (pJF->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}, PlotRange -> All]\n\n"));
+
+#pragma endregion
+
+        }
+        break;
     }
 
     appGeneral(_T("\n(*"));
     appSetLogDate(TRUE);
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
+    if (EDJ_ChiralAndFermionMomentum == eJob)
+    {
+        pF1->Return();
+        pF2->Return();
+    }
     if (bSmearing)
     {
         delete pStaple;

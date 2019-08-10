@@ -15,13 +15,12 @@ __BEGIN_NAMESPACE
 
 __CLG_REGISTER_HELPER_HEADER(CMeasureChiralCondensate)
 
-class CLGAPI CMeasureChiralCondensate : public CMeasure
+class CLGAPI CMeasureChiralCondensate : public CMeasureStochastic
 {
     __CLGDECLARE_CLASS(CMeasureChiralCondensate)
 public:
     CMeasureChiralCondensate()
-        : CMeasure()
-        , m_uiFieldCount(100)
+        : CMeasureStochastic()
         , m_uiConfigurationCount(0)
         , m_pDeviceXYBuffer(NULL)
         , m_pHostXYBuffer(NULL)
@@ -41,6 +40,7 @@ public:
     ~CMeasureChiralCondensate();
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
+    virtual void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd);
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
     virtual void Average(UINT uiConfigurationCount);
@@ -48,14 +48,13 @@ public:
     virtual void Reset();
 
     virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
-    virtual UBOOL IsSourceScanning() const { return FALSE; }
 
 protected:
     
-    UINT m_uiFieldCount;
     UINT m_uiConfigurationCount;
     CLGComplex* m_pDeviceXYBuffer;
     CLGComplex* m_pHostXYBuffer;
+    CLGComplex m_cTmpSum;
 
     UINT* m_pDistributionR;
     Real* m_pDistributionC;

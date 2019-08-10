@@ -108,22 +108,14 @@ CMeasureChiralCondensate::~CMeasureChiralCondensate()
 
 void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
-    CMeasure::Initial(pOwner, pLatticeData, param, byId);
+    CMeasureStochastic::Initial(pOwner, pLatticeData, param, byId);
 
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBuffer, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     m_pHostXYBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lx * _HC_Ly);
 
     Reset();
 
-    INT iValue = 2;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("FieldCount"), iValue);
-    m_uiFieldCount = static_cast<UINT>(iValue);
-
-    iValue = 1;
+    INT iValue = 1;
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
 
@@ -142,6 +134,140 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
 
         m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
         m_pHostDistributionC = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+    }
+}
+
+void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
+    const class CFieldGauge* pAcceptGauge, 
+    const class CFieldGauge* pCorrespondingStaple, 
+    const class CFieldFermion* pZ4, 
+    const class CFieldFermion* pInverseZ4, 
+    UBOOL bStart, 
+    UBOOL bEnd)
+{
+    if (bStart)
+    {
+        _ZeroXYPlaneC(m_pDeviceXYBuffer);
+        m_cTmpSum = _make_cuComplex(F(0.0), F(0.0));
+    }
+    
+    UINT uiVolume = appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
+    const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);   
+
+    
+#pragma region Dot
+
+    // The results are Atomic Add to m_pDeviceXYBuffer
+
+    preparethread;
+    _kernelDotAndGatherXY << <block, threads >> > (
+        pF1W->m_pDeviceData,
+        pF2W->m_pDeviceData,
+        m_pDeviceXYBuffer,
+        _D_ComplexThreadBuffer);
+
+    CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+
+    m_cTmpSum.x = m_cTmpSum.x + thisSum.x / uiVolume;
+    m_cTmpSum.y = m_cTmpSum.y + thisSum.y / uiVolume;
+
+#pragma endregion
+
+    if (bEnd)
+    {
+        if (m_bMeasureDistribution)
+        {
+            dim3 block2(_HC_DecompX, 1, 1);
+            dim3 threads2(_HC_DecompLx, 1, 1);
+            dim3 block3(m_uiMaxR + 1, 1, 1);
+            dim3 threads3(m_uiMaxR + 1, 1, 1);
+
+            _kernelChiralCondensateInitialDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionC);
+
+            _kernelChiralCondensateMeasureDist << <block2, threads2 >> >(
+                m_pDeviceXYBuffer,
+                CCommonData::m_sCenter,
+                m_uiMaxR,
+                m_byFieldId,
+                m_pDistributionR,
+                m_pDistributionC
+                );
+
+            _kernelChiralAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionC);
+
+            //extract res
+            checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(m_pHostDistributionC, m_pDistributionC, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+            if (0 == m_uiConfigurationCount)
+            {
+                assert(0 == m_lstR.Num());
+                assert(0 == m_lstC.Num());
+
+                for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
+                {
+                    if (m_pHostDistributionR[uiL] > 0)
+                    {
+                        m_lstR.AddItem(uiL);
+                        m_lstC.AddItem(m_pHostDistributionC[uiL] / (m_uiFieldCount * _HC_Lz * _HC_Lt));
+
+                        if (m_bShowResult)
+                        {
+                            appDetailed(_T("C(%f)=%f, \n"),
+                                _hostsqrt(static_cast<Real>(uiL)),
+                                m_pHostDistributionC[uiL]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (INT i = 0; i < m_lstR.Num(); ++i)
+                {
+                    assert(m_pHostDistributionR[m_lstR[i]] > 0);
+                    m_lstC.AddItem(m_pHostDistributionC[m_lstR[i]] / (m_uiFieldCount * _HC_Lz * _HC_Lt));
+
+                    if (m_bShowResult)
+                    {
+                        appDetailed(_T("C(%f)=%f, \n"),
+                            _hostsqrt(static_cast<Real>(m_lstR[i])),
+                            m_pHostDistributionC[m_lstR[i]]);
+                    }
+                }
+            }
+        }
+
+        checkCudaErrors(cudaMemcpy(m_pHostXYBuffer, m_pDeviceXYBuffer, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+        if (m_bShowResult)
+        {
+            appDetailed(_T("\n ------ Densisty -----\n"));
+        }
+
+        for (UINT i = static_cast<UINT>(CCommonData::m_sCenter.x); i < _HC_Lx; ++i)
+        {
+            CLGComplex cvalue = m_pHostXYBuffer[i * _HC_Ly + CCommonData::m_sCenter.y];
+            cvalue.x = cvalue.x / (m_uiFieldCount * _HC_Lz * _HC_Lt);
+            cvalue.y = cvalue.y / (m_uiFieldCount * _HC_Lz * _HC_Lt);
+            m_lstCondensateDensity.AddItem(cvalue);
+            if (m_bShowResult)
+            {
+                appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+                    cvalue.x,
+                    cvalue.y < F(0.0) ? _T("") : _T("+"),
+                    appAbs(cvalue.y));
+            }
+        }
+        if (m_bShowResult)
+        {
+            appDetailed(_T("\n ------ Densisty -----\n"));
+        }
+
+        m_cTmpSum.x = m_cTmpSum.x / m_uiFieldCount;
+        m_cTmpSum.y = m_cTmpSum.y / m_uiFieldCount;
+        appDetailed(_T("\nChiral Condensate = %2.12f + %2.12f\n"), m_cTmpSum.x, m_cTmpSum.y);
+        ++m_uiConfigurationCount;
+        m_lstCondensate.AddItem(m_cTmpSum);
     }
 }
 

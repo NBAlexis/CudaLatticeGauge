@@ -15,13 +15,12 @@ __BEGIN_NAMESPACE
 
 __CLG_REGISTER_HELPER_HEADER(CMeasureAMomentumStochastic)
 
-class CLGAPI CMeasureAMomentumStochastic : public CMeasure
+class CLGAPI CMeasureAMomentumStochastic : public CMeasureStochastic
 {
     __CLGDECLARE_CLASS(CMeasureAMomentumStochastic)
 public:
     CMeasureAMomentumStochastic()
-        : CMeasure()
-        , m_uiFieldCount(100)
+        : CMeasureStochastic()
         , m_uiConfigurationCount(0)
         , m_pDeviceXYBufferJL(NULL)
         , m_pDeviceXYBufferJS(NULL)
@@ -45,6 +44,7 @@ public:
     ~CMeasureAMomentumStochastic();
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
+    virtual void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd);
     virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
     virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
     virtual void Average(UINT uiConfigurationCount);
@@ -52,11 +52,9 @@ public:
     virtual void Reset();
 
     virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
-    virtual UBOOL IsSourceScanning() const { return FALSE; }
 
 protected:
     
-    UINT m_uiFieldCount;
     UINT m_uiConfigurationCount;
     Real* m_pDeviceXYBufferJL;
     Real* m_pDeviceXYBufferJS;

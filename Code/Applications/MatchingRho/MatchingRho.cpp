@@ -36,14 +36,18 @@ int main(int argc, char * argv[])
     params.FetchValueINT(_T("DoSmearing"), iVaule);
     UBOOL bDoSmearing = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SaveIndexStart"), iVaule);
+    UINT iSaveIndexStart = static_cast<UINT>(iVaule);
+
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
 
     TArray<Real> pionCorrelator;
     TArray<Real> rhoCorrelator;
-    TArray<Real> potentialR;
-    TArray<CLGComplex> potentialC;
+    //TArray<Real> potentialR;
+    //TArray<CLGComplex> potentialC;
 
     //=========================================================
     if (!appInitialCLG(params))
@@ -52,7 +56,8 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    CMeasurePolyakov* pPL = dynamic_cast<CMeasurePolyakov*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    //CMeasurePolyakov* pPL = dynamic_cast<CMeasurePolyakov*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureMesonCorrelator* pMC = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CFieldGaugeSU3* pStaple = NULL;
     if (bDoSmearing)
@@ -112,18 +117,18 @@ int main(int argc, char * argv[])
                         + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
                 }
 
-                for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                {
-                    if (0 == potentialR.Num())
-                    {
-                        potentialR.AddItem(_hostsqrt(pPL->m_lstR[i]));
-                    }
+                //for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                //{
+                //    if (0 == potentialR.Num())
+                //    {
+                //        potentialR.AddItem(_hostsqrt(pPL->m_lstR[i]));
+                //    }
 
-                    potentialC.AddItem(pPL->m_lstC[(uiAccepCountAfterE - 1) * pPL->m_lstR.Num() + i]);
-                }
+                //    potentialC.AddItem(pPL->m_lstC[(uiAccepCountAfterE - 1) * pPL->m_lstR.Num() + i]);
+                //}
 
                 //save configurations
-                sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE);
+                sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE + iSaveIndexStart);
                 sFileName = sSavePrefix + sFileName;
                 //=================================
                 //Save info
@@ -166,6 +171,46 @@ int main(int argc, char * argv[])
     else
     {
         pPL->Report();
+
+        appSetLogDate(FALSE);
+
+        //extract result
+        assert(static_cast<INT>(iEquib) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
+        UINT uiMaxL = (_HC_Lx + 1) / 2 - 1;
+        uiMaxL = uiMaxL * uiMaxL;
+        TArray<CCString> r_idx;
+
+        appGeneral(_T("pr={"));
+
+        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+        {
+            appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pPL->m_lstR[i])), (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
+            //if (pPL->m_lstR[i] < uiMaxL)
+            //{
+            //    CCString tobeAdd;
+            //    tobeAdd.Format(_T("Transpose[p%d][[%d]]"), uiOmega, i + 1);
+            //    r_idx[pPL->m_lstR[i]].AddItem(tobeAdd);
+            //}
+        }
+
+        appGeneral(_T("};\n"));
+
+        appGeneral(_T("pl={\n"));
+
+        for (UINT j = 0; j < iEquib; ++j)
+        {
+            appGeneral(_T("{"));
+            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+            {
+                CLGComplex cV = pPL->m_lstP[j * pPL->m_lstR.Num() + i];
+                appGeneral(_T("%2.12f %s %2.12f I%s"), cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
+            }
+            appGeneral(_T("}%s\n"), (j == iEquib - 1) ? _T("") : _T(","));
+        }
+
+        appGeneral(_T("\n};\n"));
+
+        appSetLogDate(TRUE);
     }
 
     //=================================
