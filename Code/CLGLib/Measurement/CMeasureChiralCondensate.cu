@@ -126,8 +126,8 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
     if (m_bMeasureDistribution)
     {
         //assuming the center is really at center
-        m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
-            + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
+        m_uiMaxR = ((_HC_Lx + 1) / 2 ) * ((_HC_Lx + 1) / 2 )
+            + ((_HC_Ly + 1) / 2 ) * ((_HC_Ly + 1) / 2 );
 
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionC, sizeof(Real) * (m_uiMaxR + 1)));

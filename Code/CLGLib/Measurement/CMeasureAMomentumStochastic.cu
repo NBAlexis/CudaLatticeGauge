@@ -385,8 +385,8 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
     m_bNaive = iValue != 0;
 
     //assuming the center is really at center
-    m_uiMaxR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1)
-        + ((_HC_Ly + 1) / 2 - 1) * ((_HC_Ly + 1) / 2 - 1);
+    m_uiMaxR = ((_HC_Lx + 1) / 2 ) * ((_HC_Lx + 1) / 2 )
+        + ((_HC_Ly + 1) / 2 ) * ((_HC_Ly + 1) / 2 );
 
     m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
 

@@ -529,19 +529,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     appGeneral(_T("{"));
                     for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJG->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-                appGeneral(_T("\n};\n"));
-
-                appGeneral(_T("\njfli%d={\n"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 1; i < pJF->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJF->m_lstR.Num() + i] / _hostsqrt(pJF->m_lstR[i]), (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJF->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
                     }
                     appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
                 }
@@ -577,18 +565,6 @@ INT MeasurePolyakovDist(CParameters& params)
                     for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
                     {
                         appGeneral(_T("%2.12f%s"), pJF->m_lstJS[j * pJF->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-                appGeneral(_T("\n};\n"));
-
-                appGeneral(_T("\njfsi%d={\n"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 1; i < pJF->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pJF->m_lstJS[j * pJF->m_lstR.Num() + i] / _hostsqrt(pJF->m_lstR[i]), (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
                     }
                     appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
                 }
@@ -1194,101 +1170,6 @@ INT MeasurePolyakovDist(CParameters& params)
                 appGeneral(_T("Mean[jfs%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
             }
             appGeneral(_T("}\n"));
-
-#pragma endregion
-
-#pragma endregion
-
-#pragma region r times omega
-
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-#pragma region JFL
-
-                    appGeneral(_T("\njflrw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("Transpose[jfl%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-
-                    appGeneral(_T("\njflirw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("Transpose[jfli%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-
-#pragma endregion
-
-#pragma region JFS
-
-                    appGeneral(_T("\njfsrw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("Transpose[jfs%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-
-                    appGeneral(_T("\njfsirw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("Transpose[jfsi%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-
-#pragma endregion
-                }
-            }
-
-
-#pragma region JFL
-
-            appGeneral(_T("\njflrwlist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[jflrw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            appGeneral(_T("\njflirwlist={"));
-            for (INT i = 1; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[jflirw%d]]}"), (1 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-#pragma endregion
-
-#pragma region JFS
-
-            appGeneral(_T("\njfsrwlist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[jfsrw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            appGeneral(_T("\njfsirwlist={"));
-            for (INT i = 1; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[jfsirw%d]]}"), (1 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
 
 #pragma endregion
 
