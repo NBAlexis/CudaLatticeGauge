@@ -46,7 +46,7 @@ _kernelDFermionWilsonSquareSU3(
 {
     intokernaldir;
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
     if (bDDagger)
@@ -157,8 +157,8 @@ _kernelDWilsonForceSU3(
 {
     intokernaldir;
 
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
-    deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -171,7 +171,7 @@ _kernelDWilsonForceSU3(
 
         SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
-        deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+        const deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
@@ -790,7 +790,7 @@ void CFieldFermionWilsonSquareSU3::D(const CField* pGauge, EOperatorCoefficientT
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
-    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;
@@ -816,7 +816,7 @@ void CFieldFermionWilsonSquareSU3::Ddagger(const CField* pGauge, EOperatorCoeffi
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
     Real fRealCoeff = fCoeffReal;
-    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;
@@ -840,7 +840,7 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     Real fRealCoeff = fCoeffReal;
-    CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
     if (EOCT_Minus == eCoeffType)
     {
         eCoeffType = EOCT_Real;
@@ -971,7 +971,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
 
 void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceData)
 {
-    UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
+    const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
     switch (sourceData.m_eSourceType)
     {
     case EFS_Point:

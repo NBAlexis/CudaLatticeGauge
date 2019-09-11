@@ -24,10 +24,10 @@ UINT TestOperators(CParameters& )
     pF1->InitialField(EFIT_RandomGaussian);
     pF2->InitialField(EFIT_RandomGaussian);
 
-    CLGComplex dot1 = pF1->Dot(pF1);
-    CLGComplex dot2 = pF2->Dot(pF2);
-    CLGComplex dot3 = pF1->Dot(pF2);
-    CLGComplex dot4 = pF2->Dot(pF1);
+    const CLGComplex dot1 = pF1->Dot(pF1);
+    const CLGComplex dot2 = pF2->Dot(pF2);
+    const CLGComplex dot3 = pF1->Dot(pF2);
+    const CLGComplex dot4 = pF2->Dot(pF1);
     appGeneral(_T("Estimator f1.f1 = (%f %f); f2.f2 = (%f %f); f1.f2 = (%f %f); f2.f1 = (%f %f)\n"),
         dot1.x / (12 * _HC_Volume), dot1.y, dot2.x / (12 * _HC_Volume), dot2.y, dot3.x / (12 * _HC_Volume), dot3.y / (12 * _HC_Volume), dot4.x / (12 * _HC_Volume), dot4.y / (12 * _HC_Volume));
 
@@ -68,8 +68,8 @@ UINT TestOperators(CParameters& )
     pF3->D(pGauge);
     pF2->CopyTo(pF4);
     pF4->Ddagger(pGauge);
-    CLGComplex dot5 = pF2->Dot(pF3);
-    CLGComplex dot6 = pF4->Dot(pF1);
+    const CLGComplex dot5 = pF2->Dot(pF3);
+    const CLGComplex dot6 = pF4->Dot(pF1);
     appGeneral(_T("DDagger f2.(D.f1) = (%f %f); (D+.f2).f1 = (%f %f);\n"),
         dot5.x, dot5.y, dot6.x, dot6.y);
 

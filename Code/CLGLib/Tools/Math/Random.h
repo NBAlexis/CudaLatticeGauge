@@ -131,7 +131,7 @@ public:
     /**
     * Note that this gives [0, 1), and curand_uniform gives (0, 1]
     */
-    __device__ __inline__ Real _deviceRandomF(UINT fatIndex)
+    __device__ __inline__ Real _deviceRandomF(UINT fatIndex) const
     {
         switch (m_eRandomType)
         {
@@ -157,42 +157,42 @@ public:
     * Although in bridge++, it says the deviation is 1/_sqrt(2)
     * In fact, the standard deviation of it is 1
     */
-    __device__ __inline__ Real _deviceRandomGaussF(UINT fatIndex)
+    __device__ __inline__ Real _deviceRandomGaussF(UINT fatIndex) const
     {
-        Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+        const Real f1 = _deviceRandomF(fatIndex);
+        const Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
-        Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
+        const Real oneMinusf1 = F(1.0) - f1;
+        const Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
+        const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
         return _cos(f2) * amplitude;
     }
 
-    __device__ __inline__ Real _deviceRandomGaussFSqrt2(UINT fatIndex)
+    __device__ __inline__ Real _deviceRandomGaussFSqrt2(UINT fatIndex) const
     {
-        Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+        const Real f1 = _deviceRandomF(fatIndex);
+        const Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
-        Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * F(0.5);
+        const Real oneMinusf1 = F(1.0) - f1;
+        const Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
+        const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * F(0.5);
         return _cos(f2) * amplitude;
     }
 
-    __device__ __inline__ CLGComplex _deviceRandomGaussC(UINT fatIndex)
+    __device__ __inline__ CLGComplex _deviceRandomGaussC(UINT fatIndex) const
     {
-        Real f1 = _deviceRandomF(fatIndex);
-        Real f2 = _deviceRandomF(fatIndex) * PI2;
+        const Real f1 = _deviceRandomF(fatIndex);
+        const Real f2 = _deviceRandomF(fatIndex) * PI2;
 
-        Real oneMinusf1 = F(1.0) - f1;
-        Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
-        Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
+        const Real oneMinusf1 = F(1.0) - f1;
+        const Real inSqrt = -F(2.0) * _log(oneMinusf1 > F(0.0) ? oneMinusf1 : (_CLG_FLT_MIN));
+        const Real amplitude = (inSqrt > F(0.0) ? _sqrt(inSqrt) : F(0.0)) * InvSqrt2;
         return _make_cuComplex(_cos(f2) * amplitude, _sin(f2) * amplitude);
     }
 
-    __device__ __inline__ CLGComplex _deviceRandomZ4(UINT fatIndex)
+    __device__ __inline__ CLGComplex _deviceRandomZ4(UINT fatIndex) const
     {
-        BYTE byRandom = static_cast<BYTE>(F(4.0) * _deviceRandomF(fatIndex));
+        const BYTE byRandom = static_cast<BYTE>(F(4.0) * _deviceRandomF(fatIndex));
 
         if (0 == byRandom)
         {
@@ -262,7 +262,7 @@ protected:
 
     void InitialTableSchrage(UINT uiSeed);
 
-    __device__ __inline__ UINT _deviceRandomUISchrage(UINT fatIndex)
+    __device__ __inline__ UINT _deviceRandomUISchrage(UINT fatIndex) const
     {
         m_pDeviceSeedTable[fatIndex] = ((1664525UL * m_pDeviceSeedTable[fatIndex] + 1013904223UL) & 0xffffffff);
         return m_pDeviceSeedTable[fatIndex];

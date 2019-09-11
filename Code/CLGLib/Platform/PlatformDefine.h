@@ -20,6 +20,10 @@
 #pragma warning(disable : 4100) /* unreferenced formal parameter */
 #pragma warning(disable : 4201) /* nonstandard extension used: nameless struct/union */
 
+//It dosen't work for intellisense warnings.
+#pragma warning(disable : 26451) /* arithmetic overflow */
+#pragma warning(disable : 26495) /* always initialize a member variable */
+
 #pragma endregion Warnings
 
 #pragma region Type definations
@@ -46,44 +50,44 @@
 //NOTE: We assume int is int32, and long long is int64, which is true both for MSVC and GCC
 //We do NOT use long, long is int32 in MSVC and int64 in GCC.
 
-typedef double					DOUBLE;
-typedef unsigned long long		QWORD;
-typedef long long				SQWORD;
+typedef double                    DOUBLE;
+typedef unsigned long long        QWORD;
+typedef long long                SQWORD;
 typedef long long               LONGLONG;
 typedef unsigned long long      ULONGLONG;
 
 // Unsigned base types.
-typedef unsigned char		BYTE;		// 8-bit  unsigned.
-typedef unsigned short		WORD;		// 16-bit unsigned.
-typedef unsigned int    	UINT;		// 32-bit unsigned.
-typedef unsigned long		DWORD;		// 32-bit unsigned.
-typedef unsigned long long	QWORD;		// 64-bit unsigned.
+typedef unsigned char        BYTE;        // 8-bit  unsigned.
+typedef unsigned short        WORD;        // 16-bit unsigned.
+typedef unsigned int        UINT;        // 32-bit unsigned.
+typedef unsigned long        DWORD;        // 32-bit unsigned.
+typedef unsigned long long    QWORD;        // 64-bit unsigned.
 
                                         // Signed base types.
-typedef	signed char			SBYTE;		// 8-bit  signed.
-typedef signed short		SWORD;		// 16-bit signed.
-typedef signed int      	INT;		// 32-bit signed.
-typedef signed long long	SQWORD;		// 64-bit signed.
+typedef    signed char            SBYTE;        // 8-bit  signed.
+typedef signed short        SWORD;        // 16-bit signed.
+typedef signed int          INT;        // 32-bit signed.
+typedef signed long long    SQWORD;        // 64-bit signed.
 typedef size_t              SIZE_T;
 
                                         // Character types.
-typedef char				ANSICHAR;	// An ANSI character.
-                                        //typedef unsigned short      UNICHAR;	// A UNICODE character.
+typedef char                ANSICHAR;    // An ANSI character.
+                                        //typedef unsigned short      UNICHAR;    // A UNICODE character.
 typedef short               UNICHAR;
-typedef unsigned char		ANSICHARU;	// An ANSI character.
-typedef unsigned short      UNICHARU;	// A UNICODE character.
+typedef unsigned char        ANSICHARU;    // An ANSI character.
+typedef unsigned short      UNICHARU;    // A UNICODE character.
 
                                         // Other base types.
-typedef signed int   		UBOOL;		// Boolean 0 (FALSE) or 1 (TRUE).
-typedef float				FLOAT;		// 32-bit IEEE floating point.
-typedef double				DOUBLE;		// 64-bit IEEE double.
+typedef signed int           UBOOL;        // Boolean 0 (FALSE) or 1 (TRUE).
+typedef float                FLOAT;        // 32-bit IEEE floating point.
+typedef double                DOUBLE;        // 64-bit IEEE double.
                                         //TODO even undef SIZE_T not work..
                                         //typedef unsigned long       SIZE_T;     // Corresponds to C SIZE_T.
 
 #ifdef _CLG_X64
-typedef unsigned long long	PTRINT;		// Integer large enough to hold a pointer.
+typedef unsigned long long    PTRINT;        // Integer large enough to hold a pointer.
 #else
-typedef unsigned int		PTRINT;		// Integer large enough to hold a pointer.
+typedef unsigned int        PTRINT;        // Integer large enough to hold a pointer.
 #endif
 
 #undef MAXBYTE
@@ -135,10 +139,10 @@ typedef ANSICHARU TCHARU;
 
 #pragma endregion Type definations
 
-#define __REMINDER_STR(s)		#s
+#define __REMINDER_STR(s)        #s
 #define __REMINDER_STRINT(s)    __REMINDER_STR(s)
-#define REMINDER(prefix, msg)	message( __FILE__ "(" __REMINDER_STRINT(__LINE__) ") : " prefix msg )
-#define TODO(msg)				REMINDER("TODO: ", #msg)
+#define REMINDER(prefix, msg)    message( __FILE__ "(" __REMINDER_STRINT(__LINE__) ") : " prefix msg )
+#define TODO(msg)                REMINDER("TODO: ", #msg)
 
 __BEGIN_NAMESPACE
 

@@ -26,17 +26,17 @@ public:
     CSLASolverGMRES();
     ~CSLASolverGMRES();
 
-    virtual void Configurate(const CParameters& param);
-    virtual void AllocateBuffers(const CField* pField);
+    void Configurate(const CParameters& param) override;
+    void AllocateBuffers(const CField* pField) override;
     virtual void ReleaseBuffers();
-    virtual UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, 
-        EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL);
+    UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, 
+        EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
 protected:
 
     void RotateH(/*UINT uiK*/);
     void SolveY(/*UINT uiHeisenbergDim*/);
-    inline UINT HIndex(UINT x /*0-k*/, UINT y /*0-(k-1)*/) { return y + x * m_uiMaxDim; }
+    inline UINT HIndex(UINT x /*0-k*/, UINT y /*0-(k-1)*/) const { return y + x * m_uiMaxDim; }
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;

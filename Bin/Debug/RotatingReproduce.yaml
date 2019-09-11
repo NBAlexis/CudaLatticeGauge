@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : GENERAL
 VerboseOutput : datetime
 
@@ -78,7 +78,7 @@ JobAugular:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
@@ -165,14 +165,14 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 100
     EquvibSkip : 1
-    EquvibStep : 40
-    SaveStartIndex : 61
+    EquvibStep : 300
+    SaveStartIndex : 1101
     OmegaSep : 20
-    OmegaStart : 5
-    MaxOmega : 0.1
-    MinNt : 5
-    MaxNt : 5
-    SavePrefix : N53551575_
+    OmegaStart : 6
+    MaxOmega : 0.14
+    MinNt : 3
+    MaxNt : 3
+    SavePrefix : N49616_
     Additive : 1
 
     # 53551575Nt4 Omega60 
@@ -182,11 +182,11 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [0.0, 0.380741381920426, 0.36734490088905625, 0.4190711254902025, 0.42375206764276535, 0.42770863197479353, 0.4406649451294063, 0.47519853875930074, 0.5156114971407512, 0.5623958144750791, 0.5470751524554538, 0.6046101624335859, 0.6246294276915867, 0.6608348992671862, 0.6669355925255004, 0.7046687838711712, 0.7405988138682612, 0.7332413347422516, 0.8015026187889981, 0.7725062576982105, 0.8053944943348079]
+    Polyakovs : [0.880538263571348, 0.9456148411561357, 0.979348580626056, 0.9060825393030213, 0.9980024785900804, 1.0498352886188749, 0.9911384945748823, 1.0389138823751345, 1.069633251606899, 1.0634599310784725,  1.1718977001449467, 1.203326341657677, 1.1855144368171124, 1.2752075108287677, 1.2651606621530622, 1.3358180205476078, 1.2934386924484065, 1.3655826717373911, 1.3842030458049073, 1.4372646114330463,  1.4110810708614454]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 5]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -252,7 +252,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1575
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -263,11 +263,11 @@ JobThermal:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.355
+        Beta : 4.96
         Omega : 0.0
 
     Action2:
@@ -283,16 +283,16 @@ JobThermal:
         DiviationStep : 10
         MaxStep : 100
 
-        # SolverName : CSLASolverGMRES
+        SolverName : CSLASolverGMRES
         # double
-        # Accuracy : 0.0000000001
+        Accuracy : 0.00000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
         MaxDim : 20
 
-        SolverName : CSLASolverGCRODR
-        Accuracy : 0.000001
+        # SolverName : CSLASolverGCRODR
+        # Accuracy : 0.000001
         MDim : 26
         KDim : 5
 
@@ -324,20 +324,20 @@ JobPolyakovDist:
     ShowParameterContent : 0
 
     GaugeBate : 5.02
-    OmegaRange : 0.14
+    OmegaRange : 0.028
     StartOmega : 0
-    EndOmega : 20
-    StartN : 41
-    EndN : 160
-    ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum
+    EndOmega : 4
+    StartN : 51
+    EndN : 1700
+    ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
-    DoSmearing : 0
     FermionMomentum : 0
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/50217/Nt6/N50217_
+    SavePrefix : ../../../ThermalCircle/Final150+320xStep/50216/Nt3/N50216_
+    ## SavePrefix : D:/NotUsingCLGCon/50216/Nt3/N50216_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -361,7 +361,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.17
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -432,10 +432,3 @@ JobPolyakovDist:
         Naive : 1
         ShowResult : 0
 
-    GaugeSmearing:
-
-        SmearingName : CGaugeSmearingAPEStout
-        RhoS : 0.1
-        RhoT : 0.1
-        Iterate : 10
-        ProjIterate : 6

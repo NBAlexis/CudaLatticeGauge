@@ -135,7 +135,7 @@ public:
         return m_pDeviceIndexPositionToSIndex[byFieldId][_deviceGetBigIndex(inSite)];
     }
 
-    __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byDir)
+    __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byDir) const
     {
         return (m_pBondInfoTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
     }

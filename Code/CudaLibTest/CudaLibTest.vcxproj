@@ -35,8 +35,8 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B4269890-49D2-4BE5-BA4F-B8635EA9795D}</ProjectGuid>
     <RootNamespace>CudaLatticeGauge</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     <CudaToolkitCustomDir>F:\Cuda10</CudaToolkitCustomDir>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

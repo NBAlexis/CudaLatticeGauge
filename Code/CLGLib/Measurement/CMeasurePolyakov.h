@@ -27,32 +27,33 @@ public:
 
     CMeasurePolyakov()
         : CMeasure()
-        , m_pTmpLoop(NULL)
-        , m_pTraceRes(NULL)
-        , m_pTmpDeviceSum(NULL)
+          , m_pTmpLoop(NULL)
+          , m_pTraceRes(NULL)
+          , m_pTmpDeviceSum(NULL)
 
-        , m_pCorrelator(NULL)
-        , m_pCorrelatorCounter(NULL)
-        , m_pHostCorrelator(NULL)
-        , m_pHostCorrelatorCounter(NULL)
-        , m_uiMaxLengthSq(1)
+          , m_pCorrelator(NULL)
+          , m_pCorrelatorCounter(NULL)
+          , m_pHostCorrelator(NULL)
+          , m_pHostCorrelatorCounter(NULL)
+          , m_uiMaxLengthSq(1)
 
-        , m_uiConfigurationCount(0)
-        , m_bShowResult(FALSE)
+          , m_uiConfigurationCount(0)
+          , m_bShowResult(FALSE)
+          , m_cAverageLoop()
     {
     }
 
     ~CMeasurePolyakov();
 
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
-    virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
-    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
-    virtual void Average(UINT uiConfigurationCount);
-    virtual void Report();
-    virtual void Reset();
+    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
+    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
+    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void Average(UINT uiConfigurationCount) override;
+    void Report() override;
+    void Reset() override;
 
-    virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
-    virtual UBOOL IsSourceScanning() const { return FALSE; }
+    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsSourceScanning() const override { return FALSE; }
 
 protected:
 

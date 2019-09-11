@@ -20,16 +20,16 @@ class CLGAPI CMeasureMesonCorrelator : public CMeasure
     __CLGDECLARE_CLASS(CMeasureMesonCorrelator)
 public:
     CMeasureMesonCorrelator() : CMeasure(), m_uiResoultCount(0) {}
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
+    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    virtual void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField);
-    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) {}
-    virtual void Average(UINT uiConfigurationCount);
-    virtual void Report();
-    virtual void Reset();
+    void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
+    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void Average(UINT uiConfigurationCount) override;
+    void Report() override;
+    void Reset() override;
 
-    virtual UBOOL IsGaugeMeasurement() const { return TRUE; }
-    virtual UBOOL IsSourceScanning() const { return FALSE; }
+    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsSourceScanning() const override { return FALSE; }
 
 protected:
 

@@ -62,9 +62,9 @@ public:
     {
         Stop();
 
-        DWORD dwCount = GetCounter();
-        FLOAT fElapsed = Elapsed();
-        FLOAT fAverage = (0 != dwCount) ? (fElapsed / dwCount) : 0;
+        const DWORD dwCount = GetCounter();
+        const FLOAT fElapsed = Elapsed();
+        const FLOAT fAverage = (0 != dwCount) ? (fElapsed / dwCount) : 0;
 
         appVOut(vl, _T("Elapsed time: %s: total %12.2f sec, count %4d, average %12.2f sec\n")
             , m_sId.c_str()

@@ -35,44 +35,44 @@ public:
     CFieldGaugeSU3();
     ~CFieldGaugeSU3();
 
-    virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType);
-    virtual void InitialWithByte(BYTE* byData);
-    virtual void InitialField(EFieldInitialType eInitialType);
-    virtual EFieldType GetFieldType() const { return EFT_GaugeSU3; }
-    virtual void DebugPrintMe() const;
+    void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
+    void InitialWithByte(BYTE* byData) override;
+    void InitialField(EFieldInitialType eInitialType) override;
+    EFieldType GetFieldType() const override { return EFT_GaugeSU3; }
+    void DebugPrintMe() const override;
 
 #pragma region HMC
 
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const;
-    virtual void CalculateOnlyStaple(CFieldGauge* pStaple) const;
-    virtual void MakeRandomGenerator();
-    virtual Real CalculatePlaqutteEnergy(Real betaOverN) const;
-    virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const;
-    virtual Real CalculateKinematicEnergy() const;
+    void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
+    void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
+    void MakeRandomGenerator() override;
+    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
+    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
+    Real CalculateKinematicEnergy() const override;
 
 #pragma endregion
 
 #pragma region BLAS
 
-    virtual void Zero();
-    virtual void Indentity();
+    void Zero() override;
+    void Indentity() override;
 
-    virtual void AxpyPlus(const CField* x);
-    virtual void AxpyMinus(const CField* x);
-    virtual void Axpy(Real a, const CField* x);
-    virtual void Axpy(const CLGComplex& a, const CField* x);
-    virtual void ScalarMultply(const CLGComplex& a);
-    virtual void ScalarMultply(Real a);
+    void AxpyPlus(const CField* x) override;
+    void AxpyMinus(const CField* x) override;
+    void Axpy(Real a, const CField* x) override;
+    void Axpy(const CLGComplex& a, const CField* x) override;
+    void ScalarMultply(const CLGComplex& a) override;
+    void ScalarMultply(Real a) override;
 
 #pragma endregion
 
-    virtual void ExpMult(Real a, CField* U) const;
+    void ExpMult(Real a, CField* U) const override;
 
-    virtual void ElementNormalize();
-    virtual CLGComplex Dot(const CField* other) const;
-    virtual void SaveToFile(const CCString &fileName) const;
-    virtual BYTE* CopyDataOut(UINT &uiSize) const;
-    virtual CCString GetInfos(const CCString &tab) const;
+    void ElementNormalize() override;
+    CLGComplex Dot(const CField* other) const override;
+    void SaveToFile(const CCString &fileName) const override;
+    BYTE* CopyDataOut(UINT &uiSize) const override;
+    CCString GetInfos(const CCString &tab) const override;
 
     deviceSU3* m_pDeviceData;
 

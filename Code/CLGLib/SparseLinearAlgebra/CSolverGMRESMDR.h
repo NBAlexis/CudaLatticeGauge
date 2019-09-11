@@ -21,7 +21,7 @@ class CLGAPI CSLASolverGMRESMDR : public CSLASolverGCRODR
 
 protected:
 
-    virtual void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
+    void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM) override;
 
     /**
     * [C,R]=U

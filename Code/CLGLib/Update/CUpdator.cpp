@@ -11,7 +11,7 @@
 
 __BEGIN_NAMESPACE
 
-void CUpdator::SaveConfiguration(UINT uiUpdateStep)
+void CUpdator::SaveConfiguration(UINT uiUpdateStep) const
 {
     if (1 == uiUpdateStep)
     {

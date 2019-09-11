@@ -149,7 +149,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             if (0 == (j + 1) % m_uiDevationCheck)
             {
                 //Normal of S is small, then stop
-                Real fDeviation = pS->Dot(pS).x / fBLength;
+                const Real fDeviation = pS->Dot(pS).x / fBLength;
                 appParanoiac(_T("CSLASolverBiCGStab::Solve deviation: restart:%d, iteration:%d, deviation:%8.18f\n"), i, j, fDeviation);
                 if (fDeviation < m_fAccuracy)
                 {

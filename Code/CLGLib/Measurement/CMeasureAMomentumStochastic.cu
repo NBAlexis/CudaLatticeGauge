@@ -16,6 +16,11 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumStochastic)
 
 #pragma region kernels
 
+/**
+ * Here JL is using y(T^+ - T^-) - x(T^+ - T^-)
+ * Note that we are using fmY = -static_cast<Real>(sSite4.y - sCenter.y) = -y
+ * By definition this is in fact -JL
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJL(
     const deviceWilsonVectorSU3 * __restrict__ pLeft,
@@ -30,7 +35,7 @@ _kernelDotAndGatherXYAMomentumJL(
 
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
     Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
     Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
@@ -192,7 +197,7 @@ _kernelDotAndGatherXYAMomentumJS(
 
 #pragma region JS
 
-    deviceWilsonVectorSU3 right_element(pRight[uiSiteIndex]);
+    const deviceWilsonVectorSU3 right_element(pRight[uiSiteIndex]);
     deviceWilsonVectorSU3 js(__chiralGamma[SIGMA12].MulWilsonC(right_element));
     js = __chiralGamma[GAMMA4].MulWilsonC(js);
     js.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
@@ -204,6 +209,10 @@ _kernelDotAndGatherXYAMomentumJS(
     atomicAdd(&resultXYPlaneJS[uiXY], cDotRes.x);
 }
 
+/**
+ * JS = (gamma4-1) T+  +  (1+gamma4) T-
+ * Note that, the T+ term multiply 0.5, it is in fact -0.5, that is -0.5(1-gamma4)T+
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS_Exp(
     const deviceWilsonVectorSU3 * __restrict__ pLeft,
@@ -217,10 +226,10 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     intokernalInt4;
 
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix sigma12 = __chiralGamma[SIGMA12];
 
 #pragma region JS
 
@@ -229,23 +238,23 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     //get things
 
     //x, mu
-    BYTE idir = 3;
+    const BYTE idir = 3;
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
     SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+    const deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
     x_m_mu_Gauge_element.Dagger();
 
-    deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
-    deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);
+    const deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
+    const deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);
 
     //hopping terms
 
@@ -310,7 +319,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelAMomentumAverageDist(UINT* pCount, Real* pValueJL, Real* pValueJS)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     if (pCount[uiIdx] > 0)
     {
         pValueJL[uiIdx] = pValueJL[uiIdx] / static_cast<Real>(pCount[uiIdx]);
@@ -462,7 +471,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
     if (bEnd)
     {
-        Real fDivider = CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
+        const Real fDivider = CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
         dim3 block2(_HC_DecompX, 1, 1);
         dim3 threads2(_HC_DecompLx, 1, 1);
         dim3 block3(m_uiMaxR + 1, 1, 1);
@@ -625,7 +634,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
 
     }
 
-    Real fDivider = CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
+    const Real fDivider = CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
     dim3 block2(_HC_DecompX, 1, 1);
     dim3 threads2(_HC_DecompLx, 1, 1);
     dim3 block3(m_uiMaxR + 1, 1, 1);

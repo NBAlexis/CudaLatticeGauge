@@ -417,7 +417,7 @@ and
 \begin{split}
 &S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
 &D(n|m)=\left(1+2\kappa(\hat{y}-\hat{x})\hat{\Omega}-i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
-&-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
+&-\kappa\sum _{\mu}\left[(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right]\\
 &-\kappa \hat{y}\hat{\Omega} \left((1-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(1+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
 &+\kappa \hat{x}\hat{\Omega} \left((1-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(1+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
 \end{split}
@@ -750,6 +750,25 @@ And the trace is just
 &\sum _{i=1}^{12}(OD^{-1})_{i,i}(n)
 \end{split}
 \end{equation}
+
+Also, note that, the $D$ and $\psi$ are scaled.
+
+Now, we can consider the physical meaning of $J_G$. Using
+\begin{equation}
+\begin{split}
+&F_{0i}=E^i,\;\;F_{ij}=2c\epsilon _{ijk}B_i
+\end{split}
+\end{equation}
+therefor
+\begin{equation}
+\begin{split}
+&{\bf j}=(x,y,0)\times \left({\bf E}\times {\bf B}\right)\\
+&{\bf j}=(x,y,0) \times \left( (F_{01},F_{02},F_{03}), F_{23},F_{31},F_{12} \right)\\
+&j_z=-2c\left(x F_{01}F_{12}+yF_{02}F_{12}-xF_{03}F_{23}+yF_{03}F_{13}\right)\\
+\end{split}
+\end{equation}
+
+
 
 \subsubsection{\label{sec:RotatingCurrentDensityChargeDensity}The Current density and Charge density}
 

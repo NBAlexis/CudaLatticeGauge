@@ -24,13 +24,13 @@ public:
     */
     CActionGaugePlaquette();
 
-    virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable);
-    virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
+    Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable) override;
+    void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
 
-    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const;
-    virtual void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate);
-    virtual void OnFinishTrajectory(UBOOL bAccepted);
-    virtual CCString GetInfos(const CCString &tab) const;
+    UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
+    void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
+    void OnFinishTrajectory(UBOOL bAccepted) override;
+    CCString GetInfos(const CCString &tab) const override;
 
     void SetBeta(Real fBeta);
     //Real GetEnergyPerPlaqutte() const;

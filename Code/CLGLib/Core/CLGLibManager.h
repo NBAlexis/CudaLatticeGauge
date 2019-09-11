@@ -30,9 +30,10 @@ public:
         , m_pLatticeData(NULL)
         , m_pFileSystem(NULL)
         , m_pBuffer(NULL)
+        , m_InitialCache()
     {
-
     }
+
     ~CCLGLibManager()
     {
 
@@ -64,22 +65,22 @@ protected:
     void InitialRandom(class CParameters& params);
 
     //Optional
-    void CreateGaugeField(class CParameters& params);
-    void CreateGaugeBoundaryField(class CParameters& params);
-    void CreateFermionFields(class CParameters& params);
-    void CreateFermionBoundaryField(class CParameters& params);
-    void CreateIndexAndBoundary(class CParameters& params);
+    void CreateGaugeField(class CParameters& params) const;
+    void CreateGaugeBoundaryField(class CParameters& params) const;
+    void CreateFermionFields(class CParameters& params) const;
+    void CreateFermionBoundaryField(class CParameters& params) const;
+    void CreateIndexAndBoundary(class CParameters& params) const;
     void CreateActionList(class CParameters& params);
-    void CreateUpdator(class CParameters& params);
+    void CreateUpdator(class CParameters& params) const;
     void CreateMeasurement(class CParameters& params);
-    void CreateSolver(class CParameters& params);
-    void CreateGaugeSmearing(class CParameters& params);
+    void CreateSolver(class CParameters& params) const;
+    void CreateGaugeSmearing(class CParameters& params) const;
 
     //==================================
     //Cache
 
     //Requared
-    void InitialIndexBuffer();
+    void InitialIndexBuffer() const;
 };
 
 extern CLGAPI CCLGLibManager GCLGManager;
@@ -176,7 +177,7 @@ inline TArray<UINT> _getDecompose(const TArray<UINT>& contraints, const TArray<U
                     && factorsOfY[j] <= (UINT)contraints[2]
                     && factorsOfZ[k] <= (UINT)contraints[3])
                 {
-                    UINT uiThreadPerBlcok = factorsOfX[i] * factorsOfY[j] * factorsOfZ[k];
+                    const UINT uiThreadPerBlcok = factorsOfX[i] * factorsOfY[j] * factorsOfZ[k];
                     if (uiThreadPerBlcok <= (UINT)contraints[0]
                         && uiThreadPerBlcok > uiBlockSize)
                     {

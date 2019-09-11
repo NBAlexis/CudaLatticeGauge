@@ -27,9 +27,9 @@ public:
         , m_bHasT(FALSE)
         , m_uiIterate(1) {  }
 
-    virtual void Initial(class CLatticeData* pOwner, const CParameters& params);
-    virtual void GaugeSmearing(class CFieldGauge* pGauge, CFieldGauge* pStaple);
-    virtual CCString GetInfos(const CCString& sTab) const;
+    void Initial(class CLatticeData* pOwner, const CParameters& params) override;
+    void GaugeSmearing(class CFieldGauge* pGauge, CFieldGauge* pStaple) override;
+    CCString GetInfos(const CCString& sTab) const override;
 
     Real m_fRhoS;
     Real m_fRhoT;

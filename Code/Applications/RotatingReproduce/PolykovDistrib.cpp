@@ -14,6 +14,7 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_Chiral,
     EDJ_AngularMomentum,
     EDJ_ChiralAndFermionMomentum,
+    EDJ_Correlation,
     )
 
 INT MeasurePolyakovDist(CParameters& params)
@@ -31,10 +32,6 @@ INT MeasurePolyakovDist(CParameters& params)
     iVaule = 1;
     params.FetchValueINT(_T("StartN"), iVaule);
     UINT iStartN = static_cast<UINT>(iVaule);
-
-    iVaule = 1;
-    params.FetchValueINT(_T("DoSmearing"), iVaule);
-    UBOOL bSmearing = 0 != iVaule;
 
     iVaule = 1;
     params.FetchValueINT(_T("FermionMomentum"), iVaule);
@@ -85,12 +82,6 @@ INT MeasurePolyakovDist(CParameters& params)
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAMomentumStochastic* pJF = dynamic_cast<CMeasureAMomentumStochastic*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
 
-    CFieldGaugeSU3D* pStaple = NULL;
-    if (bSmearing)
-    {
-        pStaple = dynamic_cast<CFieldGaugeSU3D*>(appGetLattice()->m_pGaugeField->GetCopy());
-    }
-
     appSetLogDate(FALSE);
 
     CFieldFermionWilsonSquareSU3* pF1 = NULL;
@@ -120,15 +111,10 @@ INT MeasurePolyakovDist(CParameters& params)
             sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
 
-            if (bSmearing)
-            {
-                appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-            }
-
             switch (eJob)
             {
                 case EDJ_Polyakov:
+                case EDJ_Correlation:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
@@ -1226,10 +1212,7 @@ INT MeasurePolyakovDist(CParameters& params)
         pF1->Return();
         pF2->Return();
     }
-    if (bSmearing)
-    {
-        delete pStaple;
-    }
+
     appQuitCLG();
 
     return 0;

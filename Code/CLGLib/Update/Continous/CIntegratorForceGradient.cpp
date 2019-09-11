@@ -27,11 +27,11 @@ void CIntegratorForceGradient::Initial(CHMC* pOwner, CLatticeData* pLattice, con
 
 void CIntegratorForceGradient::Evaluate()
 {
-    Real f1Over2EStep = m_fEStep * F(0.5);
-    Real f1Over6Estep = m_fEStep * OneOver6;
-    Real f1Over3Estep = f1Over6Estep * F(2.0);
-    Real f2Over3Estep = f1Over3Estep * F(2.0);
-    Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
+    const Real f1Over2EStep = m_fEStep * F(0.5);
+    const Real f1Over6Estep = m_fEStep * OneOver6;
+    const Real f1Over3Estep = f1Over6Estep * F(2.0);
+    const Real f2Over3Estep = f1Over3Estep * F(2.0);
+    const Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
     UpdateP(f1Over6Estep, FALSE, ESP_StartTrajectory);

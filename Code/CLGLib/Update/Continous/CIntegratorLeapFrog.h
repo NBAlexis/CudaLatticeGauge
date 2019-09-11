@@ -24,9 +24,9 @@ public:
     * The gauge field is copied
     * The random momentum field is generated
     */
-    virtual void Evaluate()
+    void Evaluate() override
     {
-        Real fHalfPstep = F(0.5) * m_fEStep;
+        const Real fHalfPstep = F(0.5) * m_fEStep;
         UpdateP(fHalfPstep, FALSE, ESP_StartTrajectory);
         appDetailed("  leap frog sub step 0\n");
 
@@ -49,7 +49,7 @@ public:
         FinishEvaluate();
     }
 
-    virtual CCString GetInfos(const CCString& sTab) const
+    CCString GetInfos(const CCString& sTab) const override
     {
         CCString sRet;
         sRet = sTab + _T("Name : LeapFrog\n");

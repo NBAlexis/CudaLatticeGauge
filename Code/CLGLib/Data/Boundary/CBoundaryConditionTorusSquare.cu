@@ -45,7 +45,7 @@ _kernalBakeEdgeTorusBoundary(
         }
     }
 
-    UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
+    const UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
     pDeviceData[idxAll] = SIndex(uiSiteIndex);
     pDeviceData[idxAll].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
 }
@@ -94,8 +94,8 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallI
     biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
     uint3 biggerLatticeMod;
 
-    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
     dim3 threads(threadPerSite, 1, 1);
     dim3 blocks(uiVolumn / threadPerSite, 1, 1);
     biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
@@ -113,8 +113,8 @@ void CBoundaryConditionTorusSquare::BakeBondInfo(const SSmallInt4*, BYTE* device
     biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
     biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
 
-    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
     dim3 threads(threadPerSite, 1, 1);
     dim3 blocks(uiVolumn / threadPerSite, 1, 1);
 

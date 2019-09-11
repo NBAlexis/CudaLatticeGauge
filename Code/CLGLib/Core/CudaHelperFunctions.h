@@ -154,14 +154,14 @@ inline bool checkCmdLineFlag(const int argc, const char **argv,
 
     if (argc >= 1) {
         for (int i = 1; i < argc; i++) {
-            int string_start = stringRemoveDelimiter('-', argv[i]);
+            const int string_start = stringRemoveDelimiter('-', argv[i]);
             const char *string_argv = &argv[i][string_start];
 
             const char *equal_pos = strchr(string_argv, '=');
-            int argv_length = static_cast<int>(
+            const int argv_length = static_cast<int>(
                 equal_pos == 0 ? strlen(string_argv) : equal_pos - string_argv);
 
-            int length = static_cast<int>(strlen(string_ref));
+            const int length = static_cast<int>(strlen(string_ref));
 
             if (length == argv_length &&
                 !STRNCASECMP(string_argv, string_ref, length)) {
@@ -182,13 +182,13 @@ inline bool getCmdLineArgumentValue(const int argc, const char **argv,
 
     if (argc >= 1) {
         for (int i = 1; i < argc; i++) {
-            int string_start = stringRemoveDelimiter('-', argv[i]);
+            const int string_start = stringRemoveDelimiter('-', argv[i]);
             const char *string_argv = &argv[i][string_start];
-            int length = static_cast<int>(strlen(string_ref));
+            const int length = static_cast<int>(strlen(string_ref));
 
             if (!STRNCASECMP(string_argv, string_ref, length)) {
                 if (length + 1 <= static_cast<int>(strlen(string_argv))) {
-                    int auto_inc = (string_argv[length] == '=') ? 1 : 0;
+                    const int auto_inc = (string_argv[length] == '=') ? 1 : 0;
                     *value = (T)atoi(&string_argv[length + auto_inc]);
                 }
 
@@ -208,13 +208,13 @@ inline int getCmdLineArgumentInt(const int argc, const char **argv,
 
     if (argc >= 1) {
         for (int i = 1; i < argc; i++) {
-            int string_start = stringRemoveDelimiter('-', argv[i]);
+            const int string_start = stringRemoveDelimiter('-', argv[i]);
             const char *string_argv = &argv[i][string_start];
-            int length = static_cast<int>(strlen(string_ref));
+            const int length = static_cast<int>(strlen(string_ref));
 
             if (!STRNCASECMP(string_argv, string_ref, length)) {
                 if (length + 1 <= static_cast<int>(strlen(string_argv))) {
-                    int auto_inc = (string_argv[length] == '=') ? 1 : 0;
+                    const int auto_inc = (string_argv[length] == '=') ? 1 : 0;
                     value = atoi(&string_argv[length + auto_inc]);
                 }
                 else {
@@ -242,13 +242,13 @@ inline float getCmdLineArgumentFloat(const int argc, const char **argv,
 
     if (argc >= 1) {
         for (int i = 1; i < argc; i++) {
-            int string_start = stringRemoveDelimiter('-', argv[i]);
+            const int string_start = stringRemoveDelimiter('-', argv[i]);
             const char *string_argv = &argv[i][string_start];
-            int length = static_cast<int>(strlen(string_ref));
+            const int length = static_cast<int>(strlen(string_ref));
 
             if (!STRNCASECMP(string_argv, string_ref, length)) {
                 if (length + 1 <= static_cast<int>(strlen(string_argv))) {
-                    int auto_inc = (string_argv[length] == '=') ? 1 : 0;
+                    const int auto_inc = (string_argv[length] == '=') ? 1 : 0;
                     value = static_cast<float>(atof(&string_argv[length + auto_inc]));
                 }
                 else {
@@ -276,9 +276,9 @@ inline bool getCmdLineArgumentString(const int argc, const char **argv,
 
     if (argc >= 1) {
         for (int i = 1; i < argc; i++) {
-            int string_start = stringRemoveDelimiter('-', argv[i]);
+            const int string_start = stringRemoveDelimiter('-', argv[i]);
             char *string_argv = const_cast<char*>(&argv[i][string_start]);
-            int length = static_cast<int>(strlen(string_ref));
+            const int length = static_cast<int>(strlen(string_ref));
 
             if (!STRNCASECMP(string_argv, string_ref, length)) {
                 *string_retval = &string_argv[length + 1];
@@ -1265,7 +1265,7 @@ template <typename T> void check(T result, char const *const func, const char *c
 
 inline void __getLastCudaError(const char *errorMessage, const char *file,
     const int line) {
-    cudaError_t err = cudaGetLastError();
+    const cudaError_t err = cudaGetLastError();
 
     if (cudaSuccess != err) {
         fprintf(stderr,
@@ -1284,7 +1284,7 @@ inline void __getLastCudaError(const char *errorMessage, const char *file,
 
 inline void __printLastCudaError(const char *errorMessage, const char *file,
     const int line) {
-    cudaError_t err = cudaGetLastError();
+    const cudaError_t err = cudaGetLastError();
 
     if (cudaSuccess != err) {
         fprintf(stderr,
@@ -1437,7 +1437,7 @@ inline int gpuGetMaxGflopsDeviceId() {
                     _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor);
             }
 
-            uint64_t compute_perf = (uint64_t)deviceProp.multiProcessorCount *
+            const uint64_t compute_perf = (uint64_t)deviceProp.multiProcessorCount *
                 sm_per_multiproc * deviceProp.clockRate;
 
             if (compute_perf > max_compute_perf) {

@@ -23,11 +23,11 @@ public:
 
     CIntegratorNestedLeapFrog() : CNestedIntegrator() {}
 
-    virtual void Evaluate();
+    void Evaluate() override;
 
     void NestedEvaluate(UBOOL bLast);
 
-    virtual CCString GetInfos(const CCString& sTab) const;
+    CCString GetInfos(const CCString& sTab) const override;
 
 };
 

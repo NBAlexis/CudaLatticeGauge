@@ -26,7 +26,7 @@ UINT RunTest(CParameters&params, TestList* pTest)
     //Do the work
     CTimer timer;
     timer.Start();
-    UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
+    const UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
     appGeneral(_T("=========== Finished, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), uiErrors, timer.Elapsed());
 
@@ -47,7 +47,7 @@ void ListAllTests(const THashMap<CCString, TArray<TestList*>*>& category)
         {
             for (INT j = 0; j < 3; ++j)
             {
-                INT indexOfTest = i * 3 + j;
+                const INT indexOfTest = i * 3 + j;
                 if (indexOfTest < lst->Num())
                 {
                     TCHAR names[256];

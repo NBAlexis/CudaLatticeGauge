@@ -187,7 +187,7 @@ void CLinearAlgebraHelper::TestSmallMatrix()
     appGeneral(_T("\nhes=\n"));
     PrintMatrix(hesij, testDim1, testDim1);
 
-    CLGComplex norm2 = pHelper->Normal2Host(yij, hij, testDim1);
+    const CLGComplex norm2 = pHelper->Normal2Host(yij, hij, testDim1);
 
     //transpose
     pHelper->TransposeHost(mij, testDim1, testDim2);
@@ -330,8 +330,8 @@ _kernelInitialZero(CLGComplex* R, UINT dy)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialOne(CLGComplex* R, UINT dy)
 {
-    UINT i = threadIdx.x;
-    UINT j = threadIdx.y;
+    const UINT i = threadIdx.x;
+    const UINT j = threadIdx.y;
     if (i == j)
     {
         R[threadIdx.x * dy + threadIdx.y] = _make_cuComplex(F(1.0), F(0.0));
@@ -372,7 +372,7 @@ _kernelSmallMatrixMult_NN(CLGComplex* res,
     const CLGComplex* __restrict__ right,
     UINT leftDim, UINT midDim)
 {
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     UINT y = threadIdx.y;
     UINT n = blockIdx.x;
 
@@ -395,8 +395,8 @@ _kernelSmallMatrixMult_ND(CLGComplex* res,
     const CLGComplex* __restrict__ right,
     UINT leftDim, UINT midDim)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
     UINT n = blockIdx.x;
 
     //left is dx x n, right is n x dy matrix
@@ -444,8 +444,8 @@ _kernelNormal2(
     CLGComplex* res,
     UINT dm)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     //assume res is zeroed
     CLGComplex toAdd = _cuCmulf(_cuConjf(v[x]), _cuCmulf(m[x * dm + y], v[y]));
@@ -477,7 +477,7 @@ void CLinearAlgebraHelper::SmallMatrixMult(
     }
 }
 
-void CLinearAlgebraHelper::Normal2(const CLGComplex* v, const CLGComplex* matrix, CLGComplex* devicees, UINT dm)
+void CLinearAlgebraHelper::Normal2(const CLGComplex* v, const CLGComplex* matrix, CLGComplex* devicees, UINT dm) const
 {
     dim3 block(1, 1, 1);
     dim3 thread(dm, dm, 1);
@@ -511,7 +511,7 @@ __global__ void
 _kernelMatrixBlockMult_LNN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     UINT y = threadIdx.y;
 
     if (x >= iStart && x < iEnd)
@@ -557,8 +557,8 @@ __global__ void
 _kernelMatrixBlockMult_LND(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     if (x >= iStart && x < iEnd)
     {
@@ -599,7 +599,7 @@ __global__ void
 _kernelMatrixBlockMult_RNN(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     UINT y = threadIdx.y;
 
     if (y >= iStart && y < iEnd)
@@ -645,8 +645,8 @@ __global__ void
 _kernelMatrixBlockMult_RND(CLGComplex* res, const CLGComplex* __restrict__ left, const CLGComplex* __restrict__ right, UINT iStart, UINT iEnd, UINT dm)
 {
     UINT n = blockIdx.x;
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     if (y >= iStart && y < iEnd)
     {
@@ -717,15 +717,15 @@ void CLinearAlgebraHelper::BlockMatrixMult(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMatrixAddConstant(CLGComplex* m, CLGComplex* c, UINT dy)
 {
-    UINT i = threadIdx.x;
+    const UINT i = threadIdx.x;
     m[i * dy + i] = _cuCaddf(m[i * dy + i], c[0]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMatrixTranspose(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT dx, UINT dy)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     tmpM[y * dx + x] = m[x * dy + y];
 }
@@ -733,8 +733,8 @@ _kernelMatrixTranspose(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMatrixDagger(const CLGComplex* __restrict__ m, CLGComplex* tmpM, UINT dx, UINT dy)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     tmpM[y * dx + x] = _cuConjf(m[x * dy + y]);
 }
@@ -824,8 +824,8 @@ _kernelCopyMatrixXY(
     const CLGComplex* __restrict__ orignal,
     UINT newdy, UINT olddy)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     mtr[x * newdy + y] = orignal[x * olddy + y];
 }
@@ -836,8 +836,8 @@ _kernelMatrixBlockCopy(
     const CLGComplex* __restrict__ src, 
     UINT srcX, UINT srcY, UINT destX, UINT destY, UINT srcDim, UINT destDim)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     dest[(x + destX) * destDim + (y + destY)] = src[(x + srcX) * srcDim + (y + srcY)];
 }
@@ -887,8 +887,8 @@ _kernelOneStepHouseHolderQR(
     const CLGComplex* __restrict__ R,
     UINT i, UINT dy)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     __shared__ Real length;
     __shared__ Real lengthu;
@@ -931,18 +931,18 @@ _kernelOneStepHouseHolderQR(
 
         if (x == i)
         {
-            Real fLengthuxL = __cuCabsSqf(u[x]);
+            const Real fLengthuxL = __cuCabsSqf(u[x]);
             Real fCos = F(0.0);
             Real fSin = F(0.0);
             if (fLengthuxL > _CLG_FLT_MIN_)
-            { 
-                Real fuxL = __div(F(1.0), _sqrt(fLengthuxL));
+            {
+                const Real fuxL = __div(F(1.0), _sqrt(fLengthuxL));
                 fCos = u[x].x * fuxL;
                 fSin = u[x].y * fuxL;
             }
             else
             {
-                Real fArg = _atan2(u[x].y, u[x].x);
+                const Real fArg = _atan2(u[x].y, u[x].x);
                 fCos = _cos(fArg);
                 fSin = _sin(fArg);
             }
@@ -1107,8 +1107,8 @@ _kernelOneStepHouseHolder(
     const CLGComplex* __restrict__ A, 
     UINT i, UINT dx)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     __shared__ Real length;
     __shared__ Real lengthu;
@@ -1161,7 +1161,7 @@ _kernelOneStepHouseHolder(
             }
             else
             {
-                Real fArg = _atan2(u[x].y, u[x].x);
+                const Real fArg = _atan2(u[x].y, u[x].x);
                 fCos = _cos(fArg);
                 fSin = _sin(fArg);
             }
@@ -1260,12 +1260,12 @@ _kernelOneLineReduceBS(
     const CLGComplex* __restrict__ R, 
     UINT i, UINT dk, UINT dx)
 {
-    UINT j = threadIdx.x + i + 1; //j=i+1 to dx
-    UINT n = threadIdx.y;
+    const UINT j = threadIdx.x + i + 1; //j=i+1 to dx
+    const UINT n = threadIdx.y;
 
     if (j < dx)
     {
-        CLGComplex toAdd = _cuCmulf(R[i * dx + j], y[j * dk + n]);
+        const CLGComplex toAdd = _cuCmulf(R[i * dx + j], y[j * dk + n]);
         atomicAdd(&y[i * dk + n].x, -toAdd.x);
         atomicAdd(&y[i * dk + n].y, -toAdd.y);
     }
@@ -1305,20 +1305,20 @@ void CLinearAlgebraHelper::SolveY(CLGComplex* deviceY, const CLGComplex* deviceR
 __global__ void _CLG_LAUNCH_BOUND
 _kernelWilkinsonShift(CLGComplex* m, CLGComplex* c, Real fCrit, UINT dim)
 {
-    UINT i = threadIdx.x;
+    const UINT i = threadIdx.x;
     if (0 == i)
     {
         //d
         c[0] = m[dim * dim - 1];
 
         //bc
-        CLGComplex omega = _cuCmulf(m[dim * dim - dim - 1], m[dim * dim - 2]);
+        const CLGComplex omega = _cuCmulf(m[dim * dim - dim - 1], m[dim * dim - 2]);
 
-        Real fOmegaSq = __cuCabsSqf(omega);
+        const Real fOmegaSq = __cuCabsSqf(omega);
         if (fOmegaSq > fCrit)
         {
             //(d-a)/2
-            CLGComplex xi = _make_cuComplex(
+            const CLGComplex xi = _make_cuComplex(
                 F(0.5) * (c[0].x - m[dim * dim - dim - 2].x),
                 F(0.5) * (c[0].y - m[dim * dim - dim - 2].y));
 
@@ -1334,7 +1334,7 @@ _kernelWilkinsonShift(CLGComplex* m, CLGComplex* c, Real fCrit, UINT dim)
             }
             if (xi.x * eta.x + xi.y * eta.y < F(0.0))
             {
-                CLGComplex divider = _cuCsubf(eta, xi);
+                const CLGComplex divider = _cuCsubf(eta, xi);
                 if (__cuCabsSqf(divider) > _CLG_FLT_MIN_)
                 {
                     c[0] = _cuCsubf(c[0], _cuCdivf(omega, divider));
@@ -1342,7 +1342,7 @@ _kernelWilkinsonShift(CLGComplex* m, CLGComplex* c, Real fCrit, UINT dim)
             }
             else
             {
-                CLGComplex divider = _cuCaddf(eta, xi);
+                const CLGComplex divider = _cuCaddf(eta, xi);
                 if (__cuCabsSqf(divider) > _CLG_FLT_MIN_)
                 {
                     c[0] = _cuCsubf(c[0], _cuCdivf(omega, divider));
@@ -1386,13 +1386,13 @@ __device__ __inline__ static void _deviceCalculateEigenValueTwo(
     Real fCrit)
 {
     //bc
-    CLGComplex omega = _cuCmulf(h10, h01);
+    const CLGComplex omega = _cuCmulf(h10, h01);
 
-    Real fOmegaSq = omega.x * omega.x + omega.y * omega.y;
+    const Real fOmegaSq = omega.x * omega.x + omega.y * omega.y;
     if (fOmegaSq > fCrit)
     {
         //(d-a)/2
-        CLGComplex xi = _make_cuComplex(
+        const CLGComplex xi = _make_cuComplex(
             F(0.5) * (h11.x - h00.x),
             F(0.5) * (h11.y - h00.y));
         //sqrt(((d-a)/2)^2 + bc)
@@ -1406,8 +1406,8 @@ __device__ __inline__ static void _deviceCalculateEigenValueTwo(
         {
             eta = _make_cuComplex(F(0.0), F(0.0));
         }
-        CLGComplex divider1 = _cuCaddf(eta, xi);
-        CLGComplex divider2 = _cuCsubf(eta, xi);
+        const CLGComplex divider1 = _cuCaddf(eta, xi);
+        const CLGComplex divider2 = _cuCsubf(eta, xi);
         if (__cuCabsSqf(divider1) > _CLG_FLT_MIN_ && __cuCabsSqf(divider2) > _CLG_FLT_MIN_)
         {
             if (xi.x * eta.x + xi.y * eta.y < F(0.0))
@@ -1480,7 +1480,7 @@ __device__ __inline__ static void _deviceTwoHouseHolder(CLGComplex& a, CLGComple
     Real fSin = F(0.0);
     if (lena < _CLG_FLT_MIN_)
     {
-        Real fArg = _atan2(a.y, a.x);
+        const Real fArg = _atan2(a.y, a.x);
         fCos = _cos(fArg);
         fSin = _sin(fArg);
     }
@@ -1523,7 +1523,7 @@ __device__ __inline__ static void _deviceThreeHouseHolder(CLGComplex& a, CLGComp
     Real fSin = F(0.0);
     if (lena < _CLG_FLT_MIN_)
     {
-        Real fArg = _atan2(a.y, a.x);
+        const Real fArg = _atan2(a.y, a.x);
         fCos = _cos(fArg);
         fSin = _sin(fArg);
     }
@@ -1641,9 +1641,9 @@ _kernelStepK_1(
     {
         y = y + k - 1;
     }
-    UINT ux = threadIdx.y / 3;
-    UINT x = ux + k;
-    UINT uy = threadIdx.y % 3;
+    const UINT ux = threadIdx.y / 3;
+    const UINT x = ux + k;
+    const UINT uy = threadIdx.y % 3;
 
     //we are going to change all H(x, y)
     if (0 == threadIdx.x && 0 == ux && 1 == uy)
@@ -1678,7 +1678,7 @@ _kernelStepK_1(
     __syncthreads();
 
     //U = 1 - vvT
-    CLGComplex u = _cuCmulf(um[ux * 3 + uy], lines[uy][y]);
+    const CLGComplex u = _cuCmulf(um[ux * 3 + uy], lines[uy][y]);
 
     atomicAdd(&H[x * dm + y].x, -u.x);
     atomicAdd(&H[x * dm + y].y, -u.y);
@@ -1698,11 +1698,11 @@ _kernelStepK_2(
     CLGComplex* xyz,
     UINT k, UINT dm)
 {
-    UINT x = threadIdx.x;
-    UINT ux = threadIdx.y / 3;
-    UINT uy = threadIdx.y % 3;
+    const UINT x = threadIdx.x;
+    const UINT ux = threadIdx.y / 3;
+    const UINT uy = threadIdx.y % 3;
 
-    UINT y = uy + k;
+    const UINT y = uy + k;
 
     __shared__ CLGComplex lines[CLinearAlgebraHelper::_kMaxSmallDim][3];
     if (0 == ux)
@@ -1713,7 +1713,7 @@ _kernelStepK_2(
 
     __syncthreads();
 
-    CLGComplex u = _cuCmulf(lines[x][ux], um[ux * 3 + uy]);
+    const CLGComplex u = _cuCmulf(lines[x][ux], um[ux * 3 + uy]);
 
     atomicAdd(&H[x * dm + y].x, -u.x);
     atomicAdd(&H[x * dm + y].y, -u.y);
@@ -1722,7 +1722,7 @@ _kernelStepK_2(
 
     if (0 == x && 0 == ux)
     {
-        int nextrow = k + uy + 1;
+        const int nextrow = k + uy + 1;
         if (nextrow < dm)
         {
             xyz[uy] = H[nextrow * dm + k];
@@ -1733,7 +1733,7 @@ _kernelStepK_2(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDoubleShiftFinal(CLGComplex* H, CLGComplex* xyz, UINT dm)
 {
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     __shared__ CLGComplex house[2];
     __shared__ CLGComplex um[4];
     __shared__ CLGComplex lines[2][CLinearAlgebraHelper::_kMaxSmallDim];
@@ -1984,8 +1984,8 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelSortEigenValues(const CLGComplex* __restrict__ R,
     CLGComplex* outV, Real* tmpF, INT* tmpO, UINT k, UINT dx)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     if (0 == x)
     {
@@ -2018,8 +2018,8 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelSortEigenValuesBig(const CLGComplex* __restrict__ R,
     CLGComplex* outV, Real* tmpF, INT* tmpO, UINT k, UINT dx)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     if (0 == x)
     {
@@ -2051,22 +2051,22 @@ _kernelSortEigenValuesBig(const CLGComplex* __restrict__ R,
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDaggerVector(CLGComplex* y, const CLGComplex* __restrict__ Q, UINT dx)
 {
-    UINT j = threadIdx.x;
+    const UINT j = threadIdx.x;
     y[j] = _cuConjf(Q[j * dx]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInverseIterateShift(CLGComplex* A, const CLGComplex* __restrict__ outV, UINT k, UINT dx)
 {
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     A[x * dx + x] = _cuCsubf(A[x * dx + x], outV[k]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelNormVectors(CLGComplex* v, UINT dx)
 {
-    UINT x = threadIdx.y;
-    UINT y = threadIdx.x;
+    const UINT x = threadIdx.y;
+    const UINT y = threadIdx.x;
     __shared__ Real fAmp[CLinearAlgebraHelper::_kMaxSmallDim];
     if (0 == y)
     {
@@ -2096,8 +2096,8 @@ _kernelNormVectors(CLGComplex* v, UINT dx)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelErrorCheck(Real* outE, CLGComplex* v, const CLGComplex* __restrict__ A, UINT dx)
 {
-    UINT x = threadIdx.x;
-    UINT y = threadIdx.y;
+    const UINT x = threadIdx.x;
+    const UINT y = threadIdx.y;
 
     __shared__ Real length;
     __shared__ CLGComplex afterMult[CLinearAlgebraHelper::_kMaxSmallDim];
@@ -2370,8 +2370,8 @@ void CLinearAlgebraHelper::EigenValueProblemHessenberg(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelExchangeOrders(INT* orders)
 {
-    UINT x = threadIdx.x; //0 to dm
-    UINT y = threadIdx.y; //0 to dk
+    const UINT x = threadIdx.x; //0 to dm
+    const UINT y = threadIdx.y; //0 to dk
     __shared__ INT outOrders[CLinearAlgebraHelper::_kMaxSmallDim];
 
     if (y == orders[x])
@@ -2391,7 +2391,7 @@ _kernelExchangeOrders(INT* orders)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialE1Vector(CLGComplex* v, UINT dm, UINT x)
 {
-    UINT y = threadIdx.x;
+    const UINT y = threadIdx.x;
     if (0 == y)
     {
         v[x * dm + y] = _make_cuComplex(F(1.0), F(0.0));
@@ -2409,8 +2409,8 @@ _kernelCreateBackshiftProblem(
     UINT dm,
     CLGComplex* resultMatrixR, CLGComplex* resultVecotr)
 {
-    UINT x = threadIdx.x; //0 -> iOrder - 1
-    UINT y = threadIdx.y; //0 -> iOrder - 1
+    const UINT x = threadIdx.x; //0 -> iOrder - 1
+    const UINT y = threadIdx.y; //0 -> iOrder - 1
 
     if (y < x)
     {
@@ -2439,7 +2439,7 @@ _kernelFinalNorm(
     UINT dm,
     CLGComplex* resultVecotr)
 {
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     __shared__ Real fLength;
     if (1 == iOrder)
     {
@@ -2447,7 +2447,7 @@ _kernelFinalNorm(
         {
             //norm of
             //- r[0,1]/(r[0,0] - r[1,1])
-            CLGComplex a = _cuCdivf(triangular[1], _cuCsubf(triangular[dm + 1], triangular[0]));
+            const CLGComplex a = _cuCdivf(triangular[1], _cuCsubf(triangular[dm + 1], triangular[0]));
             fLength = __div(F(1.0), _sqrt(__cuCabsSqf(a) + F(1.0)));
             resultVecotr[0] = a;
             resultVecotr[0].x = resultVecotr[0].x * fLength;
@@ -2636,7 +2636,7 @@ _kernelLeftGivenHessenberg(UINT i, UINT j,
 {
     //A is Henssenberg, so no need to calculate all 
     //UINT affectedDimA = dm - j;
-    UINT x = threadIdx.x;
+    const UINT x = threadIdx.x;
     
     __shared__ CLGComplex lineAi[CLinearAlgebraHelper::_kMaxSmallDim];
     __shared__ CLGComplex lineAj[CLinearAlgebraHelper::_kMaxSmallDim];
@@ -2650,12 +2650,12 @@ _kernelLeftGivenHessenberg(UINT i, UINT j,
 
     if (0 == x)
     {
-        CLGComplex h00 = A[(i - 1) * dm + j];
-        CLGComplex h10 = A[i * dm + j];
-        Real fh00Addh10 = __cuCabsSqf(h00) + __cuCabsSqf(h10);
+        const CLGComplex h00 = A[(i - 1) * dm + j];
+        const CLGComplex h10 = A[i * dm + j];
+        const Real fh00Addh10 = __cuCabsSqf(h00) + __cuCabsSqf(h10);
         if (fh00Addh10 > _CLG_FLT_MIN_)
         {
-            Real fDemon = __div(F(1.0), _sqrt(fh00Addh10));
+            const Real fDemon = __div(F(1.0), _sqrt(fh00Addh10));
             c0 = cuCmulf_cr(h00, fDemon);
             s0 = cuCmulf_cr(h10, fDemon);
             c0h = _cuConjf(c0);
@@ -2671,7 +2671,7 @@ _kernelLeftGivenHessenberg(UINT i, UINT j,
 
         //  c0h s0h
         //  -s0 c0
-        CLGComplex g_im1 = g[i - 1];
+        const CLGComplex g_im1 = g[i - 1];
         g[i - 1] = _cuCaddf(_cuCmulf(c0h, g[i - 1]), _cuCmulf(s0h, g[i]));
         g[i] = _cuCsubf(_cuCmulf(c0, g[i]), _cuCmulf(s0, g_im1));
     }
@@ -2682,7 +2682,7 @@ _kernelLeftGivenHessenberg(UINT i, UINT j,
     A[i * dm + x + j] = _cuCsubf(_cuCmulf(c0, lineAj[x]), _cuCmulf(s0, lineAi[x]));
 }
 
-void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT dm)
+void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT dm) const
 {
     dim3 block(1, 1, 1);
     for (UINT i = 0; i < dm; ++i)

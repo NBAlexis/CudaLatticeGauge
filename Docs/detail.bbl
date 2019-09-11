@@ -116,4 +116,10 @@ Isaac~Tamblyn Kyle~Mills, Michael~Spanner.
   and the Schr$\rm \ddot{o}$dinger equation}}.
 \newblock {\em Phys. Rev. A}, 96:042113, 2017, arXiv:1702.01361.
 
+\bibitem{autocorrelation}
+Ulli Wolff.
+\newblock \href{http://dx.doi.org/10.1016/S0010-4655(03)00467-3}{{Monte Carlo
+  errors with less errors}}.
+\newblock {\em Comput. Phys. Commun.}, 156:143--153, 2004, arXiv:1702.01361.
+
 \end{thebibliography}

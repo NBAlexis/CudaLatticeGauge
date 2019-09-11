@@ -24,7 +24,7 @@ _kernelPolyakovLoopOfSite(
     deviceSU3* res)
 {
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
-    UINT uiSiteIndex = uiXYZ * _DC_Lt + uiT;
+    const UINT uiSiteIndex = uiXYZ * _DC_Lt + uiT;
     UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, _DC_Dir - 1);
     //(uiSiteIndex + 1) * _DC_Dir - 1;//uiSiteIndex * _DC_Dir + (_DC_Dir - 1);
     //if (0 == uiXYZ)
@@ -32,8 +32,8 @@ _kernelPolyakovLoopOfSite(
     //    printf("t=%d, site=%d, linkidx=%d\n", uiT, uiSiteIndex, uiLinkIdx);
     //}
 
-    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+    const SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
     if (0 == uiT)
     {
@@ -137,7 +137,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelPolyakovAverageDist(UINT* pCount, CLGComplex* pValue)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     if (pCount[uiIdx] > 0)
     {
         pValue[uiIdx].x =
@@ -368,8 +368,8 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     {
         appDetailed(_T("\n\n ==================== Polyakov Loop (%d con)============================ \n\n"), m_uiConfigurationCount);
     }
-    
-    UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
+
+    const UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
     res[0].x = res[0].x / uiSiteNumber;
     res[0].y = res[0].y / uiSiteNumber;
     m_lstLoop.AddItem(res[0]);

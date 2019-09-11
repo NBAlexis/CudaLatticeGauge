@@ -1,0 +1,3 @@
+#define __launch_bounds__ 
+
+

@@ -120,7 +120,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
             if (expect_map) 
             {
                 // open key in the previous line actually correspond to empty value
-                level_t lv = levels.top();
+                const level_t lv = levels.top();
                 levels.pop();
 
                 CCString     key_s = lv.second.first;
@@ -137,7 +137,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
             {
                 while (indent < current_indent)
                 {
-                    level_t lv = levels.top();
+                    const level_t lv = levels.top();
                     levels.pop();
 
                     CCString     key_s = lv.second.first;
@@ -168,7 +168,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
 
                 TArray<CCString> v;
 
-                INT nvalues = ParseVector(buf, v);
+                const INT nvalues = ParseVector(buf, v);
 
                 if (nvalues < 0) 
                 {
@@ -197,7 +197,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
 
     while (current_indent > 0)
     {
-        level_t lv = levels.top();
+        const level_t lv = levels.top();
         levels.pop();
 
         CCString     key = lv.second.first;
@@ -362,7 +362,7 @@ void CYAMLParser::ParseFile(const CCString& params_file, CParameters& params)
     filesize = (INT)fin.tellg();
     fin.seekg(0, std::ios::beg);
 
-    INT padding = 8 - (filesize % 8);
+    const INT padding = 8 - (filesize % 8);
 
     appParanoiac(_T("YAML::read_params: filesize = %d, padding = %d\n"), filesize, padding);
 

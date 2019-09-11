@@ -62,9 +62,9 @@ inline DOUBLE appStrToDOUBLE(const TCHAR* s)
 }
 
 //=====================================================
-//	CCStringData
+//    CCStringData
 //=====================================================
-#define __SafeStrlen(s)		((INT)((s)?appStrlen(s):0))
+#define __SafeStrlen(s)        ((INT)((s)?appStrlen(s):0))
 
 class CLGAPIPRIVATE CCStringData
 {
@@ -86,7 +86,7 @@ public:
 };
 
 //=====================================================
-//	CCString
+//    CCString
 //=====================================================
 class CLGAPI CCString
 {
@@ -157,7 +157,7 @@ protected:
     */
     void AllocCopy(CCString& dest, INT nCopyLen, INT nCopyIndex, INT nExtraLen) const
     {
-        INT nNewLen = nCopyLen + nExtraLen;
+        const INT nNewLen = nCopyLen + nExtraLen;
         if (nNewLen == 0)
         {
             dest.Init();
@@ -202,7 +202,7 @@ protected:
     */
     void ConcatCopy(INT nSrc1Len, const TCHAR* lpszSrc1Data, INT nSrc2Len, const TCHAR* lpszSrc2Data)
     {
-        INT nNewLen = nSrc1Len + nSrc2Len;
+        const INT nNewLen = nSrc1Len + nSrc2Len;
         if (nNewLen != 0)
         {
             AllocBuffer(nNewLen);
@@ -492,7 +492,7 @@ public:
         if (lpsz != m_pchData)
         {
             // fix up data and length
-            INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
+            const INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
             memmove(m_pchData, lpsz, (nDataLength + 1) * sizeof(TCHAR));
             GetData()->m_nDataLength = nDataLength;
         }
@@ -511,7 +511,7 @@ public:
         if (lpsz != m_pchData)
         {
             // fix up data and length
-            INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
+            const INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
             memmove(m_pchData, lpsz, (nDataLength + 1) * sizeof(TCHAR));
             GetData()->m_nDataLength = nDataLength;
         }
@@ -529,7 +529,7 @@ public:
     // searching
     INT Find(const TCHAR* lpszSub, INT nStart) const
     {
-        INT nLength = GetData()->m_nDataLength;
+        const INT nLength = GetData()->m_nDataLength;
         if (nStart > nLength)
             return -1;
 
@@ -541,7 +541,7 @@ public:
     }
     INT Find(TCHAR ch, INT nStart) const
     {
-        INT nLength = GetData()->m_nDataLength;
+        const INT nLength = GetData()->m_nDataLength;
         if (nStart >= nLength)
             return -1;
 
@@ -583,7 +583,7 @@ public:
         GetData()->m_nRefs = -1;
         return lpsz;
     }
-    void UnlockBuffer(); //out side
+    void UnlockBuffer() const; //out side
 
 protected:
 
@@ -724,7 +724,7 @@ enum EGetStringListFlag
 inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT> seperate, DWORD dwFlag = 0)
 {
     TArray<CCString> outList;
-    CCBitFlag flag(dwFlag);
+    const CCBitFlag flag(dwFlag);
     const TCHAR * lpsz = (const TCHAR *)(orignString);
     TCHAR lp[CCString::MAX_PATH];
     memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
@@ -738,7 +738,7 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
 
         bIsSeperate = bIsSeperate || (*lpsz == 0) ||  (*lpsz == '\n') ||  (*lpsz == '\r');
 
-        UBOOL bTail = (*lpsz == 0);
+        const UBOOL bTail = (*lpsz == 0);
 
         if (bIsSeperate)
         {
@@ -816,7 +816,7 @@ inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate,
     INT location = -1;
     for (INT i = 0; i < seperate.Num(); ++i)
     {
-        INT location1 = bCutHead ? orignString.Find(static_cast<TCHAR>(seperate[i])) : orignString.ReverseFind(static_cast<TCHAR>(seperate[i]));
+        const INT location1 = bCutHead ? orignString.Find(static_cast<TCHAR>(seperate[i])) : orignString.ReverseFind(static_cast<TCHAR>(seperate[i]));
 
         //no need to do this
 //         if (-1 == location1)

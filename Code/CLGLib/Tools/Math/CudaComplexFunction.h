@@ -39,8 +39,8 @@ extern "C" {
     */
     __device__ static __inline__ CLGComplex __cuCpowerf(const CLGComplex& c, Real p)
     {
-        Real fArg = __cuCargf(c) * p;
-        Real fAbs = _pow(_cuCabsf(c), p);
+        const Real fArg = __cuCargf(c) * p;
+        const Real fAbs = _pow(_cuCabsf(c), p);
         return _make_cuComplex(_cos(fArg) * fAbs, _sin(fArg) * fAbs);
     }
 
@@ -49,7 +49,7 @@ extern "C" {
     */
     __device__ static __inline__ CLGComplex __cuCexpf(const CLGComplex& c)
     {
-        Real factor = _exp(c.x);
+        const Real factor = _exp(c.x);
         return _make_cuComplex(factor * _cos(c.y), factor * _sin(c.y));
     }
 
@@ -58,8 +58,8 @@ extern "C" {
     */
     __device__ static __inline__ CLGComplex __cuCsqrtf(const CLGComplex& c)
     {
-        Real fRadius = _cuCabsf(c);
-        Real fCosA = __div(c.x, fRadius);
+        const Real fRadius = _cuCabsf(c);
+        const Real fCosA = __div(c.x, fRadius);
         CLGComplex out;
         out.x = _sqrt(F(0.5) * fRadius * (fCosA + F(1.0)));
         out.y = _sqrt(F(0.5) * fRadius * (F(1.0) - fCosA));

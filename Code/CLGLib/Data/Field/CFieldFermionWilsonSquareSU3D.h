@@ -24,12 +24,12 @@ public:
 
     CFieldFermionWilsonSquareSU3D() : CFieldFermionWilsonSquareSU3() {}
 
-    virtual void FixBoundary();
-    virtual void PrepareForHMC(const CFieldGauge* pGauge);
-    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
-    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
-    virtual CCString GetInfos(const CCString &tab) const;
+    void FixBoundary() override;
+    void PrepareForHMC(const CFieldGauge* pGauge) override;
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
+    CCString GetInfos(const CCString &tab) const override;
 
     //No need to rewrite them, once D operator and Random Gaussian make sure boundary
     //All fields come from other operators (D, D+, DD+, etc), or Linear Algebra will keep the boundary

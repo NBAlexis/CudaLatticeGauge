@@ -182,14 +182,14 @@ extern "C" {
         */
         __device__ __inline__ static deviceSU3 makeSU3RandomGenerator(UINT fatIndex)
         {
-            Real r1 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r2 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r3 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r4 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r5 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r6 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r7 = _deviceRandomGaussFSqrt2(fatIndex);
-            Real r8 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r1 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r2 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r3 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r4 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r5 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r6 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r7 = _deviceRandomGaussFSqrt2(fatIndex);
+            const Real r8 = _deviceRandomGaussFSqrt2(fatIndex);
 
             deviceSU3 ret;
             //we directly generate i ra Ta instead of ra Ta
@@ -233,7 +233,7 @@ extern "C" {
         __device__ __inline__ static deviceSU3 makeSU3Generator(UINT uiGenerator)
         {
             deviceSU3 ret = makeSU3Zero();
-            Real half = F(0.5);
+            const Real half = F(0.5);
             switch (uiGenerator)
             {
             case 0:
@@ -894,9 +894,9 @@ extern "C" {
 
             //new [1] = [1] - conj([3])
             //new [3] = [3] - conj([1]) = -conj(new [1])
-            CLGComplex new1 = _cuCsubf(m_me[1], _cuConjf(m_me[3]));
-            CLGComplex new2 = _cuCsubf(m_me[2], _cuConjf(m_me[6]));
-            CLGComplex new5 = _cuCsubf(m_me[5], _cuConjf(m_me[7]));
+            const CLGComplex new1 = _cuCsubf(m_me[1], _cuConjf(m_me[3]));
+            const CLGComplex new2 = _cuCsubf(m_me[2], _cuConjf(m_me[6]));
+            const CLGComplex new5 = _cuCsubf(m_me[5], _cuConjf(m_me[7]));
             m_me[1] = _make_cuComplex(F(0.5) * _cuCrealf(new1), F(0.5) * _cuCimagf(new1));
             m_me[3] = _make_cuComplex(-_cuCrealf(m_me[1]), _cuCimagf(m_me[1]));
             m_me[2] = _make_cuComplex(F(0.5) * _cuCrealf(new2), F(0.5) * _cuCimagf(new2));
@@ -904,7 +904,7 @@ extern "C" {
             m_me[5] = _make_cuComplex(F(0.5) * _cuCrealf(new5), F(0.5) * _cuCimagf(new5));
             m_me[7] = _make_cuComplex(-_cuCrealf(m_me[5]), _cuCimagf(m_me[5]));
 
-            Real fImgTr = __div(m_me[0].y + m_me[4].y + m_me[8].y, F(3.0));
+            const Real fImgTr = __div(m_me[0].y + m_me[4].y + m_me[8].y, F(3.0));
             m_me[0] = _make_cuComplex(F(0.0), m_me[0].y - fImgTr);
             m_me[4] = _make_cuComplex(F(0.0), m_me[4].y - fImgTr);
             m_me[8] = _make_cuComplex(F(0.0), m_me[8].y - fImgTr);
@@ -960,13 +960,13 @@ extern "C" {
         */
         __device__ __inline__ void Norm()
         {
-            Real fDiv1 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[0]) + __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2])));
+            const Real fDiv1 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[0]) + __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2])));
             m_me[0] = cuCmulf_cr(m_me[0], fDiv1);
             m_me[1] = cuCmulf_cr(m_me[1], fDiv1);
             m_me[2] = cuCmulf_cr(m_me[2], fDiv1);
 
             //it is the name in Bridge++
-            CLGComplex sp1 = _cuConjf(
+            const CLGComplex sp1 = _cuConjf(
                 _cuCaddf(_cuCaddf(
                     _cuCmulf(m_me[0], _cuConjf(m_me[3]))
                     , _cuCmulf(m_me[1], _cuConjf(m_me[4])))
@@ -976,7 +976,7 @@ extern "C" {
             m_me[3] = _cuCsubf(m_me[3], _cuCmulf(sp1, m_me[0]));
             m_me[4] = _cuCsubf(m_me[4], _cuCmulf(sp1, m_me[1]));
             m_me[5] = _cuCsubf(m_me[5], _cuCmulf(sp1, m_me[2]));
-            Real fDiv2 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5])));
+            const Real fDiv2 = __div(F(1.0), _sqrt(__cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5])));
             m_me[3] = cuCmulf_cr(m_me[3], fDiv2);
             m_me[4] = cuCmulf_cr(m_me[4], fDiv2);
             m_me[5] = cuCmulf_cr(m_me[5], fDiv2);
@@ -1092,7 +1092,7 @@ extern "C" {
             */
             for (BYTE i = 0; i < uiPrecision; ++i)
             {
-                Real exp_factor = __rcp(uiPrecision - i);
+                const Real exp_factor = __rcp(uiPrecision - i);
                 CLGComplex alpha = cuCmulf_cr(a, exp_factor);
                 //aU/(N-i) = this x alpha
                 deviceSU3 aUoN = MulCompC(alpha);
@@ -1235,47 +1235,47 @@ extern "C" {
             Real a2i = halfadn2 * m_me[2].y;
             Real a3i = adn3 * m_me[5].y;
 #else
-            Real aOver12 = a * F(0.08333333333333333333333333333333);
-            Real aOver6 = a * F(0.16666666666666666666666666666667);
+            const Real aOver12 = a * F(0.08333333333333333333333333333333);
+            const Real aOver6 = a * F(0.16666666666666666666666666666667);
 
             //y1 = a(Im(m11-m22))/12, y2 = a(Im(m11-m33))/12, y3= a(Im(m22-m33))/6
-            Real y1 = aOver12 * (m_me[0].y - m_me[4].y);
-            Real y2 = aOver12 * (m_me[0].y - m_me[8].y);
-            Real y3 = aOver6 * (m_me[4].y - m_me[8].y);
+            const Real y1 = aOver12 * (m_me[0].y - m_me[4].y);
+            const Real y2 = aOver12 * (m_me[0].y - m_me[8].y);
+            const Real y3 = aOver6 * (m_me[4].y - m_me[8].y);
 
             //l1 = y1^2 + (|m12|/4)^2
             //l2 = y2^2 + (|m13|/4)^2
             //l3 = y3^2 + (|m23|/2)^2
-            Real a2 = a * a;
-            Real aSqOver16 = a2 * F(0.0625);
-            Real aSqOver4 = a2 * F(0.25);
-            Real l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]);
-            Real l2 = y2 * y2 + aSqOver16 * __cuCabsSqf(m_me[2]);
-            Real l3 = y3 * y3 + aSqOver4 * __cuCabsSqf(m_me[5]);
+            const Real a2 = a * a;
+            const Real aSqOver16 = a2 * F(0.0625);
+            const Real aSqOver4 = a2 * F(0.25);
+            const Real l1 = y1 * y1 + aSqOver16 * __cuCabsSqf(m_me[1]);
+            const Real l2 = y2 * y2 + aSqOver16 * __cuCabsSqf(m_me[2]);
+            const Real l3 = y3 * y3 + aSqOver4 * __cuCabsSqf(m_me[5]);
 
             //dn1 = 1/ (1 + y1^2 +  (|m12|/4)^2)
-            Real dn1 = __div(F(1.0), F(1.0) + l1);
-            Real dn2 = __div(F(1.0), F(1.0) + l2);
-            Real dn3 = __div(F(1.0), F(1.0) + l3);
+            const Real dn1 = __div(F(1.0), F(1.0) + l1);
+            const Real dn2 = __div(F(1.0), F(1.0) + l2);
+            const Real dn3 = __div(F(1.0), F(1.0) + l3);
 
             //dn1(1 - l1) = -l1 x dn1 + dn1
-            Real c1r = dn1 - l1 * dn1;
-            Real c2r = dn2 - l2 * dn2;
-            Real c3r = dn3 - l3 * dn3;
-            Real c1i = F(2.0) * y1 * dn1;
-            Real c2i = F(2.0) * y2 * dn2;
-            Real c3i = F(2.0) * y3 * dn3;
+            const Real c1r = dn1 - l1 * dn1;
+            const Real c2r = dn2 - l2 * dn2;
+            const Real c3r = dn3 - l3 * dn3;
+            const Real c1i = F(2.0) * y1 * dn1;
+            const Real c2i = F(2.0) * y2 * dn2;
+            const Real c3i = F(2.0) * y3 * dn3;
 
-            Real halfa = F(0.5) * a;
-            Real halfadn1 = halfa * dn1;
-            Real halfadn2 = halfa * dn2;
-            Real adn3 = a * dn3;
-            Real a1r = halfadn1 * m_me[1].x;
-            Real a2r = halfadn2 * m_me[2].x;
-            Real a3r = adn3 * m_me[5].x;
-            Real a1i = halfadn1 * m_me[1].y;
-            Real a2i = halfadn2 * m_me[2].y;
-            Real a3i = adn3 * m_me[5].y;
+            const Real halfa = F(0.5) * a;
+            const Real halfadn1 = halfa * dn1;
+            const Real halfadn2 = halfa * dn2;
+            const Real adn3 = a * dn3;
+            const Real a1r = halfadn1 * m_me[1].x;
+            const Real a2r = halfadn2 * m_me[2].x;
+            const Real a3r = adn3 * m_me[5].x;
+            const Real a1i = halfadn1 * m_me[1].y;
+            const Real a2i = halfadn2 * m_me[2].y;
+            const Real a3i = adn3 * m_me[5].y;
 #endif
 
             //6 Temp Reals
@@ -1345,10 +1345,10 @@ extern "C" {
                 a3rc2i + a3ic2r
             );
 #else
-            Real abs2a = a2r * a2r + a2i * a2i;
-            Real abs2c = c2r * c2r - c2i * c2i;
+            const Real abs2a = a2r * a2r + a2i * a2i;
+            const Real abs2c = c2r * c2r - c2i * c2i;
 
-            Real c2ic2r = F(2.0) * c2i * c2r;
+            const Real c2ic2r = F(2.0) * c2i * c2r;
             //(abs2c-abs2a c3r)+I(2 c2i c2r+abs2a c3i)
             midMatrix[0] = _make_cuComplex(
                 abs2c - abs2a * c3r,
@@ -1369,14 +1369,14 @@ extern "C" {
 
             //q1 = c2i - c2r c3i - c2i c3r
             //q2 = c2r - c2i c3i + c2r c3r
-            Real q1 = c2i - c2r * c3i - c2i * c3r;
-            Real q2 = c2r - c2i * c3i + c2r * c3r;
+            const Real q1 = c2i - c2r * c3i - c2i * c3r;
+            const Real q2 = c2r - c2i * c3i + c2r * c3r;
 
             //(a2r q2-a2i q1)+(a2i q2+a2r q1)I
-            Real a2rq1 = a2r * q1;
-            Real a2iq1 = a2i * q1;
-            Real a2rq2 = a2r * q2;
-            Real a2iq2 = a2i * q2;
+            const Real a2rq1 = a2r * q1;
+            const Real a2iq1 = a2i * q1;
+            const Real a2rq2 = a2r * q2;
+            const Real a2iq2 = a2i * q2;
             midMatrix[2] = _make_cuComplex(
                 a2rq2 - a2iq1,
                 a2iq2 + a2rq1
@@ -1392,10 +1392,10 @@ extern "C" {
             midMatrix[3] = _make_cuComplex(c3r, c3i);
 
             //a3i c2i+a3r c2r+I (-a3r c2i+a3i c2r)
-            Real a3ic2i = a3i * c2i;
-            Real a3rc2r = a3r * c2r;
-            Real a3rc2i = a3r * c2i;
-            Real a3ic2r = a3i * c2r;
+            const Real a3ic2i = a3i * c2i;
+            const Real a3rc2r = a3r * c2r;
+            const Real a3rc2i = a3r * c2i;
+            const Real a3ic2r = a3i * c2r;
             midMatrix[4] = _make_cuComplex(
                 a3ic2i + a3rc2r,
                 a3ic2r - a3rc2i

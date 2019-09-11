@@ -56,7 +56,7 @@ __device__ void _deviceMeasure5(const SSmallInt4& site, const SSmallInt4& sCente
 */
 __device__ void _deviceMeasure6(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
-    Real fYOmega = static_cast<Real>(site.y - sCenter.y) * fOmega;
+    const Real fYOmega = static_cast<Real>(site.y - sCenter.y) * fOmega;
     deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(element);
     toAdd.MulReal(fYOmega);
     element = __chiralGamma[GAMMA1].MulWilsonC(element);
@@ -68,7 +68,7 @@ __device__ void _deviceMeasure6(const SSmallInt4& site, const SSmallInt4& sCente
 */
 __device__ void _deviceMeasure7(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
-    Real fXOmega = static_cast<Real>(site.x - sCenter.x) * fOmega;
+    const Real fXOmega = static_cast<Real>(site.x - sCenter.x) * fOmega;
     deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(element);
     toAdd.MulReal(fXOmega);
     element = __chiralGamma[GAMMA2].MulWilsonC(element);
@@ -123,11 +123,11 @@ _kernel_Gammas(
     //s * 3 + c
     UINT uiC = threadIdx.x;
     UINT uiS = threadIdx.y;
-    UINT uiCS = uiS * 3 + uiC;
+    const UINT uiCS = uiS * 3 + uiC;
 
-    UINT uiSiteIndex = _deviceGetSiteIndex(sSite4);
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiSiteIndex = _deviceGetSiteIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         res[uiArrayIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
@@ -357,9 +357,9 @@ void CMeasureChargeAndCurrents::Report()
             appGeneral(_T("{"));
             for (UINT i = 0; i < (_HC_Lx - 1); ++i)
             {
-                UINT uiThisSiteThisFunc = n * (_HC_Lx - 1) + i;
-                UINT uiOneConf = _kGammaInInterests * (_HC_Lx - 1);
-                Real fV = m_lstAllRes[uiOneConf * j + uiThisSiteThisFunc].x;
+                const UINT uiThisSiteThisFunc = n * (_HC_Lx - 1) + i;
+                const UINT uiOneConf = _kGammaInInterests * (_HC_Lx - 1);
+                const Real fV = m_lstAllRes[uiOneConf * j + uiThisSiteThisFunc].x;
                 average[i] = average[i] + fV;
                 appGeneral(_T("%2.12f, "), fV);
             }

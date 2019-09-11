@@ -167,11 +167,11 @@ _kernelDWilsonForceSU3_D(
     BYTE byFieldId)
 {
     intokernalInt4;
-    BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    deviceWilsonVectorSU3 x_Left(_deviceGetFermionBCWilsonSU3(pInverseDDdagger, sSite, byFieldId));
-    deviceWilsonVectorSU3 x_Right(_deviceGetFermionBCWilsonSU3(pInverseD, sSite, byFieldId));
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const deviceWilsonVectorSU3 x_Left(_deviceGetFermionBCWilsonSU3(pInverseDDdagger, sSite, byFieldId));
+    const deviceWilsonVectorSU3 x_Right(_deviceGetFermionBCWilsonSU3(pInverseD, sSite, byFieldId));
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -198,7 +198,7 @@ _kernelDWilsonForceSU3_D(
              // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
             //all not on surface
-            deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+            const deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
             deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
             //deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
             //deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
@@ -287,8 +287,8 @@ _kernelInitialFermionWilsonSquareSU3ForHMC(
 {
     intokernalInt4;
 
-    UINT bigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][bigIdx];
+    const UINT bigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][bigIdx];
     if (sIdx.IsDirichlet())
     {
         pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3(); //((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(sIdx)];
@@ -304,7 +304,7 @@ _kernelFixBoundaryWilsonSU3(deviceWilsonVectorSU3* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
 
-    SIndex idx = __idx->_deviceGetMappingIndex(sSite4, byFieldId);
+    const SIndex idx = __idx->_deviceGetMappingIndex(sSite4, byFieldId);
     if (idx.IsDirichlet())
     {
         pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3(); //((CFieldBoundaryWilsonSquareSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[__idx->_devcieExchangeBoundaryFieldSiteIndex(idx)];

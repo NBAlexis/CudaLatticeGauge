@@ -125,7 +125,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
 
         for (UINT jj = 0; jj < m_uiIterateNumber; ++jj)
         {
-            UINT j = jj % m_uiMaxDim;
+            const UINT j = jj % m_uiMaxDim;
 
             pP[j]->CopyTo(pAP[j]);
             pAP[j]->ApplyOperator(uiM, pGaugeFeild);
@@ -159,7 +159,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
             if (jj != m_uiIterateNumber - 1) //otherwise, just restart
             {
                 //p(j+1) = r
-                UINT nextPjIndex = (jj + 1) % m_uiMaxDim;
+                const UINT nextPjIndex = (jj + 1) % m_uiMaxDim;
                 pAP[j]->CopyTo(pP[nextPjIndex]);
                 pAP[j]->CopyTo(pAAP);
                 pAAP->ApplyOperator(uiM, pGaugeFeild);

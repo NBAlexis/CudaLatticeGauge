@@ -265,7 +265,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             for (UINT k = 0; k < m_uiKDim; ++k)
             {
                 //B(k, j) = C(k)^dagger AV(j)
-                CLGComplex CkH_W = m_lstC[k]->Dot(pW);
+                const CLGComplex CkH_W = m_lstC[k]->Dot(pW);
                 m_pHostHmGm[k * m_uiMDim + j] = CkH_W;
                 //v(j+1) = (I - Ck CkH).A v(j)
                 vjp1->Axpy(_make_cuComplex(-CkH_W.x, -CkH_W.y), m_lstC[k]);
@@ -273,14 +273,14 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             for (UINT k = m_uiKDim; k <= j; ++k)
             {
                 CField* vk = GetW(k);
-                CLGComplex dotc = vk->Dot(vjp1);
+                const CLGComplex dotc = vk->Dot(vjp1);
                 m_pHostHmGm[k * m_uiMDim + j] = dotc;
                 //w -= h[k,j] v[k]
                 vjp1->Axpy(_make_cuComplex(-dotc.x, -dotc.y), vk);
             }
 
             //h[j + 1, j] = ||w||
-            Real fWNorm = _hostsqrt(vjp1->Dot(vjp1).x);
+            const Real fWNorm = _hostsqrt(vjp1->Dot(vjp1).x);
             m_pHostHmGm[(j + 1) * m_uiMDim + j] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
             vjp1->ScalarMultply(F(1.0) / fWNorm);
@@ -389,14 +389,14 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         for (UINT k = 0; k <= j; ++k)
         {
             CField* vk = GetW(k);
-            CLGComplex dotc = vk->Dot(vjp1);
+            const CLGComplex dotc = vk->Dot(vjp1);
             m_pHostHmGm[k * m_uiMDim + j] = dotc;
             //w -= h[k,j] v[k]
             vjp1->Axpy(_make_cuComplex(-dotc.x, -dotc.y), vk);
         }
 
         //h[j + 1, j] = ||w||
-        Real fWNorm = _sqrt(vjp1->Dot(vjp1).x);
+        const Real fWNorm = _sqrt(vjp1->Dot(vjp1).x);
         m_pHostHmGm[(j + 1) * m_uiMDim + j] = _make_cuComplex(fWNorm, F(0.0));
         //v[j + 1] = w / ||w||
 
@@ -457,7 +457,7 @@ void CSLASolverGCRODR::QRFactorAY(const CFieldGauge* pGaugeField, EFieldOperator
     //QR of AY
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
-        Real fLength = _hostsqrt(m_lstC[i]->Dot(m_lstC[i]).x);
+        const Real fLength = _hostsqrt(m_lstC[i]->Dot(m_lstC[i]).x);
         m_pHostTmpR[i * m_uiKDim + i] = _make_cuComplex(fLength, F(0.0));
         m_lstC[i]->ScalarMultply(F(1.0) / fLength);
         for (UINT j = i + 1; j < m_uiKDim; ++j)
@@ -472,7 +472,7 @@ void CSLASolverGCRODR::QRFactorAY(const CFieldGauge* pGaugeField, EFieldOperator
     }
 }
 
-void CSLASolverGCRODR::FindPk1()
+void CSLASolverGCRODR::FindPk1() const
 {
     switch (m_eDeflationType)
     {
@@ -754,8 +754,8 @@ void CSLASolverGCRODR::NormUkAndSetD()
 
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
-        CLGComplex dotres = m_lstU[i]->Dot(m_lstU[i]);
-        Real fLength = F(1.0) / _hostsqrt(dotres.x);
+        const CLGComplex dotres = m_lstU[i]->Dot(m_lstU[i]);
+        const Real fLength = F(1.0) / _hostsqrt(dotres.x);
         m_pHostHmGm[i * m_uiMDim + i] = _make_cuComplex(fLength, F(0.0));
         m_lstU[i]->ScalarMultply(fLength);
     }

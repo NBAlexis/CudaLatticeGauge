@@ -37,7 +37,7 @@ public:
     */
     virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
 
-    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override
     {
         switch (op)
         {
@@ -99,8 +99,8 @@ public:
 
 #pragma endregion
 
-    virtual UBOOL IsGaugeField() const { return FALSE; }
-    virtual UBOOL IsFermionField() const { return TRUE; }
+    UBOOL IsGaugeField() const override { return FALSE; }
+    UBOOL IsFermionField() const override { return TRUE; }
 
 protected:
 

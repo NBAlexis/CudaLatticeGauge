@@ -36,7 +36,7 @@ UINT TestBoundary(CParameters& sParam)
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(20, TRUE);
 
-    Real fRes = pMeasure->m_fLastRealResult;
+    const Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.02))
@@ -44,8 +44,8 @@ UINT TestBoundary(CParameters& sParam)
         ++uiError;
     }
 
-    UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
     appGeneral(_T("accept (%d/25) : expected >= 23. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 23)

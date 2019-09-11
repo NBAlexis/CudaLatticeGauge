@@ -16,11 +16,14 @@ __BEGIN_NAMESPACE
 class CLGAPI CMeasure : public CBase
 {
 public:
-    CMeasure() 
+    CMeasure()
         : m_pOwner(NULL)
+        , m_pLatticeData(NULL)
         , m_bNeedSmearing(FALSE)
+        , m_byId(0)
         , m_byFieldId(0)
         , m_fLastRealResult(F(0.0))
+        , m_cLastComplexResult()
     {
     }
 
@@ -104,7 +107,7 @@ public:
     {
     }
 
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
+    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId) override
     {
         CMeasure::Initial(pOwner, pLatticeData, param, byId);
         INT iValue = 100;
@@ -112,7 +115,7 @@ public:
         m_uiFieldCount = static_cast<UINT>(iValue);
     }
 
-    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) 
+    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override
     {
         appCrucial(_T("Should not use SourceSanning"));
     }
@@ -120,14 +123,14 @@ public:
     /**
     * Z4 Source
     */
-    virtual void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd)
+    void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override
     {
         appCrucial(_T("OnConfigurationAcceptedZ4 not implemented"));
     }
 
-    virtual UBOOL IsGaugeMeasurement() const = 0;
-    virtual UBOOL IsSourceScanning() const { return FALSE; }
-    virtual UBOOL IsZ4Source() const { return TRUE; }
+    UBOOL IsGaugeMeasurement() const override = 0;
+    UBOOL IsSourceScanning() const override { return FALSE; }
+    UBOOL IsZ4Source() const override { return TRUE; }
     UINT GetFieldCount() const { return m_uiFieldCount; }
     void SetFieldCount(UINT uiFieldCount) { m_uiFieldCount = uiFieldCount; }
 

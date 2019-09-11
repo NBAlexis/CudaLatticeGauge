@@ -78,8 +78,8 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
 {
     intokernalInt4;
 
-    UINT uiDim = _DC_Dim;
-    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    const UINT uiDim = _DC_Dim;
+    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
 
     //24
     UINT iListIndex = uiSiteIndex 
@@ -127,7 +127,7 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult,
     intokernalInt4;
 
     UINT uiDim = _DC_Dim;
-    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
     
     for (UINT uiLinkDir = 0; uiLinkDir < uiDim; ++uiLinkDir)
     {
@@ -203,10 +203,10 @@ _kernelCacheGaugeMove(SIndex* pCached,
     intokernalInt4;
 
     UINT uiDir = _DC_Dir;
-    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
     for (UINT i = 0; i < uiDir; ++i)
     {
-        UINT uiBigIdx = pWalkingTable[uiBigSiteIndex * 2 * uiDir + i];
+        const UINT uiBigIdx = pWalkingTable[uiBigSiteIndex * 2 * uiDir + i];
         pCached[uiSiteIndex * uiDir + i] = pMappingTable[uiBigIdx];
         pCached[uiSiteIndex * uiDir + i].m_byDir = i;
         pCached[uiSiteIndex * uiDir + i].m_byTag = 
@@ -222,8 +222,8 @@ _kernelCacheFermionMove(SIndex* pCached,
 {
     intokernalInt4;
 
-    UINT uiDir = _DC_Dir;
-    UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
+    const UINT uiDir = _DC_Dir;
+    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
     for (UINT i = 0; i < uiDir; ++i)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, i);
@@ -241,8 +241,8 @@ _kernelPlaqutteCount(UINT* atomic)
 {
     intokernal;
 
-    BYTE plaqCount = static_cast<BYTE>(__idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx]);
-    BYTE plaqLength = static_cast<BYTE>(__idx->m_pSmallData[CIndexData::kPlaqLengthIdx]);
+    const BYTE plaqCount = static_cast<BYTE>(__idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx]);
+    const BYTE plaqLength = static_cast<BYTE>(__idx->m_pSmallData[CIndexData::kPlaqLengthIdx]);
 
     UINT plaqCountAll = plaqCount * plaqLength;
     UINT toAdd = 0;
@@ -272,7 +272,7 @@ UINT CIndexSquare::GetDecompose(UINT volumn)
 {
     TArray<UINT> factors = _getFactors(volumn);
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
-    UINT maxThreadPerBlock = deviceConstraints[1]; //we only use 1 dimension, so it is the constraint of blockDim.x
+    const UINT maxThreadPerBlock = deviceConstraints[1]; //we only use 1 dimension, so it is the constraint of blockDim.x
 
     UINT uiMax = 1;
     for (INT i = 0; i < factors.Num(); ++i)
@@ -295,8 +295,8 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
     biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
     uint3 biggerLatticeMod;
 
-    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    UINT threadPerSite = GetDecompose(uiVolumn);
+    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    const UINT threadPerSite = GetDecompose(uiVolumn);
     dim3 threads(threadPerSite, 1, 1);
     dim3 blocks(uiVolumn / threadPerSite, 1, 1);
     biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;

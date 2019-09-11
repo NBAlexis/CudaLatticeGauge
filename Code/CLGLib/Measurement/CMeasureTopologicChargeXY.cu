@@ -24,7 +24,7 @@ _kernelTopoChargeClover(
     Real* pResBuffer)
 {
     intokernalInt4;
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
@@ -41,7 +41,7 @@ _kernelTopoChargeSumOverZT(
     Real* densityXYPlane)
 {
     intokernalInt4;
-    UINT uiXYIndex = sSite4.x * _DC_Ly + sSite4.y;
+    const UINT uiXYIndex = sSite4.x * _DC_Ly + sSite4.y;
     atomicAdd(&densityXYPlane[uiXYIndex], pChargeDensity[uiSiteIndex]);
 }
 
@@ -95,7 +95,7 @@ void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGaug
 
     checkCudaErrors(cudaMemcpy(m_pXYHostDensity, m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
 
-    Real fCharge = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    const Real fCharge = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
     ++m_uiConfigurationCount;
     if (m_bShowResult)

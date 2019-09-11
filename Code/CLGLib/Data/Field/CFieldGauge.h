@@ -50,16 +50,16 @@ public:
 
 #pragma endregion
 
-    virtual UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real )
+    UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real ) override
     {
         appCrucial("CFieldGauge: Do Operator implimented yet");
         return FALSE;
     }
 
-    virtual void CopyTo(CField* U) const;
+    void CopyTo(CField* U) const override;
 
-    virtual UBOOL IsGaugeField() const { return TRUE; }
-    virtual UBOOL IsFermionField() const { return FALSE; }
+    UBOOL IsGaugeField() const override { return TRUE; }
+    UBOOL IsFermionField() const override { return FALSE; }
 
 protected:
 

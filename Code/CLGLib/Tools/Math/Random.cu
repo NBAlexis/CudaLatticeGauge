@@ -16,7 +16,7 @@ _kernalAllocateSeedTable(UINT* pDevicePtr)
 {
     intokernaldir;
 
-    UINT uiSeed = _DC_Seed;
+    const UINT uiSeed = _DC_Seed;
 
     for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
@@ -39,9 +39,9 @@ _kernalInitialXORWOW(curandState * states)
 __global__ void _CLG_LAUNCH_BOUND
 _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 {
-    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
-    UINT uiSeed = _DC_Seed;
-    UINT uiDir = _DC_Dir;
+    const UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
+    const UINT uiSeed = _DC_Seed;
+    const UINT uiDir = _DC_Dir;
     for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
         UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
@@ -52,9 +52,9 @@ _kernalInitialPhilox(curandStatePhilox4_32_10_t * states)
 __global__ void _CLG_LAUNCH_BOUND
 _kernalInitialMRG(curandStateMRG32k3a  * states)
 {
-    UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
-    UINT uiSeed = _DC_Seed;
-    UINT uiDir = _DC_Dir;
+    const UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * blockDim.y * gridDim.y * blockDim.z * gridDim.z + (threadIdx.y + blockIdx.y * blockDim.y) * blockDim.z * gridDim.z + (threadIdx.z + blockIdx.z * blockDim.z));
+    const UINT uiSeed = _DC_Seed;
+    const UINT uiDir = _DC_Dir;
     for (UINT idir = 0; idir < uiDir + 1; ++idir)
     {
         UINT fatIndex = _deviceGetFatIndex(uiSiteIndex, idir);
@@ -251,11 +251,11 @@ _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithrea
     UINT uiToAdd = 0;
     UINT uiToAdd2 = 0;
     //We have a very large grid, but for a block, it is always smaller (or equval to volumn)
-    UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
+    const UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
     for (UINT i = 0; i < uiLoop; ++i)
     {
-        Real x = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
-        Real y = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
+        const Real x = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
+        const Real y = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
         if (x * x + y * y < 1.0f)
         {
             ++uiToAdd;
@@ -288,10 +288,10 @@ _kernelMCE(Real* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithread
     __shared__ Real sData2[1024];
     Real fToAdd = 0;
     Real fToAdd2 = 0;
-    UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
+    const UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
     for (UINT i = 0; i < uiLoop; ++i)
     {
-        CLGComplex c = _deviceRandomGaussC(fatIndex);
+        const CLGComplex c = _deviceRandomGaussC(fatIndex);
         fToAdd += (c.x + c.y);
         fToAdd2 += (c.x * c.x + c.y * c.y);
     }
@@ -318,11 +318,11 @@ Real CLGAPI CalculatePi(const TArray<UINT> & decompose)
 {
     dim3 blocknumber(decompose[0], decompose[1], decompose[2]);
     dim3 threadnumber(decompose[3], decompose[4], decompose[5]);
-    UINT threadCount = decompose[3] * decompose[4] * decompose[5];
-    UINT lengthyz = decompose[4] * decompose[5];
-    UINT lengthz = decompose[5];
-    UINT total = decompose[0] * decompose[1] * decompose[2] * decompose[3] * decompose[4] * decompose[5] * decompose[6];
-    UINT uiLoop = decompose[6];
+    const UINT threadCount = decompose[3] * decompose[4] * decompose[5];
+    const UINT lengthyz = decompose[4] * decompose[5];
+    const UINT lengthz = decompose[5];
+    const UINT total = decompose[0] * decompose[1] * decompose[2] * decompose[3] * decompose[4] * decompose[5] * decompose[6];
+    const UINT uiLoop = decompose[6];
 
     UINT outPutHost[2];
     outPutHost[0] = 0;
@@ -347,11 +347,11 @@ Real CLGAPI CalculateE(const TArray<UINT> & decompose)
 {
     dim3 blocknumber(decompose[0], decompose[1], decompose[2]);
     dim3 threadnumber(decompose[3], decompose[4], decompose[5]);
-    UINT threadCount = decompose[3] * decompose[4] * decompose[5];
-    UINT lengthyz = decompose[4] * decompose[5];
-    UINT lengthz = decompose[5];
-    UINT total = decompose[0] * decompose[1] * decompose[2] * decompose[3] * decompose[4] * decompose[5] * decompose[6];
-    UINT uiLoop = decompose[6];
+    const UINT threadCount = decompose[3] * decompose[4] * decompose[5];
+    const UINT lengthyz = decompose[4] * decompose[5];
+    const UINT lengthz = decompose[5];
+    const UINT total = decompose[0] * decompose[1] * decompose[2] * decompose[3] * decompose[4] * decompose[5] * decompose[6];
+    const UINT uiLoop = decompose[6];
 
     Real outPutHost[2];
     outPutHost[0] = 0.0F;
@@ -367,8 +367,8 @@ Real CLGAPI CalculateE(const TArray<UINT> & decompose)
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaMemcpy(outPutHost, outPut, sizeof(Real) * 2, cudaMemcpyDeviceToHost));
 
-    Real fAv = outPutHost[0] / (2.0f * total);
-    Real fBv = outPutHost[1] / (2.0f * total) - fAv * fAv;
+    const Real fAv = outPutHost[0] / (2.0f * total);
+    const Real fBv = outPutHost[1] / (2.0f * total) - fAv * fAv;
 
     return _hostsqrt(fBv);
 }

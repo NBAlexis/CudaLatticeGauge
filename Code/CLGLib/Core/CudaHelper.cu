@@ -465,7 +465,7 @@ void CCudaHelper::SetFieldPointers()
         }
         else
         {
-            UINT uiSize = pField->GetClass()->GetSize();
+            const UINT uiSize = pField->GetClass()->GetSize();
             CField* pDeviceField = NULL;
             checkCudaErrors(cudaMalloc((void**)&pDeviceField, static_cast<size_t>(uiSize)));
             checkCudaErrors(cudaMemcpy(pDeviceField, pField, static_cast<size_t>(uiSize), cudaMemcpyHostToDevice));
@@ -479,7 +479,7 @@ void CCudaHelper::SetFieldPointers()
         }
         else
         {
-            UINT uiSize = pBoundaryField->GetClass()->GetSize();
+            const UINT uiSize = pBoundaryField->GetClass()->GetSize();
             CFieldBoundary* pDeviceBoundaryField = NULL;
             checkCudaErrors(cudaMalloc((void**)&pDeviceBoundaryField, static_cast<size_t>(uiSize)));
             checkCudaErrors(cudaMemcpy(pDeviceBoundaryField, pBoundaryField, static_cast<size_t>(uiSize), cudaMemcpyHostToDevice));
@@ -496,7 +496,7 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
     TArray<UINT> ret;
 
     INT deviceCount = 0;
-    cudaError_t error_id = cudaGetDeviceCount(&deviceCount);
+    const cudaError_t error_id = cudaGetDeviceCount(&deviceCount);
 
     if (error_id != cudaSuccess)
     {
@@ -553,13 +553,13 @@ Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
     return ReduceRealWithThreadCount(pDeviceBuffer);
 }
 
-void CCudaHelper::ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial)
+void CCudaHelper::ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial) const
 {
     preparethread;
     _kernelThreadBufferZeroComplex<<<block, threads>>>(pDeviceBuffer, cInitial);
 }
 
-void CCudaHelper::ThreadBufferZero(Real * pDeviceBuffer, Real fInitial)
+void CCudaHelper::ThreadBufferZero(Real * pDeviceBuffer, Real fInitial) const
 {
     preparethread;
     _kernelThreadBufferZeroReal << <block, threads >> >(pDeviceBuffer, fInitial);
@@ -567,8 +567,8 @@ void CCudaHelper::ThreadBufferZero(Real * pDeviceBuffer, Real fInitial)
 
 Real CCudaHelper::ReduceReal(Real* deviceBuffer, UINT uiLength)
 {
-    UINT iRequiredDim = (uiLength + 1) >> 1;
-    UINT iPower = GetReduceDim(iRequiredDim);
+    const UINT iRequiredDim = (uiLength + 1) >> 1;
+    const UINT iPower = GetReduceDim(iRequiredDim);
     for (UINT i = 0; i <= iPower; ++i)
     {
         UINT iJump = 1 << i;
@@ -599,8 +599,8 @@ Real CCudaHelper::ReduceRealWithThreadCount(Real* deviceBuffer)
 
 CLGComplex CCudaHelper::ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength)
 {
-    UINT iRequiredDim = (uiLength + 1) >> 1;
-    UINT iPower = GetReduceDim(iRequiredDim);
+    const UINT iRequiredDim = (uiLength + 1) >> 1;
+    const UINT iPower = GetReduceDim(iRequiredDim);
     for (UINT i = 0; i <= iPower; ++i)
     {
         UINT iJump = 1 << i;

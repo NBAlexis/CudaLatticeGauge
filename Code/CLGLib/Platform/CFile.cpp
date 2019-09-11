@@ -29,10 +29,14 @@ BYTE* CFileSystem::ReadAllBytes(const TCHAR* sFilename, UINT& size)
         return NULL;
     }
     fseek(fp, 0, SEEK_END);
-    UINT fileSize = static_cast<UINT>(ftell(fp));
+    const UINT fileSize = static_cast<UINT>(ftell(fp));
     size = fileSize;
     fseek(fp, 0, SEEK_SET);
     BYTE* ret = (BYTE*)malloc(fileSize);
+    if (NULL == ret)
+    {
+        return NULL;
+    }
 #if defined(__GNUC__)
     size_t notusing __attribute__((unused)) = fread(ret, 1, fileSize, fp);
 #else
@@ -66,7 +70,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
         return CCString("");
     }
     fseek(fp, 0, SEEK_END);
-    UINT fileSize = static_cast<UINT>(ftell(fp));
+    const UINT fileSize = static_cast<UINT>(ftell(fp));
     fseek(fp, 0, SEEK_SET);
     BYTE* file_data = (BYTE*)malloc(fileSize + sizeof(TCHAR));
 
@@ -85,7 +89,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
 
     BYTE* string_start = NULL;
     INT string_len = 0;
-    UBOOL ansi_to_unicode = FALSE;
+    const UBOOL ansi_to_unicode = FALSE;
     UBOOL unicode_to_ansi = FALSE;
 
 #if __BIG_ENDIAN
@@ -132,7 +136,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
         {
             BYTE* a = (BYTE*)p;
             BYTE* b = a + 1;
-            BYTE c = *a;
+            const BYTE c = *a;
             *a = *b;
             *b = c;
         }

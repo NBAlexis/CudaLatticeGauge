@@ -51,7 +51,7 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
     }
 
     //source scanning measurement
-    THashMap<BYTE, TArray<CMeasure*>> allScanningFields = HasSourceScanning();
+    const THashMap<BYTE, TArray<CMeasure*>> allScanningFields = HasSourceScanning();
     TArray<BYTE> allFieldIds = allScanningFields.GetAllKeys();
     for (INT i = 0; i < allFieldIds.Num(); ++i)
     {

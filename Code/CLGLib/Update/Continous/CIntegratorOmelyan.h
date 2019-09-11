@@ -21,15 +21,15 @@ class CLGAPI CIntegratorOmelyan : public CIntegrator
 
 public:
 
-    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
 
     /**
     * The gauge field is copied
     * The random momentum field is generated
     */
-    virtual void Evaluate()
+    void Evaluate() override
     {
-        Real fHalfEstep = F(0.5) * m_fEStep;
+        const Real fHalfEstep = F(0.5) * m_fEStep;
         appDetailed("  Omelyan sub step 0\n");
         UpdateP(m_f2Lambda * fHalfEstep, FALSE, ESP_StartTrajectory);
 
@@ -54,7 +54,7 @@ public:
         FinishEvaluate();
     }
 
-    virtual CCString GetInfos(const CCString& sTab) const;
+    CCString GetInfos(const CCString& sTab) const override;
 
 protected:
 

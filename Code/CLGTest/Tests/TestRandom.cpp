@@ -30,10 +30,10 @@ UINT TestRandom(CParameters& sParam)
     sParam.FetchValueArrayUINT(_T("GaussianDecomp"), decompGaussian);
     sParam.FetchValueReal(_T("TestAccuracy"), accuracy);
 
-    Real piv = CalculatePi(decompPi);
+    const Real piv = CalculatePi(decompPi);
     appGeneral(_T("------- PI result:%f\n"), piv);
 
-    Real ev = CalculateE(decompGaussian);
+    const Real ev = CalculateE(decompGaussian);
     appGeneral(_T("------- 1/_sqrt(2) (should be 0.707) result:%f\n"), ev);
 
     if (appAbs(hostRandom / hostSampleCount - F(0.5)) > accuracy * F(50.0))

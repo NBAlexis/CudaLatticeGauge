@@ -54,7 +54,7 @@ TestDebug:
     RandomSeed : 1234567
 
     Gauge:
-	
+    
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
 
@@ -238,13 +238,13 @@ TestUpdatorLeapFrog:
         IntegratorStep : 35
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquette
@@ -281,13 +281,13 @@ TestUpdatorOmelyan:
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquette
@@ -319,13 +319,13 @@ TestUpdatorForceGradient:
         IntegratorStep : 6
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquette
@@ -347,7 +347,7 @@ TestFileIOBridgePPText:
     ExpectedRes : 0.625129946974942
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
@@ -371,7 +371,7 @@ TestFileIOBridgePPBin:
     ExpectedRes : 0.625129946974942
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
@@ -399,13 +399,13 @@ TestSolverBiCGStab:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
 
     FermionField1:
         
@@ -451,13 +451,13 @@ TestSolverGMRES:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
         Period : [0, 0, 1, 1]
 
     FermionField1:
@@ -511,13 +511,13 @@ TestSolverGCR:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
 
     FermionField1:
         
@@ -564,13 +564,13 @@ TestSolverGCRODR:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
 
     FermionField1:
         
@@ -617,13 +617,13 @@ TestSolverGMRESLowMode:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
-		
+        
 
     FermionField1:
         
@@ -666,13 +666,13 @@ TestSolverGCRODRLowMode:
 
     ## For D operator, we must have a gauge field
     Gauge:
-	
+    
         ## FieldName = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
-		
+        
 
     FermionField1:
         
@@ -732,10 +732,10 @@ TestFermionUpdator:
         IntegratorStep : 60
 
     Gauge:
-	
+    
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         FieldName : CFieldFermionWilsonSquareSU3
@@ -801,7 +801,7 @@ TestFermionUpdatorOmelyan:
     Gauge:
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
@@ -852,7 +852,7 @@ TestFermionUpdatorForceGradient:
     Gauge:
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
@@ -901,10 +901,10 @@ TestFermionUpdatorNestedLeapFrog:
         NestedStep : 5
 
     Gauge:
-	
+    
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         FieldName : CFieldFermionWilsonSquareSU3
@@ -961,10 +961,10 @@ TestFermionUpdatorNestedOmelyan:
         NestedStep : 3
 
     Gauge:
-	
+    
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         FieldName : CFieldFermionWilsonSquareSU3
@@ -1021,10 +1021,10 @@ TestFermionUpdatorNestedForceGradient:
         NestedStep : 3
 
     Gauge:
-	
+    
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         FieldName : CFieldFermionWilsonSquareSU3
@@ -1085,7 +1085,7 @@ TestFermionUpdatorOmelyanGCRODR:
     Gauge:
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
@@ -1152,7 +1152,7 @@ TestFermionUpdatorOmelyanGMRESMDR:
     Gauge:
         FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian
@@ -1249,13 +1249,13 @@ TestFermionUpdatorLargeScale:
         NestedStep : 6
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1333,13 +1333,13 @@ TestFermionUpdatorWithMesonCorrelator:
         IntegratorStep : 15
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1416,13 +1416,13 @@ TestFermionUpdatorWithMesonCorrelatorRelease:
         IntegratorStep : 20
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1499,13 +1499,13 @@ TestOperators:
         IntegratorStep : 40
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1576,13 +1576,13 @@ TestQuickAxpy:
         IntegratorStep : 40
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1641,13 +1641,13 @@ TestGammaMatrixSpeed:
     MeasureListLength : 0
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1676,13 +1676,13 @@ TestSaveConfiguration:
     MeasureListLength : 0
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
-		
+        
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -1729,13 +1729,13 @@ TestSaveConfigurationLowMode:
         ##ConfigurationFilePrefix : TestSaveConfiguration
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_ReadFromFile
-		
+        
         GaugeFileType : EFFT_CLGBin
 
         GaugeFileName : LowMode.con_
@@ -1813,7 +1813,7 @@ TestDirichletBoundary:
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3D
 
@@ -1839,7 +1839,7 @@ TestDirichletBoundary:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
-		
+        
     Solver:
         SolverName : CSLASolverGMRES
         SolverForFieldId : 2
@@ -1894,7 +1894,7 @@ TestRotation:
         NestedStep : 6
 
     Gauge:
-	
+    
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3D
 
@@ -1923,7 +1923,7 @@ TestRotation:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
-		
+        
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
@@ -2039,7 +2039,7 @@ TestZ3Symmetry:
         FieldInitialType : EFIT_ReadFromFile
         GaugeFileType : EFFT_CLGBin
         GaugeFileName : 50216_Matching_1.con_
-		
+        
     FermionField1:
         FieldName : CFieldFermionWilsonSquareSU3
         FieldInitialType : EFIT_RandomGaussian

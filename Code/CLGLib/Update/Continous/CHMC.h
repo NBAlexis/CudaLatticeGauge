@@ -23,14 +23,14 @@ public:
 
     CHMC() : CUpdator(), m_pIntegrator(NULL), m_bMetropolis(FALSE) {  }
     ~CHMC();
-    virtual UINT Update(UINT iSteps, UBOOL bMeasure);
-    virtual Real CalculateEnergy() { return 0.0f; }
-    virtual EUpdatorType GetUpdatorType() const { return EUT_HMC; }
+    UINT Update(UINT iSteps, UBOOL bMeasure) override;
+    Real CalculateEnergy() override { return 0.0f; }
+    EUpdatorType GetUpdatorType() const override { return EUT_HMC; }
 
     class CIntegrator* m_pIntegrator;
 
-    virtual void Initial(class CLatticeData* pOwner, const CParameters& params);
-    virtual CCString GetInfos(const CCString &tab) const;
+    void Initial(class CLatticeData* pOwner, const CParameters& params) override;
+    CCString GetInfos(const CCString &tab) const override;
 
 protected:
 

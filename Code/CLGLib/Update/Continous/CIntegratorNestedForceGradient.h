@@ -24,15 +24,15 @@ public:
     CIntegratorNestedForceGradient() : CNestedIntegrator(), m_pUPrime(NULL) {}
     ~CIntegratorNestedForceGradient();
 
-    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
 
-    virtual void Evaluate();
+    void Evaluate() override;
 
     void NestedEvaluate(UBOOL bLast);
 
-    virtual CCString GetInfos(const CCString& sTab) const;
+    CCString GetInfos(const CCString& sTab) const override;
 
-    virtual void ChangeStepCount(UBOOL bGrow)
+    void ChangeStepCount(UBOOL bGrow) override
     {
         CNestedIntegrator::ChangeStepCount(bGrow);
         m_fNestedStepLength = F(0.5) * m_fNestedStepLength;

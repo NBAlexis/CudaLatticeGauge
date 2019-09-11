@@ -76,7 +76,7 @@ _kernelCalculateLinkCount(
 )
 {
     intokernalOnlyInt4;
-    UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
+    const UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     INT uiCount = 0;
     for (BYTE byDir = 0; byDir < _DC_Dir; ++byDir)
@@ -97,7 +97,7 @@ _kernelCalculateSiteCount(
 )
 {
     intokernalOnlyInt4;
-    UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
+    const UINT uiBigIdx = _deviceGetBigIndex(sSite4, pSmallData);
 
     if (!pMappingTable[uiBigIdx].IsDirichlet())
     {
@@ -116,7 +116,7 @@ UINT inline _GetDecompose(UINT volumn)
 {
     TArray<UINT> factors = _getFactors(volumn);
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
-    UINT maxThreadPerBlock = deviceConstraints[0];
+    const UINT maxThreadPerBlock = deviceConstraints[0];
 
     UINT uiMax = 1;
     for (INT i = 0; i < factors.Num(); ++i)
@@ -139,8 +139,8 @@ void CIndexData::DebugPrintWalkingTable()
     biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
     //uint3 biggerLatticeMod;
 
-    UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    UINT threadPerSite = _GetDecompose(uiVolumn);
+    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    const UINT threadPerSite = _GetDecompose(uiVolumn);
     dim3 threads(threadPerSite, 1, 1);
     dim3 blocks(uiVolumn / threadPerSite, 1, 1);
 
@@ -162,6 +162,8 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
     checkCudaErrors(cudaMalloc((void**)&deviceRes, sizeof(INT) * 2));
 
     preparethread;
+
+    assert(NULL != pData->m_pSmallData);
 
     for (BYTE i = 1; i < kMaxFieldCount; ++i)
     {

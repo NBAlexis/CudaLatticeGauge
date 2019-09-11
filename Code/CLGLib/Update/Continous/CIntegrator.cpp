@@ -93,7 +93,7 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::UpdateU(Real fStep)
+void CIntegrator::UpdateU(Real fStep) const
 {
     //U(k) = exp (i e P) U(k-1)
     m_pMomentumField->ExpMult(fStep, m_pGaugeField);
@@ -119,7 +119,7 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-void CIntegrator::FinishEvaluate()
+void CIntegrator::FinishEvaluate() const
 {
     m_pGaugeField->ElementNormalize();
 }

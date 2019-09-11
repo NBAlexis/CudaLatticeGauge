@@ -53,7 +53,7 @@ public:
     void SetConfigurationCount(UINT uiCount) { m_iAcceptedConfigurationCount = uiCount; }
     UINT GetConfigurationCount() const { return m_iAcceptedConfigurationCount; }
     //void OnConfigurationAccepted();
-    void SaveConfiguration(UINT uiUpdateStep);
+    void SaveConfiguration(UINT uiUpdateStep) const;
 
     void SetTestHdiff(UBOOL bTestHDiff) 
     {

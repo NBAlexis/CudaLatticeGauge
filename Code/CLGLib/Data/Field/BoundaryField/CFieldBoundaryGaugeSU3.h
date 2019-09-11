@@ -35,13 +35,13 @@ public:
         checkCudaErrors(cudaFree(m_pDeviceData));
     }
 
-    virtual EFieldType GetFieldType() const
+    EFieldType GetFieldType() const override
     {
         return EFT_GaugeSU3;
     }
 
-    virtual void InitialField(CParameters& param);
-    virtual CCString GetInfos(const CCString &tab) const;
+    void InitialField(CParameters& param) override;
+    CCString GetInfos(const CCString &tab) const override;
 
     deviceSU3* m_pDeviceData;
 };

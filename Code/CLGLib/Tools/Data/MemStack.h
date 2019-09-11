@@ -15,20 +15,20 @@ __BEGIN_NAMESPACE
 enum { kDefaultMemoryAlignment = sizeof(void*)};
 
 //============================================================
-//	CCMemStack: a simple memory pool, generally use with CMemMark
-//		1) basically, you should derive a class, and specify 
-//		   the chunk size (e.g 64k)
-//			class CMyMemStack : public CCMemStack
-//			{
-//			public:
-//				CMyMemStack() { Init(YourMemChunkSize, AlignmentSize); }
-//				~CMyMemStack() { Reset(); }
-//			};
-//		2) and then, use PushBytes to allocate some memory, the 
-//		   memory is aligned with the size that your specified,
-//		   if it is -1, use the value specified while calling Init()
-//		3) generally, you use CMemMark to free the allocated
-//		   chunks
+//    CCMemStack: a simple memory pool, generally use with CMemMark
+//        1) basically, you should derive a class, and specify 
+//           the chunk size (e.g 64k)
+//            class CMyMemStack : public CCMemStack
+//            {
+//            public:
+//                CMyMemStack() { Init(YourMemChunkSize, AlignmentSize); }
+//                ~CMyMemStack() { Reset(); }
+//            };
+//        2) and then, use PushBytes to allocate some memory, the 
+//           memory is aligned with the size that your specified,
+//           if it is -1, use the value specified while calling Init()
+//        3) generally, you use CMemMark to free the allocated
+//           chunks
 //============================================================
 class CLGAPI CMemStack
 {
@@ -84,7 +84,7 @@ public:
 
     void Reset() { FreeChunks(NULL); }
 
-    INT GetByteCount()
+    INT GetByteCount() const
     {
         SIZE_T Count = 0;
         for (CTaggedMemory* pChunk = m_pTopChunk; pChunk; pChunk = pChunk->m_pNext)
@@ -102,17 +102,17 @@ public:
 
 protected:
     // Variables.
-    BYTE*			m_pTop;				// Top of current chunk (Top<=End).
-    BYTE*			m_pEnd;				// End of current chunk.
-    INT				m_iDefaultChunkSize;	// Maximum chunk size to allocate.
-    INT				m_iDefaultAlignment;  // Memory alignment for each allocation
-    CTaggedMemory*	m_pTopChunk;			// Only chunks 0..ActiveChunks-1 are valid.
+    BYTE*            m_pTop;                // Top of current chunk (Top<=End).
+    BYTE*            m_pEnd;                // End of current chunk.
+    INT                m_iDefaultChunkSize;    // Maximum chunk size to allocate.
+    INT                m_iDefaultAlignment;  // Memory alignment for each allocation
+    CTaggedMemory*    m_pTopChunk;            // Only chunks 0..ActiveChunks-1 are valid.
 
     // Functions.
     BYTE* AllocateNewChunk( INT MinSize )
     {
         CTaggedMemory* pChunk = NULL;
-        INT DataSize = appMax(MinSize, m_iDefaultChunkSize - (INT)sizeof(CTaggedMemory));
+        const INT DataSize = appMax(MinSize, m_iDefaultChunkSize - (INT)sizeof(CTaggedMemory));
         pChunk = (CTaggedMemory*)(new BYTE[DataSize + sizeof(CTaggedMemory)]);
         pChunk->m_iDataSize = DataSize;
         pChunk->m_pNext = m_pTopChunk;
@@ -141,12 +141,12 @@ protected:
 };
 
 //============================================================
-//	CMemMark: a simple memory pool, generally use with FMemStack
-//			  it pops the memory allocated after FMemMark is created
-//		1) FMyMemStack MyStack
-//		2) FMemMark MyMark(MyStack)
-//		3) MyStack.PushBytes(..)
-//		4) MyMark.Pop()
+//    CMemMark: a simple memory pool, generally use with FMemStack
+//              it pops the memory allocated after FMemMark is created
+//        1) FMyMemStack MyStack
+//        2) FMemMark MyMark(MyStack)
+//        3) MyStack.PushBytes(..)
+//        4) MyMark.Pop()
 //============================================================
 class CLGAPI CMemMark
 {
@@ -161,7 +161,7 @@ public:
 
     // CMemMark interface.
     //inline
-    void Pop()
+    void Pop() const
     {
         // Unlock any new chunks that were allocated.
         if( m_pSavedChunk != m_pMem->m_pTopChunk )

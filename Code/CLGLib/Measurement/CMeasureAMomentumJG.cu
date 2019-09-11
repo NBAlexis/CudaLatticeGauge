@@ -40,7 +40,7 @@ _kernelAverageOverZT_XYPlane(Real* pBuffer)
 
     if (0 == sSite4.z && 0 == sSite4.w)
     {
-        UINT uiIdx = sSite4.x * _DC_Ly + sSite4.y;
+        const UINT uiIdx = sSite4.x * _DC_Ly + sSite4.y;
         pBuffer[uiIdx] = pBuffer[uiIdx] / (_DC_Lz * _DC_Lt);
     }
 }
@@ -58,7 +58,7 @@ _kernelCalculateAngularMomentumJG(
 {
     intokernalOnlyInt4;
 
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     Real fRes = F(0.0);
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
@@ -67,25 +67,25 @@ _kernelCalculateAngularMomentumJG(
         //4-chair terms except for the last one
         betaOverN = F(0.125) * betaOverN;
 
-        Real fX = (sSite4.x - sCenter.x);
+        const Real fX = (sSite4.x - sCenter.x);
 
         //===============
         //+x Omega V412
-        Real fV412 = fX * _deviceChairTerm(pDeviceData, 3, 0, 1, uiN);
+        const Real fV412 = fX * _deviceChairTerm(pDeviceData, 3, 0, 1, uiN);
 
         //===============
         //+x Omega V432
-        Real fV432 = fX * _deviceChairTerm(pDeviceData, 3, 2, 1, uiN);
+        const Real fV432 = fX * _deviceChairTerm(pDeviceData, 3, 2, 1, uiN);
 
-        Real fY = -(sSite4.y - sCenter.y);
+        const Real fY = -(sSite4.y - sCenter.y);
 
         //===============
         //-y Omega V421
-        Real fV421 = fY * _deviceChairTerm(pDeviceData, 3, 1, 0, uiN);
+        const Real fV421 = fY * _deviceChairTerm(pDeviceData, 3, 1, 0, uiN);
 
         //===============
         //-y Omega V431
-        Real fV431 = fY * _deviceChairTerm(pDeviceData, 3, 2, 0, uiN);
+        const Real fV431 = fY * _deviceChairTerm(pDeviceData, 3, 2, 0, uiN);
 
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }
@@ -130,7 +130,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelMomentumJGAverageDist(UINT* pCount, Real* pValue)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     if (pCount[uiIdx] > 0)
     {
         pValue[uiIdx] = pValue[uiIdx] / static_cast<Real>(pCount[uiIdx]);
@@ -234,7 +234,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
-    Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
+    const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
 
     _ZeroXYPlane(m_pDeviceDataBufferOneConfig);
 
@@ -399,7 +399,7 @@ void CMeasureAMomentumJG::Report()
             appGeneral(_T("{"));
             for (UINT j = 0; j < _HC_Lx - 1; ++j)
             {
-                UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
+                const UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
                 appGeneral(_T("%1.6f, "), m_lstRes[idx]);
                 if (0 == k)
                 {

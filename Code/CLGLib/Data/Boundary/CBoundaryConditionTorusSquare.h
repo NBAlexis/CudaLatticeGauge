@@ -23,11 +23,11 @@ public:
 
     CBoundaryConditionTorusSquare();
 
-    virtual void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const;
+    void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const override;
 
-    virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
+    void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) override;
 
-    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const;
+    void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const override;
 };
 
 __END_NAMESPACE

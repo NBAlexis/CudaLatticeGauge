@@ -42,8 +42,8 @@ inline UINT TMapHashKey<const CCString&>(const CCString& key)
     DWORD hash = 0;
     while (*name)
     {
-        TCHAR Ch = (TCHAR)appToUpper(*name++);
-        BYTE  B = (BYTE)Ch;
+        const TCHAR Ch = (TCHAR)appToUpper(*name++);
+        const BYTE  B = (BYTE)Ch;
         hash = ((hash << 3) + B) ^ (hash);
 #ifdef UNICODE
         B = Ch >> 8;
@@ -69,10 +69,10 @@ public:
     class TPair
     {
     public:
-        const KEY	m_Key;
-        VALUE	m_Value;
+        const KEY    m_Key;
+        VALUE    m_Value;
     protected:
-        TPair( ARG_KEY keyval ) : m_Key( keyval )	{}
+        TPair( ARG_KEY keyval ) : m_Key( keyval )    {}
     };
 protected:
     class TAssoc : public TPair
@@ -80,7 +80,7 @@ protected:
     public:
         friend class THashMap<KEY, ARG_KEY, VALUE, ARG_VALUE>;
         TAssoc* m_pNext;
-        UINT	 m_nHashValue;  // needed for efficient iteration
+        UINT     m_nHashValue;  // needed for efficient iteration
     public:
         TAssoc( ARG_KEY key ) : TPair( key ) {}
     };
@@ -308,8 +308,8 @@ public:
 protected:
 
     TAssoc** m_pHashTable;
-    UINT	m_nHashTableSize;
-    INT		m_nCount;
+    UINT    m_nHashTableSize;
+    INT        m_nCount;
     CCMapMemStack m_MemStack;
 
 public:

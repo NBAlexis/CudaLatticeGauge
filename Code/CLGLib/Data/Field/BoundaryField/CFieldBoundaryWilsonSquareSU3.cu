@@ -19,7 +19,7 @@ __BEGIN_NAMESPACE
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialWilsonFeield_Identity(deviceWilsonVectorSU3 *pDevicePtr)
 {
-    UINT uiSiteIndex = threadIdx.x;
+    const UINT uiSiteIndex = threadIdx.x;
     pDevicePtr[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 }
 

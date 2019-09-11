@@ -32,7 +32,7 @@ void CIntegratorNestedOmelyan::Evaluate()
         _FAIL_EXIT;
     }
 
-    Real fHalfEstep = F(0.5) * m_fEStep;
+    const Real fHalfEstep = F(0.5) * m_fEStep;
     appDetailed("  Omelyan sub step 0\n");
     UpdatePF(m_f2Lambda * fHalfEstep, ESP_StartTrajectory);
 
@@ -61,7 +61,7 @@ void CIntegratorNestedOmelyan::Evaluate()
 
 void CIntegratorNestedOmelyan::NestedEvaluate(UBOOL bLast)
 {
-    Real fHalfEstep = F(0.5) * m_fNestedStepLength;
+    const Real fHalfEstep = F(0.5) * m_fNestedStepLength;
     appDetailed("  Omelyan nested sub step 0\n");
     UpdatePG(m_f2Lambda * fHalfEstep, FALSE);
 

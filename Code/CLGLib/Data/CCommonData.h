@@ -265,7 +265,7 @@ extern "C" {
 
         __device__ __inline__ void DebugPrint() const
         {
-            SSmallInt4 xyzt = __deviceSiteIndexToInt4(m_uiSiteIndex);
+            const SSmallInt4 xyzt = __deviceSiteIndexToInt4(m_uiSiteIndex);
             printf("%s(xyzt:%d,%d,%d,%d)_(%x)%s\n", NeedToOpposite() ? "-" : "", xyzt.x, xyzt.y, xyzt.z, xyzt.w, m_byDir, NeedToDagger() ? "^-1" : "");
         }
 

@@ -13,20 +13,20 @@
 #define _STLSTRINGFUNCTIONS_H_
 
 #   define appStrpbrk   std::strpbrk
-#   define appStrstr	std::strstr
-#   define appStrcpy	strcpy_s
-#   define appStrcat	std::strcat
-#   define appStrlen	std::strlen
-#   define appStrcmp	std::strcmp
+#   define appStrstr    std::strstr
+#   define appStrcpy    strcpy_s
+#   define appStrcat    std::strcat
+#   define appStrlen    std::strlen
+#   define appStrcmp    std::strcmp
 #   define appStrncmp   std::strncmp
-#   define appStrchr	std::strchr
-#   define appStrrchr	std::strrchr
-#   define appSprintf	sprintf_s
-#   define appVsprintf	vsprintf_s
-#   define appVsnprintf	vsnprintf_s
+#   define appStrchr    std::strchr
+#   define appStrrchr    std::strrchr
+#   define appSprintf    sprintf_s
+#   define appVsprintf    vsprintf_s
+#   define appVsnprintf    vsnprintf_s
 
-#   define appIsSpace	::isspace
-#   define appIsDigit	::isdigit
+#   define appIsSpace    ::isspace
+#   define appIsDigit    ::isdigit
 
 __BEGIN_NAMESPACE
 

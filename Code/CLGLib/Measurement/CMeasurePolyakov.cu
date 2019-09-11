@@ -56,7 +56,7 @@ _kernelStaticPotentialCorrelatorOfSite(
     SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
     SBYTE uiZ = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y);
     UINT uiXYZ = uiXY * _DC_Lz + uiZ;
-    UINT uiCenter = (sCenter.x * _DC_Ly + sCenter.y) * _DC_Lz + sCenter.z;
+    const UINT uiCenter = (sCenter.x * _DC_Ly + sCenter.y) * _DC_Lz + sCenter.z;
     UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX) 
              + (sCenter.y - uiY) * (sCenter.y - uiY) 
              + (sCenter.z - uiZ) * (sCenter.z - uiZ);
@@ -74,7 +74,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelAverageStaticPotentialCorrelatorOfSite(UINT* counter, CLGComplex* correlator)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     if (counter[uiIdx] > 0)
     {
         correlator[uiIdx].x =
@@ -203,7 +203,7 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
     checkCudaErrors(cudaMemcpy(m_pHostCorrelatorCounter, m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(m_pHostCorrelator, m_pCorrelator, sizeof(CLGComplex) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
 
-    UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
+    const UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
     res[0].x = res[0].x / uiSiteNumber;
     res[0].y = res[0].y / uiSiteNumber;
     m_lstAverageLoop.AddItem(res[0]);

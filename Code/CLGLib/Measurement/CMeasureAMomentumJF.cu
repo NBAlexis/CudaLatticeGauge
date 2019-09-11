@@ -203,20 +203,20 @@ _kernel_FS(
     deviceWilsonVectorSU3* res)
 {
     //s * 3 + c
-    UINT uiC = threadIdx.x;
-    UINT uiS = threadIdx.y;
-    UINT uiCS = uiS * 3 + uiC;
+    const UINT uiC = threadIdx.x;
+    const UINT uiS = threadIdx.y;
+    const UINT uiCS = uiS * 3 + uiC;
 
-    UINT uiSiteIndex = _deviceGetSiteIndex(sSite4);
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiSiteIndex = _deviceGetSiteIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         res[byArrayIdx] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
         return;
     }
 
-    deviceWilsonVectorSU3 right_element(pSources[uiCS][uiSiteIndex]);
+    const deviceWilsonVectorSU3 right_element(pSources[uiCS][uiSiteIndex]);
     deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12].MulWilsonC(right_element));
     term3 = __chiralGamma[GAMMA4].MulWilsonC(term3);
     term3.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
@@ -311,7 +311,7 @@ _kernel_Trace_JFLS(
     CLGComplex* pResLine,
     Real fKappa)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     pResLine[uiIdx] = cuCmulf_cr(pOperator[uiIdx].Sum(), fKappa);
 }
 
@@ -537,7 +537,7 @@ void CMeasureAMomentumJF::SourceSanning(const class CFieldGauge* pGauge, const c
     deviceWilsonVectorSU3** ppDevicePtr;
     checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
-    BYTE byArrayIdx = static_cast<BYTE>(sourceSite.x - 1);
+    const BYTE byArrayIdx = static_cast<BYTE>(sourceSite.x - 1);
 
     _kernel_XDy_yDx << <_blocks, _thread1 >> > (
         pGaugeSU3->m_pDeviceData,
@@ -583,7 +583,7 @@ void CMeasureAMomentumJF::SourceSanning(const class CFieldGauge* pGauge, const c
         //all sites calculated
         ++m_uiConfigurationCount;
         dim3 _thread2(_HC_Lx - 1, 1, 1);
-        Real fKappa = CCommonData::m_fKai;
+        const Real fKappa = CCommonData::m_fKai;
         _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataL, m_pDeviceDataBufferL, fKappa);
         _kernel_Trace_JFLS << <_blocks, _thread2 >> > (m_pOperatorDataS, m_pDeviceDataBufferS, fKappa);
 

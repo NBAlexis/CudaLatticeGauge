@@ -32,17 +32,17 @@ public:
     CSLASolverGCRODR();
     ~CSLASolverGCRODR();
 
-    virtual void Configurate(const CParameters& param);
-    virtual void AllocateBuffers(const CField* pField);
+    void Configurate(const CParameters& param) override;
+    void AllocateBuffers(const CField* pField) override;
     virtual void ReleaseBuffers();
 
-    virtual UBOOL Solve(
+    UBOOL Solve(
         CField* pFieldX, 
         const CField* pFieldB, 
         const CFieldGauge* pGaugeFeild, 
         EFieldOperator uiM, 
         ESolverPhase ePhase = ESP_Once,
-        const CField* pStart = NULL);
+        const CField* pStart = NULL) override;
 
 protected:
 
@@ -50,7 +50,7 @@ protected:
 
     void QRFactorAY(const class CFieldGauge* pGaugeField, EFieldOperator uiM);
 
-    void FindPk1();
+    void FindPk1() const;
 
     void FindPk2();
 

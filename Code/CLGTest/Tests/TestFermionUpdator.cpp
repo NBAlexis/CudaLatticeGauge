@@ -37,7 +37,7 @@ UINT TestFermionUpdator(CParameters& sParam)
 #endif
     
 #if !_CLG_DEBUG
-    Real fRes = pMeasure->m_fLastRealResult;
+    const Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.01))
@@ -45,8 +45,8 @@ UINT TestFermionUpdator(CParameters& sParam)
         ++uiError;
     }
 
-    UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
     appGeneral(_T("accept (%d/60) : expected >= 50. HDiff = %f : expected < 0.3\n (exp(-0.3) is 74%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 50)
@@ -87,7 +87,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
         return 1;
     }
 
-    UINT uiError = 0;
+    const UINT uiError = 0;
 
 #if _CLG_DEBUG
 
@@ -118,7 +118,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(20, FALSE);
     appGetLattice()->m_pUpdator->Update(50, TRUE);
 
-    Real fRes = pMeasure->m_lstResults[0][0];
+    const Real fRes = pMeasure->m_lstResults[0][0];
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
     if (appAbs(fRes - fExpected) > F(0.005))
     {
@@ -162,9 +162,9 @@ UINT TestFermionUpdatorL(CParameters& sParam)
     pMeasure->Reset();
     appGetLattice()->m_pUpdator->Update(static_cast<UINT>(updates - 1), TRUE);
 
-    Real fRes = pMeasure->m_fLastRealResult;
-    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    Real fH = appGetLattice()->m_pUpdator->GetHValue();
+    const Real fRes = pMeasure->m_fLastRealResult;
+    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const Real fH = appGetLattice()->m_pUpdator->GetHValue();
 
     appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     UINT uiError = 0;

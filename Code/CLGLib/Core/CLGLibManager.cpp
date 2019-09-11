@@ -29,8 +29,8 @@ void CCLGLibManager::SetupLog(CParameters &params)
     CCString verboselevel;
     EVerboseLevel eVerbLevel = CRUCIAL;
     CCString sVerbFile = _T("stdout");
-    UBOOL fetchVerbLevel = params.FetchStringValue(_T("VerboseLevel"), verboselevel);
-    UBOOL fetchVerbFile = params.FetchStringValue(_T("VerboseOutput"), sVerbFile);
+    const UBOOL fetchVerbLevel = params.FetchStringValue(_T("VerboseLevel"), verboselevel);
+    const UBOOL fetchVerbFile = params.FetchStringValue(_T("VerboseOutput"), sVerbFile);
     if (fetchVerbLevel || fetchVerbFile) //do NOT put fetch string in if, it will enter if when the first is TRUE
     {
         eVerbLevel = __STRING_TO_ENUM(EVerboseLevel, verboselevel);
@@ -197,7 +197,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     CCString sRandomSeedType;
     if (params.FetchStringValue(_T("RandomSeedType"), sRandomSeedType))
     {
-        ERandomSeedType eRST = __STRING_TO_ENUM(ERandomSeedType, sRandomSeedType);
+        const ERandomSeedType eRST = __STRING_TO_ENUM(ERandomSeedType, sRandomSeedType);
         if (ERST_Timestamp == eRST)
         {
             m_InitialCache.constIntegers[ECI_RandomSeed] = appGetTimeStamp();
@@ -225,7 +225,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("MeasureListLength"), 0);
     m_InitialCache.constIntegers[ECI_MeasureListLength] = static_cast<UINT>(iVaules);
 
-    UINT iThreadConstraint = m_InitialCache.constIntegers[ECI_ThreadConstaint];
+    const UINT iThreadConstraint = m_InitialCache.constIntegers[ECI_ThreadConstaint];
     __FetchIntWithDefault(_T("SummationDecompose"), iThreadConstraint);
     m_InitialCache.constIntegers[ECI_SummationDecompose] = static_cast<UINT>(iVaules);
     appDetailed(_T("Summation decompose: %d\n"), m_InitialCache.constIntegers[ECI_SummationDecompose]);
@@ -233,7 +233,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_SUN] = 1;
     if (params.Exist(_T("Gauge")))
     {
-        CParameters gauge = params.GetParameter(_T("Gauge"));
+        const CParameters gauge = params.GetParameter(_T("Gauge"));
         if (gauge.Exist(_T("FieldName")))
         {
             CCString sFieldName;
@@ -271,7 +271,7 @@ void CCLGLibManager::InitialRandom(CParameters &)
     m_pLatticeData->m_uiRandomSeed = m_InitialCache.constIntegers[ECI_RandomSeed];
 }
 
-void CCLGLibManager::CreateGaugeField(class CParameters& params)
+void CCLGLibManager::CreateGaugeField(class CParameters& params) const
 {
     //INT iVaules = 0;
     CCString sValues;
@@ -280,13 +280,14 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
     __FetchStringWithDefault(_T("FieldName"), _T("CFieldGaugeSU3"));
     sGaugeClassName = sValues;
     __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
-    EFieldInitialType eGaugeInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+    const EFieldInitialType eGaugeInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
 
     CBase* pGaugeField = appCreate(sGaugeClassName);
     CFieldGauge* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldGauge*>(pGaugeField)) : NULL;
     if (NULL == pGauge)
     {
         appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
+        return;
     }
     pGauge->m_byFieldId = 1;
     if (EFIT_ReadFromFile != eGaugeInitial)
@@ -303,7 +304,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
             appCrucial(_T("Gauge initial type is EFIT_ReadFromFile, but cannot find GaugeFileType or GaugeFileName!\n"));
             _FAIL_EXIT;
         }
-        EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
+        const EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
         pGauge->m_pOwner = m_pLatticeData;
         pGauge->InitialFieldWithFile(sFileName, eFileType);
     }
@@ -326,7 +327,7 @@ void CCLGLibManager::CreateGaugeField(class CParameters& params)
     appGeneral(_T("Create the gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 }
 
-void CCLGLibManager::CreateGaugeBoundaryField(class CParameters& params)
+void CCLGLibManager::CreateGaugeBoundaryField(class CParameters& params) const
 {
     CCString sValues;
 
@@ -347,7 +348,7 @@ void CCLGLibManager::CreateGaugeBoundaryField(class CParameters& params)
     appGeneral(_T("Create the boundary gauge %s with initial: %s\n"), sGaugeClassName.c_str(), sValues.c_str());
 }
 
-void CCLGLibManager::CreateFermionFields(class CParameters& params)
+void CCLGLibManager::CreateFermionFields(class CParameters& params) const
 {
     INT iVaules = 0;
     CCString sValues;
@@ -356,7 +357,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     __FetchStringWithDefault(_T("FieldName"), _T("CFieldFermionWilsonSquareSU3"));
     sFermionClassName = sValues;
     __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
-    EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+    const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
 
     CBase* pFermionField = appCreate(sFermionClassName);
     CFieldFermion* pFermion = (NULL != pFermionField) ? (dynamic_cast<CFieldFermion*>(pFermionField)) : NULL;
@@ -367,7 +368,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     }
 
     __FetchIntWithDefault(_T("FieldId"), -1);
-    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    const BYTE byFieldId = static_cast<BYTE>(iVaules);
     assert(byFieldId < kMaxFieldCount && byFieldId > 1);
     if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
     {
@@ -406,12 +407,12 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params)
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
 }
 
-void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params)
+void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params) const
 {
     CCString sValues;
     INT iVaules;
     __FetchStringWithDefault(_T("FieldName"), _T("CFieldBoundaryWilsonSquareSU3"));
-    CCString sFieldClassName = sValues;
+    const CCString sFieldClassName = sValues;
 
     CBase* pBCField = appCreate(sFieldClassName);
     CFieldBoundary* pBC = (NULL != pBCField) ? (dynamic_cast<CFieldBoundary*>(pBCField)) : NULL;
@@ -423,12 +424,12 @@ void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params)
     pBC->InitialField(params);
 
     __FetchIntWithDefault(_T("FieldId"), -1);
-    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    const BYTE byFieldId = static_cast<BYTE>(iVaules);
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
     appGeneral(_T("Create the boundary fermion field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
 }
 
-void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params)
+void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params) const
 {
     //INT iVaules = 0;
     CCString sValues;
@@ -496,7 +497,7 @@ void CCLGLibManager::CreateActionList(class CParameters& params)
     appGeneral(_T("Create the action list, with %d actions: %s\n"), actions.Num(), sActionNameList.c_str());
 }
 
-void CCLGLibManager::CreateUpdator(class CParameters& params)
+void CCLGLibManager::CreateUpdator(class CParameters& params) const
 {
     CCString sValues;
 
@@ -568,7 +569,7 @@ void CCLGLibManager::CreateMeasurement(class CParameters& params)
     appGeneral(_T("Create the measure list, with %d measures: %s\n"), pMeasurements->m_lstAllMeasures.Num(), sMeasureNameList.c_str());
 }
 
-void CCLGLibManager::CreateSolver(class CParameters& params)
+void CCLGLibManager::CreateSolver(class CParameters& params) const
 {
     CCString sSolverName = _T("CSLASolverBiCGStab");
     params.FetchStringValue(_T("SolverName"), sSolverName);
@@ -583,7 +584,7 @@ void CCLGLibManager::CreateSolver(class CParameters& params)
     m_pLatticeData->CreateFermionSolver(sSolverName, params, pField);
 }
 
-void CCLGLibManager::CreateGaugeSmearing(class CParameters& params)
+void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
 {
     CCString sSmearingName = _T("CGaugeSmearingAPEStout");
     params.FetchStringValue(_T("SmearingName"), sSmearingName);
@@ -598,7 +599,7 @@ void CCLGLibManager::CreateGaugeSmearing(class CParameters& params)
 
 #pragma region Caches
 
-void CCLGLibManager::InitialIndexBuffer()
+void CCLGLibManager::InitialIndexBuffer() const
 {
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
     if (NULL != m_pLatticeData->m_pGaugeField)

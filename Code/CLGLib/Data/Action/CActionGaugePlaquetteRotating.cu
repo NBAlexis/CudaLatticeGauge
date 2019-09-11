@@ -30,7 +30,7 @@ _kernelAdd4PlaqutteTermSU3_Test(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     if (__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].IsDirichlet())
     {
@@ -46,13 +46,13 @@ _kernelAdd4PlaqutteTermSU3_Test(
     //======================================================
     //4-plaqutte terms
     //Omega^2 x^2 Retr[1 - U_1,4]
-    Real fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 0, 3, uiBigIdx);
+    const Real fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 0, 3, uiBigIdx);
 
     //Omega^2 y^2 Retr[1 - U_2,4]
-    Real fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 1, 3, uiBigIdx);
+    const Real fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 1, 3, uiBigIdx);
 
     //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
-    Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx);
+    const Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx);
 
     results[uiSiteIndex] = (fU14 + fU24 + fU34) * betaOverN;
 }
@@ -80,7 +80,7 @@ _kernelAdd4PlaqutteTermSU3(
     UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
     BYTE idx0 = _iz_idx % 3;
 
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
     UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
     
@@ -134,7 +134,7 @@ _kernelAddChairTermSU3_Term12(
 {
     intokernalInt4;
 
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
     if (__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
     {
@@ -143,15 +143,15 @@ _kernelAddChairTermSU3_Term12(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    Real fXOmega = (sSite4.x - sCenterSite.x) * fOmega;
+    const Real fXOmega = (sSite4.x - sCenterSite.x) * fOmega;
 
     //===============
     //+x Omega V412
-    Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, 3, 0, 1, uiN);
+    const Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, 3, 0, 1, uiN);
 
     //===============
     //+x Omega V432
-    Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, 3, 2, 1, uiN);
+    const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, 3, 2, 1, uiN);
 
     results[uiSiteIndex] = (fV412 + fV432) * betaOverN;
 }
@@ -165,7 +165,7 @@ _kernelAddChairTermSU3_Term34(
 {
     intokernalInt4;
 
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
     if (__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
     {
@@ -174,15 +174,15 @@ _kernelAddChairTermSU3_Term34(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    Real fYOmega = -(sSite4.y - sCenterSite.y) * fOmega;
+    const Real fYOmega = -(sSite4.y - sCenterSite.y) * fOmega;
 
     //===============
     //-y Omega V421
-    Real fV421 = fYOmega * _deviceChairTerm(pDeviceData, 3, 1, 0, uiN);
+    const Real fV421 = fYOmega * _deviceChairTerm(pDeviceData, 3, 1, 0, uiN);
 
     //===============
     //-y Omega V431
-    Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, 3, 2, 0, uiN);
+    const Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, 3, 2, 0, uiN);
 
     results[uiSiteIndex] = (fV421 + fV431) * betaOverN;
 }
@@ -196,7 +196,7 @@ _kernelAddChairTermSU3_Term5(
 {
     intokernalInt4;
 
-    UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
     if (__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
     {
@@ -205,11 +205,11 @@ _kernelAddChairTermSU3_Term5(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    Real fXYOmega2 = (sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y) * fOmegaSq;
+    const Real fXYOmega2 = (sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
-    Real fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, 0, 3, 1, uiN);
+    const Real fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, 0, 3, 1, uiN);
 
     results[uiSiteIndex] = fV142 * betaOverN;
 }
@@ -226,7 +226,7 @@ _kernelAddForce4PlaqutteTermSU3_XYZ(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(-0.5);
     deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
@@ -258,13 +258,13 @@ _kernelAddForce4PlaqutteTermSU3_T(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //UINT uiDir = _DC_Dir;
 
     betaOverN = betaOverN * F(-0.5);
     deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
 
-    BYTE idir = 3;
+    const BYTE idir = 3;
     if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
     {
         return;
@@ -294,7 +294,7 @@ _kernelAddForceChairTermSU3_Term1_1(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -305,7 +305,7 @@ _kernelAddForceChairTermSU3_Term1_1(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
-        deviceSU3 staple_term1_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 0, 1, 0);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term1_4);
@@ -324,7 +324,7 @@ _kernelAddForceChairTermSU3_Term1_2(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -335,7 +335,7 @@ _kernelAddForceChairTermSU3_Term1_2(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
-        deviceSU3 staple_term1_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             1, 0, 3, 0);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term1_2);
@@ -354,7 +354,7 @@ _kernelAddForceChairTermSU3_Term1_3(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -365,7 +365,7 @@ _kernelAddForceChairTermSU3_Term1_3(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
-        deviceSU3 staple_term1_1 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 0, 1, 0);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term1_1);
@@ -384,7 +384,7 @@ _kernelAddForceChairTermSU3_Term2_1(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -395,7 +395,7 @@ _kernelAddForceChairTermSU3_Term2_1(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
-        deviceSU3 staple_term2_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 1, 0);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term2_4);
@@ -414,7 +414,7 @@ _kernelAddForceChairTermSU3_Term2_2(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -425,7 +425,7 @@ _kernelAddForceChairTermSU3_Term2_2(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
-        deviceSU3 staple_term2_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             1, 2, 3, 0);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term2_2);
@@ -444,7 +444,7 @@ _kernelAddForceChairTermSU3_Term2_3(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -455,7 +455,7 @@ _kernelAddForceChairTermSU3_Term2_3(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
-        deviceSU3 staple_term2_3 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 1, 0);
         deviceSU3 force3(pDeviceData[uiLink3]);
         force3.MulDagger(staple_term2_3);
@@ -474,7 +474,7 @@ _kernelAddForceChairTermSU3_Term3_1(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -485,7 +485,7 @@ _kernelAddForceChairTermSU3_Term3_1(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
-        deviceSU3 staple_term3_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 1, 0, 1);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term3_4);
@@ -505,7 +505,7 @@ _kernelAddForceChairTermSU3_Term3_2(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -516,7 +516,7 @@ _kernelAddForceChairTermSU3_Term3_2(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
-        deviceSU3 staple_term3_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             0, 1, 3, 1);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term3_1);
@@ -535,7 +535,7 @@ _kernelAddForceChairTermSU3_Term3_3(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -546,7 +546,7 @@ _kernelAddForceChairTermSU3_Term3_3(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
-        deviceSU3 staple_term3_2 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 1, 0, 1);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term3_2);
@@ -566,7 +566,7 @@ _kernelAddForceChairTermSU3_Term4_1(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -577,7 +577,7 @@ _kernelAddForceChairTermSU3_Term4_1(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
-        deviceSU3 staple_term4_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 0, 1);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term4_4);
@@ -597,7 +597,7 @@ _kernelAddForceChairTermSU3_Term4_2(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -608,7 +608,7 @@ _kernelAddForceChairTermSU3_Term4_2(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
-        deviceSU3 staple_term4_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 3, 1);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term4_1);
@@ -628,7 +628,7 @@ _kernelAddForceChairTermSU3_Term4_3(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
 
@@ -639,7 +639,7 @@ _kernelAddForceChairTermSU3_Term4_3(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
-        deviceSU3 staple_term4_3 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 0, 1);
         deviceSU3 force3(pDeviceData[uiLink3]);
         force3.MulDagger(staple_term4_3);
@@ -659,7 +659,7 @@ _kernelAddForceChairTermSU3_Term5_1(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmegaSq * F(0.125);
 
@@ -669,7 +669,7 @@ _kernelAddForceChairTermSU3_Term5_1(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
-        deviceSU3 staple_term5_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             0, 3, 1, 2);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term5_1);
@@ -688,7 +688,7 @@ _kernelAddForceChairTermSU3_Term5_2(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmegaSq * F(0.125);
 
@@ -698,7 +698,7 @@ _kernelAddForceChairTermSU3_Term5_2(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
-        deviceSU3 staple_term5_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             1, 3, 0, 2);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term5_2);
@@ -718,7 +718,7 @@ _kernelAddForceChairTermSU3_Term5_3(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(0.5) * fOmegaSq * F(0.125);
 
@@ -728,7 +728,7 @@ _kernelAddForceChairTermSU3_Term5_3(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
-        deviceSU3 staple_term5_4 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        const deviceSU3 staple_term5_4 = _deviceStapleChairTerm2(pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
             0, 3, 1, 2);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term5_4);

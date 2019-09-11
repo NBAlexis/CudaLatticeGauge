@@ -27,28 +27,30 @@ public:
     CFieldFermionWilsonSquareSU3();
     ~CFieldFermionWilsonSquareSU3();
 
-    virtual EFieldType GetFieldType() const 
+    EFieldType GetFieldType() const override
     {
         return EFT_FermionWilsonSquareSU3;
     }
 
-    virtual void InitialField(EFieldInitialType eInitialType);
-    virtual void InitialFieldWithFile(const CCString&, EFieldFileType);
-    virtual void InitialWithByte(BYTE* byData);
-    virtual void InitialOtherParameters(CParameters& params);
-    virtual void DebugPrintMe() const;
+    void InitialField(EFieldInitialType eInitialType) override;
+    void InitialFieldWithFile(const CCString&, EFieldFileType) override;
+    void InitialWithByte(BYTE* byData) override;
+    void InitialOtherParameters(CParameters& params) override;
+    void DebugPrintMe() const override;
 
-    virtual void Zero() { InitialField(EFIT_Zero); }
-    virtual void Indentity() { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
+    void Zero() override { InitialField(EFIT_Zero); }
+
+    void Indentity() override
+    { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
 
     //This is Axpy(1.0f, x)
-    virtual void AxpyPlus(const CField* x);
-    virtual void AxpyMinus(const CField* x);
-    virtual void Axpy(Real a, const CField* x);
-    virtual void Axpy(const CLGComplex& a, const CField* x);
-    virtual void ScalarMultply(const CLGComplex& a);
-    virtual void ScalarMultply(Real a);
-    virtual CLGComplex Dot(const CField* other) const;
+    void AxpyPlus(const CField* x) override;
+    void AxpyMinus(const CField* x) override;
+    void Axpy(Real a, const CField* x) override;
+    void Axpy(const CLGComplex& a, const CField* x) override;
+    void ScalarMultply(const CLGComplex& a) override;
+    void ScalarMultply(Real a) override;
+    CLGComplex Dot(const CField* other) const override;
 
     //=================================
     //It is tested, although, the DEBUG Mode, this is faster
@@ -62,27 +64,27 @@ public:
     CLGComplex Dot1(const CField* other) const;
 
     //pGauge must be gauge SU3
-    virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
-    virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
-    virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
-    virtual UBOOL InverseD(const CField* pGauge);
-    virtual UBOOL InverseDdagger(const CField* pGauge);
-    virtual UBOOL InverseDDdagger(const CField* pGauge);
-    virtual void ApplyGamma(EGammaMatrix eGamma);
-    virtual void PrepareForHMC(const CFieldGauge* pGauge);
+    void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    UBOOL InverseD(const CField* pGauge) override;
+    UBOOL InverseDdagger(const CField* pGauge) override;
+    UBOOL InverseDDdagger(const CField* pGauge) override;
+    void ApplyGamma(EGammaMatrix eGamma) override;
+    void PrepareForHMC(const CFieldGauge* pGauge) override;
 
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const;
-    virtual void InitialAsSource(const SFermionSource& sourceData);
-    virtual void SaveToFile(const CCString &fileName) const;
-    virtual BYTE* CopyDataOut(UINT &uiSize) const;
-    virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const;
-    virtual CCString GetInfos(const CCString &tab) const;
+    UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+    void InitialAsSource(const SFermionSource& sourceData) override;
+    void SaveToFile(const CCString &fileName) const override;
+    BYTE* CopyDataOut(UINT &uiSize) const override;
+    TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
+    CCString GetInfos(const CCString &tab) const override;
 
     void SetKai(Real fKai);
 
-    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
-    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const;
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
 
     deviceWilsonVectorSU3 * m_pDeviceData;
 
@@ -103,7 +105,7 @@ public:
     ~CFieldMatrixOperationWilsonSquareSU3();
     
     //real left = (res,left)
-    virtual void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY);
+    void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY) override;
 
     deviceWilsonVectorSU3** m_pResBuffer;
     deviceWilsonVectorSU3** m_pLeftBuffer;

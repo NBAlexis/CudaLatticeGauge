@@ -129,7 +129,7 @@ public:
     * v^+ Av
     * NOTE: deviceRes must be zeroed
     */
-    void Normal2(const CLGComplex* v, const CLGComplex* matrix, CLGComplex* deviceRes, UINT dm);
+    void Normal2(const CLGComplex* v, const CLGComplex* matrix, CLGComplex* deviceRes, UINT dm) const;
     CLGComplex Normal2Host(const CLGComplex* v, const CLGComplex* matrix, UINT dm);
 
 #pragma endregion
@@ -138,7 +138,7 @@ public:
     void ThinQRFactorization(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT dx, UINT dy);
     static void SolveY(CLGComplex* Y, const CLGComplex* R, UINT dk, UINT dx);
 
-    void RotateHenssenberg(CLGComplex* H, CLGComplex* B, UINT dmH);
+    void RotateHenssenberg(CLGComplex* H, CLGComplex* B, UINT dmH) const;
     void RotateHenssenbergHost(CLGComplex* H, CLGComplex* B, UINT dmH);
 
     void QRFactorizationHost(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT uiDim);
@@ -221,7 +221,7 @@ protected:
         CLGComplex * m_pMatrix;
         UBOOL m_bUsing;
 
-        void Free()
+        void Free() const
         {
             m_pOwner->ReleaseTmpMatrix(m_uiIndex);
         }

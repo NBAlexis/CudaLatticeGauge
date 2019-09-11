@@ -258,8 +258,8 @@ extern "C" {
         {
             for (BYTE row = 0; row < 4; ++row)
             {
-                CLGComplex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
-                BYTE byNoneZero = m_uiIndex[row];
+                const CLGComplex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
+                const BYTE byNoneZero = m_uiIndex[row];
                 if (byNoneZero == 0)
                 {
                     printf("(%2f,%2f) 0     0     0\n",

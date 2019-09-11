@@ -11,14 +11,14 @@
 
 UINT TestRotation(CParameters& sParam)
 {
-    Real fExpected = F(0.65);
+    const Real fExpected = F(0.65);
 
     INT iVaule = 2;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
-    UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    const UINT iBeforeEquib = static_cast<UINT>(iVaule);
     iVaule = 10;
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
-    UINT iAfterEquib = static_cast<UINT>(iVaule);
+    const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
     //sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
@@ -53,7 +53,7 @@ UINT TestRotation(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(iAfterEquib, TRUE);
 #endif
 
-    Real fRes = pMeasure->m_fLastRealResult;
+    const Real fRes = pMeasure->m_fLastRealResult;
     appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
     UINT uiError = 0;
 #if _CLG_DEBUG
@@ -65,8 +65,8 @@ UINT TestRotation(CParameters& sParam)
         ++uiError;
     }
 
-    UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
 #if _CLG_DEBUG
     appGeneral(_T("accept (%d/5) : expected >= 4. HDiff = %f : expected < 1\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 #else

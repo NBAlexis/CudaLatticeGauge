@@ -189,8 +189,8 @@ public:
         }
     }
 
-    void ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial = _make_cuComplex(F(0.0),F(0.0)));
-    void ThreadBufferZero(Real * pDeviceBuffer, Real fInitial = F(0.0));
+    void ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial = _make_cuComplex(F(0.0),F(0.0))) const;
+    void ThreadBufferZero(Real * pDeviceBuffer, Real fInitial = F(0.0)) const;
 
     CLGComplex ThreadBufferSum(CLGComplex * pDeviceBuffer);
     Real ThreadBufferSum(Real * pDeviceBuffer);

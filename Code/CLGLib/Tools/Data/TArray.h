@@ -14,14 +14,14 @@
 __BEGIN_NAMESPACE
 ///////////////////////////////////////////////////////////////////////////
 // TArray<TYPE, ARG_TYPE>
-//	1)The implementation is similar to MFC's CArray,
-//	  See help of CArray in MFC for details
-//	2)some STL interface is added, e.g: clear, empty, size, etc
-//	3)memory issues
-//		* ReserveSpace	: memory is reserved
-//		* SetSize		: memory will be allocated or deallocated according to size and growby
-//		* RemoveAll		: memory is freed
-//		* FreeExtra		: array is shrinked
+//    1)The implementation is similar to MFC's CArray,
+//      See help of CArray in MFC for details
+//    2)some STL interface is added, e.g: clear, empty, size, etc
+//    3)memory issues
+//        * ReserveSpace    : memory is reserved
+//        * SetSize        : memory will be allocated or deallocated according to size and growby
+//        * RemoveAll        : memory is freed
+//        * FreeExtra        : array is shrinked
 
 template<class TYPE, class ARG_TYPE = const TYPE&>
 class __DLL_EXPORT TArray
@@ -140,7 +140,7 @@ public:
 
     inline INT FindItemIndex(ARG_TYPE Item)
     {
-        INT ret = INDEX_NONE;
+        const INT ret = INDEX_NONE;
         for(INT i = 0; i < m_nSize; ++i)
         {
             if(m_pData[i] == Item)
@@ -184,7 +184,7 @@ public:
         {
             // create buffer big enough to hold number of requested elements or
             // _nGrowBy elements, whichever is larger.
-            INT nAllocSize = appMax(nNewSize, m_nGrowBy);
+            const INT nAllocSize = appMax(nNewSize, m_nGrowBy);
             m_pData = (TYPE*)(new BYTE[(SIZE_T)(nAllocSize) * sizeof(TYPE)]);
             memset( (void*)(m_pData), 0, (SIZE_T)(nAllocSize) * sizeof(TYPE) );
             for( INT i = 0; i < nNewSize; ++i )
@@ -306,8 +306,8 @@ public:
 
     inline INT AddSize(INT nSizeToAdd, UBOOL bZeroMemory = FALSE)
     {
-        INT nOldSize = GetSize();
-        INT nNewSize = nSizeToAdd + nOldSize; 
+        const INT nOldSize = GetSize();
+        const INT nNewSize = nSizeToAdd + nOldSize; 
         SetSize(nNewSize); 
         if(bZeroMemory)
         {
@@ -323,7 +323,7 @@ public:
 
     inline INT AddItem(ARG_TYPE newElement)
     {
-        INT nIndex = m_nSize;
+        const INT nIndex = m_nSize;
         SetAtGrow(nIndex, newElement);
         return nIndex; 
     }
@@ -331,7 +331,7 @@ public:
     //Only return first found
     inline INT RemoveItem( ARG_TYPE Item )
     {
-        INT ret = INDEX_NONE;
+        const INT ret = INDEX_NONE;
         for(INT i = 0; i < m_nSize; ++i)
         {
             if(m_pData[i] == Item)
@@ -406,7 +406,7 @@ public:
         assert(nIndex + nCount <= m_nSize);
 
         // just remove a range
-        INT nMoveCount = m_nSize - (nIndex + nCount);
+        const INT nMoveCount = m_nSize - (nIndex + nCount);
         for( INT i = 0; i < nCount; ++i )
             (m_pData + nIndex + i)->~TYPE();
         if (nMoveCount)
@@ -430,7 +430,7 @@ public:
 
     inline void ReserveSpace(INT nCount)
     {
-        INT grow_by = m_nGrowBy;
+        const INT grow_by = m_nGrowBy;
         SetSize(m_nSize, nCount);
         m_nGrowBy = grow_by;
     }

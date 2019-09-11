@@ -135,7 +135,7 @@ CField* CLatticeData::GetPooledFieldById(BYTE byId)
     return m_pFieldPoolMap[byId]->GetOne();
 }
 
-void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
+void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple) const
 {
     //accept gauge already copy to m_pGaugeField in Updator, maybe change this behavour in the furture.
     if (NULL != m_pMeasurements)
@@ -144,7 +144,7 @@ void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGaug
     }
 }
 
-void CLatticeData::OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport)
+void CLatticeData::OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const
 {
     if (NULL != m_pMeasurements && bMeasured)
     {
@@ -152,7 +152,7 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport)
     }
 }
 
-void CLatticeData::FixAllFieldBoundary()
+void CLatticeData::FixAllFieldBoundary() const
 {
     if (m_pIndex->NeedToFixBoundary())
     {
@@ -168,7 +168,7 @@ void CLatticeData::FixAllFieldBoundary()
     }
 }
 
-void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc)
+void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc) const
 {
     m_pIndex->m_pBoundaryCondition->SetFieldSpecificBc(byFieldId, bc);
 }

@@ -20,7 +20,7 @@ void CIntegratorNestedLeapFrog::Evaluate()
         appCrucial(_T("Nested Updator only work with actions more than 2!"));
         _FAIL_EXIT;
     }
-    Real fHalfPstep = F(0.5) * m_fEStep;
+    const Real fHalfPstep = F(0.5) * m_fEStep;
     UpdatePF(fHalfPstep, ESP_StartTrajectory);
     appDetailed("  leap frog sub step 0\n");
 
@@ -45,7 +45,7 @@ void CIntegratorNestedLeapFrog::Evaluate()
 
 void CIntegratorNestedLeapFrog::NestedEvaluate(UBOOL bLast)
 {
-    Real fHalfPstep = F(0.5) * m_fNestedStepLength;
+    const Real fHalfPstep = F(0.5) * m_fNestedStepLength;
     UpdatePG(fHalfPstep, FALSE);
     appDetailed("  leap frog nested sub step 0\n");
 

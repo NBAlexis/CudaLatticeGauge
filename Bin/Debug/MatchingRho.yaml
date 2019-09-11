@@ -5,10 +5,11 @@ ShowDeviceInformation : 0
 ShowParameterContent : 1
 BeforeEquvibStep : 1
 EquvibStep : 1000
-OnlyMeasure : 0
+OnlyMeasure : 1
 DoSmearing : 0
-SavePrefix : 50216_
-# SavePrefix : ../../../ThermalCircle/Matching/B50217/50217_
+DoMeasureFermion : 1
+# SavePrefix : 50216_
+SavePrefix : ../../../ThermalCircle/Match/49916/49916_
 
 Dim : 4
 Dir : 4
@@ -48,10 +49,10 @@ Updator:
 Gauge:
 
     FieldName : CFieldGaugeSU3
-    # FieldInitialType : EFIT_Random
-    FieldInitialType : EFIT_ReadFromFile
-    GaugeFileType : EFFT_CLGBin
-    GaugeFileName : 50216_Matching_1.con_
+    FieldInitialType : EFIT_Random
+    # FieldInitialType : EFIT_ReadFromFile
+    # GaugeFileType : EFFT_CLGBin
+    # GaugeFileName : 50216_Matching_1.con_
 
     Period : [1, 1, 1, 1]
 
@@ -64,11 +65,11 @@ FermionField1:
     PoolNumber : 5
     Period : [1, 1, 1, -1]
 
-		
+        
 Action1:
    
     ActionName : CActionGaugePlaquette
-    Beta : 5.02
+    Beta : 4.99
 
 
 Action2:
@@ -97,8 +98,9 @@ Solver:
 
 Measure1:
 
-    MeasureName : CMeasurePolyakov
+    MeasureName : CMeasurePolyakovXY
     FieldId : 1
+    ShowResult : 1
 
 Measure2:
 

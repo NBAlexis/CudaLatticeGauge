@@ -177,7 +177,7 @@ public:
         }
     }
 
-    inline void Flush()
+    inline void Flush() const
     {
         if (NULL != m_pStream)
         {

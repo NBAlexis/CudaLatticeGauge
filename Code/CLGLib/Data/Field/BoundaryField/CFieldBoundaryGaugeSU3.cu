@@ -19,8 +19,8 @@ __BEGIN_NAMESPACE
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialSU3Feield_Identity(deviceSU3 *pDevicePtr)
 {
-    UINT uiSiteIndex = threadIdx.x;
-    UINT uiBoundIndex = threadIdx.y;
+    const UINT uiSiteIndex = threadIdx.x;
+    const UINT uiBoundIndex = threadIdx.y;
 
     pDevicePtr[uiSiteIndex * _DC_Dir + uiBoundIndex] = deviceSU3::makeSU3Id();
 }

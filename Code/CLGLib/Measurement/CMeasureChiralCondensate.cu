@@ -68,7 +68,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelChiralAverageDist(UINT* pCount, Real* pValue)
 {
-    UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x;
     if (pCount[uiIdx] > 0)
     {
         pValue[uiIdx] = pValue[uiIdx] / static_cast<Real>(pCount[uiIdx]);
@@ -150,8 +150,8 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
         _ZeroXYPlaneC(m_pDeviceXYBuffer);
         m_cTmpSum = _make_cuComplex(F(0.0), F(0.0));
     }
-    
-    UINT uiVolume = appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+
+    const UINT uiVolume = appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
     const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);   
 
@@ -167,7 +167,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
         m_pDeviceXYBuffer,
         _D_ComplexThreadBuffer);
 
-    CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+    const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 
     m_cTmpSum.x = m_cTmpSum.x + thisSum.x / uiVolume;
     m_cTmpSum.y = m_cTmpSum.y + thisSum.y / uiVolume;
@@ -277,7 +277,7 @@ void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge
 
     CFieldFermion* pF1 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     CFieldFermion* pF2 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-    UINT uiVolume = appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    const UINT uiVolume = appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF1);
     CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pF2);
 
@@ -300,7 +300,7 @@ void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge
             m_pDeviceXYBuffer,
             _D_ComplexThreadBuffer);
 
-        CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+        const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 #pragma endregion
 
         res.x = res.x + thisSum.x / uiVolume;

@@ -37,9 +37,9 @@ public:
 
 /*----------------------------------------------------------------------------
 SimpleList.
-//		Sample:
-//			1) TSimpleSingleList<MyStruct*>* MyList = NULL;			//create the list head
-//			2) MyList = new TSimpleSingleList<MyStruct*>(MyList);	//add a new item, and make it as head
+//        Sample:
+//            1) TSimpleSingleList<MyStruct*>* MyList = NULL;            //create the list head
+//            2) MyList = new TSimpleSingleList<MyStruct*>(MyList);    //add a new item, and make it as head
 ----------------------------------------------------------------------------*/
 template <class ElementType> class TSimpleList : public ElementType
 {

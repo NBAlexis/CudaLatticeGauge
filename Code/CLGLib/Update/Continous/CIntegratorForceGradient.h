@@ -24,11 +24,11 @@ public:
     CIntegratorForceGradient() : CIntegrator(), m_pUPrime(NULL) {}
     ~CIntegratorForceGradient();
 
-    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
 
-    virtual void Evaluate();
+    void Evaluate() override;
 
-    virtual CCString GetInfos(const CCString& sTab) const;
+    CCString GetInfos(const CCString& sTab) const override;
 
 protected:
 

@@ -41,7 +41,7 @@ public:
 
     void Initial(FLOAT fSize)
     {
-        m_ulTotal = static_cast<ULONGLONG>(fSize * 1024.f) * (1ull << 20);
+        m_ulTotal = static_cast<ULONGLONG>(1024.f * fSize) * (1ull << 20);
         checkCudaErrors(cudaMalloc((void**)&m_pDevicePtr, m_ulTotal));
         m_ulFree = m_ulTotal;
         m_bUseBuffer = TRUE;
@@ -72,7 +72,7 @@ public:
         return cudaSuccess;
     }
 
-    inline cudaError_t CudaFree(void* pPtr)
+    inline cudaError_t CudaFree(void* pPtr) const
     {
         if (!m_bUseBuffer)
         {

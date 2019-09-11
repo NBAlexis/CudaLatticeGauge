@@ -185,7 +185,7 @@ public:
     //These are functions for parse
     static void Parse(ISTREAM& iss, CParameters& params)
     {
-        INT result = ParseStream(iss, params);
+        const INT result = ParseStream(iss, params);
 
         if (result != EXIT_SUCCESS) 
         {

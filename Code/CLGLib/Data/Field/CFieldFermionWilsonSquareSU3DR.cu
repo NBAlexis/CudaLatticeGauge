@@ -256,8 +256,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         pResultData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
@@ -279,15 +279,15 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 right_element = bDDagger ?
         gamma5.MulWilsonC(pDeviceData[uiSiteIndex]) : pDeviceData[uiSiteIndex];
 
     deviceWilsonVectorSU3 term3 = deviceWilsonVectorSU3(right_element);
 
-    Real fkOmega = fOmega * kai;
-    Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fkOmega;
-    Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fkOmega;
+    const Real fkOmega = fOmega * kai;
+    const Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fkOmega;
+    const Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fkOmega;
 
     //res = res + 2 (y-x) k Omega right - i k gamma4 sigma12 right
     //-2(y-x) k Omega right
@@ -1306,10 +1306,10 @@ _kernelDWilsonForceSU3_DR_X_Naive(
     BYTE byFieldId)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
@@ -1334,11 +1334,11 @@ _kernelDWilsonForceSU3_DR_X_Naive(
 
     //====================
     //Get things
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
     deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
@@ -1369,10 +1369,10 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
     BYTE byFieldId)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
@@ -1397,11 +1397,11 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
 
     //====================
     //Get things
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
     deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
@@ -1432,10 +1432,10 @@ _kernelDWilsonForceSU3_DR_X(
     BYTE byFieldId)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
@@ -1460,11 +1460,11 @@ _kernelDWilsonForceSU3_DR_X(
 
     //====================
     //Get things
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
     deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
@@ -1497,10 +1497,10 @@ _kernelDWilsonForceSU3_DR_Y(
     BYTE byFieldId)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
@@ -1525,11 +1525,11 @@ _kernelDWilsonForceSU3_DR_Y(
 
     //====================
     //Get things
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
     deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 

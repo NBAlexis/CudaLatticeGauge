@@ -1,0 +1,111 @@
+\subsection{\label{sec:DataAnalyse}Data Analyse}
+
+We write the data analyse code based on Ref.~\cite{autocorrelation} in Mathematica.
+
+\subsubsection{What is autocorrelation\index{autocorrelation}}
+
+The problem to address is that, the configurations generated are not statistically independent. So one need to take the relations between configurations into account.
+
+To consider the relation between two sets, correlation functions are used, assuming two sets $a_{\alpha,\beta}$, assume $a_{\alpha,\beta}-\bar{a}_{\alpha,\beta}$ is a normal distribution.
+\begin{equation}
+\begin{split}
+&\langle (a_{\alpha}-\bar{a}_{\alpha})(a_{\beta}-\bar{a}_{\beta})\rangle = \frac{1}{N^2}\sum _{i,j}\Gamma _{\alpha\beta}(j-i)
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&C_{\alpha\beta}=\sum _{t=-\infty}^{\infty}\Gamma _{\alpha\beta}(t)
+\end{split}
+\end{equation}
+
+\textbf{Note that, $C_{\alpha\alpha}(0)=N\langle \delta _{\alpha}^2\rangle$ is the standard error.}
+
+For one single observable, one can define a correlation of a set of itself with delayed Markov time as
+\begin{equation}
+\begin{split}
+&\tau _{\alpha}=\frac{1}{2\Gamma _{\alpha\alpha}(0)} \sum _{t=-\infty}^{\infty}\Gamma _{\alpha\alpha}(t)
+\end{split}
+\end{equation}
+For a purely exponential behaviour, $\Gamma _{\alpha\beta}(t)\sim \exp (-|t|/\tau)$. Generally, we can estimate $2\tau _{\alpha}$ as an interval such that two configurations are effectively independent~\cite{autocorrelation}.
+
+Here, $\Gamma _{\alpha\beta}(t)$ is \textbf{autocorrelation\index{autocorrelation}}.
+
+\subsubsection{How to calculate autocorrelation, and how to use it to obtain the interval}
+
+Considering, we have already obtained a set of measurements by using configurations generated with Markov chain $\{a_{\alpha}^{i,r}\}$, where $\alpha$ indicating different observables, $r=1\to R$ indicating different replicas (usually, different replicas are obtained by running multi-times starting from same parameters, or running parallelly starting from same parameters), and $i=1\to N_r$ is index of each value in the replica.
+
+Assume we measured $a^{i,r}_{\alpha}$, and want to obtain $F=f(a_{\alpha})$.
+
+In Ref.~\cite{autocorrelation}, a biased estimator is used such that
+\begin{equation}
+\begin{split}
+&N=\sum _r^RN_r,\\
+&\bar{a}^r_{\alpha}=\frac{1}{N_r}\sum _i a_{\alpha}^{i,r}\\
+&\bar{\bar{a}}_{\alpha}=\frac{1}{N} \sum^R _r N_r \bar{a}^r_{\alpha}\\
+&\bar{F}=\frac{1}{N} \sum^R _r N_rf(\bar{a}^r_{\alpha}),\\
+&\bar{\bar{F}}=f(\bar{\bar{a}}_{\alpha})\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&F_{mean}=\left\{\begin{array}{cc}\bar{\bar{F}}, & R=1 \\ \frac{R\bar{\bar{F}}-\bar{F}}{R-1} & R\geq 2\end{array}\right.
+\end{split}
+\end{equation}
+
+The error is related to a correlation
+\begin{equation}
+\begin{split}
+&\bar{\bar{\Gamma}} _{\alpha \beta}(t)=\frac{1}{N-Rt}\sum _{r=1}^R \sum _{i=1}^{N_r-t} \left(a^{i,r}_{\alpha}-\bar{\bar{a}}_{\alpha}\right)\left(a^{i+t,r}_{\beta}-\bar{\bar{a}}_{\beta}\right)
+\end{split}
+\end{equation}
+at first we need to project it onto single variable, for this purpose, we need to calculate gradient as
+\begin{equation}
+\begin{split}
+&h_{\alpha}=\sqrt{\frac{\Gamma _{\alpha\alpha}(0)}{N}},\\
+&\bar{\bar{f}}_{\alpha}\approx \frac{1}{2h_{\alpha}}\left(f(\bar{\bar{a}}_1,\bar{\bar{a}}_2,\ldots, \bar{\bar{a}}_{\alpha}+h_{\alpha},\ldots)-f(\bar{\bar{a}}_1,\bar{\bar{a}}_2,\ldots, \bar{\bar{a}}_{\alpha}-h_{\alpha},\ldots)\right)
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\bar{\bar{\Gamma}} _F(t)=\sum _{\alpha\beta}\bar{\bar{f}}_{\alpha}\bar{\bar{f}}_{\beta}\bar{\bar{\Gamma}} _{\alpha\beta}(t)\\
+\end{split}
+\end{equation}
+then the sum from $t=-\infty \to \infty$ is approximated as
+\begin{equation}
+\begin{split}
+&\bar{\bar{C}} _F(W)=\bar{\bar{\Gamma}} _F(0)+2\sum _{t=1}^W\bar{\bar{\Gamma}} _F(t)\\
+\end{split}
+\end{equation}
+By definition, if window $W$ is known, then
+\begin{equation}
+\begin{split}
+&\bar{\bar{\tau}}_{int} (W) = \frac{\bar{\bar{C}} _F(W)}{2\bar{\bar{C}} _F(0)}
+\end{split}
+\end{equation}
+
+To get $\tau$ one need to use a factor $S$ to fit the exponential, assuming
+\begin{equation}
+\begin{split}
+&2\bar{\bar{\tau}} _{int} (W) = \sum _{t=-\infty}^{\infty}\exp\left(-\frac{S|t|}{\bar{\bar{\tau}} (W)}\right)
+\end{split}
+\end{equation}
+with $S$ as a constant usually $S=1\to 2$.
+
+Then one can let $\bar{\bar{\tau}} (W)= S\tau _{int}(W)$, and calculate
+\begin{equation}
+\begin{split}
+&g(W)=\exp \left(-\frac{W}{\bar{\bar{\tau}} (W)}\right)-\frac{\bar{\bar{\tau}} (W)}{\sqrt{WN}}
+\end{split}
+\end{equation}
+and fix $W$ as the first index such that $g(W)<0$ change sign.
+
+Once $W$ is obtained, one can calculate $2\bar{\bar{\tau}}_{int}(W)$ which is the Markov time separation such that two configurations can be considered as independent. Also, the error estimate is
+\begin{equation}
+\begin{split}
+&\delta _F^2 = \frac{\bar{\bar{C}}(W)}{N}
+\end{split}
+\end{equation}
+

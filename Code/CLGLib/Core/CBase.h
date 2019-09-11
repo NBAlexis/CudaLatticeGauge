@@ -80,7 +80,7 @@ protected:
 public:
 
     UINT GetSize() const { return m_dwObjectSize; }
-    class CBase* Create() { return m_pfnCreateObject(); }
+    class CBase* Create() const { return m_pfnCreateObject(); }
     const TCHAR* GetName() const { return m_sClassName; }
 };
 

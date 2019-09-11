@@ -39,29 +39,29 @@ public:
 
 #pragma region HMC
 
-    virtual void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const;
-    virtual void CalculateOnlyStaple(CFieldGauge* pStaple) const;
+    void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
+    void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
 
-    virtual void MakeRandomGenerator();
-    virtual Real CalculatePlaqutteEnergy(Real betaOverN) const;
+    void MakeRandomGenerator() override;
+    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
 
-    virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const
+    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override
     {
         return CalculatePlaqutteEnergy(betaOverN);
     }
 
-    virtual Real CalculateKinematicEnergy() const;
+    Real CalculateKinematicEnergy() const override;
 
 #pragma endregion
 
 #pragma region BLAS
 
-    virtual void FixBoundary();
+    void FixBoundary() override;
 
 #pragma endregion
 
-    virtual void ExpMult(Real a, CField* U) const;
-    virtual CCString GetInfos(const CCString &tab) const;
+    void ExpMult(Real a, CField* U) const override;
+    CCString GetInfos(const CCString &tab) const override;
 };
 
 #pragma region device functions
@@ -90,7 +90,7 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3Dir(
     UINT uiBigIdx,
     BYTE byDir)
 {
-    SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
         ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir

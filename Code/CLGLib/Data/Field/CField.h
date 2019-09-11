@@ -51,7 +51,7 @@ __DEFINE_ENUM(EFieldOperator,
 
 
 /**
-* When apply operator, it is convinient to apply a coefficient at the same time
+* When apply operator, it is convenient to apply a coefficient at the same time
 */
 enum EOperatorCoefficientType
 {

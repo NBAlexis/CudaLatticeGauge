@@ -45,10 +45,10 @@ public:
     void OnFinishTrajectory(UBOOL bAccepted);
     void Prepare(UBOOL bLastAccepted, UINT uiStep);
     void UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase);
-    void UpdateU(Real fStep);
+    void UpdateU(Real fStep) const;
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
     virtual CCString GetInfos(const CCString& sTab) const = 0;
-    void FinishEvaluate();
+    void FinishEvaluate() const;
     virtual void ChangeStepCount(UBOOL bGrow) 
     {
         if (bGrow)
@@ -96,7 +96,7 @@ public:
     {
     }
 
-    virtual void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params);
+    void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
     CCString GetNestedInfo(const CCString & sTab) const;
 
     void UpdatePF(Real fStep, ESolverPhase ePhase);
@@ -104,7 +104,7 @@ public:
     //Gauge force is irrelevant from solver
     void UpdatePG(Real fStep, UBOOL bCacheStaple);
 
-    virtual void ChangeStepCount(UBOOL bGrow)
+    void ChangeStepCount(UBOOL bGrow) override
     {
         CIntegrator::ChangeStepCount(bGrow);
         m_fNestedStepLength = m_fEStep / m_uiNestedStep;

@@ -13,18 +13,18 @@ INT TestAngularMomentum(CParameters& params)
 {
     INT iVaule = 5;
     params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
-    UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    const UINT iBeforeEquib = static_cast<UINT>(iVaule);
     iVaule = 200;
     params.FetchValueINT(_T("EquvibStep"), iVaule);
-    UINT iAfterEquib = static_cast<UINT>(iVaule);
+    const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
     iVaule = 0;
     params.FetchValueINT(_T("LoopStart"), iVaule);
-    UINT iLoopStart = static_cast<UINT>(iVaule);
+    const UINT iLoopStart = static_cast<UINT>(iVaule);
 
     iVaule = 6;
     params.FetchValueINT(_T("LoopEnd"), iVaule);
-    UINT iLoopEnd = static_cast<UINT>(iVaule);
+    const UINT iLoopEnd = static_cast<UINT>(iVaule);
 
     appSetupLog(params);
     if (!appInitialCLG(params))
@@ -40,7 +40,7 @@ INT TestAngularMomentum(CParameters& params)
     for (UINT i = iLoopStart; i < iLoopEnd; ++i)
     {
         UINT uiLastAccept = 0;
-        Real omega = F(0.02) * i;
+        const Real omega = F(0.02) * i;
         appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
         pGauageAction->SetOmega(omega);
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
@@ -57,7 +57,7 @@ INT TestAngularMomentum(CParameters& params)
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iAfterEquib)
         {
             appGetLattice()->m_pUpdator->Update(1, TRUE);
-            UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
+            const UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
             if (uiAcce != uiLastAccept)
             {
                 CCString sFileName;

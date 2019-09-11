@@ -18,26 +18,26 @@
 
 #if defined(_CLG_WIN)
 #   if !defined(CLGAPI)
-#	    define __LIB_TITLE__	"CLGLib"
+#        define __LIB_TITLE__    "CLGLib"
 #       ifdef _CLG_PRIVATE
 #           define CLGAPI __DLL_EXPORT
 #       else
-#   	    define CLGAPI __DLL_IMPORT
+#           define CLGAPI __DLL_IMPORT
 #       endif
 #       ifndef _CLG_PRIVATE
-#   	    ifdef _CLG_DEBUG
-#	    	    define __LIB_FILE__	__LIB_TITLE__ "_d.lib"
-#	        else
-#		        define __LIB_FILE__ __LIB_TITLE__ ".lib"
-#	        endif
-#	        pragma __IMPORT_LIB(__LIB_FILE__)
-#	        pragma message("linking with " __LIB_FILE__ "...")
-#	        undef __LIB_FILE__
-#	        undef __LIB_TITLE__
+#           ifdef _CLG_DEBUG
+#                define __LIB_FILE__    __LIB_TITLE__ "_d.lib"
+#            else
+#                define __LIB_FILE__ __LIB_TITLE__ ".lib"
+#            endif
+#            pragma __IMPORT_LIB(__LIB_FILE__)
+#            pragma message("linking with " __LIB_FILE__ "...")
+#            undef __LIB_FILE__
+#            undef __LIB_TITLE__
 #       endif
 #   endif
 #else
-#	define CLGAPI  
+#    define CLGAPI  
 #endif
 
 

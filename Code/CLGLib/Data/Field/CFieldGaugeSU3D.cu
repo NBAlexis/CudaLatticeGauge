@@ -25,8 +25,8 @@ _kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr)
 
     intokernalInt4;
 
-    BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -55,7 +55,7 @@ _kernelStapleAtSiteSU3CacheIndex_D(
 
     //Real test_force = F(0.0);
     betaOverN = betaOverN * F(-0.5);
-    UINT plaqLengthm1 = plaqLength - 1;
+    const UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -186,7 +186,7 @@ _kernelCalculateOnlyStaple_D(
     intokernaldir;
 
     //Real test_force = F(0.0);
-    UINT plaqLengthm1 = plaqLength - 1;
+    const UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -234,8 +234,8 @@ _kernelExpMultSU3RealQ_D(
     deviceSU3 *pU)
 {
     intokernalInt4;
-    UINT uiDir = _DC_Dir;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiDir = _DC_Dir;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
@@ -262,8 +262,8 @@ _kernelExpMultSU3Real_D(
     BYTE prec)
 {
     intokernalInt4;
-    UINT uiDir = _DC_Dir;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiDir = _DC_Dir;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
@@ -289,8 +289,8 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData, Real* results)
 {
     intokernalInt4;
-    UINT uiDir = _DC_Dir;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiDir = _DC_Dir;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     Real resThisThread = F(0.0);
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -310,8 +310,8 @@ _kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    UINT uiDir = _DC_Dir;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const UINT uiDir = _DC_Dir;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {

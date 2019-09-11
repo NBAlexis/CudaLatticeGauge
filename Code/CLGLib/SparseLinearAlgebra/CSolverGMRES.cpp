@@ -132,14 +132,14 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             pW->ApplyOperator(uiM, pGaugeFeild);
             for (UINT k = 0; k <= j; ++k)
             {
-                CLGComplex dotc = m_lstVectors[k]->Dot(pW);
+                const CLGComplex dotc = m_lstVectors[k]->Dot(pW);
                 m_h[HIndex(k, j)] = dotc;
                 //w -= h[k,j] v[k]
                 pW->Axpy(_make_cuComplex(-dotc.x, -dotc.y), m_lstVectors[k]);
             }
 
             //h[j + 1, j] = ||w||
-            Real fWNorm = _sqrt(pW->Dot(pW).x);
+            const Real fWNorm = _sqrt(pW->Dot(pW).x);
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
             if (j < m_uiMaxDim - 1)
@@ -201,25 +201,25 @@ void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
     m_g[0] = _make_cuComplex(m_fBeta, F(0.0));
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
-        UINT ii = HIndex(i, i);
-        UINT i1i = HIndex(i + 1, i);
-        Real denomi = F(1.0) / _sqrt(__cuCabsSqf(m_h[ii]) + __cuCabsSqf(m_h[i1i]));
-        CLGComplex cs = cuCmulf_cr(m_h[ii], denomi);
-        CLGComplex sn = cuCmulf_cr(m_h[i1i], denomi);
-        CLGComplex cs_h = _cuConjf(cs);
-        CLGComplex sn_h = _cuConjf(sn);
+        const UINT ii = HIndex(i, i);
+        const UINT i1i = HIndex(i + 1, i);
+        const Real denomi = F(1.0) / _sqrt(__cuCabsSqf(m_h[ii]) + __cuCabsSqf(m_h[i1i]));
+        const CLGComplex cs = cuCmulf_cr(m_h[ii], denomi);
+        const CLGComplex sn = cuCmulf_cr(m_h[i1i], denomi);
+        const CLGComplex cs_h = _cuConjf(cs);
+        const CLGComplex sn_h = _cuConjf(sn);
 
         for (UINT j = i; j < m_uiMaxDim; ++j)
         {
-            UINT ij = HIndex(i, j);
-            UINT i1j = HIndex(i + 1, j);
+            const UINT ij = HIndex(i, j);
+            const UINT i1j = HIndex(i + 1, j);
 
-            CLGComplex hij = m_h[ij];
+            const CLGComplex hij = m_h[ij];
             m_h[ij] = _cuCaddf(_cuCmulf(cs_h, hij), _cuCmulf(sn_h, m_h[i1j]));
             m_h[i1j] = _cuCsubf(_cuCmulf(cs, m_h[i1j]), _cuCmulf(sn, hij));
         }
 
-        CLGComplex minus_gi = _make_cuComplex(-m_g[i].x, -m_g[i].y);
+        const CLGComplex minus_gi = _make_cuComplex(-m_g[i].x, -m_g[i].y);
         m_g[i] = _cuCmulf(cs_h, m_g[i]);
         m_g[i + 1] = _cuCmulf(sn, minus_gi);
     }
@@ -233,7 +233,7 @@ void CSLASolverGMRES::SolveY(/*UINT uiHeisenbergDim*/)
         m_pHelper->SolveYHost(m_y, m_h, 1, m_uiMaxDim);
         return;
     }
-    INT iHeisenbergDim = static_cast<INT>(m_uiMaxDim);
+    const INT iHeisenbergDim = static_cast<INT>(m_uiMaxDim);
     for (INT i = m_uiMaxDim - 1; i > -1; --i)
     {
         for (INT j = i + 1; j < iHeisenbergDim; ++j)

@@ -37,15 +37,15 @@ public:
     CMeasureChargeAndCurrents();
     ~CMeasureChargeAndCurrents();
 
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId);
-    virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) {}
-    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site);
-    virtual void Average(UINT uiConfigurationCount);
-    virtual void Report();
-    virtual void Reset();
+    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
+    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override {}
+    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override;
+    void Average(UINT uiConfigurationCount) override;
+    void Report() override;
+    void Reset() override;
 
-    virtual UBOOL IsGaugeMeasurement() const { return FALSE; }
-    virtual UBOOL IsSourceScanning() const { return TRUE; }
+    UBOOL IsGaugeMeasurement() const override { return FALSE; }
+    UBOOL IsSourceScanning() const override { return TRUE; }
 
 protected:
 

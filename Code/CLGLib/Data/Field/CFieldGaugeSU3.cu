@@ -177,7 +177,7 @@ _kernelStapleAtSiteSU3CacheIndex(
 
     //Real test_force = F(0.0);
     betaOverN = betaOverN * F(-0.5);
-    UINT plaqLengthm1 = plaqLength - 1;
+    const UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -239,7 +239,7 @@ _kernelCalculateOnlyStaple(
     intokernaldir;
 
     //Real test_force = F(0.0);
-    UINT plaqLengthm1 = plaqLength - 1;
+    const UINT plaqLengthm1 = plaqLength - 1;
     UINT plaqCountAll = plaqCount * plaqLengthm1;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -566,7 +566,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
     {
     case EFFT_BridgePPTXT:
     {
-        CCString sContent = appGetFileSystem()->ReadAllText(sFileName);
+        const CCString sContent = appGetFileSystem()->ReadAllText(sFileName);
         TArray<INT> seps;
         seps.AddItem(_T('\n'));
         seps.AddItem(_T('\r'));

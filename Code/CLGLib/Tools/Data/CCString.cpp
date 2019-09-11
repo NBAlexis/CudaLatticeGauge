@@ -11,7 +11,7 @@
 __BEGIN_NAMESPACE
 
 //============================================================
-//	String
+//    String
 //============================================================
 static TCHAR _NullChar = _T('\0');
 static INT _NullString[] = {-1,0,0,0};
@@ -46,7 +46,7 @@ CCString::CCString(const CCString& stringSrc)
 CCString::CCString(const TCHAR* lpsz)
 {
     Init();
-    SIZE_T nLen = (SIZE_T)(__SafeStrlen(lpsz));
+    const SIZE_T nLen = (SIZE_T)(__SafeStrlen(lpsz));
     if (nLen != 0)
     {
         AllocBuffer((INT)(nLen));
@@ -261,7 +261,7 @@ TCHAR* CCString::GetBuffer(INT nMinBufLength)
 #endif
         // we have to grow the buffer
         CCStringData* pOldData = GetData();
-        INT nOldLen = GetData()->m_nDataLength;   // AllocBuffer will tromp it
+        const INT nOldLen = GetData()->m_nDataLength;   // AllocBuffer will tromp it
         if (nMinBufLength < nOldLen)
             nMinBufLength = nOldLen;
         AllocBuffer(nMinBufLength);
@@ -328,7 +328,7 @@ void CCString::FreeExtra()
 *
 *
 */
-void CCString::UnlockBuffer()
+void CCString::UnlockBuffer() const
 {
     assert(GetData()->m_nRefs == -1);
     if (GetData() != _EmptyStringData)
@@ -350,7 +350,7 @@ void CCString::TrimLeft()
     if (lpsz != m_pchData)
     {
         // fix up data and length
-        INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
+        const INT nDataLength = GetData()->m_nDataLength - (INT)(lpsz - m_pchData);
         memmove(m_pchData, lpsz, (nDataLength + 1) * sizeof(TCHAR));
         GetData()->m_nDataLength = nDataLength;
     }
@@ -532,7 +532,7 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
                     // 309 zeroes == max precision of a double
                     // 6 == adjustment in case precision is not specified,
                     //   which means that the precision defaults to 6
-                    DWORD nLength = appMax(nWidth, 312 + nPrecision + 6);
+                    const DWORD nLength = appMax(nWidth, 312 + nPrecision + 6);
                     pszTemp = (TCHAR*)appAlloca(nLength);
 
                     f = va_arg(argList, DOUBLE);
@@ -579,11 +579,11 @@ INT CCString::Delete(INT nIndex, INT nCount /* = 1 */)
 {
     if (nIndex < 0)
         nIndex = 0;
-    INT nNewLength = GetData()->m_nDataLength;
+    const INT nNewLength = GetData()->m_nDataLength;
     if (nCount > 0 && nIndex < nNewLength)
     {
         CopyBeforeWrite();
-        INT nBytesToCopy = nNewLength - (nIndex + nCount) + 1;
+        const INT nBytesToCopy = nNewLength - (nIndex + nCount) + 1;
 
         memcpy(m_pchData + nIndex,
             m_pchData + nIndex + nCount, nBytesToCopy * sizeof(TCHAR));
@@ -620,7 +620,7 @@ INT CCString::Insert(INT nIndex, TCHAR ch)
 
     // move existing bytes down
     //memcpy(m_pchData + nIndex + 1,
-    //	m_pchData + nIndex, (nNewLength-nIndex)*sizeof(TCHAR));
+    //    m_pchData + nIndex, (nNewLength-nIndex)*sizeof(TCHAR));
     memmove(m_pchData + nIndex + 1, m_pchData + nIndex, (nNewLength - nIndex) * sizeof(TCHAR));
     m_pchData[nIndex] = ch;
     GetData()->m_nDataLength = nNewLength;
@@ -637,7 +637,7 @@ INT CCString::Insert(INT nIndex, const TCHAR* pstr)
     if (nIndex < 0)
         nIndex = 0;
 
-    INT nInsertLength = __SafeStrlen(pstr);
+    const INT nInsertLength = __SafeStrlen(pstr);
     INT nNewLength = GetData()->m_nDataLength;
     if (nInsertLength > 0)
     {
@@ -657,8 +657,8 @@ INT CCString::Insert(INT nIndex, const TCHAR* pstr)
 
         // move existing bytes down
         //memcpy(m_pchData + nIndex + nInsertLength,
-        //	m_pchData + nIndex,
-        //	(nNewLength-nIndex-nInsertLength+1)*sizeof(TCHAR));
+        //    m_pchData + nIndex,
+        //    (nNewLength-nIndex-nInsertLength+1)*sizeof(TCHAR));
         memmove(m_pchData + nIndex + nInsertLength, m_pchData + nIndex, (nNewLength - nIndex - nInsertLength + 1) * sizeof(TCHAR));
         memcpy(m_pchData + nIndex, pstr, nInsertLength * sizeof(TCHAR));
         GetData()->m_nDataLength = nNewLength;
@@ -703,10 +703,10 @@ INT CCString::Replace(TCHAR chOld, TCHAR chNew)
 INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
 {
     // can't have empty or NULL lpszOld
-    INT nSourceLen = __SafeStrlen(lpszOld);
+    const INT nSourceLen = __SafeStrlen(lpszOld);
     if (nSourceLen == 0)
         return 0;
-    INT nReplacementLen = __SafeStrlen(lpszNew);
+    const INT nReplacementLen = __SafeStrlen(lpszNew);
 
     // loop once to figure out the size of the result string
     INT nCount = 0;
@@ -731,7 +731,7 @@ INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
         // if the buffer is too small, just
         //   allocate a new buffer (slow but sure)
         INT nOldLength = GetData()->m_nDataLength;
-        INT nNewLength =  nOldLength + (nReplacementLen - nSourceLen) * nCount;
+        const INT nNewLength =  nOldLength + (nReplacementLen - nSourceLen) * nCount;
         if (GetData()->m_nAllocLength < nNewLength || GetData()->m_nRefs > 1)
         {
             CCStringData* pOldData = GetData();
@@ -749,7 +749,7 @@ INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
         {
             while ( (lpszTarget = appStrstr(lpszStart, lpszOld)) != NULL)
             {
-                INT nBalance = nOldLength - (INT)(lpszTarget - m_pchData) + nSourceLen;
+                const INT nBalance = nOldLength - (INT)(lpszTarget - m_pchData) + nSourceLen;
                 memmove(lpszTarget + nReplacementLen, lpszTarget + nSourceLen,
                     nBalance * sizeof(TCHAR));
                 memcpy(lpszTarget, lpszNew, nReplacementLen * sizeof(TCHAR));
@@ -788,7 +788,7 @@ INT CCString::Remove(TCHAR chRemove)
         pstrSource = appStrInc(pstrSource);
     }
     *pstrDest = _T('\0');
-    INT nCount = (INT)(pstrSource - pstrDest);
+    const INT nCount = (INT)(pstrSource - pstrDest);
     GetData()->m_nDataLength -= nCount;
 
     return nCount;

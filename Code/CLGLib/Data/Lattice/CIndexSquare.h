@@ -21,8 +21,8 @@ __CLG_REGISTER_HELPER_HEADER(CIndexSquare)
 __device__ __inline__ static
 SSmallInt4 _deviceMoveSquareSite(SSmallInt4 ret, SBYTE dir)
 {
-    UBOOL bReverse = dir < 0;
-    BYTE uDir = static_cast<BYTE>(bReverse ? ((-dir) - 1) : (dir - 1));
+    const UBOOL bReverse = dir < 0;
+    const BYTE uDir = static_cast<BYTE>(bReverse ? ((-dir) - 1) : (dir - 1));
     if (0 == uDir)
     {
         if (bReverse)
@@ -85,17 +85,17 @@ public:
     */
     static UINT GetDecompose(UINT volumn);
 
-    virtual void BakeAllIndexBuffer(class CIndexData* pData);
-    virtual void BakePlaquttes(class CIndexData* pData, BYTE byFieldId);
-    virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId);
-    virtual UINT GetPlaqutteCount() const;
+    void BakeAllIndexBuffer(class CIndexData* pData) override;
+    void BakePlaquttes(class CIndexData* pData, BYTE byFieldId) override;
+    void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) override;
+    UINT GetPlaqutteCount() const override;
 };
 
 #pragma region device Functions
 
 static __device__ __inline__ SSmallInt4 _deviceCoordMoving(const SSmallInt4& sFrom, BYTE i)
 {
-    SBYTE offset = i < _DC_Dir ? -1 : 1;
+    const SBYTE offset = i < _DC_Dir ? -1 : 1;
     SSmallInt4 ret = sFrom;
     ret.m_byData4[i < _DC_Dir ? (4 - _DC_Dir + i) : (4 - _DC_Dir * 2 + i)] += offset;
     return ret;

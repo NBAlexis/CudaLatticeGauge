@@ -34,10 +34,10 @@ void CIntegratorNestedForceGradient::Evaluate()
     }
 
     //Real f1Over2EStep = m_fEStep * F(0.5);
-    Real f1Over6Estep = m_fEStep * OneOver6;
-    Real f1Over3Estep = f1Over6Estep * F(2.0);
-    Real f2Over3Estep = f1Over3Estep * F(2.0);
-    Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
+    const Real f1Over6Estep = m_fEStep * OneOver6;
+    const Real f1Over3Estep = f1Over6Estep * F(2.0);
+    const Real f2Over3Estep = f1Over3Estep * F(2.0);
+    const Real f1Over24EstepSq = m_fEStep * m_fEStep * OneOver24;
 
     appDetailed("  Force Gradient sub step 0\n");
     UpdatePF(f1Over6Estep, ESP_StartTrajectory);
@@ -84,11 +84,11 @@ void CIntegratorNestedForceGradient::Evaluate()
 
 void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
 {
-    Real f1Over2EStep = m_fNestedStepLength * F(0.5);
-    Real f1Over6Estep = m_fNestedStepLength * OneOver6;
-    Real f1Over3Estep = f1Over6Estep * F(2.0);
-    Real f2Over3Estep = f1Over3Estep * F(2.0);
-    Real f1Over24EstepSq = m_fNestedStepLength * m_fNestedStepLength * OneOver24;
+    const Real f1Over2EStep = m_fNestedStepLength * F(0.5);
+    const Real f1Over6Estep = m_fNestedStepLength * OneOver6;
+    const Real f1Over3Estep = f1Over6Estep * F(2.0);
+    const Real f2Over3Estep = f1Over3Estep * F(2.0);
+    const Real f1Over24EstepSq = m_fNestedStepLength * m_fNestedStepLength * OneOver24;
 
     appDetailed("  Force Gradient nested sub step 0\n");
     UpdatePG(f1Over6Estep, FALSE);
