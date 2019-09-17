@@ -154,6 +154,11 @@ void CLatticeData::OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const
 
 void CLatticeData::FixAllFieldBoundary() const
 {
+    if (NULL == m_pIndex)
+    {
+        return;
+    }
+
     if (m_pIndex->NeedToFixBoundary())
     {
         for (UINT i = 0; i < kMaxFieldCount; ++i)

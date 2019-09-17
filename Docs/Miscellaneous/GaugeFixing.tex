@@ -1,0 +1,79 @@
+\subsection{\label{sec:GaugeFixing}Gauge Fixing}
+
+\subsubsection{\label{sec:FFT}Introduction of FFT before start}
+
+\textbf{We may use 3D cuFFT to implement 4D FFT, however, before this can be done, we need to understand what FFT is.}
+
+\textbf{\index{FFT}FFT} is to calculate Discrete Fourier Transform~(DFT), in 1D, it is
+\begin{equation}
+\begin{split}
+&\tilde{x}_m=\sum _n x_nW_N^{mn}\\
+&W_N^j\equiv \exp (-i\frac{2\pi j}{N})\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Cooley-Tukey mapping
+\end{itemize}
+
+Let $N=N_1\times N_2$, we first calculate DFT of subset $I_{n_1}=\{n_2N_1+n_1\}$, such that
+\begin{equation}
+\begin{split}
+&\tilde{x}_m=\sum _{n_1} S_{n_1},\;\;S_{n_1}=\sum _{n_2}x_{n_2N_1+n_1}W_N^{m(n_2N_1+n_1)}\\
+\end{split}
+\end{equation}
+Note that, $S_{n_1}$ can be further factorized as
+\begin{equation}
+\begin{split}
+&\tilde{x}_m=\sum _{n_1} W_N^{mn_1}S'_{n_1},\;\;S'_{n_1}=\sum _{n_2}x_{n_2N_1+n_1}W_N^{mn_2N_1}\\
+\end{split}
+\end{equation}
+then, note that, $N$ can be divided by $N_1$ (the result is $N_2$), so $W_N^{mn_2N_1}=W_{N_2}^{mn_2}$, so $S'$ is just DFT of subset $I_{n_1}$. Then, we can also decompose
+\begin{equation}
+\begin{split}
+&m=m_1N_{\textcolor[rgb]{1,0,0}{2}}+m_2\\
+\end{split}
+\end{equation}
+to write
+\begin{equation}
+\begin{split}
+&\tilde{x}_{m_1N_2+m_2}=\sum _{n_1} W_N^{n_1(m_1N_2+m_2)}S'_{n_1}=\sum _{n_1} W_{N_1}^{n_1m_1}W_N^{n_1m_2}S'_{n_1}\\
+\end{split}
+\end{equation}
+The $W_N^{n_1m_2}$ is twiddle factor, after `twiddle', $S^{''}_{n_1}=W_N^{n_1m_2}S'_{n_1}$, the result is again a DFT with size $N_1$
+\begin{equation}
+\begin{split}
+&\tilde{x}_{m_1N_2+m_2}=\sum _{n_1} W_{N_1}^{n_1m_1}S^{''}_{n_1}\\
+\end{split}
+\end{equation}
+
+As an example, we show index mapping of a $2\times 3\times 5 \times 7$ array
+\begin{equation}
+\begin{split}
+&x_1,\ldots, x_{210}\\
+&(x_1,x_8,x_{15}\ldots ,x_{7\times 29+1}),\ldots,(x_{7i+j},x_{7(i+1)+j},\;\ldots),\ldots , (x_{7},x_{7+7},x_{14+7}\ldots,x_{7\times 29+7})\\
+&((x_1,x_{35+1},x_{70+1},x_{105+1},x_{140+1},x_{175+1}),(x_{8},x_{35+8},x_{70+8},\ldots)\ldots,),\ldots\\
+&((((x_1,x_{105+1}),(x_{35+1},x_{140+1}),(x_{70+1},x_{175+1}),\ldots ),\ldots ),\ldots )\\
+\end{split}
+\end{equation}
+which can be index with 4D index
+\begin{equation}
+\begin{split}
+&(x_{1,1,1,1},x_{1,1,1,2},\ldots)\\
+&(x_{1,1,1,1},x_{1,1,2,1},x_{1,1,3,1}\ldots ,x_{2,3,5,1}),\ldots,(x_{1,1,1,j},\ldots),\ldots ,(x_{1,1,1,7},\ldots,x_{2,3,5,7})\\
+&((x_{1,1,1,1},x_{1,2,1,1},\ldots, x_{2,3,1,1}),(x_{1,1,2,1}\ldots ,x_{2,3,2,1}),\ldots)\\
+&(((x_{1,1,1,1},x_{2,1,1,1}),(x_{1,2,1,1},x_{2,2,1,1}),(x_{1,3,1,1},x_{2,3,1,1}))\ldots)\\
+\end{split}
+\end{equation}
+
+\begin{itemize}
+  \item Good mapping
+\end{itemize}
+
+\subsubsection{\label{sec:CornellGaugeFixing}Cornell Gauge Fixing}
+
+\subsubsection{\label{sec:FFTCornellGaugeFixing}FFT accelerated Cornell Gauge Fixing}
+
+\subsubsection{\label{sec:LandauGauge}Landau Gauge}
+
+\subsubsection{\label{sec:CoulombGauge}Coulomb Gauge} 

@@ -52,6 +52,9 @@
     <Filter Include="Data\Field\BoundaryField">
       <UniqueIdentifier>{d2abb76d-ad2f-4a4a-874a-fc8432db4a3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GaugeFixing">
+      <UniqueIdentifier>{74273227-39c8-4451-b296-142591257ab3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tools\Timer.h">
@@ -314,6 +317,9 @@
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\CLGFFT.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -474,6 +480,9 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu">
       <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Tools\Math\CLGFFT.cpp">
+      <Filter>Tools\Math</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

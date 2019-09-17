@@ -90,6 +90,7 @@
     <ClInclude Include="Tools\Data\THashMap.h" />
     <ClInclude Include="Tools\Data\MemStack.h" />
     <ClInclude Include="Tools\EnumGather.h" />
+    <ClInclude Include="Tools\Math\CLGFFT.h" />
     <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
@@ -163,6 +164,7 @@
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
+    <CudaCompile Include="Tools\Math\CLGFFT.cpp" />
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>
@@ -321,7 +323,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>curand.lib;cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cufft.lib;curand.lib;cudadevrt.lib;cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <CudaCompile>
@@ -411,7 +413,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <ImportLibrary>$(SolutionDir)..\Libs\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>curand.lib;cudadevrt.lib;cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cufft.lib;curand.lib;cudadevrt.lib;cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>

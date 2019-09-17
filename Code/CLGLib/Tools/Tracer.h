@@ -26,7 +26,7 @@ __DEFINE_ENUM( EVerboseLevel,
 
 enum 
 {
-    _kTraceBuffSize = 1024,
+    _kTraceBuffSize = 4096,
 };
 
 class CLGAPI CTracer

@@ -93,6 +93,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/THashMap.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/MemStack.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/EnumGather.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/GammaMatrix.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CudaComplexFunction.h
@@ -133,6 +134,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
@@ -176,6 +178,7 @@ set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 target_link_libraries(CLGLib -lcurand)
+target_link_libraries(CLGLib -lcufft)
 
 # To enable the double, the minimum arch is 6.0
 target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_61,code=sm_61>)
@@ -201,7 +204,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSU3Generator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestUpdator.cpp
-    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestZ3Symmetry.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGaugeFixing.cpp
     )
 
 target_compile_features(CLGTest PUBLIC cxx_std_14)

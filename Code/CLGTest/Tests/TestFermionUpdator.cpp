@@ -87,7 +87,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
         return 1;
     }
 
-    const UINT uiError = 0;
+    UINT uiError = 0;
 
 #if _CLG_DEBUG
 

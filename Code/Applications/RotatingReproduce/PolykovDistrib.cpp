@@ -14,8 +14,108 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_Chiral,
     EDJ_AngularMomentum,
     EDJ_ChiralAndFermionMomentum,
-    EDJ_Correlation,
     )
+
+
+enum { kExportDigital = 20, };
+
+CCString ExportComplexArray(const TArray<CLGComplex> lst)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    CCString sSaveString = _T("");
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        TCHAR str[50];
+        _gcvt_s(str, 50, lst[i].x, iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        _gcvt_s(str, 50, lst[i].y, iDigital);
+        CCString sImg = CCString(str);
+        sImg = sImg.Replace(_T("e"), _T("*^"));
+        CCString sMid = _T(" + ");
+        if (sImg.Left(1) == _T("-"))
+        {
+            sImg = sImg.Right(sImg.GetLength() - 1);
+            sMid = _T(" - ");
+        }
+        sSaveString = sSaveString + _T(" ") + sReal + sMid + sImg 
+            + ((i == lst.GetCount() - 1) ? _T(" I") : _T(" I,"));
+    }
+
+    return sSaveString;
+}
+
+CCString ExportComplexArray2(const TArray<TArray<CLGComplex>> lst)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    CCString sSaveString = _T("");
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            TCHAR str[50];
+            _gcvt_s(str, 50, lst[i][j].x, iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            _gcvt_s(str, 50, lst[i][j].y, iDigital);
+            CCString sImg = CCString(str);
+            sImg = sImg.Replace(_T("e"), _T("*^"));
+            CCString sMid = _T(" + ");
+            if (sImg.Left(1) == _T("-"))
+            {
+                sImg = sImg.Right(sImg.GetLength() - 1);
+                sMid = _T(" - ");
+            }
+            sSaveString = sSaveString + _T(" ") + sReal + sMid + sImg
+            + ((j == lst[i].GetCount() - 1) ? _T(" I") : _T(" I,"));
+        }
+        sSaveString = sSaveString + _T("\n");
+    }
+
+    return sSaveString;
+}
+
+CCString ExportRealArray(const TArray<Real> lst)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    CCString sSaveString = _T("");
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        TCHAR str[50];
+        _gcvt_s(str, 50, lst[i], iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        sSaveString = sSaveString + _T(" ") + sReal
+        + ((i == lst.GetCount() - 1) ? _T("") : _T(","));
+    }
+
+    return sSaveString;
+}
+
+CCString ExportComplexArray2(const TArray<TArray<Real>> lst)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    CCString sSaveString = _T("");
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            TCHAR str[50];
+            _gcvt_s(str, 50, lst[i][j], iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            sSaveString = sSaveString + _T(" ") + sReal
+                + ((j == lst[i].GetCount() - 1) ? _T("") : _T(","));
+        }
+        sSaveString = sSaveString + _T("\n");
+    }
+    return sSaveString;
+}
+
+void WriteStringFile(const CCString& sFileName, const CCString& sContent)
+{
+    appGetFileSystem()->WriteAllText(sFileName, sContent);
+}
 
 INT MeasurePolyakovDist(CParameters& params)
 {
@@ -74,6 +174,9 @@ INT MeasurePolyakovDist(CParameters& params)
         TArray<CCString> newlst;
         r_omega_idx.AddItem(newlst);
     }
+    TArray<Real> lstR;
+    TArray<TArray<CLGComplex>> lstPolyIn;
+    TArray<TArray<CLGComplex>> lstPolyOut;
 
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
@@ -110,11 +213,10 @@ INT MeasurePolyakovDist(CParameters& params)
             CCString sFileName;
             sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-
+            
             switch (eJob)
             {
                 case EDJ_Polyakov:
-                case EDJ_Correlation:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
@@ -167,73 +269,90 @@ INT MeasurePolyakovDist(CParameters& params)
         {
             case EDJ_Polyakov:
             {
+                CCString sFileNameWrite1;
+                CCString sFileNameWrite2;
+                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sSavePrefix.c_str(), _HC_Lt);
+                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sSavePrefix.c_str(), _HC_Lt, uiOmega);
+                
                 //extract result
                 assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
-
+                
                 if (uiOmega == iStartOmega)
                 {
-                    appGeneral(_T("pr={"));
+                    //appGeneral(_T("pr={"));
 
                     for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pPL->m_lstR[i])), (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                        if (pPL->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[p%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pPL->m_lstR[i]].AddItem(tobeAdd);
-                        }
-                    }
+                        lstR.AddItem(_hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
 
-                    appGeneral(_T("};\n"));
+                        //appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pPL->m_lstR[i])), (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                        //if (pPL->m_lstR[i] < uiMaxL)
+                        //{
+                        //    CCString tobeAdd;
+                        //    tobeAdd.Format(_T("Transpose[p%d][[%d]]"), uiOmega, i + 1);
+                        //    r_omega_idx[uiOmega * uiOmega * pPL->m_lstR[i]].AddItem(tobeAdd);
+                        //}
+                    }
+                    WriteStringFile(sFileNameWrite1, ExportRealArray(lstR));
+                    //appGeneral(_T("};\n"));
                 }
-                else
+                //else
+                //{
+                //    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                //    {
+                //        if (pPL->m_lstR[i] < uiMaxL)
+                //        {
+                //            CCString tobeAdd;
+                //            tobeAdd.Format(_T("Transpose[p%d][[%d]]"), uiOmega, i + 1);
+                //            r_omega_idx[uiOmega * uiOmega * pPL->m_lstR[i]].AddItem(tobeAdd);
+                //        }
+                //    }
+                //}
+
+                TArray<TArray<CLGComplex>> polyakovOmgR;
+                TArray<CLGComplex> polyIn;
+                TArray<CLGComplex> polyOut;
+                //appGeneral(_T("p%d={\n"), uiOmega);
+
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
                 {
+                    TArray<CLGComplex> thisConfiguration;
+                    //appGeneral(_T("{"));
                     for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                     {
-                        if (pPL->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[p%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pPL->m_lstR[i]].AddItem(tobeAdd);
-                        }
+                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
+                        //CLGComplex cV = pPL->m_lstP[j * pPL->m_lstR.Num() + i];
+                        //appGeneral(_T("%2.12f %s %2.12f I%s"), cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
                     }
+                    //appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
+                    polyakovOmgR.AddItem(thisConfiguration);
+                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
+                    polyOut.AddItem(pPL->m_lstLoop[j]);
                 }
+                lstPolyIn.AddItem(polyIn);
+                lstPolyOut.AddItem(polyOut);
+                WriteStringFile(sFileNameWrite2, ExportComplexArray2(polyakovOmgR));
+                //appGeneral(_T("\n};\n"));
 
-                appGeneral(_T("p%d={\n"), uiOmega);
+                //appGeneral(_T("p$in%d={"), uiOmega);
+                //for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                //{
+                //    CLGComplex cV = pPL->m_lstLoopInner[j];
+                //    appGeneral(_T("%2.12f %s %2.12f I%s"), 
+                //        cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, 
+                //        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
+                //}
+                //appGeneral(_T("};\n"));
 
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                    {
-                        CLGComplex cV = pPL->m_lstP[j * pPL->m_lstR.Num() + i];
-                        appGeneral(_T("%2.12f %s %2.12f I%s"), cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, (i == pPL->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-
-                appGeneral(_T("\n};\n"));
-
-                appGeneral(_T("p$in%d={"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    CLGComplex cV = pPL->m_lstLoopInner[j];
-                    appGeneral(_T("%2.12f %s %2.12f I%s"), 
-                        cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y, 
-                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
-                }
-                appGeneral(_T("};\n"));
-
-                appGeneral(_T("p$out%d={"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    CLGComplex cV = pPL->m_lstLoop[j];
-                    appGeneral(_T("%2.12f %s %2.12f I%s"),
-                        cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y,
-                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
-                }
-                appGeneral(_T("};\n"));
+                //appGeneral(_T("p$out%d={"), uiOmega);
+                //for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                //{
+                //    CLGComplex cV = pPL->m_lstLoop[j];
+                //    appGeneral(_T("%2.12f %s %2.12f I%s"),
+                //        cV.x, cV.y < F(0.0) ? _T("") : _T("+"), cV.y,
+                //        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
+                //}
+                //appGeneral(_T("};\n"));
 
             }
             break;
@@ -561,6 +680,8 @@ INT MeasurePolyakovDist(CParameters& params)
 #pragma endregion
             }
             break;
+            default:
+                break;
         }
 
         appGeneral(_T("\n"));
@@ -570,131 +691,137 @@ INT MeasurePolyakovDist(CParameters& params)
     {
         case EDJ_Polyakov:
         {
-            appGeneral(_T("\np0all={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("p%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("};\n"));
-
-            appGeneral(_T("\np0allmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\np0allchi={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p%d*p%d] - Mean[p%d]*Mean[p%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n\n"));
-
-#pragma region in and out
-
-            appGeneral(_T("\npinallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p$in%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\npinallarg={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Arg[Mean[p$in%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\npinallchi={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p$in%d*p$in%d] - Mean[p$in%d]*Mean[p$in%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n\n"));
-
-            appGeneral(_T("\npoutallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p$out%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\npoutallarg={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Arg[Mean[p$out%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\npoutallchi={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Abs[Mean[p$out%d*p$out%d] - Mean[p$out%d]*Mean[p$out%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n\n"));
-
-#pragma endregion
-
-            #pragma region r times omega
-
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("\nprw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-                }
-            }
-
-            appGeneral(_T("\nprwlist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[prw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            appGeneral(_T("\nprwchilist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[prw%d*prw%d] - Mean[prw%d]*Mean[prw%d]]}"), 
-                        (0 == i ? _T("\n") : _T(",")), 
-                        _hostsqrt(i), 
-                        i, i, i, i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            #pragma endregion
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[p0allmean][[%d]]%s"), i + 1, (i == (pPL->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[p0allchi][[%d]]%s"), i + 1, (i == (pPL->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-            appGeneral(_T("\nListLinePlot[{pinallmean, poutallmean}]\n"));
-            appGeneral(_T("\nListLinePlot[{pinallarg, poutallarg}, PlotRange -> All]\n"));
-            appGeneral(_T("\nListLinePlot[{pinallchi, poutallchi}, PlotRange -> All]\n"));
-            appGeneral(_T("\nListPlot[prwlist]\n\n"));
+            CCString sFileNameWrite1;
+            CCString sFileNameWrite2;
+            sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_In.csv"), sSavePrefix.c_str(), _HC_Lt);
+            sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sSavePrefix.c_str(), _HC_Lt);
+            WriteStringFile(sFileNameWrite1, ExportComplexArray2(lstPolyIn));
+            WriteStringFile(sFileNameWrite2, ExportComplexArray2(lstPolyOut));
+//            appGeneral(_T("\np0all={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("p%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("};\n"));
+//
+//            appGeneral(_T("\np0allmean={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n"));
+//
+//            appGeneral(_T("\np0allchi={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p%d*p%d] - Mean[p%d]*Mean[p%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n\n"));
+//
+//#pragma region in and out
+//
+//            appGeneral(_T("\npinallmean={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p$in%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n"));
+//
+//            appGeneral(_T("\npinallarg={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Arg[Mean[p$in%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n"));
+//
+//            appGeneral(_T("\npinallchi={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p$in%d*p$in%d] - Mean[p$in%d]*Mean[p$in%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n\n"));
+//
+//            appGeneral(_T("\npoutallmean={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p$out%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n"));
+//
+//            appGeneral(_T("\npoutallarg={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Arg[Mean[p$out%d]]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n"));
+//
+//            appGeneral(_T("\npoutallchi={"));
+//            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+//            {
+//                appGeneral(_T("Abs[Mean[p$out%d*p$out%d] - Mean[p$out%d]*Mean[p$out%d]]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}\n\n"));
+//
+//#pragma endregion
+//
+//            #pragma region r times omega
+//
+//            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+//            {
+//                if (r_omega_idx[i].Num() > 0)
+//                {
+//                    appGeneral(_T("\nprw%d=Join["), i);
+//                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
+//                    {
+//                        appGeneral(_T("%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
+//                    }
+//                    appGeneral(_T("];\n\n"));
+//                }
+//            }
+//
+//            appGeneral(_T("\nprwlist={"));
+//            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+//            {
+//                if (r_omega_idx[i].Num() > 0)
+//                {
+//                    appGeneral(_T("%s{%f, Abs[Mean[prw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
+//                }
+//            }
+//            appGeneral(_T("\n}"));
+//
+//            appGeneral(_T("\nprwchilist={"));
+//            for (INT i = 0; i < r_omega_idx.Num(); ++i)
+//            {
+//                if (r_omega_idx[i].Num() > 0)
+//                {
+//                    appGeneral(_T("%s{%f, Abs[Mean[prw%d*prw%d] - Mean[prw%d]*Mean[prw%d]]}"), 
+//                        (0 == i ? _T("\n") : _T(",")), 
+//                        _hostsqrt(i), 
+//                        i, i, i, i);
+//                }
+//            }
+//            appGeneral(_T("\n}"));
+//
+//            #pragma endregion
+//
+//            appGeneral(_T("\nListLinePlot[{"));
+//            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+//            {
+//                appGeneral(_T("Transpose[p0allmean][[%d]]%s"), i + 1, (i == (pPL->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}, PlotRange -> All]\n\n"));
+//
+//            appGeneral(_T("\nListLinePlot[{"));
+//            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+//            {
+//                appGeneral(_T("Transpose[p0allchi][[%d]]%s"), i + 1, (i == (pPL->m_lstR.Num() - 1)) ? _T("") : _T(", "));
+//            }
+//            appGeneral(_T("}, PlotRange -> All]\n\n"));
+//
+//            appGeneral(_T("\nListLinePlot[{pinallmean, poutallmean}]\n"));
+//            appGeneral(_T("\nListLinePlot[{pinallarg, poutallarg}, PlotRange -> All]\n"));
+//            appGeneral(_T("\nListLinePlot[{pinallchi, poutallchi}, PlotRange -> All]\n"));
+//            appGeneral(_T("\nListPlot[prwlist]\n\n"));
             
         }
         break;
@@ -1201,6 +1328,8 @@ INT MeasurePolyakovDist(CParameters& params)
 
         }
         break;
+            default:
+                break;
     }
 
     appGeneral(_T("\n(*"));
@@ -1217,3 +1346,5 @@ INT MeasurePolyakovDist(CParameters& params)
 
     return 0;
 }
+
+

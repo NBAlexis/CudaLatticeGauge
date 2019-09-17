@@ -119,6 +119,7 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Tools/Math/GammaMatrix.h" //gamma matrix must later than cuComplexI
 
 #include "Tools/Math/CLinearAlgebraHelper.h"
+#include "Tools/Math/CLGFFT.h"
 
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"

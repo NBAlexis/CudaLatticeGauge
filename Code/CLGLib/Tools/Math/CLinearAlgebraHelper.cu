@@ -71,6 +71,8 @@ CLinearAlgebraHelper::~CLinearAlgebraHelper()
 
 void CLinearAlgebraHelper::TestSmallMatrix()
 {
+    appSetLogDate(FALSE);
+
     const INT testDim1 = 30;
     const INT testDim2 = 15;
     CLinearAlgebraHelper* pHelper = new CLinearAlgebraHelper(testDim1);
@@ -315,6 +317,8 @@ void CLinearAlgebraHelper::TestSmallMatrix()
     }
 
     appGeneral(_T("\n\n(*============= Please copy those results to Mathematica to check, all should be nearly zero ============ *)\n"));
+
+    appSetLogDate(TRUE);
 }
 
 #pragma region Common

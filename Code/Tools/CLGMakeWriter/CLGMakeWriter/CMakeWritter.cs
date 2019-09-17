@@ -108,10 +108,10 @@ target_compile_features(CLGLib PUBLIC cxx_std_14)
 set_target_properties( CLGLib
                        PROPERTIES CUDA_SEPARABLE_COMPILATION ON)";
 
-            sContent += "\n\ntarget_link_libraries(CLGLib -lcurand)\n\n";
+            sContent += "\n\ntarget_link_libraries(CLGLib -lcurand)\n";
+            sContent += "target_link_libraries(CLGLib -lcufft)\n";
 
-
-            sContent += "# To enable the double, the minimum arch is 6.0\n";
+            sContent += "\n# To enable the double, the minimum arch is 6.0\n";
             sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch={0},code={1}>)\n\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
 
             #endregion

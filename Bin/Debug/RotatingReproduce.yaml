@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist}
-RotatingJob : ERJ_Thermal
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : GENERAL
 VerboseOutput : datetime
 
@@ -165,14 +165,14 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 100
     EquvibSkip : 1
-    EquvibStep : 300
-    SaveStartIndex : 1101
+    EquvibStep : 800
+    SaveStartIndex : 1501
     OmegaSep : 20
-    OmegaStart : 6
+    OmegaStart : 17
     MaxOmega : 0.14
     MinNt : 3
     MaxNt : 3
-    SavePrefix : N49616_
+    SavePrefix : N47816_
     Additive : 1
 
     # 53551575Nt4 Omega60 
@@ -182,7 +182,7 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [0.880538263571348, 0.9456148411561357, 0.979348580626056, 0.9060825393030213, 0.9980024785900804, 1.0498352886188749, 0.9911384945748823, 1.0389138823751345, 1.069633251606899, 1.0634599310784725,  1.1718977001449467, 1.203326341657677, 1.1855144368171124, 1.2752075108287677, 1.2651606621530622, 1.3358180205476078, 1.2934386924484065, 1.3655826717373911, 1.3842030458049073, 1.4372646114330463,  1.4110810708614454]
+    Polyakovs : [0.6818772647439125242, 0.683289014291498556, 0.6143468397427558241, 0.6719792436657010834, 0.6336738259314578993, 0.6989869711472794102, 0.7424265456233721846, 0.7676290496130512012, 0.7808549569233470708, 0.8126872600927215339, 0.8309790701947155995, 0.8508839991937849553, 0.9445690519584155207, 0.9889093060105087102, 1.0342400874367265914, 1.120371975815483990, 1.085262539161899595, 1.1243631181701217295, 1.229986968348953221, 1.300200516071472602, 1.2949614988582555802]
 
     Dim : 4
     Dir : 4
@@ -227,7 +227,7 @@ JobThermal:
         ReportMeasure : 0
         Adaptive : 1
         MinMaxStep : [1, 50]
-        GrowReduceThreshold : [-0.4, 0.02]
+        GrowReduceThreshold : [-0.3, 0.02]
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
@@ -267,7 +267,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.96
+        Beta : 4.78
         Omega : 0.0
 
     Action2:
@@ -323,17 +323,17 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.02
-    OmegaRange : 0.028
+    GaugeBate : 4.99
+    OmegaRange : 0.14
     StartOmega : 0
-    EndOmega : 4
+    EndOmega : 20
     StartN : 51
-    EndN : 1700
+    EndN : 2900
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/50216/Nt3/N50216_
-    ## SavePrefix : D:/NotUsingCLGCon/50216/Nt3/N50216_
+    SavePrefix : ../../../ThermalCircle/Final150+320xStep/49916/Nt3/N49916_
+    ## SavePrefix : D:/NotUsingCLGCon/47816/Nt3/N47816_
 
     Dim : 4
     Dir : 4

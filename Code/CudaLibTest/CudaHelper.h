@@ -25,10 +25,15 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <chrono>
+#include <string>
 #include "cuda_runtime.h"
 #include "vector_types.h"
 #include "cuda.h"
 #include "cuComplex.h"
+#include <cufft.h>
+#include <cufftXt.h>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
 
 #define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
 
@@ -82,6 +87,29 @@ __device__ static __inline__ cuComplex cuCsqrtf(const cuComplex& c)
     }
 
     return out;
+}
+
+inline void ClearLog()
+{
+    std::ofstream ofs;
+    ofs.open("CudaHelper.log", std::ofstream::out);
+    ofs.close();
+}
+
+inline void SaveLog(const char* formmat, ...)
+{
+    std::ofstream ofs;
+    ofs.open("CudaHelper.log", std::ofstream::out | std::ofstream::app);
+    static char cBuff[4096];
+
+    va_list arg;
+    {
+        va_start(arg, formmat);
+        vsnprintf_s(cBuff, 4095, formmat, arg);
+        va_end(arg);
+    }
+    ofs << cBuff;
+    ofs.close();
 }
 
 #endif //#ifndef _CUDAHELP_H_

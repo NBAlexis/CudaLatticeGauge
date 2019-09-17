@@ -601,6 +601,12 @@ void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
 
 void CCLGLibManager::InitialIndexBuffer() const
 {
+    if (NULL == m_pLatticeData->m_pIndexCache)
+    {
+        appGeneral(_T("No Index Cache"));
+        return;
+    }
+
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
     if (NULL != m_pLatticeData->m_pGaugeField)
     {

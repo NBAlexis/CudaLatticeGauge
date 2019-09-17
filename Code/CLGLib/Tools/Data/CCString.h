@@ -519,8 +519,19 @@ public:
     void TrimLeft(); //out side
 
     // advanced manipulation
-    INT Replace(TCHAR chOld, TCHAR chNew);
-    INT Replace(const TCHAR* lpszOld, const TCHAR* lpszNew);
+    //broken
+    //INT Replace(TCHAR chOld, TCHAR chNew);
+    //INT Replace(const TCHAR* lpszOld, const TCHAR* lpszNew);
+    CCString Replace(TCHAR chOld, TCHAR chNew) const
+    {
+        TCHAR o[1];
+        TCHAR n[1];
+        o[0] = chOld;
+        n[0] = chNew;
+        return Replace(o, n);
+    }
+    CCString Replace(const TCHAR* lpszOld, const TCHAR* lpszNew) const;
+
     INT Remove(TCHAR chRemove);
     INT Insert(INT nIndex, TCHAR ch);
     INT Insert(INT nIndex, const TCHAR* pstr);

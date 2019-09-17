@@ -90,7 +90,7 @@ int main(int argc, char * argv[])
     {
         sRealByte += appIntToString(realByte[i]) + _T(", ");
     }
-    appGeneral(_T(" \n ================= sizeof(Real) : %d and -1.2345 is %s =============\n"), sizeof(Real), sRealByte);
+    appGeneral(_T(" \n ================= sizeof(Real) : %d and -1.2345 is %s =============\n"), sizeof(Real), sRealByte.c_str());
     
     TArray<TestList*> allTests;
     THashMap<CCString, TArray<TestList*>*> category;

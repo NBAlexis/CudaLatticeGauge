@@ -1,26 +1,29 @@
 //=============================================================================
-// FILENAME : RotatingReproduce.h
+// FILENAME : TestZ3Symmetry.cpp
 // 
 // DESCRIPTION:
-// Reproduce the results of PRL
+//
+//     Test the Z3 Symmetry
 //
 // REVISION:
-//  [02/26/2019 nbale]
+//  [06/23/2019 nbale]
 //=============================================================================
 
-#include "CLGLib.h"
+#include "CLGTest.h"
 
-__DEFINE_ENUM(ERotatingJob,
-    ERJ_AngularMomentum,
-    ERJ_Thermal,
-    ERJ_PolyakovDist,
-    )
+#define _tfftMX 9
+#define _tfftMY 10
+#define _tfftMZ 11
+#define _tfftMT 12
+
+UINT TestFFT(CParameters&)
+{
+    CCLGFFTHelper::TestFFT();
+    return 0;
+}
 
 
-extern INT TestAngularMomentum(CParameters& params);
-extern INT TestThermal(CParameters& params);
-extern INT MeasurePolyakovDist(CParameters& params);
-
+__REGIST_TEST(TestFFT, Misc, TestFFT);
 
 
 

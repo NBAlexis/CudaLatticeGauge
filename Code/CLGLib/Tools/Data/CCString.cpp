@@ -671,99 +671,21 @@ INT CCString::Insert(INT nIndex, const TCHAR* pstr)
 *
 *
 */
-INT CCString::Replace(TCHAR chOld, TCHAR chNew)
+CCString CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew) const
 {
+    std::string str(c_str());
+    const std::string from(lpszOld);
+    const std::string to(lpszNew);
+    size_t start_pos = str.find(from);
     INT nCount = 0;
-
-    // short-circuit the nop case
-    if (chOld != chNew)
+    while (start_pos != std::string::npos)
     {
-        // otherwise modify each character that matches in the string
-        CopyBeforeWrite();
-        TCHAR* psz = m_pchData;
-        TCHAR* pszEnd = psz + GetData()->m_nDataLength;
-        while (psz < pszEnd)
-        {
-            // replace instances of the specified character only
-            if (*psz == chOld)
-            {
-                *psz = chNew;
-                ++nCount;
-            }
-            psz = appStrInc(psz);
-        }
-    }
-    return nCount;
-}
-
-/**
-*
-*
-*/
-INT CCString::Replace(const TCHAR* lpszOld, const TCHAR* lpszNew)
-{
-    // can't have empty or NULL lpszOld
-    const INT nSourceLen = __SafeStrlen(lpszOld);
-    if (nSourceLen == 0)
-        return 0;
-    const INT nReplacementLen = __SafeStrlen(lpszNew);
-
-    // loop once to figure out the size of the result string
-    INT nCount = 0;
-    TCHAR* lpszStart = m_pchData;
-    TCHAR* lpszEnd = m_pchData + GetData()->m_nDataLength;
-    TCHAR* lpszTarget;
-    while (lpszStart < lpszEnd)
-    {
-        while ((lpszTarget = appStrstr(lpszStart, lpszOld)) != NULL)
-        {
-            ++nCount;
-            lpszStart = lpszTarget + nSourceLen;
-        }
-        lpszStart += appStrlen(lpszStart) + 1; //appStrlen different from lstrlen?
+        str.replace(start_pos, from.length(), to);
+        ++nCount;
+        start_pos = str.find(from);
     }
 
-    // if any changes were made, make them
-    if (nCount > 0)
-    {
-        CopyBeforeWrite();
-
-        // if the buffer is too small, just
-        //   allocate a new buffer (slow but sure)
-        INT nOldLength = GetData()->m_nDataLength;
-        const INT nNewLength =  nOldLength + (nReplacementLen - nSourceLen) * nCount;
-        if (GetData()->m_nAllocLength < nNewLength || GetData()->m_nRefs > 1)
-        {
-            CCStringData* pOldData = GetData();
-            TCHAR* pstr = m_pchData;
-            AllocBuffer(nNewLength);
-            memcpy(m_pchData, pstr, pOldData->m_nDataLength * sizeof(TCHAR));
-            CCString::Release(pOldData);
-        }
-        // else, we just do it in-place
-        lpszStart = m_pchData;
-        lpszEnd = m_pchData + GetData()->m_nDataLength;
-
-        // loop again to actually do the work
-        while (lpszStart < lpszEnd)
-        {
-            while ( (lpszTarget = appStrstr(lpszStart, lpszOld)) != NULL)
-            {
-                const INT nBalance = nOldLength - (INT)(lpszTarget - m_pchData) + nSourceLen;
-                memmove(lpszTarget + nReplacementLen, lpszTarget + nSourceLen,
-                    nBalance * sizeof(TCHAR));
-                memcpy(lpszTarget, lpszNew, nReplacementLen * sizeof(TCHAR));
-                lpszStart = lpszTarget + nReplacementLen;
-                lpszStart[nBalance] = _T('\0');
-                nOldLength += (nReplacementLen - nSourceLen);
-            }
-            lpszStart += appStrlen(lpszStart) + 1; //appStrlen different from lstrlen?
-        }
-        assert(m_pchData[nNewLength] == _T('\0'));
-        GetData()->m_nDataLength = nNewLength;
-    }
-
-    return nCount;
+    return CCString(str.c_str());
 }
 
 /**
