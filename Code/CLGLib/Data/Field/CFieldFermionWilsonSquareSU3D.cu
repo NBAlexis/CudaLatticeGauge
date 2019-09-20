@@ -358,6 +358,52 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMC(const CFieldGauge* pGauge)
     }
 }
 
+void CFieldFermionWilsonSquareSU3D::PrepareForHMCOnlyRandomize()
+{
+    preparethread;
+    _kernelInitialFermionWilsonSquareSU3ForHMC << <block, threads >> > (
+        m_pDeviceData,
+        m_byFieldId);
+}
+
+void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    preparethread;
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * _HC_Volume, cudaMemcpyDeviceToDevice));
+
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+        FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+
+    pPooled->Return();
+
+    if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    {
+        m_fLength = Dot(this).x;
+    }
+    //cache a inverse DDdagger field
+    if (CCommonData::m_bStoreLastSolution)
+    {
+        CFieldCache* pCache = appGetLattice()->m_pFieldCache;
+        CField* pField = pCache->GetCachedField(CFieldCache::CachedInverseDDdaggerField);
+        if (NULL == pField)
+        {
+            pField = GetCopy();
+            pCache->CacheField(CFieldCache::CachedInverseDDdaggerField, pField);
+        }
+        else
+        {
+            CopyTo(pField);
+        }
+    }
+}
+
 void CFieldFermionWilsonSquareSU3D::FixBoundary()
 {
     appDetailed(_T("CFieldFermionWilsonSquareSU3D::FixBoundary()\n"));

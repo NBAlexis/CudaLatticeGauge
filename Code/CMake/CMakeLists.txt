@@ -59,6 +59,10 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixing.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
@@ -111,8 +115,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu
@@ -134,7 +141,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu

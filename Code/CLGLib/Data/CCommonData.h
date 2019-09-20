@@ -144,6 +144,11 @@ __DEFINE_ENUM(ESolverPhase,
                 SBYTE x, y, z, w;
             };
         };
+
+        __device__ UBOOL IsOdd() const
+        {
+            return 1 == (((x & 1) ^ (y & 1) ^ (z & 1) ^ (w & 1)) & 1);
+        }
         
     };
 #if defined(__cplusplus)

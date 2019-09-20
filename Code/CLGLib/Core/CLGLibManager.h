@@ -75,6 +75,7 @@ protected:
     void CreateMeasurement(class CParameters& params);
     void CreateSolver(class CParameters& params) const;
     void CreateGaugeSmearing(class CParameters& params) const;
+    void CreateGaugeFixing(class CParameters& params) const;
 
     //==================================
     //Cache

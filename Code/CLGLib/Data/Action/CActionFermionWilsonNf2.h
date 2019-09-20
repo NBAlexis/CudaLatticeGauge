@@ -30,8 +30,6 @@ public:
     void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
 
-protected:
-
     class CFieldFermionWilsonSquareSU3* m_pFerimionField;
 };
 

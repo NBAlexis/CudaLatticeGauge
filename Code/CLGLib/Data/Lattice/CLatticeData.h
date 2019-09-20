@@ -71,6 +71,7 @@ public:
     class CSLASolver* m_pFermionSolver;
 
     class CGaugeSmearing* m_pGaugeSmearing;
+    class CGaugeFixing* m_pGaugeFixing;
 
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.Exist(byId) ? m_pFieldMap.GetAt(byId) : NULL; }
     class CFieldBoundary* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }

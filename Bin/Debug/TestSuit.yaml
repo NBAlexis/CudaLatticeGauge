@@ -2002,7 +2002,6 @@ TestRotation:
         Iterate : 3
         ProjIterate : 6
 
-
 TestFFT:
 
     Dim : 4
@@ -2011,3 +2010,182 @@ TestFFT:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+
+TestGaugeFixingLandauCornell:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingLandauCornell
+        Alpha : 0.08
+        MaxIterate : 10000
+        FFT : 1
+
+TestGaugeFixingCoulombCornell:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.08
+        MaxIterate : 10000
+        FFT : 1
+
+TestGaugeFixingLandauLosAlamos:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    GaugeFixing:
+
+        Name : CGaugeFixingLandauLosAlamos
+        Omega : 1.0
+        CheckErrorStep : 10
+        MaxIterate : 100
+
+
+TestGaugeFixingCoulombCornellDR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.08
+        MaxIterate : 100000
+        ## Dirichlet boundary condition have some problem with FFT acceleration...
+        FFT : 1
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        Restart : 100
+        AbsoluteAccuracy : 1

@@ -25,6 +25,7 @@
 
 #define __LINE_MULDN(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), right.m_me[d]), _cuCmulf(_cuConjf(m_me[b]), right.m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), right.m_me[ff]))
 
+//self^dagger.self
 #define __LINE_MULDN_ME(a, b, c, d, ee, ff) _cuCaddf(_cuCaddf(_cuCmulf(_cuConjf(m_me[a]), m_me[d]), _cuCmulf(_cuConjf(m_me[b]), m_me[ee])), _cuCmulf(_cuConjf(m_me[c]), m_me[ff]))
 
 
@@ -345,6 +346,30 @@ extern "C" {
             }
             break;
             }
+            return ret;
+        }
+
+        /**
+         *        m11 I  m12   m13
+         * ret =  -m12*  m22 I m23
+         *        -m13* -m23*  -(m11+m22)I
+         */
+        __device__ __inline__ static deviceSU3 makeSU3TA(
+            const CLGComplex& m12, 
+            const CLGComplex& m13, 
+            const CLGComplex& m23,
+            Real m11, Real m22)
+        {
+            deviceSU3 ret;
+            ret.m_me[0] = _make_cuComplex(F(0.0), m11);;
+            ret.m_me[1] = m12;
+            ret.m_me[2] = m13;
+            ret.m_me[3] = _make_cuComplex(-m12.x, m12.y);
+            ret.m_me[4] = _make_cuComplex(F(0.0), m22);
+            ret.m_me[5] = m23;
+            ret.m_me[6] = _make_cuComplex(-m13.x, m13.y);
+            ret.m_me[7] = _make_cuComplex(-m23.x, m23.y);
+            ret.m_me[8] = _make_cuComplex(F(0.0), - m11 - m22);;
             return ret;
         }
 
@@ -986,6 +1011,10 @@ extern "C" {
             m_me[8] = _cuConjf(_cuCsubf(_cuCmulf(m_me[0], m_me[4]), _cuCmulf(m_me[1], m_me[3])));
         }
 
+        /**
+         * HYP projection
+         * When Det[U] is large, it need large ite...
+         */
         __device__ __inline__ void Proj(BYTE ite = 4)
         {
             //tr(me^+ me) = m0^* m0 + m1^* m1 + m2^* m2 + ...
@@ -1000,7 +1029,7 @@ extern "C" {
                 + __cuCabsSqf(m_me[7])
                 + __cuCabsSqf(m_me[8]);
             //1 / sqrt( tr(me^+ me) / 3 )
-            fDiv = __rcp(_sqrt(fDiv * F(0.3333333333333)));
+            fDiv = __rcp(_sqrt(fDiv * F(0.3333333333333333)));
             m_me[0] = cuCmulf_cr(m_me[0], fDiv);
             m_me[1] = cuCmulf_cr(m_me[1], fDiv);
             m_me[2] = cuCmulf_cr(m_me[2], fDiv);
@@ -1050,7 +1079,7 @@ extern "C" {
                 //coef = det(me)
                 CLGComplex coef = Determinent(m_me);
                 //coef = 1 - (i/3)Im(coef)
-                coef = _make_cuComplex(F(1.0), -F(0.33333333333) * coef.y);
+                coef = _make_cuComplex(F(1.0), -F(0.3333333333333333) * coef.y);
                 //me = coef me
                 m_me[0] = _cuCmulf(coef, m_me[0]);
                 m_me[1] = _cuCmulf(coef, m_me[1]);
@@ -1061,6 +1090,63 @@ extern "C" {
                 m_me[6] = _cuCmulf(coef, m_me[6]);
                 m_me[7] = _cuCmulf(coef, m_me[7]);
                 m_me[8] = _cuCmulf(coef, m_me[8]);
+            }
+        }
+
+        /**
+         * Cabbibo-Marinari Projection
+         * Only one iteration can make it SU3, however, 6 iteration makes it large trace
+         */
+        __device__ __inline__ void CabbiboMarinariProj(BYTE ite = 6)
+        {
+            for (BYTE iteration = 0; iteration < ite; ++iteration)
+            {
+                CLGComplex a11 = _cuCaddf(_cuConjf(m_me[0]), m_me[4]);
+                CLGComplex b11 = _cuCaddf(_cuConjf(m_me[0]), m_me[8]);
+                CLGComplex c22 = _cuCaddf(_cuConjf(m_me[4]), m_me[8]);
+                CLGComplex a12 = _cuCsubf(_cuConjf(m_me[3]), m_me[1]);
+                CLGComplex b13 = _cuCsubf(_cuConjf(m_me[6]), m_me[2]);
+                CLGComplex c23 = _cuCsubf(_cuConjf(m_me[7]), m_me[5]);
+                //CLGComplex a12 = _cuCsubf(_cuConjf(m_me[1]), m_me[3]);
+                //CLGComplex b13 = _cuCsubf(_cuConjf(m_me[2]), m_me[6]);
+                //CLGComplex c23 = _cuCsubf(_cuConjf(m_me[5]), m_me[7]);
+                Real fNorm = __rcp(_sqrt(__cuCabsSqf(a11) + __cuCabsSqf(a12)));
+                a11 = cuCmulf_cr(a11, fNorm);
+                a12 = cuCmulf_cr(a12, fNorm);
+                fNorm = __rcp(_sqrt(__cuCabsSqf(b11) + __cuCabsSqf(b13)));
+                b11 = cuCmulf_cr(b11, fNorm);
+                b13 = cuCmulf_cr(b13, fNorm);
+                fNorm = __rcp(_sqrt(__cuCabsSqf(c22) + __cuCabsSqf(c23)));
+                c22 = cuCmulf_cr(c22, fNorm);
+                c23 = cuCmulf_cr(c23, fNorm);
+
+                /**
+                 * ({
+                {a11 b11,
+                a12 c22 - a11 b13 Conjugate[c23], 
+                a11 b13 Conjugate[c22] + a12 c23},
+                {-b11 Conjugate[a12], 
+                c22 Conjugate[a11] + b13 Conjugate[a12] Conjugate[c23], 
+                c23 Conjugate[a11] - b13 Conjugate[a12] Conjugate[c22]},
+                {-Conjugate[b13],
+                -Conjugate[b11] Conjugate[c23], 
+                Conjugate[b11] Conjugate[c22]}
+                })
+                 */
+                m_me[0] = _cuCmulf(a11, b11);
+                m_me[1] = _cuCsubf(_cuCmulf(a12, c22), _cuCmulf(_cuCmulf(a11, b13), _cuConjf(c23)));
+                m_me[2] = _cuCaddf(_cuCmulf(_cuCmulf(a11, b13), _cuConjf(c22)), _cuCmulf(a12, c23));
+
+                m_me[3].x = -b11.x * a12.x - b11.y * a12.y;
+                m_me[3].y = a12.y * b11.x - a12.x * b11.y;
+                m_me[4] = _cuCaddf(_cuCmulf(c22, _cuConjf(a11)), _cuCmulf(_cuCmulf(b13, _cuConjf(a12)), _cuConjf(c23)));
+                m_me[5] = _cuCsubf(_cuCmulf(c23, _cuConjf(a11)), _cuCmulf(_cuCmulf(b13, _cuConjf(a12)), _cuConjf(c22)));
+
+                m_me[6].x = -b13.x; m_me[6].y = b13.y;
+                m_me[7].x = b11.y * c23.y - b11.x * c23.x;
+                m_me[7].y = b11.x * c23.y + b11.y * c23.x;
+                m_me[8].x = b11.x * c22.x - b11.y * c22.y;
+                m_me[8].y = - b11.x * c22.y - b11.y * c22.x;
             }
         }
 

@@ -595,6 +595,17 @@ void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
     }
 }
 
+void CCLGLibManager::CreateGaugeFixing(class CParameters& params) const
+{
+    CCString sSmearingName = _T("CGaugeFixingLandauCornell");
+    params.FetchStringValue(_T("Name"), sSmearingName);
+    m_pLatticeData->m_pGaugeFixing = dynamic_cast<CGaugeFixing*>(appCreate(sSmearingName));
+    if (NULL != m_pLatticeData->m_pGaugeFixing)
+    {
+        m_pLatticeData->m_pGaugeFixing->Initial(m_pLatticeData, params);
+    }
+}
+
 #pragma endregion
 
 #pragma region Caches
@@ -703,6 +714,12 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeSmearing"));
         CreateGaugeSmearing(gaugesmearing);
+    }
+    checkCudaErrors(cudaGetLastError());
+    if (params.Exist(_T("GaugeFixing")))
+    {
+        CParameters gaugesmearing = params.GetParameter(_T("GaugeFixing"));
+        CreateGaugeFixing(gaugesmearing);
     }
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Updator")))

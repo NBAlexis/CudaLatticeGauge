@@ -35,6 +35,7 @@ CLatticeData::CLatticeData()
     , m_pFieldCache(NULL)
     , m_pIndexCache(NULL)
     , m_pGaugeSmearing(NULL)
+    , m_pGaugeFixing(NULL)
 
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
@@ -88,6 +89,7 @@ CLatticeData::~CLatticeData()
     appSafeDelete(m_pMeasurements);
     appSafeDelete(m_pFermionSolver);
     appSafeDelete(m_pGaugeSmearing);
+    appSafeDelete(m_pGaugeFixing);
 }
 
 void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField)
@@ -233,6 +235,18 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     {
         sRet = sRet + sTab + _T("OtherField") + appIntToString(i) + _T(" : \n");
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
+    }
+
+    if (NULL != m_pGaugeSmearing)
+    {
+        sRet = sRet + sTab + _T("Gauge Smearing : \n");
+        sRet = sRet + m_pGaugeSmearing->GetInfos(sTab + _T("    "));
+    }
+
+    if (NULL != m_pGaugeFixing)
+    {
+        sRet = sRet + sTab + _T("Gauge Fixing : \n");
+        sRet = sRet + m_pGaugeFixing->GetInfos(sTab + _T("    "));
     }
     return sRet;
 }

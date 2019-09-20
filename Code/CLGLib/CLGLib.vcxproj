@@ -56,6 +56,10 @@
     <ClInclude Include="Data\Lattice\CIndexData.h" />
     <ClInclude Include="Data\Lattice\CIndexSquare.h" />
     <ClInclude Include="Data\Lattice\CLatticeData.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixing.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingCoulombCornell.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingLandauCornell.h" />
+    <ClInclude Include="GaugeFixing\CGaugeFixingLandauLosAlamos.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
@@ -110,8 +114,13 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu" />
+    <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu" />
     <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingLandauCornell.cu">
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
@@ -164,7 +173,7 @@
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />
-    <CudaCompile Include="Tools\Math\CLGFFT.cpp" />
+    <CudaCompile Include="Tools\Math\CLGFFT.cu" />
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu" />
     <CudaCompile Include="Tools\Math\Random.cu">
       <FileType>Document</FileType>

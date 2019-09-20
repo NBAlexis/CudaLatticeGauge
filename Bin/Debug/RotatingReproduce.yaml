@@ -323,17 +323,18 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.99
+    GaugeBate : 4.93
     OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
-    StartN : 51
-    EndN : 2900
+    StartN : 50
+    EndN : 3000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/49916/Nt3/N49916_
-    ## SavePrefix : D:/NotUsingCLGCon/47816/Nt3/N47816_
+    SavePrefix : ../../../ThermalCircle/Final150+320xStep/49316/Nt3/N49316_
+    ## SavePrefix : D:/NotUsingCLGCon/C49016/Nt3/C49016_
+    ## SavePrefix : D:/NotUsingCLGCon/C49016/C49016_
 
     Dim : 4
     Dir : 4

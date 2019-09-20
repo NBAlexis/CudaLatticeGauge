@@ -26,6 +26,13 @@ public:
 
     void FixBoundary() override;
     void PrepareForHMC(const CFieldGauge* pGauge) override;
+
+    /**
+    * For test
+    */
+    void PrepareForHMCOnlyRandomize();
+    void PrepareForHMCNotRandomize(const CFieldGauge* pGauge);
+
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
     void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;

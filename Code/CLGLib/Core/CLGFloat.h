@@ -122,6 +122,9 @@
 
 #endif
 
+#define _zeroc (_make_cuComplex(F(0.0), F(0.0)))
+#define _onec (_make_cuComplex(F(1.0), F(0.0)))
+#define _imgc (_make_cuComplex(F(0.0), F(1.0)))
 //Those are constants we are using
 
 //save some constant memory of cuda?

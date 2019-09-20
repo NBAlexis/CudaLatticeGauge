@@ -111,6 +111,7 @@ UINT uiSiteIndex = ((threadIdx.x + blockIdxX * blockDim.x) * _DC_GridDimZT + (th
 UINT uiSiteIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z)); \
 BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
+#define cudaSafeFree(ptr) if (NULL != ptr) { checkCudaErrors(cudaFree(ptr)); ptr = NULL; }
 
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
@@ -182,6 +183,11 @@ BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearingAPEProj.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearingAPEStout.h"
+
+#include "GaugeFixing/CGaugeFixing.h"
+#include "GaugeFixing/CGaugeFixingLandauCornell.h"
+#include "GaugeFixing/CGaugeFixingCoulombCornell.h"
+#include "GaugeFixing/CGaugeFixingLandauLosAlamos.h"
 
 #include "Update/CUpdator.h"
 #include "Update/Continous/CIntegrator.h"

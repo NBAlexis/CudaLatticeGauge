@@ -320,6 +320,18 @@
     <ClInclude Include="Tools\Math\CLGFFT.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixing.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixingLandauCornell.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixingCoulombCornell.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixingLandauLosAlamos.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -481,8 +493,17 @@
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Tools\Math\CLGFFT.cpp">
+    <CudaCompile Include="Tools\Math\CLGFFT.cu">
       <Filter>Tools\Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingLandauCornell.cu">
+      <Filter>GaugeFixing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu">
+      <Filter>GaugeFixing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu">
+      <Filter>GaugeFixing</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
