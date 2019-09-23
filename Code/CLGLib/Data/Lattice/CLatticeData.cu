@@ -24,21 +24,21 @@ UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 */
 CLatticeData::CLatticeData()
     : m_pRandom(NULL)
-    , m_pGaugeField(NULL)
-    , m_pUpdator(NULL)
-
-    , m_pDeviceRandom(NULL)
-    , m_pIndex(NULL)
-
-    , m_pFermionSolver(NULL)
-    , m_pMeasurements(NULL)
-    , m_pFieldCache(NULL)
-    , m_pIndexCache(NULL)
-    , m_pGaugeSmearing(NULL)
-    , m_pGaugeFixing(NULL)
-
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
+
+    , m_pGaugeField(NULL)
+    , m_pFieldCache(NULL)
+
+    , m_pUpdator(NULL)
+    , m_pMeasurements(NULL)
+    , m_pDeviceRandom(NULL)
+    , m_pIndex(NULL)
+    , m_pIndexCache(NULL)
+    , m_pFermionSolver(NULL)
+
+    , m_pGaugeSmearing(NULL)
+    , m_pGaugeFixing(NULL)
 {
     m_pFieldCache = new CFieldCache();    
 }

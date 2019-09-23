@@ -47,7 +47,7 @@ The $W_N^{n_1m_2}$ is twiddle factor, after `twiddle', $S^{''}_{n_1}=W_N^{n_1m_2
 \end{split}
 \end{equation}
 
-The FFT is implemented in cuFFT, \textbf{We may use a batched 3D cuFFT and a batched 1D cuFFT to implement 4D FFT.}
+The FFT is implemented in cuFFT, \textcolor[rgb]{0,0,1}{We may use a batched 3D cuFFT and a batched 1D cuFFT to implement 4D FFT.}
 
 \subsubsection{\label{sec:CornellGaugeFixing}Cornell Gauge Fixing and FFT accelerated}
 
@@ -67,4 +67,105 @@ The steepest descend method can be simply described as
 \end{equation}
 where $x$ is a vector, and $x_n$ means iteration for n-times, $\alpha$ is a tunable parameter.
 
-\subsubsection{\label{sec:LosAlamos}Los Alamos Gauge Fixing and over relaxation} 
+Using the \textbf{\index{Cornell gauge fixing}Cornell gauge fixing}, we follow Ref.~\cite{CornellGaugeFixing}
+
+The Cornell gauge fixing is a steepest descend algorithm, which can be described as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=0$ to max iteration}
+    \State $A_{\mu}(n)=U_{\mu}(n).TA()$
+    \State $\Gamma (n)=\sum _{\mu}(A_{\mu}(n-\mu)-A_{\mu}(n))$
+    \If {$\sum _n \Gamma (n)\Gamma^{\dagger} (n) < \epsilon$}
+        \Return 
+        \Comment {Succeed.}
+    \EndIf
+    \State $G(n)=\exp \left(-\alpha _0\Gamma (n)\right)$
+    \State $U_{\mu}(n)=G(n)U_{\mu}(n)G^{\dagger}(n+\mu)$
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.CornellGaugeFixing}Cornell gauge fixing}
+\end{algorithm}
+
+Note:
+\begin{itemize}
+  \item TA means traceless anti-Hermitian.
+  \item For a traceless anti-Hermitian matrix, $M^{\dagger}M=2(|m11+m22|^2+|m12|^2+|m13|^2+|m23|^2)$, where $m11$ and $m22$ are pure imaginary numbers.
+  \item For a traceless anti-Hermitian matrix, $\exp (M)$ can be calculated as Appendix. A of Ref.~\cite{luscher2005}.
+  \item $\alpha _0$ is a tunable parameter usually set to $0.05 - 0.1$.
+\end{itemize}
+
+The Cornell gauge fixing can be Fourier accelerated. At first, prepare the table such that
+\begin{equation}
+\begin{split}
+&f_p(n)=\left\{\begin{array}{cc} \frac{4N_d}{2V\left(N_d-\sum _{\mu}\cos \left(\frac{2\pi n_{\mu}}{L_{\mu}}\right)\right)}, & N_d\neq \sum _{\mu}\cos \left(\frac{2\pi n_{\mu}}{L_{\mu}}\right); \\ \frac{4N_d}{V}, & N_d=\sum _{\mu}\cos \left(\frac{2\pi n_{\mu}}{L_{\mu}}\right). \end{array}\right.
+\end{split}
+\end{equation}
+where $N_d=4$ is the number of dimension (Note, for Coulomb gauge, it is not $4$), and $V$ is the volume of the FFT transform (just the volume of the lattice, for the case of Coulomb gauge, it is the spatial volume.). $L_{\mu}$ is the extend of the direction.
+
+Then, the step to generate gauge transform is modified by insert a FFT and an inverse FFT such that
+\begin{equation}
+\begin{split}
+&G(n)=\exp \left(-\alpha _0\Gamma (n)\right)\to G(n)=\exp \left(-\alpha _0  \hat{\textmd{F}} f_p(n)\textmd{F} \Gamma (n)\right)
+\end{split}
+\end{equation}
+where the FFT of a matrix is the FFT of each matrix element.
+
+
+\subsubsection{\label{sec:LosAlamos}Los Alamos Gauge Fixing and over relaxation}
+
+Using the \textbf{\index{Los Alamos gauge fixing}Los Alamos gauge fixing}, we follow Ref.~\cite{LosAlamosGaugeFixing}
+
+The idea is to maximize $F(U)=\sum _n\sum _{\mu} ReTr[U_{\mu}(n)]$.
+
+By rewrite
+\begin{equation}
+\begin{split}
+&F(U)=\sum _n\sum _{\mu} ReTr[U_{\mu}(n)]=\frac{1}{2}\sum _n\sum _{\mu} ReTr[U_{\mu}(n)+U_{\mu}^{\dagger}(n-\mu)]=\frac{1}{2}\sum _n ReTr[\omega (n)],\\
+&\omega (n)\equiv \sum _{\mu} \left(U_{\mu}(n)+U_{\mu}^{\dagger}(n-\mu)\right).
+\end{split}
+\end{equation}
+
+Note that, if for the gauge transform such that only even sites or odd sites are non-unity, the transform of $\omega$ is $G(n)\omega (n)$ or $\omega (n)G^{\dagger}(n)$, and $ReTr[G(n)\omega (n)]=ReTr[\omega (n)G^{\dagger}(n)]$. So we just need to find a $G(n)$ such that $ReTr[G(n)\omega (n)]\geq ReTr[\omega (n)]$, which is known as \textbf{\index{Cabibbo-Marinari trick}Cabibbo-Marinari trick}, which is
+\begin{equation}
+\begin{split}
+&G(n)=ABC\\
+&a_{11}=\frac{1}{\sqrt{|a_{11}|^2+|a_{12}|^2}}(m_{11}^*+m_{22}),\;\;a_{12}=\frac{1}{\sqrt{|a_{11}|^2+|a_{12}|^2}}(m_{21}^*-m_{12})\\
+&b_{11}=\frac{1}{\sqrt{|b_{11}|^2+|b_{13}|^2}}(m_{11}^*+m_{33}),\;\;b_{13}=\frac{1}{\sqrt{|b_{11}|^2+|b_{13}|^2}}(m_{31}^*-m_{13})\\
+&c_{22}=\frac{1}{\sqrt{|c_{22}|^2+|c_{23}|^2}}(m_{22}^*+m_{33}),\;\;c_{23}=\frac{1}{\sqrt{|c_{22}|^2+|c_{23}|^2}}(m_{32}^*-m_{23})\\
+&A=\left(\begin{array}{ccc} a_{11} & a_{12} & 0 \\ -a_{12}^* & a_{11}^* & 0 \\ 0 & 0 & 1 \end{array}\right),B=\left(\begin{array}{ccc} b_{11} & 0 & b_{13} \\ 0 & 1 & 0 \\ -b_{31}^* & 0 & b_{11}^* \end{array}\right),C=\left(\begin{array}{ccc} 1 & 0 & 0 \\ 0 & c_{22} & c_{23} \\ 0 & -c_{23}^* & c_{22}^* \end{array}\right)\\
+\end{split}
+\end{equation}
+
+The Los Alamos gauge fixing with over relaxation $\omega $ can be summarized as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\For{$i=0$ to max iteration}
+    \If {$\sum _n \Gamma (n)\Gamma^{\dagger} (n) < \epsilon$}
+        \Return
+        \Comment {Succeed. $\Gamma$ is defined in the above.}
+    \EndIf
+    \State for all odd sites
+    \State $G(n)=\sum _{\mu}\left(U_{\mu}(n)+U_{\mu}^{\dagger}(n-\mu)\right)$
+    \State $G(n)=(1-\omega)\mathbb{1}_{3\times 3}+\omega G(n)$
+    \State $G(n)=CabibboMarinariProjection(G(n))$
+    \If {n is odd}
+        \State $U_{\mu} (n)=G(n)U_{\mu} (n)$
+    \Else
+        \State $U_{\mu} (n)=U_{\mu} (n)G^{\dagger}(n+\mu)$
+    \EndIf
+    \State for all even sites, do the same thing.
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.LosAlamosGaugeFixing}Los Alamos gauge fixing with over relaxation $\omega $}
+\end{algorithm}
+
+Note:
+\begin{itemize}
+  \item There is no need to check convergence every iteration.
+  \item When $\omega = 1$, there is no over relaxation, $\omega = \frac{2}{1+\frac{3}{L}}$ is often used.
+\end{itemize}
+
+\subsubsection{\label{sec:CoulombGauge}Coulomb Gauge}
+
+The Coulomb gauge is very similar to Landau gauge, however, note that the gauge transform can be performed time slice by time slice. Usually, the count of iteration to convergence is different for each time slice.
+

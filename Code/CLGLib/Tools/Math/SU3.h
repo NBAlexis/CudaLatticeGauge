@@ -1096,11 +1096,12 @@ extern "C" {
         /**
          * Cabbibo-Marinari Projection
          * Only one iteration can make it SU3, however, 6 iteration makes it large trace
+         * NOTE: It has been tested using Mathematica, the trace is not increasing...
          */
-        __device__ __inline__ void CabbiboMarinariProj(BYTE ite = 6)
+        __device__ __inline__ void CabbiboMarinariProj(/*BYTE ite = 1*/)
         {
-            for (BYTE iteration = 0; iteration < ite; ++iteration)
-            {
+            //for (BYTE iteration = 0; iteration < ite; ++iteration)
+            //{
                 CLGComplex a11 = _cuCaddf(_cuConjf(m_me[0]), m_me[4]);
                 CLGComplex b11 = _cuCaddf(_cuConjf(m_me[0]), m_me[8]);
                 CLGComplex c22 = _cuCaddf(_cuConjf(m_me[4]), m_me[8]);
@@ -1147,7 +1148,7 @@ extern "C" {
                 m_me[7].y = b11.x * c23.y + b11.y * c23.x;
                 m_me[8].x = b11.x * c22.x - b11.y * c22.y;
                 m_me[8].y = - b11.x * c22.y - b11.y * c22.x;
-            }
+            //}
         }
 
         /**

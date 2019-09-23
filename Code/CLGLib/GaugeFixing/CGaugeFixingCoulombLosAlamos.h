@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CGaugeFixingLandauLosAlamos.h
+// FILENAME : CGaugeFixingCoulombLosAlamos.h
 // 
 // DESCRIPTION:
 //
@@ -7,23 +7,24 @@
 // 
 //
 // REVISION:
-//  [09/21/2019 nbale]
+//  [09/23/2019 nbale]
 //=============================================================================
 
-#ifndef _CGAUGEFIXINGLANDAULOSALAMOS_H_
-#define _CGAUGEFIXINGLANDAULOSALAMOS_H_
+#ifndef _CGAUGEFIXINGCOULOMBLOSALAMOS_H_
+#define _CGAUGEFIXINGCOULOMBLOSALAMOS_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CGaugeFixingLandauLosAlamos)
+__CLG_REGISTER_HELPER_HEADER(CGaugeFixingCoulombLosAlamos)
 
-class CLGAPI CGaugeFixingLandauLosAlamos : public CGaugeFixing
+class CLGAPI CGaugeFixingCoulombLosAlamos : public CGaugeFixing
 {
-    __CLGDECLARE_CLASS(CGaugeFixingLandauLosAlamos)
+    __CLGDECLARE_CLASS(CGaugeFixingCoulombLosAlamos)
 public:
 
-    CGaugeFixingLandauLosAlamos()
+    CGaugeFixingCoulombLosAlamos()
     : CGaugeFixing()
+    , m_pDDecomp(NULL)
     , m_fOmega(F(1.0))
     , m_iCheckErrorStep(1000)
     , m_pG(NULL)
@@ -35,7 +36,7 @@ public:
     {
     }
 
-    ~CGaugeFixingLandauLosAlamos()
+    ~CGaugeFixingCoulombLosAlamos()
     {
         cudaSafeFree(m_pG);
         cudaSafeFree(m_pA11);
@@ -47,8 +48,14 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
+    void GaugeFixingForT(deviceSU3* pResGauge, SBYTE uiT);
     Real CheckRes(const CFieldGauge* pGauge) override;
+    Real CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge);
+    Real CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT);
     CCString GetInfos(const CCString& sTab) const override;
+
+    UINT m_pHDecomp[6];
+    UINT* m_pDDecomp;
 
     Real m_fOmega;
     UINT m_iCheckErrorStep;
@@ -58,11 +65,13 @@ public:
     CLGComplex* m_pA13;
     Real* m_pA22;
     CLGComplex* m_pA23;
+
+    TArray<INT> m_lstDims;
 };
 
 __END_NAMESPACE
 
-#endif //#ifndef _CGAUGEFIXINGLANDAULOSALAMOS_H_
+#endif //#ifndef _CGAUGEFIXINGCOULOMBLOSALAMOS_H_
 
 //=============================================================================
 // END OF FILE

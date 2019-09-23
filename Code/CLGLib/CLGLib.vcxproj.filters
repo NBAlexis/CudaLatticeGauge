@@ -332,6 +332,9 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingLandauLosAlamos.h">
       <Filter>GaugeFixing</Filter>
     </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -503,6 +506,9 @@
       <Filter>GaugeFixing</Filter>
     </CudaCompile>
     <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu">
+      <Filter>GaugeFixing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu">
       <Filter>GaugeFixing</Filter>
     </CudaCompile>
   </ItemGroup>

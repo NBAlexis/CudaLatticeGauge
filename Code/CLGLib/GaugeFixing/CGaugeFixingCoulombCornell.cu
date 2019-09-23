@@ -9,27 +9,6 @@
 //=============================================================================
 #include "CLGLib_Private.h"
 
-#define preparethread_S \
-dim3 block(m_pHDecomp[0], m_pHDecomp[1], m_pHDecomp[2]); \
-dim3 threads(m_pHDecomp[3], m_pHDecomp[4], m_pHDecomp[5]);
-
-#define intokernalInt4_S \
-SSmallInt4 sSite4; \
-sSite4.x = static_cast<SBYTE>(threadIdx.x + blockIdx.x * blockDim.x); \
-sSite4.y = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); \
-sSite4.z = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z); \
-sSite4.w = uiT; \
-UINT uiSiteIndex = sSite4.x * _DC_MultX + sSite4.y * _DC_MultY + sSite4.z * _DC_Lt + sSite4.w; \
-UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
-
-#define intokernalInt4_S_Only3D \
-SSmallInt4 sSite4; \
-sSite4.x = static_cast<SBYTE>(threadIdx.x + blockIdx.x * blockDim.x); \
-sSite4.y = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y); \
-sSite4.z = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z); \
-sSite4.w = uiT; \
-UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
-
 __BEGIN_NAMESPACE
 
 #pragma region kernels

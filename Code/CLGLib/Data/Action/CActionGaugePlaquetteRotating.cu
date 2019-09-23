@@ -744,11 +744,11 @@ _kernelAddForceChairTermSU3_Term5_3(
 
 CActionGaugePlaquetteRotating::CActionGaugePlaquetteRotating()
     : CAction()
-    , m_uiPlaqutteCount(0)
+    , m_fOmega(F(0.0))
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
-    , m_fOmega(F(0.0))
+    , m_uiPlaqutteCount(0)
 {
 }
 

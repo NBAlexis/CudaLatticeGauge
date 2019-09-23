@@ -50,7 +50,7 @@ UINT TestGaugeFixingLandau(CParameters&)
     return uiError;
 }
 
-UINT TestGaugeFixingCoulombCornellDR(CParameters&)
+UINT TestGaugeFixingCoulombDR(CParameters&)
 {
     UINT uiError = 0;
     CFieldGaugeSU3D* pGauge = dynamic_cast<CFieldGaugeSU3D*>(appGetLattice()->GetFieldById(1)->GetCopy());
@@ -85,7 +85,7 @@ UINT TestGaugeFixingCoulombCornellDR(CParameters&)
     {
         ++uiError;
     }
-    appGeneral(_T("Divation = %f\n"), fError);
+    appGeneral(_T("Divation = %2.12f\n"), fError);
     appGeneral(_T("Before Energy1 = %f, Energy2 = %f\n"), fEnergy1, fEnergy2);
     appGeneral(_T("After Energy1 = %f, Energy2 = %f\n"), fEnergy3, fEnergy4);
 
@@ -101,9 +101,13 @@ __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauCornell);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombCornell);
 
-//__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauLosAlamos);
+__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauLosAlamos);
 
-__REGIST_TEST(TestGaugeFixingCoulombCornellDR, Misc, TestGaugeFixingCoulombCornellDR);
+__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombLosAlamos);
+
+__REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
+
+__REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR);
 
 
 //=============================================================================
