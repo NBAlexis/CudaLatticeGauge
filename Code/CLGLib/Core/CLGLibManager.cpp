@@ -210,6 +210,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("CacheStaple"), 1);
     CCommonData::m_bStoreStaple = (0 != iVaules);
 
+    __FetchIntWithDefault(_T("StochasticGaussian"), 0);
+    CCommonData::m_bStochasticGaussian = (0 != iVaules);
+    
     __FetchIntWithDefault(_T("CacheSolution"), 1);
     CCommonData::m_bStoreLastSolution = (0 != iVaules);
 

@@ -62,6 +62,21 @@ public:
 
     void ExpMult(Real a, CField* U) const override;
     CCString GetInfos(const CCString &tab) const override;
+
+#pragma region Test Functions to test gauge invarience of angular momentum
+
+    /**
+     * iA = U.TA() / 2
+     */
+    void TransformToIA() override;
+
+    /**
+     * U=exp(iA)
+     */
+    void TransformToU() override;
+
+#pragma endregion
+
 };
 
 #pragma region device functions
@@ -96,6 +111,68 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3Dir(
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
         ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
+}
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirOne(
+    const deviceSU3* __restrict__ pBuffer,
+    UINT uiBigIdx,
+    BYTE byDir)
+{
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+        deviceSU3::makeSU3Id()
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+}
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
+    const deviceSU3* __restrict__ pBuffer,
+    UINT uiBigIdx,
+    BYTE byDir)
+{
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+        deviceSU3::makeSU3Zero()
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+}
+
+/**
+ * calculate D_mu A _nu = (Delta _mu - A_mu) A _nu
+ * Use U now to calculate A pure
+ * me will be changed, so, if me is A phys, copy me first
+ */
+static __device__ __inline__ deviceSU3 _deviceDPureMu(
+    const deviceSU3* __restrict__ piA, 
+    const deviceSU3* __restrict__ piApure,
+    UINT uiBigIdx,
+    BYTE byMu,
+    BYTE byNu)
+{
+    //i a D A = (A_nu (n) - A_nu (n-mu)) - iApure _mu A _nu
+    const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
+
+    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu);
+    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
+    res.MulReal(F(-1.0));
+    res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
+    res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu));
+    return res;
+}
+
+static __device__ __inline__ deviceSU3 _deviceDPureMuUpure(
+    const deviceSU3* __restrict__ piA,
+    const deviceSU3* __restrict__ piUpure,
+    UINT uiBigIdx,
+    BYTE byMu,
+    BYTE byNu)
+{
+    //i a D A = (A_nu (n) - A_nu (n-mu)) - iApure _mu A _nu
+    const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
+
+    deviceSU3 res = _deviceGetGaugeBCSU3DirOne(piUpure, uiBigIdx, byMu);
+    res.Ta();
+    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
+    res.MulReal(F(-0.5));
+    res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
+    res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu));
+    return res;
 }
 
 #pragma endregion

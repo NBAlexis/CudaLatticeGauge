@@ -465,6 +465,71 @@ _kernelSetConfigurationSU3(
     gaugeSU3KernelFuncionEnd
 }
 
+/**
+ * iA = U.TA() / 2
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToIA(
+    deviceSU3* pDeviceData)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        pDeviceData[uiLinkIndex].Ta();
+        pDeviceData[uiLinkIndex].MulReal(F(0.5));
+    }
+}
+
+/**
+ * E_mu = F_{0 mu}
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToE(
+    const deviceSU3* __restrict__ pDeviceData,
+    deviceSU3* pRes)
+{
+    intokernalInt4;
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    
+    //we only need uiDir = 0,1,2
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        deviceSU3 res = deviceSU3::makeSU3Zero();
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (dir < uiDir - 1)
+        {
+            //find clover F
+            //res = _deviceClover(pDeviceData, uiBigIdx, 3, dir).ImC();
+            res = _deviceClover(pDeviceData, uiBigIdx, 3, dir);
+            res.Ta();
+            res.MulReal(F(0.25));
+        }
+
+        pRes[uiLinkIndex] = res;
+    }
+}
+
+/**
+ * U = exp(A)
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToU(
+    deviceSU3* pDeviceData)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        pDeviceData[uiLinkIndex] = (0 == _DC_ExpPrecision)
+            ? pDeviceData[uiLinkIndex].QuickExp(F(1.0))
+            : pDeviceData[uiLinkIndex].ExpReal(F(1.0), _DC_ExpPrecision);
+    }
+}
+
 #pragma endregion
 
 void CFieldGaugeSU3::AxpyPlus(const CField* x)
@@ -824,6 +889,33 @@ void CFieldGaugeSU3::CopyTo(CField* pTarget) const
 
     CFieldGaugeSU3* pTargetField = dynamic_cast<CFieldGaugeSU3*>(pTarget);
     checkCudaErrors(cudaMemcpy(pTargetField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToDevice));
+}
+
+void CFieldGaugeSU3::TransformToIA()
+{
+    preparethread;
+    _kernelTransformToIA << <block, threads >> > (m_pDeviceData);
+}
+
+
+void CFieldGaugeSU3::TransformToU()
+{
+    preparethread;
+    _kernelTransformToU << <block, threads >> > (m_pDeviceData);
+}
+
+void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const
+{
+    if (NULL == pResoult || EFT_GaugeSU3 != pResoult->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: U field is not SU3");
+        return;
+    }
+
+    CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(pResoult);
+
+    preparethread;
+    _kernelTransformToE << <block, threads >> > (m_pDeviceData, pUField->m_pDeviceData);
 }
 
 void CFieldGaugeSU3::DebugPrintMe() const

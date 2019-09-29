@@ -18,7 +18,7 @@ class CLGAPI CMeasurementManager
 public:
     CMeasurementManager(class CLatticeData* pOwner) 
         : m_iAcceptedConfigurationCount(0)
-        , m_pOwner(pOwner) 
+        , m_pOwner(pOwner)
         , m_bNeedGaugeSmearing(FALSE)
         , m_bEverResetted(FALSE)
     {
@@ -42,6 +42,7 @@ protected:
     UBOOL m_bEverResetted;
 
     THashMap<BYTE, TArray<CMeasure*>> HasSourceScanning() const;
+    THashMap<BYTE, TArray<CMeasureStochastic*>> HasZ4(UINT& uiFieldCount) const;
     UBOOL NeedSmearing() const;
 };
 

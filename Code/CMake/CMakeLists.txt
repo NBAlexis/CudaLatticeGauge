@@ -47,6 +47,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
@@ -61,8 +62,10 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixing.h
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombLosAlamos.h
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.h
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
@@ -115,11 +118,15 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombLosAlamos.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu
@@ -201,6 +208,7 @@ include_directories(${PROJECT_SOURCE_DIR}/CLGTest)
 add_executable(CLGTest 
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.h
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestAngularMomentum.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestBoundary.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestConfigurationFileIO.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionUpdator.cpp

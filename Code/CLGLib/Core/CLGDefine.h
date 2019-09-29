@@ -83,6 +83,7 @@
 #define ARRAY_COUNT( aarray ) \
     ( sizeof(aarray) / sizeof((aarray)[0]) )
 
+#define appSafeFree(p)        {if(p){free(p); p=NULL;}}
 #define appSafeDelete(p)        {if(p){delete p; p=NULL;}}
 #define appSafeDeleteArray(p)    {if(p){delete[] p; p=NULL;}}
 

@@ -82,6 +82,60 @@ public:
             appAbs(cmp.y));
     }
 
+    static void FillDataWithR_R(
+        TArray<Real>& arrData,
+        TArray<Real>& arrInner,
+        TArray<Real>& arrFull,
+        TArray<UINT>& arrR,
+        Real* hostData,
+        UINT* hostR,
+        UINT uiConfig,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        UBOOL bFillR);
+
+    static void FillDataWithR_C(
+        TArray<CLGComplex>& arrData,
+        TArray<CLGComplex>& arrInner,
+        TArray<CLGComplex>& arrFull,
+        TArray<UINT>& arrR,
+        CLGComplex* hostData,
+        UINT* hostR,
+        UINT uiConfig,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        UBOOL bFillR);
+
+    
+    static void ReportDistributionXY_R(UINT uiConfig, const TArray<Real>& arrayRes);
+    static void ReportDistributionXY_C(UINT uiConfig, const TArray<CLGComplex>& arrayRes);
+
+    static void _ZeroXYPlane(Real* pDeviceRes);
+    static void _ZeroXYPlaneC(CLGComplex* pDeviceRes);
+    /**
+    * array[x, y] = array[x, y] / (lz * lt)
+    */
+    static void _AverageXYPlane(Real* pDeviceRes);
+    static void _AverageXYPlaneC(CLGComplex* pDeviceRes);
+
+    static void XYDataToRdistri_R(
+        const Real* __restrict__ source,
+        UINT* count,
+        Real* result,
+        UINT uiMaxR,
+        UBOOL bCalculateCounter,
+        BYTE byFieldId);
+
+    static void XYDataToRdistri_C(
+        const CLGComplex* __restrict__ source,
+        UINT* count,
+        CLGComplex* result,
+        UINT uiMaxR,
+        UBOOL bCalculateCounter,
+        BYTE byFieldId);
+
+    static void ReportDistributeWithR_R(UINT uiConf, UINT uiR, const TArray<Real>& arrayData);
+
 protected:
 
     class CMeasurementManager* m_pOwner;
@@ -103,14 +157,14 @@ class CLGAPI CMeasureStochastic : public CMeasure
 public:
     CMeasureStochastic()
         : CMeasure()
-        , m_uiFieldCount(100)
+        , m_uiFieldCount(25)
     {
     }
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId) override
     {
         CMeasure::Initial(pOwner, pLatticeData, param, byId);
-        INT iValue = 100;
+        INT iValue = 25;
         param.FetchValueINT(_T("FieldCount"), iValue);
         m_uiFieldCount = static_cast<UINT>(iValue);
     }

@@ -335,6 +335,12 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.h">
       <Filter>GaugeFixing</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3EvenOdd.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h">
+      <Filter>GaugeFixing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -510,6 +516,15 @@
     </CudaCompile>
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu">
       <Filter>GaugeFixing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3EvenOdd.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GaugeFixing\CGaugeFixingRandom.cu">
+      <Filter>GaugeFixing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasure.cu">
+      <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,22 @@ public:
 
 #pragma endregion
 
+#pragma region Test Functions to test gauge invarience of angular momentum
+
+    /**
+     * iA = U.TA() / 2
+     */
+    void TransformToIA() override;
+
+    /**
+     * U=exp(iA)
+     */
+    void TransformToU() override;
+
+    void CalculateE_Using_U(CFieldGauge* pResoult) const override;
+
+#pragma endregion
+
     void ExpMult(Real a, CField* U) const override;
 
     void ElementNormalize() override;

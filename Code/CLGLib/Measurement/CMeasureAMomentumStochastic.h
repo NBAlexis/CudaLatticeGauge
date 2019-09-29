@@ -24,15 +24,22 @@ public:
         , m_uiConfigurationCount(0)
         , m_pDeviceXYBufferJL(NULL)
         , m_pDeviceXYBufferJS(NULL)
+        , m_pDeviceXYBufferJLPure(NULL)
+        , m_pDeviceXYBufferJPot(NULL)
         , m_bExponential(TRUE)
         , m_bNaive(TRUE)
+        , m_bMeasureJLPure(FALSE)
 
         , m_pDistributionR(NULL)
         , m_pDistributionJL(NULL)
         , m_pDistributionJS(NULL)
+        , m_pDistributionJLPure(NULL)
+        , m_pDistributionJPot(NULL)
         , m_pHostDistributionR(NULL)
         , m_pHostDistributionJL(NULL)
         , m_pHostDistributionJS(NULL)
+        , m_pHostDistributionJLPure(NULL)
+        , m_pHostDistributionJPot(NULL)
 
         , m_uiMaxR(1)
         , m_uiEdgeR(1)
@@ -51,23 +58,31 @@ public:
     void Report() override;
     void Reset() override;
 
-    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsGaugeMeasurement() const override { return FALSE; }
+    UBOOL IsZ4Source() const override  { return TRUE; }
 
 protected:
     
     UINT m_uiConfigurationCount;
     Real* m_pDeviceXYBufferJL;
     Real* m_pDeviceXYBufferJS;
+    Real* m_pDeviceXYBufferJLPure;
+    Real* m_pDeviceXYBufferJPot;
 
     UBOOL m_bExponential;
     UBOOL m_bNaive;
+    UBOOL m_bMeasureJLPure;
 
     UINT* m_pDistributionR;
     Real* m_pDistributionJL;
     Real* m_pDistributionJS;
+    Real* m_pDistributionJLPure;
+    Real* m_pDistributionJPot;
     UINT* m_pHostDistributionR;
     Real* m_pHostDistributionJL;
     Real* m_pHostDistributionJS;
+    Real* m_pHostDistributionJLPure;
+    Real* m_pHostDistributionJPot;
 
     UINT m_uiMaxR;
     UINT m_uiEdgeR;
@@ -78,9 +93,17 @@ public:
     TArray<UINT> m_lstR;
     TArray<Real> m_lstJL;
     TArray<Real> m_lstJS;
+    TArray<Real> m_lstJLPure;
+    TArray<Real> m_lstJPot;
 
     TArray<Real> m_lstJLAll;
     TArray<Real> m_lstJLInner;
+    TArray<Real> m_lstJSAll;
+    TArray<Real> m_lstJSInner;
+    TArray<Real> m_lstJLPureAll;
+    TArray<Real> m_lstJLPureInner;
+    TArray<Real> m_lstJPotAll;
+    TArray<Real> m_lstJPotInner;
 };
 
 __END_NAMESPACE

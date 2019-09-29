@@ -30,6 +30,16 @@ public:
     void SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc) const;
     void FixAllFieldBoundary() const;
 
+    /**
+     * A phys is calculated use U at Coulomb gauge
+     */
+    void SetAPhys(const CFieldGauge* pUatCoulomb);
+
+    /**
+     * Calculate A, then A pure = A - A phys
+     */
+    void SetAPure(const CFieldGauge* pUnow);
+
     CCString GetInfos(const CCString& sTab) const;
 
     class CRandom* m_pRandom;
@@ -37,11 +47,14 @@ public:
     UINT m_uiRandomSeed;
 
     class CFieldGauge* m_pGaugeField;
+    class CFieldGauge* m_pAphys;
+    class CFieldGauge* m_pUpure;
+
     /**
     * Now we support only 2x2x2x2 x 4 field. 
     * U_mu(nu=0) is the nu=0 boundary, U_mu(nu=1) is the nu=N_nu boundary
     */
-    class CFieldGauge* m_pGaugeBoundary;
+    //class CFieldGauge* m_pGaugeBoundary;
 
     TArray<class CField*> m_pOtherFields; //only for delete
     THashMap<BYTE, class CField*> m_pFieldMap;

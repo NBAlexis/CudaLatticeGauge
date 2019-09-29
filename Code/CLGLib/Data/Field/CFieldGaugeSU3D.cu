@@ -328,6 +328,54 @@ _kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
     }
 }
 
+
+/**
+ * iA = U.TA() / 2
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToIA_D(
+    deviceSU3* pDeviceData)
+{
+    intokernalInt4;
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            pDeviceData[uiLinkIndex].Ta();
+            pDeviceData[uiLinkIndex].MulReal(F(0.5));
+        }
+    }
+}
+
+
+/**
+ * U = exp(A)
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToU_D(
+    deviceSU3* pDeviceData)
+{
+    intokernalInt4;
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            //pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].ExpReal(F(1.0), 8);
+            pDeviceData[uiLinkIndex] = (0 == _DC_ExpPrecision)
+                ? pDeviceData[uiLinkIndex].QuickExp(F(1.0))
+                : pDeviceData[uiLinkIndex].ExpReal(F(1.0), _DC_ExpPrecision);
+        }
+    }
+}
+
 #pragma endregion
 
 
@@ -443,6 +491,18 @@ void CFieldGaugeSU3D::FixBoundary()
     _kernelFixBoundarySU3_D << <block, threads >> > (m_pDeviceData);
 }
 
+void CFieldGaugeSU3D::TransformToIA()
+{
+    preparethread;
+    _kernelTransformToIA_D<< <block, threads >> > (m_pDeviceData);
+}
+
+void CFieldGaugeSU3D::TransformToU()
+{
+    preparethread;
+    _kernelTransformToU_D << <block, threads >> > (m_pDeviceData);
+}
+
 void CFieldGaugeSU3D::CopyTo(CField* pTarget) const
 {
     CFieldGaugeSU3::CopyTo(pTarget);
@@ -450,9 +510,7 @@ void CFieldGaugeSU3D::CopyTo(CField* pTarget) const
 
 CCString CFieldGaugeSU3D::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldGaugeSU3 Dirichlet\n");
-    return sRet;
+    return tab + _T("Name : CFieldGaugeSU3 Dirichlet\n");
 }
 
 __END_NAMESPACE

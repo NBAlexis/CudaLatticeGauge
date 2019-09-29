@@ -16,34 +16,6 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumJG)
 
 #pragma region kernles
 
-/**
-* Initial as zero
-*/
-__global__ void _CLG_LAUNCH_BOUND
-_kernelInitialZero_XYPlane(Real* pBuffer)
-{
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        pBuffer[sSite4.x * _DC_Ly + sSite4.y] = F(0.0);
-    }
-}
-
-/**
-* Average over z and t
-*/
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAverageOverZT_XYPlane(Real* pBuffer)
-{
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        const UINT uiIdx = sSite4.x * _DC_Ly + sSite4.y;
-        pBuffer[uiIdx] = pBuffer[uiIdx] / (_DC_Lz * _DC_Lt);
-    }
-}
 
 /**
 * calculate momentum, and sum over y and z
@@ -93,69 +65,71 @@ _kernelCalculateAngularMomentumJG(
     atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
 }
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelMomentumJGInitialDist(UINT* pCount, Real* pValue)
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateGaugeSpin(
+    const deviceSU3* __restrict__ pE, 
+    const deviceSU3* __restrict__ piAphys,
+    Real* pBuffer,
+    Real fBetaOverN)
 {
-    pCount[threadIdx.x] = 0;
-    pValue[threadIdx.x] = F(0.0);
-}
-
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelMomentumJGMeasureDist(
-    const Real* __restrict__ jgXY,
-    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
-    UINT* counter, Real* correlator)
-{
-    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-             + (sCenter.y - uiY) * (sCenter.y - uiY);
-
-    SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
-    sSite4.x = uiX;
-    sSite4.y = uiY;
-    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    intokernalInt4;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    
+    if (!site.IsDirichlet())
     {
-        atomicAdd(&counter[uiC], 1);
-        atomicAdd(&correlator[uiC], jgXY[uiXY]);
+        //Note i A phys is i x A phys
+        UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
+        UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
+        deviceSU3 beforeTrace = pE[uiLinkX].MulC(piAphys[uiLinkY]);
+        beforeTrace.Sub(pE[uiLinkY].MulC(piAphys[uiLinkX]));
+        CLGComplex cRes = cuCmulf_cr(beforeTrace.Tr(), -fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], cRes.x);
     }
 }
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelMomentumJGAverageDist(UINT* pCount, Real* pValue)
+/**
+ * 
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMomemtumJGChen(
+    const deviceSU3* __restrict__ pE,
+    const deviceSU3* __restrict__ piUpure,
+    const deviceSU3* __restrict__ piAphys,
+    SSmallInt4 sCenter,
+    Real* pBuffer,
+    Real fBetaOverN)
 {
-    const UINT uiIdx = threadIdx.x;
-    if (pCount[uiIdx] > 0)
+    intokernalOnlyInt4;
+    
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+
+    CLGComplex res = _zeroc;
+    const Real fX = (sSite4.x - sCenter.x);
+    const Real fY = (sSite4.y - sCenter.y);
+    if (!site.IsDirichlet())
     {
-        pValue[uiIdx] = pValue[uiIdx] / static_cast<Real>(pCount[uiIdx]);
+        //only calculate x,y,z
+        for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+        {
+            deviceSU3 DyAphys = _deviceDPureMuUpure(piAphys, piUpure, uiBigIdx, 1, dir);
+            deviceSU3 DxAphys = _deviceDPureMuUpure(piAphys, piUpure, uiBigIdx, 0, dir);
+            DyAphys.MulReal(fX);
+            DxAphys.MulReal(fY);
+            DyAphys.Sub(DxAphys);
+
+            DyAphys = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys);
+            _cuCaddf(res, DyAphys.Tr());
+        }
+
+        res = cuCmulf_cr(res, -fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
     }
 }
 
 #pragma endregion
-
-/**
-* array[x, y] = array[x, y] / (lz * lt)
-*/
-CLGAPI void _AverageXYPlane(Real* pDeviceRes)
-{
-    preparethread;
-    _kernelAverageOverZT_XYPlane << <block, threads >> > (pDeviceRes);
-}
-
-/**
-* array[x, y] = 0
-*/
-CLGAPI void _ZeroXYPlane(Real* pDeviceRes)
-{
-    preparethread;
-    _kernelInitialZero_XYPlane << <block, threads >> > (pDeviceRes);
-}
 
 CMeasureAMomentumJG::~CMeasureAMomentumJG()
 {
@@ -187,6 +161,12 @@ CMeasureAMomentumJG::~CMeasureAMomentumJG()
     {
         free(m_pHostDistributionJG);
     }
+
+    appSafeFree(m_pHostSpinBuffer);
+    cudaSafeFree(m_pDeviceSpinBuffer);
+    appSafeFree(m_pHostDistributionJGS);
+    cudaSafeFree(m_pDistributionJGS);
+    appSafeDelete(m_pE);
 }
 
 void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -209,6 +189,17 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     param.FetchValueINT(_T("MeasureDist"), iValue);
     m_bMeasureDistribution = iValue != 0;
 
+    iValue = 0;
+    param.FetchValueINT(_T("MeasureSpin"), iValue);
+    m_bMeasureSpin = iValue != 0;
+
+    if (m_bMeasureSpin)
+    {
+        m_pHostSpinBuffer = (Real*)malloc(sizeof(Real) * _HC_Lx * _HC_Ly);
+        checkCudaErrors(cudaMalloc((void**)& m_pDeviceSpinBuffer, sizeof(Real) * _HC_Lx * _HC_Ly));
+        m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(m_byFieldId)->GetCopy());
+    }
+
     if (m_bMeasureDistribution)
     {
         //assuming the center is really at center
@@ -222,6 +213,12 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
 
         m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
         m_pHostDistributionJG = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+
+        if (m_bMeasureSpin)
+        {
+            m_pHostDistributionJGS = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+            checkCudaErrors(cudaMalloc((void**)& m_pDistributionJGS, sizeof(Real) * (m_uiMaxR + 1)));
+        }
     }
 }
 
@@ -249,100 +246,25 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     _AverageXYPlane(m_pDeviceDataBufferOneConfig);
 
+    checkCudaErrors(cudaGetLastError());
+
     if (m_bMeasureDistribution)
     {
-        dim3 block2(_HC_DecompX, 1, 1);
-        dim3 threads2(_HC_DecompLx, 1, 1);
-        dim3 block3(m_uiMaxR + 1, 1, 1);
-        dim3 threads3(m_uiMaxR + 1, 1, 1);
+        XYDataToRdistri_R(m_pDeviceDataBufferOneConfig, m_pDistributionR, m_pDistributionJG,
+            m_uiMaxR, TRUE, m_byFieldId);
 
-        _kernelMomentumJGInitialDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionJG);
-
-        _kernelMomentumJGMeasureDist << <block2, threads2 >> >(
-            m_pDeviceDataBufferOneConfig,
-            CCommonData::m_sCenter,
-            m_uiMaxR,
-            m_byFieldId,
-            m_pDistributionR,
-            m_pDistributionJG
-            );
-
-        _kernelMomentumJGAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionJG);
+        checkCudaErrors(cudaGetLastError());
 
         //extract res
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-
-        Real fAverageJGInner = F(0.0);
-        UINT uiInnerPointsInner = 0;
-        Real fAverageJGAll = F(0.0);
-        UINT uiInnerPointsAll = 0;
-        if (0 == m_uiConfigurationCount)
-        {
-            assert(0 == m_lstR.Num());
-            assert(0 == m_lstJG.Num());
-
-            for (UINT uiL = 0; uiL <= m_uiMaxR; ++uiL)
-            {
-                if (m_pHostDistributionR[uiL] > 0)
-                {
-                    m_lstR.AddItem(uiL);
-                    m_lstJG.AddItem(m_pHostDistributionJG[uiL]);
-
-                    uiInnerPointsAll += m_pHostDistributionR[uiL];
-                    fAverageJGAll += m_pHostDistributionR[uiL] * m_pHostDistributionJG[uiL];
-                    if (uiL < m_uiEdgeR)
-                    {
-                        uiInnerPointsInner += m_pHostDistributionR[uiL];
-                        fAverageJGInner += m_pHostDistributionR[uiL] * m_pHostDistributionJG[uiL];
-                    }
-
-                    if (m_bShowResult)
-                    {
-                        appDetailed(_T("JG(%f)=%f, \n"),
-                            _hostsqrt(static_cast<Real>(uiL)),
-                            m_pHostDistributionJG[uiL]);
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (INT i = 0; i < m_lstR.Num(); ++i)
-            {
-                assert(m_pHostDistributionR[m_lstR[i]] > 0);
-                m_lstJG.AddItem(m_pHostDistributionJG[m_lstR[i]]);
-
-                uiInnerPointsAll += m_pHostDistributionR[m_lstR[i]];
-                fAverageJGAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJG[m_lstR[i]];
-                if (m_lstR[i] < m_uiEdgeR)
-                {
-                    uiInnerPointsInner += m_pHostDistributionR[m_lstR[i]];
-                    fAverageJGInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJG[m_lstR[i]];
-                }
-
-                if (m_bShowResult)
-                {
-                    appDetailed(_T("JG(%f)=%f, \n"),
-                        _hostsqrt(static_cast<Real>(m_lstR[i])),
-                        m_pHostDistributionJG[m_lstR[i]]);
-                }
-            }
-        }
-
-        if (uiInnerPointsAll > 0)
-        {
-            fAverageJGAll = fAverageJGAll / uiInnerPointsAll;
-        }
-        if (uiInnerPointsInner > 0)
-        {
-            fAverageJGInner = fAverageJGInner / uiInnerPointsInner;
-        }
-        m_lstJGAll.AddItem(fAverageJGAll);
-        m_lstJGInner.AddItem(fAverageJGInner);
+        FillDataWithR_R(
+            m_lstJG, m_lstJGInner, m_lstJGAll, m_lstR, 
+            m_pHostDistributionJG, m_pHostDistributionR, 
+            m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, TRUE
+            );
     }
 
-    ++m_uiConfigurationCount;
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBufferOneConfig, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
 
     if (m_bShowResult)
@@ -372,6 +294,90 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         appDetailed(_T("\n"));
     }
 
+
+    if (m_bMeasureSpin)
+    {
+        _ZeroXYPlane(m_pDeviceSpinBuffer);
+        pGaugeSU3->CalculateE_Using_U(m_pE);
+        CFieldGaugeSU3* pESU3 = dynamic_cast<CFieldGaugeSU3*>(m_pE);
+        CFieldGaugeSU3* pAphysSU3 = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
+        if (NULL == pAphysSU3)
+        {
+            appCrucial(_T("CMeasureAMomentumJG: A phys not calculated\n"));
+        }
+        else
+        {
+            _kernelCalculateGaugeSpin << <block, threads >> > (pESU3->m_pDeviceData, pAphysSU3->m_pDeviceData, m_pDeviceSpinBuffer, fBetaOverN);
+
+            _AverageXYPlane(m_pDeviceSpinBuffer);
+            checkCudaErrors(cudaMemcpy(m_pHostSpinBuffer, m_pDeviceSpinBuffer, sizeof(CLGComplex)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            for (UINT i = 1; i < _HC_Ly; ++i)
+            {
+                for (UINT j = 1; j < _HC_Lx; ++j)
+                {
+                    m_lstResJGS.AddItem(m_pHostSpinBuffer[j * _HC_Ly + i]);
+                }
+            }
+
+            if (m_bMeasureDistribution)
+            {
+                XYDataToRdistri_R(
+                    m_pDeviceSpinBuffer, m_pDistributionR, m_pDistributionJGS, 
+                    m_uiMaxR, FALSE, m_byFieldId);
+                
+                checkCudaErrors(cudaMemcpy(m_pHostDistributionJGS, m_pDistributionJGS, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                FillDataWithR_R(
+                    m_lstJGS, m_lstJGSInner, m_lstJGSAll, m_lstR,
+                    m_pHostDistributionJGS, m_pHostDistributionR,
+                    m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                );
+            }
+
+            CFieldGaugeSU3* pUpure = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pUpure);
+            if (NULL == pUpure)
+            {
+                appCrucial(_T("CMeasureAMomentumJG: A pure not calculated\n"));
+            }
+            else
+            {
+                _ZeroXYPlane(m_pDeviceSpinBuffer);
+                _kernelMomemtumJGChen << <block, threads >> > (
+                    pESU3->m_pDeviceData,
+                    pUpure->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    CCommonData::m_sCenter,
+                    m_pDeviceSpinBuffer,
+                    fBetaOverN);
+
+                _AverageXYPlane(m_pDeviceSpinBuffer);
+                checkCudaErrors(cudaMemcpy(m_pHostSpinBuffer, m_pDeviceSpinBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+                for (UINT i = 1; i < _HC_Ly; ++i)
+                {
+                    for (UINT j = 1; j < _HC_Lx; ++j)
+                    {
+                        m_lstResJGChen.AddItem(m_pHostSpinBuffer[j * _HC_Ly + i]);
+                    }
+                }
+
+                if (m_bMeasureDistribution)
+                {
+                    XYDataToRdistri_R(
+                        m_pDeviceSpinBuffer, m_pDistributionR, m_pDistributionJGS, 
+                        m_uiMaxR, FALSE, m_byFieldId);
+
+                    //extract res
+                    checkCudaErrors(cudaMemcpy(m_pHostDistributionJGS, m_pDistributionJGS, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                    FillDataWithR_R(
+                        m_lstJGChen, m_lstJGChenInner, m_lstJGChenAll, m_lstR,
+                        m_pHostDistributionJGS, m_pHostDistributionR,
+                        m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                    );
+                }
+            }
+        }
+    }
+
+    ++m_uiConfigurationCount;
 }
 
 void CMeasureAMomentumJG::Average(UINT )
@@ -383,48 +389,27 @@ void CMeasureAMomentumJG::Report()
 {
     appSetLogDate(FALSE);
 
-    assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) 
-        == static_cast<UINT>(m_lstRes.Num()));
     appGeneral(_T("\n===================================================\n"));
     appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), CCommonData::m_sCenter.x);
     appGeneral(_T("===================================================\n"));
 
-    TArray<Real> tmp;
-    appGeneral(_T("{\n"));
-    for (UINT k = 0; k < m_uiConfigurationCount; ++k)
-    {
-        appGeneral(_T("{"));
-        for (UINT i = 0; i < _HC_Ly - 1; ++i)
-        {
-            appGeneral(_T("{"));
-            for (UINT j = 0; j < _HC_Lx - 1; ++j)
-            {
-                const UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
-                appGeneral(_T("%1.6f, "), m_lstRes[idx]);
-                if (0 == k)
-                {
-                    tmp.AddItem(m_lstRes[idx]);
-                }
-                else
-                {
-                    tmp[i * (_HC_Lx - 1) + j] += m_lstRes[idx];
-                }
-            }
-            appGeneral(_T("}, "));
-        }
-        appGeneral(_T("}\n"));
-    }
-    appGeneral(_T("}\n"));
+    ReportDistributionXY_R(m_uiConfigurationCount, m_lstRes);
 
-    appGeneral(_T("\n -------------------- Average -------------------------\n\n"));
-    
-    for (UINT i = 0; i < _HC_Ly - 1; ++i)
+    appGeneral(_T("===================================================\n"));
+
+    if (m_bMeasureSpin)
     {
-        for (UINT j = 0; j < _HC_Lx - 1; ++j)
-        {
-            appGeneral(_T("(x=%d,y=%d)%2.8f,   "), j + 1, i + 1, tmp[i * (_HC_Lx - 1) + j] / m_uiConfigurationCount);
-        }
-        appGeneral(_T("\n"));
+        appGeneral(_T("\n===================================================\n"));
+        appGeneral(_T("=========== Angular Momentum JGS of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("===================================================\n"));
+
+        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS);
+
+        appGeneral(_T("\n===================================================\n"));
+        appGeneral(_T("=========== Angular Momentum JG Chen of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("===================================================\n"));
+
+        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChen);
     }
 
     appGeneral(_T("===================================================\n"));
@@ -437,12 +422,20 @@ void CMeasureAMomentumJG::Reset()
 {
     m_uiConfigurationCount = 0;
     m_lstRes.RemoveAll();
+    m_lstResJGS.RemoveAll();
+    m_lstResJGChen.RemoveAll();
 
     m_lstR.RemoveAll();
     m_lstJG.RemoveAll();
+    m_lstJGS.RemoveAll();
+    m_lstJGChen.RemoveAll();
 
     m_lstJGAll.RemoveAll();
     m_lstJGInner.RemoveAll();
+    m_lstJGSAll.RemoveAll();
+    m_lstJGSInner.RemoveAll();
+    m_lstJGChenAll.RemoveAll();
+    m_lstJGChenInner.RemoveAll();
 }
 
 __END_NAMESPACE

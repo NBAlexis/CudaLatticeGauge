@@ -50,6 +50,22 @@ public:
 
 #pragma endregion
 
+#pragma region Test Functions to test gauge invarience of angular momentum
+
+    /**
+     * iA = U.TA() / 2
+     */
+    virtual void TransformToIA() = 0;
+
+    /**
+     * U=exp(iA)
+     */
+    virtual void TransformToU() = 0;
+
+    virtual void CalculateE_Using_U(CFieldGauge* pResoult) const = 0;
+
+#pragma endregion
+
     UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real ) override
     {
         appCrucial("CFieldGauge: Do Operator implimented yet");

@@ -3,7 +3,7 @@
 // 
 // DESCRIPTION:
 //
-// Note!! this does not pass the test,
+// 
 // 
 //
 // REVISION:

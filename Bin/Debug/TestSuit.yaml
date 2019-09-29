@@ -2297,3 +2297,99 @@ TestGaugeFixingCoulombLosAlamosDR:
 
         Restart : 100
         AbsoluteAccuracy : 1
+
+TestAngularMomentum:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 2
+    CacheStaple : 0
+    StochasticGaussian : 1
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        ## FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombLosAlamos
+        Omega : 1.33
+        CheckErrorStep : 200
+        MaxIterate : 2000
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        MeasureDist : 1
+        MeasureSpin : 1
+        ShowResult : 1
+
+    Measure2:
+
+        MeasureName : CMeasureAMomentumStochastic
+        FieldId : 2
+        MeasureDist : 1
+        MeasurePure : 1
+        Exponential : 1
+        Naive : 1
+        ShowResult : 1
+        FieldCount : 1

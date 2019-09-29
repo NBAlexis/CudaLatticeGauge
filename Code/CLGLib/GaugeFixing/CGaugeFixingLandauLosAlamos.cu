@@ -365,22 +365,6 @@ _kernelCalculateLandauDivation(
     pDeviceRes[uiSiteIndex] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
 }
 
-/**
- * F = ReTr(sum _n, mu U_mu (n))
- */
-//__global__ void _CLG_LAUNCH_BOUND
-//_kernelMeasureF(Real* pDeviceRes, const deviceSU3* __restrict__ pU)
-//{
-//    intokernaldir;
-//
-//    Real fRes = F(0.0);
-//    for (BYTE dir = 0; dir < uiDir; ++dir)
-//    {
-//        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-//        fRes += pU[uiLinkIndex].ReTr();
-//    }
-//    pDeviceRes[uiSiteIndex] = fRes;
-//}
 
 #pragma endregion
 

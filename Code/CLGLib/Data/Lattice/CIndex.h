@@ -40,6 +40,18 @@ __DEFINE_ENUM(EIndexType,
     )
 
 
+
+__DEFINE_ENUM(EIndexEvenOdd,
+
+    EIE_All,
+    EIE_EvenToOdd,
+    EIE_OddToEven,
+    EIE_EvenToOddOnEven,
+    EIE_OddToEvenOnOdd,
+    EIE_ForceDWORD = 0x7fffffff,
+    )
+
+
 class CLGAPI CIndex : public CBase
 {
 public:

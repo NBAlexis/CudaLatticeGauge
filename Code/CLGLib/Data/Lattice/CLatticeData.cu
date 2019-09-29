@@ -17,6 +17,7 @@ Real CLGAPI CCommonData::m_fOmega = F(0.0);
 SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);
 UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
 UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
+UBOOL CLGAPI CCommonData::m_bStochasticGaussian = FALSE;
 
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
@@ -28,6 +29,8 @@ CLatticeData::CLatticeData()
     , m_uiRandomSeed(0)
 
     , m_pGaugeField(NULL)
+    , m_pAphys(NULL)
+    , m_pUpure(NULL)
     , m_pFieldCache(NULL)
 
     , m_pUpdator(NULL)
@@ -84,6 +87,8 @@ CLatticeData::~CLatticeData()
 
     appSafeDelete(m_pFieldCache);
     appSafeDelete(m_pGaugeField);
+    appSafeDelete(m_pAphys);
+    appSafeDelete(m_pUpure);
     appSafeDelete(m_pIndexCache);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
@@ -178,6 +183,39 @@ void CLatticeData::FixAllFieldBoundary() const
 void CLatticeData::SetFieldBoundaryCondition(BYTE byFieldId, const SBoundCondition& bc) const
 {
     m_pIndex->m_pBoundaryCondition->SetFieldSpecificBc(byFieldId, bc);
+}
+
+void CLatticeData::SetAPhys(const CFieldGauge* pUatCoulomb)
+{
+    if (NULL == m_pAphys)
+    {
+        m_pAphys = dynamic_cast<CFieldGauge*>(pUatCoulomb->GetCopy());
+    }
+    else
+    {
+        pUatCoulomb->CopyTo(m_pAphys);
+    }
+    m_pAphys->TransformToIA();
+}
+
+void CLatticeData::SetAPure(const CFieldGauge* pUnow)
+{
+    if (NULL == m_pAphys)
+    {
+        appCrucial(_T("CLatticeData: A phys is undefined, need to define A phys first!\n"));
+        return;
+    }
+    if (NULL == m_pUpure)
+    {
+        m_pUpure = dynamic_cast<CFieldGauge*>(pUnow->GetCopy());
+    }
+    else
+    {
+        pUnow->CopyTo(m_pUpure);
+    }
+    m_pUpure->TransformToIA();
+    m_pUpure->AxpyMinus(m_pAphys);
+    m_pUpure->TransformToU();
 }
 
 CCString CLatticeData::GetInfos(const CCString& sTab) const

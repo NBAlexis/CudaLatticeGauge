@@ -149,12 +149,6 @@ _kernelPolyakovAverageDist(UINT* pCount, CLGComplex* pValue)
 
 #pragma endregion
 
-CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes)
-{
-    preparethread;
-    _kernelPolyakovZeroXYPlane << <block, threads >> > (pDeviceRes, NULL);
-}
-
 CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes)
 {
     dim3 block1(_HC_DecompX, _HC_DecompY, 1);

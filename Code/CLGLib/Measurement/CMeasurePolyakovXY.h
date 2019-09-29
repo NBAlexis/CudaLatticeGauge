@@ -13,10 +13,6 @@
 
 __BEGIN_NAMESPACE
 
-/**
-* array[x, y] = 0
-*/
-extern CLGAPI void _ZeroXYPlaneC(CLGComplex* pDeviceRes);
 
 /**
 * No need to initial pRes = 0

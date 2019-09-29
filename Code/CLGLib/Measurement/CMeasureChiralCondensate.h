@@ -47,7 +47,8 @@ public:
     void Report() override;
     void Reset() override;
 
-    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsGaugeMeasurement() const override { return FALSE; }
+    UBOOL IsZ4Source() const override { return TRUE; }
 
 protected:
     
