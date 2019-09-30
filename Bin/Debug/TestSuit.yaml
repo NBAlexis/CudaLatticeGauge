@@ -2302,7 +2302,7 @@ TestAngularMomentum:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [6, 6, 6, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -2392,4 +2392,4 @@ TestAngularMomentum:
         Exponential : 1
         Naive : 1
         ShowResult : 1
-        FieldCount : 1
+        FieldCount : 5000

@@ -310,7 +310,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             _kernelCalculateGaugeSpin << <block, threads >> > (pESU3->m_pDeviceData, pAphysSU3->m_pDeviceData, m_pDeviceSpinBuffer, fBetaOverN);
 
             _AverageXYPlane(m_pDeviceSpinBuffer);
-            checkCudaErrors(cudaMemcpy(m_pHostSpinBuffer, m_pDeviceSpinBuffer, sizeof(CLGComplex)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(m_pHostSpinBuffer, m_pDeviceSpinBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
             for (UINT i = 1; i < _HC_Ly; ++i)
             {
                 for (UINT j = 1; j < _HC_Lx; ++j)

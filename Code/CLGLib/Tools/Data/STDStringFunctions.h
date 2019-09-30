@@ -58,8 +58,6 @@ inline TCHAR* strcpy_s(TCHAR* dest, size_t length, const TCHAR* source)
 
 #endif
 
-
-
 inline TCHAR appToUpper(TCHAR in)
 {
     return static_cast<TCHAR>(::toupper(in));
