@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AngularMomentumTest.cpp" />
+    <ClCompile Include="GaugeFixingJob.cpp" />
     <ClCompile Include="PolykovDistrib.cpp" />
     <ClCompile Include="RotatingReproduce.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

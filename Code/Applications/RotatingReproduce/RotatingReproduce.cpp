@@ -26,23 +26,29 @@ int main(int argc, char * argv[])
     INT res = 0;
     switch (eJob)
     {
-    case ERJ_AngularMomentum:
-    {
-        CParameters workingParam1 = params.GetParameter(_T("JobAugular"));
-        res = TestAngularMomentum(workingParam1);
-    }
+        case ERJ_AngularMomentum:
+            {
+                CParameters workingParam1 = params.GetParameter(_T("JobAugular"));
+                res = TestAngularMomentum(workingParam1);
+            }
         break;
         case ERJ_Thermal:
-        {
-            CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
-            res = TestThermal(workingParam2);
-        }
+            {
+                CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
+                res = TestThermal(workingParam2);
+            }
         break;
         case ERJ_PolyakovDist:
-        {
-            CParameters workingParam2 = params.GetParameter(_T("JobPolyakovDist"));
-            res = MeasurePolyakovDist(workingParam2);
-        }
+            {
+                CParameters workingParam3 = params.GetParameter(_T("JobPolyakovDist"));
+                res = MeasurePolyakovDist(workingParam3);
+            }
+        break;
+        case ERJ_GaugeFixing:
+            {
+                CParameters workingParam4 = params.GetParameter(_T("JobGaugeFixing"));
+                res = GaugeFixing(workingParam4);
+            }
         break;
     }
 

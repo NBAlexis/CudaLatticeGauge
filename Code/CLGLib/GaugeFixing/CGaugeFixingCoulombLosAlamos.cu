@@ -529,7 +529,7 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
         if (0 == m_iIterate % m_iCheckErrorStep)
         {
             const Real fTheta = CheckResDeviceBufferOnlyT(pDeviceBufferPointer, uiT);
-            appParanoiac(_T("Iterate : %d, error = %2.12f\n"), m_iIterate, fTheta);
+            appDetailed(_T("Iterate : %d, error = %2.12f\n"), m_iIterate, fTheta);
             if (fTheta < m_fAccuracy)
             {
                 return;

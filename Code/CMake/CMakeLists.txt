@@ -235,6 +235,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)
 add_executable(RotatingReproduce 
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.h
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/AngularMomentumTest.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/PolykovDistrib.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.cpp
     ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/ThermalTest.cpp

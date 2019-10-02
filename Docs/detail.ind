@@ -1,6 +1,8 @@
 \begin{theindex}
 
-  \item autocorrelation, \hyperpage{71, 72}
+  \item APE smearing, \hyperpage{51}
+  \item APE stout, \hyperpage{51}
+  \item autocorrelation, \hyperpage{85, 86}
 
   \indexspace
 
@@ -11,6 +13,7 @@
 
   \item Cabibbo-Marinari trick, \hyperpage{43}
   \item Cornell gauge fixing, \hyperpage{41}
+  \item correlator, \hyperpage{45}
 
   \indexspace
 
@@ -20,6 +23,7 @@
   \indexspace
 
   \item equilibrium, \hyperpage{17}
+  \item exceptional configurations, \hyperpage{51}
 
   \indexspace
 
@@ -32,6 +36,8 @@
 
   \indexspace
 
+  \item gauge smearing, \hyperpage{51}
+  \item gauge smoothing, \hyperpage{51}
   \item GCR, \hyperpage{25}
   \item GCRO-DR, \hyperpage{27, 28}, \hyperpage{37}
   \item generalized eigen-value problem, \hyperpage{30}, \hyperpage{36}
@@ -55,6 +61,10 @@
 
   \indexspace
 
+  \item Ji decomposition, \hyperpage{78}
+
+  \indexspace
+
   \item Krylov subspace, \hyperpage{21}
 
   \indexspace
@@ -64,10 +74,11 @@
   \item leap frog, \hyperpage{16}
   \item link index, \hyperpage{5}
   \item Los Alamos gauge fixing, \hyperpage{42}
-  \item low mode, \hyperpage{27}
+  \item low mode, \hyperpage{27}, \hyperpage{51}
 
   \indexspace
 
+  \item meson, \hyperpage{45}
   \item Metropolis, \hyperpage{17}
   \item molecular dynamics, \hyperpage{8}
   \item multi-rate integrator, \hyperpage{19}
@@ -82,8 +93,10 @@
 
   \indexspace
 
+  \item plaquette energy, \hyperpage{45}
+  \item point source, \hyperpage{47, 48}
   \item preconditioner, \hyperpage{27}
-  \item pseudofermions, \hyperpage{7}
+  \item pseudofermions, \hyperpage{7}, \hyperpage{48}
 
   \indexspace
 
@@ -91,6 +104,7 @@
 
   \indexspace
 
+  \item reciprocal space, \hyperpage{48}
   \item REV, \hyperpage{30}
   \item Ritz eigen-vector, \hyperpage{30}
 
@@ -100,7 +114,9 @@
   \item singular value decomposition, \hyperpage{30}
   \item site index, \hyperpage{5}
   \item solver, \hyperpage{14}, \hyperpage{21}
-  \item staple, \hyperpage{10}
+  \item source, \hyperpage{47}
+  \item staple, \hyperpage{10}, \hyperpage{51}
+  \item stout, \hyperpage{51}
   \item SVD, \hyperpage{30}
 
 \end{theindex}

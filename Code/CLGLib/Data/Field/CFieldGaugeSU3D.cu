@@ -330,7 +330,7 @@ _kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
 
 
 /**
- * iA = U.TA() / 2
+ * iA = U.TA() 
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformToIA_D(
@@ -346,7 +346,6 @@ _kernelTransformToIA_D(
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex].Ta();
-            pDeviceData[uiLinkIndex].MulReal(F(0.5));
         }
     }
 }

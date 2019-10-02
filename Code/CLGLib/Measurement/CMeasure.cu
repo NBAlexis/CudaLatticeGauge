@@ -337,11 +337,18 @@ void CMeasure::ReportDistributionXY_R(UINT uiConfig, const TArray<Real>& arrayRe
                 if (0 == k)
                 {
                     tmpjgs.AddItem(arrayRes[idx]);
-                    appGeneral(_T("%2.12f"), arrayRes[idx]);
                 }
                 else
                 {
                     tmpjgs[i * (_HC_Lx - 1) + j] += arrayRes[idx];
+                }
+
+                if (0 == j)
+                {
+                    appGeneral(_T("%2.12f"), arrayRes[idx]);
+                }
+                else
+                {
                     appGeneral(_T(", %2.12f"), arrayRes[idx]);
                 }
             }
@@ -404,10 +411,18 @@ void CMeasure::ReportDistributionXY_C(UINT uiConfig, const TArray<CLGComplex>& a
             for (UINT j = 0; j < _HC_Lx - 1; ++j)
             {
                 const UINT idx = k * (_HC_Lx - 1) * (_HC_Ly - 1) + i * (_HC_Lx - 1) + j;
-                
+
                 if (0 == k)
                 {
                     tmpjgs.AddItem(arrayRes[idx]);
+                }
+                else
+                {
+                    tmpjgs[i * (_HC_Lx - 1) + j] = _cuCaddf(tmpjgs[i * (_HC_Lx - 1) + j], arrayRes[idx]);
+                }
+
+                if (0 == j)
+                {
                     appGeneral(_T("%2.12f %s %2.12f I"), 
                         arrayRes[idx].x, 
                         arrayRes[idx].y > 0 ? _T("+") : _T("-"), 
@@ -415,14 +430,13 @@ void CMeasure::ReportDistributionXY_C(UINT uiConfig, const TArray<CLGComplex>& a
                 }
                 else
                 {
-                    tmpjgs[i * (_HC_Lx - 1) + j] = _cuCaddf(tmpjgs[i * (_HC_Lx - 1) + j], arrayRes[idx]);
                     appGeneral(_T(", %2.12f %s %2.12f I"),
                         arrayRes[idx].x,
                         arrayRes[idx].y > 0 ? _T("+") : _T("-"),
                         appAbs(arrayRes[idx].y));
                 }
             }
-            appGeneral(_T("}, "));
+            appGeneral(_T("},\n  "));
         }
         appGeneral(_T("}\n"));
     }

@@ -466,7 +466,7 @@ _kernelSetConfigurationSU3(
 }
 
 /**
- * iA = U.TA() / 2
+ * iA = U.TA() 
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformToIA(
@@ -478,7 +478,6 @@ _kernelTransformToIA(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         pDeviceData[uiLinkIndex].Ta();
-        pDeviceData[uiLinkIndex].MulReal(F(0.5));
     }
 }
 
@@ -499,10 +498,9 @@ _kernelTransformToE(
     {
         deviceSU3 res = deviceSU3::makeSU3Zero();
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (dir < uiDir - 1)
+        //if (dir < uiDir - 1)
         {
             //find clover F
-            //res = _deviceClover(pDeviceData, uiBigIdx, 3, dir).ImC();
             res = _deviceClover(pDeviceData, uiBigIdx, 3, dir);
             res.Ta();
             res.MulReal(F(0.25));

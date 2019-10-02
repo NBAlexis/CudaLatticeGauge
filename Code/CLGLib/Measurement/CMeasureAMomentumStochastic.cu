@@ -184,7 +184,149 @@ _kernelDotAndGatherXYAMomentumJL(
     atomicAdd(&resultXYPlaneJL[uiXY], cDotRes.x);
 }
 
-//Simplify it because we only use the naive version
+/**
+ * Simplified version
+ * Not support naive anymore
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotAndGatherXYAMomentumJPure(
+    const deviceWilsonVectorSU3* __restrict__ pLeft,
+    const deviceWilsonVectorSU3* __restrict__ pRight,
+    const deviceSU3* __restrict__ pGauge,
+    const deviceSU3* __restrict__ pAphys,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    BYTE byFieldId, SSmallInt4 sCenter,
+    Real* resultXYPlaneJL)
+{
+    intokernalInt4;
+
+    const UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
+    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+
+    deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
+
+#pragma region JL
+
+    //idir = mu
+    for (UINT idir = 0; idir < 2; ++idir)
+    {
+        //=========================
+        //get things
+
+        //x, mu
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        const SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+        const SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+        //hopping terms
+
+        //U(x,mu) phi(x+ mu)
+        deviceWilsonVectorSU3 phi_right = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir).MulWilsonVector(_deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId));
+        if (x_p_mu_Fermion.NeedToOpposite())
+        {
+            if (0 == idir)
+            {
+                //opposite, note fmY = - Y
+                // k y Omega gamma4 U(x,mu) phi(x+ mu)
+                phi_right.MulReal(fmY);
+                jl.Add(gamma4.MulWilsonC(phi_right));
+            }
+            else if (1 == idir)
+            {
+                //opposite
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                phi_right.MulReal(fmX);
+                jl.Sub(gamma4.MulWilsonC(phi_right));
+            }
+        }
+        else
+        {
+            if (0 == idir)
+            {
+                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                phi_right.MulReal(fmY);
+                jl.Sub(gamma4.MulWilsonC(phi_right));
+            }
+            else if (1 == idir)
+            {
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                phi_right.MulReal(fmX);
+                jl.Add(gamma4.MulWilsonC(phi_right));
+            }
+        }
+
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        x_m_mu_Gauge_element.Dagger();
+        //U^{dagger}(x-mu) phi(x-mu)
+        phi_right = x_m_mu_Gauge_element.MulWilsonVector(_deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId));
+        if (x_m_mu_Fermion.NeedToOpposite())
+        {
+            if (0 == idir)
+            {
+                //oppsite and -fY
+                //- k y Omega gamma4 U(x,mu) phi(x - mu)
+                phi_right.MulReal(fmY);
+                jl.Sub(gamma4.MulWilsonC(phi_right));
+            }
+            else if (1 == idir)
+            {
+                //oppsite and -fX
+                //+ k x Omega gamma4 U(x,mu) phi(x - mu)
+                phi_right.MulReal(fmX);
+                jl.Add(gamma4.MulWilsonC(phi_right));
+            }
+        }
+        else
+        {
+            if (0 == idir)
+            {
+                //- k y Omega gamma4 U(x,mu) phi(x - mu)
+                phi_right.MulReal(fmY);
+                jl.Add(gamma4.MulWilsonC(phi_right));
+            }
+            else if (1 == idir)
+            {
+                //+ k x Omega gamma4 U(x,mu) phi(x - mu)
+                phi_right.MulReal(fmX);
+                jl.Sub(gamma4.MulWilsonC(phi_right));
+            }
+        }
+
+        //this part above is D mu phi
+        //we now sub A phys
+        //2.0 is for 2 a i A / 2a
+        if (0 == idir)
+        {
+            // - y A_x gamma4 phi(x)
+            phi_right = gamma4.MulWilsonC(x_Fermion_element.MulRealC(fmY * F(2.0)));
+            jl.Add(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
+        }
+        else if (1 == idir)
+        {
+            // + x A_y gamma4 phi(x)
+            phi_right = gamma4.MulWilsonC(x_Fermion_element.MulRealC(fmX * F(2.0)));
+            jl.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
+        }
+    }
+
+#pragma endregion
+
+    //this part is Dmu phi
+
+
+    CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(jl);
+
+    atomicAdd(&resultXYPlaneJL[uiXY], cDotRes.x);
+}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS(
@@ -326,9 +468,10 @@ _kernelDotAndGatherXYAMomentumJPot(
     midX.MulReal(fY);
     midY.Sub(midX);
 
-    CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(midY.MulWilsonVector(pRight[uiSiteIndex]));
+    CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(
+        __chiralGamma[GAMMA4].MulWilsonC(midY.MulWilsonVector(pRight[uiSiteIndex])));
 
-    atomicAdd(&resultXYPlaneJPot[uiXY], cDotRes.x);
+    atomicAdd(&resultXYPlaneJPot[uiXY], cDotRes.x * F(2.0));
 }
 
 #pragma endregion
@@ -500,22 +643,22 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
     if (m_bMeasureJLPure)
     {
         CFieldGaugeSU3* pAphys = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
-        CFieldGaugeSU3* pUpure = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pUpure);
-        if (NULL == pAphys || NULL == pUpure)
+        if (NULL == pAphys)
         {
             appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
         }
         else
         {
+            //checkCudaErrors(cudaMemcpy(m_pDeviceXYBufferJLPure, m_pDeviceXYBufferJL, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToDevice));
 
-            _kernelDotAndGatherXYAMomentumJL << <block, threads >> > (
+            _kernelDotAndGatherXYAMomentumJPure << <block, threads >> > (
                 pF2W->m_pDeviceData,
                 pF1W->m_pDeviceData,
-                pUpure->m_pDeviceData,
+                pGaugeSU3->m_pDeviceData,
+                pAphys->m_pDeviceData,
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
                 m_byFieldId,
-                m_bNaive,
                 CCommonData::m_sCenter,
                 m_pDeviceXYBufferJLPure
                 );

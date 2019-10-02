@@ -39,17 +39,13 @@ public:
     CMeasureAMomentumJG() 
         : CMeasure()
         , m_pHostDataBuffer(NULL)
-        , m_pDeviceDataBufferOneConfig(NULL)
-        , m_pHostSpinBuffer(NULL)
-        , m_pDeviceSpinBuffer(NULL)
+        , m_pDeviceDataBuffer(NULL)
         , m_byFieldId(1)
 
         , m_pDistributionR(NULL)
         , m_pDistributionJG(NULL)
         , m_pHostDistributionR(NULL)
         , m_pHostDistributionJG(NULL)
-        , m_pDistributionJGS(NULL)
-        , m_pHostDistributionJGS(NULL)
 
         , m_uiMaxR(1)
         , m_uiEdgeR(1)
@@ -60,6 +56,7 @@ public:
 
         , m_bMeasureSpin(FALSE)
         , m_pE(NULL)
+        , m_pDpureA(NULL)
     {
     }
 
@@ -78,21 +75,14 @@ public:
 protected:
 
     Real * m_pHostDataBuffer;
-    Real * m_pDeviceDataBufferOneConfig;
+    Real * m_pDeviceDataBuffer;
 
-    //those buffer are reused in calculation of JG chen
-    Real* m_pHostSpinBuffer;
-    Real* m_pDeviceSpinBuffer;
     BYTE m_byFieldId;
 
     UINT* m_pDistributionR;
     Real* m_pDistributionJG;
     UINT* m_pHostDistributionR;
     Real* m_pHostDistributionJG;
-
-    //those buffer are reused in calculation of JG chen
-    Real* m_pDistributionJGS;
-    Real* m_pHostDistributionJGS;
 
     UINT m_uiMaxR;
     UINT m_uiEdgeR;
@@ -103,9 +93,11 @@ protected:
     TArray<Real> m_lstRes;
     TArray<Real> m_lstResJGS;
     TArray<Real> m_lstResJGChen;
+    TArray<Real> m_lstResJGChenApprox;
 
     UBOOL m_bMeasureSpin;
     CFieldGauge* m_pE;
+    CFieldGauge* m_pDpureA;
 
 public:
 
@@ -125,6 +117,11 @@ public:
     TArray<Real> m_lstJGChenInner;
     //jg chen as function of R
     TArray<Real> m_lstJGChen;
+
+    TArray<Real> m_lstJGChenApproxAll;
+    TArray<Real> m_lstJGChenApproxInner;
+    //jg chen as function of R
+    TArray<Real> m_lstJGChenApprox;
 };
 
 __END_NAMESPACE

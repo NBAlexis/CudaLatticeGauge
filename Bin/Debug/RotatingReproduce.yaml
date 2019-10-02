@@ -1,157 +1,7 @@
-# {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist}
-RotatingJob : ERJ_PolyakovDist
+# {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
+RotatingJob : ERJ_GaugeFixing
 VerboseLevel : GENERAL
 VerboseOutput : datetime
-
-JobAugular:
-
-    ## Log options
-    ## Verbose will always show in stdout
-    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
-    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
-    VerboseLevel : GENERAL
-    VerboseOutput : datetime
-    ShowDeviceInformation : 0
-    ShowParameterContent : 0
-    BeforeEquvibStep : 80
-    EquvibStep : 10
-    LoopStart : 0
-    LoopEnd : 6
-    OmegaSep : 150
-    MaxOmega : 0.15
-    MinNt : 2
-    MaxNt : 6
-    ConfigNumberEachOmega : 3
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [12, 12, 12, 12]
-    LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_XORWOW
-    RandomSeedType : ERST_Timestamp
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 5
-    CacheStaple : 0
-
-    Updator:
-
-        UpdatorType : CHMC
-        Metropolis : 1
-        ReportMeasure : 0
-        Adaptive : 1
-        MinMaxStep : [2, 50]
-        GrowReduceThreshold : [-0.4, 0.02]
-
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorNestedForceGradient
-        ## IntegratorType : CIntegratorNestedOmelyan
-        IntegratorStepLength : 1
-        IntegratorStep : 5
-        NestedStep : 5
-        Omelyan2Lambda : 0.38636665500756728
-
-    Gauge:
-        FieldName : CFieldGaugeSU3D
-        FieldInitialType : EFIT_Random
-
-        Period : [0, 0, 1, 1]
-
-    GaugeBoundary:
-
-        FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-
-        FieldName : CFieldFermionWilsonSquareSU3DR
-        FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.1665
-        FieldId : 2
-        PoolNumber : 26
-        Period : [0, 0, 1, -1]
-        Naive : 1
-        Exponential : 1
-
-    BoundaryFermionField1:
-
-        FieldName : CFieldBoundaryWilsonSquareSU3
-        FieldId : 2
-        
-    Action1:
-   
-        ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.32144
-        Omega : 0.06
-
-    Action2:
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-
-    Solver:
-        SolverForFieldId : 2
-        SolverName : CSLASolverGMRES
-        MaxDim : 40
-        Accuracy : 0.000000001
-
-
-        ##SolverName : CSLASolverGCRODR
-        ##MDim : 27
-        ##KDim : 4
-        ##RecalculateR : 10
-        ##DeflateSpace : EEDT_SVD
-        ##Accuracy : 0.00001
-
-        Restart : 200
-        AbsoluteAccuracy : 1
-
-    Measure1:
-
-        MeasureName : CMeasureAMomentumJG
-        FieldId : 1
-        ShowResult : 1
-
-    Measure2:
-
-        MeasureName : CMeasureAMomentumJF
-        FieldId : 2
-        ShowResult : 1
-        Naive : 1
-        Exponential : 1
-
-    Measure3:
-
-        MeasureName : CMeasureChargeAndCurrents
-        FieldId : 2
-        ShowResult : 1
-
-    Measure4:
-
-        MeasureName : CMeasureTopologicChargeXY
-        FieldId : 2
-        ShowResult : 1
-        GaugeSmearing : 1
-
-    Measure5:
-
-        MeasureName : CMeasurePolyakovXY
-        FieldId : 2
-        ShowResult : 1
-
-    Measure6:
-
-        MeasureName : CMeasureChiralCondensate
-        FieldId : 2
-        FieldCount : 10
-
-    GaugeSmearing:
-
-        SmearingName : CGaugeSmearingAPEStout
-        RhoS : 0.1
-        RhoT : 0.1
-        Iterate : 5
-        ProjIterate : 6
 
 JobThermal:
 
@@ -434,3 +284,198 @@ JobPolyakovDist:
         Naive : 1
         ShowResult : 0
 
+JobGaugeFixing:
+
+    VerboseLevel : DETAILED
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 1
+
+    Nt : 3
+    OmegaStart : 0
+    OmegaEnd : 20
+    IndexStart : 1
+    IndexEnd : 2000
+    LoadPrefix : ../../../ThermalCircle/Final150+320xStep/49616/Nt3/N49616_
+    SavePrefix : GFN49616_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 3]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3D
+        FieldInitialType : EFIT_Random
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombLosAlamos
+        Omega : 1.6
+        CheckErrorStep : 1000
+        MaxIterate : 1000000
+        Accuracy : 0.00000000000001
+
+
+JobAugular:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    BeforeEquvibStep : 80
+    EquvibStep : 10
+    LoopStart : 0
+    LoopEnd : 6
+    OmegaSep : 150
+    MaxOmega : 0.15
+    MinNt : 2
+    MaxNt : 6
+    ConfigNumberEachOmega : 3
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 12]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 5
+    CacheStaple : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [2, 50]
+        GrowReduceThreshold : [-0.4, 0.02]
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        ## IntegratorType : CIntegratorNestedOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 5
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+        FieldName : CFieldGaugeSU3D
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.1665
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.32144
+        Omega : 0.06
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Solver:
+        SolverForFieldId : 2
+        SolverName : CSLASolverGMRES
+        MaxDim : 40
+        Accuracy : 0.000000001
+
+
+        ##SolverName : CSLASolverGCRODR
+        ##MDim : 27
+        ##KDim : 4
+        ##RecalculateR : 10
+        ##DeflateSpace : EEDT_SVD
+        ##Accuracy : 0.00001
+
+        Restart : 200
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+
+    Measure2:
+
+        MeasureName : CMeasureAMomentumJF
+        FieldId : 2
+        ShowResult : 1
+        Naive : 1
+        Exponential : 1
+
+    Measure3:
+
+        MeasureName : CMeasureChargeAndCurrents
+        FieldId : 2
+        ShowResult : 1
+
+    Measure4:
+
+        MeasureName : CMeasureTopologicChargeXY
+        FieldId : 2
+        ShowResult : 1
+        GaugeSmearing : 1
+
+    Measure5:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 2
+        ShowResult : 1
+
+    Measure6:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 10
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEStout
+        RhoS : 0.1
+        RhoT : 0.1
+        Iterate : 5
+        ProjIterate : 6

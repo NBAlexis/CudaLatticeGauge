@@ -134,7 +134,7 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
 }
 
 /**
- * calculate D_mu A _nu = (Delta _mu - A_mu) A _nu
+ * calculate D_mu A _nu = Delta _mu + [A_mu, A _nu]
  * Use U now to calculate A pure
  * me will be changed, so, if me is A phys, copy me first
  */
@@ -145,31 +145,14 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu(
     BYTE byMu,
     BYTE byNu)
 {
-    //i a D A = (A_nu (n) - A_nu (n-mu)) - iApure _mu A _nu
+    //i a D A = (A_nu (n) - A_nu (n-mu)) + iApure _mu A _nu - i A _nu Apure _mu
     const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
 
-    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu);
-    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
-    res.MulReal(F(-1.0));
-    res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
-    res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu));
-    return res;
-}
-
-static __device__ __inline__ deviceSU3 _deviceDPureMuUpure(
-    const deviceSU3* __restrict__ piA,
-    const deviceSU3* __restrict__ piUpure,
-    UINT uiBigIdx,
-    BYTE byMu,
-    BYTE byNu)
-{
-    //i a D A = (A_nu (n) - A_nu (n-mu)) - iApure _mu A _nu
-    const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
-
-    deviceSU3 res = _deviceGetGaugeBCSU3DirOne(piUpure, uiBigIdx, byMu);
-    res.Ta();
-    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
-    res.MulReal(F(-0.5));
+    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu); //Apure _mu
+    deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu); //A _nu
+    res2.Mul(res); //A _nu Apure _mu
+    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu)); //Apure _mu A _nu
+    res.Sub(res2); //[Apure, A]
     res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
     res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu));
     return res;

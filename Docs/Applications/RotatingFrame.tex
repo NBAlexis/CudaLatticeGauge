@@ -768,6 +768,313 @@ therefor
 \end{split}
 \end{equation}
 
+\textbf{Details about Angular momentum}
+
+In the lattice code, we use
+\begin{equation}
+\begin{split}
+&F_{\mu\nu}\equiv \partial _{\mu}A_{\nu}-\partial _{\nu}A_{\mu}+i[A_{\mu},A_{\nu}]=g_{YM}\sum _aT^a F^a_{\mu\nu}\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&F^a_{0i}=E^a_i,\;\;F^a_{ij}=\epsilon _{ijk}B^a_i
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&{\bf J}_G=\sum _a {\bf r}\times \left({\bf E}^a\times {\bf B}^a\right)\\
+&=-\left(\begin{array}{c}
+y(F^a_{02}F^a_{23}-F^a_{01}F^a_{31})+z(F^a_{03}F^a_{23}-F^a_{01}F^a_{12})\\
+x(F^a_{01}F^a_{31}-F^a_{02}F^a_{23})+z(F^a_{03}F^a_{31}-F^a_{02}F^a_{12})\\
+x F^a_{01}F^a_{12}+yF^a_{02}F^a_{12}-xF^a_{03}F^a_{23}+yF^a_{03}F^a_{13} \end{array}\right)\\
+\end{split}
+\end{equation}
+Using ${\rm tr}[T_iT_j]=\frac{1}{2}\delta _{ij}$, one have
+\begin{equation}
+\begin{split}
+&\frac{2}{g_{YM}^2}{\rm tr}\left[F_{\mu\nu}F_{\rho\sigma}\right]=\sum _a F^a_{\mu\nu}F^a_{\rho\sigma}\\
+\end{split}
+\end{equation}
+with $\frac{\beta}{N_c} \equiv \frac{2}{g_{YM}^2}$, it is
+\begin{equation}
+\begin{split}
+&{\bf J}_G=-\frac{\beta}{N_c}{\rm tr}_c\left[\left(\begin{array}{c}
+y(F_{02}F_{23}-F_{01}F_{31})+z(F_{03}F_{23}-F_{01}F_{12})\\
+x(F_{01}F_{31}-F_{02}F_{23})+z(F_{03}F_{31}-F_{02}F_{12})\\
+x F_{01}F_{12}+yF_{02}F_{12}-xF_{03}F_{23}+yF_{03}F_{13} \end{array}\right)\right],\\
+\end{split}
+\end{equation}
+After Wick rotation, which is to replace $F_{0i}\to iF_{0i}$, one have
+\begin{equation}
+\begin{split}
+&{\bf J}^E_G=-i\frac{\beta}{N_c}{\rm tr}_c\left[\left(\begin{array}{c}
+y(F_{02}F_{23}-F_{01}F_{31})+z(F_{03}F_{23}-F_{01}F_{12})\\
+x(F_{01}F_{31}-F_{02}F_{23})+z(F_{03}F_{31}-F_{02}F_{12})\\
+x F_{01}F_{12}+yF_{02}F_{12}-xF_{03}F_{23}+yF_{03}F_{13} \end{array}\right)\right],\\
+\end{split}
+\end{equation}
+where ${\rm tr}_c$ is trace in color space. Then $J_{Gz}$ is
+\begin{equation}
+\begin{split}
+&J^E_{Gz}=-i\frac{\beta}{N_c}\left(x {\rm tr}[F_{01}F_{12}]+y{\rm tr}[F_{02}F_{12}]-x{\rm tr}[F_{03}F_{23}]+y{\rm tr}[F_{03}F_{13}]\right)\\
+\end{split}
+\end{equation}
+Then discretize using ${\rm Retr}[V_{\mu\nu\rho}]=-a^4{\rm tr}\left[F_{\mu\nu}F_{\nu\rho}\right]+\mathcal{O}(a^6)$, and make the index of time $0\to 4$, and use dimensionless $\hat{x}=a^{-1}x$, it is\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&J^E_{Gz}=ia^{-3}\frac{\beta}{N_c}\left(\hat{x} {\rm Retr}[V_{412}+V_{432}]-\hat{y}{\rm Retr}[V_{421}+V_{431}]\right)\\
+\end{split}
+\end{equation}
+}
+
+If we use $\partial \mathcal{L}/\partial \Omega $, it is
+\begin{equation}
+\begin{split}
+&J'_{G}=\left.\frac{\partial\mathcal{L}_G}{\partial\Omega}\right|_{\Omega=0}=a\left(\left.\frac{\partial\mathcal{L}_G}{\partial(a\Omega)}\right|_{\Omega=0}\right)\\
+&=a^{-3}\left\{\frac{\beta}{N_c}\left(\hat{x} {\rm Retr}[V_{412}+V_{432}]-\hat{y}{\rm Retr}[V_{421}+V_{431}]\right)\right\}\\
+\end{split}
+\end{equation}
+\textbf{So, the $iJ'_G$ is just the $z$ component of $J_G^E$ in \index{Ji decomposition}Ji decomposition~\cite{AngularMomentum}}
+
+Now, considering
+\begin{equation}
+\begin{split}
+&{\bf L}_F=\frac{1}{i}\psi^{\dagger}{\bf r}\times {\bf D}\psi=\frac{1}{i}\bar{\psi}\gamma _0{\bf r}\times {\bf D}\psi\\
+\end{split}
+\end{equation}
+using
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi}_{c_1,s_1}(m) \psi _{c_2,s_2}(n) \rangle _F \equiv \frac{1}{Z}\int \mathcal{D}[\bar{\psi}\psi ]\bar{\psi}_i \psi _j \exp(-\sum _n \bar{\psi}(n)A\psi (n) )=-(A^{-1})_{c_2,s_2;c_1,s_1}(n|m)\\
+\end{split}
+\end{equation}
+with $\hat{D}=m-\slashed {D}$ and Wick rotated $S_F=\textcolor[rgb]{0,0,1}{a^4}\sum _n\bar{\psi}(n)\hat{D}\psi(n)$ (here $S$ is not spin but action, once change the integral over a Minkovski space to a summation, the Wick rotation is already assumed. However, Wick rotation will not change ${\bf D}$.) Using that
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi}_{c_1,s_1}(m) \psi _{c_2,s_2}(n) \rangle _F \equiv \frac{1}{Z}\int \mathcal{D}[\bar{\psi}\psi ]\bar{\psi}_i \psi _j \exp(-S_F)=-a^{-4}(\hat{D}^{-1})_{c_2,s_2;c_1,s_1}(n|m)\\
+\end{split}
+\end{equation}
+therefor
+\begin{equation}
+\begin{split}
+&\sum _{c_1,c_2,s_1,s_2}\delta _{c_1,c_2}\delta _{s_1,s_2}\langle \bar{\psi}_{c_1,s_1}(m) A_{c_1,s_1;c_2,s_2}(m|n) \psi _{c_2,s_2}(n) \rangle _F \\
+&=-a^{-4}(\hat{D}^{-1})_{c_2,s_2;c_1,s_1}(n|m)A_{c_1,s_1;c_2,s_2}(m|n)\\
+\end{split}
+\end{equation}
+consider a local operator it is
+\begin{equation}
+\begin{split}
+&\sum _{c_1,c_2,s_1,s_2}\delta _{c_1,c_2}\delta _{s_1,s_2}\langle \bar{\psi}_{c_1,s_1}(n) A_{c_1,s_1;c_2,s_2}(n|n) \psi _{c_2,s_2}(n) \rangle _F \\
+&=-a^{-4}(\hat{D}^{-1})_{c_2,s_2;c_1,s_1}(n|n)A_{c_1,s_1;c_2,s_2}(n|n)=-a^{-4}{\rm tr}_{c,s}\left[A(n)\hat{D}^{-1}(n)\right]\\
+\end{split}
+\end{equation}
+
+Specifically, we are considering
+\begin{equation}
+\begin{split}
+&\langle L^E_{F_z}\rangle=ia^{-4}{\rm tr}_{c,s}\left[\gamma ^0 \left(x\left(\partial _{y}+iA_{y}(n)\right)-y\left(\partial _{x}+iA_{x}(n)\right)\right)\hat{D}^{-1}(n)\right]\\
+\end{split}
+\end{equation}
+
+The $D$ operator and $\psi$ fields are scaled ones. The $\tilde{D}$ and $\tilde{\psi}$ are the original ones.
+
+The discretized Wilson operator is
+\begin{equation}
+\begin{split}
+&D_W\approx\frac{1}{m+\frac{4}{a}}\hat{D}\\
+&D_W(n|m)=\delta _{n,m}-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}\right)\\
+&+y\Omega \gamma _4\kappa\left(U_{x}(n)\delta _{n+ax,m}-U_{-x}(n)\delta _{n-ax,m}\right)-x\Omega \gamma _4\kappa\left(U_{y}(n)\delta _{n+ay,m}-U_{-y}(n)\delta _{n-ay,m}\right) -i\kappa\gamma _4a\Omega \sigma ^{12}\delta _{n,m}\\
+&\kappa=\frac{1}{2am+8}\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&\langle L^E_{F_z}\rangle=ia^{-4}\frac{1}{m+\frac{4}{a}}{\rm tr}_{c,s}\left[\gamma ^0 \left(x\left(\partial _{y}+iA_{y}(n)\right)-y\left(\partial _{x}+iA_{x}(n)\right)\right)\hat{D}_W^{-1}(n)\right]\\
+\end{split}
+\end{equation}
+and use
+\begin{equation}
+\begin{split}
+&(\partial _{\mu}+iA_{\mu})\psi(n)= \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a}+\mathcal{O}(a)\\
+\end{split}
+\end{equation}
+so\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\langle L^E_{F_z}\rangle=ia^{-3}\kappa {\rm tr}_{c,s}\left[\gamma ^4 \left(\hat{x} \left(U_y(n)\delta _{n+ay,m}-U_{-y}(n)\delta _{n-ay,m}\right)\right.\right.\\
+&\left.\left.-\hat{y} \left(U_{x}(n)\delta _{n+ax,m}-U_{-x}(n)\delta _{n-ax,m}\right)\right)\hat{D}_W^{-1}(n)\right]\\
+\end{split}
+\end{equation}
+}
+
+Similarly, using
+\begin{equation}
+\begin{split}
+&\left.\frac{\partial \mathcal{L}}{\partial \Omega}\right|_{\Omega=0}=\bar{\psi}\left\{-\kappa y \left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\right.\\
+&\left.+\kappa x \left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\right\}\psi\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\langle L'_F\rangle =\langle \left.\frac{\partial \mathcal{L}}{\partial \Omega}\right|_{\Omega=0} \rangle=-a^{-4}{\rm tr}\left[-\kappa y \left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\right.\\
+&\left.+\kappa x \left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\hat{D}_{W}\right]\\
+&=\kappa a^{-3} {\rm tr}_{c,s}\left[\gamma ^4 \left(\hat{x} \left(U_y(n)\delta _{n+ay,m}-U_{-y}(n)\delta _{n-ay,m}\right)\right.\right.\\
+&\left.\left.-\hat{y} \left(U_{x}(n)\delta _{n+ax,m}-U_{-x}(n)\delta _{n-ax,m}\right)\right)\hat{D}_W^{-1}(n)\right]\\
+\end{split}
+\end{equation}
+
+\textbf{Again, $i\langle L'_F\rangle $ is the $z$ component of $L_F$ in Ji decomposition~\cite{AngularMomentum}.}
+
+\textbf{Note that $\kappa$ entered because of $\hat{D}_W^{-1}$. Later we will calculate $D_{pure}$ acting on $A_{phys}$, where $\kappa$ shall not show up.}
+
+Similarly, considering (here $\gamma _{1,2}$ have already been Wick rotated)
+\begin{equation}
+\begin{split}
+&{\bf S}_F=\tilde{\psi}^{\dagger}\frac{1}{2}{\bf \Sigma}\tilde{\psi}\\
+&\Sigma_z\equiv \begin{pmatrix}
+                  \sigma _z & 0 \\
+                  0 & \sigma _z
+                \end{pmatrix}=\sigma ^E _{12}\equiv \frac{i}{2}\left(\gamma ^E_2\gamma ^E_1-\gamma ^E_1\gamma ^E_2\right)\\
+&S_{F_z}=\psi^{\dagger}\frac{1}{2}\sigma ^E_{12}\psi=\bar{\psi}\gamma _4\frac{1}{2}\sigma ^E_{12}\psi\\
+\end{split}
+\end{equation}
+therefor
+\begin{equation}
+\begin{split}
+&\langle S_{F_z}\rangle=-a^{-4}{\rm tr}_{c,s}\left[\gamma _4\frac{1}{2}\sigma ^E_{12}\hat{D}^{-1}(n)\right]=-a^{-4}\frac{1}{m+\frac{4}{a}}{\rm tr}_{c,s}\left[\gamma _0\frac{1}{2}\sigma ^{12}\hat{D}_W^{-1}(n)\right]=-a^{-3}\kappa {\rm tr}_{c,s}\left[\gamma _4\sigma ^{12}\hat{D}_W^{-1}(n)\right]\\
+&\textcolor[rgb]{0,0,1}{\langle S_{F_z}\rangle=ia^{-3}\kappa {\rm tr}_{c,s}\left[\gamma _4i\sigma ^{12}\hat{D}_W^{-1}(n)\right]}\\
+\end{split}
+\end{equation}
+
+On the other hand
+\begin{equation}
+\begin{split}
+&\langle\left.\frac{\partial \mathcal{L}}{\partial \Omega}\right|_{\Omega=0}\rangle=\langle \bar{\psi}\left(-i\kappa \gamma _4 a \sigma ^{12}\right)\psi \rangle\\
+&=-a^{-4}{\rm tr}\left[-i\kappa \gamma _4 a \sigma ^{12}\hat{D}_W^{-1}\right]=a^{-3}{\rm tr}\left[i\kappa \gamma _4  \sigma ^{12}\hat{D}_W^{-1}\right]\\
+\end{split}
+\end{equation}
+
+Note that, finally, this term is discretized as an imaginary chiral potential such that
+\begin{equation}
+\begin{split}
+&\langle\left.\frac{\partial \mathcal{L}}{\partial \Omega}\right|_{\Omega=0}\rangle=\langle \bar{\psi}\left(-\kappa \frac{ia \sigma ^{12}}{2}\left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)\right)\psi \rangle\\
+&=a^{-3}{\rm tr}\left[\frac{i\kappa \sigma ^{12}}{2} \left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)\hat{D}_W^{-1}\right]\\
+\end{split}
+\end{equation}
+
+We can do it in Coulomb gauge, since in Coulomb gauge, ${\bf A}={\bf A}_{phys}$, and ${\bf A}_{phys}$ is unchanged under gauge transformation.
+
+Using the fact that
+\begin{equation}
+\begin{split}
+&E_{0i}=F_{0i}=g_{YM}\sum _aT^a F^a_{0i},\;\;{\bf A}=g_{YM}\sum _{a}T^a{\bf A}^a,\;\;{\rm tr}[T^aT^b]=\frac{1}{2}\delta _{ab}\\
+&\sum _a {\bf E}^a \times {\bf A}^a=\frac{2}{g^2_{YM}}{\rm tr}[{\bf F_{0i}}\times {\bf A}]\\
+&\left(\sum _a {\bf E}^a \times {\bf A}^a\right)_z=\frac{2}{g^2_{YM}}{\rm tr}[F_{0x} A_y -F_{0y} A_x]\\
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\{M\}_{TA}=\frac{1}{2}\left(M-M^{\dagger}-\frac{1}{3}{\rm tr}(M-M^{\dagger})\right).\\
+&U_{\mu}(n)=\exp (iaA_{\mu}(n))\\
+&A_{\mu}(n)\approx a^{-1}\frac{1}{i}\{U_{\mu}(n)\}_{TA}\\
+&U_{\mu, \nu}(n)\equiv U_{\mu}(n)U_{\nu}(n+a\mu)U^{-1}_{\mu}(n+a\nu)U^{-1}_{\nu}(n)=\exp (ia^2F_{\mu\nu}(n)+\mathcal{O}(a^3))\\
+&F_{\mu\nu}(n)\approx a^{-2}\frac{1}{i}\left(U_{\mu\nu}(n)\right)_{TA}\\
+\end{split}
+\end{equation}
+or we can use the Clover gauge field
+\begin{equation}
+\begin{split}
+&F^{clover}_{\mu\nu}(n)=a^{-2}\frac{1}{4i}\left[U_{\mu,\nu}(n)+U_{\nu,-\mu}(n)+U_{-\mu,-\nu}(n)+U_{-\nu,\mu}(n)\right]_{TA}
+\end{split}
+\end{equation}
+so after Wick rotation $F_{0i}\to iF_{0i}$ it is
+\begin{equation}
+\begin{split}
+&\left\langle \left(\sum _a {\bf E}^a \times {\bf A}^a\right)_z\right\rangle =ia^{-3}\frac{\beta}{N_c} {\rm tr}[F^{clover}_{0x} \hat{A}_y - F^{clover}_{0y}\hat{A}_x]\\
+\end{split}
+\end{equation}
+where $\hat{A}=aA$
+
+Note that, for all angular momentums, the lattice version is $i\langle \ldots \rangle _{lat}=\langle \ldots \rangle $, therefor, our final form of angular momentum is
+\begin{equation}
+\begin{split}
+&\left\langle \left(\sum _a {\bf E}^a \times {\bf A}^a\right)_z\right\rangle _{lat} =a^{-3}\frac{\beta}{N_c} {\rm tr}[F^{clover}_{4x} \hat{A}_y -F^{clover}_{4y} \hat{A}_x]\\
+&=\textcolor[rgb]{0,0,1}{-a^{-3}\frac{\beta}{N_c} {\rm tr}[\{U^{clover}_{4x}\}_{TA} \{U_{phys,y}\}_{TA} -\{U^{clover}_{4y}\}_{TA} \{U_{phys,x}\}_{TA}]}
+\end{split}
+\end{equation}
+
+The gauge invariant $D_{pure}$ for fermion can be obtained by
+\begin{equation}
+\begin{split}
+&(\partial _{\mu}+iA_{\mu})\psi(n)= \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a}+\mathcal{O}(a)\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&(\partial _{\mu}+i(A_{\mu}-A_{phys,\mu})\psi(n)= \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a}-\frac{2iaA_{phys,\mu}(n)}{2a}\psi (n)+\mathcal{O}(a)\\
+\end{split}
+\end{equation}
+Note that $2iaA_{phys}$ is just $\textcolor[rgb]{1,0,0}{2}\{U_{phys}\}_{TA}$.
+
+Another momentum angular is
+\begin{equation}
+\begin{split}
+&\sum _{a,i}E^{ai}({\bf x}\times {\bf D}_{pure})A^{ai}\\
+\end{split}
+\end{equation}
+with $D_{pure}=\partial _{\mu}\textcolor[rgb]{1,0,0}{+}ig[\tilde{A}_{pure,\mu},\cdot]$ (in our definition, $A=g\tilde{A}$)
+
+After Wick rotation, it is
+\begin{equation}
+\begin{split}
+&i\sum _{a,i}F^a_{0i}({\bf x}\times {\bf D}_{pure})A^{ai}=i\frac{2}{g^2_{YM}}\sum _i{\rm tr}\left[F_{0i}({\bf x}\times {\bf D}_{pure})A^{i}\right]\\
+\end{split}
+\end{equation}
+
+Note that
+\begin{equation}
+\begin{split}
+&U_{\mu}(n)A_{phys,\nu}(n+\mu)U^{\dagger}_{\mu}(n)-U^{\dagger}_{\mu}(n-\mu)A_{phys,\nu}(n-\mu)U_{\mu}(n-\mu)\\
+&=\left(1+iaA_{\mu}(n)+\mathcal{O}(a^2)\right)A_{phys,\nu}(n+\mu)\left(1-iaA_{\mu}(n)+\mathcal{O}(a^2)\right)\\
+&-\left(1-iaA_{\mu}(n-\mu)+\mathcal{O}(a^2)\right)A_{phys,\nu}(n-\mu)\left(1-iaA_{\mu}(n-\mu)+\mathcal{O}(a^2)\right)\\
+&=A_{phys,\nu}(n+\mu)-A_{phys,\nu}(n-\mu)\\
+&+ia\left[A_{\mu}(n),A_{phys,\nu}(n+\mu)\right]+ia[A_{\mu}(n-\mu), A_{phys,\nu}(n-\mu)]+\mathcal{O}(a^2)\\
+&=A_{phys,\nu}(n+\mu)-A_{phys,\nu}(n-\mu)+2ia\left[A_{\mu}(n),A_{phys,\nu}(n)\right]+\mathcal{O}(a^2)\\
+\end{split}
+\end{equation}
+in the last step, $A(n+\mu)\approx A(n)+\mathcal{O}(a)$ is used. Then
+\begin{equation}
+\begin{split}
+&U_{\mu}(n)A_{phys,\nu}(n+\mu)U^{\dagger}_{\mu}(n)-U^{\dagger}_{\mu}(n-\mu)A_{phys,\nu}(n-\mu)U_{\mu}(n-\mu)\\
+&=2a\left(\frac{A_{phys,\nu}(n+\mu)-A_{phys,\nu}(n-\mu)}{2a}+i\left[A_{\mu}(n),A_{phys,\nu}(n)\right]\right)+\mathcal{O}(a^2)\\
+&\approx 2a \left(\partial _{\mu}A_{phys,\nu}+i\left[A_{pure,\mu},A_{phys,\nu}\right]\right)=2aD_{pure,\mu}A_{phys,\nu}\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&D_{pure,\mu}A_{phys,\nu}=\frac{1}{2a}\left(U_{\mu}(n)A_{phys,\nu}(n+\mu)U^{\dagger}_{\mu}(n)-U^{\dagger}_{\mu}(n-\mu)A_{phys,\nu}(n-\mu)U_{\mu}(n-\mu)\right)\\
+&=\frac{1}{2ia^2}\left(U_{\mu}(n)\{U_{phys,\nu}\}_{TA}(n+\mu)U^{\dagger}_{\mu}(n)-U^{\dagger}_{\mu}(n-\mu)\{U_{phys,\nu}(n-\mu)\}_{TA}U_{\mu}(n-\mu)\right)\\
+&\equiv \frac{1}{2ia^2} (DA)_{\mu\nu}
+\end{split}
+\end{equation}
+
+and
+\begin{equation}
+\begin{split}
+&i\sum _{a,j}F^a_{0j}({\bf x}\times {\bf D}_{pure})A^{aj}=i\sum _j\frac{1}{i}a^{-2}\frac{\beta}{N_C}{\rm tr}\left[\{U_{0j}\}_{TA}({\bf x}\times {\bf D}_{pure})A^{aj}\right]\\
+&=-i\sum _j\frac{1}{2}a^{-4}\frac{\beta}{N_C}{\rm tr}\left[\{U_{0j}\}_{TA}\left(x (DA)_{y j} - y (DA)_{x j}\right)\right]\\
+&=-i\frac{1}{2}\frac{\beta}{N_C} a^{-3}\sum _j{\rm tr}\left[\{U_{4j}\}_{TA}\left(\hat{x} (DA)_{1 j} - \hat{y} (DA)_{0 j}\right)\right]\\
+\end{split}
+\end{equation}
 
 
 \subsubsection{\label{sec:RotatingCurrentDensityChargeDensity}The Current density and Charge density}

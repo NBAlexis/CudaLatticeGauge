@@ -2307,7 +2307,7 @@ TestAngularMomentum:
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
-    RandomSeed : 1234567
+    RandomSeed : 7654321
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 2
