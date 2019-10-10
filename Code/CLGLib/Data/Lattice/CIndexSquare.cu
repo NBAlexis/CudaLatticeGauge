@@ -363,6 +363,8 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
 
 void CIndexSquare::BakeMoveIndex(CIndexData* pData, BYTE byFieldId)
 {
+    appParanoiac(_T("CIndexSquare::BakeMoveIndex for field ID:%d\n"), byFieldId);
+
     preparethread;
 
     checkCudaErrors(cudaMalloc((void**)&pData->m_pGaugeMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir));

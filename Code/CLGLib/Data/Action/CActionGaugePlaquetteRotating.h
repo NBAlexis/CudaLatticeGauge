@@ -59,6 +59,12 @@ protected:
 * big index is the index of walking table.
 * The plaqutte index may not be cached because n may out of boundary, so we calculate every one
 * n, n+mu, n+nu, n
+*
+*   <----- ^ 
+*   |      |
+*   |      |
+*   V      |
+* O ------->
 */
 static __device__ __inline__ deviceSU3 _device1PlaqutteTermPP(
     const deviceSU3* __restrict__ pDeviceData,
@@ -79,6 +85,12 @@ static __device__ __inline__ deviceSU3 _device1PlaqutteTermPP(
 
 /**
 * U(-mu,nu) = U^+_{mu}(N-mu) U_{nu}(N-mu) U_{mu}(N-mu+nu) U^+_{nu}(N)
+*
+*    ------->
+*    ^      |
+*    |      |
+*    |      V
+*    <------- O
 */
 static __device__ __inline__ deviceSU3 _device1PlaqutteTermMP(
     const deviceSU3* __restrict__ pDeviceData,
@@ -98,7 +110,13 @@ static __device__ __inline__ deviceSU3 _device1PlaqutteTermMP(
 }
 
 /**
-* U(mu,-nu) = U(N) U(N+mu-nu) U(N-nu) U(N-nu)
+* U(mu,-nu) = U(N) U^+(N+mu-nu) U^+(N-nu) U(N-nu)
+*
+* O  ------->
+*    ^      |
+*    |      |
+*    |      V
+*    <-------
 */
 static __device__ __inline__ deviceSU3 _device1PlaqutteTermPM(
     const deviceSU3* __restrict__ pDeviceData,
@@ -118,7 +136,13 @@ static __device__ __inline__ deviceSU3 _device1PlaqutteTermPM(
 }
 
 /**
-* U(-mu,-nu) = U(N-mu) U(N-mu-nu) U(N-mu-nu) U(N-nu)
+* U(-mu,-nu) = U^+(N-mu) U^+(N-mu-nu) U(N-mu-nu) U(N-nu)
+*
+* <----- ^ O
+* |      |
+* |      |
+* V      |
+* ------->
 */
 static __device__ __inline__ deviceSU3 _device1PlaqutteTermMM(
     const deviceSU3* __restrict__ pDeviceData,
@@ -188,6 +212,12 @@ static __device__ __inline__ Real _device1PlaqutteTermReTr(
 * 3 - 1/4 Retr[ U_{mu,nu}(n)+U_{-mu,nu}(n)+U_{mu,-nu}(n)+U_{-mu,-nu}(n) ]
 * = 3 - 1/4 Retr[ U_{mu,nu}(n)+U^+_{mu,nu}(n-mu)+U^+_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu) ]
 * = 3 - 1/4 Retr[ U_{mu,nu}(n)+U_{mu,nu}(n-mu)+U_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu) ]
+* Hey! it is wrong but correct!
+* In fact, it is
+* 3 - 1/4 Retr[ U_{mu,nu}(n)+U^+_{-mu,nu}(n)+U^+_{mu,-nu}(n)+U_{-mu,-nu}(n) ]
+* which is 
+* 3 - 1/4 Retr[ U_{mu,nu}(n)+U_{mu,nu}(n-mu)+U_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu) ]
+* Thanks to Retr!
 */
 static __device__ __inline__ Real _device4PlaqutteTerm(const deviceSU3* __restrict__ pDeviceData,
     BYTE byMu, BYTE byNu, UINT uiBigIndex)

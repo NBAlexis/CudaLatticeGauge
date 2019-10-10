@@ -194,6 +194,16 @@ UBOOL CFileSystem::WriteAllText(const TCHAR* sFilename, const CCString& data)
     return WriteAllBytes(sFilename, (BYTE*)data.c_str(), data.GetLength() * sizeof(TCHAR));
 }
 
+UBOOL CFileSystem::AppendAllText(const TCHAR* sFilename, const CCString& data)
+{
+    std::ofstream file;
+    file.open(sFilename, std::ios::app | std::ios::out);
+    file << std::string(data.c_str());
+    file.flush();
+    file.close();
+    return TRUE;
+}
+
 //UBOOL CFileSystem::SetDefaultDirectory(const TCHAR* Filename)
 //{
 //    return SetCurrentDirectory(Filename) != 0;

@@ -51,75 +51,82 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
     }
 
     //z4 source
-    UINT uiFieldCount = 1;
+    UINT uiFieldCount = 0;
     const THashMap<BYTE, TArray<CMeasureStochastic*>> allZ4Fields = HasZ4(uiFieldCount);
-    TArray<BYTE> allFieldIdsz4 = allZ4Fields.GetAllKeys();
-    for (INT i = 0; i < allFieldIdsz4.Num(); ++i)
+    if (uiFieldCount > 0)
     {
-        BYTE byFieldIdz4 = allFieldIdsz4[i];
-        TArray<CMeasureStochastic*> measures = allZ4Fields.GetAt(byFieldIdz4);
-        TArray<CFieldFermion*> leftField;
-        TArray<CFieldFermion*> rightField;
-
-        for (UINT j = 0; j < uiFieldCount; ++j)
+        TArray<BYTE> allFieldIdsz4 = allZ4Fields.GetAllKeys();
+        for (INT i = 0; i < allFieldIdsz4.Num(); ++i)
         {
-            CFieldFermion* pF1 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
-            CFieldFermion* pF2 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
-            if (CCommonData::m_bStochasticGaussian)
-            {
-                pF1->InitialField(EFIT_RandomGaussian);
-            }
-            else
-            {
-                pF1->InitialField(EFIT_RandomZ4);
-            }
-            pF1->FixBoundary();
-            pF1->CopyTo(pF2);
-            pF1->InverseD(pAcceptGauge);
+            BYTE byFieldIdz4 = allFieldIdsz4[i];
+            TArray<CMeasureStochastic*> measures = allZ4Fields.GetAt(byFieldIdz4);
+            TArray<CFieldFermion*> leftField;
+            TArray<CFieldFermion*> rightField;
 
-            for (INT k = 0; k < measures.GetCount(); ++k)
+            for (UINT j = 0; j < uiFieldCount; ++j)
             {
-                measures[k]->OnConfigurationAcceptedZ4(
-                    measures[k]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                    measures[k]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
-                    pF2, pF1, 
-                    0 == j, uiFieldCount == j + 1);
+                CFieldFermion* pF1 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
+                CFieldFermion* pF2 = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(byFieldIdz4));
+                if (CCommonData::m_bStochasticGaussian)
+                {
+                    pF1->InitialField(EFIT_RandomGaussian);
+                }
+                else
+                {
+                    pF1->InitialField(EFIT_RandomZ4);
+                }
+                pF1->FixBoundary();
+                pF1->CopyTo(pF2);
+                pF1->InverseD(pAcceptGauge);
+
+                for (INT k = 0; k < measures.GetCount(); ++k)
+                {
+                    measures[k]->OnConfigurationAcceptedZ4(
+                        measures[k]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                        measures[k]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
+                        pF2, pF1,
+                        0 == j, uiFieldCount == j + 1);
+                }
             }
         }
     }
 
     //source scanning measurement
-    const THashMap<BYTE, TArray<CMeasure*>> allScanningFields = HasSourceScanning();
-    TArray<BYTE> allFieldIds = allScanningFields.GetAllKeys();
-    for (INT i = 0; i < allFieldIds.Num(); ++i)
+    UBOOL bHasSourceScanning = FALSE;
+    const THashMap<BYTE, TArray<CMeasure*>> allScanningFields = HasSourceScanning(bHasSourceScanning);
+    if (bHasSourceScanning)
     {
-        BYTE byFieldId = allFieldIds[i];
-        TArray<CMeasure*> measures = allScanningFields.GetAt(byFieldId);
-        for (UINT x = 1; x < _HC_Lx; ++x)
+        TArray<BYTE> allFieldIds = allScanningFields.GetAllKeys();
+        for (INT i = 0; i < allFieldIds.Num(); ++i)
         {
-            SSmallInt4 sourceSite;
-            sourceSite.x = static_cast<SBYTE>(x);
-            sourceSite.y = CCommonData::m_sCenter.y;
-            sourceSite.z = CCommonData::m_sCenter.z;
-            sourceSite.w = CCommonData::m_sCenter.w;
-
-            CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
-            TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
-                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                sourceSite);
-
-            for (INT j = 0; j < measures.Num(); ++j)
+            BYTE byFieldId = allFieldIds[i];
+            TArray<CMeasure*> measures = allScanningFields.GetAt(byFieldId);
+            for (UINT x = 1; x < _HC_Lx; ++x)
             {
-                measures[j]->SourceSanning(
+                SSmallInt4 sourceSite;
+                sourceSite.x = static_cast<SBYTE>(x);
+                sourceSite.y = CCommonData::m_sCenter.y;
+                sourceSite.z = CCommonData::m_sCenter.z;
+                sourceSite.w = CCommonData::m_sCenter.w;
+
+                CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
+                TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
                     m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
-                    sources, 
                     sourceSite);
-            }
 
-            for (INT j = 0; j < sources.Num(); ++j)
-            {
-                sources[j]->Return();
+                for (INT j = 0; j < measures.Num(); ++j)
+                {
+                    measures[j]->SourceSanning(
+                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
+                        sources,
+                        sourceSite);
+                }
+
+                for (INT j = 0; j < sources.Num(); ++j)
+                {
+                    sources[j]->Return();
+                }
             }
         }
     }
@@ -179,13 +186,15 @@ CMeasure* CMeasurementManager::GetMeasureById(BYTE byId) const
     return m_mapMeasures.GetAt(byId);
 }
 
-THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning() const
+THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning(UBOOL& bHasSourceScanning) const
 {
+    bHasSourceScanning = FALSE;
     THashMap<BYTE, TArray<CMeasure*>> ret;
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
         if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsSourceScanning())
         {
+            bHasSourceScanning = TRUE;
             BYTE byFieldId = m_lstAllMeasures[i]->GetFieldId();
             if (ret.Exist(byFieldId))
             {
@@ -207,7 +216,7 @@ THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning() const
 THashMap<BYTE, TArray<CMeasureStochastic*>> CMeasurementManager::HasZ4(UINT &uiFieldCount) const
 {
     THashMap<BYTE, TArray<CMeasureStochastic*>> ret;
-    uiFieldCount = 1;
+    uiFieldCount = 0;
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
         CMeasureStochastic* pStoch = dynamic_cast<CMeasureStochastic*>(m_lstAllMeasures[i]);

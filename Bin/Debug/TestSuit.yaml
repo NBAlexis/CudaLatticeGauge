@@ -1194,6 +1194,7 @@ TestFermionUpdatorOmelyanGMRESMDR:
 TestFermionUpdatorLargeScale:
     ## Should be about 1100 - 1350s
 
+    ## Single float
     ## For 32x32x32x32 lattice
     ## 5 Gauge Fields - gauge, force, staple, evaluating gauge, momentum. 2.5GB (about 512MB each)
     ## Total 18 Fermion fields.

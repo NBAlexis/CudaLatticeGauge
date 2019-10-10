@@ -329,6 +329,8 @@ public:
     //it is convinient to set all parameters at one place
     static Real m_fOmega;
     static SSmallInt4 m_sCenter;
+
+    static UINT m_uiMaxThreadPerBlock;
 };
 
 __END_NAMESPACE

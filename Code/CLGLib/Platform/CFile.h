@@ -32,6 +32,7 @@ public:
     UBOOL WriteAllBytes(const TCHAR* sFilename, BYTE* data, UINT uiSize);
     CCString ReadAllText(const TCHAR* sFilename);
     UBOOL WriteAllText(const TCHAR* sFilename, const CCString& data);
+    static UBOOL AppendAllText(const TCHAR* sFilename, const CCString& data);
 
     //UBOOL MakeDir(const CCString& dirPath);
 

@@ -111,15 +111,19 @@ int main(int argc, char * argv[])
             {
                 uiAccepCountAfterE = uiAccepCountBeforeE2;
 
-                //save measures
-                for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
+                if (NULL != pMC)
                 {
-                    pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
-                    rhoCorrelator.AddItem((
-                        pMC->m_lstResultsLastConf[1][uiLt]
-                        + pMC->m_lstResultsLastConf[2][uiLt]
-                        + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
+                    //save measures
+                    for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
+                    {
+                        pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
+                        rhoCorrelator.AddItem((
+                            pMC->m_lstResultsLastConf[1][uiLt]
+                            + pMC->m_lstResultsLastConf[2][uiLt]
+                            + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
+                    }
                 }
+
 
                 //for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                 //{
@@ -235,7 +239,7 @@ int main(int argc, char * argv[])
     //report final result
     // we are satisfied with the report of Polyakov Loop, so only report the Meason correlator
 
-    if (!bOnlyMeasure || bMeasureFermion)
+    if ((!bOnlyMeasure || bMeasureFermion) && NULL != pMC)
     {
         appSetLogDate(FALSE);
         appGeneral(_T("\n ==================== Pion correlator C(p=0, nt) ==============\n\n"));

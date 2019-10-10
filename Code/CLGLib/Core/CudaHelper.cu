@@ -518,6 +518,10 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
 
     //We need to constrain it further for shared memeory per block
     ret.AddItem(deviceProp.maxThreadsPerBlock);
+    if (CCommonData::m_uiMaxThreadPerBlock > 0 && ret[0] > CCommonData::m_uiMaxThreadPerBlock)
+    {
+        ret[0] = CCommonData::m_uiMaxThreadPerBlock;
+    }
 #if _CLG_USE_LAUNCH_BOUND
     ret[0] = ret[0] > _CLG_LAUNCH_MAX_THREAD ? _CLG_LAUNCH_MAX_THREAD : ret[0];
 #endif

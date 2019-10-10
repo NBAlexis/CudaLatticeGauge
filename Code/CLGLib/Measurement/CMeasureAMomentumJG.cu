@@ -345,6 +345,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             m_pHostDistributionJG, m_pHostDistributionR, 
             m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, TRUE
             );
+
+        checkCudaErrors(cudaGetLastError());
     }
 
     checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -382,7 +384,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         _ZeroXYPlane(m_pDeviceDataBuffer);
         pGaugeSU3->CalculateE_Using_U(m_pE);
         CFieldGaugeSU3* pESU3 = dynamic_cast<CFieldGaugeSU3*>(m_pE);
-        CFieldGaugeSU3* pAphysSU3 = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
+        const CFieldGaugeSU3* pAphysSU3 = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
         CFieldGaugeSU3* pDpureA = dynamic_cast<CFieldGaugeSU3*>(m_pDpureA);
         if (NULL == pAphysSU3)
         {
@@ -398,6 +400,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
+
             for (UINT i = 1; i < _HC_Ly; ++i)
             {
                 for (UINT j = 1; j < _HC_Lx; ++j)
@@ -436,6 +440,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
+
             for (UINT i = 1; i < _HC_Ly; ++i)
             {
                 for (UINT j = 1; j < _HC_Lx; ++j)
@@ -457,6 +463,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
                 );
+
+                checkCudaErrors(cudaGetLastError());
             }
 
             pGaugeSU3->CopyTo(pDpureA);
@@ -477,6 +485,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
+
             for (UINT i = 1; i < _HC_Ly; ++i)
             {
                 for (UINT j = 1; j < _HC_Lx; ++j)
@@ -498,6 +508,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     m_pHostDistributionJG, m_pHostDistributionR,
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
                 );
+                checkCudaErrors(cudaGetLastError());
             }
         }
     }

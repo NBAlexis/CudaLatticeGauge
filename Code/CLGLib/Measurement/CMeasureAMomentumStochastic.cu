@@ -588,14 +588,18 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
     UBOOL bStart,
     UBOOL bEnd)
 {
-
+    checkCudaErrors(cudaGetLastError());
     if (bStart)
     {
         _ZeroXYPlane(m_pDeviceXYBufferJL);
         _ZeroXYPlane(m_pDeviceXYBufferJS);
-        _ZeroXYPlane(m_pDeviceXYBufferJLPure);
-        _ZeroXYPlane(m_pDeviceXYBufferJPot);
+        if (m_bMeasureJLPure)
+        {
+            _ZeroXYPlane(m_pDeviceXYBufferJLPure);
+            _ZeroXYPlane(m_pDeviceXYBufferJPot);
+        }
     }
+    checkCudaErrors(cudaGetLastError());
 
     const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
     const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
@@ -604,7 +608,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 #pragma region Dot
 
     //The reuslts are stored by AtomicAdd into m_pDeviceXYBufferJL and m_pDeviceXYBufferJS
-
     preparethread;
     _kernelDotAndGatherXYAMomentumJL << <block, threads >> >(
         pF2W->m_pDeviceData,
@@ -617,6 +620,8 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         CCommonData::m_sCenter,
         m_pDeviceXYBufferJL
         );
+
+    checkCudaErrors(cudaGetLastError());
 
     if (m_bExponential)
     {
@@ -640,9 +645,11 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             );
     }
 
+    checkCudaErrors(cudaGetLastError());
+
     if (m_bMeasureJLPure)
     {
-        CFieldGaugeSU3* pAphys = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
+        const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
         if (NULL == pAphys)
         {
             appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
@@ -671,6 +678,8 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 m_byFieldId,
                 m_pDeviceXYBufferJPot
                 );
+
+            checkCudaErrors(cudaGetLastError());
         }
     }
 
@@ -686,6 +695,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJL, m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));        
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJS, m_pDistributionJS, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaGetLastError());
 
         if (m_bMeasureJLPure)
         {
@@ -693,6 +703,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             XYDataToRdistri_R(m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, false, m_byFieldId);
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLPure, m_pDistributionJLPure, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJPot, m_pDistributionJPot, sizeof(Real)* (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
         }
 
         Real fAverageJLInner = F(0.0);

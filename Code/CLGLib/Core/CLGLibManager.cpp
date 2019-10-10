@@ -64,6 +64,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     assert(iVaules > 1);
     m_InitialCache.constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
 
+    __FetchIntWithDefault(_T("MaxThreadPerBlock"), 0);
+    if (iVaules > 0)
+    {
+        CCommonData::m_uiMaxThreadPerBlock = static_cast<UINT>(iVaules);
+    }
+
     TArray<INT> intValues;
     if (!params.FetchValueArrayINT(_T("LatticeLength"), intValues))
     {

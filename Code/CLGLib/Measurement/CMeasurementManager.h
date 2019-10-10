@@ -41,7 +41,7 @@ protected:
     UBOOL m_bNeedGaugeSmearing;
     UBOOL m_bEverResetted;
 
-    THashMap<BYTE, TArray<CMeasure*>> HasSourceScanning() const;
+    THashMap<BYTE, TArray<CMeasure*>> HasSourceScanning(UBOOL& bHasSourceScanning) const;
     THashMap<BYTE, TArray<CMeasureStochastic*>> HasZ4(UINT& uiFieldCount) const;
     UBOOL NeedSmearing() const;
 };

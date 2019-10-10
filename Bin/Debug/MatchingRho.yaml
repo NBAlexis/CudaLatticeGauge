@@ -3,17 +3,29 @@ VerboseLevel : GENERAL
 VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 1
-BeforeEquvibStep : 30
-EquvibStep : 10
+BeforeEquvibStep : 0
+EquvibStep : 60
 OnlyMeasure : 0
-DoSmearing : 0
+DoSmearing : 0 
 DoMeasureFermion : 0
-SavePrefix : 502157_
+SaveIndexStart : 21
+SavePrefix : 551565_
 # SavePrefix : ../../../ThermalCircle/Match/49916/49916_
 
 Dim : 4
 Dir : 4
-LatticeLength : [22, 22, 22, 44]
+# LatticeLength : [12, 12, 12, 24]
+
+# nt2
+# LatticeLength : [10, 10, 8, 16]
+# nt3
+# LatticeLength : [14, 14, 12, 24]
+# nt4
+# LatticeLength : [18, 18, 16, 32]
+# nt5
+LatticeLength : [22, 22, 20, 40]
+# nt6
+# LatticeLength : [26, 26, 24, 40] //max is 40
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionTorusSquare
 ThreadAutoDecompose : 1
@@ -21,7 +33,7 @@ RandomType : ER_XORWOW
 RandomSeedType : ERST_Timestamp
 ActionListLength : 2
 FermionFieldCount : 1
-MeasureListLength : 2
+MeasureListLength : 1
 CacheStaple : 0
 
 ## ============================================================
@@ -42,17 +54,17 @@ Updator:
     IntegratorType : CIntegratorNestedForceGradient
     ## IntegratorType : CIntegratorForceGradient
     IntegratorStepLength : 1
-    IntegratorStep : 20
+    IntegratorStep : 10
     NestedStep : 5
     Omelyan2Lambda : 0.38636665500756728
 
 Gauge:
 
     FieldName : CFieldGaugeSU3
-    FieldInitialType : EFIT_Random
-    # FieldInitialType : EFIT_ReadFromFile
-    # GaugeFileType : EFFT_CLGBin
-    # GaugeFileName : 50216_Matching_1.con_
+    # FieldInitialType : EFIT_Random
+    FieldInitialType : EFIT_ReadFromFile
+    GaugeFileType : EFFT_CLGBin
+    GaugeFileName : 551565_Matching_21.con
 
     Period : [1, 1, 1, 1]
 
@@ -60,16 +72,16 @@ FermionField1:
 
     FieldName : CFieldFermionWilsonSquareSU3
     FieldInitialType : EFIT_RandomGaussian
-    Hopping : 0.157
+    Hopping : 0.1565
     FieldId : 2
-    PoolNumber : 5
+    PoolNumber : 1
     Period : [1, 1, 1, -1]
 
         
 Action1:
    
     ActionName : CActionGaugePlaquette
-    Beta : 5.02
+    Beta : 5.5
 
 
 Action2:
@@ -107,11 +119,3 @@ Measure2:
     MeasureName : CMeasureMesonCorrelator
     GammaMatrix : [ UNITY, GAMMA51, GAMMA52, GAMMA53 ]
     FieldId : 2
-
-GaugeSmearing:
-
-    SmearingName : CGaugeSmearingAPEStout
-    RhoS : 0.1
-    RhoT : 0.1
-    Iterate : 10
-    ProjIterate : 6

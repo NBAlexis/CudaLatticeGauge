@@ -18,6 +18,7 @@ SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);
 UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
 UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 UBOOL CLGAPI CCommonData::m_bStochasticGaussian = FALSE;
+UINT CLGAPI CCommonData::m_uiMaxThreadPerBlock = 0;
 
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
