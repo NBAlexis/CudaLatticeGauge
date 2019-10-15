@@ -498,12 +498,15 @@ _kernelTransformToE(
     {
         deviceSU3 res = deviceSU3::makeSU3Zero();
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        //if (dir < uiDir - 1)
+        if (dir < uiDir - 1)
         {
             //find clover F
             res = _deviceClover(pDeviceData, uiBigIdx, 3, dir);
-            res.Ta();
-            res.MulReal(F(0.25));
+            //test not using clover
+            //res = _device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx);
+            res.iIm2();
+            //not using clover not multiply 0.25
+            res.MulReal(F(0.125));
         }
 
         pRes[uiLinkIndex] = res;

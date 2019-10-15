@@ -94,6 +94,7 @@ protected:
     TArray<Real> m_lstResJGS;
     TArray<Real> m_lstResJGChen;
     TArray<Real> m_lstResJGChenApprox;
+    TArray<Real> m_lstResJGChenApprox2;
 
     UBOOL m_bMeasureSpin;
     CFieldGauge* m_pE;
@@ -122,6 +123,11 @@ public:
     TArray<Real> m_lstJGChenApproxInner;
     //jg chen as function of R
     TArray<Real> m_lstJGChenApprox;
+
+    TArray<Real> m_lstJGChenApprox2All;
+    TArray<Real> m_lstJGChenApprox2Inner;
+    //jg chen as function of R
+    TArray<Real> m_lstJGChenApprox2;
 };
 
 __END_NAMESPACE

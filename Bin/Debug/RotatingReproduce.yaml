@@ -173,28 +173,29 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.96
-    OmegaRange : 0.14
+    GaugeBate : 4.90
+    OmegaRange : 0.117
     StartOmega : 0
-    EndOmega : 20
-    StartN : 101
-    EndN : 2000
+    EndOmega : 10
+    StartN : 201
+    EndN : 600
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
-    DistributionJob : EDJ_AngularMomentum
+    DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
-    StochasticFieldCount : 16
+    StochasticFieldCount : 25
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/49616/Nt3/N49616_
-    SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
-    CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
+    ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
+    ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
+
     ## SavePrefix : D:/NotUsingCLGCon/C49016/Nt3/C49016_
     ## SavePrefix : D:/NotUsingCLGCon/C49016/C49016_
-    ## SavePrefix : G:/CLGConfigs/_f50216/Nt3/N50216_
-    ## CSVSavePrefix : G:/CLGConfigs/_f50216/N50216_
+    SavePrefix : G:/CLGConfigs/_c49016/Nt3/NC49016_
+    CSVSavePrefix : G:/CLGConfigs/_c49016/NC49016_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [14, 14, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1

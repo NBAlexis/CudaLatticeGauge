@@ -58,14 +58,17 @@ protected:
 /**
  * U_{mu,nu}(n)+U^+_{-mu,nu}(n)+U^+_{mu,-nu}(n)+U_{-mu,-nu}(n)
  * or
+ * U_{mu,nu}(n)+U_{nu,-mu}(n)+U_{-nu,mu}(n)+U_{-mu,-nu}(n) <--- we are using this one
+ * or
  * U_{mu,nu}(n)+U_{mu,nu}(n-mu)+U_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu)
+ *
  */
 static __device__ __inline__ deviceSU3 _deviceClover(const deviceSU3* __restrict__ pGaugeField, UINT uiBigIdx, BYTE mu, BYTE nu)
 {
     deviceSU3 ret(_device1PlaqutteTermPP(pGaugeField, mu, nu, uiBigIdx));
     ret.Add(_device1PlaqutteTermMM(pGaugeField, mu, nu, uiBigIdx));
-    ret.AddDagger(_device1PlaqutteTermPM(pGaugeField, nu, mu, uiBigIdx));
-    ret.AddDagger(_device1PlaqutteTermMP(pGaugeField, nu, mu, uiBigIdx));
+    ret.Add(_device1PlaqutteTermPM(pGaugeField, nu, mu, uiBigIdx));
+    ret.Add(_device1PlaqutteTermMP(pGaugeField, nu, mu, uiBigIdx));
 
     return ret;
 }

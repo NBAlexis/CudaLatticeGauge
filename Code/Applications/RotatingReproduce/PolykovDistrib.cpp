@@ -397,6 +397,7 @@ INT MeasurePolyakovDist(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JG);
                 _CLG_EXPORT_ANGULAR(pJG, JGS);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
 
                 if (bJF && NULL != pJF)
                 {

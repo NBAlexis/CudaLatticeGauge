@@ -243,8 +243,12 @@ public:
     UINT* m_pSmallData;
     UINT* m_byRegionTable;
 
-    //extend site * dir * 2
-    //cached the neighbours of a site, cached as a index of m_pWalkingTable[index]
+    /**
+    * extend site * dir * 2
+    * cached the neighbours of a site, cached as a index of m_pWalkingTable[index]
+    * N-mu is m_pWalkingTable[N * DIR * 2 + mu]
+    * N+mu is m_pWalkingTable[N * DIR * 2 + DIR + mu]
+    */
     UINT* m_pWalkingTable;
     SSmallInt4* m_pMappingTable;
     BYTE* m_pBondInfoTable;

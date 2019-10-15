@@ -27,12 +27,16 @@ extern INT GaugeFixing(CParameters& params);
 #define _CLG_EXPORT_ANGULAR(measureName, lstName) \
 CCString sFileNameWrite##lstName = _T("%s_angular"); \
 CCString sFileNameWrite##lstName##In = _T("%s_angular"); \
+CCString sFileNameWrite##lstName##All = _T("%s_angular"); \
 sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
-sFileNameWrite##lstName##In = sFileNameWrite##lstName##In + _T(#lstName) + _T("_Nt%d_In.csv"); \
+sFileNameWrite##lstName##In = sFileNameWrite##lstName##In + _T(#lstName) + _T("_Nt%d_In_O%d.csv"); \
+sFileNameWrite##lstName##All = sFileNameWrite##lstName##All + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
 sFileNameWrite##lstName.Format(sFileNameWrite##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
-sFileNameWrite##lstName##In.Format(sFileNameWrite##lstName##In, sCSVSavePrefix.c_str(), _HC_Lt); \
+sFileNameWrite##lstName##In.Format(sFileNameWrite##lstName##In, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+sFileNameWrite##lstName##All.Format(sFileNameWrite##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 TArray<TArray<Real>> lstName##OverR; \
 TArray<Real> lstName##In; \
+TArray<Real> lstName##All; \
 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 { \
     TArray<Real> thisConfiguration; \
@@ -42,12 +46,11 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     } \
     lstName##OverR.AddItem(thisConfiguration); \
     lstName##In.AddItem(measureName->m_lst##lstName##Inner[j]); \
+    lstName##All.AddItem(measureName->m_lst##lstName##All[j]); \
 } \
 WriteStringFile(sFileNameWrite##lstName, ExportRealArray2(lstName##OverR)); \
-CCString sHead##lstName; \
-sHead##lstName.Format("\n\n\n(* Omega = %d *)\n\n\n", uiOmega); \
-AppendStringFile(sFileNameWrite##lstName##In, sHead##lstName); \
-AppendStringFile(sFileNameWrite##lstName##In, ExportRealArray(lstName##In));
+WriteStringFile(sFileNameWrite##lstName##In, ExportRealArray(lstName##In)); \
+WriteStringFile(sFileNameWrite##lstName##All, ExportRealArray(lstName##All)); 
 
 
 //=============================================================================

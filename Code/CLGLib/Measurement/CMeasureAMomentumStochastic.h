@@ -25,6 +25,7 @@ public:
         , m_pDeviceXYBufferJL(NULL)
         , m_pDeviceXYBufferJS(NULL)
         , m_pDeviceXYBufferJLPure(NULL)
+        , m_pDeviceXYBufferJLJM(NULL)
         , m_pDeviceXYBufferJPot(NULL)
         , m_bExponential(TRUE)
         , m_bNaive(TRUE)
@@ -34,11 +35,13 @@ public:
         , m_pDistributionJL(NULL)
         , m_pDistributionJS(NULL)
         , m_pDistributionJLPure(NULL)
+        , m_pDistributionJLJM(NULL)
         , m_pDistributionJPot(NULL)
         , m_pHostDistributionR(NULL)
         , m_pHostDistributionJL(NULL)
         , m_pHostDistributionJS(NULL)
         , m_pHostDistributionJLPure(NULL)
+        , m_pHostDistributionJLJM(NULL)
         , m_pHostDistributionJPot(NULL)
 
         , m_uiMaxR(1)
@@ -67,6 +70,7 @@ protected:
     Real* m_pDeviceXYBufferJL;
     Real* m_pDeviceXYBufferJS;
     Real* m_pDeviceXYBufferJLPure;
+    Real* m_pDeviceXYBufferJLJM;
     Real* m_pDeviceXYBufferJPot;
 
     UBOOL m_bExponential;
@@ -77,11 +81,13 @@ protected:
     Real* m_pDistributionJL;
     Real* m_pDistributionJS;
     Real* m_pDistributionJLPure;
+    Real* m_pDistributionJLJM;
     Real* m_pDistributionJPot;
     UINT* m_pHostDistributionR;
     Real* m_pHostDistributionJL;
     Real* m_pHostDistributionJS;
     Real* m_pHostDistributionJLPure;
+    Real* m_pHostDistributionJLJM;
     Real* m_pHostDistributionJPot;
 
     UINT m_uiMaxR;
@@ -94,6 +100,7 @@ public:
     TArray<Real> m_lstJL;
     TArray<Real> m_lstJS;
     TArray<Real> m_lstJLPure;
+    TArray<Real> m_lstJLJM;
     TArray<Real> m_lstJPot;
 
     TArray<Real> m_lstJLAll;
@@ -102,6 +109,8 @@ public:
     TArray<Real> m_lstJSInner;
     TArray<Real> m_lstJLPureAll;
     TArray<Real> m_lstJLPureInner;
+    TArray<Real> m_lstJLJMAll;
+    TArray<Real> m_lstJLJMInner;
     TArray<Real> m_lstJPotAll;
     TArray<Real> m_lstJPotInner;
 };

@@ -127,6 +127,42 @@ _kernelMomemtumJGChenApprox(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMomemtumJGChenApprox2(
+    const deviceSU3* __restrict__ pE,
+    const deviceSU3* __restrict__ pApure,
+    const deviceSU3* __restrict__ pAphys,
+    SSmallInt4 sCenter,
+    Real* pBuffer,
+    Real fBetaOverN)
+{
+    intokernalOnlyInt4;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
+    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+
+    CLGComplex res = _zeroc;
+    if (!site.IsDirichlet())
+    {
+        //only calculate x,y,z
+        for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+        {
+            deviceSU3 DxAphys = _deviceDPureMu2(pAphys, pApure, uiBigIdx, 0, dir);
+            DxAphys.MulReal(fmY);
+            deviceSU3 DyAphys = _deviceDPureMu2(pAphys, pApure, uiBigIdx, 1, dir);
+            DyAphys.MulReal(fmX);
+            DyAphys.Sub(DxAphys);
+            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys).Tr());
+        }
+
+        res = cuCmulf_cr(res, -fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
+    }
+}
+
 /**
  * 
  */
@@ -153,7 +189,7 @@ _kernelMomemtumJGChen(
             res = _cuCaddf(res, beforeTrace.Tr());
         }
 
-        res = cuCmulf_cr(res, fBetaOverN * F(-0.5));
+        res = cuCmulf_cr(res, fBetaOverN * F(0.5));
         atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
     }
 }
@@ -510,6 +546,45 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 );
                 checkCudaErrors(cudaGetLastError());
             }
+
+            _ZeroXYPlane(m_pDeviceDataBuffer);
+
+            _kernelMomemtumJGChenApprox2 << <block, threads >> > (
+                pESU3->m_pDeviceData,
+                pDpureA->m_pDeviceData,
+                pAphysSU3->m_pDeviceData,
+                CCommonData::m_sCenter,
+                m_pDeviceDataBuffer,
+                fBetaOverN
+                );
+
+            _AverageXYPlane(m_pDeviceDataBuffer);
+            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
+
+            for (UINT i = 1; i < _HC_Ly; ++i)
+            {
+                for (UINT j = 1; j < _HC_Lx; ++j)
+                {
+                    m_lstResJGChenApprox2.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+                }
+            }
+
+            if (m_bMeasureDistribution)
+            {
+                XYDataToRdistri_R(
+                    m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_uiMaxR, FALSE, m_byFieldId);
+
+                //extract res
+                checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                FillDataWithR_R(
+                    m_lstJGChenApprox2, m_lstJGChenApprox2Inner, m_lstJGChenApprox2All, m_lstR,
+                    m_pHostDistributionJG, m_pHostDistributionR,
+                    m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                );
+                checkCudaErrors(cudaGetLastError());
+            }
         }
     }
 
@@ -552,6 +627,12 @@ void CMeasureAMomentumJG::Report()
         appGeneral(_T("========================================================\n"));
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox);
+
+        appGeneral(_T("\n========================================================\n"));
+        appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("========================================================\n"));
+
+        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox2);
     }
 
     appGeneral(_T("===================================================\n"));
@@ -567,12 +648,14 @@ void CMeasureAMomentumJG::Reset()
     m_lstResJGS.RemoveAll();
     m_lstResJGChen.RemoveAll();
     m_lstResJGChenApprox.RemoveAll();
+    m_lstResJGChenApprox2.RemoveAll();
 
     m_lstR.RemoveAll();
     m_lstJG.RemoveAll();
     m_lstJGS.RemoveAll();
     m_lstJGChen.RemoveAll();
     m_lstJGChenApprox.RemoveAll();
+    m_lstJGChenApprox2.RemoveAll();
 
     m_lstJGAll.RemoveAll();
     m_lstJGInner.RemoveAll();
@@ -582,6 +665,8 @@ void CMeasureAMomentumJG::Reset()
     m_lstJGChenInner.RemoveAll();
     m_lstJGChenApproxAll.RemoveAll();
     m_lstJGChenApproxInner.RemoveAll();
+    m_lstJGChenApprox2All.RemoveAll();
+    m_lstJGChenApprox2Inner.RemoveAll();
 }
 
 __END_NAMESPACE

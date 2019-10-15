@@ -952,6 +952,34 @@ extern "C" {
         }
 
         /**
+        * res = U - U^dagger
+        * It is like a matrix Im(M)
+        * res = 2i Im(M), so is called iIm2
+        */
+        __device__ __inline__ void iIm2()
+        {
+            //0 1 2
+            //3 4 5
+            //6 7 8
+
+            //new [1] = [1] - conj([3])
+            //new [3] = [3] - conj([1]) = -conj(new [1])
+            const CLGComplex new1 = _cuCsubf(m_me[1], _cuConjf(m_me[3]));
+            const CLGComplex new2 = _cuCsubf(m_me[2], _cuConjf(m_me[6]));
+            const CLGComplex new5 = _cuCsubf(m_me[5], _cuConjf(m_me[7]));
+            m_me[1] = _make_cuComplex(_cuCrealf(new1), _cuCimagf(new1));
+            m_me[3] = _make_cuComplex(-_cuCrealf(m_me[1]), _cuCimagf(m_me[1]));
+            m_me[2] = _make_cuComplex(_cuCrealf(new2), _cuCimagf(new2));
+            m_me[6] = _make_cuComplex(-_cuCrealf(m_me[2]), _cuCimagf(m_me[2]));
+            m_me[5] = _make_cuComplex(_cuCrealf(new5), _cuCimagf(new5));
+            m_me[7] = _make_cuComplex(-_cuCrealf(m_me[5]), _cuCimagf(m_me[5]));
+
+            m_me[0] = _make_cuComplex(F(0.0), F(2.0) * m_me[0].y);
+            m_me[4] = _make_cuComplex(F(0.0), F(2.0) * m_me[4].y);
+            m_me[8] = _make_cuComplex(F(0.0), F(2.0) * m_me[8].y);
+        }
+
+        /**
         * return -i(U-U^dagger) = ((-iU)+(-iU)dagger)
         */
         __device__ __inline__ deviceSU3 Im2C() const
