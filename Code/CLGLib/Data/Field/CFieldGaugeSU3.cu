@@ -481,6 +481,19 @@ _kernelTransformToIA(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToIALog(
+    deviceSU3* pDeviceData)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].Log();
+    }
+}
+
 /**
  * E_mu = F_{0 mu}
  */
@@ -528,6 +541,19 @@ _kernelTransformToU(
         pDeviceData[uiLinkIndex] = (0 == _DC_ExpPrecision)
             ? pDeviceData[uiLinkIndex].QuickExp(F(1.0))
             : pDeviceData[uiLinkIndex].ExpReal(F(1.0), _DC_ExpPrecision);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToULog(
+    deviceSU3* pDeviceData)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].StrictExp();
     }
 }
 
@@ -895,14 +921,29 @@ void CFieldGaugeSU3::CopyTo(CField* pTarget) const
 void CFieldGaugeSU3::TransformToIA()
 {
     preparethread;
-    _kernelTransformToIA << <block, threads >> > (m_pDeviceData);
+    if (0 == _HC_ALog)
+    {
+        _kernelTransformToIA << <block, threads >> > (m_pDeviceData);
+    }
+    else
+    {
+        _kernelTransformToIALog << <block, threads >> > (m_pDeviceData);
+    }
 }
 
 
 void CFieldGaugeSU3::TransformToU()
 {
     preparethread;
-    _kernelTransformToU << <block, threads >> > (m_pDeviceData);
+    if (0 == _HC_ALog)
+    {
+        _kernelTransformToU << <block, threads >> > (m_pDeviceData);
+    }
+    else
+    {
+        _kernelTransformToULog << <block, threads >> > (m_pDeviceData);
+    }
+    
 }
 
 void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const

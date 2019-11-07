@@ -165,11 +165,30 @@ UINT TestDirichletDOperator(CParameters&)
     return 0;
 }
 
+
+UINT TestALogDefinition(CParameters&)
+{
+    //create a random field
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+
+    CFieldGaugeSU3* pTestGauge = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
+    pGauge->TransformToIA();
+    pGauge->TransformToU();
+    pTestGauge->AxpyMinus(pGauge);
+
+    const CLGComplex testDot = pTestGauge->Dot(pTestGauge);
+    appGeneral(_T("Dot result = %f + %f I\n"), testDot.x, testDot.y);
+
+    return 0;
+}
+
 __REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators);
 
 __REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
+
+__REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition);
 
 //__REGIST_TEST(TestDirichletDOperator, Misc, TestRotationOperator);
 

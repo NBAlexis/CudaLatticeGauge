@@ -37,6 +37,7 @@
 \contentsline {subsubsection}{\numberline {4.1.2}Cornell Gauge Fixing and FFT accelerated}{41}{subsubsection.4.1.2}% 
 \contentsline {subsubsection}{\numberline {4.1.3}Los Alamos Gauge Fixing and over relaxation}{42}{subsubsection.4.1.3}% 
 \contentsline {subsubsection}{\numberline {4.1.4}Coulomb Gauge}{44}{subsubsection.4.1.4}% 
+\contentsline {subsubsection}{\numberline {4.1.5}Logarithm definition}{44}{subsubsection.4.1.5}% 
 \contentsline {section}{\numberline {5}Measurement}{45}{section.5}% 
 \contentsline {subsection}{\numberline {5.1}Plaquette Energy}{45}{subsection.5.1}% 
 \contentsline {subsection}{\numberline {5.2}Meson Correlator}{45}{subsection.5.2}% 

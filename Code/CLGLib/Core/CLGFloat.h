@@ -38,6 +38,13 @@
 #define _cuCabsf cuCabs
 #define _cuCdivf cuCdiv
 #define F(v) v
+#if defined(__cplusplus) && defined(__CUDACC__)
+#define _floor2int __double2int_rd
+#define _round2int __double2int_rn
+#else
+#define _floor2int(a) static_cast<INT>(floor(a))
+#define _round2int(a) static_cast<INT>(round(a))
+#endif
 
 #else
 
@@ -78,6 +85,13 @@
 #define _cuCabsf cuCabsf
 #define _cuCdivf cuCdivf
 #define F(v) v##f
+#if defined(__cplusplus) && defined(__CUDACC__)
+#define _floor2int __float2int_rd
+#define _round2int __float2int_rn
+#else
+#define _floor2int(a) static_cast<INT>(floor(a))
+#define _round2int(a) static_cast<INT>(round(a))
+#endif
 
 #endif
 

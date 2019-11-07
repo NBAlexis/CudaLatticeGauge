@@ -2012,6 +2012,28 @@ TestFFT:
     RandomType : ER_Schrage
     RandomSeed : 1234567
 
+TestALogDefinition:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    UseLogADefinition : 1
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
 TestGaugeFixingLandauCornell:
 
     Dim : 4
@@ -2307,6 +2329,7 @@ TestAngularMomentum:
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
+    RandomSeedType : ERST_Timestamp
     RandomType : ER_Schrage
     RandomSeed : 7654321
     ActionListLength : 2

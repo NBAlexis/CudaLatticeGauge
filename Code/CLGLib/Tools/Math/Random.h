@@ -192,7 +192,7 @@ public:
 
     __device__ __inline__ CLGComplex _deviceRandomZ4(UINT fatIndex) const
     {
-        const BYTE byRandom = static_cast<BYTE>(F(4.0) * _deviceRandomF(fatIndex));
+        const INT byRandom = _floor2int(F(4.0) * _deviceRandomF(fatIndex));
 
         if (0 == byRandom)
         {

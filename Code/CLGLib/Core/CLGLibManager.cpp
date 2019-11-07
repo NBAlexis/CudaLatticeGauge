@@ -234,6 +234,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("MeasureListLength"), 0);
     m_InitialCache.constIntegers[ECI_MeasureListLength] = static_cast<UINT>(iVaules);
 
+    __FetchIntWithDefault(_T("UseLogADefinition"), 0);
+    m_InitialCache.constIntegers[ECI_UseLogADefinition] = static_cast<UINT>(iVaules);
+
     const UINT iThreadConstraint = m_InitialCache.constIntegers[ECI_ThreadConstaint];
     __FetchIntWithDefault(_T("SummationDecompose"), iThreadConstraint);
     m_InitialCache.constIntegers[ECI_SummationDecompose] = static_cast<UINT>(iVaules);

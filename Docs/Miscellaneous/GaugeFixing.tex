@@ -76,7 +76,7 @@ The Cornell gauge fixing is a steepest descend algorithm, which can be described
     \State $A_{\mu}(n)=U_{\mu}(n).TA()$
     \State $\Gamma (n)=\sum _{\mu}(A_{\mu}(n-\mu)-A_{\mu}(n))$
     \If {$\sum _n \Gamma (n)\Gamma^{\dagger} (n) < \epsilon$}
-        \Return 
+        \Return
         \Comment {Succeed.}
     \EndIf
     \State $G(n)=\exp \left(-\alpha _0\Gamma (n)\right)$
@@ -169,3 +169,56 @@ Note:
 
 The Coulomb gauge is very similar to Landau gauge, however, note that the gauge transform can be performed time slice by time slice. Usually, the count of iteration to convergence is different for each time slice.
 
+\subsubsection{\label{sec:LogarithmDefinition}Logarithm definition}
+
+The usual definition of $U_{\mu}$ is $U_{\mu}=e^{iaA_{\mu}}$, there for the real definition of $A$ should be $iaA_{\mu}=\log (U_{\mu})$.
+
+To calculate $\log (U)$, we need to calculate $U^{\frac{1}{k}}$ first, which is straightforward for a $3\times 3$ matrix. let
+\begin{equation}
+\begin{split}
+&A=P^{-1}DP
+\end{split}
+\end{equation}
+where $D$ is a diagonal matrix, let
+\begin{equation}
+\begin{split}
+&B=P^{-1}D^{\frac{1}{k}}P,\;\;B^k=\left(P^{-1}D^{\frac{1}{k}}P\right)^k=P^{-1}\left(D^{\frac{1}{k}}\right)^k P=P^{-1}DP=A\\
+\end{split}
+\end{equation}
+
+The problem reduce to a eigne system problem.
+
+\begin{itemize}
+  \item Eigenvalue of $3\times 3$ matrix
+\end{itemize}
+
+The eigenvalues of a $3\times 3$ matrix can be obtained by solve the equation
+\begin{equation}
+\begin{split}
+&A=\det \left[\alpha \mathbb{I}_3- A\right]=0=\alpha ^3-\alpha ^2 {\rm tr}\left[A\right]-\alpha \frac{1}{2}\left({\rm tr}\left[A^2\right]-{\rm tr}^2\left[A\right]\right)-\det \left[A\right]\\
+\end{split}
+\end{equation}
+Using the fact that, if $A=a B +b\mathbb{I}_3$, the eigenvalue of $A$ is $\lambda _A = a \lambda _B+b$, we can make a traceless matrix
+\begin{equation}
+\begin{split}
+&B=\frac{1}{\sqrt{\frac{{\rm tr}\left[\left(A-\frac{{\rm tr}\left[A\right]}{3}\right)^2\right]}{6}}}\left(A-\frac{{\rm tr}\left[A\right]}{3}\right)\\
+\end{split}
+\end{equation}
+such that
+\begin{equation}
+\begin{split}
+&{\rm tr}\left[B\right]=0,\;\;{\rm tr}\left[B^2\right]=6\\
+\end{split}
+\end{equation}
+and the eigenvalue equation for $B$ is
+\begin{equation}
+\begin{split}
+&\lambda _B^3-3\lambda _B -\det \left[B\right]=0
+\end{split}
+\end{equation}
+which can be solved analytically (for example, by using Mathematica).
+
+
+\begin{itemize}
+  \item Eigenvector of $3\times 3$ matrix
+\end{itemize}

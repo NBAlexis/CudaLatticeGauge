@@ -472,7 +472,7 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
             m_pA13,
             m_pA22,
             m_pA23);
-        fRes += appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz);
+        fRes += appAbs(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz));
     }
     return fRes;
 }

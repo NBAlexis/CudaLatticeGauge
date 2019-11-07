@@ -89,6 +89,9 @@
 
 #define _DC_InverseSqrtLink16 (_constFloats[ECF_InverseSqrtLink16])
 
+#define _DC_ALog (_constIntegers[ECI_UseLogADefinition])
+#define _HC_ALog (appGetCudaHelper()->m_ConstIntegers[ECI_UseLogADefinition])
+
 #pragma endregion
 
 __BEGIN_NAMESPACE

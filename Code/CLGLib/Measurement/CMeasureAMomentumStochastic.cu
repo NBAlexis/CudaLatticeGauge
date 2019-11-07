@@ -864,11 +864,11 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             assert(0 == m_lstR.Num());
         }
 
-        assert(m_uiConfigurationCount * m_lstR.Num() == m_lstJL.Num());
-        assert(m_uiConfigurationCount * m_lstR.Num() == m_lstJS.Num());
-        assert(m_uiConfigurationCount * m_lstR.Num() == m_lstJLPure.Num());
-        assert(m_uiConfigurationCount * m_lstR.Num() == m_lstJLJM.Num());
-        assert(m_uiConfigurationCount * m_lstR.Num() == m_lstJPot.Num());
+        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJL.Num());
+        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJS.Num());
+        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJLPure.Num());
+        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJLJM.Num());
+        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJPot.Num());
 
         if (0 == m_uiConfigurationCount)
         {

@@ -37,6 +37,12 @@
                      ((xi) * (ar) + (xr) * (ai)) + ((yi) * (br) + (yr) * (bi)) );
 
 
+
+// C = (A - a) (B - b)
+//tmpM1.m_me[0] = _cuCaddf(_cuCaddf(_cuCmulf(m_me[0], m_me[0]), _cuCmulf(m_me[1], m_me[3])), _cuCmulf(m_me[2], m_me[6]));
+#define __LINE_MUL_POLY(res, a, b, c, d, e, f) res = _cuCaddf(_cuCaddf(_cuCmulf(a, d), _cuCmulf(b, e)), _cuCmulf(c, f));
+
+
 #if _CLG_DOUBLEFLOAT
 #define __SU3MATRIX_ALIGN 256
 #else
@@ -73,7 +79,7 @@ extern "C" {
 
         __device__ void DebugPrint() const
         {
-            printf("=%1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n %1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n %1.7f%s%1.7fi, %1.7f%s%1.7fi, %1.7f%s%1.7fi;\n",
+            printf("={{%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I}};\n",
                 m_me[0].x,
                 m_me[0].y < 0 ? "" : "+",
                 m_me[0].y,
@@ -657,6 +663,19 @@ extern "C" {
             m_me[8] = _cuCmulf(m_me[8], right);
         }
 
+        __device__ __inline__ void DivComp(const CLGComplex& right)
+        {
+            m_me[0] = _cuCdivf(m_me[0], right);
+            m_me[1] = _cuCdivf(m_me[1], right);
+            m_me[2] = _cuCdivf(m_me[2], right);
+            m_me[3] = _cuCdivf(m_me[3], right);
+            m_me[4] = _cuCdivf(m_me[4], right);
+            m_me[5] = _cuCdivf(m_me[5], right);
+            m_me[6] = _cuCdivf(m_me[6], right);
+            m_me[7] = _cuCdivf(m_me[7], right);
+            m_me[8] = _cuCdivf(m_me[8], right);
+        }
+
         __device__ __inline__ void MulDagger(const deviceSU3& right)
         {
             CLGComplex res[9];
@@ -754,6 +773,7 @@ extern "C" {
 
         __device__ __inline__ deviceSU3 MulCompC(const CLGComplex& right) const { deviceSU3 ret(*this); ret.MulComp(right); return ret; }
         __device__ __inline__ deviceSU3 MulRealC(const Real& right) const { deviceSU3 ret(*this); ret.MulReal(right); return ret; }
+        __device__ __inline__ deviceSU3 DivCompC(const CLGComplex& right) const { deviceSU3 ret(*this); ret.DivComp(right); return ret; }
 
         //the reduce regcount version
         __device__ __inline__ void MulRealCArray(CLGComplex* res, const Real& right) const 
@@ -1626,6 +1646,282 @@ extern "C" {
 #undef a3rc2i
 #undef a3ic2r
 #endif
+
+#pragma endregion
+
+#pragma region power and log
+
+        /**
+         * Eigen values of any 3x3 matrix
+         */
+        __device__ __inline__ void CalculateEigenValues(CLGComplex& c1, CLGComplex& c2, CLGComplex& c3) const
+        {
+            const Real fUpperTraingle = __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2]) + __cuCabsSqf(m_me[5]);
+            const Real fDownTraingle = __cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[6]) + __cuCabsSqf(m_me[7]);
+
+            if (fUpperTraingle < _CLG_FLT_EPSILON
+             || fDownTraingle < _CLG_FLT_EPSILON)
+            {
+                c1 = m_me[0];
+                c2 = m_me[4];
+                c3 = m_me[8];
+                return;
+            }
+
+            //q=tr / 3
+            const CLGComplex fQ = cuCmulf_cr(Tr(), F(0.33333333333333333333333));
+            deviceSU3 cpy = SubCompC(fQ);
+            const CLGComplex fP = __cuCsqrtf(cuCmulf_cr((cpy.MulC(cpy)).Tr(), F(0.1666666666666666666667)));
+            cpy.DivComp(fP);          
+            CLGComplex fDet = Determinent(cpy.m_me);
+
+            //[ r+sqrt(r^2-4) ] ^(1/3)
+            fDet = __cuCpowerf(_cuCaddf(fDet, 
+                __cuCsqrtf(cuCsubf_cr(_cuCmulf(fDet, fDet), F(4.0)))), 
+                F(0.333333333333333333333333));
+
+            const CLGComplex _1over2Power13 = _make_cuComplex(
+                F(1.2599210498948731647672106072782283505702514647015079800819), F(0.0));
+            const CLGComplex _m1over2Power13 = 
+                _make_cuComplex(F(0.629960524947436582383605303639114175285125732350753990041), 
+                    F(1.0911236359717214035600726141898088813258733387403009407035));
+            const CLGComplex _m1over2Power13Star = 
+                _make_cuComplex(-F(0.629960524947436582383605303639114175285125732350753990041), 
+                    F(1.0911236359717214035600726141898088813258733387403009407035));
+
+            //q+p(det/r+r/det)
+
+            c1 = _cuCaddf(fQ, _cuCmulf(fP,
+                _cuCaddf(_cuCdivf(fDet, _m1over2Power13Star), _cuCdivf(_m1over2Power13Star, fDet))
+                ));
+            c2 = _cuCaddf(fQ, _cuCmulf(fP,
+                _cuCaddf(_cuCdivf(fDet, _1over2Power13), _cuCdivf(_1over2Power13, fDet))
+            ));
+            c3 = _cuCsubf(fQ, _cuCmulf(fP,
+                _cuCaddf(_cuCdivf(fDet, _m1over2Power13), _cuCdivf(_m1over2Power13, fDet))
+            ));
+        }
+
+        __device__ __inline__ deviceSU3 EigenVectors(
+            const CLGComplex& c1, 
+            const CLGComplex& c2, 
+            const CLGComplex& c3) const
+        {
+            deviceSU3 tmpM1;
+            deviceSU3 retRes;
+            
+            CLGComplex right_m_lambda1 = _cuCsubf(m_me[0], c3);
+            CLGComplex right_m_lambda2 = _cuCsubf(m_me[4], c3);
+            CLGComplex right_m_lambda3 = _cuCsubf(m_me[8], c3);
+            CLGComplex left_m_lambda = _cuCsubf(m_me[0], c2);
+            __LINE_MUL_POLY(tmpM1.m_me[0], left_m_lambda, m_me[1], m_me[2], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[1], left_m_lambda, m_me[1], m_me[2], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[2], left_m_lambda, m_me[1], m_me[2], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[4], c2);
+            __LINE_MUL_POLY(tmpM1.m_me[3], m_me[3], left_m_lambda, m_me[5], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[4], m_me[3], left_m_lambda, m_me[5], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[5], m_me[3], left_m_lambda, m_me[5], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[8], c2);
+            __LINE_MUL_POLY(tmpM1.m_me[6], m_me[6], m_me[7], left_m_lambda, right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[7], m_me[6], m_me[7], left_m_lambda, m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[8], m_me[6], m_me[7], left_m_lambda, m_me[2], m_me[5], right_m_lambda3);
+
+            //v1 = 0, 3, 6
+            retRes.m_me[0] = _cuCaddf(_cuCaddf(tmpM1.m_me[0], tmpM1.m_me[1]), tmpM1.m_me[2]);
+            retRes.m_me[3] = _cuCaddf(_cuCaddf(tmpM1.m_me[3], tmpM1.m_me[4]), tmpM1.m_me[5]);
+            retRes.m_me[6] = _cuCaddf(_cuCaddf(tmpM1.m_me[6], tmpM1.m_me[7]), tmpM1.m_me[8]);
+            if (__cuCabsSqf(retRes.m_me[0]) > _CLG_FLT_EPSILON)
+            {
+                retRes.m_me[3] = _cuCdivf(retRes.m_me[3], retRes.m_me[0]);
+                retRes.m_me[6] = _cuCdivf(retRes.m_me[6], retRes.m_me[0]);
+                retRes.m_me[0] = _make_cuComplex(F(1.0), F(0.0));
+            }
+            Real fDenorm = __cuCabsSqf(retRes.m_me[0]) + __cuCabsSqf(retRes.m_me[3]) + __cuCabsSqf(retRes.m_me[6]);
+            if (fDenorm > _CLG_FLT_EPSILON)
+            {
+                fDenorm = __rcp(_sqrt(fDenorm));
+                retRes.m_me[0] = cuCmulf_cr(retRes.m_me[0], fDenorm);
+                retRes.m_me[3] = cuCmulf_cr(retRes.m_me[3], fDenorm);
+                retRes.m_me[6] = cuCmulf_cr(retRes.m_me[6], fDenorm);
+            }
+            else
+            {
+                retRes.m_me[3] = _make_cuComplex(F(0.0), F(0.0));
+                retRes.m_me[6] = _make_cuComplex(F(0.0), F(0.0));
+            }
+
+
+            right_m_lambda1 = _cuCsubf(m_me[0], c1);
+            right_m_lambda2 = _cuCsubf(m_me[4], c1);
+            right_m_lambda3 = _cuCsubf(m_me[8], c1);
+            left_m_lambda = _cuCsubf(m_me[0], c3);
+            __LINE_MUL_POLY(tmpM1.m_me[0], left_m_lambda, m_me[1], m_me[2], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[1], left_m_lambda, m_me[1], m_me[2], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[2], left_m_lambda, m_me[1], m_me[2], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[4], c3);
+            __LINE_MUL_POLY(tmpM1.m_me[3], m_me[3], left_m_lambda, m_me[5], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[4], m_me[3], left_m_lambda, m_me[5], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[5], m_me[3], left_m_lambda, m_me[5], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[8], c3);
+            __LINE_MUL_POLY(tmpM1.m_me[6], m_me[6], m_me[7], left_m_lambda, right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[7], m_me[6], m_me[7], left_m_lambda, m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[8], m_me[6], m_me[7], left_m_lambda, m_me[2], m_me[5], right_m_lambda3);
+            retRes.m_me[1] = _cuCaddf(_cuCaddf(tmpM1.m_me[0], tmpM1.m_me[1]), tmpM1.m_me[2]);
+            retRes.m_me[4] = _cuCaddf(_cuCaddf(tmpM1.m_me[3], tmpM1.m_me[4]), tmpM1.m_me[5]);
+            retRes.m_me[7] = _cuCaddf(_cuCaddf(tmpM1.m_me[6], tmpM1.m_me[7]), tmpM1.m_me[8]);
+            CLGComplex v1v2 = _cuCaddf(_cuCaddf(
+                _cuCmulf(_cuConjf(retRes.m_me[0]), retRes.m_me[1]), 
+                _cuCmulf(_cuConjf(retRes.m_me[3]), retRes.m_me[4])),
+                _cuCmulf(_cuConjf(retRes.m_me[6]), retRes.m_me[7]));
+            retRes.m_me[1] = _cuCsubf(retRes.m_me[1], _cuCmulf(v1v2, retRes.m_me[0]));
+            retRes.m_me[4] = _cuCsubf(retRes.m_me[4], _cuCmulf(v1v2, retRes.m_me[3]));
+            retRes.m_me[7] = _cuCsubf(retRes.m_me[7], _cuCmulf(v1v2, retRes.m_me[6]));
+            if (__cuCabsSqf(retRes.m_me[4]) > _CLG_FLT_EPSILON)
+            {
+                retRes.m_me[1] = _cuCdivf(retRes.m_me[1], retRes.m_me[4]);
+                retRes.m_me[7] = _cuCdivf(retRes.m_me[7], retRes.m_me[4]);
+                retRes.m_me[4] = _make_cuComplex(F(1.0), F(0.0));
+            }
+            fDenorm = __cuCabsSqf(retRes.m_me[1]) + __cuCabsSqf(retRes.m_me[4]) + __cuCabsSqf(retRes.m_me[7]);
+            if (fDenorm > _CLG_FLT_EPSILON)
+            {
+                fDenorm = __rcp(_sqrt(fDenorm));
+                retRes.m_me[1] = cuCmulf_cr(retRes.m_me[1], fDenorm);
+                retRes.m_me[4] = cuCmulf_cr(retRes.m_me[4], fDenorm);
+                retRes.m_me[7] = cuCmulf_cr(retRes.m_me[7], fDenorm);
+            }
+            else
+            {
+                retRes.m_me[4] = _make_cuComplex(F(0.0), F(0.0));
+                retRes.m_me[7] = _make_cuComplex(F(0.0), F(0.0));
+            }
+
+
+            right_m_lambda1 = _cuCsubf(m_me[0], c2);
+            right_m_lambda2 = _cuCsubf(m_me[4], c2);
+            right_m_lambda3 = _cuCsubf(m_me[8], c2);
+            left_m_lambda = _cuCsubf(m_me[0], c1);
+            __LINE_MUL_POLY(tmpM1.m_me[0], left_m_lambda, m_me[1], m_me[2], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[1], left_m_lambda, m_me[1], m_me[2], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[2], left_m_lambda, m_me[1], m_me[2], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[4], c1);
+            __LINE_MUL_POLY(tmpM1.m_me[3], m_me[3], left_m_lambda, m_me[5], right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[4], m_me[3], left_m_lambda, m_me[5], m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[5], m_me[3], left_m_lambda, m_me[5], m_me[2], m_me[5], right_m_lambda3);
+            left_m_lambda = _cuCsubf(m_me[8], c1);
+            __LINE_MUL_POLY(tmpM1.m_me[6], m_me[6], m_me[7], left_m_lambda, right_m_lambda1, m_me[3], m_me[6]);
+            __LINE_MUL_POLY(tmpM1.m_me[7], m_me[6], m_me[7], left_m_lambda, m_me[1], right_m_lambda2, m_me[7]);
+            __LINE_MUL_POLY(tmpM1.m_me[8], m_me[6], m_me[7], left_m_lambda, m_me[2], m_me[5], right_m_lambda3);
+
+            retRes.m_me[2] = _cuCaddf(_cuCaddf(tmpM1.m_me[0], tmpM1.m_me[1]), tmpM1.m_me[2]);
+            retRes.m_me[5] = _cuCaddf(_cuCaddf(tmpM1.m_me[3], tmpM1.m_me[4]), tmpM1.m_me[5]);
+            retRes.m_me[8] = _cuCaddf(_cuCaddf(tmpM1.m_me[6], tmpM1.m_me[7]), tmpM1.m_me[8]);
+            v1v2 = _cuCaddf(_cuCaddf(
+                _cuCmulf(_cuConjf(retRes.m_me[0]), retRes.m_me[2]),
+                _cuCmulf(_cuConjf(retRes.m_me[3]), retRes.m_me[5])),
+                _cuCmulf(_cuConjf(retRes.m_me[6]), retRes.m_me[8]));
+            const CLGComplex v2v3 = _cuCaddf(_cuCaddf(
+                _cuCmulf(_cuConjf(retRes.m_me[1]), retRes.m_me[2]),
+                _cuCmulf(_cuConjf(retRes.m_me[4]), retRes.m_me[5])),
+                _cuCmulf(_cuConjf(retRes.m_me[7]), retRes.m_me[8]));
+            retRes.m_me[2] = _cuCsubf(retRes.m_me[2], _cuCmulf(v1v2, retRes.m_me[0]));
+            retRes.m_me[5] = _cuCsubf(retRes.m_me[5], _cuCmulf(v1v2, retRes.m_me[3]));
+            retRes.m_me[8] = _cuCsubf(retRes.m_me[8], _cuCmulf(v1v2, retRes.m_me[6]));
+            retRes.m_me[2] = _cuCsubf(retRes.m_me[2], _cuCmulf(v2v3, retRes.m_me[1]));
+            retRes.m_me[5] = _cuCsubf(retRes.m_me[5], _cuCmulf(v2v3, retRes.m_me[4]));
+            retRes.m_me[8] = _cuCsubf(retRes.m_me[8], _cuCmulf(v2v3, retRes.m_me[7]));
+
+            if (__cuCabsSqf(retRes.m_me[8]) > _CLG_FLT_EPSILON)
+            {
+                retRes.m_me[2] = _cuCdivf(retRes.m_me[2], retRes.m_me[8]);
+                retRes.m_me[5] = _cuCdivf(retRes.m_me[5], retRes.m_me[8]);
+                retRes.m_me[8] = _make_cuComplex(F(1.0), F(0.0));
+            }
+            fDenorm = __cuCabsSqf(retRes.m_me[2]) + __cuCabsSqf(retRes.m_me[5]) + __cuCabsSqf(retRes.m_me[8]);
+            if (fDenorm > _CLG_FLT_EPSILON)
+            {
+                fDenorm = __rcp(_sqrt(fDenorm));
+                retRes.m_me[2] = cuCmulf_cr(retRes.m_me[2], fDenorm);
+                retRes.m_me[5] = cuCmulf_cr(retRes.m_me[5], fDenorm);
+                retRes.m_me[8] = cuCmulf_cr(retRes.m_me[8], fDenorm);
+            }
+            else
+            {
+                retRes.m_me[2] = _make_cuComplex(F(0.0), F(0.0));
+                retRes.m_me[5] = _make_cuComplex(F(0.0), F(0.0));
+            }
+
+            return retRes;
+        }
+
+        __device__ __inline__ deviceSU3 Power(Real fPower) const
+        {
+            CLGComplex c1;
+            CLGComplex c2;
+            CLGComplex c3;
+            CalculateEigenValues(c1, c2, c3);
+            const deviceSU3 diagonal = EigenVectors(c1, c2, c3);
+
+            deviceSU3 ret;
+            ret.m_me[0] = __cuCpowerf(c1, fPower);
+            ret.m_me[1] = _zeroc;
+            ret.m_me[2] = _zeroc;
+            ret.m_me[3] = _zeroc;
+            ret.m_me[4] = __cuCpowerf(c2, fPower);
+            ret.m_me[5] = _zeroc;
+            ret.m_me[6] = _zeroc;
+            ret.m_me[7] = _zeroc;
+            ret.m_me[8] = __cuCpowerf(c3, fPower);
+            ret.MulDagger(diagonal);
+            ret = diagonal.MulC(ret);
+            return ret;
+        }
+
+        __device__ __inline__ deviceSU3 Log() const
+        {
+            CLGComplex c1;
+            CLGComplex c2;
+            CLGComplex c3;
+            CalculateEigenValues(c1, c2, c3);
+            const deviceSU3 diagonal = EigenVectors(c1, c2, c3);
+            deviceSU3 ret;
+            ret.m_me[0] = __cuClogf(c1);
+            ret.m_me[1] = _zeroc;
+            ret.m_me[2] = _zeroc;
+            ret.m_me[3] = _zeroc;
+            ret.m_me[4] = __cuClogf(c2);
+            ret.m_me[5] = _zeroc;
+            ret.m_me[6] = _zeroc;
+            ret.m_me[7] = _zeroc;
+            ret.m_me[8] = __cuClogf(c3);
+            ret.MulDagger(diagonal);
+            ret = diagonal.MulC(ret);
+            return ret;
+        }
+
+        __device__ __inline__ deviceSU3 StrictExp() const
+        {
+            CLGComplex c1;
+            CLGComplex c2;
+            CLGComplex c3;
+            CalculateEigenValues(c1, c2, c3);
+            const deviceSU3 diagonal = EigenVectors(c1, c2, c3);
+
+            
+            deviceSU3 ret;
+            ret.m_me[0] = __cuCexpf(c1);
+            ret.m_me[1] = _zeroc;
+            ret.m_me[2] = _zeroc;
+            ret.m_me[3] = _zeroc;
+            ret.m_me[4] = __cuCexpf(c2);
+            ret.m_me[5] = _zeroc;
+            ret.m_me[6] = _zeroc;
+            ret.m_me[7] = _zeroc;
+            ret.m_me[8] = __cuCexpf(c3);
+            ret.MulDagger(diagonal);
+            ret = diagonal.MulC(ret);
+            return ret;
+        }
 
 #pragma endregion
 

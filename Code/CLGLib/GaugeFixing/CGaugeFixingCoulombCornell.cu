@@ -544,7 +544,7 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
             m_pA22,
             m_pA23);
 
-        fRet += appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz);
+        fRet += appAbs(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz));
     }
     return fRet / _HC_Lt;
 }

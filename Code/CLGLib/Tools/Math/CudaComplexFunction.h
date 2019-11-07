@@ -54,6 +54,15 @@ extern "C" {
     }
 
     /**
+     * log(c)
+     */
+    __device__ static __inline__ CLGComplex __cuClogf(const CLGComplex& c)
+    {
+        const Real fArg = __cuCargf(c);
+        return _make_cuComplex(_log(_cuCabsf(c)), fArg > PI ? fArg - PI2 : fArg);
+    }
+
+    /**
     * _sqrt(c)
     */
     __device__ static __inline__ CLGComplex __cuCsqrtf(const CLGComplex& c)
@@ -66,7 +75,7 @@ extern "C" {
         // signbit should be false if x.y is negative
         //if (signbit(c.y))
         //    out.y *= -F(1.0);
-        if (c.y >= F(0.0))
+        if (c.y < F(0.0)) //same as Mathematica
             out.y *= -F(1.0);
 
         return out;

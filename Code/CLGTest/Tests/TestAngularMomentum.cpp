@@ -38,6 +38,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJFS2 = F(0.0);
     Real fJFLPure1 = F(0.0);
     Real fJFLPure2 = F(0.0);
+    Real fJFLJM1 = F(0.0);
+    Real fJFLJM2 = F(0.0);
     Real fJFPot1 = F(0.0);
     Real fJFPot2 = F(0.0);
 
@@ -65,6 +67,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJFL1 = pJF->m_lstJLAll[0];
     fJFS1 = pJF->m_lstJSAll[0];
     fJFLPure1 = pJF->m_lstJLPureAll[0];
+    fJFLJM1 = pJF->m_lstJLJMAll[0];
     fJFPot1 = pJF->m_lstJPotAll[0];
 
     Real fJG1In = pJG->m_lstJGInner[0];
@@ -75,6 +78,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJFL1In = pJF->m_lstJLInner[0];
     Real fJFS1In = pJF->m_lstJSInner[0];
     Real fJFLPure1In = pJF->m_lstJLPureInner[0];
+    Real fJFLJM1In = pJF->m_lstJLJMInner[0];
     Real fJFPot1In = pJF->m_lstJPotInner[0];
 
     //====== Step 4 ========
@@ -99,6 +103,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJFL2 = pJF->m_lstJLAll[0];
     fJFS2 = pJF->m_lstJSAll[0];
     fJFLPure2 = pJF->m_lstJLPureAll[0];
+    fJFLJM2 = pJF->m_lstJLJMAll[0];
     fJFPot2 = pJF->m_lstJPotAll[0];
 
     Real fJG2In = pJG->m_lstJGInner[0];
@@ -109,6 +114,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJFL2In = pJF->m_lstJLInner[0];
     Real fJFS2In = pJF->m_lstJSInner[0];
     Real fJFLPure2In = pJF->m_lstJLPureInner[0];
+    Real fJFLJM2In = pJF->m_lstJLJMInner[0];
     Real fJFPot2In = pJF->m_lstJPotInner[0];
 
     //====== Step compare ========
@@ -221,10 +227,14 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGeneral(_T("Ji Decompose JFL: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFL1, fJFL2, appAbs(fJFL1 - fJFL2));
     appGeneral(_T("Ji Decompose JFS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFS1, fJFS2, appAbs(fJFS1 - fJFS2));
     appGeneral(_T("Chen Decompose JFPure: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLPure1, fJFLPure2, appAbs(fJFLPure1 - fJFLPure2));
+    appGeneral(_T("Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLJM1, fJFLJM2, appAbs(fJFLJM1 - fJFLJM2));
     appGeneral(_T("Chen Decompose JFPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFPot1, fJFPot2, appAbs(fJFPot1 - fJFPot2));
 
     appGeneral(_T("JFPure - JFL - JFPot = %2.12f\n"), fJFLPure1 - fJFL1 - fJFPot1);
     appGeneral(_T("JG, JGS+JGChen-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 + fJGChen1 - fJFPot1);
+    appGeneral(_T("JG, JGS-JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 - fJFPot1);
+    appGeneral(_T("JG, JGS-JGChenApprox+JFLJM-JFL, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 + fJFLJM1 - fJFL1);
+    appGeneral(_T("JGChen 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChen1, fJGChen2, fJGChen3, fJGChen4, fJGChen5);
     appGeneral(_T("JGChen Approx 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChenApprox1, fJGChenApprox2, fJGChenApprox3, fJGChenApprox4, fJGChenApprox5);
 
     appGeneral(_T("Inner Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1In, fJG2In, appAbs(fJG1In - fJG2In));
@@ -236,6 +246,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGeneral(_T("Inner Ji Decompose JFL: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFL1In, fJFL2In, appAbs(fJFL1In - fJFL2In));
     appGeneral(_T("Inner Ji Decompose JFS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFS1In, fJFS2In, appAbs(fJFS1In - fJFS2In));
     appGeneral(_T("Inner Chen Decompose JFPure: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLPure1In, fJFLPure2In, appAbs(fJFLPure1In - fJFLPure2In));
+    appGeneral(_T("Inner Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLJM1In, fJFLJM2In, appAbs(fJFLJM1In - fJFLJM2In));
     appGeneral(_T("Inner Chen Decompose JFPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFPot1In, fJFPot2In, appAbs(fJFPot1In - fJFPot2In));
 
     appGeneral(_T("Inner JFPure - JFL - JFPot = %2.12f\n"), fJFLPure1In - fJFL1In - fJFPot1In);

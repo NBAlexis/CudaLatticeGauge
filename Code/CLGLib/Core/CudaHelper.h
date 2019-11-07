@@ -97,6 +97,7 @@ enum EConstIntId
     ECI_ThreadConstaintY,
     ECI_ThreadConstaintZ,
     ECI_SummationDecompose,
+    ECI_UseLogADefinition, // A = U.TA() ? or A = Log(U)
 
     ECI_ForceDWORD = 0x7fffffff,
 };
