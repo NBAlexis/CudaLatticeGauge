@@ -271,7 +271,9 @@ INT TestThermal(CParameters& params)
             if (NULL != pCC)
             {
                 //===================== Chiral condensate =====================
-                assert(pCC->m_lstCondensate.Num() == static_cast<INT>(iEquib - iEquibSkip));
+                assert(pCC->m_lstChiralAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
+                assert(pCC->m_lstPionAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
+                assert(pCC->m_lstRhonAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
                 assert(pCC->m_lstAverageCondensateDensity.Num() == static_cast<INT>(CCommonData::m_sCenter.x));
                 chiral.AddItem(_cuCabsf(pCC->m_cAverageCondensate));
                 for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
