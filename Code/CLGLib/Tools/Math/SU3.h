@@ -1901,13 +1901,23 @@ extern "C" {
 
         __device__ __inline__ deviceSU3 StrictExp() const
         {
+            const Real fAbsAll = 
+              __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2]) + __cuCabsSqf(m_me[3])
+            + __cuCabsSqf(m_me[4]) + __cuCabsSqf(m_me[5]) + __cuCabsSqf(m_me[6])
+            + __cuCabsSqf(m_me[7]) + __cuCabsSqf(m_me[8]) + __cuCabsSqf(m_me[9]);
+
+            //if A is small, there will be problems
+            if (fAbsAll < F(0.0001))
+            {
+                return QuickExp(F(1.0));
+            }
+
             CLGComplex c1;
             CLGComplex c2;
             CLGComplex c3;
             CalculateEigenValues(c1, c2, c3);
             const deviceSU3 diagonal = EigenVectors(c1, c2, c3);
 
-            
             deviceSU3 ret;
             ret.m_me[0] = __cuCexpf(c1);
             ret.m_me[1] = _zeroc;

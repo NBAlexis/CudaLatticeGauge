@@ -173,7 +173,7 @@ The Coulomb gauge is very similar to Landau gauge, however, note that the gauge 
 
 The usual definition of $U_{\mu}$ is $U_{\mu}=e^{iaA_{\mu}}$, there for the real definition of $A$ should be $iaA_{\mu}=\log (U_{\mu})$.
 
-To calculate $\log (U)$, we need to calculate $U^{\frac{1}{k}}$ first, which is straightforward for a $3\times 3$ matrix. let
+To calculate take an example of $U^{\frac{1}{k}}$ first, let
 \begin{equation}
 \begin{split}
 &A=P^{-1}DP
@@ -222,3 +222,19 @@ which can be solved analytically (for example, by using Mathematica).
 \begin{itemize}
   \item Eigenvector of $3\times 3$ matrix
 \end{itemize}
+
+If we assume there is no degeneracy due to float point precision, then any column of the matrix $\left(A-\lambda _2 \mathbb{I}_3\right)\left(A-\lambda _3 \mathbb{I}_3\right)$ is an eigenvector correspond to $\lambda _1$, because $\left(A-\lambda _1 \mathbb{I}_3\right)\left(A-\lambda _2 \mathbb{I}_3\right)\left(A-\lambda _3 \mathbb{I}_3\right)=0$.
+
+\begin{itemize}
+  \item Power, logarithm, and exponential
+\end{itemize}
+
+Similar as the power,
+\begin{equation}
+\begin{split}
+&A=P^{-1}DP\\
+&\log (A)=P\log (D)P^{-1}\\
+&\exp (A)=P\exp (D)P^{-1}\\
+\end{split}
+\end{equation}
+where the exponential and logarithm of a diagonal matrix is easy to do.

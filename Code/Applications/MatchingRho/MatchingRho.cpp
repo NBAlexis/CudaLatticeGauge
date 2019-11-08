@@ -9,6 +9,21 @@
 
 #include "MatchingRho.h"
 
+#define __Show_Correlator(name) \
+appGeneral(_T("\n ==================== %s correlator C(p=0, nt) ==============\n\n"), _T(#name)); \
+appGeneral(_T("{\n")); \
+for (UINT iConf = 0; iConf < uiAccepCountAfterE; ++iConf) \
+{ \
+    appGeneral(_T("{")); \
+    for (UINT iT = 0; iT < _HC_Lt; ++iT) \
+    { \
+        appGeneral(_T("%2.20f%s "), name##Correlator[iConf * _HC_Lt + iT], (iT == _HC_Lt - 1) ? _T("") : _T(",")); \
+    } \
+    appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(",")); \
+} \
+appGeneral(_T("}\n")); \
+
+
 int main(int argc, char * argv[])
 {
     CParameters params;
@@ -50,6 +65,12 @@ int main(int argc, char * argv[])
 
     TArray<Real> pionCorrelator;
     TArray<Real> rhoCorrelator;
+
+    TArray<Real> rho0Correlator;
+    TArray<Real> rho1Correlator;
+    TArray<Real> rho2Correlator;
+    TArray<Real> rho3Correlator;
+
     //TArray<Real> potentialR;
     //TArray<CLGComplex> potentialC;
 
@@ -117,10 +138,16 @@ int main(int argc, char * argv[])
                     for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
                     {
                         pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
+                        rho1Correlator.AddItem(pMC->m_lstResultsLastConf[1][uiLt]);
+                        rho2Correlator.AddItem(pMC->m_lstResultsLastConf[2][uiLt]);
+                        rho3Correlator.AddItem(pMC->m_lstResultsLastConf[3][uiLt]);
+
                         rhoCorrelator.AddItem((
                             pMC->m_lstResultsLastConf[1][uiLt]
                             + pMC->m_lstResultsLastConf[2][uiLt]
                             + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
+
+                        rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                     }
                 }
 
@@ -173,10 +200,15 @@ int main(int argc, char * argv[])
                 for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
                 {
                     pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
+                    rho1Correlator.AddItem(pMC->m_lstResultsLastConf[1][uiLt]);
+                    rho2Correlator.AddItem(pMC->m_lstResultsLastConf[2][uiLt]);
+                    rho3Correlator.AddItem(pMC->m_lstResultsLastConf[3][uiLt]);
                     rhoCorrelator.AddItem((
                         pMC->m_lstResultsLastConf[1][uiLt]
                       + pMC->m_lstResultsLastConf[2][uiLt]
                       + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
+
+                    rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                 }
             }
             else
@@ -242,31 +274,13 @@ int main(int argc, char * argv[])
     if ((!bOnlyMeasure || bMeasureFermion) && NULL != pMC)
     {
         appSetLogDate(FALSE);
-        appGeneral(_T("\n ==================== Pion correlator C(p=0, nt) ==============\n\n"));
-        appGeneral(_T("{\n"));
-        for (UINT iConf = 0; iConf < uiAccepCountAfterE; ++iConf)
-        {
-            appGeneral(_T("{"));
-            for (UINT iT = 0; iT < _HC_Lt; ++iT)
-            {
-                appGeneral(_T("%2.12f%s "), pionCorrelator[iConf * _HC_Lt + iT], (iT == _HC_Lt - 1) ? _T("") : _T(","));
-            }
-            appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(","));
-        }
-        appGeneral(_T("}\n"));
 
-        appGeneral(_T("\n ==================== Pho correlator C(p=0, nt) ==============\n\n"));
-        appGeneral(_T("{\n"));
-        for (UINT iConf = 0; iConf < uiAccepCountAfterE; ++iConf)
-        {
-            appGeneral(_T("{"));
-            for (UINT iT = 0; iT < _HC_Lt; ++iT)
-            {
-                appGeneral(_T("%2.12f%s "), rhoCorrelator[iConf * _HC_Lt + iT], (iT == _HC_Lt - 1) ? _T("") : _T(","));
-            }
-            appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(","));
-        }
-        appGeneral(_T("}\n"));
+        __Show_Correlator(pion);
+        __Show_Correlator(rho);
+        __Show_Correlator(rho1);
+        __Show_Correlator(rho2);
+        __Show_Correlator(rho3);
+        __Show_Correlator(rho0);
 
         appSetLogDate(TRUE);
     }

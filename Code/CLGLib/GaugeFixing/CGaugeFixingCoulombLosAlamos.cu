@@ -302,7 +302,6 @@ _kernelCalculateASpace_S(
     }
 }
 
-
 /**
 * res = Tr[Delta A^2]
 * If Delta A is a anti-Hermitian, Tr[Delta A^2] = 2 (|A12|^2+|A13|^2+|A23|^2 + |A11+A22|^2)
@@ -480,6 +479,7 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
 Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT)
 {
     preparethread_S;
+
     _kernelCalculateASpace_S << <block, threads >> > (
         uiT,
         pGauge,

@@ -22,13 +22,19 @@ public:
     CMeasureChiralCondensate()
         : CMeasureStochastic()
         , m_uiConfigurationCount(0)
-        , m_pDeviceXYBuffer(NULL)
+        , m_pDeviceXYBufferChiral(NULL)
+        , m_pDeviceXYBufferPion(NULL)
+        , m_pDeviceXYBufferRhon(NULL)
         , m_pHostXYBuffer(NULL)
 
         , m_pDistributionR(NULL)
-        , m_pDistributionC(NULL)
+        , m_pDistributionChiral(NULL)
+        , m_pDistributionPion(NULL)
+        , m_pDistributionRhon(NULL)
         , m_pHostDistributionR(NULL)
-        , m_pHostDistributionC(NULL)
+        , m_pHostDistributionChiral(NULL)
+        , m_pHostDistributionPion(NULL)
+        , m_pHostDistributionRhon(NULL)
 
         , m_uiMaxR(1)
         , m_bMeasureDistribution(FALSE)
@@ -53,14 +59,22 @@ public:
 protected:
     
     UINT m_uiConfigurationCount;
-    CLGComplex* m_pDeviceXYBuffer;
+    CLGComplex* m_pDeviceXYBufferChiral;
+    CLGComplex* m_pDeviceXYBufferPion;
+    CLGComplex* m_pDeviceXYBufferRhon;
     CLGComplex* m_pHostXYBuffer;
-    CLGComplex m_cTmpSum;
+    CLGComplex m_cTmpSumChiral;
+    CLGComplex m_cTmpSumPion;
+    CLGComplex m_cTmpSumRhon;
 
     UINT* m_pDistributionR;
-    Real* m_pDistributionC;
+    Real* m_pDistributionChiral;
+    Real* m_pDistributionPion;
+    Real* m_pDistributionRhon;
     UINT* m_pHostDistributionR;
-    Real* m_pHostDistributionC;
+    Real* m_pHostDistributionChiral;
+    Real* m_pHostDistributionPion;
+    Real* m_pHostDistributionRhon;
 
     UINT m_uiMaxR;
     UBOOL m_bMeasureDistribution;
@@ -68,14 +82,19 @@ protected:
 
 public:
 
-    TArray<CLGComplex> m_lstCondensate;
+    TArray<CLGComplex> m_lstChiralAll;
+    TArray<CLGComplex> m_lstPionAll;
+    TArray<CLGComplex> m_lstRhonAll;
     TArray<CLGComplex> m_lstCondensateDensity;
+
     CLGComplex m_cAverageCondensate;
     TArray<CLGComplex> m_lstAverageCondensateDensity;
 
     //c(R)
     TArray<UINT> m_lstR;
-    TArray<Real> m_lstC;
+    TArray<Real> m_lstChiral;
+    TArray<Real> m_lstPion;
+    TArray<Real> m_lstRhon;
 };
 
 __END_NAMESPACE

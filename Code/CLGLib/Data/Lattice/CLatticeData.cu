@@ -245,6 +245,9 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("BoundaryCondition : %s\n"), (NULL == m_pIndex || NULL == m_pIndex->m_pBoundaryCondition) ? _T("None") : m_pIndex->m_pBoundaryCondition->GetClass()->GetName());
     sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
+    sRet = sRet + sTab + sInfos;
+
     if (NULL != m_pFermionSolver)
     {
         sRet = sRet + sTab + _T("Solver : \n");

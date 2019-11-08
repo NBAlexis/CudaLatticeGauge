@@ -59,6 +59,47 @@ _kernelCalculateA3D(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateA3DLog(
+    SBYTE uiT,
+    const deviceSU3* __restrict__ pU,
+    Real* pA11,
+    CLGComplex* pA12,
+    CLGComplex* pA13,
+    Real* pA22,
+    CLGComplex* pA23)
+{
+    intokernalInt4_S;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    //No need to calcuate A4, since we don't need it
+    for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            deviceSU3 su3A(pU[uiLinkIndex]);
+            su3A = su3A.Log();
+            pA11[uiLinkIndex3D] = su3A.m_me[0].y;
+            pA12[uiLinkIndex3D] = su3A.m_me[1];
+            pA13[uiLinkIndex3D] = su3A.m_me[2];
+            pA22[uiLinkIndex3D] = su3A.m_me[4].y;
+            pA23[uiLinkIndex3D] = su3A.m_me[5];
+        }
+        else
+        {
+            pA11[uiLinkIndex3D] = F(0.0);
+            pA12[uiLinkIndex3D] = _zeroc;
+            pA13[uiLinkIndex3D] = _zeroc;
+            pA22[uiLinkIndex3D] = F(0.0);
+            pA23[uiLinkIndex3D] = _zeroc;
+        }
+    }
+}
+
 /**
  * Gamma(n) = Delta _{-mu} A(n) = \sum _mu (A_mu(n - mu) - A_mu(n))
  */
@@ -154,6 +195,7 @@ _kernelCalculateG3D(
             : pA.ExpReal(fAlpha, _DC_ExpPrecision);
     }
 }
+
 
 /**
  * g(n) U_mu(n) g(n+mu)^dagger
@@ -419,18 +461,33 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
     preparethread_S;
     m_iIterate = 0;
     Real fTheta = F(0.0);
-    
+
     while (m_iIterate < m_iMaxIterate)
     {
         //======= 1. Calculate Gamma    =========
-        _kernelCalculateA3D << <block, threads >> > (
-            uiT,
-            pDeviceBufferPointer,
-            m_pA11,
-            m_pA12,
-            m_pA13,
-            m_pA22,
-            m_pA23);
+        if (0 == _HC_ALog)
+        {
+            _kernelCalculateA3D << <block, threads >> > (
+                uiT,
+                pDeviceBufferPointer,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+        else
+        {
+            _kernelCalculateA3DLog << <block, threads >> > (
+                uiT,
+                pDeviceBufferPointer,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+
         _kernelCalculateAGradient3D << <block, threads >> > (
             uiT,
             m_pGamma11,
@@ -501,7 +558,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
             m_pGamma13,
             m_pGamma22,
             m_pGamma23,
-            -m_fAlpha);
+            m_fAlpha);
         _kernelGaugeTransform3D << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
         _kernelGaugeTransform3DT << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
         ++m_iIterate;
@@ -523,14 +580,29 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
     preparethread_S;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
     {
-        _kernelCalculateA3D << <block, threads >> > (
-            uiT,
-            pGaugeSU3->m_pDeviceData,
-            m_pA11,
-            m_pA12,
-            m_pA13,
-            m_pA22,
-            m_pA23);
+        if (0 == _HC_ALog)
+        {
+            _kernelCalculateA3D << <block, threads >> > (
+                uiT,
+                pGaugeSU3->m_pDeviceData,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+        else
+        {
+            _kernelCalculateA3DLog << <block, threads >> > (
+                uiT,
+                pGaugeSU3->m_pDeviceData,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+
         _kernelCalculateAGradient3D << <block, threads >> > (
             uiT,
             m_pGamma11,

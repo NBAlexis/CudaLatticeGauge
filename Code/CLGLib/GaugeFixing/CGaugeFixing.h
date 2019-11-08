@@ -31,6 +31,7 @@ public:
     , m_fAccuracy(F(0.00000000001))
     , m_iIterate(0)
     , m_iMaxIterate(1000000)
+    , m_iLinearIterate(20)
     , m_iShowErrorStep(1000)
     {
         
@@ -49,6 +50,7 @@ public:
     Real m_fAccuracy;
     UINT m_iIterate;
     UINT m_iMaxIterate;
+    UINT m_iLinearIterate;
     UINT m_iShowErrorStep;
 };
 

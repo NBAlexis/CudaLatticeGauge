@@ -2,7 +2,7 @@
 // FILENAME : CGaugeFixingLandauLosAlamos.h
 // 
 // DESCRIPTION:
-//
+// It seems the Los Alamos cannot fix gauge with logarithm definition
 // 
 // 
 //

@@ -56,6 +56,44 @@ _kernelCalculateA(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateALog(
+    const deviceSU3* __restrict__ pU,
+    Real* pA11,
+    CLGComplex* pA12,
+    CLGComplex* pA13,
+    Real* pA22,
+    CLGComplex* pA23)
+{
+    intokernalInt4;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            deviceSU3 su3A(pU[uiLinkIndex]);
+            su3A = su3A.Log();
+            pA11[uiLinkIndex] = su3A.m_me[0].y;
+            pA12[uiLinkIndex] = su3A.m_me[1];
+            pA13[uiLinkIndex] = su3A.m_me[2];
+            pA22[uiLinkIndex] = su3A.m_me[4].y;
+            pA23[uiLinkIndex] = su3A.m_me[5];
+        }
+        else
+        {
+            pA11[uiLinkIndex] = F(0.0);
+            pA12[uiLinkIndex] = _zeroc;
+            pA13[uiLinkIndex] = _zeroc;
+            pA22[uiLinkIndex] = F(0.0);
+            pA23[uiLinkIndex] = _zeroc;
+        }
+    }
+}
+
 /**
  * Gamma(n) = Delta _{-mu} A(n) = \sum _mu (A_mu(n - mu) - A_mu(n))
  */
@@ -342,13 +380,27 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
     while (m_iIterate < m_iMaxIterate)
     {
         //======= 1. Calculate Gamma    =========
-        _kernelCalculateA << <block, threads>> > (
-            pDeviceBufferPointer,
-            m_pA11,
-            m_pA12, 
-            m_pA13, 
-            m_pA22,
-            m_pA23);
+        if (0 == _HC_ALog)
+        {
+            _kernelCalculateA << <block, threads >> > (
+                pDeviceBufferPointer,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+        else
+        {
+            _kernelCalculateALog << <block, threads >> > (
+                pDeviceBufferPointer,
+                m_pA11,
+                m_pA12,
+                m_pA13,
+                m_pA22,
+                m_pA23);
+        }
+
         _kernelCalculateAGradient << <block, threads >> > (
             m_pGamma11,
             m_pGamma12,
@@ -409,14 +461,16 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
         }
 
         //======= 4. Gauge Transform    =========
+        //Be careful not to use strictLog when A is really small
         _kernelCalculateG << <block, threads >> > (
             m_pG,
             m_pGamma11,
-            m_pGamma12, 
+            m_pGamma12,
             m_pGamma13,
             m_pGamma22,
-            m_pGamma23, 
-            -m_fAlpha);
+            m_pGamma23,
+            m_fAlpha);
+
         _kernelGaugeTransform << <block, threads >> > (m_pG, pDeviceBufferPointer);
 
         ++m_iIterate;
@@ -436,13 +490,27 @@ Real CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     preparethread;
-    _kernelCalculateA << <block, threads >> > (
-        pGaugeSU3->m_pDeviceData,
-        m_pA11,
-        m_pA12,
-        m_pA13,
-        m_pA22,
-        m_pA23);
+    if (0 == _HC_ALog)
+    {
+        _kernelCalculateA << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pA11,
+            m_pA12,
+            m_pA13,
+            m_pA22,
+            m_pA23);
+    }
+    else
+    {
+        _kernelCalculateALog << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pA11,
+            m_pA12,
+            m_pA13,
+            m_pA22,
+            m_pA23);
+    }
+
     _kernelCalculateAGradient << <block, threads >> > (
         m_pGamma11,
         m_pGamma12,

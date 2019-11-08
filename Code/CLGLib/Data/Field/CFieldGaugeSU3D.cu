@@ -392,6 +392,25 @@ _kernelTransformToU_D(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToU_DLog(
+    deviceSU3* pDeviceData)
+{
+    intokernalInt4;
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            //pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].ExpReal(F(1.0), 8);
+            pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].StrictExp();
+        }
+    }
+}
+
 #pragma endregion
 
 
@@ -523,7 +542,15 @@ void CFieldGaugeSU3D::TransformToIA()
 void CFieldGaugeSU3D::TransformToU()
 {
     preparethread;
-    _kernelTransformToU_D << <block, threads >> > (m_pDeviceData);
+    if (0 == _HC_ALog)
+    {
+        _kernelTransformToU_D << <block, threads >> > (m_pDeviceData);
+    }
+    else
+    {
+        _kernelTransformToU_DLog << <block, threads >> > (m_pDeviceData);
+    }
+    
 }
 
 void CFieldGaugeSU3D::CopyTo(CField* pTarget) const

@@ -296,7 +296,6 @@ _kernelCalculateAAll(
     }
 }
 
-
 /**
 * res = Tr[Delta A^2]
 * If Delta A is a anti-Hermitian, Tr[Delta A^2] = 2 (|A12|^2+|A13|^2+|A23|^2 + |A11+A22|^2)

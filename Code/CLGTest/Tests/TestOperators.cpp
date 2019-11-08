@@ -178,7 +178,10 @@ UINT TestALogDefinition(CParameters&)
 
     const CLGComplex testDot = pTestGauge->Dot(pTestGauge);
     appGeneral(_T("Dot result = %f + %f I\n"), testDot.x, testDot.y);
-
+    if (_cuCabsf(testDot) > F(0.000000001))
+    {
+        return 1;
+    }
     return 0;
 }
 

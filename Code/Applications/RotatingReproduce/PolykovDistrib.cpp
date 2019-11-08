@@ -357,7 +357,7 @@ INT MeasurePolyakovDist(CParameters& params)
             case EDJ_Chiral:
             {
                 //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstC.Num());
+                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstChiral.Num());
 
                 if (uiOmega == iStartOmega)
                 {
@@ -396,7 +396,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     appGeneral(_T("{"));
                     for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), pCC->m_lstC[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                        appGeneral(_T("%2.12f%s"), pCC->m_lstChiral[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
                     }
                     appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
                 }
@@ -426,7 +426,7 @@ INT MeasurePolyakovDist(CParameters& params)
 #pragma region Chiral
 
                 //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstC.Num());
+                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstChiral.Num());
 
                 if (uiOmega == iStartOmega)
                 {
@@ -465,7 +465,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     appGeneral(_T("{"));
                     for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), pCC->m_lstC[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
+                        appGeneral(_T("%2.12f%s"), pCC->m_lstChiral[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
                     }
                     appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
                 }

@@ -697,7 +697,8 @@ TestSolverGCRODRLowMode:
         KDim : 4
         ## If QR Iteration all converge, it is no need to do so
         RecalculateR : 5
-        DeflateSpace : EEDT_REV
+        # DeflateSpace : EEDT_REV
+        DeflateSpace : EEDT_SVD
         ## Can NOT be too small, otherwise, will never reached..
         Accuracy : 0.000001
         Restart : 30
@@ -2047,6 +2048,7 @@ TestGaugeFixingLandauCornell:
     ActionListLength : 1
     FermionFieldCount : 0
     MeasureListLength : 0
+    UseLogADefinition : 0
 
     Gauge:
     
@@ -2081,6 +2083,7 @@ TestGaugeFixingCoulombCornell:
     ActionListLength : 1
     FermionFieldCount : 0
     MeasureListLength : 0
+    UseLogADefinition : 0
 
     Gauge:
     
@@ -2184,6 +2187,7 @@ TestGaugeFixingCoulombCornellDR:
     FermionFieldCount : 1
     MeasureListLength : 0
     CacheStaple : 0
+    UseLogADefinition : 1
 
     Gauge:
     
@@ -2230,7 +2234,6 @@ TestGaugeFixingCoulombCornellDR:
         Name : CGaugeFixingCoulombCornell
         Alpha : 0.08
         MaxIterate : 100000
-        ## Dirichlet boundary condition have some problem with FFT acceleration...
         FFT : 1
 
     Solver:
@@ -2337,6 +2340,7 @@ TestAngularMomentum:
     MeasureListLength : 2
     CacheStaple : 0
     StochasticGaussian : 1
+    UseLogADefinition : 1
 
     Gauge:
     
@@ -2381,10 +2385,10 @@ TestAngularMomentum:
 
     GaugeFixing:
 
-        Name : CGaugeFixingCoulombLosAlamos
-        Omega : 1.33
-        CheckErrorStep : 200
-        MaxIterate : 2000
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.08
+        MaxIterate : 3000
+        FFT : 1
 
     Solver:
 

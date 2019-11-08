@@ -3,7 +3,7 @@
 // 
 // DESCRIPTION:
 //
-// 
+// It seems the Los Alamos cannot fix gauge with logarithm definition
 // 
 //
 // REVISION:
