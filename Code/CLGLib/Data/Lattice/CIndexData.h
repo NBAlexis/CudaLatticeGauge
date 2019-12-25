@@ -42,6 +42,7 @@ public:
         , m_pBondInfoTable(NULL)
         , m_pPlaqutteCache(NULL)
         , m_pStappleCache(NULL)
+        , m_pEtaMu(NULL)
         , m_uiSiteXYZT(1)
         , m_uiSiteXYZ(1)
         , m_uiLinkNumber(1)
@@ -89,6 +90,7 @@ public:
         {
             checkCudaErrors(cudaFree(m_pStappleCache));
         }
+        cudaSafeFree(m_pEtaMu);
 
         for (BYTE i = 0; i < kMaxFieldCount; ++i)
         {
@@ -266,6 +268,9 @@ public:
 
     SIndex* m_pGaugeMoveCache[kMaxFieldCount];
     SIndex* m_pFermionMoveCache[kMaxFieldCount];
+
+    //eta mu table
+    BYTE* m_pEtaMu;
 
     BYTE m_uiPlaqutteLength;
     BYTE m_uiPlaqutteCountPerSite;

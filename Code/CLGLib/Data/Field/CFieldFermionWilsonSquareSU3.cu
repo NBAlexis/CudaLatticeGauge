@@ -466,6 +466,25 @@ _kernelMakePointSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite, B
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMakeWallSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredT, BYTE bySpin, BYTE byColor, BYTE byFieldID, UINT uiVolumn)
+{
+    intokernalInt4;
+    const Real fDenominator = F(1.0) / uiVolumn;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][uiBigIdx];
+
+    if (uiDesiredT == sSite4.w && !sIdx.IsDirichlet())
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeOneWilsonVectorSU3SpinColor(bySpin, byColor);
+        pDeviceData[uiSiteIndex].MulReal(fDenominator);
+    }
+    else
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    }
+}
+
 #pragma endregion
 
 CFieldFermionWilsonSquareSU3::CFieldFermionWilsonSquareSU3() 
@@ -979,6 +998,17 @@ void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceD
         preparethread;
         _kernelMakePointSource<<<block, threads >>>(m_pDeviceData, uiSiteIndex, sourceData.m_bySpinIndex, sourceData.m_byColorIndex);
     }
+    case EFS_Wall:
+    {
+        preparethread;
+        _kernelMakeWallSource << <block, threads >> > (
+            m_pDeviceData, 
+            sourceData.m_sSourcePoint.w, 
+            sourceData.m_bySpinIndex, 
+            sourceData.m_byColorIndex,
+            m_byFieldId,
+            appGetLattice()->m_pIndexCache->m_uiSiteXYZ);
+    }
     break;
     default:
         appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
@@ -1063,8 +1093,7 @@ TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(co
 
 CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3\n");
+    CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3\n");
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }

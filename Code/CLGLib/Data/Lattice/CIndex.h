@@ -85,6 +85,11 @@ public:
     virtual void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) = 0;
 
     /**
+     * pre-calculate eta mu
+     */
+    virtual void BakeEtaMuTable(class CIndexData* pData) = 0;
+
+    /**
     * Call this after BakePlaquttes
     */
     virtual UINT GetPlaqutteCount() const = 0;

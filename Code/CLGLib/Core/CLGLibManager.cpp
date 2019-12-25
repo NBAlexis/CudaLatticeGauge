@@ -633,6 +633,7 @@ void CCLGLibManager::InitialIndexBuffer() const
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
     if (NULL != m_pLatticeData->m_pGaugeField)
     {
+        UBOOL bHasStaggeredFermion = FALSE;
         assert(1 == m_pLatticeData->m_pGaugeField->m_byFieldId);
 
         m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, 1);
@@ -642,7 +643,15 @@ void CCLGLibManager::InitialIndexBuffer() const
             if (NULL != m_pLatticeData->GetFieldById(i))
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
+                if (EFT_FermionStaggered == m_pLatticeData->GetFieldById(i)->GetFieldType())
+                {
+                    bHasStaggeredFermion = TRUE;
+                }
             }
+        }
+        if (bHasStaggeredFermion)
+        {
+            m_pLatticeData->m_pIndex->BakeEtaMuTable(m_pLatticeData->m_pIndexCache);
         }
     }
     m_pLatticeData->m_pIndex->CalculateSiteCount(m_pLatticeData->m_pIndexCache);

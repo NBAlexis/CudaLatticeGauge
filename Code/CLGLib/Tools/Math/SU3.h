@@ -494,6 +494,25 @@ extern "C" {
             return ret;
         }
 
+        /**
+         * Another version of makeSU3Contract without spin sum
+         */
+        __device__ __inline__ static deviceSU3 makeSU3ContractV(const deviceSU3Vector& left, const deviceSU3Vector& right)
+        {
+            deviceSU3 ret;
+            ret.m_me[0] = _cuCmulf(_cuConjf(left.m_ve[0]), right.m_ve[0]);
+            ret.m_me[1] = _cuCmulf(_cuConjf(left.m_ve[1]), right.m_ve[0]);
+            ret.m_me[2] = _cuCmulf(_cuConjf(left.m_ve[2]), right.m_ve[0]);
+            ret.m_me[3] = _cuCmulf(_cuConjf(left.m_ve[0]), right.m_ve[1]);
+            ret.m_me[4] = _cuCmulf(_cuConjf(left.m_ve[1]), right.m_ve[1]);
+            ret.m_me[5] = _cuCmulf(_cuConjf(left.m_ve[2]), right.m_ve[1]);
+            ret.m_me[6] = _cuCmulf(_cuConjf(left.m_ve[0]), right.m_ve[2]);
+            ret.m_me[7] = _cuCmulf(_cuConjf(left.m_ve[1]), right.m_ve[2]);
+            ret.m_me[8] = _cuCmulf(_cuConjf(left.m_ve[2]), right.m_ve[2]);
+            
+            return ret;
+        }
+
 #pragma endregion create
 
 #pragma region operators

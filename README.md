@@ -1,6 +1,6 @@
 # CudaLatticeGauge
 
-lattice gauge simulation with CUDA</br>
+lattice gauge (lattice QCD) simulation with CUDA</br>
 
 Test on laptops using GMRES with 12 orthrognal basis</br>
 One trajectory with 8/48 Multi-rate approximate Force-gradiant steps

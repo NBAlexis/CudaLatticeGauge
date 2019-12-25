@@ -146,7 +146,7 @@ INT TestThermal(CParameters& params)
             bNeedBake = FALSE;
         }
 
-        if (bNeedBake)
+        if (bNeedBake && iBeforeEquib > 0)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
             if (NULL != pGauageAction)
@@ -176,6 +176,10 @@ INT TestThermal(CParameters& params)
             }
             appGeneral(_T("}\n"));
             appSetLogDate(TRUE);
+        }
+        else
+        {
+            appGeneral(_T("Not Baked\n"));
         }
 
         UINT uiOmega = iOmegaStart;

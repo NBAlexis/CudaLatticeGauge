@@ -15,14 +15,21 @@ __BEGIN_NAMESPACE
 
 __DEFINE_ENUM(EFermionSource,
     EFS_Point,
+    EFS_Wall,
+    EFS_MomentumWall,
 )
 
+//this is a host only structure
 struct SFermionSource
 {
     EFermionSource m_eSourceType;
     SSmallInt4 m_sSourcePoint;
     BYTE m_bySpinIndex;
     BYTE m_byColorIndex;
+    CLGComplex m_cOtherParameters1;
+    CLGComplex m_cOtherParameters2;
+    CLGComplex m_cOtherParameters3;
+    CLGComplex m_cOtherParameters4;
 };
 
 class CLGAPI CFieldFermion : public CField

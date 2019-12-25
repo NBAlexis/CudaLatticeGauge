@@ -42,6 +42,7 @@
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CField.h" />
+    <ClInclude Include="Data\Field\CFieldFermionKS.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3EvenOdd.h" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Update\CUpdator.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="Data\Field\CFieldFermionKS.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3EvenOdd.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu" />

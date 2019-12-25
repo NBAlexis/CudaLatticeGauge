@@ -4,25 +4,24 @@ VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 1
 BeforeEquvibStep : 0
-EquvibStep : 30
-OnlyMeasure : 1
+EquvibStep : 100
+OnlyMeasure : 0
 DoSmearing : 0
-DoMeasureFermion : 1
-SaveIndexStart : 0
-# SavePrefix : 543163
+DoMeasureFermion : 0
+# If Only Measure, for SaveIndexStart + 1 to SaveIndexStart + EquvibStep + 1
+# If running, save start from SaveIndexStart + 1
+SaveIndexStart : 44
+# SavePrefix : 54016
 # SavePrefix : ../../../ThermalCircle/Match/49916/49916_
-SavePrefix : D:/NotUsingCLGCon/Nx26_542162/543162_
+# SavePrefix : D:/NotUsingCLGCon/Nx26_542162/542162_
+SavePrefix : D:/NotUsingCLGCon/Nx22_551565/537516_
 
 Dim : 4
 Dir : 4
-LatticeLength : [26, 26, 12, 48]
+LatticeLength : [22, 22, 10, 40]
 
 # LatticeLength : [12, 12, 12, 24]
 
-# nt5
-# LatticeLength : [22, 22, 15, 40]
-# nt6
-# LatticeLength : [26, 26, 18, 48]
 LatticeIndex : CIndexSquare
 LatticeBoundary : CBoundaryConditionTorusSquare
 ThreadAutoDecompose : 1
@@ -30,7 +29,7 @@ RandomType : ER_XORWOW
 RandomSeedType : ERST_Timestamp
 ActionListLength : 2
 FermionFieldCount : 1
-MeasureListLength : 2
+MeasureListLength : 1
 CacheStaple : 0
 
 ## ============================================================
@@ -51,17 +50,17 @@ Updator:
     IntegratorType : CIntegratorNestedForceGradient
     ## IntegratorType : CIntegratorForceGradient
     IntegratorStepLength : 1
-    IntegratorStep : 14
+    IntegratorStep : 15
     NestedStep : 5
     Omelyan2Lambda : 0.38636665500756728
 
 Gauge:
 
     FieldName : CFieldGaugeSU3
-    FieldInitialType : EFIT_Random
-    # FieldInitialType : EFIT_ReadFromFile
-    # GaugeFileType : EFFT_CLGBin
-    # GaugeFileName : 542162_Matching_26.con
+    # FieldInitialType : EFIT_Random
+    FieldInitialType : EFIT_ReadFromFile
+    GaugeFileType : EFFT_CLGBin
+    GaugeFileName : 537516_Matching_44.con
 
     Period : [1, 1, 1, 1]
 
@@ -69,7 +68,7 @@ FermionField1:
 
     FieldName : CFieldFermionWilsonSquareSU3
     FieldInitialType : EFIT_RandomGaussian
-    Hopping : 0.162
+    Hopping : 0.16
     FieldId : 2
     PoolNumber : 1
     Period : [1, 1, 1, -1]
@@ -78,7 +77,7 @@ FermionField1:
 Action1:
    
     ActionName : CActionGaugePlaquette
-    Beta : 5.43
+    Beta : 5.375
 
 
 Action2:
@@ -94,7 +93,7 @@ Solver:
     # float
     # Accuracy : 0.000001
     # MaxDim = 15 for 5.0(or 5.02) and 0.17
-    # MaxDim : 60
+    MaxDim : 25
 
     # SolverName : CSLASolverGCRODR
     # Accuracy : 0.00001
@@ -102,7 +101,7 @@ Solver:
     KDim : 5
     RecalculateR : 2
     DeflateSpace : EEDT_SVD
-    Restart : 200
+    Restart : 400
     AbsoluteAccuracy : 1
 
 Measure1:

@@ -109,6 +109,7 @@ __DEFINE_ENUM(EFieldType,
 
     EFT_GaugeSU3,
     EFT_FermionWilsonSquareSU3,
+    EFT_FermionStaggered,
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,
 
@@ -151,6 +152,19 @@ __DEFINE_ENUM(ESolverPhase,
         __device__ UBOOL IsOdd() const
         {
             return (x + y + z + w) & 1;
+        }
+
+        /**
+         * eta_{mu}(n) = (-1)^{sum (nu<mu)}
+         */
+        __device__ UBOOL EtaOdd(BYTE nu) const
+        {
+            SWORD sSum = 0;
+            for (BYTE byIdx = 0; byIdx < nu && byIdx < 4; ++byIdx)
+            {
+                sSum += m_byData4[byIdx];
+            }
+            return sSum & 1;
         }
         
     };

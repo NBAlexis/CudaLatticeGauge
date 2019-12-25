@@ -235,6 +235,18 @@ _kernelCacheFermionMove(SIndex* pCached,
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCacheEtaMu(BYTE* pCached)
+{
+    intokernalInt4;
+    pCached[uiSiteIndex] =
+          ((sSite4.EtaOdd(4) ? 1 : 0) << 4)
+        & ((sSite4.EtaOdd(3) ? 1 : 0) << 3)
+        & ((sSite4.EtaOdd(2) ? 1 : 0) << 2)
+        & ((sSite4.EtaOdd(1) ? 1 : 0) << 1)
+        &  (sSite4.EtaOdd(0) ? 1 : 0);
+}
+
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteCount(UINT* atomic)
@@ -377,6 +389,14 @@ void CIndexSquare::BakeMoveIndex(CIndexData* pData, BYTE byFieldId)
         pData->m_pSmallData,
         pData->m_pBondInfoTable);
     _kernelCacheFermionMove << <block, threads >> > (pData->m_pFermionMoveCache[byFieldId], pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+}
+
+void CIndexSquare::BakeEtaMuTable(class CIndexData* pData)
+{
+    appParanoiac(_T("CIndexSquare::BakeEtaMuTable\n"));
+    checkCudaErrors(cudaMalloc((void**)&pData->m_pEtaMu, sizeof(BYTE) * _HC_Volume));
+    preparethread;
+    _kernelCacheEtaMu << <block, threads >> > (pData->m_pEtaMu);
 }
 
 UINT CIndexSquare::GetPlaqutteCount() const

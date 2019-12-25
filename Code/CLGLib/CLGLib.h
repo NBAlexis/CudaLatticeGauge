@@ -173,6 +173,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldFermionWilsonSquareSU3D.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3DR.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.h"
+#include "Data/Field/CFieldFermionKS.h"
 
 
 //=====================================================

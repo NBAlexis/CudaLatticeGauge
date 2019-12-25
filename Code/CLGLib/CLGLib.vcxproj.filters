@@ -341,6 +341,9 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h">
       <Filter>GaugeFixing</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKS.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -525,6 +528,9 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasure.cu">
       <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKS.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

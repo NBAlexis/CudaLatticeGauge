@@ -184,7 +184,7 @@ int main(int argc, char * argv[])
         else
         {
             ++uiAccepCountAfterE;
-            sFileName.Format(_T("Matching_%d.con"), uiAccepCountAfterE);
+            sFileName.Format(_T("Matching_%d.con"), uiAccepCountAfterE + iSaveIndexStart);
             sFileName = sSavePrefix + sFileName;
             
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);

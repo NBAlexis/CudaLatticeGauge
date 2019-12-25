@@ -55,7 +55,7 @@ public:
 #pragma region BLAS
 
     void Zero() override;
-    void Indentity() override;
+    void Identity() override;
 
     void AxpyPlus(const CField* x) override;
     void AxpyMinus(const CField* x) override;

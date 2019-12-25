@@ -269,7 +269,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
     if (m_bMeasureDistribution)
     {
-        dim3 block3(m_uiMaxR + 1, 1, 1);
+        dim3 block3(1, 1, 1);
         dim3 threads3(m_uiMaxR + 1, 1, 1);
 
         _kernelPolyakovInitialDist<<<block3, threads3 >>>(m_pDistributionR, m_pDistributionP);
@@ -283,7 +283,21 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             m_pDistributionP
         );
 
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionP, m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        for (UINT tst = 0; tst < m_uiMaxR; ++tst)
+        {
+            appParanoiac(_T("%f %f, "), m_pHostDistributionP[tst].x, m_pHostDistributionP[tst].y);
+        }
+        appParanoiac(_T("\n"));
+
         _kernelPolyakovAverageDist << <block3, threads3 >> >(m_pDistributionR, m_pDistributionP);
+
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionP, m_pDistributionP, sizeof(CLGComplex) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        for (UINT tst = 0; tst < m_uiMaxR; ++tst)
+        {
+            appParanoiac(_T("%f %f, "), m_pHostDistributionP[tst].x, m_pHostDistributionP[tst].y);
+        }
+        appParanoiac(_T("\n"));
 
         //extract res
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -306,8 +320,9 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
                     if (m_bShowResult)
                     {
-                        appDetailed(_T("C(%f)=%f + %f I\n"),
+                        appDetailed(_T("C(%f, with %d points)=%f + %f I\n"),
                             _hostsqrt(static_cast<Real>(uiL)),
+                            m_pHostDistributionR[uiL],
                             m_pHostDistributionP[uiL].x,
                             m_pHostDistributionP[uiL].y);
                     }
@@ -336,8 +351,9 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
                 if (m_bShowResult)
                 {
-                    appDetailed(_T("C(%f)=%f + %f I\n"),
+                    appDetailed(_T("C(%f, with %d points)=%f + %f I\n"),
                         _hostsqrt(static_cast<Real>(m_lstR[i])),
+                        m_pHostDistributionR[m_lstR[i]],
                         m_pHostDistributionP[m_lstR[i]].x,
                         m_pHostDistributionP[m_lstR[i]].y);
                 }
@@ -381,14 +397,25 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
     {
         m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[
             i * _HC_Ly + CCommonData::m_sCenter.y]);
-        if (m_bShowResult)
+    }
+
+    if (m_bShowResult)
+    {
+        for (UINT i = 1; i < _HC_Lx; ++i)
         {
-            appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
-                m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].x,
-                m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y < F(0.0) ? _T("") : _T("+"),
-                appAbs(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y].y));
+            appDetailed(_T("{"));
+            for (UINT j = 1; j < _HC_Ly; ++j)
+            {
+                appDetailed(_T("%1.12f %s %1.12f I%s"),
+                    m_pXYHostLoopDensity[i * _HC_Ly + j].x,
+                    m_pXYHostLoopDensity[i * _HC_Ly + j].y < F(0.0) ? _T("-") : _T("+"),
+                    appAbs(m_pXYHostLoopDensity[i * _HC_Ly + j].y),
+                    (j == _HC_Ly - 1) ? _T("},\n") : _T(",   ")
+                );
+            }
         }
     }
+
     if (m_bShowResult)
     {
         appGeneral(_T("\n"));

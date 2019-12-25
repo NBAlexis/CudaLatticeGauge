@@ -2421,3 +2421,74 @@ TestAngularMomentum:
         Naive : 1
         ShowResult : 1
         FieldCount : 5000
+
+TestKSFermion:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.535
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 60
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionKS
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1575
+
+        FieldId : 2
+
+        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
+        ## = 6 + MaxDim of GMRES
+        PoolNumber : 26
+
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0001
+        Restart : 15
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

@@ -631,7 +631,7 @@ void CFieldGaugeSU3::Zero()
     _kernelInitialSU3Feield << <block, threads >> > (m_pDeviceData, EFIT_Zero);
 }
 
-void CFieldGaugeSU3::Indentity()
+void CFieldGaugeSU3::Identity()
 {
     preparethread;
     _kernelInitialSU3Feield << <block, threads >> > (m_pDeviceData, EFIT_Identity);
@@ -654,6 +654,12 @@ void CFieldGaugeSU3::InitialField(EFieldInitialType eInitialType)
 
 void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eType)
 {
+    if (!CFileSystem::IsFileExist(sFileName))
+    {
+        appCrucial(_T("File not exist!!! %s \n"), sFileName.c_str());
+        _FAIL_EXIT;
+    }
+
     switch (eType)
     {
     case EFFT_BridgePPTXT:

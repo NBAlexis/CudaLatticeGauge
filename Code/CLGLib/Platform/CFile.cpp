@@ -204,6 +204,14 @@ UBOOL CFileSystem::AppendAllText(const TCHAR* sFilename, const CCString& data)
     return TRUE;
 }
 
+UBOOL CFileSystem::IsFileExist(const CCString& sFileName)
+{
+    IFSTREAM f(sFileName.c_str());
+    const UBOOL bRet = f.good();
+    f.close();
+    return bRet;
+}
+
 //UBOOL CFileSystem::SetDefaultDirectory(const TCHAR* Filename)
 //{
 //    return SetCurrentDirectory(Filename) != 0;

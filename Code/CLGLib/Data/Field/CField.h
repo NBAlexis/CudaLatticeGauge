@@ -79,7 +79,7 @@ public:
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
 
     virtual void Zero() = 0;
-    virtual void Indentity() = 0;
+    virtual void Identity() = 0;
     virtual void FixBoundary() {}
 
     //This is Axpy(1.0f, x)
