@@ -111,14 +111,14 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelPolyakovMeasureDist(
     const CLGComplex* __restrict__ traceXY,
-    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
+    const SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
     UINT* counter, CLGComplex* correlator)
 {
     UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-             + (sCenter.y - uiY) * (sCenter.y - uiY);
+    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
+    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
+    UINT uiC = (static_cast<INT>(sCenter.x) - uiX) * (static_cast<INT>(sCenter.x) - uiX)
+             + (static_cast<INT>(sCenter.y) - uiY) * (static_cast<INT>(sCenter.y) - uiY);
 
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;

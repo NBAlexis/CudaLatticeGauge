@@ -559,7 +559,7 @@ void CFieldFermionKS::PrepareForHMC(const CFieldGauge* pGauge)
         return;
     }
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermionKS* pPooled = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     preparethread;
     _kernelInitialFermionKS << <block, threads >> > (
         pPooled->m_pDeviceData,

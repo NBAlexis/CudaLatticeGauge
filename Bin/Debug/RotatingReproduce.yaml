@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -15,15 +15,15 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 200
-    SaveStartIndex : 335
+    EquvibStep : 300
+    SaveStartIndex : 901
     OmegaSep : 10
-    OmegaStart : 7
-    MaxOmega : 0.0585
-    MinNt : 6
-    MaxNt : 6
-    SavePrefix : NC542162_
-    Additive : 0
+    OmegaStart : 0
+    MaxOmega : 0.0702
+    MinNt : 5
+    MaxNt : 5
+    SavePrefix : NC537516_
+    Additive : 1
 
     # 53551575Nt4 Omega60 
     # Polyakovs : [0.7631883645116788, 0.8118459888019867, 0.8038000156133291, 0.8085112089840242, 0.8035024063891989, 0.8058693619339026, 0.7961035941151434, 0.8667103476474274, 0.877848606871448, 0.9106615476053999, 0.9094629687651986, 0.9132674941654673, 0.956531256692272, 0.9811401816076729, 1.0099076140384722, 1.0339336795388183, 1.0520049963037232, 1.0782282810185038, 1.0779729132774476, 1.0932795492843526, 1.1149388806172058]
@@ -32,11 +32,11 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    # Polyakovs : [0.30982932522657764389, 0.3533238616538533829, 0.3394077885455025548, 0.3572319422401914745, 0.3990227030993605480, 0.4133472999974396718, 0.4500461954067204964, 0.4915953731450861102, 0.0, 0.0, 0.0]
+    Polyakovs : [0.4559988706578787675, 0.4458342538631707526, 0.4790143499539904804, 0.5374820632202741339, 0.5377869988606654906, 0.5848313053266844964, 0.6153772280451201440, 0.0, 0.0, 0.0, 0.0]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [26, 26, 12, 6]
+    LatticeLength : [22, 22, 10, 5]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -55,8 +55,8 @@ JobThermal:
     # Nt4Polyakov : 0.48454420912248297
 
     # 55150
-    Nt6FileName : NC542162_Rotate_Nt6_O7_335.con
-    Nt6Polyakov : 0.485643680353
+    # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
+    # Nt5Polyakov : 0.4742444189672135
 
     # 50217
     # Nt4FileName : N50217_Nt4.con
@@ -102,7 +102,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.162
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -117,7 +117,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.42
+        Beta : 5.375
         Omega : 0.0
 
     Action2:
@@ -173,12 +173,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.385
-    OmegaRange : 0.00702
+    GaugeBate : 5.375
+    OmegaRange : 0.04212
     StartOmega : 0
-    EndOmega : 1
+    EndOmega : 6
     StartN : 151
-    EndN : 600
+    EndN : 900
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
@@ -186,10 +186,10 @@ JobPolyakovDist:
     StochasticGaussian : 1
     CheckGaugeFixing : 0
 
-    #SavePrefix : D:/NotUsingCLGCon/Nx26_542162/542162Nt6/NC542162_
-    #CSVSavePrefix : D:/NotUsingCLGCon/Nx26_542162/542162Nt6/Polyakov/NC542162_
-    SavePrefix : D:/NotUsingCLGCon/Nx22_551565/538516Nt5/NC538516_
-    CSVSavePrefix : D:/NotUsingCLGCon/Nx22_551565/538516Nt5/Polyakov/NC538516_
+    # SavePrefix : D:/NotUsingCLGCon/Nx26_542162/540161Nt6/Nt6/NC540161_
+    # CSVSavePrefix : D:/NotUsingCLGCon/Nx26_542162/540161Nt6/Polyakov/NC540161_
+    SavePrefix : D:/NotUsingCLGCon/Nx22_551565/537516Nt5/Nt5/NC537516_
+    CSVSavePrefix : D:/NotUsingCLGCon/Nx22_551565/537516Nt5/Polyakov/NC537516_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 

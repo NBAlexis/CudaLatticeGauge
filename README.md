@@ -31,7 +31,7 @@ So H_diff = 0.32 is tested using double float.
 
 See detailed.pdf for more.
 
-Please report bug to yangjichong@fudan.edu.cn
+Please report bug to yangjichong@lnnu.edu.cn
 
 Thank you ^_^
 
