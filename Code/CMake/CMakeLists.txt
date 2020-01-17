@@ -45,6 +45,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.h
@@ -118,6 +119,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKS.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombLosAlamos.cu
