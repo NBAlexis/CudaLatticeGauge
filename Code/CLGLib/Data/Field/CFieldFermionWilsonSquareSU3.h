@@ -43,6 +43,8 @@ public:
     void Identity() override
     { appCrucial(_T("Not supported for CFermionWilsonSquareSU3!")); }
 
+    void Dagger() override;
+
     //This is Axpy(1.0f, x)
     void AxpyPlus(const CField* x) override;
     void AxpyMinus(const CField* x) override;
@@ -90,6 +92,10 @@ public:
 
 protected:
 
+    UBOOL InverseD_eo(const CField*) override;
+    UBOOL InverseDdagger_eo(const CField*) override;
+    UBOOL InverseDDdagger_eo(const CField*) override;
+
     Real m_fKai;
 
     //Not using, this is used in "Dot1" which create a thread for each element of a Wilson vector
@@ -97,6 +103,7 @@ protected:
     Real* m_tmpBuffer2;
 
 };
+
 
 class CLGAPI CFieldMatrixOperationWilsonSquareSU3 : public CFieldMatrixOperation
 {

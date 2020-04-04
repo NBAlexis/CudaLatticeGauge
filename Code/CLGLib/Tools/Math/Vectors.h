@@ -212,6 +212,13 @@ extern "C" {
             m_ve[2].y = -m_ve[2].y;
         }
 
+        __device__ __inline__ void Conjugate()
+        {
+            m_ve[0].y = -m_ve[0].y;
+            m_ve[1].y = -m_ve[1].y;
+            m_ve[2].y = -m_ve[2].y;
+        }
+
         __device__ __inline__ deviceSU3Vector SubRealC(Real other) const { deviceSU3Vector ret(*this); ret.SubReal(other); return ret; }
         __device__ __inline__ deviceSU3Vector SubCompC(const CLGComplex& other) const { deviceSU3Vector ret(*this); ret.SubComp(other); return ret; }
         __device__ __inline__ deviceSU3Vector SubC(const deviceSU3Vector& other) const { deviceSU3Vector ret(*this); ret.Sub(other); return ret; }
@@ -297,6 +304,14 @@ extern "C" {
             m_d[1].Opposite();
             m_d[2].Opposite();
             m_d[3].Opposite();
+        }
+
+        __device__ __inline__ void Conjugate()
+        {
+            m_d[0].Conjugate();
+            m_d[1].Conjugate();
+            m_d[2].Conjugate();
+            m_d[3].Conjugate();
         }
 
         __device__ __inline__ static deviceWilsonVectorSU3 makeRandomGaussian(UINT fatIndex)

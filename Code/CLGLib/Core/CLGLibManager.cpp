@@ -591,9 +591,8 @@ void CCLGLibManager::CreateSolver(class CParameters& params) const
     if (NULL == pField)
     {
         appCrucial(_T("Solver must be created for a specified field!\n"));
-        _FAIL_EXIT;
     }
-    m_pLatticeData->CreateFermionSolver(sSolverName, params, pField);
+    m_pLatticeData->CreateFermionSolver(sSolverName, params, pField, static_cast<BYTE>(byFieldId));
 }
 
 void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
@@ -643,7 +642,7 @@ void CCLGLibManager::InitialIndexBuffer() const
             if (NULL != m_pLatticeData->GetFieldById(i))
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
-                if (EFT_FermionStaggered == m_pLatticeData->GetFieldById(i)->GetFieldType())
+                if (EFT_FermionStaggeredSU3 == m_pLatticeData->GetFieldById(i)->GetFieldType())
                 {
                     bHasStaggeredFermion = TRUE;
                 }
@@ -730,6 +729,16 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         CParameters solver = params.GetParameter(_T("Solver"));
         CreateSolver(solver);
     }
+    for (INT i = 0; i < _kMaxFieldCount; ++i)
+    {
+        CCString sSolverName = _T("Solver") + appIntToString(i);
+        if (params.Exist(sSolverName))
+        {
+            CParameters solver = params.GetParameter(sSolverName);
+            CreateSolver(solver);
+        }
+    }
+
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeSmearing")))
     {

@@ -89,6 +89,8 @@ public:
 
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
+    virtual void Dagger() = 0;
+
     Real GetLength() const { return m_fLength; }
     //This is a * me
     virtual void ScalarMultply(const CLGComplex& a) = 0;
@@ -124,6 +126,7 @@ public:
 
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return FALSE; }
+    virtual UBOOL IsEvenField() const { return FALSE; }
 
 #pragma endregion
 
@@ -162,7 +165,7 @@ public:
         {
             return m_pPool.Pop();
         }
-        appDetailed(_T("Warning: Field Pool Out Number!!!\n"));
+        appGeneral(_T("Warning: Field Pool Out Number!!!\n"));
         CField* newOne = CreateNew();
         return newOne;
     }
@@ -236,6 +239,10 @@ public:
     THashMap<UINT, CField*> m_pCachedFieldMaps;
 };
 
+/**
+ * Maybe better to implement as a template?
+ * No ..., for different inherent, the main work is just the kernel.
+ */
 class CLGAPI CFieldMatrixOperation
 {
 public:

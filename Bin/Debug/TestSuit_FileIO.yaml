@@ -1,0 +1,167 @@
+
+TestFileIOBridgePPText:
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExpectedRes : 0.625129946974942
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_ReadFromFile
+
+        ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
+        GaugeFileType : EFFT_BridgePPTXT
+
+        GaugeFileName : bridgepp_conf_text.dat
+
+TestFileIOBridgePPBin:
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExpectedRes : 0.625129946974942
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_ReadFromFile
+
+        ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
+        GaugeFileType : EFFT_BridgePPBin
+
+        GaugeFileName : bridgepp_conf_binary.dat
+
+TestSaveConfiguration:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Identity
+        
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1355
+
+        FieldId : 2
+
+        PoolNumber : 1
+
+TestSaveConfigurationLowMode:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ##ThreadAutoDecompose : 0
+    ##ThreadDecompose : [8, 8, 8]
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.17
+    ##SummationDecompose : 128
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        ##SaveConfiguration : 1
+        ##ConfigurationFilePrefix : TestSaveConfiguration
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_ReadFromFile
+        
+        GaugeFileType : EFFT_CLGBin
+
+        GaugeFileName : LowMode.con_
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1355
+
+        FieldId : 2
+
+        PoolNumber : 15
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 100
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.000000001
+        Restart : 50
+        ## 0 is recommanded
+        AbsoluteAccuracy : 0
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.2
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

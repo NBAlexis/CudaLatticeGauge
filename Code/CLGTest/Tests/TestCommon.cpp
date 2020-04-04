@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : TestOperators.cpp
+// FILENAME : TestCommon.cpp
 // 
 // DESCRIPTION:
 //
@@ -86,7 +86,6 @@ UINT TestOperators(CParameters& )
     return uiErrors;
 }
 
-
 UINT TestSmallMatrix(CParameters&)
 {
     CLinearAlgebraHelper::TestSmallMatrix();
@@ -164,7 +163,6 @@ UINT TestDirichletDOperator(CParameters&)
 
     return 0;
 }
-
 
 UINT TestALogDefinition(CParameters&)
 {

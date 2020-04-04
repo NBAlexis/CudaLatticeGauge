@@ -56,6 +56,7 @@ public:
 
     void Zero() override;
     void Identity() override;
+    void Dagger() override;
 
     void AxpyPlus(const CField* x) override;
     void AxpyMinus(const CField* x) override;

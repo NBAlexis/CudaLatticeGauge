@@ -1,0 +1,53 @@
+\subsection{\label{sec:EvenOdd}\index{Even-odd preconditioner}Even-odd preconditioner}
+
+The equation for the $D$ operator can be written as
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{cc}D_{ee} & D_{eo} \\ D_{oe} & D_{oo}\end{array}\right) \left(\begin{array}{c}z_e \\ z_o \end{array}\right)=\left(\begin{array}{c}\phi _e \\ \phi_o \end{array}\right)
+\end{split}
+\end{equation}
+Where $D_{oe}$ means $D_{o\leftarrow e}$. Often, $D_{oo}^{-1}$ and $D_{ee}^{-1}$ is very easy to calculate. In the case of Wilson-Dirac fermion without $\mathcal{O}(a)$ improvement, it is $\mathbb{I}$.
+
+It can be divided into 3 step to solve this equation
+\begin{enumerate}
+  \item Calculate $\tilde{\phi}_e = \phi _e - D_{eo}D_{oo}^{-1}\phi _o$.
+  \item Solve $\left(D_{ee}- D_{eo}D_{oo}^{-1}D_{oe} \right) z_e = \tilde{\phi}_e$.
+  \item $z_o = D_{oo}^{-1}(\phi _o -D_{oe}z_e)$.
+\end{enumerate}
+
+This is because (\textbf{Note the order of $D$'s should not change.})
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{cc}D_{ee} & D_{eo} \\ D_{oe} & D_{oo}\end{array}\right) \left(\begin{array}{c}z_e \\ z_o \end{array}\right)
+=\left(\begin{array}{cc}1 & D_{eo}D_{oo}^{-1} \\ 0 & 1\end{array}\right) \left(\begin{array}{cc}D_{ee}-D_{eo}D_{oo}^{-1}D_{oe} & 0 \\ D_{oe} & D_{oo}\end{array}\right) \left(\begin{array}{c}z_e \\ z_o \end{array}\right)=\left(\begin{array}{c}\phi _e \\ \phi_o \end{array}\right)\\
+\end{split}
+\end{equation}
+Using 
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{cc}1 & -D_{eo}D_{oo}^{-1} \\ 0 & 1\end{array}\right)\left(\begin{array}{cc}1 & D_{eo}D_{oo}^{-1} \\ 0 & 1\end{array}\right)=\left(\begin{array}{cc}1 & 0 \\ 0 & 1\end{array}\right)\\
+\end{split}
+\end{equation}
+So that
+\begin{equation}
+\begin{split}
+&\left(\begin{array}{cc}D_{ee}-D_{eo}D_{oo}^{-1}D_{oe} & 0 \\ D_{oe} & D_{oo}\end{array}\right) \left(\begin{array}{c}z_e \\ z_o \end{array}\right)=\left(\begin{array}{cc}1 & -D_{eo}D_{oo}^{-1} \\ 0 & 1\end{array}\right)\left(\begin{array}{c}\phi _e \\ \phi_o \end{array}\right)=\left(\begin{array}{c}\tilde{\phi} _e \\ \phi_o \end{array}\right)\\
+\end{split}
+\end{equation}
+Which leads to two equations
+\begin{equation}
+\begin{split}
+&(D_{ee}-D_{eo}D_{oo}^{-1}D_{oe})z_e = \tilde{\phi}_e,\\
+&D_{oe} z_e + D_{oo} z_o = \phi _o, \\
+\end{split}
+\end{equation}
+which leads to step 1,2,3.
+
+\textbf{Because the D matrix is sparse, For $n$ sites, $D\phi$ is not $O(n^2)$ but $O((c+1)n)$ ($c=2D$ for neighbour sites), so in the even-odd preconditioner, $D_{eo}$ is not $O(n^2/4)$ but $O(cn/2)$. Solving $\left(D_{ee}- D_{eo}D_{oo}^{-1}D_{oe} \right) z_e = \tilde{\phi}_e$, one need to calculate $D_{eo}$ and $D_{oe}$, so it is not $O(n^2/2)$ but $O(cn)$, as a result the effect of even-odd preconditioner is limited.}
+
+\textbf{There is one more problem: for HMC, one need to solve mainly $(DD^{\dagger})^{-1}$. Which can not be even-odd decomposed, so one need to at first solve $D^{-1}$ then $(D^{\dagger})^{-1}$, the solution in the last step cannot be set as an initial guess.}
+
+\textcolor[rgb]{1,0,0}{\textbf{Note, for some reason I do not know, the GCRO-DR and GMRES-MDR not yet support even-odd preconditioner.}}
+
+\textcolor[rgb]{1,0,0}{\textbf{Note, for periodic boundary condition, and odd extent lattice, the $D_{ee}\neq \mathbb{I}$ and $D_{oo}\neq \mathbb{I}$. For example, for $4\times 4\times 3\times 3$, $(0,0,0,1)$ is connected with $(0,0,2,1)$. Note that, $D_{oo}$ is neither a diagonal matrix, so $D_{oo}^{-1}$ need to be solved, which makes the even-odd inefficient, so we do NOT support such case.}}
+

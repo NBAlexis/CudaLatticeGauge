@@ -1,0 +1,373 @@
+
+TestSolverBiCGStab:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 8
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverGMRES:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+        Period : [0, 0, 1, 1]
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomZ4
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## cuda is even slower
+        UseCudaForSmallMatrix : 0
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 5
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverGCR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 25
+
+    Solver:
+
+        SolverName : CSLASolverGCR
+        SolverForFieldId : 2
+        MaxDim : 10
+        ## Iterate can be larger than MaxDim to truncate, but a restart seems much better
+        Iterate : 10
+        DiviationStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        ## For this solver, restart quickly is better
+        Restart : 50
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverGCRODR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 25
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 6
+        KDim : 3
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 20
+        DeflateSpace : EEDT_SVD
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0004
+        Restart : 5
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverGMRESLowMode:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExpectedErr : 0.1
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Identity
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1249
+
+        FieldId : 2
+
+        PoolNumber : 35
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 10
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverGCRODRLowMode:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExpectedErr : 0.1
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Identity
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1249
+
+        FieldId : 2
+
+        PoolNumber : 35
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        MDim : 16
+        KDim : 4
+        ## If QR Iteration all converge, it is no need to do so
+        RecalculateR : 5
+        # DeflateSpace : EEDT_REV
+        DeflateSpace : EEDT_SVD
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.000001
+        Restart : 30
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestSolverBiCGStabLowMode:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExpectedErr : 0.1
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Identity
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1249
+
+        FieldId : 2
+
+        PoolNumber : 35
+
+    Solver:
+
+        SolverName : CSLASolverBiCGStab
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 30
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0000000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1

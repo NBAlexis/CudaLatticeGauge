@@ -50,7 +50,8 @@ inline THashMap<CCString, INT> appGetEnumTable(const CCString &inGatheredEnum)
 }
 
 //This is an example
-enum Eabc
+//enum class can prevent enum convert to int
+enum class Eabc
 {
     Ex = 0,
     Ey,
@@ -148,7 +149,6 @@ inline enumname appStringToEnum##enumname(const CCString& s) \
 
 
 #endif //#ifndef _ENUMGATHER_H_
-
 
 //=============================================================================
 // END OF FILE

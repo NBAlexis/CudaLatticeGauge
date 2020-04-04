@@ -332,7 +332,7 @@ For complex vector, one can use \index{BiCGStab}BiCGStab in Table.~6.2 in Ref.~\
 \For{$i=0$ to $r$}
     \State ${\bf r}={\bf b}-A{\bf x}$
     \Comment {Restart $r$ times}
-    \State ${\bf r}_h={\bf r}$
+    \State ${\bf r}_h={\bf r}^*$ (Note, that we use $r^*$ as in \cite{sparselinearbook1} which is tested to be better.)
     \For{$j=0$ to $itera$}
         \State $\rho = {\bf r}_h^* \cdot {\bf r}_j$
         \If {$j=0$}

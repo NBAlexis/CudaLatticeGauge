@@ -112,9 +112,9 @@ inline class CFileSystem* appGetFileSystem()
     return GCLGManager.m_pFileSystem;
 }
 
-inline class CSLASolver* appGetFermionSolver()
+inline class CSLASolver* appGetFermionSolver(BYTE byFieldId)
 {
-    return appGetLattice()->m_pFermionSolver;
+    return appGetLattice()->m_pFermionSolver[byFieldId];
 }
 
 inline class CGaugeSmearing* appGetGaugeSmearing()

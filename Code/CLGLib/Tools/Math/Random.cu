@@ -254,9 +254,9 @@ _kernelMCPi(UINT* output, UINT lengthyz, UINT lengthz, UINT uiLoop, UINT uithrea
     const UINT fatIndex = threadIdx.x * lengthyz + threadIdx.y * lengthz + threadIdx.z;
     for (UINT i = 0; i < uiLoop; ++i)
     {
-        const Real x = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
-        const Real y = _deviceRandomF(fatIndex) * 2.0f - 1.0f;
-        if (x * x + y * y < 1.0f)
+        const Real x = _deviceRandomF(fatIndex) * F(2.0) - F(1.0);
+        const Real y = _deviceRandomF(fatIndex) * F(2.0) - F(1.0);
+        if (x * x + y * y < F(1.0))
         {
             ++uiToAdd;
         }
@@ -340,7 +340,7 @@ Real CLGAPI CalculatePi(const TArray<UINT> & decompose)
 
     appParanoiac(_T("==== results: %d / %d \n"), outPutHost[0], outPutHost[1]);
 
-    return 4.0f * outPutHost[0] / (Real)(total);
+    return F(4.0) * outPutHost[0] / (Real)(total);
 }
 
 Real CLGAPI CalculateE(const TArray<UINT> & decompose)

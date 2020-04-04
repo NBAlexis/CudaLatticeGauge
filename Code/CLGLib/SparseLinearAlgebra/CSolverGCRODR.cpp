@@ -119,6 +119,12 @@ void CSLASolverGCRODR::Configurate(const CParameters& param)
 */
 void CSLASolverGCRODR::AllocateBuffers(const CField* pFieldB)
 {
+    if (pFieldB->IsEvenField())
+    {
+        appCrucial(_T("Even field not supported yet...\n"));
+        _FAIL_EXIT;
+    }
+
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceHm, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceEigenValue, sizeof(CLGComplex) * m_uiKDim));
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePk, sizeof(CLGComplex) * m_uiKDim * m_uiMDim));

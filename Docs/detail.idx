@@ -17,62 +17,64 @@
 \indexentry{force-gradient integrator|hyperpage}{18}
 \indexentry{multi-rate integrator|hyperpage}{19}
 \indexentry{nested integrator|hyperpage}{19}
-\indexentry{solver|hyperpage}{21}
-\indexentry{Krylov subspace|hyperpage}{21}
-\indexentry{GMRES|hyperpage}{21}
-\indexentry{Givens rotation|hyperpage}{23}
-\indexentry{backward substitution|hyperpage}{24}
-\indexentry{GCR|hyperpage}{25}
-\indexentry{GCRO-DR|hyperpage}{27}
-\indexentry{GMRES-MDR|hyperpage}{27}
-\indexentry{low mode|hyperpage}{27}
-\indexentry{deflation|hyperpage}{27}
-\indexentry{preconditioner|hyperpage}{27}
-\indexentry{preconditioner|hyperpage}{27}
-\indexentry{deflation|hyperpage}{28}
+\indexentry{solver|hyperpage}{22}
+\indexentry{Krylov subspace|hyperpage}{22}
+\indexentry{GMRES|hyperpage}{22}
+\indexentry{Givens rotation|hyperpage}{24}
+\indexentry{backward substitution|hyperpage}{25}
+\indexentry{GCR|hyperpage}{26}
 \indexentry{GCRO-DR|hyperpage}{28}
-\indexentry{Ritz eigen-vector|hyperpage}{30}
-\indexentry{REV|hyperpage}{30}
-\indexentry{harmonic Ritz eigen vector|hyperpage}{30}
-\indexentry{singular value decomposition|hyperpage}{30}
-\indexentry{SVD|hyperpage}{30}
-\indexentry{generalized eigen-value problem|hyperpage}{30}
-\indexentry{GEV|hyperpage}{30}
-\indexentry{Hessenberg matrix|hyperpage}{31}
-\indexentry{Householder reflection|hyperpage}{31}
-\indexentry{QR factorization|hyperpage}{31}
-\indexentry{Shifted QR iteration|hyperpage}{32}
-\indexentry{Implicit shifted QR iteration|hyperpage}{33}
-\indexentry{Implicit shifted QR iteration|hyperpage}{33}
-\indexentry{Double shifted QR iteration|hyperpage}{33}
-\indexentry{Francis QR iteration|hyperpage}{33}
-\indexentry{Inverse power iteration|hyperpage}{34}
-\indexentry{backward substitution|hyperpage}{35}
-\indexentry{generalized eigen-value problem|hyperpage}{36}
-\indexentry{forward substitution|hyperpage}{37}
-\indexentry{GCRO-DR|hyperpage}{37}
-\indexentry{GMRES-MDR|hyperpage}{39}
-\indexentry{FFT|hyperpage}{40}
-\indexentry{Landau Gauge|hyperpage}{41}
-\indexentry{Cornell gauge fixing|hyperpage}{41}
-\indexentry{Los Alamos gauge fixing|hyperpage}{42}
-\indexentry{Cabibbo-Marinari trick|hyperpage}{43}
-\indexentry{plaquette energy|hyperpage}{46}
-\indexentry{meson|hyperpage}{46}
-\indexentry{correlator|hyperpage}{46}
-\indexentry{source|hyperpage}{48}
-\indexentry{point source|hyperpage}{48}
-\indexentry{pseudofermions|hyperpage}{49}
-\indexentry{point source|hyperpage}{49}
-\indexentry{reciprocal space|hyperpage}{49}
-\indexentry{gauge smearing|hyperpage}{52}
-\indexentry{low mode|hyperpage}{52}
-\indexentry{exceptional configurations|hyperpage}{52}
-\indexentry{gauge smoothing|hyperpage}{52}
-\indexentry{APE smearing|hyperpage}{52}
-\indexentry{staple|hyperpage}{52}
-\indexentry{stout|hyperpage}{52}
-\indexentry{APE stout|hyperpage}{52}
-\indexentry{Ji decomposition|hyperpage}{79}
-\indexentry{autocorrelation|hyperpage}{86}
-\indexentry{autocorrelation|hyperpage}{87}
+\indexentry{GMRES-MDR|hyperpage}{28}
+\indexentry{low mode|hyperpage}{28}
+\indexentry{deflation|hyperpage}{28}
+\indexentry{preconditioner|hyperpage}{28}
+\indexentry{preconditioner|hyperpage}{28}
+\indexentry{deflation|hyperpage}{29}
+\indexentry{GCRO-DR|hyperpage}{29}
+\indexentry{Ritz eigen-vector|hyperpage}{31}
+\indexentry{REV|hyperpage}{31}
+\indexentry{harmonic Ritz eigen vector|hyperpage}{31}
+\indexentry{singular value decomposition|hyperpage}{31}
+\indexentry{SVD|hyperpage}{31}
+\indexentry{generalized eigen-value problem|hyperpage}{31}
+\indexentry{GEV|hyperpage}{31}
+\indexentry{Hessenberg matrix|hyperpage}{32}
+\indexentry{Householder reflection|hyperpage}{32}
+\indexentry{QR factorization|hyperpage}{32}
+\indexentry{Shifted QR iteration|hyperpage}{33}
+\indexentry{Implicit shifted QR iteration|hyperpage}{34}
+\indexentry{Implicit shifted QR iteration|hyperpage}{34}
+\indexentry{Double shifted QR iteration|hyperpage}{34}
+\indexentry{Francis QR iteration|hyperpage}{34}
+\indexentry{Inverse power iteration|hyperpage}{35}
+\indexentry{backward substitution|hyperpage}{36}
+\indexentry{generalized eigen-value problem|hyperpage}{37}
+\indexentry{forward substitution|hyperpage}{38}
+\indexentry{GCRO-DR|hyperpage}{38}
+\indexentry{GMRES-MDR|hyperpage}{40}
+\indexentry{Even-odd preconditioner|hyperpage}{40}
+\indexentry{FFT|hyperpage}{43}
+\indexentry{Landau Gauge|hyperpage}{44}
+\indexentry{Cornell gauge fixing|hyperpage}{44}
+\indexentry{Los Alamos gauge fixing|hyperpage}{45}
+\indexentry{Cabibbo-Marinari trick|hyperpage}{46}
+\indexentry{plaquette energy|hyperpage}{49}
+\indexentry{meson|hyperpage}{49}
+\indexentry{correlator|hyperpage}{49}
+\indexentry{source|hyperpage}{51}
+\indexentry{point source|hyperpage}{51}
+\indexentry{pseudofermions|hyperpage}{52}
+\indexentry{point source|hyperpage}{52}
+\indexentry{reciprocal space|hyperpage}{52}
+\indexentry{gauge smearing|hyperpage}{55}
+\indexentry{low mode|hyperpage}{55}
+\indexentry{exceptional configurations|hyperpage}{55}
+\indexentry{gauge smoothing|hyperpage}{55}
+\indexentry{APE smearing|hyperpage}{55}
+\indexentry{staple|hyperpage}{55}
+\indexentry{stout|hyperpage}{55}
+\indexentry{APE stout|hyperpage}{55}
+\indexentry{chiral condensate|hyperpage}{56}
+\indexentry{Ji decomposition|hyperpage}{82}
+\indexentry{autocorrelation|hyperpage}{89}
+\indexentry{autocorrelation|hyperpage}{90}

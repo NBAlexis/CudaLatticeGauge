@@ -135,6 +135,8 @@ __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdator
 __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelatorRelease);
 #endif
 
+//Why I cannot find 'TestGaugeSmearingAPEProj'?
+
 __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEProj);
 
 __REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEStout);

@@ -39,12 +39,12 @@ CLatticeData::CLatticeData()
     , m_pDeviceRandom(NULL)
     , m_pIndex(NULL)
     , m_pIndexCache(NULL)
-    , m_pFermionSolver(NULL)
 
     , m_pGaugeSmearing(NULL)
     , m_pGaugeFixing(NULL)
 {
-    m_pFieldCache = new CFieldCache();    
+    m_pFieldCache = new CFieldCache();
+    memset(m_pFermionSolver, 0, sizeof(CSLASolver*) * _kMaxFieldCount);
 }
 
 CLatticeData::~CLatticeData()
@@ -93,22 +93,25 @@ CLatticeData::~CLatticeData()
     appSafeDelete(m_pIndexCache);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
-    appSafeDelete(m_pFermionSolver);
+    for (BYTE byField = 0; byField < _kMaxFieldCount; ++byField)
+    {
+        appSafeDelete(m_pFermionSolver[byField]);
+    }
     appSafeDelete(m_pGaugeSmearing);
     appSafeDelete(m_pGaugeFixing);
 }
 
-void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField)
+void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField, BYTE byFieldId)
 {
     CBase* pSolver = appCreate(sSolver);
-    m_pFermionSolver = dynamic_cast<CSLASolver*>(pSolver);
+    m_pFermionSolver[byFieldId] = dynamic_cast<CSLASolver*>(pSolver);
     if (NULL == m_pFermionSolver)
     {
         appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
         _FAIL_EXIT;
     }
-    m_pFermionSolver->Configurate(param);
-    m_pFermionSolver->AllocateBuffers(pFermionField);
+    m_pFermionSolver[byFieldId]->Configurate(param);
+    m_pFermionSolver[byFieldId]->AllocateBuffers(pFermionField);
 
     appGeneral(_T("Create sparse linear algebra solver: %s \n"), sSolver.c_str());
 }
@@ -248,11 +251,15 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
 
-    if (NULL != m_pFermionSolver)
+    for (INT i = 0; i < _kMaxFieldCount; ++i)
     {
-        sRet = sRet + sTab + _T("Solver : \n");
-        sRet = sRet + m_pFermionSolver->GetInfos(sTab + _T("    "));
+        if (NULL != m_pFermionSolver[i])
+        {
+            sRet = sRet + sTab + _T("Solver : \n");
+            sRet = sRet + m_pFermionSolver[i]->GetInfos(sTab + _T("    "));
+        }
     }
+
     if (NULL != m_pUpdator)
     {
         sRet = sRet + sTab + _T("Updator : \n");

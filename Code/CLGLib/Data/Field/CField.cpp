@@ -26,7 +26,9 @@ void CField::Return()
     m_pPool->Return(this);
 }
 
-CFieldFermion::CFieldFermion() : CField()
+CFieldFermion::CFieldFermion()
+: CField()
+, m_byEvenFieldId(-1)
 {
     m_uiLinkeCount = _HC_Volume * _HC_Dir;
     m_uiSiteCount = _HC_Volume;

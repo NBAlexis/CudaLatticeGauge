@@ -337,7 +337,7 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMC(const CFieldGauge* pGauge)
 
     pPooled->Return();
 
-    if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
     {
         m_fLength = Dot(this).x;
     }
@@ -383,7 +383,7 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge*
 
     pPooled->Return();
 
-    if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
     {
         m_fLength = Dot(this).x;
     }

@@ -20,9 +20,6 @@
     <ClCompile Include="Tests\TestFermionUpdator.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestOperators.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -38,6 +35,9 @@
     <ClCompile Include="Tests\TestAngularMomentum.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestCommon.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
@@ -46,8 +46,43 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{186a5d87-9702-43d4-b9ed-f9c57b98a1f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="YAMLs">
+      <UniqueIdentifier>{9976372d-b9be-4375-82aa-4311ae9b449e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Bin\Debug\TestSuit.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Common.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Random.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Boundary.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_FileIO.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_FermionUpdator.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_GaugeFixing.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Solver.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Updator.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
   </ItemGroup>
 </Project>

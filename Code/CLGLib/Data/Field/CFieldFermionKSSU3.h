@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldFermionKS.h
+// FILENAME : CFieldFermionKSSU3.h
 // 
 // DESCRIPTION:
 // This is the class for Kogut-Susskind staggered fermions
@@ -11,25 +11,25 @@
 //  [12/08/2019 nbale]
 //=============================================================================
 
-#ifndef _CFIELDFERMIONKS_H_
-#define _CFIELDFERMIONKS_H_
+#ifndef _CFIELDFERMIONKSSU3_H_
+#define _CFIELDFERMIONKSSU3_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CFieldFermionKS)
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionKSSU3)
 
-class CLGAPI CFieldFermionKS : public CFieldFermion
+class CLGAPI CFieldFermionKSSU3 : public CFieldFermion
 {
-    __CLGDECLARE_FIELD(CFieldFermionKS)
+    __CLGDECLARE_FIELD(CFieldFermionKSSU3)
 
 public:
 
-    CFieldFermionKS();
-    ~CFieldFermionKS();
+    CFieldFermionKSSU3();
+    ~CFieldFermionKSSU3();
 
     EFieldType GetFieldType() const override
     {
-        return EFT_FermionStaggered;
+        return EFT_FermionStaggeredSU3;
     }
 
     void InitialField(EFieldInitialType eInitialType) override;
@@ -39,6 +39,7 @@ public:
     void DebugPrintMe() const override;
 
     void Zero() override { InitialField(EFIT_Zero); }
+    void Dagger() override;
 
     void Identity() override
     {
@@ -84,11 +85,11 @@ protected:
     Real m_fKai;
 };
 
-class CLGAPI CFieldMatrixOperationKS : public CFieldMatrixOperation
+class CLGAPI CFieldMatrixOperationKSSU3 : public CFieldMatrixOperation
 {
 public:
-    CFieldMatrixOperationKS();
-    ~CFieldMatrixOperationKS();
+    CFieldMatrixOperationKSSU3();
+    ~CFieldMatrixOperationKSSU3();
 
     //real left = (res,left)
     void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY) override;

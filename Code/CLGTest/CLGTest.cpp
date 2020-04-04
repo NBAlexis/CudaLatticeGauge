@@ -76,8 +76,28 @@ int main(int argc, char * argv[])
     CParameters params;
 #if _CLG_DEBUG
     CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Common.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Random.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Boundary.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_FileIO.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_FermionUpdator.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_GaugeFixing.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Rotation.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Solver.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_Updator.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_EvenOdd.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Common.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Random.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Boundary.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_FileIO.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_FermionUpdator.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_GaugeFixing.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Rotation.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Solver.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_Updator.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_EvenOdd.yaml"), params);
 #endif
     appSetupLog(params);
 

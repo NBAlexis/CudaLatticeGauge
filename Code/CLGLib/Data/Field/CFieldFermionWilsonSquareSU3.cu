@@ -12,8 +12,6 @@
 
 #include "CLGLib_Private.h"
 
-#define _QUICK_AXPY_BLOCK 2
-
 __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CFieldFermionWilsonSquareSU3)
@@ -445,6 +443,13 @@ _kernelInitialFermionWilsonSquareSU3(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelFermionWilsonSquareSU3Conjugate(deviceWilsonVectorSU3* pDevicePtr)
+{
+    intokernal;
+    pDevicePtr[uiSiteIndex].Conjugate();
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelApplyGammaSU3(deviceWilsonVectorSU3* pDeviceData, UINT uiGamma)
 {
     intokernal;
@@ -512,6 +517,13 @@ void CFieldFermionWilsonSquareSU3::InitialField(EFieldInitialType eInitialType)
     _kernelInitialFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
 }
 
+void CFieldFermionWilsonSquareSU3::Dagger()
+{
+    preparethread;
+
+    _kernelFermionWilsonSquareSU3Conjugate << <block, threads >> > (m_pDeviceData);
+}
+
 void CFieldFermionWilsonSquareSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFieldType)
 {
     if (eFieldType != EFFT_CLGBin)
@@ -555,6 +567,13 @@ void CFieldFermionWilsonSquareSU3::InitialOtherParameters(CParameters& params)
         appCrucial(_T("CFieldFermionWilsonSquareSU3: Kai is nearly 0, such that Dphi \approx phi! This will cause problem!\n"));
     }
     CCommonData::m_fKai = m_fKai;
+
+    INT iEvenFieldId = -1;
+    params.FetchValueINT(_T("EvenFieldId"), iEvenFieldId);
+    if (iEvenFieldId > 0)
+    {
+        m_byEvenFieldId = static_cast<SBYTE>(iEvenFieldId);
+    }
 }
 
 void CFieldFermionWilsonSquareSU3::DebugPrintMe() const
@@ -577,6 +596,7 @@ void CFieldFermionWilsonSquareSU3::CopyTo(CField* U) const
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
     pField->m_byFieldId = m_byFieldId;
     pField->m_fKai = m_fKai;
+    pField->m_byEvenFieldId = m_byEvenFieldId;
 }
 
 #pragma region Quick Axpys (Although this is faster in debug mode, this is not fast in release Mode)
@@ -774,7 +794,7 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMC(const CFieldGauge* pGauge)
 
     pPooled->Return();
 
-    if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+    if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
     {
         m_fLength = Dot(this).x;
     }
@@ -878,6 +898,11 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
 
 UBOOL CFieldFermionWilsonSquareSU3::InverseD(const CField* pGauge)
 {
+    if (m_byEvenFieldId > 0)
+    {
+        return InverseD_eo(pGauge);
+    }
+
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
@@ -886,11 +911,16 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseD(const CField* pGauge)
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     //Find a solver to solve me.
-    return appGetFermionSolver()->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_D);
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_D);
 }
 
 UBOOL CFieldFermionWilsonSquareSU3::InverseDdagger(const CField* pGauge)
 {
+    if (m_byEvenFieldId > 0)
+    {
+        return InverseDdagger_eo(pGauge);
+    }
+
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
@@ -899,11 +929,16 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDdagger(const CField* pGauge)
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     //Find a solver to solve me.
-    return appGetFermionSolver()->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_Ddagger);
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_Ddagger);
 }
 
 UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
 {
+    if (m_byEvenFieldId > 0)
+    {
+        return InverseDDdagger_eo(pGauge);
+    }
+
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
@@ -912,7 +947,7 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
     const CFieldGaugeSU3 * pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     //Find a solver to solve me.
-    return appGetFermionSolver()->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
 }
 
 UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
@@ -957,15 +992,25 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
     CFieldFermionWilsonSquareSU3* pDDaggerPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDDaggerPhi);
     CFieldFermionWilsonSquareSU3* pDPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDPhi);
     //if (!pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3))
-    if (!appGetFermionSolver()->Solve(
-        pDDaggerPhiWilson, this, pGaugeSU3, 
-        EFO_F_DDdagger, ePhase, pCachedField))
+
+    if (FALSE)//m_byEvenFieldId > 0)
     {
-        appCrucial(_T("Sparse Linear Solver failed...\n"));
-        pDDaggerPhi->Return();
-        pDPhi->Return();
-        return FALSE;
+        CopyTo(pDDaggerPhiWilson);
+        pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3);
     }
+    else
+    {
+        if (!appGetFermionSolver(m_byFieldId)->Solve(
+            pDDaggerPhiWilson, this, pGaugeSU3,
+            EFO_F_DDdagger, ePhase, pCachedField))
+        {
+            appCrucial(_T("Sparse Linear Solver failed...\n"));
+            pDDaggerPhi->Return();
+            pDPhi->Return();
+            return FALSE;
+        }
+    }
+
     //phi 2 = D^{-1}phi = D+ (DD+)^{-1} phi
     //It is faster to calcuate D+ phi2 then D^{-1} phi
     pDDaggerPhiWilson->CopyTo(pDPhiWilson);
@@ -1081,7 +1126,7 @@ TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(co
 
             ret[s * 3 + c]->InitialAsSource(sourceData);
 
-            if (NULL != appGetFermionSolver() && !appGetFermionSolver()->IsAbsoluteAccuracy())
+            if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
             {
                 ret[s * 3 + c]->m_fLength = ret[s * 3 + c]->Dot(ret[s * 3 + c]).x;
             }
@@ -1097,6 +1142,99 @@ CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }
+
+#pragma region Even Odd Preconditioner
+
+
+/**
+ * Calculate phi_even
+ * Solve D z_even = phi_even
+ * Calculate z_odd = D_oo^{-1} (phi_odd + D_oe z_even)
+ */
+UBOOL CFieldFermionWilsonSquareSU3::InverseD_eo(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return FALSE;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    CFieldFermionWilsonSU3DEven* pEvenField = dynamic_cast<CFieldFermionWilsonSU3DEven*>(appGetLattice()->GetPooledFieldById(m_byEvenFieldId));
+    if (NULL == pEvenField)
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 NO even field!"));
+        return FALSE;
+    }
+
+    pEvenField->WriteEvenSites(this, pFieldSU3, FALSE);
+
+    //Find a solver to solve me.
+    if (!appGetFermionSolver(m_byEvenFieldId)->Solve(pEvenField, /*this is const*/pEvenField, pFieldSU3, EFO_F_D))
+    {
+        if (NULL != pEvenField)
+        {
+            pEvenField->Return();
+        }
+        return FALSE;
+    }
+
+    //z_even obtained, we calculate phi_odd + D_oe z_even
+    pEvenField->WriteBackEvenSites(this, pFieldSU3, FALSE);
+    pEvenField->Return();
+    return TRUE;
+}
+
+UBOOL CFieldFermionWilsonSquareSU3::InverseDdagger_eo(const CField* pGauge)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return FALSE;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    CFieldFermionWilsonSU3DEven* pEvenField = dynamic_cast<CFieldFermionWilsonSU3DEven*>(appGetLattice()->GetPooledFieldById(m_byEvenFieldId));
+    if (NULL == pEvenField)
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 NO even field!"));
+        return FALSE;
+    }
+
+    pEvenField->WriteEvenSites(this, pFieldSU3, TRUE);
+
+    //Find a solver to solve me.
+    if (!appGetFermionSolver(m_byEvenFieldId)->Solve(pEvenField, /*this is const*/pEvenField, pFieldSU3, EFO_F_Ddagger))
+    {
+        if (NULL != pEvenField)
+        {
+            pEvenField->Return();
+        }
+        return FALSE;
+    }
+
+    //z_even obtained, we calculate phi_odd + D_oe z_even
+    pEvenField->WriteBackEvenSites(this, pFieldSU3, TRUE);
+    pEvenField->Return();
+
+    return TRUE;
+}
+
+/**
+ * Our solver can not solve this field (or, we need more than one solver, so we solve DDdagger twice
+ * Maybe change to multi-solver
+ * (D D+)^{-1} = D+^{-1} D^{-1}
+ */
+UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger_eo(const CField* pGauge)
+{
+    if (!InverseD_eo(pGauge))
+    {
+        return FALSE;
+    }
+    return InverseDdagger_eo(pGauge);
+}
+
+#pragma endregion
 
 #pragma region Field Matrix Operation
 

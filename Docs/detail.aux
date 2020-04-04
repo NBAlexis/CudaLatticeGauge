@@ -14,8 +14,8 @@
 \fi}
 \global\let\hyper@last\relax 
 \gdef\HyperFirstAtBeginDocument#1{#1}
-\providecommand*\HyPL@Entry[1]{}
-\HyPL@Entry{0<</S/D>>}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
 \newlabel{sec:data}{{1}{5}{\label {sec:data}Data}{section.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Data}{5}{section.1}\protected@file@percent }
 \newlabel{index}{{1.1}{5}{\label {index}Index of lattice}{subsection.1.1}{}}
@@ -75,6 +75,7 @@
 \citation{latticeqcdreview2009}
 \citation{luscher2005}
 \citation{latticeqcdbook2010}
+\citation{sparselinearbook1}
 \newlabel{sec:Solver_In_HMC}{{2.1.4}{14}{\label {sec:Solver_In_HMC}\index {solver}Solver in HMC}{subsubsection.2.1.4}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.4}Solver in HMC}{14}{subsubsection.2.1.4}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
@@ -117,161 +118,171 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1}The D=1 staggered fermion and Jordan-Wigner transformation}{20}{subsubsection.2.3.1}\protected@file@percent }
 \citation{templates}
 \citation{sparselinearbook1}
-\newlabel{sec:solver}{{3}{21}{\label {sec:solver}\index {solver}Sparse linear algebra solver}{section.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Sparse linear algebra solver}{21}{section.3}\protected@file@percent }
-\newlabel{Krylov_subspace}{{3.1}{21}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{subsection.3.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Krylov subspace}{21}{subsection.3.1}\protected@file@percent }
-\newlabel{eq.krylov1}{{50}{21}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{equation.3.50}{}}
-\newlabel{eq.krylov2}{{51}{21}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{equation.3.51}{}}
-\newlabel{sec:GMRES}{{3.2}{21}{\label {sec:GMRES}\index {GMRES}GMRES}{subsection.3.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}GMRES}{21}{subsection.3.2}\protected@file@percent }
-\newlabel{alg.ArnoldiModifiedGS}{{3}{22}{Arnoldi with modified Gram-Schmidt\relax }{algorithm.3}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Arnoldi with modified Gram-Schmidt\relax }}{22}{algorithm.3}\protected@file@percent }
-\newlabel{eq,gemres.1}{{54}{22}{\label {sec:GMRES}\index {GMRES}GMRES}{equation.3.54}{}}
-\newlabel{alg.GEMRES.RotateH}{{4}{24}{Rotate H\relax }{algorithm.4}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Rotate H\relax }}{24}{algorithm.4}\protected@file@percent }
-\newlabel{alg.GEMRES.SolveY}{{5}{24}{Solve Y\relax }{algorithm.5}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Solve Y\relax }}{24}{algorithm.5}\protected@file@percent }
+\newlabel{sec:solver}{{3}{22}{\label {sec:solver}\index {solver}Sparse linear algebra solver}{section.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Sparse linear algebra solver}{22}{section.3}\protected@file@percent }
+\newlabel{Krylov_subspace}{{3.1}{22}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{subsection.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Krylov subspace}{22}{subsection.3.1}\protected@file@percent }
+\newlabel{eq.krylov1}{{51}{22}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{equation.3.51}{}}
+\newlabel{eq.krylov2}{{52}{22}{\label {Krylov_subspace}\index {Krylov subspace}Krylov subspace}{equation.3.52}{}}
+\newlabel{sec:GMRES}{{3.2}{22}{\label {sec:GMRES}\index {GMRES}GMRES}{subsection.3.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}GMRES}{22}{subsection.3.2}\protected@file@percent }
+\newlabel{alg.ArnoldiModifiedGS}{{3}{23}{Arnoldi with modified Gram-Schmidt\relax }{algorithm.3}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Arnoldi with modified Gram-Schmidt\relax }}{23}{algorithm.3}\protected@file@percent }
+\newlabel{eq,gemres.1}{{55}{23}{\label {sec:GMRES}\index {GMRES}GMRES}{equation.3.55}{}}
+\newlabel{alg.GEMRES.RotateH}{{4}{25}{Rotate H\relax }{algorithm.4}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Rotate H\relax }}{25}{algorithm.4}\protected@file@percent }
+\newlabel{alg.GEMRES.SolveY}{{5}{25}{Solve Y\relax }{algorithm.5}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Solve Y\relax }}{25}{algorithm.5}\protected@file@percent }
 \citation{sparselinearbook1}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces GMRES(m)\relax }}{25}{algorithm.6}\protected@file@percent }
-\newlabel{sec:GCR}{{3.3}{25}{\label {sec:GCR}\index {GCR}GCR}{subsection.3.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}GCR}{25}{subsection.3.3}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {7}{\ignorespaces incomplete GCR with restart\relax }}{26}{algorithm.7}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces GMRES(m)\relax }}{26}{algorithm.6}\protected@file@percent }
+\newlabel{sec:GCR}{{3.3}{26}{\label {sec:GCR}\index {GCR}GCR}{subsection.3.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}GCR}{26}{subsection.3.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {7}{\ignorespaces incomplete GCR with restart\relax }}{27}{algorithm.7}\protected@file@percent }
 \citation{sparselinearbook1}
 \citation{luscher2010}
 \citation{deflation}
-\newlabel{sec:GCRODR}{{3.4}{27}{\label {sec:GCRODR}\index {GCRO-DR}\index {GMRES-MDR} GCRO-DR and GMRES-MDR}{subsection.3.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4} GCRO-DR and GMRES-MDR}{27}{subsection.3.4}\protected@file@percent }
-\newlabel{sec:preconditioner}{{3.4.1}{27}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{subsubsection.3.4.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}Brief introduction to deflation preconditioner}{27}{subsubsection.3.4.1}\protected@file@percent }
-\newlabel{eq.gcrodr.precondition}{{70}{27}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{equation.3.70}{}}
-\newlabel{eq.gcrod.exactsolution}{{71}{28}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{equation.3.71}{}}
-\newlabel{sec:gcrodr}{{3.4.2}{28}{\label {sec:gcrodr}\index {GCRO-DR}Brief intro to GCRO-DR}{subsubsection.3.4.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.2}Brief intro to GCRO-DR}{28}{subsubsection.3.4.2}\protected@file@percent }
-\newlabel{eq.gcrodr.1}{{75}{29}{\label {sec:gcrodr}\index {GCRO-DR}Brief intro to GCRO-DR}{equation.3.75}{}}
-\newlabel{sec:deflationsubspace}{{3.4.3}{29}{\label {sec:deflationsubspace}The choice of deflation subspace}{subsubsection.3.4.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.3}The choice of deflation subspace}{29}{subsubsection.3.4.3}\protected@file@percent }
-\newlabel{eq.gcrodr.subdeflation}{{76}{29}{\label {sec:deflationsubspace}The choice of deflation subspace}{equation.3.76}{}}
+\newlabel{sec:GCRODR}{{3.4}{28}{\label {sec:GCRODR}\index {GCRO-DR}\index {GMRES-MDR} GCRO-DR and GMRES-MDR}{subsection.3.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4} GCRO-DR and GMRES-MDR}{28}{subsection.3.4}\protected@file@percent }
+\newlabel{sec:preconditioner}{{3.4.1}{28}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{subsubsection.3.4.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}Brief introduction to deflation preconditioner}{28}{subsubsection.3.4.1}\protected@file@percent }
+\newlabel{eq.gcrodr.precondition}{{71}{28}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{equation.3.71}{}}
+\newlabel{eq.gcrod.exactsolution}{{72}{29}{\label {sec:preconditioner}\index {preconditioner}Brief introduction to deflation preconditioner}{equation.3.72}{}}
+\newlabel{sec:gcrodr}{{3.4.2}{29}{\label {sec:gcrodr}\index {GCRO-DR}Brief intro to GCRO-DR}{subsubsection.3.4.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.2}Brief intro to GCRO-DR}{29}{subsubsection.3.4.2}\protected@file@percent }
+\newlabel{eq.gcrodr.1}{{76}{30}{\label {sec:gcrodr}\index {GCRO-DR}Brief intro to GCRO-DR}{equation.3.76}{}}
+\newlabel{sec:deflationsubspace}{{3.4.3}{30}{\label {sec:deflationsubspace}The choice of deflation subspace}{subsubsection.3.4.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.3}The choice of deflation subspace}{30}{subsubsection.3.4.3}\protected@file@percent }
+\newlabel{eq.gcrodr.subdeflation}{{77}{30}{\label {sec:deflationsubspace}The choice of deflation subspace}{equation.3.77}{}}
 \citation{deflation}
 \citation{matrixcomputation}
-\newlabel{sec:eigenSolver}{{3.4.4}{31}{\label {sec:eigenSolver}Eigen solver}{subsubsection.3.4.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{31}{subsubsection.3.4.4}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {8}{\ignorespaces Shifted QR Iteration\relax }}{33}{algorithm.8}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {9}{\ignorespaces Implicit shifted QR iteration\relax }}{34}{algorithm.9}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {10}{\ignorespaces Inverse power Iteration\relax }}{35}{algorithm.10}\protected@file@percent }
-\newlabel{alg.backsub}{{11}{35}{Backward substitution\relax }{algorithm.11}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {11}{\ignorespaces Backward substitution\relax }}{35}{algorithm.11}\protected@file@percent }
-\newlabel{sec:implementationgcrodr}{{3.4.5}{36}{\label {sec:implementationgcrodr}Implementation of GCRO-DR}{subsubsection.3.4.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{36}{subsubsection.3.4.5}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {12}{\ignorespaces ${\bf  x}={\bf  x}-AB^{\dagger }{\bf  v}$\relax }}{36}{algorithm.12}\protected@file@percent }
+\newlabel{sec:eigenSolver}{{3.4.4}{32}{\label {sec:eigenSolver}Eigen solver}{subsubsection.3.4.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{32}{subsubsection.3.4.4}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {8}{\ignorespaces Shifted QR Iteration\relax }}{34}{algorithm.8}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {9}{\ignorespaces Implicit shifted QR iteration\relax }}{35}{algorithm.9}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {10}{\ignorespaces Inverse power Iteration\relax }}{36}{algorithm.10}\protected@file@percent }
+\newlabel{alg.backsub}{{11}{36}{Backward substitution\relax }{algorithm.11}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {11}{\ignorespaces Backward substitution\relax }}{36}{algorithm.11}\protected@file@percent }
+\newlabel{sec:implementationgcrodr}{{3.4.5}{37}{\label {sec:implementationgcrodr}Implementation of GCRO-DR}{subsubsection.3.4.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{37}{subsubsection.3.4.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {12}{\ignorespaces ${\bf  x}={\bf  x}-AB^{\dagger }{\bf  v}$\relax }}{37}{algorithm.12}\protected@file@percent }
 \citation{deflation}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {13}{\ignorespaces modified Gram-Schmidt for QR factorization decompose of $A\mathaccentV {tilde}07E{Y}_k$\relax }}{37}{algorithm.13}\protected@file@percent }
-\newlabel{sec:impgcrodr}{{3.4.6}{37}{\label {sec:impgcrodr}\index {GCRO-DR}Implement of GCRO-DR}{subsubsection.3.4.6}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.6}Implement of GCRO-DR}{37}{subsubsection.3.4.6}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {14}{\ignorespaces GCRO-DR\relax }}{38}{algorithm.14}\protected@file@percent }
-\newlabel{sec:impgmresmdr}{{3.4.7}{39}{\label {sec:impgmresmdr}\index {GMRES-MDR}Implement of GMRES-MDR}{subsubsection.3.4.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.7}Implement of GMRES-MDR}{39}{subsubsection.3.4.7}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {15}{\ignorespaces First iteration of GMRES-MDR if $U_k$ is defined.\relax }}{39}{algorithm.15}\protected@file@percent }
-\newlabel{sec:testofgcrodr}{{3.4.8}{39}{\label {sec:testofgcrodr}Test of GCRO-DR and GMRES-MDR}{subsubsection.3.4.8}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.8}Test of GCRO-DR and GMRES-MDR}{39}{subsubsection.3.4.8}\protected@file@percent }
-\newlabel{sec:Miscellaneous}{{4}{40}{\label {sec:Miscellaneous}Miscellaneous topics}{section.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Miscellaneous topics}{40}{section.4}\protected@file@percent }
-\newlabel{sec:GaugeFixing}{{4.1}{40}{\label {sec:GaugeFixing}Gauge Fixing}{subsection.4.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Gauge Fixing}{40}{subsection.4.1}\protected@file@percent }
-\newlabel{sec:FFT}{{4.1.1}{40}{\label {sec:FFT}Introduction of FFT before start}{subsubsection.4.1.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Introduction of FFT before start}{40}{subsubsection.4.1.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {13}{\ignorespaces modified Gram-Schmidt for QR factorization decompose of $A\mathaccentV {tilde}07E{Y}_k$\relax }}{38}{algorithm.13}\protected@file@percent }
+\newlabel{sec:impgcrodr}{{3.4.6}{38}{\label {sec:impgcrodr}\index {GCRO-DR}Implement of GCRO-DR}{subsubsection.3.4.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.6}Implement of GCRO-DR}{38}{subsubsection.3.4.6}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {14}{\ignorespaces GCRO-DR\relax }}{39}{algorithm.14}\protected@file@percent }
+\newlabel{sec:impgmresmdr}{{3.4.7}{40}{\label {sec:impgmresmdr}\index {GMRES-MDR}Implement of GMRES-MDR}{subsubsection.3.4.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.7}Implement of GMRES-MDR}{40}{subsubsection.3.4.7}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {15}{\ignorespaces First iteration of GMRES-MDR if $U_k$ is defined.\relax }}{40}{algorithm.15}\protected@file@percent }
+\newlabel{sec:testofgcrodr}{{3.4.8}{40}{\label {sec:testofgcrodr}Test of GCRO-DR and GMRES-MDR}{subsubsection.3.4.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.8}Test of GCRO-DR and GMRES-MDR}{40}{subsubsection.3.4.8}\protected@file@percent }
+\newlabel{sec:EvenOdd}{{3.5}{40}{\label {sec:EvenOdd}\index {Even-odd preconditioner}Even-odd preconditioner}{subsection.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Even-odd preconditioner}{40}{subsection.3.5}\protected@file@percent }
+\newlabel{sec:Miscellaneous}{{4}{43}{\label {sec:Miscellaneous}Miscellaneous topics}{section.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Miscellaneous topics}{43}{section.4}\protected@file@percent }
+\newlabel{sec:GaugeFixing}{{4.1}{43}{\label {sec:GaugeFixing}Gauge Fixing}{subsection.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Gauge Fixing}{43}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:FFT}{{4.1.1}{43}{\label {sec:FFT}Introduction of FFT before start}{subsubsection.4.1.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}Introduction of FFT before start}{43}{subsubsection.4.1.1}\protected@file@percent }
 \citation{CornellGaugeFixing}
 \citation{luscher2005}
-\newlabel{sec:CornellGaugeFixing}{{4.1.2}{41}{\label {sec:CornellGaugeFixing}Cornell Gauge Fixing and FFT accelerated}{subsubsection.4.1.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Cornell Gauge Fixing and FFT accelerated}{41}{subsubsection.4.1.2}\protected@file@percent }
-\newlabel{alg.CornellGaugeFixing}{{16}{41}{Cornell gauge fixing\relax }{algorithm.16}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {16}{\ignorespaces Cornell gauge fixing\relax }}{41}{algorithm.16}\protected@file@percent }
+\newlabel{sec:CornellGaugeFixing}{{4.1.2}{44}{\label {sec:CornellGaugeFixing}Cornell Gauge Fixing and FFT accelerated}{subsubsection.4.1.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Cornell Gauge Fixing and FFT accelerated}{44}{subsubsection.4.1.2}\protected@file@percent }
+\newlabel{alg.CornellGaugeFixing}{{16}{44}{Cornell gauge fixing\relax }{algorithm.16}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {16}{\ignorespaces Cornell gauge fixing\relax }}{44}{algorithm.16}\protected@file@percent }
 \citation{LosAlamosGaugeFixing}
-\newlabel{sec:LosAlamos}{{4.1.3}{42}{\label {sec:LosAlamos}Los Alamos Gauge Fixing and over relaxation}{subsubsection.4.1.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Los Alamos Gauge Fixing and over relaxation}{42}{subsubsection.4.1.3}\protected@file@percent }
-\newlabel{alg.LosAlamosGaugeFixing}{{17}{43}{Los Alamos gauge fixing with over relaxation $\omega $\relax }{algorithm.17}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {17}{\ignorespaces Los Alamos gauge fixing with over relaxation $\omega $\relax }}{43}{algorithm.17}\protected@file@percent }
-\newlabel{sec:CoulombGauge}{{4.1.4}{44}{\label {sec:CoulombGauge}Coulomb Gauge}{subsubsection.4.1.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.4}Coulomb Gauge}{44}{subsubsection.4.1.4}\protected@file@percent }
-\newlabel{sec:LogarithmDefinition}{{4.1.5}{44}{\label {sec:LogarithmDefinition}Logarithm definition}{subsubsection.4.1.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.5}Logarithm definition}{44}{subsubsection.4.1.5}\protected@file@percent }
-\newlabel{sec:GaugeFixing}{{5}{46}{\label {sec:GaugeFixing}Measurement}{section.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Measurement}{46}{section.5}\protected@file@percent }
-\newlabel{PlaquetteEnergy}{{5.1}{46}{\label {PlaquetteEnergy}\index {plaquette energy}Plaquette Energy}{subsection.5.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Plaquette Energy}{46}{subsection.5.1}\protected@file@percent }
-\newlabel{eq.plaqutteEnergy.staple}{{108}{46}{\label {PlaquetteEnergy}\index {plaquette energy}Plaquette Energy}{equation.5.108}{}}
-\newlabel{MesonCorrelator}{{5.2}{46}{\label {MesonCorrelator}\index {meson}\index {correlator}Meson Correlator}{subsection.5.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Meson Correlator}{46}{subsection.5.2}\protected@file@percent }
-\newlabel{MesonWaveFunction}{{5.2.1}{46}{\label {MesonWaveFunction}Meson Wave Function}{subsubsection.5.2.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Meson Wave Function}{46}{subsubsection.5.2.1}\protected@file@percent }
-\newlabel{MesonCorrelatorSub}{{5.2.2}{46}{\label {MesonCorrelatorSub}Meson Correlator}{subsubsection.5.2.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Meson Correlator}{46}{subsubsection.5.2.2}\protected@file@percent }
-\newlabel{Source}{{5.2.3}{48}{\label {Source}\index {source}Sources}{subsubsection.5.2.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Sources}{48}{subsubsection.5.2.3}\protected@file@percent }
-\newlabel{eq.mesoncorrelator.Fourier}{{117}{48}{\label {Source}\index {source}Sources}{equation.5.117}{}}
-\newlabel{eq.mesoncorrelator.matrix1}{{124}{49}{\label {Source}\index {source}Sources}{equation.5.124}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces \relax }}{51}{table.caption.1}\protected@file@percent }
-\newlabel{tab2}{{1}{51}{\relax }{table.caption.1}{}}
-\newlabel{SummaryOfparametersMesonCorrelator}{{5.2.4}{51}{\label {SummaryOfparametersMesonCorrelator}Summary of parameters}{subsubsection.5.2.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.4}Summary of parameters}{51}{subsubsection.5.2.4}\protected@file@percent }
-\newlabel{Gauge_Smearing}{{5.2.5}{52}{\label {Gauge_Smearing}\index {gauge smearing}Gauge smearing}{subsubsection.5.2.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.5}Gauge smearing}{52}{subsubsection.5.2.5}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {18}{\ignorespaces $\mathcal  {P}(U)$ approximately\relax }}{52}{algorithm.18}\protected@file@percent }
-\newlabel{sec:Programming}{{6}{54}{\label {sec:Programming}Programming}{section.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Programming}{54}{section.6}\protected@file@percent }
-\newlabel{cuda}{{6.1}{54}{\label {cuda}cuda}{subsection.6.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}cuda}{54}{subsection.6.1}\protected@file@percent }
-\newlabel{cudathreads}{{6.1.1}{54}{\label {cudathreads}blocks and threads}{subsubsection.6.1.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{54}{subsubsection.6.1.1}\protected@file@percent }
-\newlabel{device member function}{{6.1.2}{54}{\label {device member function}device member function}{subsubsection.6.1.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.2}device member function}{54}{subsubsection.6.1.2}\protected@file@percent }
-\newlabel{device virtual member function}{{6.1.3}{57}{\label {device virtual member function}device virtual member function}{subsubsection.6.1.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{57}{subsubsection.6.1.3}\protected@file@percent }
-\newlabel{sec:Testing}{{7}{60}{\label {sec:Testing}Testing}{section.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Testing}{60}{section.7}\protected@file@percent }
-\newlabel{test_random}{{7.1}{60}{\label {test_random}random number}{subsection.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}random number}{60}{subsection.7.1}\protected@file@percent }
+\newlabel{sec:LosAlamos}{{4.1.3}{45}{\label {sec:LosAlamos}Los Alamos Gauge Fixing and over relaxation}{subsubsection.4.1.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Los Alamos Gauge Fixing and over relaxation}{45}{subsubsection.4.1.3}\protected@file@percent }
+\newlabel{alg.LosAlamosGaugeFixing}{{17}{46}{Los Alamos gauge fixing with over relaxation $\omega $\relax }{algorithm.17}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {17}{\ignorespaces Los Alamos gauge fixing with over relaxation $\omega $\relax }}{46}{algorithm.17}\protected@file@percent }
+\newlabel{sec:CoulombGauge}{{4.1.4}{47}{\label {sec:CoulombGauge}Coulomb Gauge}{subsubsection.4.1.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.4}Coulomb Gauge}{47}{subsubsection.4.1.4}\protected@file@percent }
+\newlabel{sec:LogarithmDefinition}{{4.1.5}{47}{\label {sec:LogarithmDefinition}Logarithm definition}{subsubsection.4.1.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.5}Logarithm definition}{47}{subsubsection.4.1.5}\protected@file@percent }
+\newlabel{sec:GaugeFixing}{{5}{49}{\label {sec:GaugeFixing}Measurement}{section.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Measurement}{49}{section.5}\protected@file@percent }
+\newlabel{PlaquetteEnergy}{{5.1}{49}{\label {PlaquetteEnergy}\index {plaquette energy}Plaquette Energy}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Plaquette Energy}{49}{subsection.5.1}\protected@file@percent }
+\newlabel{eq.plaqutteEnergy.staple}{{114}{49}{\label {PlaquetteEnergy}\index {plaquette energy}Plaquette Energy}{equation.5.114}{}}
+\newlabel{MesonCorrelator}{{5.2}{49}{\label {MesonCorrelator}\index {meson}\index {correlator}Meson Correlator}{subsection.5.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Meson Correlator}{49}{subsection.5.2}\protected@file@percent }
+\newlabel{MesonWaveFunction}{{5.2.1}{49}{\label {MesonWaveFunction}Meson Wave Function}{subsubsection.5.2.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Meson Wave Function}{49}{subsubsection.5.2.1}\protected@file@percent }
+\newlabel{MesonCorrelatorSub}{{5.2.2}{49}{\label {MesonCorrelatorSub}Meson Correlator}{subsubsection.5.2.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Meson Correlator}{49}{subsubsection.5.2.2}\protected@file@percent }
+\newlabel{Source}{{5.2.3}{51}{\label {Source}\index {source}Sources}{subsubsection.5.2.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Sources}{51}{subsubsection.5.2.3}\protected@file@percent }
+\newlabel{eq.mesoncorrelator.Fourier}{{123}{51}{\label {Source}\index {source}Sources}{equation.5.123}{}}
+\newlabel{eq.mesoncorrelator.matrix1}{{130}{52}{\label {Source}\index {source}Sources}{equation.5.130}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces \relax }}{54}{table.caption.1}\protected@file@percent }
+\newlabel{tab2}{{1}{54}{\relax }{table.caption.1}{}}
+\newlabel{SummaryOfparametersMesonCorrelator}{{5.2.4}{54}{\label {SummaryOfparametersMesonCorrelator}Summary of parameters}{subsubsection.5.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.4}Summary of parameters}{54}{subsubsection.5.2.4}\protected@file@percent }
+\newlabel{Gauge_Smearing}{{5.2.5}{55}{\label {Gauge_Smearing}\index {gauge smearing}Gauge smearing}{subsubsection.5.2.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.5}Gauge smearing}{55}{subsubsection.5.2.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {18}{\ignorespaces $\mathcal  {P}(U)$ approximately\relax }}{55}{algorithm.18}\protected@file@percent }
+\newlabel{ChiralCondensateWilson}{{5.3}{56}{\label {ChiralCondensateWilson}\index {chiral condensate}Chiral Condensate of Wilson fermion}{subsection.5.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Chiral Condensate of Wilson fermion}{56}{subsection.5.3}\protected@file@percent }
+\newlabel{WallSource}{{5.3.1}{56}{\label {WallSource}Wall source}{subsubsection.5.3.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Wall source}{56}{subsubsection.5.3.1}\protected@file@percent }
+\newlabel{DecayConstant}{{5.3.2}{56}{\label {DecayConstant}Decay constant}{subsubsection.5.3.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Decay constant}{56}{subsubsection.5.3.2}\protected@file@percent }
+\newlabel{EffectiveQuarkMass}{{5.3.3}{56}{\label {EffectiveQuarkMass}Effective Quark Mass}{subsubsection.5.3.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.3}Effective Quark Mass}{56}{subsubsection.5.3.3}\protected@file@percent }
+\newlabel{sec:Programming}{{6}{57}{\label {sec:Programming}Programming}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Programming}{57}{section.6}\protected@file@percent }
+\newlabel{cuda}{{6.1}{57}{\label {cuda}cuda}{subsection.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}cuda}{57}{subsection.6.1}\protected@file@percent }
+\newlabel{cudathreads}{{6.1.1}{57}{\label {cudathreads}blocks and threads}{subsubsection.6.1.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{57}{subsubsection.6.1.1}\protected@file@percent }
+\newlabel{device member function}{{6.1.2}{57}{\label {device member function}device member function}{subsubsection.6.1.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.2}device member function}{57}{subsubsection.6.1.2}\protected@file@percent }
+\newlabel{device virtual member function}{{6.1.3}{60}{\label {device virtual member function}device virtual member function}{subsubsection.6.1.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{60}{subsubsection.6.1.3}\protected@file@percent }
+\newlabel{sec:Testing}{{7}{63}{\label {sec:Testing}Testing}{section.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Testing}{63}{section.7}\protected@file@percent }
+\newlabel{test_random}{{7.1}{63}{\label {test_random}random number}{subsection.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}random number}{63}{subsection.7.1}\protected@file@percent }
 \citation{rotation}
-\newlabel{sec:Applications}{{8}{61}{\label {sec:Applications}Applications}{section.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Applications}{61}{section.8}\protected@file@percent }
-\newlabel{sec:RotatingFrame}{{8.1}{61}{\label {sec:RotatingFrame}Rotating Frame}{subsection.8.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Rotating Frame}{61}{subsection.8.1}\protected@file@percent }
-\newlabel{sec:RotatingGaugeAction}{{8.1.1}{62}{\label {sec:RotatingGaugeAction}The rotating gauge action}{subsubsection.8.1.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{62}{subsubsection.8.1.1}\protected@file@percent }
-\newlabel{sec:RotatingFermionAction}{{8.1.2}{64}{\label {sec:RotatingFermionAction}Rotating Fermion action}{subsubsection.8.1.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{64}{subsubsection.8.1.2}\protected@file@percent }
-\newlabel{sec:ExponentialChemicalPotential}{{8.1.3}{68}{\label {sec:ExponentialChemicalPotential}The exponential chemical potential}{subsubsection.8.1.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{68}{subsubsection.8.1.3}\protected@file@percent }
-\newlabel{sec:TheFinalActionOfRotation}{{8.1.4}{69}{\label {sec:TheFinalActionOfRotation}The final action of rotation}{subsubsection.8.1.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{69}{subsubsection.8.1.4}\protected@file@percent }
+\newlabel{sec:Applications}{{8}{64}{\label {sec:Applications}Applications}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Applications}{64}{section.8}\protected@file@percent }
+\newlabel{sec:RotatingFrame}{{8.1}{64}{\label {sec:RotatingFrame}Rotating Frame}{subsection.8.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Rotating Frame}{64}{subsection.8.1}\protected@file@percent }
+\newlabel{sec:RotatingGaugeAction}{{8.1.1}{65}{\label {sec:RotatingGaugeAction}The rotating gauge action}{subsubsection.8.1.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{65}{subsubsection.8.1.1}\protected@file@percent }
+\newlabel{sec:RotatingFermionAction}{{8.1.2}{67}{\label {sec:RotatingFermionAction}Rotating Fermion action}{subsubsection.8.1.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{67}{subsubsection.8.1.2}\protected@file@percent }
+\newlabel{sec:ExponentialChemicalPotential}{{8.1.3}{71}{\label {sec:ExponentialChemicalPotential}The exponential chemical potential}{subsubsection.8.1.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{71}{subsubsection.8.1.3}\protected@file@percent }
+\newlabel{sec:TheFinalActionOfRotation}{{8.1.4}{72}{\label {sec:TheFinalActionOfRotation}The final action of rotation}{subsubsection.8.1.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{72}{subsubsection.8.1.4}\protected@file@percent }
 \citation{rotation}
-\newlabel{sec:ForceFromGaugeAction}{{8.1.5}{71}{\label {sec:ForceFromGaugeAction}The force from gauge action}{subsubsection.8.1.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{71}{subsubsection.8.1.5}\protected@file@percent }
-\newlabel{sec:TheForceFromFermionAction}{{8.1.6}{75}{\label {sec:TheForceFromFermionAction}The force from fermion action}{subsubsection.8.1.6}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{75}{subsubsection.8.1.6}\protected@file@percent }
-\newlabel{sec:AngularMomentum}{{8.1.7}{76}{\label {sec:AngularMomentum}The angular momentum}{subsubsection.8.1.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{76}{subsubsection.8.1.7}\protected@file@percent }
+\newlabel{sec:ForceFromGaugeAction}{{8.1.5}{74}{\label {sec:ForceFromGaugeAction}The force from gauge action}{subsubsection.8.1.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{74}{subsubsection.8.1.5}\protected@file@percent }
+\newlabel{sec:TheForceFromFermionAction}{{8.1.6}{78}{\label {sec:TheForceFromFermionAction}The force from fermion action}{subsubsection.8.1.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{78}{subsubsection.8.1.6}\protected@file@percent }
+\newlabel{sec:AngularMomentum}{{8.1.7}{79}{\label {sec:AngularMomentum}The angular momentum}{subsubsection.8.1.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{79}{subsubsection.8.1.7}\protected@file@percent }
 \citation{AngularMomentum}
 \citation{AngularMomentum}
-\newlabel{sec:RotatingCurrentDensityChargeDensity}{{8.1.8}{84}{\label {sec:RotatingCurrentDensityChargeDensity}The Current density and Charge density}{subsubsection.8.1.8}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{84}{subsubsection.8.1.8}\protected@file@percent }
-\newlabel{sec:RotatingTopologicalDensity}{{8.1.9}{84}{\label {sec:RotatingTopologicalDensity}The Topological Density}{subsubsection.8.1.9}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{84}{subsubsection.8.1.9}\protected@file@percent }
-\newlabel{sec:RotatingPolyakovLoop}{{8.1.10}{85}{\label {sec:RotatingPolyakovLoop}The Polyakov loop}{subsubsection.8.1.10}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{85}{subsubsection.8.1.10}\protected@file@percent }
-\newlabel{sec:RotatingChiralCondensate}{{8.1.11}{85}{\label {sec:RotatingChiralCondensate}The Chiral Condensate}{subsubsection.8.1.11}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{85}{subsubsection.8.1.11}\protected@file@percent }
+\newlabel{sec:RotatingCurrentDensityChargeDensity}{{8.1.8}{87}{\label {sec:RotatingCurrentDensityChargeDensity}The Current density and Charge density}{subsubsection.8.1.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{87}{subsubsection.8.1.8}\protected@file@percent }
+\newlabel{sec:RotatingTopologicalDensity}{{8.1.9}{87}{\label {sec:RotatingTopologicalDensity}The Topological Density}{subsubsection.8.1.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{87}{subsubsection.8.1.9}\protected@file@percent }
+\newlabel{sec:RotatingPolyakovLoop}{{8.1.10}{88}{\label {sec:RotatingPolyakovLoop}The Polyakov loop}{subsubsection.8.1.10}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{88}{subsubsection.8.1.10}\protected@file@percent }
+\newlabel{sec:RotatingChiralCondensate}{{8.1.11}{88}{\label {sec:RotatingChiralCondensate}The Chiral Condensate}{subsubsection.8.1.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{88}{subsubsection.8.1.11}\protected@file@percent }
 \citation{aipde}
 \citation{aisolver1}
 \citation{autocorrelation}
 \citation{autocorrelation}
-\newlabel{sec:SampleProducer}{{8.2}{86}{\label {sec:SampleProducer}Sample Producer}{subsection.8.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Sample Producer}{86}{subsection.8.2}\protected@file@percent }
-\newlabel{sec:DataAnalyse}{{8.3}{86}{\label {sec:DataAnalyse}Data Analyse}{subsection.8.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Data Analyse}{86}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{86}{subsubsection.8.3.1}\protected@file@percent }
+\newlabel{sec:SampleProducer}{{8.2}{89}{\label {sec:SampleProducer}Sample Producer}{subsection.8.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Sample Producer}{89}{subsection.8.2}\protected@file@percent }
+\newlabel{sec:DataAnalyse}{{8.3}{89}{\label {sec:DataAnalyse}Data Analyse}{subsection.8.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Data Analyse}{89}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{89}{subsubsection.8.3.1}\protected@file@percent }
 \citation{autocorrelation}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{87}{subsubsection.8.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{90}{subsubsection.8.3.2}\protected@file@percent }
 \bibdata{detail}
 \bibcite{latticeqcdbook2017}{{1}{}{{}}{{}}}
 \bibcite{latticeqcdbook2010}{{2}{}{{}}{{}}}
@@ -281,11 +292,11 @@
 \bibcite{latticeqcdreview2009}{{6}{}{{}}{{}}}
 \bibcite{bridge}{{7}{}{{}}{{}}}
 \bibcite{luscher2005}{{8}{}{{}}{{}}}
-\bibcite{forcegradient1}{{9}{}{{}}{{}}}
-\bibcite{forcegradient2}{{10}{}{{}}{{}}}
-\bibcite{forcegradient3}{{11}{}{{}}{{}}}
-\bibcite{templates}{{12}{}{{}}{{}}}
-\bibcite{sparselinearbook1}{{13}{}{{}}{{}}}
+\bibcite{sparselinearbook1}{{9}{}{{}}{{}}}
+\bibcite{forcegradient1}{{10}{}{{}}{{}}}
+\bibcite{forcegradient2}{{11}{}{{}}{{}}}
+\bibcite{forcegradient3}{{12}{}{{}}{{}}}
+\bibcite{templates}{{13}{}{{}}{{}}}
 \bibcite{luscher2010}{{14}{}{{}}{{}}}
 \bibcite{deflation}{{15}{}{{}}{{}}}
 \bibcite{matrixcomputation}{{16}{}{{}}{{}}}

@@ -48,6 +48,11 @@ Martin~L$\rm \ddot{u}$scher.
   HMC algorithm for two-flavor lattice QCD}}.
 \newblock {\em Computer Physics Communications}, 165:199--220, 2005.
 
+\bibitem{sparselinearbook1}
+Yousef Saad.
+\newblock {Iterative methods for sparse linear systems}.
+\newblock 2003.
+
 \bibitem{forcegradient1}
 P.~J.~Silva A.~D.~Kennedy, M. A.~Clark.
 \newblock \href{http://arxiv.org/abs/0910.2950}{{Force Gradient Integrators}}.
@@ -73,11 +78,6 @@ R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,
   Iterative Methods}.
 \newblock 1994, \href{http://www.netlib.org/templates/Templates.html}{Available
   at: http://www.netlib.org/templates/Templates.html}.
-
-\bibitem{sparselinearbook1}
-Yousef Saad.
-\newblock {Iterative methods for sparse linear systems}.
-\newblock 2003.
 
 \bibitem{luscher2010}
 Martin~L$\rm \ddot{u}$scher.

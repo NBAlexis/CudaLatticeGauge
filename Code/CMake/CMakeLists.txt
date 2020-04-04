@@ -45,10 +45,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKS.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
@@ -119,8 +120,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKS.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3EvenOdd.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombLosAlamos.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.cu
@@ -215,7 +217,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestConfigurationFileIO.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGammaMatrixSpeed.cpp
-    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestOperators.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestCommon.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRandom.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRotation.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp

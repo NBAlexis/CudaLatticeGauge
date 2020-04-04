@@ -89,6 +89,7 @@ public:
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+
     virtual UBOOL InverseD(const CField* pGauge) = 0;
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
@@ -109,10 +110,35 @@ public:
     UBOOL IsGaugeField() const override { return FALSE; }
     UBOOL IsFermionField() const override { return TRUE; }
 
+    /**
+     * For even odd preconditioner
+     */
+    virtual void WriteEvenSites(const CFieldFermion* , const CFieldGauge* , UBOOL ) { appCrucial(_T("Not implemented.\n")); }
+    virtual void WriteBackEvenSites(CFieldFermion* , const CFieldGauge* , UBOOL ) const { appCrucial(_T("Not implemented.\n")); }
+
 protected:
+
+    virtual UBOOL InverseD_eo(const CField*)
+    {
+        appCrucial(_T("Not implemented.\n"));
+        return FALSE;
+    }
+
+    virtual UBOOL InverseDdagger_eo(const CField* )
+    {
+        appCrucial(_T("Not implemented.\n"));
+        return FALSE;
+    }
+
+    virtual UBOOL InverseDDdagger_eo(const CField*)
+    {
+        appCrucial(_T("Not implemented.\n"));
+        return FALSE;
+    }
 
     UINT m_uiLinkeCount;
     UINT m_uiSiteCount;
+    SBYTE m_byEvenFieldId;
 };
 
 __END_NAMESPACE

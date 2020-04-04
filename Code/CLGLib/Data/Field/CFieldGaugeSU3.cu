@@ -81,6 +81,16 @@ _kernelInitialSU3Feield(deviceSU3 *pDevicePtr, EFieldInitialType eInitialType)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelDaggerSU3(deviceSU3* pDevicePtr)
+{
+    gaugeSU3KernelFuncionStart
+
+    pDevicePtr[uiLinkIndex].Dagger();
+
+    gaugeSU3KernelFuncionEnd
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelAxpySU3A(deviceSU3 *pDevicePtr, const deviceSU3* __restrict__ x, CLGComplex a)
 {
     gaugeSU3KernelFuncionStart
@@ -635,6 +645,12 @@ void CFieldGaugeSU3::Identity()
 {
     preparethread;
     _kernelInitialSU3Feield << <block, threads >> > (m_pDeviceData, EFIT_Identity);
+}
+
+void CFieldGaugeSU3::Dagger()
+{
+    preparethread;
+    _kernelDaggerSU3 << <block, threads >> > (m_pDeviceData);
 }
 
 void CFieldGaugeSU3::MakeRandomGenerator()

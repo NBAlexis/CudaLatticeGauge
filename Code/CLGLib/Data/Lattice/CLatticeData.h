@@ -22,7 +22,7 @@ public:
     CLatticeData();
     ~CLatticeData();
 
-    void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField);
+    void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
     void OnUpdatorConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) const;
     void OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const;
     //void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
@@ -81,7 +81,7 @@ public:
     class CIndex* m_pIndex;
     class CIndexData* m_pIndexCache;
 
-    class CSLASolver* m_pFermionSolver;
+    class CSLASolver* m_pFermionSolver[_kMaxFieldCount];
 
     class CGaugeSmearing* m_pGaugeSmearing;
     class CGaugeFixing* m_pGaugeFixing;
@@ -92,7 +92,7 @@ public:
     class CField* GetPooledFieldById(BYTE byId);
 };
 
-inline class CSLASolver* appGetFermionSolver();
+inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);
 
 inline class CGaugeSmearing* appGetGaugeSmearing();
 

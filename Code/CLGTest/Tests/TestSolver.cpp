@@ -30,7 +30,7 @@ UINT TestSolver(CParameters& params)
     {
         ++uiError;
     }
-
+    
     CFieldFermionWilsonSquareSU3* pResult2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
     pResult2->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
@@ -97,7 +97,7 @@ UINT TestSolver(CParameters& params)
     {
         ++uiError;
     }
-
+    
     return uiError;
 }
 
@@ -112,6 +112,20 @@ __REGIST_TEST(TestSolver, Solver, TestSolverGCRODR);
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
 
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode);
+
+__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabD);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESD);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabDR);
+
+__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESDR);
 
 //=============================================================================
 // END OF FILE

@@ -15,15 +15,15 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 300
-    SaveStartIndex : 901
-    OmegaSep : 10
-    OmegaStart : 2
-    MaxOmega : 0.0702
+    EquvibStep : 55
+    SaveStartIndex : 1146
+    OmegaSep : 9
+    OmegaStart : 9
+    MaxOmega : 0.06318
     MinNt : 5
     MaxNt : 5
-    SavePrefix : NC537516_
-    Additive : 1
+    SavePrefix : NC5283161_
+    Additive : 0
 
     # 53551575Nt4 Omega60 
     # Polyakovs : [0.7631883645116788, 0.8118459888019867, 0.8038000156133291, 0.8085112089840242, 0.8035024063891989, 0.8058693619339026, 0.7961035941151434, 0.8667103476474274, 0.877848606871448, 0.9106615476053999, 0.9094629687651986, 0.9132674941654673, 0.956531256692272, 0.9811401816076729, 1.0099076140384722, 1.0339336795388183, 1.0520049963037232, 1.0782282810185038, 1.0779729132774476, 1.0932795492843526, 1.1149388806172058]
@@ -32,7 +32,7 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [0.4559988706578787675, 0.4458342538631707526, 0.4790143499539904804, 0.5374820632202741339, 0.5377869988606654906, 0.5848313053266844964, 0.6153772280451201440, 0.6751868584712489792, 0.7092947855400347140, 0.0, 0.0]
+    # Polyakovs : [0.3781243340623687349, 0.4166218543361954267, 0.4544966362838826790, 0.5317278155600311659, 0.5425285609865123915, 0.5981980182126539395, 0.6070117010755633678, 0.6610793751388700304, 0.7226716541192225020, 0.7524378661269010527, 0.7823103796405777287]
 
     Dim : 4
     Dir : 4
@@ -51,8 +51,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    # Nt4FileName : N5016_Nt4.con
-    # Nt4Polyakov : 0.48454420912248297
+    Nt5FileName : NC5283161_Rotate_Nt5_O9_1146.con
+    Nt5Polyakov : 0.68327963
 
     # 55150
     # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
@@ -81,9 +81,9 @@ JobThermal:
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
-        ## IntegratorType : CIntegratorForceGradient
+        ## IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 8
         NestedStep : 5
         Omelyan2Lambda : 0.38636665500756728
 
@@ -102,22 +102,37 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.161
         FieldId : 2
-        PoolNumber : 5
+        PoolNumber : 2
         Period : [0, 0, 1, -1]
         Naive : 1
         Exponential : 1
+        # EvenFieldId : 3
+
+    FermionField2:
+
+        FieldName : CFieldFermionWilsonSU3DREven
+        FieldInitialType : EFIT_Zero
+        Hopping : 0.161
+        FieldId : 3
+        PoolNumber : 5
+        Period : [0, 0, 1, -1]
 
     BoundaryFermionField1:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
+
+    BoundaryFermionField2:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 3
         
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.375
+        Beta : 5.283
         Omega : 0.0
 
     Action2:
@@ -127,11 +142,11 @@ JobThermal:
     Solver:
         SolverForFieldId : 2
 
-        ## SolverName : CSLASolverBiCGStab
+        # SolverName : CSLASolverBiCGStab
         ## Accuracy : 0.0000001
 
-        DiviationStep : 10
-        MaxStep : 100
+        # DiviationStep : 50
+        # MaxStep : 1
 
         SolverName : CSLASolverGMRES
         # double
@@ -149,6 +164,18 @@ JobThermal:
         RecalculateR : 5
         DeflateSpace : EEDT_SVD
 
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    Solver2:
+        SolverForFieldId : 3
+        SolverName : CSLASolverGMRES
+        # SolverName : CSLASolverBiCGStab
+        DiviationStep : 50
+        MaxStep : 1
+        # double
+        Accuracy : 0.00000001
+        MaxDim : 30
         Restart : 400
         AbsoluteAccuracy : 1
 
@@ -173,12 +200,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.375
-    OmegaRange : 0.02808
+    GaugeBate : 5.38
+    OmegaRange : 0.0585
     StartOmega : 0
-    EndOmega : 4
-    StartN : 201
-    EndN : 1200
+    EndOmega : 10
+    StartN : 301
+    EndN : 900
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
@@ -186,10 +213,12 @@ JobPolyakovDist:
     StochasticGaussian : 1
     CheckGaugeFixing : 0
 
-    # SavePrefix : D:/NotUsingCLGCon/Nx26_542162/540161Nt6/Nt6/NC540161_
-    # CSVSavePrefix : D:/NotUsingCLGCon/Nx26_542162/540161Nt6/Polyakov/NC540161_
-    SavePrefix : D:/NotUsingCLGCon/Nx22_551565/537516Nt5/Nt5/NC537516_
-    CSVSavePrefix : D:/NotUsingCLGCon/Nx22_551565/537516Nt5/Polyakov/NC537516_
+    # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
+    # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
+    # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
+    # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
+    SavePrefix : H:\NotUsingCLGConfig\Extrapolation\538161Nt6\Nt6\NC538161_
+    CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\538161Nt6\Polyakov\NC538161_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -200,7 +229,7 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [26, 26, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -224,7 +253,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.161
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -306,11 +335,11 @@ JobGaugeFixing:
 
     Nt : 6
     OmegaStart : 1
-    OmegaEnd : 7
-    IndexStart : 264
-    IndexEnd : 500
-    LoadPrefix : D:/NotUsingCLGCon/Nx26_542162/542162Nt6/NC542162_
-    SavePrefix : GFN542162_
+    OmegaEnd : 3
+    IndexStart : 301
+    IndexEnd : 1200
+    LoadPrefix : ./BeforeGF/NC535161_
+    SavePrefix : ./GF/GFN535161_
     UseLogADefinition : 1
 
     Dim : 4
@@ -339,7 +368,7 @@ JobGaugeFixing:
 
         Name : CGaugeFixingCoulombCornell
         Alpha : 0.1
-        MaxIterate : 100000
+        MaxIterate : 150000
         Accuracy : 0.000000000001
         FFT : 0
 

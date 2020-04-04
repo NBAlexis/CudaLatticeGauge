@@ -30,7 +30,7 @@
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
     <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
-    <ClCompile Include="Tests\TestOperators.cpp" />
+    <ClCompile Include="Tests\TestCommon.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestRotation.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
@@ -43,6 +43,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Bin\Debug\TestSuit.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Boundary.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Common.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_FermionUpdator.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_FileIO.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_GaugeFixing.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Random.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Solver.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Updator.yaml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
