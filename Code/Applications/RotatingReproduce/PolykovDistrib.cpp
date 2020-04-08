@@ -273,6 +273,7 @@ INT MeasurePolyakovDist(CParameters& params)
                         pF1->FixBoundary();
                         pF1->CopyTo(pF2);
                         pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1->FixBoundary();
 
                         pCC->OnConfigurationAcceptedZ4(
                             appGetLattice()->m_pGaugeField,

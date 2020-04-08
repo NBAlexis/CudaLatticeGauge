@@ -94,8 +94,8 @@ _kernelChiralCondensateMeasureDist(
 )
 {
     UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    INT uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    INT uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
+    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
+    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
     UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
         + (sCenter.y - uiY) * (sCenter.y - uiY);
 
@@ -108,10 +108,10 @@ _kernelChiralCondensateMeasureDist(
     {
         atomicAdd(&counter[uiC], 1);
         atomicAdd(&chiral[uiC].x, chiralXY[uiXY].x);
-        atomicAdd(&pion[uiC].x, pionXY[uiXY].x);
-        atomicAdd(&rhon[uiC].x, rhonXY[uiXY].x);
         atomicAdd(&chiral[uiC].y, chiralXY[uiXY].y);
+        atomicAdd(&pion[uiC].x, pionXY[uiXY].x);
         atomicAdd(&pion[uiC].y, pionXY[uiXY].y);
+        atomicAdd(&rhon[uiC].x, rhonXY[uiXY].x);
         atomicAdd(&rhon[uiC].y, rhonXY[uiXY].y);
     }
 }
@@ -225,8 +225,8 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
     }
 
     const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
-    const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
-    const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);   
+    const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
+    const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
 
     
 #pragma region Dot
@@ -272,7 +272,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
         {
             dim3 block2(_HC_DecompX, 1, 1);
             dim3 threads2(_HC_DecompLx, 1, 1);
-            dim3 block3(m_uiMaxR + 1, 1, 1);
+            dim3 block3(1, 1, 1);
             dim3 threads3(m_uiMaxR + 1, 1, 1);
 
             _kernelChiralCondensateInitialDist << <block3, threads3 >> >(m_pDistributionR, 
@@ -369,7 +369,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
             m_lstCondensateDensity.AddItem(cvalue);
             if (m_bShowResult)
             {
-                appDetailed(_T("(%d,%d)=%1.6f %s %1.6f I   "), i, CCommonData::m_sCenter.y,
+                appDetailed(_T("(%d,%d)=%1.12f %s %1.12f I   "), i, CCommonData::m_sCenter.y,
                     cvalue.x,
                     cvalue.y < F(0.0) ? _T("") : _T("+"),
                     appAbs(cvalue.y));

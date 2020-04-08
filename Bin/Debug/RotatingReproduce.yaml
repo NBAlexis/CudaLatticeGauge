@@ -205,7 +205,7 @@ JobPolyakovDist:
     StartOmega : 0
     EndOmega : 10
     StartN : 201
-    EndN : 220
+    EndN : 300
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Chiral
     FermionMomentum : 1
@@ -270,29 +270,29 @@ JobPolyakovDist:
     Solver:
         SolverForFieldId : 2
 
-        ## SolverName : CSLASolverBiCGStab
+        SolverName : CSLASolverBiCGStab
         ## Accuracy : 0.0000001
 
-        DiviationStep : 10
-        MaxStep : 100
+        DiviationStep : 50
+        MaxStep : 1
 
-        SolverName : CSLASolverGMRES
+        # SolverName : CSLASolverGMRES
         # double
         Accuracy : 0.0000000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
-        MaxDim : 20
+        # MaxDim : 20
 
         # SolverName : CSLASolverGCRODR
         # Accuracy : 0.000001
-        MDim : 26
-        KDim : 5
+        # MDim : 26
+        # KDim : 5
 
-        RecalculateR : 2
-        DeflateSpace : EEDT_SVD
+        # RecalculateR : 2
+        # DeflateSpace : EEDT_SVD
 
-        Restart : 200
+        Restart : 500
         AbsoluteAccuracy : 1
 
     Measure1:
@@ -338,7 +338,7 @@ JobGaugeFixing:
     Nt : 6
     OmegaStart : 2
     OmegaEnd : 3
-    IndexStart : 555
+    IndexStart : 617
     IndexEnd : 1200
     LoadPrefix : ./BeforeGF/NC535161_
     SavePrefix : ./GF/GFN535161_

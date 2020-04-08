@@ -19,23 +19,15 @@ __BEGIN_NAMESPACE
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialZero_XYPlane(Real* pBuffer)
 {
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        pBuffer[sSite4.x * _DC_Ly + sSite4.y] = F(0.0);
-    }
+    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    pBuffer[_ixy] = F(0.0);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialZero_XYPlaneC(CLGComplex* pBuffer)
 {
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        pBuffer[sSite4.x * _DC_Ly + sSite4.y] = _zeroc;
-    }
+    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    pBuffer[_ixy] = _zeroc;
 }
 
 /**
@@ -44,26 +36,16 @@ _kernelInitialZero_XYPlaneC(CLGComplex* pBuffer)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAverageOverZT_XYPlane(Real* pBuffer)
 {
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        const UINT uiIdx = sSite4.x * _DC_Ly + sSite4.y;
-        pBuffer[uiIdx] = pBuffer[uiIdx] / (_DC_Lz * _DC_Lt);
-    }
+    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    pBuffer[_ixy] = pBuffer[_ixy] / (_DC_Lz * _DC_Lt);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAverageOverZT_XYPlaneC(CLGComplex* pBuffer)
 {
-    intokernalOnlyInt4;
-
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        const UINT uiIdx = sSite4.x * _DC_Ly + sSite4.y;
-        pBuffer[uiIdx].x = pBuffer[uiIdx].x / (_DC_Lz * _DC_Lt);
-        pBuffer[uiIdx].y = pBuffer[uiIdx].y / (_DC_Lz * _DC_Lt);
-    }
+    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    pBuffer[_ixy].x = pBuffer[_ixy].x / (_DC_Lz * _DC_Lt);
+    pBuffer[_ixy].y = pBuffer[_ixy].y / (_DC_Lz * _DC_Lt);
 }
 
 
@@ -462,7 +444,8 @@ void CMeasure::ReportDistributionXY_C(UINT uiConfig, const TArray<CLGComplex>& a
 */
 void CMeasure::_AverageXYPlane(Real* pDeviceRes)
 {
-    preparethread;
+    const dim3 block(_HC_DecompX, 1, 1);
+    const dim3 threads(_HC_DecompLx, 1, 1);
     _kernelAverageOverZT_XYPlane << <block, threads >> > (pDeviceRes);
 }
 
@@ -471,7 +454,8 @@ void CMeasure::_AverageXYPlane(Real* pDeviceRes)
 */
 void CMeasure::_ZeroXYPlane(Real* pDeviceRes)
 {
-    preparethread;
+    const dim3 block(_HC_DecompX, 1, 1);
+    const dim3 threads(_HC_DecompLx, 1, 1);
     _kernelInitialZero_XYPlane << <block, threads >> > (pDeviceRes);
 }
 
@@ -480,14 +464,16 @@ void CMeasure::_ZeroXYPlane(Real* pDeviceRes)
 */
 void CMeasure::_AverageXYPlaneC(CLGComplex* pDeviceRes)
 {
-    preparethread;
+    const dim3 block(_HC_DecompX, 1, 1);
+    const dim3 threads(_HC_DecompLx, 1, 1);
     _kernelAverageOverZT_XYPlaneC << <block, threads >> > (pDeviceRes);
 }
 
 void CMeasure::_ZeroXYPlaneC(CLGComplex* pDeviceRes)
 {
-    preparethread;
-    _kernelAverageOverZT_XYPlaneC << <block, threads >> > (pDeviceRes);
+    const dim3 block(_HC_DecompX, 1, 1); 
+    const dim3 threads(_HC_DecompLx, 1, 1);
+    _kernelInitialZero_XYPlaneC << <block, threads >> > (pDeviceRes);
 }
 
 void CMeasure::XYDataToRdistri_R(
@@ -531,7 +517,7 @@ void CMeasure::XYDataToRdistri_C(
 {
     const dim3 block2(_HC_DecompX, 1, 1);
     const dim3 threads2(_HC_DecompLx, 1, 1);
-    const dim3 block3(uiMaxR + 1, 1, 1);
+    const dim3 block3(1, 1, 1);
     const dim3 threads3(uiMaxR + 1, 1, 1);
 
     _kernelInitialDist << <block3, threads3 >> > (
