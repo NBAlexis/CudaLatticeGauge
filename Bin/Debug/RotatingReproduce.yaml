@@ -17,8 +17,8 @@ JobThermal:
     EquvibSkip : 0
     EquvibStep : 55
     SaveStartIndex : 1146
-    OmegaSep : 9
-    OmegaStart : 9
+    OmegaSep : 10
+    OmegaStart : 0
     MaxOmega : 0.06318
     MinNt : 5
     MaxNt : 5
@@ -108,26 +108,11 @@ JobThermal:
         Period : [0, 0, 1, -1]
         Naive : 1
         Exponential : 1
-        # EvenFieldId : 3
-
-    FermionField2:
-
-        FieldName : CFieldFermionWilsonSU3DREven
-        FieldInitialType : EFIT_Zero
-        Hopping : 0.161
-        FieldId : 3
-        PoolNumber : 5
-        Period : [0, 0, 1, -1]
 
     BoundaryFermionField1:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
         FieldId : 2
-
-    BoundaryFermionField2:
-
-        FieldName : CFieldBoundaryWilsonSquareSU3
-        FieldId : 3
         
     Action1:
    
@@ -142,41 +127,23 @@ JobThermal:
     Solver:
         SolverForFieldId : 2
 
-        # SolverName : CSLASolverBiCGStab
-        ## Accuracy : 0.0000001
-
-        # DiviationStep : 50
-        # MaxStep : 1
-
-        SolverName : CSLASolverGMRES
-        # double
+        SolverName : CSLASolverBiCGStab
         Accuracy : 0.00000001
-        # float
-        # Accuracy : 0.000001
-        # MaxDim = 15 for 5.0(or 5.02) and 0.17
-        MaxDim : 20
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        # SolverName : CSLASolverGMRES
+        # MaxDim : 20
 
         # SolverName : CSLASolverGCRODR
         # Accuracy : 0.000001
-        MDim : 26
-        KDim : 5
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
 
-        RecalculateR : 5
-        DeflateSpace : EEDT_SVD
-
-        Restart : 400
-        AbsoluteAccuracy : 1
-
-    Solver2:
-        SolverForFieldId : 3
-        SolverName : CSLASolverGMRES
-        # SolverName : CSLASolverBiCGStab
-        DiviationStep : 50
-        MaxStep : 1
-        # double
-        Accuracy : 0.00000001
-        MaxDim : 30
-        Restart : 400
+        Restart : 500
         AbsoluteAccuracy : 1
 
     Measure1:
