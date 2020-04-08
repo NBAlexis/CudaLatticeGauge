@@ -8,6 +8,16 @@
 //
 // We assume lx * ly < max-thread
 //
+// JG               : r x (E x B)
+// JS               : E x Aphys
+// JGChen           : E (r x Dpure) Aphys, gauge inv. version
+// JGChenApprox     : E (r x Dpure) Aphys, use Dpure a = partial - i g [Apure, a],
+//              with i a Dpure A = (A_nu (n) - A_nu (n-mu)) + iApure _mu A _nu - i A _nu Apure _mu
+// JGChenApprox2    : E (r x Dpure) Aphys, use Dpure a = partial - i g [Apure, a]
+//              with i a D A = (A_nu (n+mu) - A_nu (n-mu))/2 + iApure _mu A _nu - i A _nu Apure _mu
+//
+//  Both JGChenApprox and JGChenApprox2 are not gauge inv.
+//
 // REVISION:
 //  [05/21/2019 nbale]
 //=============================================================================

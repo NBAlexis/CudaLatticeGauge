@@ -168,7 +168,7 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu2(
     BYTE byMu,
     BYTE byNu)
 {
-    //i a D A = (A_nu (n) - A_nu (n-mu)) + iApure _mu A _nu - i A _nu Apure _mu
+    //i a D A = (A_nu (n+mu) - A_nu (n-mu))/2 + iApure _mu A _nu - i A _nu Apure _mu
     const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
     const UINT uiSiteBig_p_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + _DC_Dir + byMu];
 

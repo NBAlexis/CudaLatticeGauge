@@ -1,0 +1,95 @@
+\subsection{\label{StochasticMethods}\index{stochastic methods}Stochastic Methods}
+
+The stochastic methods is based on
+\begin{equation}
+\begin{split}
+&\frac{1}{K}\sum _k \phi ^{k*} _{c,s}(x)\phi ^k_{c',s'} (y) \approx \delta _{xy}\delta _{cc'}\delta _{ss'}
+\end{split}
+\end{equation}
+where $\phi$ is a Gaussian distributed pseud-fermion, or $\mathbb{Z}_4$ random distributed pseud-fermion (the elements are $1,-1,i,-i$ average distributed).
+
+Therefor, for any matrix,
+\begin{equation}
+\begin{split}
+&{\rm tr} \left[ M\right] \approx \frac{1}{K}\sum _k \phi ^{k\dagger} M \psi ^k
+\end{split}
+\end{equation}
+
+This is useful to measure some objects easily.
+
+\subsubsection{\label{StochasticMethodsCondensate}For condensations}
+
+For example, to measure $\langle \bar{\psi} O \psi \rangle$, where $\Gamma =1$, $\gamma _5$ or $\gamma _i$ etc.
+
+For Grassman field, and for $S_F = -\bar{\psi } D \psi$
+\begin{equation}
+\begin{split}
+&\langle  \psi _i \bar{\psi} _j\rangle= (D ^{-1})_{ji}
+\end{split}
+\end{equation}
+which means
+\begin{equation}
+\begin{split}
+&\langle  \psi _{c',s'}(n)\bar{\psi} _{c,s}(m) \rangle= (D ^{-1})_{c'c,s's}(n|m)
+\end{split}
+\end{equation}
+Then consider $\langle \bar{\psi} O _{cs,c's'} \psi \rangle$ which is
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi} O_{cs,c's'} \psi \rangle = \langle \sum _{cs,c's',mn} \bar{\psi}_{cs}(m) O _{cs,c's'}(m|n) \psi _{c's'}(n)\rangle = \sum _{cs,c's',mn} \langle \bar{\psi} _{cs}(m)  \psi _{c's'}(n)\rangle O _{cs,c's'}(m|n)\\
+&=\textcolor[rgb]{1,0,0}{-}\sum _{cs,c's',mn} \langle   \psi _{c's'}(n) \bar{\psi} _{cs}(m)\rangle O _{cs,c's'}(m|n)=-\sum _{cs,c's',mn} (D ^{-1})_{c'c,s's}(n|m) O _{cs,c's'}(m|n)\\
+\end{split}
+\end{equation}
+The sum over $m$ is matrix multiply, and sum over $n$ is a trace, so
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi} O_{cs,c's'} \psi \rangle = -{\rm tr}_{cs,m}\left[ (D ^{-1})_{c'c,s's}(n|m) O _{cs,c's'}(m|n)\right]\\
+\end{split}
+\end{equation}
+
+Note that, put $D^{-1}$ right most is more convenient to calculate, use ${\rm tr}[ABC]={\rm tr}[BCA]$, it is
+\begin{equation}
+\begin{split}
+&\langle \bar{\psi} O_{cs,c's'} \psi \rangle = -{\rm tr}_{cs,m}\left[ O _{cs,c's'}(m|n) (D ^{-1})_{c'c,s's}(n|m)\right]\\
+\end{split}
+\end{equation}
+
+For any operator, one can always calculate $D^{-1}\phi ^k$ first.
+
+\subsubsection{\label{StochasticMethodsDensity}For densities}
+
+Similarly, the observables defined as $O(x)=\langle \bar{\psi}(x) O \psi(x) \rangle$ can be calculated, the discretized version is
+\begin{equation}
+\begin{split}
+&O(n)=\langle \sum _{cs}\bar{\psi}_{cs}(n) \left(O\psi \right)_{cs}(n) \rangle = \langle  \sum _{cs}\bar{\psi}_{cs}(n) \left(\sum _{c's',m} O_{cs,c's'} (n|m)\psi _{c's'}(m)\right) \rangle \\
+\end{split}
+\end{equation}
+All the same as above, it becomes
+\begin{equation}
+\begin{split}
+&O(n)=-\sum _{cs,c's',m} (D ^{-1})_{c's',cs}(m|n) O _{cs,c's'}(n|m)\\
+\end{split}
+\end{equation}
+
+On the other hand, the $n$-component of element product of two vectors $\frac{1}{K}\sum _k (\phi ^{\dagger},  OD^{-1}\phi)$ (denoted as $X(n)$) is
+\begin{equation}
+\begin{split}
+&X(n)=\frac{1}{K}\sum _k \sum _{cs}\phi ^*_{cs}(n) \sum _{c_as_a,c_bs_b,a,b}O _{cs,c_as_a}(n|a)(D ^{-1})_{c_as_a,c_bs_b}(a|b) \phi _{c_bs_b}(b)\\
+&\approx \sum _{cs}\delta _{nb}\delta _{cc_b}\delta _{ss_b} \sum _{c_as_a,c_bs_b,a,b} O _{cs,c_as_a}(n|a)(D ^{-1})_{c_as_a,c_bs_b}(a|b) \\
+&= \sum _{cs} \sum _{c_as_a,a}O _{cs,c_as_a}(n|a)(D ^{-1})_{c_as_a,cs}(a|n) \\
+\end{split}
+\end{equation}
+Do the variable rename $a\to m$, $c_a\to c'$, $s_a\to s'$, it is
+\begin{equation}
+\begin{split}
+&X(n)\approx \sum _{cs} \sum _{c's',m}O _{cs,c's'}(n|m)(D ^{-1})_{c'c,s's}(m|n) =\sum _{cs, c's',m}(D ^{-1})_{c's',cs}(m|n) O _{cs,c's'}(n|m)\\
+&O(n)\approx -X(n)\\
+\end{split}
+\end{equation}
+
+Note, the $\sum _{cs}$ can be written as ${\rm tr}_{cs}$, and the sum $\sum _{c's',m}$ is just matrix product, so it is the trace of $n$-component of element product of two vectors $\frac{1}{K}\sum _k {\rm tr}_{cs}\left[(\phi ^{\dagger},  OD^{-1}\phi)\right]$.
+
+\textbf{It is in fact the median result to calculate the condensation.}
+
+
+

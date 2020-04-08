@@ -993,7 +993,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
     CFieldFermionWilsonSquareSU3* pDPhiWilson = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pDPhi);
     //if (!pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3))
 
-    if (FALSE)//m_byEvenFieldId > 0)
+    if (m_byEvenFieldId > 0)
     {
         CopyTo(pDDaggerPhiWilson);
         pDDaggerPhiWilson->InverseDDdagger(pGaugeSU3);

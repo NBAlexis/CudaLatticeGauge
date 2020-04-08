@@ -982,10 +982,10 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         if (uiInnerPointsJLInner > 0)
         {
             fAverageJLInner = fAverageJLInner / uiInnerPointsJLInner;
-            fAverageJSInner = fAverageJSInner / uiInnerPointsJLAll;
-            fAverageJLPureInner = fAverageJLPureInner / uiInnerPointsJLAll;
-            fAverageJLJMInner = fAverageJLJMInner / uiInnerPointsJLAll;
-            fAverageJPotInner = fAverageJPotInner / uiInnerPointsJLAll;
+            fAverageJSInner = fAverageJSInner / uiInnerPointsJLInner;
+            fAverageJLPureInner = fAverageJLPureInner / uiInnerPointsJLInner;
+            fAverageJLJMInner = fAverageJLJMInner / uiInnerPointsJLInner;
+            fAverageJPotInner = fAverageJPotInner / uiInnerPointsJLInner;
         }
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLAll.Num()));
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLInner.Num()));

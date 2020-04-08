@@ -2,7 +2,14 @@
 // FILENAME : CMeasureAMomentumStochastic.h
 // 
 // DESCRIPTION:
-// NOTE: 
+// NOTE:
+//
+// JL :     Ji decomposition orbit angular momentum, (1/i) psidagger r x D psi
+// JS :     Ji decomposition spin angular momentum, (1/2) psidagger Sigma psi
+// JLPure : Chen decomposition orbit angular momentum, (1/i) psidagger r x Dpure psi
+// JLJM :   Jaffe¨CManohar decomposition orbit angular momentum, (1/i) psidagger r x partial psi, not gauge inv.
+//          at Coulomb gauge, JLJM = JLPure
+// JPot :   Wak decomposition, Lpot g x (psidagger r x Aphys psi), Note in our definition, g A -> A.
 //
 // REVISION:
 //  [07/10/2019 nbale]

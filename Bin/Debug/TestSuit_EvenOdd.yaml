@@ -281,7 +281,7 @@ TestEOSolverGMRESDR:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 5]
+    LatticeLength : [6, 6, 6, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1

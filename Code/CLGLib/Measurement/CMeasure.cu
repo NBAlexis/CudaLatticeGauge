@@ -119,16 +119,16 @@ _kernelXY_To_R_R(
     UINT* pCount)
 {
     UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
+    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
+    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
     UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
              + (sCenter.y - uiY) * (sCenter.y - uiY);
 
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;
     sSite4.w = sCenter.w;
-    sSite4.x = uiX;
-    sSite4.y = uiY;
+    sSite4.x = static_cast<SBYTE>(uiX);
+    sSite4.y = static_cast<SBYTE>(uiY);
     if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
     {
         if (NULL != pCount)

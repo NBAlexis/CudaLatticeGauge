@@ -135,6 +135,9 @@ void AppendStringFile(const CCString& sFileName, const CCString& sContent)
 
 INT MeasurePolyakovDist(CParameters& params)
 {
+
+#pragma region read parameters
+
     appSetupLog(params);
 
     INT iVaule = 0;
@@ -165,6 +168,10 @@ INT MeasurePolyakovDist(CParameters& params)
     params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
     UBOOL bCheckGaugeFixing = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("UseZ4"), iVaule);
+    UBOOL bZ4 = 0 != iVaule;
+
     CCString sValue = _T("EDJ_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
     EDistributionJob eJob = __STRING_TO_ENUM(EDistributionJob, sValue);
@@ -189,6 +196,8 @@ INT MeasurePolyakovDist(CParameters& params)
         appCrucial(_T("Initial Failed!\n"));
         return 1;
     }
+
+#pragma endregion
 
     UINT uiMaxL = (_HC_Lx + 1) / 2 - 1;
     uiMaxL = uiMaxL * uiMaxL;
@@ -215,7 +224,8 @@ INT MeasurePolyakovDist(CParameters& params)
     CFieldFermionWilsonSquareSU3* pF2 = NULL;
 
     if (EDJ_ChiralAndFermionMomentum == eJob
-     || (EDJ_AngularMomentum == eJob && bJF))
+     || (EDJ_AngularMomentum == eJob && bJF)
+     || EDJ_Chiral == eJob)
     {
         pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
         pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -231,6 +241,8 @@ INT MeasurePolyakovDist(CParameters& params)
         pJF->Reset();
         pCC->SetFieldCount(iFieldCount);
         pJF->SetFieldCount(iFieldCount);
+
+#pragma region Measure
 
         appGeneral(_T("(*"));
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
@@ -248,7 +260,28 @@ INT MeasurePolyakovDist(CParameters& params)
                 break;
                 case EDJ_Chiral:
                 {
-                    pCC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    for (UINT i = 0; i < iFieldCount; ++i)
+                    {
+                        if (bZ4)
+                        {
+                            pF1->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1->InitialField(EFIT_RandomGaussian);
+                        }
+                        pF1->FixBoundary();
+                        pF1->CopyTo(pF2);
+                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+
+                        pCC->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2,
+                            pF1,
+                            0 == i,
+                            iFieldCount == i + 1);
+                    }
                 }
                 break;
                 case EDJ_AngularMomentum:
@@ -267,7 +300,14 @@ INT MeasurePolyakovDist(CParameters& params)
                     {
                         for (UINT i = 0; i < iFieldCount; ++i)
                         {
-                            pF1->InitialField(EFIT_RandomZ4);
+                            if (bZ4)
+                            {
+                                pF1->InitialField(EFIT_RandomZ4);
+                            }
+                            else
+                            {
+                                pF1->InitialField(EFIT_RandomGaussian);
+                            }
                             pF1->FixBoundary();
                             pF1->CopyTo(pF2);
                             pF1->InverseD(appGetLattice()->m_pGaugeField);
@@ -287,7 +327,14 @@ INT MeasurePolyakovDist(CParameters& params)
                 {
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
-                        pF1->InitialField(EFIT_RandomZ4);
+                        if (bZ4)
+                        {
+                            pF1->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1->InitialField(EFIT_RandomGaussian);
+                        }
                         pF1->FixBoundary();
                         pF1->CopyTo(pF2);
                         pF1->InverseD(appGetLattice()->m_pGaugeField);
@@ -312,6 +359,8 @@ INT MeasurePolyakovDist(CParameters& params)
             
         }
         appGeneral(_T("\n*)\n"));
+
+#pragma endregion
 
         switch (eJob)
         {
@@ -356,52 +405,20 @@ INT MeasurePolyakovDist(CParameters& params)
             break;
             case EDJ_Chiral:
             {
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstChiral.Num());
-
+                _CLG_EXPORT_CHIRAL(pCC, Chiral);
+                _CLG_EXPORT_CHIRAL(pCC, Pion);
+                _CLG_EXPORT_CHIRAL(pCC, Rhon);
                 if (uiOmega == iStartOmega)
                 {
-                    appGeneral(_T("cr={"));
-
+                    TArray<Real> lstRadius;
                     for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pCC->m_lstR[i])), (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                        if (pCC->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
-                        }
+                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pCC->m_lstR[i])));
                     }
-
-                    appGeneral(_T("};\n"));
+                    CCString sRadiousFile;
+                    sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
+                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
                 }
-                else
-                {
-                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-                    {
-                        if (pCC->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
-                        }
-                    }
-                }
-
-                appGeneral(_T("c%d={\n"), uiOmega);
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pCC->m_lstChiral[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-
-                appGeneral(_T("\n};\n"));
             }
             break;
             case EDJ_AngularMomentum:
@@ -418,6 +435,18 @@ INT MeasurePolyakovDist(CParameters& params)
                     _CLG_EXPORT_ANGULAR(pJF, JLPure);
                     _CLG_EXPORT_ANGULAR(pJF, JLJM);
                     _CLG_EXPORT_ANGULAR(pJF, JPot);
+                }
+
+                if (uiOmega == iStartOmega)
+                {
+                    TArray<Real> lstRadius;
+                    for (INT i = 0; i < pJG->m_lstR.Num(); ++i)
+                    {
+                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pJG->m_lstR[i])));
+                    }
+                    CCString sRadiousFile;
+                    sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
+                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
                 }
             }
             break;
@@ -551,80 +580,7 @@ INT MeasurePolyakovDist(CParameters& params)
         break;
         case EDJ_Chiral:
         {
-            appGeneral(_T("\nc0all={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("c%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("};\n"));
-
-            appGeneral(_T("\nc0allmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[c%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\nc0allchi={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[c%d*c%d] - Mean[c%d]*Mean[c%d]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n\n"));
-
-#pragma region r times omega
-
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("\ncrw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-                }
-            }
-
-            appGeneral(_T("\ncrwlist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[crw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            appGeneral(_T("\ncrwchilist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[crw%d*crw%d] - Mean[crw%d]*Mean[crw%d]]}"),
-                        (0 == i ? _T("\n") : _T(",")),
-                        _hostsqrt(i),
-                        i, i, i, i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-#pragma endregion
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[c0allmean][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[c0allchi][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
+            //nothing to do
         }
         break;
         case EDJ_AngularMomentum:

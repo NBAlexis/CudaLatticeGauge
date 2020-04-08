@@ -173,6 +173,7 @@ public:
 
         checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
         checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
+        
         //checkCudaErrors(cudaFree(m_pIndexBuffer));
 
         for (UINT i = 0; i < _kMaxFieldCount; ++i)

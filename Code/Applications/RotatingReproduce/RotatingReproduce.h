@@ -50,7 +50,30 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 } \
 WriteStringFile(sFileNameWrite##lstName, ExportRealArray2(lstName##OverR)); \
 WriteStringFile(sFileNameWrite##lstName##In, ExportRealArray(lstName##In)); \
-WriteStringFile(sFileNameWrite##lstName##All, ExportRealArray(lstName##All)); 
+WriteStringFile(sFileNameWrite##lstName##All, ExportRealArray(lstName##All));
+
+
+#define _CLG_EXPORT_CHIRAL(measureName, lstName) \
+CCString sFileNameWrite##lstName = _T("%s_condensate"); \
+CCString sFileNameWrite##lstName##All = _T("%s_condensate"); \
+sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
+sFileNameWrite##lstName##All = sFileNameWrite##lstName##All + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
+sFileNameWrite##lstName.Format(sFileNameWrite##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+sFileNameWrite##lstName##All.Format(sFileNameWrite##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+TArray<TArray<CLGComplex>> lstName##OverR; \
+TArray<CLGComplex> lstName##All; \
+for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
+{ \
+    TArray<CLGComplex> thisConfiguration; \
+    for (INT i = 0; i < measureName->m_lstR.Num(); ++i) \
+    { \
+        thisConfiguration.AddItem(measureName->m_lst##lstName[j * measureName->m_lstR.Num() + i]); \
+    } \
+    lstName##OverR.AddItem(thisConfiguration); \
+    lstName##All.AddItem(measureName->m_lst##lstName##All[j]); \
+} \
+WriteStringFile(sFileNameWrite##lstName, ExportComplexArray2(lstName##OverR)); \
+WriteStringFile(sFileNameWrite##lstName##All, ExportComplexArray(lstName##All)); 
 
 
 //=============================================================================

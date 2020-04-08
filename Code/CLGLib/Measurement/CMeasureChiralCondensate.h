@@ -68,13 +68,13 @@ protected:
     CLGComplex m_cTmpSumRhon;
 
     UINT* m_pDistributionR;
-    Real* m_pDistributionChiral;
-    Real* m_pDistributionPion;
-    Real* m_pDistributionRhon;
+    CLGComplex* m_pDistributionChiral;
+    CLGComplex* m_pDistributionPion;
+    CLGComplex* m_pDistributionRhon;
     UINT* m_pHostDistributionR;
-    Real* m_pHostDistributionChiral;
-    Real* m_pHostDistributionPion;
-    Real* m_pHostDistributionRhon;
+    CLGComplex* m_pHostDistributionChiral;
+    CLGComplex* m_pHostDistributionPion;
+    CLGComplex* m_pHostDistributionRhon;
 
     UINT m_uiMaxR;
     UBOOL m_bMeasureDistribution;
@@ -92,9 +92,9 @@ public:
 
     //c(R)
     TArray<UINT> m_lstR;
-    TArray<Real> m_lstChiral;
-    TArray<Real> m_lstPion;
-    TArray<Real> m_lstRhon;
+    TArray<CLGComplex> m_lstChiral;
+    TArray<CLGComplex> m_lstPion;
+    TArray<CLGComplex> m_lstRhon;
 };
 
 __END_NAMESPACE

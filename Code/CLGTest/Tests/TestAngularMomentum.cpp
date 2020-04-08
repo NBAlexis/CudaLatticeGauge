@@ -218,38 +218,52 @@ UINT TestAngularMomentum(CParameters& sParam)
         ++uiError;
     }
 
+    if (appAbs(fJFLPure1In - fJFL1In - fJFPot1In) > F(0.000001))
+    {
+        ++uiError;
+    }
+
     appGeneral(_T("Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1, fJG2, appAbs(fJG1 - fJG2));
     appGeneral(_T("Wa Decompose JGS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGS1, fJGS2, appAbs(fJGS1 - fJGS2));
     appGeneral(_T("Chen Decompose JGChen: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChen1, fJGChen2, appAbs(fJGChen1 - fJGChen2));
-    appGeneral(_T("Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChenApprox1, fJGChenApprox2, appAbs(fJGChenApprox1 - fJGChenApprox2));
-    appGeneral(_T("Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChenApprox21, fJGChenApprox22, appAbs(fJGChenApprox21 - fJGChenApprox22));
+    appGeneral(_T("Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox1, fJGChenApprox2, appAbs(fJGChenApprox1 - fJGChenApprox2));
+    appGeneral(_T("Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox21, fJGChenApprox22, appAbs(fJGChenApprox21 - fJGChenApprox22));
 
     appGeneral(_T("Ji Decompose JFL: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFL1, fJFL2, appAbs(fJFL1 - fJFL2));
     appGeneral(_T("Ji Decompose JFS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFS1, fJFS2, appAbs(fJFS1 - fJFS2));
     appGeneral(_T("Chen Decompose JFPure: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLPure1, fJFLPure2, appAbs(fJFLPure1 - fJFLPure2));
-    appGeneral(_T("Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLJM1, fJFLJM2, appAbs(fJFLJM1 - fJFLJM2));
+    appGeneral(_T("Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJFLJM1, fJFLJM2, appAbs(fJFLJM1 - fJFLJM2));
     appGeneral(_T("Chen Decompose JFPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFPot1, fJFPot2, appAbs(fJFPot1 - fJFPot2));
 
-    appGeneral(_T("JFPure - JFL - JFPot = %2.12f\n"), fJFLPure1 - fJFL1 - fJFPot1);
+    //In Wak Decomp, Lq + LG = (JGChen + JFPot)(LG) + JLPure(Lq)
+    //In Chen Decomp, Lq + LG = JGChen(LG) + JFL(Lq)
+    //So one expect JLPure + JFPot = JFL, this is Wak = Chen Decomp
+    //For Ji, Chen, Wak decomp, Sq (JFS) is the same
+    //So, JFL + JG = Chen:  JFPure (Lq) + JGS + JGChen = Wak: JFL(Lq) + JGS + JGChen + JFPot
+    //So, JG = JGS + JGChen + JFPot
+    appGeneral(_T("JFPure - JFL - JFPot = %2.12f (JFPure:%2.12f, JFL:%2.12f, JFPot:%2.12f)\n"), fJFLPure1 - fJFL1 - fJFPot1, fJFLPure1, fJFL1, fJFPot1);
     appGeneral(_T("JG, JGS+JGChen-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 + fJGChen1 - fJFPot1);
-    appGeneral(_T("JG, JGS-JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 - fJFPot1);
-    appGeneral(_T("JG, JGS-JGChenApprox+JFLJM-JFL, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 + fJFLJM1 - fJFL1);
+    appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 - fJFPot1);
+    appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 + fJFLJM1 - fJFL1);
     appGeneral(_T("JGChen 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChen1, fJGChen2, fJGChen3, fJGChen4, fJGChen5);
     appGeneral(_T("JGChen Approx 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChenApprox1, fJGChenApprox2, fJGChenApprox3, fJGChenApprox4, fJGChenApprox5);
 
     appGeneral(_T("Inner Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1In, fJG2In, appAbs(fJG1In - fJG2In));
     appGeneral(_T("Inner Wa Decompose JGS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGS1In, fJGS2In, appAbs(fJGS1In - fJGS2In));
     appGeneral(_T("Inner Chen Decompose JGChen: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChen1In, fJGChen2In, appAbs(fJGChen1In - fJGChen2In));
-    appGeneral(_T("Inner Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChenApprox1In, fJGChenApprox2In, appAbs(fJGChenApprox1In - fJGChenApprox2In));
-    appGeneral(_T("Inner Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChenApprox21In, fJGChenApprox22In, appAbs(fJGChenApprox21In - fJGChenApprox22In));
+    appGeneral(_T("Inner Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox1In, fJGChenApprox2In, appAbs(fJGChenApprox1In - fJGChenApprox2In));
+    appGeneral(_T("Inner Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox21In, fJGChenApprox22In, appAbs(fJGChenApprox21In - fJGChenApprox22In));
 
     appGeneral(_T("Inner Ji Decompose JFL: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFL1In, fJFL2In, appAbs(fJFL1In - fJFL2In));
     appGeneral(_T("Inner Ji Decompose JFS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFS1In, fJFS2In, appAbs(fJFS1In - fJFS2In));
     appGeneral(_T("Inner Chen Decompose JFPure: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLPure1In, fJFLPure2In, appAbs(fJFLPure1In - fJFLPure2In));
-    appGeneral(_T("Inner Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFLJM1In, fJFLJM2In, appAbs(fJFLJM1In - fJFLJM2In));
+    appGeneral(_T("Inner Chen Decompose JFJM: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJFLJM1In, fJFLJM2In, appAbs(fJFLJM1In - fJFLJM2In));
     appGeneral(_T("Inner Chen Decompose JFPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJFPot1In, fJFPot2In, appAbs(fJFPot1In - fJFPot2In));
 
-    appGeneral(_T("Inner JFPure - JFL - JFPot = %2.12f\n"), fJFLPure1In - fJFL1In - fJFPot1In);
+    //In Wak Decomp, Lq + LG = (JGChen + JFPot)(LG) + JLPure(Lq)
+    //In Chen Decomp, Lq + LG = JGChen(LG) + JFL(Lq)
+    //So one expect JLPure + JFPot = JFL
+    appGeneral(_T("Inner JFPure - JFL - JFPot = %2.12f (JFPure:%2.12f, JFL:%2.12f, JFPot:%2.12f)\n"), fJFLPure1In - fJFL1In - fJFPot1In, fJFLPure1In, fJFL1In, fJFPot1In);
 
     delete pRandom;
 
