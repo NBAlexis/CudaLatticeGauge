@@ -37,6 +37,7 @@ public:
 
     void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
     void InitialWithByte(BYTE* byData) override;
+    void InitialWithByteCompressed(BYTE*) override;
     void InitialField(EFieldInitialType eInitialType) override;
     EFieldType GetFieldType() const override { return EFT_GaugeSU3; }
     void DebugPrintMe() const override;
@@ -88,6 +89,7 @@ public:
     void ElementNormalize() override;
     CLGComplex Dot(const CField* other) const override;
     void SaveToFile(const CCString &fileName) const override;
+    void SaveToCompressedFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
     CCString GetInfos(const CCString &tab) const override;
 

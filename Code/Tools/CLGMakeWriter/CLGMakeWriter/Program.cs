@@ -35,6 +35,9 @@ namespace CLGMakeWriter
             string projMatchingRhoPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho" });
             string projMatchingRhoFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho/MatchingRho.vcxproj" });
 
+            string projConfigurationCompresserPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser" });
+            string projConfigurationCompresserFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser/ConfigurationCompresser.vcxproj" });
+
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -66,7 +69,8 @@ namespace CLGMakeWriter
             apps.Add("CLGTest", new CProjFile(projCLGTestFilePath, projCLGTestPath));
             apps.Add("RotatingReproduce", new CProjFile(projRotatingFilePath, projRotatingPath));
             apps.Add("MatchingRho", new CProjFile(projMatchingRhoFilePath, projMatchingRhoPath));
-
+            apps.Add("ConfigurationCompresser", new CProjFile(projConfigurationCompresserFilePath, projConfigurationCompresserPath));
+            
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 
             Console.WriteLine("work done, press enter to exit...");

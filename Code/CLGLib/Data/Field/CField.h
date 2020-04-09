@@ -33,6 +33,7 @@ __DEFINE_ENUM(EFieldFileType,
     EFFT_BridgePPTXT,
     EFFT_BridgePPBin,
     EFFT_CLGBin,
+    EFFT_CLGBinCompressed,
     
     EFFT_ForceDWORD = 0x7fffffff,
     )
@@ -71,6 +72,7 @@ public:
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
     virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
     virtual void InitialWithByte(BYTE* byData) = 0;
+    virtual void InitialWithByteCompressed(BYTE* ) { appCrucial(_T("Not implemented compressed file format!\n")); }
     virtual void InitialOtherParameters(CParameters& ) {}
 
     virtual void DebugPrintMe() const = 0;
@@ -96,6 +98,7 @@ public:
     virtual void ScalarMultply(const CLGComplex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
     virtual void SaveToFile(const CCString &fileName) const = 0;
+    virtual void SaveToCompressedFile(const CCString& ) const { appCrucial(_T("Not supported compressed file format for this field!\n")); }
     //Why we need this? because the data structure are aligned.
     //Remember to free the buffer
     virtual BYTE* CopyDataOut(UINT &uiSize) const = 0;

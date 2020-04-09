@@ -443,6 +443,7 @@ _kernelDotSU3(
     }
 
     result[uiSiteIndex] = resThisThread;
+    //printf("res = %f %f\n", pOtherDeviceData[uiSiteIndex * 4].m_me[0].x, pMyDeviceData[uiSiteIndex * 4].m_me[0].x);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -725,6 +726,14 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         free(data);
     }
     break;
+    case EFFT_CLGBinCompressed:
+    {
+        UINT uiSize = static_cast<UINT>(sizeof(Real) * 9 * m_uiLinkeCount);
+        BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        InitialWithByteCompressed(data);
+        free(data);
+    }
+    break;
     default:
         appCrucial(_T("Not supported input file type %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
         break;
@@ -737,10 +746,10 @@ void CFieldGaugeSU3::InitialWithByte(BYTE* byData)
     deviceSU3* readData = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
     for (UINT i = 0; i < m_uiLinkeCount; ++i)
     {
+        Real oneLink[18];
+        memcpy(oneLink, byData + sizeof(Real) * 18 * i, sizeof(Real) * 18);
         for (UINT j = 0; j < 16; ++j)
         {
-            Real oneLink[18];
-            memcpy(oneLink, byData + sizeof(Real) * 18 * i, sizeof(Real) * 18);
             if (j < 9)
             {
                 readData[i].m_me[j] =
@@ -756,6 +765,41 @@ void CFieldGaugeSU3::InitialWithByte(BYTE* byData)
     }
     checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyHostToDevice));
     free(readData);
+}
+
+void CFieldGaugeSU3::InitialWithByteCompressed(BYTE* byData)
+{
+    deviceSU3* readData = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        Real oneLink[9];
+        memcpy(oneLink, byData + sizeof(Real) * 9 * i, sizeof(Real) * 9);
+
+        readData[i].m_me[1] = _make_cuComplex(oneLink[0], oneLink[1]);
+        readData[i].m_me[3] = _make_cuComplex(-oneLink[0], oneLink[1]);
+
+        readData[i].m_me[2] = _make_cuComplex(oneLink[2], oneLink[3]);
+        readData[i].m_me[6] = _make_cuComplex(-oneLink[2], oneLink[3]);
+
+        readData[i].m_me[5] = _make_cuComplex(oneLink[4], oneLink[5]);
+        readData[i].m_me[7] = _make_cuComplex(-oneLink[4], oneLink[5]);
+
+        readData[i].m_me[0] = _make_cuComplex(F(0.0), oneLink[6]);
+        readData[i].m_me[4] = _make_cuComplex(F(0.0), oneLink[7]);
+        readData[i].m_me[8] = _make_cuComplex(F(0.0), oneLink[8]);
+
+        for (UINT j = 9; j < 16; ++j)
+        {
+            readData[i].m_me[j] = _zeroc;
+        }
+    }
+    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaDeviceSynchronize());
+    free(readData);
+
+    preparethread;
+    _kernelTransformToULog << <block, threads >> > (m_pDeviceData);
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 void CFieldGaugeSU3::SetByArray(Real* array)
@@ -984,8 +1028,57 @@ void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const
 
 void CFieldGaugeSU3::DebugPrintMe() const
 {
-    preparethread;
-    _kernelPrintSU3 << < block, threads >> > (m_pDeviceData);
+    //preparethread;
+    //_kernelPrintSU3 << < block, threads >> > (m_pDeviceData);
+
+    //===================================================
+    //Since Debug Print Me is only used to debug, we do it slow but convinient
+    deviceSU3* pToPrint = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(pToPrint, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+
+    for (UINT uiLink = 0; uiLink < m_uiLinkeCount; ++uiLink)
+    {
+        appGeneral(_T(" --- %d ---\n {{%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I}}\n"),
+            uiLink,
+            pToPrint[uiLink].m_me[0].x,
+            pToPrint[uiLink].m_me[0].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[0].y),
+
+            pToPrint[uiLink].m_me[1].x,
+            pToPrint[uiLink].m_me[1].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[1].y),
+
+            pToPrint[uiLink].m_me[2].x,
+            pToPrint[uiLink].m_me[2].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[2].y),
+
+            pToPrint[uiLink].m_me[3].x,
+            pToPrint[uiLink].m_me[3].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[3].y),
+
+            pToPrint[uiLink].m_me[4].x,
+            pToPrint[uiLink].m_me[4].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[4].y),
+
+            pToPrint[uiLink].m_me[5].x,
+            pToPrint[uiLink].m_me[5].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[5].y),
+
+            pToPrint[uiLink].m_me[6].x,
+            pToPrint[uiLink].m_me[6].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[6].y),
+
+            pToPrint[uiLink].m_me[7].x,
+            pToPrint[uiLink].m_me[7].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[7].y),
+
+            pToPrint[uiLink].m_me[8].x,
+            pToPrint[uiLink].m_me[8].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(pToPrint[uiLink].m_me[8].y)
+        );
+    }
+
+    free(pToPrint);
 }
 
 void CFieldGaugeSU3::SaveToFile(const CCString &fileName) const
@@ -994,6 +1087,43 @@ void CFieldGaugeSU3::SaveToFile(const CCString &fileName) const
     BYTE* byToSave = CopyDataOut(uiSize);
     appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
     free(byToSave);
+}
+
+void CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
+{
+    CFieldGaugeSU3* pPooledGauge = dynamic_cast<CFieldGaugeSU3*>(GetCopy());
+
+    preparethread;
+    _kernelTransformToIALog << <block, threads >> > (pPooledGauge->m_pDeviceData);
+
+    deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, pPooledGauge->m_pDeviceData, sizeof(deviceSU3)* m_uiLinkeCount, cudaMemcpyDeviceToHost));
+
+    //This is a traceless anti-Hermitian now, so we only save part of them
+    const UINT uiSize = static_cast<UINT>(sizeof(Real)* m_uiLinkeCount * 9);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        Real oneLink[9];
+        oneLink[0] = static_cast<Real>(toSave[i].m_me[1].x);
+        oneLink[1] = static_cast<Real>(toSave[i].m_me[1].y);
+        oneLink[2] = static_cast<Real>(toSave[i].m_me[2].x);
+        oneLink[3] = static_cast<Real>(toSave[i].m_me[2].y);
+        oneLink[4] = static_cast<Real>(toSave[i].m_me[5].x);
+        oneLink[5] = static_cast<Real>(toSave[i].m_me[5].y);
+        oneLink[6] = static_cast<Real>(toSave[i].m_me[0].y);
+        oneLink[7] = static_cast<Real>(toSave[i].m_me[4].y);
+        //The element is in fact can be NOT traceless!!!!, the trace can be 2 Pi or -2 Pi !!!
+        oneLink[8] = static_cast<Real>(toSave[i].m_me[8].y);
+
+        memcpy(byToSave + i * sizeof(Real) * 9, oneLink, sizeof(Real) * 9);
+    }
+
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+    //pPooledGauge->DebugPrintMe();
+    free(toSave);
+    free(byToSave);
+    appSafeDelete(pPooledGauge);
 }
 
 BYTE* CFieldGaugeSU3::CopyDataOut(UINT &uiSize) const

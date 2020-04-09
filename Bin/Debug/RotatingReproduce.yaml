@@ -167,14 +167,14 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.02
-    OmegaRange : 0.08775
+    GaugeBate : 5.336
+    OmegaRange : 0.0702
     StartOmega : 0
     EndOmega : 10
     StartN : 201
-    EndN : 300
+    EndN : 600
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
-    DistributionJob : EDJ_Chiral
+    DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
     StochasticFieldCount : 25
     StochasticGaussian : 1
@@ -186,8 +186,8 @@ JobPolyakovDist:
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : D:\NotUsingCLGCon\Nx18_502161\502161Nt4\Nt4\NC502161_
-    CSVSavePrefix : D:\NotUsingCLGCon\Nx18_502161\502161Nt4\Condensate\NC502161_
+    SavePrefix : H:\NotUsingCLGConfig\Extrapolation\5336161Nt5\Nt5\NC5336161_
+    CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\5336161Nt5\Polyakov\NC5336161_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -198,7 +198,7 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [18, 18, 8, 4]
+    LatticeLength : [22, 22, 10, 5]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -305,7 +305,7 @@ JobGaugeFixing:
     Nt : 6
     OmegaStart : 2
     OmegaEnd : 3
-    IndexStart : 617
+    IndexStart : 746
     IndexEnd : 1200
     LoadPrefix : ./BeforeGF/NC535161_
     SavePrefix : ./GF/GFN535161_

@@ -190,6 +190,28 @@ set_target_properties( CLGLib
 
             #endregion
 
+            #region Add Compresser
+
+            CProjFile compresserProj = excutables["ConfigurationCompresser"];
+
+            sContent += "\n\n\n# ==================== \n# ConfigurationCompresser \n# =================\n\n";
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser)\n";
+            sContent += "add_executable(ConfigurationCompresser \n    ";
+            foreach (string sFileName in compresserProj.m_lstAllHeaderFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
+            }
+            foreach (string sFileName in compresserProj.m_lstAllCppFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
+            }
+            sContent += ")\n\n";
+
+            sContent += "target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)\n";
+            sContent += "target_link_libraries(ConfigurationCompresser CLGLib)\n";
+
+            #endregion
+
             sContent = sContent.Replace("\r\n", "\n");
             sContent = sContent.Replace("\n\r", "\n");
             sContent = sContent.Replace("\r", "\n");

@@ -1,0 +1,34 @@
+# VerboseLevel : GENERAL PARANOIAC
+VerboseLevel : GENERAL
+VerboseOutput : datetime
+ShowDeviceInformation : 0
+ShowParameterContent : 1
+Dim : 4
+Dir : 4
+
+LatticeLength : [12, 12, 12, 24]
+LoadPrefix : G:\CLGConfigs\Matching\_f47516\47516_
+SavePrefix : G:\CLGConfigs\Matching\c47516\47516_
+
+# { EJT_Rotate, EJT_Matching }
+JobType : EJT_Matching
+StartOmega : 0
+EndOmega : 0
+StartIndex : 1
+EndIndex : 1000
+
+LatticeIndex : CIndexSquare
+LatticeBoundary : CBoundaryConditionTorusSquare
+ThreadAutoDecompose : 1
+RandomType : ER_Schrage
+RandomSeed : 1234567
+ActionListLength : 0
+FermionFieldCount : 0
+MeasureListLength : 0
+CacheStaple : 0
+
+Gauge:
+
+    FieldName : CFieldGaugeSU3
+    FieldInitialType : EFIT_Zero
+    Period : [1, 1, 1, 1]

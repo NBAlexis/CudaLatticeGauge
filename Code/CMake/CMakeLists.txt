@@ -262,3 +262,18 @@ add_executable(MatchingRho
 
 target_compile_features(MatchingRho PUBLIC cxx_std_14)
 target_link_libraries(MatchingRho CLGLib)
+
+
+
+# ==================== 
+# ConfigurationCompresser 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser)
+add_executable(ConfigurationCompresser 
+    ${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/ConfigurationCompresser.h
+    ${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/ConfigurationCompresser.cpp
+    )
+
+target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)
+target_link_libraries(ConfigurationCompresser CLGLib)

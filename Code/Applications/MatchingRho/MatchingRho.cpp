@@ -52,6 +52,10 @@ int main(int argc, char * argv[])
     const UBOOL bMeasureFermion = 0 != iVaule;
 
     iVaule = 0;
+    params.FetchValueINT(_T("CompressedFile"), iVaule);
+    const UBOOL bCompressedFile = 0 != iVaule;
+
+    iVaule = 0;
     params.FetchValueINT(_T("DoSmearing"), iVaule);
     const UBOOL bDoSmearing = 0 != iVaule;
 
@@ -178,16 +182,31 @@ int main(int argc, char * argv[])
 
                 //=================================
                 //Save config
-                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                if (bCompressedFile)
+                {
+                    appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileName + _T(".cco"));
+                }
+                else
+                {
+                    appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                }
             }
         }
         else
         {
             ++uiAccepCountAfterE;
-            sFileName.Format(_T("Matching_%d.con"), uiAccepCountAfterE + iSaveIndexStart);
+            sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE + iSaveIndexStart);
             sFileName = sSavePrefix + sFileName;
+
+            if (bCompressedFile)
+            {
+                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName + _T(".cco"), EFFT_CLGBinCompressed);
+            }
+            else
+            {
+                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName + _T(".con"), EFFT_CLGBin);
+            }
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             if (bDoSmearing)
             {
                 appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);

@@ -64,8 +64,8 @@ UINT TestFileIOCLG(CParameters& sParam)
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
     const CLGComplex res2 = pNewFermion->Dot(pNewFermion);
 
-    appGeneral(_T("Gauge file test: expeted 3.0 + 0.0i, res = %f%s%f"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
-    appGeneral(_T("Fermion file test: expeted 0.0 + 0.0i, res = %f%s%f"), res2.x, res2.y > 0 ? _T("+") : _T(""), res2.y);
+    appGeneral(_T("Gauge file test: expeted 3.0 + 0.0i, res = %f %s %f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
+    appGeneral(_T("Fermion file test: expeted 0.0 + 0.0i, res = %f %s %f\n"), res2.x, res2.y > 0 ? _T("+") : _T(""), res2.y);
 
     if (appAbs(res1.x - F(3.0)) > F(0.000001)
      || appAbs(res1.y) > F(0.000001))
@@ -79,10 +79,39 @@ UINT TestFileIOCLG(CParameters& sParam)
         ++uiError;
     }
 
+    appSafeDelete(pNewGauge);
+    appSafeDelete(pNewFermion);
+
+    return uiError;
+}
+
+UINT TestFileIOCLGCompressed(CParameters& sParam)
+{
+    UINT uiError = 0;
+
+    appGetLattice()->m_pGaugeField->SaveToCompressedFile(_T("testGaugeCompressed.con"));
+    CFieldGaugeSU3* pNewGauge = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
+    pNewGauge->InitialFieldWithFile(_T("testGaugeCompressed.con"), EFFT_CLGBinCompressed);
+
+    //appGeneral(_T("=====================\n"));
+    //appGetLattice()->m_pGaugeField->DebugPrintMe();
+
+    pNewGauge->AxpyMinus(appGetLattice()->m_pGaugeField);
+
+    const CLGComplex res1 = pNewGauge->Dot(pNewGauge);
+
+    appGeneral(_T("Gauge file test: expeted 0.0 + 0.0i, res = %2.16f %s %2.16f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
+
+    if (_cuCabsf(res1) > F(0.00000001))
+    {
+        ++uiError;
+    }
+    appSafeDelete(pNewGauge);
     return uiError;
 }
 
 __REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration);
+__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed);
 
 //=============================================================================
 // END OF FILE

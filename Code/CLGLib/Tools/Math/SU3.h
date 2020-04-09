@@ -59,7 +59,7 @@ extern "C" {
     //alignas 256 will crash ptax, so we manully align
     struct /*alignas(__SU3MATRIX_ALIGN)*/ deviceSU3
 #else
-    struct alignas(__SU3MATRIX_ALIGN) deviceSU3
+    struct /*alignas(__SU3MATRIX_ALIGN)*/ deviceSU3
 #endif
     {
         __device__ deviceSU3()
@@ -1926,7 +1926,7 @@ extern "C" {
             + __cuCabsSqf(m_me[7]) + __cuCabsSqf(m_me[8]) + __cuCabsSqf(m_me[9]);
 
             //if A is small, there will be problems
-            if (fAbsAll < F(0.0001))
+            if (fAbsAll < F(0.0000001))
             {
                 return QuickExp(F(1.0));
             }

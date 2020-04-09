@@ -82,6 +82,31 @@ TestSaveConfiguration:
 
         PoolNumber : 1
 
+TestFileIOCLGCompressed:
+
+    # For double format, 32^4 x 4, the total error sum(tr[U^+ U])] is 10^{-11}
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [32, 32, 32, 32]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 0
+    MeasureListLength : 0
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+
+
 TestSaveConfigurationLowMode:
 
     Dim : 4
