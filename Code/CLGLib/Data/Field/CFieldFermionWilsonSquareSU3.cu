@@ -1043,6 +1043,7 @@ void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceD
         preparethread;
         _kernelMakePointSource<<<block, threads >>>(m_pDeviceData, uiSiteIndex, sourceData.m_bySpinIndex, sourceData.m_byColorIndex);
     }
+    break;
     case EFS_Wall:
     {
         preparethread;

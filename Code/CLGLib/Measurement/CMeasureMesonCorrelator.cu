@@ -26,7 +26,6 @@ _CLG_LAUNCH_BOUND
 _kernelCalculateCorrelatorSU3(
     const deviceWilsonVectorSU3** __restrict__ sources,
     EGammaMatrix eGamma,
-    UBOOL bDirac,
     Real* correlatorRes
 )
 {
@@ -328,15 +327,28 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
         _kernelCalculateCorrelatorSU3 << <block, threads >> > (
             (const deviceWilsonVectorSU3**)ppDevicePtr, 
             m_lstGammas[i],
-            TRUE, 
             _D_RealThreadBuffer);
+
+        //if (0 == i && 0 == m_uiResoultCount)
+        //{
+        //    Real fSum = F(0.0);
+        //    Real* hostRes = (Real*)malloc(sizeof(Real) * _HC_Volume_xyz);
+        //    checkCudaErrors(cudaMemcpy(hostRes, _D_RealThreadBuffer, sizeof(Real) * _HC_Volume_xyz, cudaMemcpyDeviceToHost));
+        //    for (int j = 0; j < _HC_Volume_xyz; ++j)
+        //    {
+        //        //appGeneral(_T("%f\n"), hostRes[j]);
+        //        fSum += hostRes[j];
+        //    }
+        //    free(hostRes);
+        //    appGeneral(_T("sum of t=0 is %f\n"), fSum * m_f2OverVolumnSqrt);
+        //}
 
         appParanoiac(_T("CMeasureMesonCorrelator for %s: "), __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]).c_str());
         Real* sumSpatial = (Real*)appAlloca(sizeof(Real) * m_uiLt);
         for (UINT j = 0; j < m_uiLt; ++j)
         {
             sumSpatial[j] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + j * _HC_Volume_xyz, _HC_Volume_xyz);
-            appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, "), j, sumSpatial[j], _hostlog10(appAbs(sumSpatial[j])));
+            appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, \n"), j, sumSpatial[j], _hostlog10(appAbs(sumSpatial[j])));
         }
         appParanoiac(_T("\n"));
         //anverage
