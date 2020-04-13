@@ -95,6 +95,102 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
     return uiError;
 }
 
+//test whether the chiral condensation is respected by gauge fixing
+//only the random gauge fixing can also gauge transform the fermion field
+UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
+{
+    UINT uiError = 0;
+    CFieldGaugeSU3D* pGauge = dynamic_cast<CFieldGaugeSU3D*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    CGaugeFixingRandom* pRandom = new CGaugeFixingRandom();
+    appGetLattice()->m_pGaugeField->FixBoundary();
+    pRandom->Initial(appGetLattice(), sParam);
+
+    //Calculate condensation
+    CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
+    pFermion->InitialField(EFIT_RandomGaussian);
+    pFermion->FixBoundary();
+    CFieldFermionWilsonSquareSU3DR* pFermion2 = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(pFermion->GetCopy());
+    pFermion2->InverseD(pGauge);
+    pFermion2->FixBoundary();
+    CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    pCC->Reset();
+    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
+
+    //pGauge->DebugPrintMe();
+
+    //Extract results
+    const CLGComplex chiral1 = pCC->m_lstChiralAll[0];
+    const CLGComplex pion1 = pCC->m_lstPionAll[0];
+    const CLGComplex rhon1 = pCC->m_lstRhonAll[0];
+    const CLGComplex chiralfirstSite1 = pCC->m_lstChiral[0];
+    const CLGComplex pionfirstSite1 = pCC->m_lstPion[0];
+    const CLGComplex rhonfirstSite1 = pCC->m_lstRhon[0];
+
+    for (INT i = 0; i < 5; ++i)
+    {
+        //===============================
+        // 
+        //===============================
+        pRandom->GaugeFixing(pGauge); //the transform is randomized every GaugeFixing call
+        pRandom->AlsoFixingFermion(pFermion);
+
+        pFermion->CopyTo(pFermion2);
+        pFermion2->InverseD(pGauge);
+        pFermion2->FixBoundary();
+        pCC->Reset();
+        pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
+
+        const CLGComplex chiral2 = pCC->m_lstChiralAll[0];
+        const CLGComplex pion2 = pCC->m_lstPionAll[0];
+        const CLGComplex rhon2 = pCC->m_lstRhonAll[0];
+        const CLGComplex chiralfirstSite2 = pCC->m_lstChiral[0];
+        const CLGComplex pionfirstSite2 = pCC->m_lstPion[0];
+        const CLGComplex rhonfirstSite2 = pCC->m_lstRhon[0];
+
+        appGeneral(_T("Chiral: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), chiral1.x, chiral1.y, chiral2.x, chiral2.y);
+        if (__cuCabsSqf(_cuCsubf(chiral1, chiral2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+
+        appGeneral(_T("Pion: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), pion1.x, pion1.y, pion2.x, pion2.y);
+        if (__cuCabsSqf(_cuCsubf(pion1, pion2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+
+        appGeneral(_T("Rho: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), rhon1.x, rhon1.y, rhon2.x, rhon2.y);
+        if (__cuCabsSqf(_cuCsubf(rhon1, rhon2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+
+        appGeneral(_T("Chiral[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), chiralfirstSite1.x, chiralfirstSite1.y, chiralfirstSite2.x, chiralfirstSite2.y);
+        if (__cuCabsSqf(_cuCsubf(chiralfirstSite1, chiralfirstSite2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+
+        appGeneral(_T("Pion[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), pionfirstSite1.x, pionfirstSite1.y, pionfirstSite2.x, pionfirstSite2.y);
+        if (__cuCabsSqf(_cuCsubf(pionfirstSite1, pionfirstSite2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+
+        appGeneral(_T("Rho[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), rhonfirstSite1.x, rhonfirstSite1.y, rhonfirstSite2.x, rhonfirstSite2.y);
+        if (__cuCabsSqf(_cuCsubf(rhonfirstSite1, rhonfirstSite2)) > F(0.00000001))
+        {
+            ++uiError;
+        }
+    }
+
+    //pGauge->DebugPrintMe();
+
+    appSafeDelete(pFermion2);
+
+    return uiError;
+}
+
 __REGIST_TEST(TestFFT, Misc, TestFFT);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauCornell);
@@ -108,6 +204,8 @@ __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombLosAlamos);
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
 
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR);
+
+__REGIST_TEST(TestGaugeFixingCoulombDRChiral, Misc, TestGaugeFixingCoulombDRChiral);
 
 
 //=============================================================================

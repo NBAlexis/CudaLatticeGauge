@@ -326,22 +326,41 @@ INT MeasurePolyakovDist(CParameters& params)
                 break;
                 case EDJ_ChiralAndFermionMomentum:
                 {
-                    for (UINT i = 0; i < iFieldCount; ++i)
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    if (NULL != pJF && NULL != pCC)
                     {
-                        if (bZ4)
+                        for (UINT i = 0; i < iFieldCount; ++i)
                         {
-                            pF1->InitialField(EFIT_RandomZ4);
-                        }
-                        else
-                        {
-                            pF1->InitialField(EFIT_RandomGaussian);
-                        }
-                        pF1->FixBoundary();
-                        pF1->CopyTo(pF2);
-                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                            if (bZ4)
+                            {
+                                pF1->InitialField(EFIT_RandomZ4);
+                            }
+                            else
+                            {
+                                pF1->InitialField(EFIT_RandomGaussian);
+                            }
+                            pF1->FixBoundary();
+                            pF1->CopyTo(pF2);
+                            pF1->InverseD(appGetLattice()->m_pGaugeField);
 
-                        pCC->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF2, pF1, 0 == i, iFieldCount == i + 1);
-                        pJF->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF2, pF1, 0 == i, iFieldCount == i + 1);
+
+                            pJF->OnConfigurationAcceptedZ4(
+                                appGetLattice()->m_pGaugeField,
+                                NULL,
+                                pF2,
+                                pF1,
+                                0 == i,
+                                iFieldCount == i + 1);
+
+                            pCC->OnConfigurationAcceptedZ4(
+                                appGetLattice()->m_pGaugeField,
+                                NULL,
+                                pF2,
+                                pF1,
+                                0 == i,
+                                iFieldCount == i + 1);
+                        }
                     }
                 }
                 break;
@@ -453,111 +472,38 @@ INT MeasurePolyakovDist(CParameters& params)
             break;
             case EDJ_ChiralAndFermionMomentum:
             {
-#pragma region Chiral
+                _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS);
+                _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
 
-                //extract result
-                assert(static_cast<INT>(iEndN - iStartN + 1) * pCC->m_lstR.Num() == pCC->m_lstChiral.Num());
+                if (NULL != pJF)
+                {
+                    _CLG_EXPORT_ANGULAR(pJF, JL);
+                    _CLG_EXPORT_ANGULAR(pJF, JS);
+                    _CLG_EXPORT_ANGULAR(pJF, JLPure);
+                    _CLG_EXPORT_ANGULAR(pJF, JLJM);
+                    _CLG_EXPORT_ANGULAR(pJF, JPot);
+                }
+
+                if (NULL != pCC)
+                {
+                    _CLG_EXPORT_CHIRAL(pCC, Chiral);
+                    _CLG_EXPORT_CHIRAL(pCC, Pion);
+                    _CLG_EXPORT_CHIRAL(pCC, Rhon);
+                }
 
                 if (uiOmega == iStartOmega)
                 {
-                    appGeneral(_T("cr={"));
-
-                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
+                    TArray<Real> lstRadius;
+                    for (INT i = 0; i < pJG->m_lstR.Num(); ++i)
                     {
-                        appGeneral(_T("%2.12f%s"), _hostsqrt(static_cast<Real>(pCC->m_lstR[i])), (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                        if (pCC->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
-                        }
+                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pJG->m_lstR[i])));
                     }
-
-                    appGeneral(_T("};\n"));
+                    CCString sRadiousFile;
+                    sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
+                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
                 }
-                else
-                {
-                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-                    {
-                        if (pCC->m_lstR[i] < uiMaxL)
-                        {
-                            CCString tobeAdd;
-                            tobeAdd.Format(_T("Transpose[c%d][[%d]]"), uiOmega, i + 1);
-                            r_omega_idx[uiOmega * uiOmega * pCC->m_lstR[i]].AddItem(tobeAdd);
-                        }
-                    }
-                }
-
-                appGeneral(_T("c%d={\n"), uiOmega);
-
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pCC->m_lstChiral[j * pCC->m_lstR.Num() + i], (i == pCC->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-
-                appGeneral(_T("\n};\n"));
-
-#pragma endregion
-
-#pragma region JF
-
-#pragma region JFL
-
-                appGeneral(_T("jfl%d={\n"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pJF->m_lstJL[j * pJF->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-                appGeneral(_T("\n};\n"));
-
-                //================== JL Total ==================
-                appGeneral(_T("jfl$in%d={"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("%2.12f%s"),
-                        pJF->m_lstJLInner[j],
-                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
-                }
-                appGeneral(_T("};\n"));
-
-                appGeneral(_T("jfl$out%d={"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("%2.12f%s"),
-                        pJF->m_lstJLAll[j],
-                        (j == (iEndN - iStartN)) ? _T("") : _T(", "));
-                }
-                appGeneral(_T("};\n"));
-
-#pragma endregion
-
-#pragma region JFS
-
-                appGeneral(_T("jfs%d={\n"), uiOmega);
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    appGeneral(_T("{"));
-                    for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
-                    {
-                        appGeneral(_T("%2.12f%s"), pJF->m_lstJS[j * pJF->m_lstR.Num() + i], (i == pJF->m_lstR.Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("}%s\n"), (j == (iEndN - iStartN)) ? _T("") : _T(","));
-                }
-                appGeneral(_T("\n};\n"));
-
-#pragma endregion
-
-#pragma endregion
             }
             break;
             default:
@@ -591,163 +537,7 @@ INT MeasurePolyakovDist(CParameters& params)
         break;
         case EDJ_ChiralAndFermionMomentum:
         {
-#pragma region Chiral
-
-            appGeneral(_T("\nc0all={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("c%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("};\n"));
-
-            appGeneral(_T("\nc0allmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[c%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\nc0allchi={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[c%d*c%d] - Mean[c%d]*Mean[c%d]%s"), uiOmega, uiOmega, uiOmega, uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n\n"));
-
-#pragma region r times omega
-
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("\ncrw%d=Join["), i);
-                    for (INT j = 0; j < r_omega_idx[i].Num(); ++j)
-                    {
-                        appGeneral(_T("%s%s"), r_omega_idx[i][j].c_str(), (j == r_omega_idx[i].Num() - 1) ? _T("") : _T(", "));
-                    }
-                    appGeneral(_T("];\n\n"));
-                }
-            }
-
-            appGeneral(_T("\ncrwlist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[crw%d]]}"), (0 == i ? _T("\n") : _T(",")), _hostsqrt(i), i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-            appGeneral(_T("\ncrwchilist={"));
-            for (INT i = 0; i < r_omega_idx.Num(); ++i)
-            {
-                if (r_omega_idx[i].Num() > 0)
-                {
-                    appGeneral(_T("%s{%f, Abs[Mean[crw%d*crw%d] - Mean[crw%d]*Mean[crw%d]]}"),
-                        (0 == i ? _T("\n") : _T(",")),
-                        _hostsqrt(i),
-                        i, i, i, i);
-                }
-            }
-            appGeneral(_T("\n}"));
-
-#pragma endregion
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[c0allmean][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pCC->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[c0allchi][[%d]]%s"), i + 1, (i == (pCC->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-#pragma endregion
-
-#pragma region JF
-
-#pragma region JFL
-
-            appGeneral(_T("\njflall={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("jfl%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("};\n"));
-
-            appGeneral(_T("\njflallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[jfl%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-#pragma endregion
-
-#pragma region JFS
-
-            appGeneral(_T("\njfsall={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("jfs%d%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("};\n"));
-
-            appGeneral(_T("\njfsallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[jfs%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-#pragma endregion
-
-#pragma endregion
-
-#pragma region jf in out
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[jflallmean][[%d]]%s"), i + 1, (i == (pJF->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-#pragma region in and out jl
-
-            appGeneral(_T("\njflinallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[jfl$in%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\njfloutallmean={"));
-            for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
-            {
-                appGeneral(_T("Mean[jfl$out%d]%s"), uiOmega, uiOmega == iEndOmega ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}\n"));
-
-            appGeneral(_T("\nListLinePlot[{jflinallmean, jfloutallmean}]\n"));
-
-#pragma endregion
-
-            appGeneral(_T("\nListLinePlot[{"));
-            for (INT i = 0; i < pJF->m_lstR.Num(); ++i)
-            {
-                appGeneral(_T("Transpose[jfsallmean][[%d]]%s"), i + 1, (i == (pJF->m_lstR.Num() - 1)) ? _T("") : _T(", "));
-            }
-            appGeneral(_T("}, PlotRange -> All]\n\n"));
-
-#pragma endregion
-
+            //nothing to do
         }
         break;
             default:

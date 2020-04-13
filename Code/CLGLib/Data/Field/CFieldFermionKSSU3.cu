@@ -808,6 +808,7 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
         preparethread;
         _kernelMakePointSourceKS << <block, threads >> > (m_pDeviceData, uiSiteIndex, sourceData.m_byColorIndex);
     }
+    break;
     case EFS_Wall:
     {
         preparethread;

@@ -167,12 +167,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.336
-    OmegaRange : 0.0702
+    GaugeBate : 4.75
+    OmegaRange : 0.14
     StartOmega : 0
-    EndOmega : 10
-    StartN : 201
-    EndN : 600
+    EndOmega : 20
+    StartN : 101
+    EndN : 4500
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
@@ -186,8 +186,8 @@ JobPolyakovDist:
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : H:\NotUsingCLGConfig\Extrapolation\5336161Nt5\Nt5\NC5336161_
-    CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\5336161Nt5\Polyakov\NC5336161_
+    SavePrefix : G:\CLGConfigs\_f47516\Nt3\N47516_
+    CSVSavePrefix : G:\CLGConfigs\_f47516\Polyakov\N47516_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -198,7 +198,7 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -222,7 +222,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.161
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]
@@ -303,13 +303,15 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 6
-    OmegaStart : 2
-    OmegaEnd : 3
-    IndexStart : 759
+    OmegaStart : 0
+    OmegaEnd : 2
+    IndexStart : 301
     IndexEnd : 1200
-    LoadPrefix : ./BeforeGF/NC535161_
-    SavePrefix : ./GF/GFN535161_
+    LoadPrefix : G:\CLGConfigs\Extrapolation\535161Nt6\Nt6\NC535161_
+    SavePrefix : G:\CLGConfigs\Extrapolation\535161Nt6\GF\GFN535161_
     UseLogADefinition : 1
+    OnlyCheck : 1
+    CheckAndFix : 1
 
     Dim : 4
     Dir : 4

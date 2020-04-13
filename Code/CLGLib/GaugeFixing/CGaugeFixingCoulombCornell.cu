@@ -564,7 +564,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
         ++m_iIterate;
     }
 
-    appGeneral(_T("Gauge fixing failed with last error = %f\n"), fTheta);
+    appGeneral(_T("Gauge fixing failed with last error = %2.15f\n"), fTheta);
 }
 
 Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
@@ -615,6 +615,15 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
             m_pA13,
             m_pA22,
             m_pA23);
+
+        _kernelCalculateTrAGradientSq3D << <block, threads >> > (
+            uiT,
+            _D_RealThreadBuffer,
+            m_pGamma11,
+            m_pGamma12,
+            m_pGamma13,
+            m_pGamma22,
+            m_pGamma23);
 
         fRet += appAbs(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz));
     }

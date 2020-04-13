@@ -22,20 +22,20 @@ int main(int argc, char * argv[])
     appSetupLog(params);
 
     INT iVaule = 0;
-    params.FetchValueINT(_T("StartOmega"), iVaule);
-    const UINT iStartOmega = static_cast<UINT>(iVaule);
-
-    iVaule = 0;
-    params.FetchValueINT(_T("EndOmega"), iVaule);
-    const UINT iEndOmega = static_cast<UINT>(iVaule);
-
-    iVaule = 0;
     params.FetchValueINT(_T("StartIndex"), iVaule);
     const UINT iStartIndex = static_cast<UINT>(iVaule);
 
     iVaule = 0;
     params.FetchValueINT(_T("EndIndex"), iVaule);
     const UINT iEndIndex = static_cast<UINT>(iVaule);
+
+    //iVaule = 0;
+    //params.FetchValueINT(_T("StartOmega"), iVaule);
+    //const UINT iStartOmega = static_cast<UINT>(iVaule);
+
+    //iVaule = 0;
+    //params.FetchValueINT(_T("EndOmega"), iVaule);
+    //const UINT iEndOmega = static_cast<UINT>(iVaule);
     
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
