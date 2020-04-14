@@ -55,7 +55,7 @@ _kernelDFermionWilsonSquareSU3_DR(
 
     deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12].MulWilsonC(right_element));
     term3 = gamma4.MulWilsonC(term3);
-    term3.MulComp(_make_cuComplex(F(0.0), fOmega * kai));
+    term3.MulComp(_make_cuComplex(F(0.0), -fOmega * kai));
 
     if (!bNaive)
     {
@@ -761,7 +761,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
     deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) /* - F(1.0)*/));
     //sinpart 
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
     cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
@@ -782,7 +782,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) /*- F(1.0)*/));
     //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
     cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
@@ -1604,14 +1604,14 @@ _kernelDWilsonForceSU3_DR_T(
 
     x_p_mu_Right.Sub(gamma4.MulWilsonC(x_p_mu_Right));
     deviceWilsonVectorSU3 x_p_mu_Right_real = x_p_mu_Right.MulRealC(fCos);
-    x_p_mu_Right.MulComp(_make_cuComplex(F(0.0), -fSin));
+    x_p_mu_Right.MulComp(_make_cuComplex(F(0.0), fSin));
     x_p_mu_Right = sigma12.MulWilsonC(x_p_mu_Right);
     x_p_mu_Right_real.Add(x_p_mu_Right);
     deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, x_p_mu_Right_real);
 
     x_Right.Add(gamma4.MulWilsonC(x_Right));
     deviceWilsonVectorSU3 x_Right_real = x_Right.MulRealC(fCos);
-    x_Right.MulComp(_make_cuComplex(F(0.0), fSin));
+    x_Right.MulComp(_make_cuComplex(F(0.0), -fSin));
     x_Right = sigma12.MulWilsonC(x_Right);
     x_Right_real.Add(x_Right);
     mid.Add(deviceSU3::makeSU3Contract(x_Right_real, x_p_mu_Left));

@@ -394,7 +394,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step1(
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
     deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) /* - F(1.0)*/));
     //sinpart 
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
     cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
@@ -415,7 +415,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step1(
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) /*- F(1.0)*/));
     //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
     cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
@@ -838,7 +838,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step2(
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
     deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) /* - F(1.0)*/));
     //sinpart 
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
     cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
@@ -859,7 +859,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step2(
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) /*- F(1.0)*/));
     //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
     cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
@@ -1412,7 +1412,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteEven(
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
     deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) /* - F(1.0)*/));
     //sinpart 
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
     cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
@@ -1433,7 +1433,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteEven(
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) /*- F(1.0)*/));
     //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
     cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
@@ -1850,7 +1850,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteBack(
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
     deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * (_cos(fhalfOmega) /* - F(1.0)*/));
     //sinpart 
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
+    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
     cospart.Add(sigma12.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
@@ -1871,7 +1871,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteBack(
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * (_cos(fhalfOmega) /*- F(1.0)*/));
     //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfOmega)));
+    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), -kai * _sin(fhalfOmega)));
     cospart2.Add(sigma12.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
