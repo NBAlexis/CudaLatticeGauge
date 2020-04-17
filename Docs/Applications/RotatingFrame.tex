@@ -202,16 +202,16 @@ using $\gamma ^{\mu}=\gamma ^i e_i^{\mu}$, it is
 The Wick rotation
 \begin{equation}
 \begin{split}
-&t\to -i\tau,\;\;\gamma _i^{M}\to i\gamma _i^{E},\;\;\gamma _4=\gamma _0,\;\;\gamma _5=\gamma _1\gamma _2\gamma _3\gamma _4,\;\;A_t\to i A_{\tau},\;\;\partial _t\to i\partial _{\tau},\;\;\Omega \to i\Omega
+&t\to -i\tau,\;\;\gamma _i^{M}\to i\gamma _i^{E},\;\;\gamma _4=\gamma _0,\;\;\gamma _5=\gamma _1\gamma _2\gamma _3\gamma _4,\;\;A_t\to i A_{\tau},\;\;\partial _t\to i\partial _{\tau},\;\;\Omega \to i\Omega,\;\;\sigma ^{12}\to -\sigma ^{12}
 \end{split}
 \end{equation}
 where the superscript of gamma matrix stands for Minkowski or Euclidian. So
 \begin{equation}
 \begin{split}
 &D_R=-\left[(\gamma _1+y\Omega \gamma_4) (\partial _x+ieA_x)+(\gamma _2-x\Omega \gamma_4) (\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)\right.\\
-&\left.+\gamma _4 (\partial _{\tau}+ieA_{\tau}-\frac{i}{2}\Omega \sigma ^{12})+m\right]\\
+&\left.+\gamma _4 (\partial _{\tau}+ieA_{\tau}+\frac{i}{2}\Omega \sigma ^{12})+m\right]\\
 &=-\left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
-&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)\textcolor[rgb]{1,0,0}{-}\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right]\\
+&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)+\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right]\\
 \end{split}
 \end{equation}
 And
@@ -219,7 +219,7 @@ And
 \begin{split}
 &-S_F=i\int d^4 x \sqrt{-g_{\alpha \beta}}\bar{\psi } D_R \psi\\
 &S_F=\int d^4 x_E \bar{\psi } \left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
-&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)-\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right] \psi\\
+&\left.+\gamma _4 \left(y\Omega(\partial _x+ieA_x)-x\Omega(\partial _y+ieA_y)\right)+\frac{i}{2}\gamma _4\Omega \sigma ^{12}\right] \psi\\
 \end{split}
 \end{equation}
 
@@ -251,7 +251,7 @@ Therefor
 The Wilson term is
 \begin{equation}
 \begin{split}
-&W\psi (n)= -\sum _{\mu}\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi(n)}{2a}\\
+&W\psi (n)= -\sum _{\mu}\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi(n)}{2a} \to 0\\
 \end{split}
 \end{equation}
 considering the rotation, we add a modified Wilson term as
@@ -268,7 +268,7 @@ Similar as the Wilson term, the last two terms also decouples when approaching t
 &S_F=\sum _{n,m}\bar{\psi }(n) D_W(n|m) \psi(m)\\
 &D_W(n|m)=\left(m+\frac{4}{a}+\frac{y\Omega}{a}-\frac{x\Omega}{a}\right)\delta _{n,m}-\sum _{\mu}\frac{(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}}{2a}\\
 &-y\Omega \frac{(1-\gamma _4)U_{x}(n)\delta _{n+ax,m}+(1+\gamma _4)U_{-x}(n)\delta _{n-ax,m}}{2a}\\
-&+x\Omega \frac{(1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}}{2a} -\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
+&+x\Omega \frac{(1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}}{2a} +\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
 \end{split}
 \end{equation}
 Note that,
@@ -313,7 +313,7 @@ Note that the naive action and Wilson term both satisfy the $\gamma _5$-hermitic
 \begin{equation}
 \begin{split}
 &D_W(n|m)=\left(m+\frac{4}{a}\right)\delta _{n,m}-\sum _{\mu}\frac{(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}}{2a}\\
-&+y\Omega \frac{\gamma _4U_{x}(n)\delta _{n+ax,m}-\gamma _4U_{-x}(n)\delta _{n-ax,m}}{2a}-x\Omega \frac{\gamma _4U_{y}(n)\delta _{n+ay,m}-\gamma _4U_{-y}(n)\delta _{n-ay,m}}{2a} -\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
+&+y\Omega \frac{\gamma _4U_{x}(n)\delta _{n+ax,m}-\gamma _4U_{-x}(n)\delta _{n-ax,m}}{2a}-x\Omega \frac{\gamma _4U_{y}(n)\delta _{n+ay,m}-\gamma _4U_{-y}(n)\delta _{n-ay,m}}{2a} +\frac{i}{2}\gamma _4\Omega \sigma ^{12}\delta _{n,m}\\
 \end{split}
 \end{equation}
 This action also does not suffer from the doubler problem.
@@ -328,7 +328,7 @@ As usual, we define the hopping parameter as $\kappa = \frac{1}{2am+8}$, then re
 &S_F=\sum _{n,m}\bar{\psi }(n) D_W(n|m) \psi(m)\\
 &D_W(n|m)=\left(1+2\kappa(y-x)\Omega\right)\delta _{n,m}-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\mu,m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\mu,m}\right)\\
 &-\kappa y\Omega \left((1-\gamma _4)U_{x}(n)\delta _{n+ax,m}+(1+\gamma _4)U_{-x}(n)\delta _{n-ax,m}\right)\\
-&+\kappa x\Omega \left((1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}\right) -\kappa i\gamma _4a\Omega \sigma ^{12}\delta _{n,m}\\
+&+\kappa x\Omega \left((1-\gamma _4)U_{y}(n)\delta _{n+ay,m}+(1+\gamma _4)U_{-y}(n)\delta _{n-ay,m}\right) +\kappa i\gamma _4a\Omega \sigma ^{12}\delta _{n,m}\\
 \end{split}
 \end{equation}
 
@@ -337,45 +337,61 @@ As usual, we define the hopping parameter as $\kappa = \frac{1}{2am+8}$, then re
 On the other hand, the $i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}$ term can also be modified. The $\sigma ^{12}$ term can be considered as a chemical potential ($\bar{\psi}\gamma _0 \psi$ and then do the Wick rotation $\gamma _0\to \gamma _4$. The sign is after Wick rotation and relative to the mass term)
 \begin{equation}
 \begin{split}
-&\mu  \bar{\psi} \gamma _4 \psi,\;\;\mu = \textcolor[rgb]{1,0,0}{-}\frac{i\Omega}{2}\sigma ^{12}
+&\mu  \bar{\psi} \gamma _4 \psi,\;\;\mu = \frac{i\Omega}{2}\sigma ^{12}
 \end{split}
 \end{equation}
 and discritized as
 \begin{equation}
 \begin{split}
 &D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left(e^{\mu a}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{-\mu a}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)\\
-&=-\kappa \left(e^{\textcolor[rgb]{1,0,0}{-}\frac{ia\Omega \sigma ^{12}}{2}}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{\textcolor[rgb]{1,0,0}{+}\frac{ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
+&=-\kappa \left(e^{\textcolor[rgb]{1,0,0}{+}\frac{ia\Omega \sigma ^{12}}{2}}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} + e^{\textcolor[rgb]{1,0,0}{-}\frac{ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)
 \end{split}
 \end{equation}
 \textcolor[rgb]{1,0,0}{It looks not satisfy the $\gamma _5$ -hermiticity.} However, using $\left(\sigma ^{12}\right)^2=1$, it is in fact
 \begin{equation}
 \begin{split}
-&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left[\left(\cos(\frac{a\Omega}{2})-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
-&\left.+\left(\cos(\frac{a\Omega}{2})+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
+&D_{\tau}+\mu  \bar{\psi} \gamma _4 \psi \to -\kappa \left[\left(\cos(\frac{a\Omega}{2})+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
+&\left.+\left(\cos(\frac{a\Omega}{2})-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
 \end{split}
 \end{equation}
 The $1$ in $\textcolor[rgb]{0,0,1}{1}\pm \frac{ia\Omega \sigma ^{12}}{2}$ is the usual $D_{\tau}$. So the additional term is in fact
 \textcolor[rgb]{0,0,1}{
 \begin{equation}
 \begin{split}
-&-\kappa \left[\left(\cos(\frac{a\Omega}{2})-1-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
-&\left.+\left(\cos(\frac{a\Omega}{2})-1+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
+&-\kappa \left[\left(\cos(\frac{a\Omega}{2})-1+i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
+&\left.+\left(\cos(\frac{a\Omega}{2})-1-i\sin(\frac{a\Omega}{2})\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
 \end{split}
 \end{equation}
 }
-In the case of $a \ll 1$, it is approximately
+
+\textcolor[rgb]{0,0,1}{\textbf{Another way to do so}}
+
 \begin{equation}
 \begin{split}
-&-\kappa \left[\left(-i\frac{a\Omega}{2}\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} \right.\\
-&\left.+\left(i\frac{a\Omega}{2}\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right]
+& -\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi (n)}{2a} \to 0\\
+& \psi (n) \to  (U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu))\\
 \end{split}
 \end{equation}
-The $U_{\tau}$ is in fact added to keep gauge symmetry, originally it is
+so
 \begin{equation}
 \begin{split}
-&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)\delta _{n,n+t} +(\gamma _4+1) \delta _{n-t,n}\right)\\
-&\approx -\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)\delta _{n,n} +(\gamma _4+1) \delta _{n,n}\right)\\
-&=-\kappa \gamma _4 ia\Omega \sigma ^{12}
+&\kappa \gamma _4 ia\Omega \sigma ^{12} \psi (n)=-\kappa  \left(-ia\Omega \sigma ^{12} \right)\gamma _4\psi (n)\\
+&\approx -\kappa \left( \frac{ -ia\Omega \sigma ^{12}}{2}\right) ( \gamma _4 U_{\mu}(n) \psi (n+\tau) + \gamma _4 U_{-\mu}(n) \psi (n-\tau)) \\
+&\approx -\kappa \left( \frac{ -ia\Omega \sigma ^{12}}{2}\right)  ( \gamma _4 U_{\mu}(n) \psi (n+\tau) + \gamma _4 U_{-\mu}(n) \psi (n-\tau) - U_{\mu}(n)\psi (n+\tau) + U_{-\mu}(n)\psi (n-\tau)) \\
+&=-\kappa\left( \frac{ -ia\Omega \sigma ^{12}}{2}\right) \left((\gamma _4-1)U_{\mu}(n)\psi (n+\tau) +(\gamma _4+1) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&= -\kappa \left(\frac{-ia\Omega \sigma ^{12}}{2} (\gamma _4-1)U_{\mu}(n)\psi (n+\tau) + \frac{-ia\Omega \sigma ^{12}}{2} (\gamma _4+1) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&= -\kappa \left(\frac{ia\Omega \sigma ^{12}}{2} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + \frac{-ia\Omega \sigma ^{12}}{2} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+\end{split}
+\end{equation}
+
+so
+\begin{equation}
+\begin{split}
+&-\kappa \gamma _4 X_4 +\kappa \gamma _4 ia\Omega \sigma ^{12} \psi (n)\\
+&=-\kappa \left((1-\gamma _4)U_{\mu}(n)\psi (n+\tau) +(1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&-\kappa \left(\frac{ia\Omega \sigma ^{12}}{2} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + \frac{-ia\Omega \sigma ^{12}}{2} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&=-\kappa \left(\left(1+\frac{ia\Omega \sigma ^{12}}{2}\right) (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + \left(1-\frac{ia\Omega \sigma ^{12}}{2}\right) (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&\approx -\kappa \left(e^{\frac{ia\Omega \sigma ^{12}}{2}} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + e^{\frac{-ia\Omega \sigma ^{12}}{2}} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
 \end{split}
 \end{equation}
 which go back to the $\sigma ^{12}$ term.
@@ -416,7 +432,7 @@ and
 \begin{equation}
 \begin{split}
 &S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
-&D(n|m)=\left(1+2\kappa(\hat{y}-\hat{x})\hat{\Omega}-i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
+&D(n|m)=\left(1+2\kappa(\hat{y}-\hat{x})\hat{\Omega}+i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
 &-\kappa\sum _{\mu}\left[(1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right]\\
 &-\kappa \hat{y}\hat{\Omega} \left((1-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(1+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
 &+\kappa \hat{x}\hat{\Omega} \left((1-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(1+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
@@ -430,7 +446,7 @@ or (As in Ref.~\cite{rotation}, the naive discretization is used.)
 \begin{equation}
 \begin{split}
 &S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
-&D(n|m)=\left(1-i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
+&D(n|m)=\left(1+i\kappa \gamma _4 \hat{\Omega} \sigma ^{12}\right)\delta _{n,m}\\
 &-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
 &-\kappa \hat{y}\hat{\Omega} \left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
 &+\kappa \hat{x}\hat{\Omega} \left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
@@ -443,10 +459,10 @@ If using the exponential spin coupling term it is
 \begin{equation}
 \begin{split}
 &S_F=\sum _{n,m}\bar{\psi }(n) D(n|m) \psi(m)\\
-&D(n|m)=\delta _{n,m}-\kappa\sum _{\mu}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
+&D(n|m)=\delta _{n,m}-\kappa\sum _{\mu = 1,2,3}\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
 &-\kappa \hat{y}\hat{\Omega} \left((-\gamma _4)U_{x}(n)\delta _{n+a\hat{x},m}+(+\gamma _4)U_{-x}(n)\delta _{n-a\hat{x},m}\right)\\
 &+\kappa \hat{x}\hat{\Omega} \left((-\gamma _4)U_{y}(n)\delta _{n+a\hat{y},m}+(+\gamma _4)U_{-y}(n)\delta _{n-a\hat{y},m}\right)\\
-&-\kappa \frac{ia\Omega \sigma ^{12}}{2}\left((\gamma _4-1)U_{\tau}(n)\delta _{n,n+t} +(\gamma _4+1) U_{-\tau}(n)\delta _{n-t,n}\right)\\
+&-\kappa \left(e^{\frac{ia\Omega \sigma ^{12}}{2}}(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t} +e^{\frac{-ia\Omega \sigma ^{12}}{2}}(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\right)\\
 \end{split}
 \end{equation}
 }

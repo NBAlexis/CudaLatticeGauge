@@ -271,6 +271,7 @@ TestAngularMomentum:
         FieldId : 1
         MeasureDist : 1
         MeasureSpin : 1
+        MeasureApprox : 1
         ShowResult : 1
 
     Measure2:
@@ -282,7 +283,7 @@ TestAngularMomentum:
         Exponential : 1
         Naive : 1
         ShowResult : 1
-        FieldCount : 5000
+        FieldCount : 1
 
 TestALogDefinition:
 

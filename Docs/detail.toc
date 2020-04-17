@@ -68,15 +68,15 @@
 \contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{67}{subsubsection.8.1.1}% 
 \contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{69}{subsubsection.8.1.2}% 
 \contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{73}{subsubsection.8.1.3}% 
-\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{74}{subsubsection.8.1.4}% 
+\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{75}{subsubsection.8.1.4}% 
 \contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{76}{subsubsection.8.1.5}% 
-\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{80}{subsubsection.8.1.6}% 
-\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{81}{subsubsection.8.1.7}% 
-\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{89}{subsubsection.8.1.8}% 
-\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{89}{subsubsection.8.1.9}% 
-\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{90}{subsubsection.8.1.10}% 
-\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{90}{subsubsection.8.1.11}% 
-\contentsline {subsection}{\numberline {8.2}Sample Producer}{91}{subsection.8.2}% 
-\contentsline {subsection}{\numberline {8.3}Data Analyse}{91}{subsection.8.3}% 
-\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{91}{subsubsection.8.3.1}% 
-\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{92}{subsubsection.8.3.2}% 
+\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{81}{subsubsection.8.1.6}% 
+\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{82}{subsubsection.8.1.7}% 
+\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{90}{subsubsection.8.1.8}% 
+\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{90}{subsubsection.8.1.9}% 
+\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{91}{subsubsection.8.1.10}% 
+\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{91}{subsubsection.8.1.11}% 
+\contentsline {subsection}{\numberline {8.2}Sample Producer}{92}{subsection.8.2}% 
+\contentsline {subsection}{\numberline {8.3}Data Analyse}{92}{subsection.8.3}% 
+\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{92}{subsubsection.8.3.1}% 
+\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{93}{subsubsection.8.3.2}% 

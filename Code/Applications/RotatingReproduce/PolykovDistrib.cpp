@@ -172,6 +172,10 @@ INT MeasurePolyakovDist(CParameters& params)
     params.FetchValueINT(_T("UseZ4"), iVaule);
     UBOOL bZ4 = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SubFolder"), iVaule);
+    UBOOL bSubFolder = 0 != iVaule;
+
     CCString sValue = _T("EDJ_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
     EDistributionJob eJob = __STRING_TO_ENUM(EDistributionJob, sValue);
@@ -183,6 +187,10 @@ INT MeasurePolyakovDist(CParameters& params)
     CCString sCSVSavePrefix;
     params.FetchStringValue(_T("CSVSavePrefix"), sCSVSavePrefix);
     appGeneral(_T("csv save prefix: %s\n"), sCSVSavePrefix.c_str());
+
+    CCString sSubFolderPrefix;
+    params.FetchStringValue(_T("SubFolderPrefix"), sSubFolderPrefix);
+    appGeneral(_T("sub folder prefix: %s\n"), sSubFolderPrefix.c_str());
 
     Real fBeta = F(0.0);
     params.FetchValueReal(_T("GaugeBate"), fBeta);
@@ -248,7 +256,15 @@ INT MeasurePolyakovDist(CParameters& params)
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
         {
             CCString sFileName;
-            sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+            if (bSubFolder)
+            {
+                sFileName.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+            }
+            else
+            {
+                sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+            }
+            
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             
             switch (eJob)
@@ -446,14 +462,14 @@ INT MeasurePolyakovDist(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JG);
                 _CLG_EXPORT_ANGULAR(pJG, JGS);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen);
-                _CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
+                //_CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
 
                 if (bJF && NULL != pJF)
                 {
                     _CLG_EXPORT_ANGULAR(pJF, JL);
                     _CLG_EXPORT_ANGULAR(pJF, JS);
-                    _CLG_EXPORT_ANGULAR(pJF, JLPure);
-                    _CLG_EXPORT_ANGULAR(pJF, JLJM);
+                    //_CLG_EXPORT_ANGULAR(pJF, JLPure);
+                    //_CLG_EXPORT_ANGULAR(pJF, JLJM);
                     _CLG_EXPORT_ANGULAR(pJF, JPot);
                 }
 
@@ -475,14 +491,14 @@ INT MeasurePolyakovDist(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JG);
                 _CLG_EXPORT_ANGULAR(pJG, JGS);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen);
-                _CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
+                //_CLG_EXPORT_ANGULAR(pJG, JGChenApprox);
 
                 if (NULL != pJF)
                 {
                     _CLG_EXPORT_ANGULAR(pJF, JL);
                     _CLG_EXPORT_ANGULAR(pJF, JS);
-                    _CLG_EXPORT_ANGULAR(pJF, JLPure);
-                    _CLG_EXPORT_ANGULAR(pJF, JLJM);
+                    //_CLG_EXPORT_ANGULAR(pJF, JLPure);
+                    //_CLG_EXPORT_ANGULAR(pJF, JLJM);
                     _CLG_EXPORT_ANGULAR(pJF, JPot);
                 }
 
@@ -540,8 +556,8 @@ INT MeasurePolyakovDist(CParameters& params)
             //nothing to do
         }
         break;
-            default:
-                break;
+        default:
+            break;
     }
 
     appGeneral(_T("\n(*"));

@@ -36,7 +36,6 @@ public:
         , m_pDeviceXYBufferJPot(NULL)
         , m_bExponential(TRUE)
         , m_bNaive(TRUE)
-        , m_bMeasureJLPure(FALSE)
 
         , m_pDistributionR(NULL)
         , m_pDistributionJL(NULL)
@@ -54,6 +53,7 @@ public:
         , m_uiMaxR(1)
         , m_uiEdgeR(1)
         , m_bShowResult(FALSE)
+        , m_bMeasureJLPure(FALSE)
     {
         
     }
@@ -82,7 +82,6 @@ protected:
 
     UBOOL m_bExponential;
     UBOOL m_bNaive;
-    UBOOL m_bMeasureJLPure;
 
     UINT* m_pDistributionR;
     Real* m_pDistributionJL;
@@ -103,6 +102,7 @@ protected:
 
 public:
 
+    UBOOL m_bMeasureJLPure;
     TArray<UINT> m_lstR;
     TArray<Real> m_lstJL;
     TArray<Real> m_lstJS;

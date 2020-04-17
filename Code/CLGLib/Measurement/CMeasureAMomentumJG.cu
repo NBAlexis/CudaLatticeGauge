@@ -318,6 +318,10 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     param.FetchValueINT(_T("MeasureSpin"), iValue);
     m_bMeasureSpin = iValue != 0;
 
+    iValue = 0;
+    param.FetchValueINT(_T("MeasureApprox"), iValue);
+    m_bMeasureApprox = iValue != 0;
+
     if (m_bMeasureSpin)
     {
         m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(m_byFieldId)->GetCopy());
@@ -503,87 +507,90 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 checkCudaErrors(cudaGetLastError());
             }
 
-            pGaugeSU3->CopyTo(pDpureA);
-            pDpureA->TransformToIA();
-            //[A, Aphys] = [Apure, Aphys], so we do not need to minus Aphys
-            //pDpureA->AxpyMinus(pAphysSU3);
-
-            _ZeroXYPlane(m_pDeviceDataBuffer);
-
-            _kernelMomemtumJGChenApprox << <block, threads >> > (
-                pESU3->m_pDeviceData,
-                pDpureA->m_pDeviceData,
-                pAphysSU3->m_pDeviceData,
-                CCommonData::m_sCenter,
-                m_pDeviceDataBuffer,
-                fBetaOverN
-                );
-
-            _AverageXYPlane(m_pDeviceDataBuffer);
-            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
-            checkCudaErrors(cudaGetLastError());
-
-            for (UINT i = 1; i < _HC_Ly; ++i)
+            if (m_bMeasureApprox)
             {
-                for (UINT j = 1; j < _HC_Lx; ++j)
-                {
-                    m_lstResJGChenApprox.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
-                }
-            }
+                pGaugeSU3->CopyTo(pDpureA);
+                pDpureA->TransformToIA();
+                //[A, Aphys] = [Apure, Aphys], so we do not need to minus Aphys
+                //pDpureA->AxpyMinus(pAphysSU3);
 
-            if (m_bMeasureDistribution)
-            {
-                XYDataToRdistri_R(
-                    m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                _ZeroXYPlane(m_pDeviceDataBuffer);
 
-                //extract res
-                checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
-                    m_lstJGChenApprox, m_lstJGChenApproxInner, m_lstJGChenApproxAll, m_lstR,
-                    m_pHostDistributionJG, m_pHostDistributionR,
-                    m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
-                );
+                _kernelMomemtumJGChenApprox << <block, threads >> > (
+                    pESU3->m_pDeviceData,
+                    pDpureA->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    CCommonData::m_sCenter,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN
+                    );
+
+                _AverageXYPlane(m_pDeviceDataBuffer);
+                checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
                 checkCudaErrors(cudaGetLastError());
-            }
 
-            _ZeroXYPlane(m_pDeviceDataBuffer);
-
-            _kernelMomemtumJGChenApprox2 << <block, threads >> > (
-                pESU3->m_pDeviceData,
-                pDpureA->m_pDeviceData,
-                pAphysSU3->m_pDeviceData,
-                CCommonData::m_sCenter,
-                m_pDeviceDataBuffer,
-                fBetaOverN
-                );
-
-            _AverageXYPlane(m_pDeviceDataBuffer);
-            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
-            checkCudaErrors(cudaGetLastError());
-
-            for (UINT i = 1; i < _HC_Ly; ++i)
-            {
-                for (UINT j = 1; j < _HC_Lx; ++j)
+                for (UINT i = 1; i < _HC_Ly; ++i)
                 {
-                    m_lstResJGChenApprox2.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+                    for (UINT j = 1; j < _HC_Lx; ++j)
+                    {
+                        m_lstResJGChenApprox.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+                    }
                 }
-            }
 
-            if (m_bMeasureDistribution)
-            {
-                XYDataToRdistri_R(
-                    m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                if (m_bMeasureDistribution)
+                {
+                    XYDataToRdistri_R(
+                        m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                        m_uiMaxR, FALSE, m_byFieldId);
 
-                //extract res
-                checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-                FillDataWithR_R(
-                    m_lstJGChenApprox2, m_lstJGChenApprox2Inner, m_lstJGChenApprox2All, m_lstR,
-                    m_pHostDistributionJG, m_pHostDistributionR,
-                    m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
-                );
+                    //extract res
+                    checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                    FillDataWithR_R(
+                        m_lstJGChenApprox, m_lstJGChenApproxInner, m_lstJGChenApproxAll, m_lstR,
+                        m_pHostDistributionJG, m_pHostDistributionR,
+                        m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                    );
+                    checkCudaErrors(cudaGetLastError());
+                }
+
+                _ZeroXYPlane(m_pDeviceDataBuffer);
+
+                _kernelMomemtumJGChenApprox2 << <block, threads >> > (
+                    pESU3->m_pDeviceData,
+                    pDpureA->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    CCommonData::m_sCenter,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN
+                    );
+
+                _AverageXYPlane(m_pDeviceDataBuffer);
+                checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
                 checkCudaErrors(cudaGetLastError());
+
+                for (UINT i = 1; i < _HC_Ly; ++i)
+                {
+                    for (UINT j = 1; j < _HC_Lx; ++j)
+                    {
+                        m_lstResJGChenApprox2.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+                    }
+                }
+
+                if (m_bMeasureDistribution)
+                {
+                    XYDataToRdistri_R(
+                        m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                        m_uiMaxR, FALSE, m_byFieldId);
+
+                    //extract res
+                    checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                    FillDataWithR_R(
+                        m_lstJGChenApprox2, m_lstJGChenApprox2Inner, m_lstJGChenApprox2All, m_lstR,
+                        m_pHostDistributionJG, m_pHostDistributionR,
+                        m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                    );
+                    checkCudaErrors(cudaGetLastError());
+                }
             }
         }
     }
@@ -622,17 +629,20 @@ void CMeasureAMomentumJG::Report()
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChen);
 
-        appGeneral(_T("\n========================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JG Chen Approx of sites ==========\n"), CCommonData::m_sCenter.x);
-        appGeneral(_T("========================================================\n"));
+        if (m_bMeasureApprox)
+        {
+            appGeneral(_T("\n========================================================\n"));
+            appGeneral(_T("=========== Angular Momentum JG Chen Approx of sites ==========\n"), CCommonData::m_sCenter.x);
+            appGeneral(_T("========================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox);
+            ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox);
 
-        appGeneral(_T("\n========================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), CCommonData::m_sCenter.x);
-        appGeneral(_T("========================================================\n"));
+            appGeneral(_T("\n========================================================\n"));
+            appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), CCommonData::m_sCenter.x);
+            appGeneral(_T("========================================================\n"));
 
-        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox2);
+            ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox2);
+        }
     }
 
     appGeneral(_T("===================================================\n"));

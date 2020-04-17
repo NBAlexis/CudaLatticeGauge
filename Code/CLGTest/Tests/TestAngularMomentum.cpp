@@ -62,23 +62,23 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJG1 = pJG->m_lstJGAll[0];
     fJGS1 = pJG->m_lstJGSAll[0];
     fJGChen1 = pJG->m_lstJGChenAll[0];
-    fJGChenApprox1 = pJG->m_lstJGChenApproxAll[0];
-    fJGChenApprox21 = pJG->m_lstJGChenApprox2All[0];
+    fJGChenApprox1 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
+    fJGChenApprox21 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2All[0] : F(0.0);
     fJFL1 = pJF->m_lstJLAll[0];
     fJFS1 = pJF->m_lstJSAll[0];
-    fJFLPure1 = pJF->m_lstJLPureAll[0];
-    fJFLJM1 = pJF->m_lstJLJMAll[0];
+    fJFLPure1 = pJF->m_bMeasureJLPure ? pJF->m_lstJLPureAll[0] : F(0.0);
+    fJFLJM1 = pJF->m_bMeasureJLPure ? pJF->m_lstJLJMAll[0] : F(0.0);
     fJFPot1 = pJF->m_lstJPotAll[0];
 
     Real fJG1In = pJG->m_lstJGInner[0];
     Real fJGS1In = pJG->m_lstJGSInner[0];
     Real fJGChen1In = pJG->m_lstJGChenInner[0];
-    Real fJGChenApprox1In = pJG->m_lstJGChenApproxInner[0];
-    Real fJGChenApprox21In = pJG->m_lstJGChenApprox2Inner[0];
+    Real fJGChenApprox1In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxInner[0] : F(0.0);
+    Real fJGChenApprox21In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2Inner[0] : F(0.0);
     Real fJFL1In = pJF->m_lstJLInner[0];
     Real fJFS1In = pJF->m_lstJSInner[0];
-    Real fJFLPure1In = pJF->m_lstJLPureInner[0];
-    Real fJFLJM1In = pJF->m_lstJLJMInner[0];
+    Real fJFLPure1In = pJF->m_bMeasureJLPure ? pJF->m_lstJLPureInner[0] : F(0.0);
+    Real fJFLJM1In = pJF->m_bMeasureJLPure ? pJF->m_lstJLJMInner[0] : F(0.0);
     Real fJFPot1In = pJF->m_lstJPotInner[0];
 
     //====== Step 4 ========
@@ -98,23 +98,23 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJG2 = pJG->m_lstJGAll[0];
     fJGS2 = pJG->m_lstJGSAll[0];
     fJGChen2 = pJG->m_lstJGChenAll[0];
-    fJGChenApprox2 = pJG->m_lstJGChenApproxAll[0];
-    fJGChenApprox22 = pJG->m_lstJGChenApprox2All[0];
+    fJGChenApprox2 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
+    fJGChenApprox22 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2All[0] : F(0.0);
     fJFL2 = pJF->m_lstJLAll[0];
     fJFS2 = pJF->m_lstJSAll[0];
-    fJFLPure2 = pJF->m_lstJLPureAll[0];
-    fJFLJM2 = pJF->m_lstJLJMAll[0];
+    fJFLPure2 = pJF->m_bMeasureJLPure ? pJF->m_lstJLPureAll[0] : F(0.0);
+    fJFLJM2 = pJF->m_bMeasureJLPure ? pJF->m_lstJLJMAll[0] : F(0.0);
     fJFPot2 = pJF->m_lstJPotAll[0];
 
     Real fJG2In = pJG->m_lstJGInner[0];
     Real fJGS2In = pJG->m_lstJGSInner[0];
     Real fJGChen2In = pJG->m_lstJGChenInner[0];
-    Real fJGChenApprox2In = pJG->m_lstJGChenApproxInner[0];
-    Real fJGChenApprox22In = pJG->m_lstJGChenApprox2Inner[0];
+    Real fJGChenApprox2In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxInner[0] : F(0.0);
+    Real fJGChenApprox22In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2Inner[0] : F(0.0);
     Real fJFL2In = pJF->m_lstJLInner[0];
     Real fJFS2In = pJF->m_lstJSInner[0];
-    Real fJFLPure2In = pJF->m_lstJLPureInner[0];
-    Real fJFLJM2In = pJF->m_lstJLJMInner[0];
+    Real fJFLPure2In = pJF->m_bMeasureJLPure ? pJF->m_lstJLPureInner[0] : F(0.0);
+    Real fJFLJM2In = pJF->m_bMeasureJLPure ? pJF->m_lstJLJMInner[0] : F(0.0);
     Real fJFPot2In = pJF->m_lstJPotInner[0];
 
     //====== Step compare ========
@@ -132,7 +132,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGetLattice()->m_pMeasurements->Reset();
     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
     fJGChen3 = pJG->m_lstJGChenAll[0];
-    fJGChenApprox3 = pJG->m_lstJGChenApproxAll[0];
+    fJGChenApprox3 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 
     pRandom->GaugeFixing(appGetLattice()->m_pGaugeField);
     pRandom->AlsoFixingAphys(appGetLattice()->m_pAphys);
@@ -140,7 +140,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGetLattice()->m_pMeasurements->Reset();
     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
     fJGChen4 = pJG->m_lstJGChenAll[0];
-    fJGChenApprox4 = pJG->m_lstJGChenApproxAll[0];
+    fJGChenApprox4 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 
     pRandom->GaugeFixing(appGetLattice()->m_pGaugeField);
     pRandom->AlsoFixingAphys(appGetLattice()->m_pAphys);
@@ -148,7 +148,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGetLattice()->m_pMeasurements->Reset();
     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
     fJGChen5 = pJG->m_lstJGChenAll[0];
-    fJGChenApprox5 = pJG->m_lstJGChenApproxAll[0];
+    fJGChenApprox5 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 
     pF1->Return();
     pF2->Return();
@@ -183,9 +183,12 @@ UINT TestAngularMomentum(CParameters& sParam)
         ++uiError;
     }
 
-    if (appAbs(fJFLPure1 - fJFL1 - fJFPot1) > F(0.000001))
+    if (pJF->m_bMeasureJLPure)
     {
-        ++uiError;
+        if (appAbs(fJFLPure1 - fJFL1 - fJFPot1) > F(0.000001))
+        {
+            ++uiError;
+        }
     }
 
     if (appAbs(fJG1In - fJG2In) > F(0.000001))
@@ -218,9 +221,12 @@ UINT TestAngularMomentum(CParameters& sParam)
         ++uiError;
     }
 
-    if (appAbs(fJFLPure1In - fJFL1In - fJFPot1In) > F(0.000001))
+    if (pJF->m_bMeasureJLPure)
     {
-        ++uiError;
+        if (appAbs(fJFLPure1In - fJFL1In - fJFPot1In) > F(0.000001))
+        {
+            ++uiError;
+        }
     }
 
     appGeneral(_T("Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1, fJG2, appAbs(fJG1 - fJG2));

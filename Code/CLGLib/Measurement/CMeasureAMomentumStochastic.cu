@@ -20,6 +20,7 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumStochastic)
  * Here JL is using y(T^+ - T^-) - x(T^+ - T^-)
  * Note that we are using fmY = -static_cast<Real>(sSite4.y - sCenter.y) = -y
  * By definition this is in fact -JL
+ *
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJL(
@@ -180,6 +181,140 @@ _kernelDotAndGatherXYAMomentumJL(
 #pragma endregion
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(jl);
+
+    atomicAdd(&resultXYPlaneJL[uiXY], cDotRes.x);
+}
+
+/**
+ * Simplified to not support !Naive, the gamma4 is multplied at last
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotAndGatherXYAMomentumJL_Simple(
+    const deviceWilsonVectorSU3* __restrict__ pLeft,
+    const deviceWilsonVectorSU3* __restrict__ pRight,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    BYTE byFieldId, SSmallInt4 sCenter,
+    Real* resultXYPlaneJL)
+{
+    intokernalInt4;
+
+    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
+    Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+
+    deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+
+#pragma region JL
+
+    //idir = mu
+    for (UINT idir = 0; idir < 2; ++idir)
+    {
+        //=========================
+        //get things
+
+        //x, mu
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+        //Assuming periodic
+        //get U(x,mu), U^{dagger}(x-mu), 
+        //deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        x_m_mu_Gauge_element.Dagger();
+
+        deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
+        deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);
+
+        //hopping terms
+
+        //U(x,mu) phi(x+ mu)
+        deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+        if (x_p_mu_Fermion.NeedToOpposite())
+        {
+            if (0 == idir)
+            {
+                //- k y Omega x_p_m
+                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                u_phi_x_p_m.MulReal(fmY);
+                jl.Add(u_phi_x_p_m);
+            }
+            else if (1 == idir)
+            {
+                //+ k x Omega x_p_m
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                u_phi_x_p_m.MulReal(fmX);
+                jl.Sub(u_phi_x_p_m);
+            }
+        }
+        else
+        {
+            if (0 == idir)
+            {
+                //- k y Omega x_p_m
+                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                u_phi_x_p_m.MulReal(fmY);
+                jl.Sub(u_phi_x_p_m);
+            }
+            else if (1 == idir)
+            {
+                //+ k x Omega x_p_m
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                u_phi_x_p_m.MulReal(fmX);
+                jl.Add(u_phi_x_p_m);
+            }
+        }
+
+        //U^{dagger}(x-mu) phi(x-mu)
+        deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+        if (x_m_mu_Fermion.NeedToOpposite())
+        {
+            if (0 == idir)
+            {
+                //- k y Omega x_p_m
+                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                u_dagger_phi_x_m_m.MulReal(fmY);
+                jl.Sub(u_dagger_phi_x_m_m);
+            }
+            else if (1 == idir)
+            {
+                //+ k x Omega x_p_m
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                u_dagger_phi_x_m_m.MulReal(fmX);
+                jl.Add(u_dagger_phi_x_m_m);
+            }
+        }
+        else
+        {
+            if (0 == idir)
+            {
+                //- k y Omega x_p_m
+                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                u_dagger_phi_x_m_m.MulReal(fmY);
+                jl.Add(u_dagger_phi_x_m_m);
+            }
+            else if (1 == idir)
+            {
+                //+ k x Omega x_p_m
+                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                u_dagger_phi_x_m_m.MulReal(fmX);
+                jl.Sub(u_dagger_phi_x_m_m);
+            }
+        }
+    }
+
+#pragma endregion
+
+    CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(gamma4.MulWilsonC(jl));
 
     atomicAdd(&resultXYPlaneJL[uiXY], cDotRes.x);
 }
@@ -477,6 +612,8 @@ _kernelDotAndGatherXYAMomentumJS(
 /**
  * JS = (gamma4-1) T+  +  (1+gamma4) T-
  * Note that, the T+ term multiply 0.5, it is in fact -0.5, that is -0.5(1-gamma4)T+
+ *
+ * Still need a "- kappa"
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS_Exp(
@@ -528,20 +665,31 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     deviceWilsonVectorSU3 js = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     js.Sub(gamma4.MulWilsonC(js));
     //only sin part
-    js.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? F(0.5) : -F(0.5)));
+    //simplified, to multiply 0.5 at last
+    if (x_p_mu_Fermion.NeedToOpposite()) //this was wrong, it is x_p_mu_Fermion
+    {
+        js.MulReal(-F(1.0));
+    }
+    //js.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? F(0.5) : -F(0.5)));
 
     deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? -F(0.5) : F(0.5)));
+    //simplified, to multiply 0.5 at last
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        u_dagger_phi_x_m_m.MulReal(-F(1.0));
+    }
+    //u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? -F(0.5) : F(0.5)));
 
-    js.Add(u_dagger_phi_x_m_m);
+    js.Sub(u_dagger_phi_x_m_m); //here was add which is wrong, see D operator this is Add, but the sin bring a sign
     js = sigma12.MulWilsonC(js);
-
+    
 #pragma endregion
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(js);
 
-    atomicAdd(&resultXYPlaneJS[uiXY], cDotRes.x);
+    //0.5 i, so is -cDotRes.y
+    atomicAdd(&resultXYPlaneJS[uiXY], -cDotRes.y * F(0.5));
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -662,11 +810,11 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
 
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBufferJL, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBufferJS, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBufferJPot, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     if (m_bMeasureJLPure)
     {
         checkCudaErrors(cudaMalloc((void**)& m_pDeviceXYBufferJLPure, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
         checkCudaErrors(cudaMalloc((void**)&m_pDeviceXYBufferJLJM, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
-        checkCudaErrors(cudaMalloc((void**)& m_pDeviceXYBufferJPot, sizeof(CLGComplex) * _HC_Lx * _HC_Ly));
     }
 
     Reset();
@@ -692,19 +840,19 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionJS, sizeof(Real) * (m_uiMaxR + 1)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDistributionJPot, sizeof(Real) * (m_uiMaxR + 1)));
 
     m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
     m_pHostDistributionJL = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
     m_pHostDistributionJS = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+    m_pHostDistributionJPot = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
 
     if (m_bMeasureJLPure)
     {
         checkCudaErrors(cudaMalloc((void**)& m_pDistributionJLPure, sizeof(Real) * (m_uiMaxR + 1)));
         m_pHostDistributionJLPure = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionJLJM, sizeof(Real) * (m_uiMaxR + 1)));
-        m_pHostDistributionJLJM = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
-        checkCudaErrors(cudaMalloc((void**)& m_pDistributionJPot, sizeof(Real) * (m_uiMaxR + 1)));
-        m_pHostDistributionJPot = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));
+        m_pHostDistributionJLJM = (Real*)malloc(sizeof(Real) * (m_uiMaxR + 1));    
     }
 }
 
@@ -721,11 +869,11 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
     {
         _ZeroXYPlane(m_pDeviceXYBufferJL);
         _ZeroXYPlane(m_pDeviceXYBufferJS);
+        _ZeroXYPlane(m_pDeviceXYBufferJPot);
         if (m_bMeasureJLPure)
         {
             _ZeroXYPlane(m_pDeviceXYBufferJLPure);
             _ZeroXYPlane(m_pDeviceXYBufferJLJM);
-            _ZeroXYPlane(m_pDeviceXYBufferJPot);
         }
     }
     checkCudaErrors(cudaGetLastError());
@@ -738,17 +886,33 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
     //The reuslts are stored by AtomicAdd into m_pDeviceXYBufferJL and m_pDeviceXYBufferJS
     preparethread;
-    _kernelDotAndGatherXYAMomentumJL << <block, threads >> >(
-        pF2W->m_pDeviceData,
-        pF1W->m_pDeviceData,
-        pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_byFieldId,
-        m_bNaive,
-        CCommonData::m_sCenter,
-        m_pDeviceXYBufferJL
-        );
+    if (m_bNaive)
+    {
+        _kernelDotAndGatherXYAMomentumJL_Simple << <block, threads >> > (
+            pF2W->m_pDeviceData,
+            pF1W->m_pDeviceData,
+            pGaugeSU3->m_pDeviceData,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            m_byFieldId,
+            CCommonData::m_sCenter,
+            m_pDeviceXYBufferJL
+            );
+    }
+    else
+    {
+        _kernelDotAndGatherXYAMomentumJL << <block, threads >> > (
+            pF2W->m_pDeviceData,
+            pF1W->m_pDeviceData,
+            pGaugeSU3->m_pDeviceData,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            m_byFieldId,
+            FALSE,
+            CCommonData::m_sCenter,
+            m_pDeviceXYBufferJL
+            );
+    }
 
     checkCudaErrors(cudaGetLastError());
 
@@ -776,9 +940,24 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
     checkCudaErrors(cudaGetLastError());
 
+    const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
+    if (NULL == pAphys)
+    {
+        appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
+    }
+    _kernelDotAndGatherXYAMomentumJPot << <block, threads >> > (
+        pF2W->m_pDeviceData,
+        pF1W->m_pDeviceData,
+        pAphys->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_byFieldId,
+        m_pDeviceXYBufferJPot
+        );
+
+    checkCudaErrors(cudaGetLastError());
+
     if (m_bMeasureJLPure)
     {
-        const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
         if (NULL == pAphys)
         {
             appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
@@ -808,17 +987,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 CCommonData::m_sCenter,
                 m_pDeviceXYBufferJLJM
                 );
-
-            _kernelDotAndGatherXYAMomentumJPot << <block, threads >> > (
-                pF2W->m_pDeviceData,
-                pF1W->m_pDeviceData,
-                pAphys->m_pDeviceData,
-                CCommonData::m_sCenter,
-                m_byFieldId,
-                m_pDeviceXYBufferJPot
-                );
-
-            checkCudaErrors(cudaGetLastError());
         }
     }
 
@@ -826,24 +994,26 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
     if (bEnd)
     {
-        const Real fDivider = CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
+        //2.0 is for the flavour
+        const Real fDivider = -F(2.0) * CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
 
         XYDataToRdistri_R(m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, m_byFieldId);
         XYDataToRdistri_R(m_pDeviceXYBufferJS, m_pDistributionR, m_pDistributionJS, m_uiMaxR, FALSE, m_byFieldId);
+        XYDataToRdistri_R(m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, m_byFieldId);
 
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJL, m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));        
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJS, m_pDistributionJS, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionJPot, m_pDistributionJPot, sizeof(Real)* (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaGetLastError());
+
 
         if (m_bMeasureJLPure)
         {
             XYDataToRdistri_R(m_pDeviceXYBufferJLPure, m_pDistributionR, m_pDistributionJLPure, m_uiMaxR, FALSE, m_byFieldId);
             XYDataToRdistri_R(m_pDeviceXYBufferJLJM, m_pDistributionR, m_pDistributionJLJM, m_uiMaxR, FALSE, m_byFieldId);
-            XYDataToRdistri_R(m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, m_byFieldId);
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLPure, m_pDistributionJLPure, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLJM, m_pDistributionJLJM, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
-            checkCudaErrors(cudaMemcpy(m_pHostDistributionJPot, m_pDistributionJPot, sizeof(Real)* (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
         }
 
@@ -866,8 +1036,12 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
         assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJL.Num());
         assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJS.Num());
-        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJLPure.Num());
-        assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJLJM.Num());
+        if (m_bMeasureJLPure)
+        {
+            assert(static_cast<INT>(m_uiConfigurationCount)* m_lstR.Num() == m_lstJLPure.Num());
+            assert(static_cast<INT>(m_uiConfigurationCount)* m_lstR.Num() == m_lstJLJM.Num());
+        }
+
         assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJPot.Num());
 
         if (0 == m_uiConfigurationCount)
@@ -879,32 +1053,32 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                     m_lstR.AddItem(uiL);
                     m_lstJL.AddItem(m_pHostDistributionJL[uiL] * fDivider);
                     m_lstJS.AddItem(m_pHostDistributionJS[uiL] * fDivider);
+                    m_lstJPot.AddItem(m_pHostDistributionJPot[uiL] * fDivider);
                     if (m_bMeasureJLPure)
                     {
                         m_lstJLPure.AddItem(m_pHostDistributionJLPure[uiL] * fDivider);
                         m_lstJLJM.AddItem(m_pHostDistributionJLJM[uiL] * fDivider);
-                        m_lstJPot.AddItem(m_pHostDistributionJPot[uiL] * fDivider);
                     }
 
                     uiInnerPointsJLAll += m_pHostDistributionR[uiL];
                     fAverageJLAll += m_pHostDistributionR[uiL] * m_pHostDistributionJL[uiL];
                     fAverageJSAll += m_pHostDistributionR[uiL] * m_pHostDistributionJS[uiL];
+                    fAverageJPotAll += m_pHostDistributionR[uiL] * m_pHostDistributionJPot[uiL];
                     if (m_bMeasureJLPure)
                     {
                         fAverageJLPureAll += m_pHostDistributionR[uiL] * m_pHostDistributionJLPure[uiL];
                         fAverageJLJMAll += m_pHostDistributionR[uiL] * m_pHostDistributionJLJM[uiL];
-                        fAverageJPotAll += m_pHostDistributionR[uiL] * m_pHostDistributionJPot[uiL];
                     }
                     if (uiL < m_uiEdgeR)
                     {
                         uiInnerPointsJLInner += m_pHostDistributionR[uiL];
                         fAverageJLInner += m_pHostDistributionR[uiL] * m_pHostDistributionJL[uiL];
                         fAverageJSInner += m_pHostDistributionR[uiL] * m_pHostDistributionJS[uiL];
+                        fAverageJPotInner += m_pHostDistributionR[uiL] * m_pHostDistributionJPot[uiL];
                         if (m_bMeasureJLPure)
                         {
                             fAverageJLPureInner += m_pHostDistributionR[uiL] * m_pHostDistributionJLPure[uiL];
                             fAverageJLJMInner += m_pHostDistributionR[uiL] * m_pHostDistributionJLJM[uiL];
-                            fAverageJPotInner += m_pHostDistributionR[uiL] * m_pHostDistributionJPot[uiL];
                         }
                     }
 
@@ -916,7 +1090,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                             m_pHostDistributionJS[uiL],
                             m_bMeasureJLPure ? m_pHostDistributionJLPure[uiL] : 0.0f,
                             m_bMeasureJLPure ? m_pHostDistributionJLJM[uiL] : 0.0f,
-                            m_bMeasureJLPure ? m_pHostDistributionJPot[uiL] : 0.0f);
+                            m_pHostDistributionJPot[uiL]);
 
                     }
                 }
@@ -929,44 +1103,44 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 assert(m_pHostDistributionR[m_lstR[i]] > 0);
                 m_lstJL.AddItem(m_pHostDistributionJL[m_lstR[i]] * fDivider);
                 m_lstJS.AddItem(m_pHostDistributionJS[m_lstR[i]] * fDivider);
+                m_lstJPot.AddItem(m_pHostDistributionJPot[m_lstR[i]] * fDivider);
                 if (m_bMeasureJLPure)
                 {
                     m_lstJLPure.AddItem(m_pHostDistributionJLPure[m_lstR[i]] * fDivider);
                     m_lstJLJM.AddItem(m_pHostDistributionJLJM[m_lstR[i]] * fDivider);
-                    m_lstJPot.AddItem(m_pHostDistributionJPot[m_lstR[i]] * fDivider);
                 }
 
                 uiInnerPointsJLAll += m_pHostDistributionR[m_lstR[i]];
                 fAverageJLAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJL[m_lstR[i]];
                 fAverageJSAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJS[m_lstR[i]];
+                fAverageJPotAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJPot[m_lstR[i]];
                 if (m_bMeasureJLPure)
                 {
                     fAverageJLPureAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJLPure[m_lstR[i]];
                     fAverageJLJMAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJLJM[m_lstR[i]];
-                    fAverageJPotAll += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJPot[m_lstR[i]];
                 }
                 if (m_lstR[i] < m_uiEdgeR)
                 {
                     uiInnerPointsJLInner += m_pHostDistributionR[m_lstR[i]];
                     fAverageJLInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJL[m_lstR[i]];
                     fAverageJSInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJS[m_lstR[i]];
+                    fAverageJPotInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJPot[m_lstR[i]];
                     if (m_bMeasureJLPure)
                     {
                         fAverageJLPureInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJLPure[m_lstR[i]];
                         fAverageJLJMInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJLJM[m_lstR[i]];
-                        fAverageJPotInner += m_pHostDistributionR[m_lstR[i]] * m_pHostDistributionJPot[m_lstR[i]];
                     }
                 }
 
                 if (m_bShowResult)
                 {
-                    appDetailed(_T("(%f)JL=%f, JS=%f, JLPure=%f, JLJM=%f, JPot=%f\n"),
+                    appDetailed(_T("(%f)JL=%f, JS=%f, JLPure=%f, JLJM=%f\n"),
                         _hostsqrt(static_cast<Real>(m_lstR[i])),
                         m_pHostDistributionJL[m_lstR[i]],
                         m_pHostDistributionJS[m_lstR[i]],
                         m_bMeasureJLPure ? m_pHostDistributionJLPure[m_lstR[i]] : 0.0f,
                         m_bMeasureJLPure ? m_pHostDistributionJLJM[m_lstR[i]] : 0.0f,
-                        m_bMeasureJLPure ? m_pHostDistributionJPot[m_lstR[i]] : 0.0f);
+                        m_pHostDistributionJPot[m_lstR[i]]);
                 }
             }
         }
@@ -991,24 +1165,27 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLInner.Num()));
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJSAll.Num()));
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJSInner.Num()));
+        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJPotAll.Num()));
+        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJPotInner.Num()));
         m_lstJLAll.AddItem(fAverageJLAll * fDivider);
         m_lstJLInner.AddItem(fAverageJLInner * fDivider);
         m_lstJSAll.AddItem(fAverageJSAll* fDivider);
         m_lstJSInner.AddItem(fAverageJSInner* fDivider);
+        m_lstJPotAll.AddItem(fAverageJPotAll* fDivider);
+        m_lstJPotInner.AddItem(fAverageJPotInner* fDivider);
+
         if (m_bMeasureJLPure)
         {
             assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLPureAll.Num()));
             assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLPureInner.Num()));
             assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLJMAll.Num()));
             assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJLJMInner.Num()));
-            assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJPotAll.Num()));
-            assert(m_uiConfigurationCount == static_cast<UINT>(m_lstJPotInner.Num()));
+
             m_lstJLPureAll.AddItem(fAverageJLPureAll* fDivider);
             m_lstJLPureInner.AddItem(fAverageJLPureInner* fDivider);
             m_lstJLJMAll.AddItem(fAverageJLJMAll* fDivider);
             m_lstJLJMInner.AddItem(fAverageJLJMInner* fDivider);
-            m_lstJPotAll.AddItem(fAverageJPotAll* fDivider);
-            m_lstJPotInner.AddItem(fAverageJPotInner* fDivider);
+
         }
         ++m_uiConfigurationCount;
     }
@@ -1048,13 +1225,16 @@ void CMeasureAMomentumStochastic::Report()
 
     ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJS);
 
-    appGeneral(_T("================ JFL pure ===================\n"));
+    if (m_bMeasureJLPure)
+    {
+        appGeneral(_T("================ JFL pure ===================\n"));
 
-    ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJLPure);
+        ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJLPure);
 
-    appGeneral(_T("================ JFL Jaffe Manohar pure ===================\n"));
+        appGeneral(_T("================ JFL Jaffe Manohar pure ===================\n"));
 
-    ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJLJM);
+        ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJLJM);
+    }
 
     appGeneral(_T("================ Jpot ===================\n"));
 

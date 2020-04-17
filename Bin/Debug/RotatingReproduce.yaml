@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_GaugeFixing
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -14,15 +14,15 @@ JobThermal:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 0
-    EquvibSkip : 0
-    EquvibStep : 55
-    SaveStartIndex : 1146
-    OmegaSep : 10
-    OmegaStart : 0
-    MaxOmega : 0.06318
-    MinNt : 5
-    MaxNt : 5
-    SavePrefix : NC5283161_
+    EquvibSkip : 2900
+    EquvibStep : 3000
+    SaveStartIndex : 0
+    OmegaSep : 20
+    OmegaStart : 2
+    MaxOmega : 0.14
+    MinNt : 3
+    MaxNt : 3
+    SavePrefix : N49916_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -36,7 +36,7 @@ JobThermal:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -51,8 +51,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    Nt5FileName : NC5283161_Rotate_Nt5_O9_1146.con
-    Nt5Polyakov : 0.68327963
+    Nt3FileName : N49916_Rotate_Nt3_O1_3000.con
+    Nt3Polyakov : 0.9111776
 
     # 55150
     # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
@@ -76,14 +76,14 @@ JobThermal:
         Metropolis : 1
         ReportMeasure : 0
         Adaptive : 1
-        MinMaxStep : [1, 50]
+        MinMaxStep : [4, 50]
         GrowReduceThreshold : [-0.3, 0.02]
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         ## IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 5
         NestedStep : 5
         Omelyan2Lambda : 0.38636665500756728
 
@@ -102,7 +102,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.161
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 2
         Period : [0, 0, 1, -1]
@@ -117,7 +117,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.283
+        Beta : 4.99
         Omega : 0.0
 
     Action2:
@@ -127,14 +127,14 @@ JobThermal:
     Solver:
         SolverForFieldId : 2
 
-        SolverName : CSLASolverBiCGStab
-        Accuracy : 0.00000001
+        # SolverName : CSLASolverBiCGStab
+        Accuracy : 0.000001
 
-        DiviationStep : 50
-        MaxStep : 1
+        # DiviationStep : 50
+        # MaxStep : 1
 
-        # SolverName : CSLASolverGMRES
-        # MaxDim : 20
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
 
         # SolverName : CSLASolverGCRODR
         # Accuracy : 0.000001
@@ -167,27 +167,29 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.75
-    OmegaRange : 0.14
+    GaugeBate : 5.02
+    OmegaRange : 0.063
     StartOmega : 0
-    EndOmega : 20
+    EndOmega : 9
     StartN : 101
-    EndN : 4500
+    EndN : 120
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum
-    DistributionJob : EDJ_Polyakov
+    DistributionJob : EDJ_ChiralAndFermionMomentum
     FermionMomentum : 1
     StochasticFieldCount : 25
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 0
     UseLogADefinition : 0
+    SubFolder : 1
+    SubFolderPrefix : G:\CLGConfigs\_f50216\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : G:\CLGConfigs\_f47516\Nt3\N47516_
-    CSVSavePrefix : G:\CLGConfigs\_f47516\Polyakov\N47516_
+    SavePrefix : N50216_
+    CSVSavePrefix : G:\CLGConfigs\_f50216\AngularAndChiral\N50216_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -245,7 +247,7 @@ JobPolyakovDist:
 
         # SolverName : CSLASolverGMRES
         # double
-        Accuracy : 0.0000000001
+        Accuracy : 0.00000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
@@ -284,6 +286,7 @@ JobPolyakovDist:
         ShowResult : 0
         MeasureDist : 1
         MeasureSpin : 1
+        MeasureApprox : 0
 
     Measure4:
 
@@ -291,7 +294,7 @@ JobPolyakovDist:
         FieldId : 2
         FieldCount : 16
         Exponential : 1
-        MeasurePure : 1
+        MeasurePure : 0
         Naive : 1
         ShowResult : 0
 

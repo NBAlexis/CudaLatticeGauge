@@ -67,6 +67,7 @@ public:
         , m_bMeasureSpin(FALSE)
         , m_pE(NULL)
         , m_pDpureA(NULL)
+        , m_bMeasureApprox(FALSE)
     {
     }
 
@@ -112,6 +113,7 @@ protected:
 
 public:
 
+    UBOOL m_bMeasureApprox;
     TArray<Real> m_lstJGAll;
     TArray<Real> m_lstJGInner;
 
