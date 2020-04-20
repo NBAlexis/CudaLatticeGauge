@@ -46,6 +46,10 @@ INT GaugeFixing(CParameters& params)
     params.FetchValueINT(_T("CheckAndFix"), iVaule);
     const UBOOL bAlsoFix = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SubFolder"), iVaule);
+    UBOOL bSubFolder = 0 != iVaule;
+
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
@@ -53,6 +57,10 @@ INT GaugeFixing(CParameters& params)
     CCString sLoadPrefix;
     params.FetchStringValue(_T("LoadPrefix"), sLoadPrefix);
     appGeneral(_T("load prefix: %s\n"), sLoadPrefix.c_str());
+
+    CCString sSubFolderPrefix;
+    params.FetchStringValue(_T("SubFolderPrefix"), sSubFolderPrefix);
+    appGeneral(_T("sub folder prefix: %s\n"), sSubFolderPrefix.c_str());
 
     if (bOnlyCheck)
     {
@@ -65,6 +73,7 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
+
                 const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
                 if (fRes >= F(0.0) && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
                 {
@@ -92,7 +101,14 @@ INT GaugeFixing(CParameters& params)
                     {
                         appGeneral(_T("\nBad O%d : %d \n"), uiOmega, uiIndex);
                         CCString sLoadFile;
-                        sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                        if (bSubFolder)
+                        {
+                            sLoadFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                        }
+                        else
+                        {
+                            sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                        }
                         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
                         appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
                         appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile);
@@ -114,7 +130,14 @@ INT GaugeFixing(CParameters& params)
             {
                 CCString sLoadFile;
                 CCString sSaveFile;
-                sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                if (bSubFolder)
+                {
+                    sLoadFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                }
+                else
+                {
+                    sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                }
                 sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 appGeneral(_T("Fixing O%d : %d \n"), uiOmega, uiIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
