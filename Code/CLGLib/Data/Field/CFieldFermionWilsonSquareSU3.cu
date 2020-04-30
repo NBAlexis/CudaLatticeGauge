@@ -279,14 +279,14 @@ _kernelAxpyPlusFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelAxpyPlusQuick(
-    deviceWilsonVectorSU3 * pMe,
-    const deviceWilsonVectorSU3 * __restrict__ pOther)
-{
-    intokernalE(24);
-    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx];
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelAxpyPlusQuick(
+//    deviceWilsonVectorSU3 * pMe,
+//    const deviceWilsonVectorSU3 * __restrict__ pOther)
+//{
+//    intokernalE(24);
+//    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx];
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyMinusFermionWilsonSquareSU3(
@@ -297,14 +297,14 @@ _kernelAxpyMinusFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Sub(pOther[uiSiteIndex]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelAxpyMinusQuick(
-    deviceWilsonVectorSU3 * pMe,
-    const deviceWilsonVectorSU3 * __restrict__ pOther)
-{
-    intokernalE(24);
-    pMe[uiSiteIndex].m_rme[elementIdx] -= pOther[uiSiteIndex].m_rme[elementIdx];
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelAxpyMinusQuick(
+//    deviceWilsonVectorSU3 * pMe,
+//    const deviceWilsonVectorSU3 * __restrict__ pOther)
+//{
+//    intokernalE(24);
+//    pMe[uiSiteIndex].m_rme[elementIdx] -= pOther[uiSiteIndex].m_rme[elementIdx];
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyComplexFermionWilsonSquareSU3(
@@ -315,16 +315,16 @@ _kernelAxpyComplexFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelAxpyComplexQuick(
-    deviceWilsonVectorSU3 * pMe,
-    const deviceWilsonVectorSU3 * __restrict__ pOther, CLGComplex a)
-{
-    intokernalE(12);
-    pMe[uiSiteIndex].m_me[elementIdx] = 
-        _cuCaddf(pMe[uiSiteIndex].m_me[elementIdx], 
-            _cuCmulf(a, pOther[uiSiteIndex].m_me[elementIdx]));
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelAxpyComplexQuick(
+//    deviceWilsonVectorSU3 * pMe,
+//    const deviceWilsonVectorSU3 * __restrict__ pOther, CLGComplex a)
+//{
+//    intokernalE(12);
+//    pMe[uiSiteIndex].m_me[elementIdx] = 
+//        _cuCaddf(pMe[uiSiteIndex].m_me[elementIdx], 
+//            _cuCmulf(a, pOther[uiSiteIndex].m_me[elementIdx]));
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyRealFermionWilsonSquareSU3(
@@ -335,14 +335,14 @@ _kernelAxpyRealFermionWilsonSquareSU3(
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulRealC(a));
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelAxpyRealQuick(
-    deviceWilsonVectorSU3 * pMe,
-    const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
-{
-    intokernalE(24);
-    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx] * a;
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelAxpyRealQuick(
+//    deviceWilsonVectorSU3 * pMe,
+//    const deviceWilsonVectorSU3 * __restrict__ pOther, Real a)
+//{
+//    intokernalE(24);
+//    pMe[uiSiteIndex].m_rme[elementIdx] += pOther[uiSiteIndex].m_rme[elementIdx] * a;
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotFermionWilsonSquareSU3(
@@ -354,16 +354,16 @@ _kernelDotFermionWilsonSquareSU3(
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelDotQuick(
-    const deviceWilsonVectorSU3 * __restrict__ pMe,
-    const deviceWilsonVectorSU3 * __restrict__ pOther, Real* x, Real* y)
-{
-    intokernalE(12);
-    CLGComplex toAdd = _cuCmulf(_cuConjf(pMe[uiSiteIndex].m_me[elementIdx]), pOther[uiSiteIndex].m_me[elementIdx]);
-    atomicAdd(x, toAdd.x);
-    atomicAdd(y, toAdd.y);
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelDotQuick(
+//    const deviceWilsonVectorSU3 * __restrict__ pMe,
+//    const deviceWilsonVectorSU3 * __restrict__ pOther, Real* x, Real* y)
+//{
+//    intokernalE(12);
+//    CLGComplex toAdd = _cuCmulf(_cuConjf(pMe[uiSiteIndex].m_me[elementIdx]), pOther[uiSiteIndex].m_me[elementIdx]);
+//    atomicAdd(x, toAdd.x);
+//    atomicAdd(y, toAdd.y);
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyComplex(
@@ -374,14 +374,14 @@ _kernelScalarMultiplyComplex(
     pMe[uiSiteIndex].MulComp(a);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelScalarQuick(
-    deviceWilsonVectorSU3 * pMe,
-    CLGComplex a)
-{
-    intokernalE(12);
-    pMe[uiSiteIndex].m_me[elementIdx] = _cuCmulf(pMe[uiSiteIndex].m_me[elementIdx], a);
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelScalarQuick(
+//    deviceWilsonVectorSU3 * pMe,
+//    CLGComplex a)
+//{
+//    intokernalE(12);
+//    pMe[uiSiteIndex].m_me[elementIdx] = _cuCmulf(pMe[uiSiteIndex].m_me[elementIdx], a);
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyReal(
@@ -392,14 +392,14 @@ _kernelScalarMultiplyReal(
     pMe[uiSiteIndex].MulReal(a);
 }
 
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
-_kernelScalarQuickReal(
-    deviceWilsonVectorSU3 * pMe,
-    Real a)
-{
-    intokernalE(24);
-    pMe[uiSiteIndex].m_rme[elementIdx] *= a;
-}
+//__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+//_kernelScalarQuickReal(
+//    deviceWilsonVectorSU3 * pMe,
+//    Real a)
+//{
+//    intokernalE(24);
+//    pMe[uiSiteIndex].m_rme[elementIdx] *= a;
+//}
 
 /**
 * Initialize
@@ -599,6 +599,7 @@ void CFieldFermionWilsonSquareSU3::CopyTo(CField* U) const
     pField->m_byEvenFieldId = m_byEvenFieldId;
 }
 
+#if 0
 #pragma region Quick Axpys (Although this is faster in debug mode, this is not fast in release Mode)
 
 void CFieldFermionWilsonSquareSU3::AxpyPlus1(const CField* x)
@@ -685,6 +686,7 @@ CLGComplex CFieldFermionWilsonSquareSU3::Dot1(const CField* x) const
 }
 
 #pragma endregion
+#endif
 
 void CFieldFermionWilsonSquareSU3::AxpyPlus(const CField* x)
 {
@@ -1266,7 +1268,7 @@ CFieldMatrixOperationWilsonSquareSU3::~CFieldMatrixOperationWilsonSquareSU3()
 *                                   (mm1, ..., mmk)
 * I think this is expansive... the FLOP of Ax is about 100n, but this has m x k x n
 */
-__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
+__global__ void _CLG_LAUNCH_BOUND
 _kernelMatrixMultiply(
     deviceWilsonVectorSU3 ** pRes,
     deviceWilsonVectorSU3 ** pLeft,

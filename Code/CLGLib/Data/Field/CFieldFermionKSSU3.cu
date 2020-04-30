@@ -934,7 +934,7 @@ CFieldMatrixOperationKSSU3::~CFieldMatrixOperationKSSU3()
 *                                   (mm1, ..., mmk)
 * I think this is expansive... the FLOP of Ax is about 100n, but this has m x k x n
 */
-__global__ void _CLG_LAUNCH_BOUND_(_MATRIX_BOUND)
+__global__ void _CLG_LAUNCH_BOUND
 _kernelMatrixMultiplyKSSU3(
     deviceSU3Vector** pRes,
     deviceSU3Vector** pLeft,

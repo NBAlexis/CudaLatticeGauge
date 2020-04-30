@@ -356,7 +356,7 @@
     </CudaCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_70,sm_70;</CodeGeneration>
+      <CodeGeneration>compute_75,sm_75;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <Runtime>MDd</Runtime>
       <AdditionalCompilerOptions>
@@ -439,7 +439,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_70,sm_70;</CodeGeneration>
+      <CodeGeneration>compute_75,sm_75;</CodeGeneration>
       <Defines>WIN32;</Defines>
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>

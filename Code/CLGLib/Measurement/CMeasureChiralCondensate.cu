@@ -14,25 +14,27 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CMeasureChiralCondensate)
 
-__constant__ _deviceMeasureCondensateFunc _cMeasureCondFuncs[CMeasureChiralCondensate::_kCondMeasureCount] =
-{
-    _deviceMeasureChiral,
-    _deviceMeasureGamma1,
-    _deviceMeasureGamma2,
-    _deviceMeasureGamma3,
-    _deviceMeasureGamma4,
-    _deviceMeasureGamma5,
-    _deviceMeasureGamma45,
-    _deviceMeasureGammaX,
-    _deviceMeasureGammaY
-};
+//Function ptr is a good idea, but exceeds the regcount...
+//__constant__ _deviceMeasureCondensateFunc _cMeasureCondFuncs[CMeasureChiralCondensate::_kCondMeasureCount] =
+//{
+//    _deviceMeasureChiral,
+//    _deviceMeasureGamma1,
+//    _deviceMeasureGamma2,
+//    _deviceMeasureGamma3,
+//    _deviceMeasureGamma4,
+//    _deviceMeasureGamma5,
+//    _deviceMeasureGamma45,
+//    _deviceMeasureGammaX,
+//    _deviceMeasureGammaY
+//};
 
 #pragma region kernels
 
 /**
  * -4*kappa is multiplied outside
  */
-__global__ void _CLG_LAUNCH_BOUND
+__global__ void
+_CLG_LAUNCH_BOUND
 _kernelDotMeasureAll(
     BYTE byMeasureIndex,
     Real fOmega,
@@ -43,14 +45,50 @@ _kernelDotMeasureAll(
     CLGComplex* result)
 {
     intokernalInt4;
-    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
 
-    deviceWilsonVectorSU3 right = pOther[uiSiteIndex];
-    (*_cMeasureCondFuncs[byMeasureIndex])(sSite4, sCenter, fOmega, right);
+    deviceWilsonVectorSU3 right(pOther[uiSiteIndex]);
+    switch (byMeasureIndex)
+    {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        {
+            right = __chiralGamma[byMeasureIndex].MulWilsonC(right);
+        }
+        break;
+    case 6:
+        {
+            right = __chiralGamma[GAMMA45].MulWilsonC(right);
+        }
+        break;
+    case 7:
+        {
+            const Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y)* fOmega;
+            deviceWilsonVectorSU3 toAdd(__chiralGamma[GAMMA4].MulWilsonC(right));
+            toAdd.MulReal(fYOmega);
+            right = __chiralGamma[GAMMA1].MulWilsonC(right);
+            right.Add(toAdd);
+        }
+        break;
+    case 8:
+        {
+            const Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x)* fOmega;
+            deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(right);
+            toAdd.MulReal(fXOmega);
+            right = __chiralGamma[GAMMA2].MulWilsonC(right);
+            right.Sub(toAdd);
+        }
+        break;
+    case 0:
+    default:
+        break;
+    }
 
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(right);
-    atomicAdd(&resultXYPlan[uiXY].x, result[uiSiteIndex].x);
-    atomicAdd(&resultXYPlan[uiXY].y, result[uiSiteIndex].y);
+    atomicAdd(&resultXYPlan[_ixy].x, result[uiSiteIndex].x);
+    atomicAdd(&resultXYPlan[_ixy].y, result[uiSiteIndex].y);
 }
 
 __global__ void

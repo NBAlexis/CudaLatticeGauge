@@ -57,13 +57,13 @@ public:
     //=================================
     //It is tested, although, the DEBUG Mode, this is faster
     //But the RELEASE Mode, the above version is faster.
-    void AxpyPlus1(const CField* x);
-    void AxpyMinus1(const CField* x);
-    void Axpy1(Real a, const CField* x);
-    void Axpy1(const CLGComplex& a, const CField* x);
-    void ScalarMultply1(const CLGComplex& a);
-    void ScalarMultply1(Real a);
-    CLGComplex Dot1(const CField* other) const;
+    //void AxpyPlus1(const CField* x);
+    //void AxpyMinus1(const CField* x);
+    //void Axpy1(Real a, const CField* x);
+    //void Axpy1(const CLGComplex& a, const CField* x);
+    //void ScalarMultply1(const CLGComplex& a);
+    //void ScalarMultply1(Real a);
+    //CLGComplex Dot1(const CField* other) const;
 
     //pGauge must be gauge SU3
     void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;

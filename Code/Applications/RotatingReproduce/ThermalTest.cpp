@@ -102,18 +102,14 @@ INT TestThermal(CParameters& params)
         }
 
         CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-        CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
         TArray<TArray<CLGComplex>> polykovX_nx;
         TArray<CLGComplex> polykov;
         TArray<Real> polykovphase;
-        TArray<TArray<Real>> chiral_nx;
-        TArray<Real> chiral;
         for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
         {
             TArray<CLGComplex> a;
             TArray<Real> b;
             polykovX_nx.AddItem(a);
-            chiral_nx.AddItem(b);
         }
 
         CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
@@ -272,20 +268,6 @@ INT TestThermal(CParameters& params)
                 polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
             }
 
-            if (NULL != pCC)
-            {
-                //===================== Chiral condensate =====================
-                assert(pCC->m_lstChiralAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
-                assert(pCC->m_lstPionAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
-                assert(pCC->m_lstRhonAll.Num() == static_cast<INT>(iEquib - iEquibSkip));
-                assert(pCC->m_lstAverageCondensateDensity.Num() == static_cast<INT>(CCommonData::m_sCenter.x));
-                chiral.AddItem(_cuCabsf(pCC->m_cAverageCondensate));
-                for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
-                {
-                    chiral_nx[iX].AddItem(_cuCabsf(pCC->m_lstAverageCondensateDensity[iX]));
-                }
-            }
-
 #pragma endregion
 
             ++uiOmega;
@@ -312,18 +294,6 @@ INT TestThermal(CParameters& params)
                 polykovphase[i]);
         }
 
-        if (NULL != pCC)
-        {
-            appGeneral(_T("}\n\nChiralCondensate={\n"));
-
-            for (UINT i = 0; i <= iAfterEquib; ++i)
-            {
-                appGeneral(i == iAfterEquib ? _T("%2.10f\n") : _T("%2.10f,\n"),
-                    chiral[i]);
-            }
-        }
-        appGeneral(_T("}\n\n"));
-
         for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
         {
             appGeneral(_T("Polyakov[x=%d]={\n"), x);
@@ -336,20 +306,6 @@ INT TestThermal(CParameters& params)
                 );
             }
             appGeneral(_T("}\n\n"));
-        }
-
-        if (NULL != pCC)
-        {
-            for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
-            {
-                appGeneral(_T("ChiralCondensate[x=%d]={\n"), x);
-                for (UINT i = 0; i <= iAfterEquib; ++i)
-                {
-                    appGeneral(i == iAfterEquib ? _T("%2.10f\n") : _T("%2.10f,\n"),
-                        chiral_nx[x][i]);
-                }
-                appGeneral(_T("}\n\n"));
-            }
         }
 
         appSetLogDate(TRUE);
