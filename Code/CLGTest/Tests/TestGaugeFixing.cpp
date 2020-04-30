@@ -119,12 +119,13 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
     //pGauge->DebugPrintMe();
 
     //Extract results
-    const CLGComplex chiral1 = pCC->m_lstChiralAll[0];
-    const CLGComplex pion1 = pCC->m_lstPionAll[0];
-    const CLGComplex rhon1 = pCC->m_lstRhonAll[0];
-    const CLGComplex chiralfirstSite1 = pCC->m_lstChiral[0];
-    const CLGComplex pionfirstSite1 = pCC->m_lstPion[0];
-    const CLGComplex rhonfirstSite1 = pCC->m_lstRhon[0];
+    CLGComplex oldAll[CMeasureChiralCondensate::_kCondMeasureCount];
+    CLGComplex oldPosition0[CMeasureChiralCondensate::_kCondMeasureCount];
+    for (UINT i = 0; i < CMeasureChiralCondensate::_kCondMeasureCount; ++i)
+    {
+        oldAll[i] = pCC->m_lstCondAll[i][0];
+        oldPosition0[i] = pCC->m_lstCond[i][0];
+    }
 
     for (INT i = 0; i < 5; ++i)
     {
@@ -140,51 +141,27 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
         pCC->Reset();
         pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
 
-        const CLGComplex chiral2 = pCC->m_lstChiralAll[0];
-        const CLGComplex pion2 = pCC->m_lstPionAll[0];
-        const CLGComplex rhon2 = pCC->m_lstRhonAll[0];
-        const CLGComplex chiralfirstSite2 = pCC->m_lstChiral[0];
-        const CLGComplex pionfirstSite2 = pCC->m_lstPion[0];
-        const CLGComplex rhonfirstSite2 = pCC->m_lstRhon[0];
-
-        appGeneral(_T("Chiral: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), chiral1.x, chiral1.y, chiral2.x, chiral2.y);
-        if (__cuCabsSqf(_cuCsubf(chiral1, chiral2)) > F(0.00000001))
+        for (UINT i = 0; i < CMeasureChiralCondensate::_kCondMeasureCount; ++i)
         {
-            ++uiError;
-        }
+            //reset, so, the index is 0
+            const CLGComplex toBeCompareAll = pCC->m_lstCondAll[i][0];
+            const CLGComplex toBeComparePosition0 = pCC->m_lstCond[i][0];
 
-        appGeneral(_T("Pion: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), pion1.x, pion1.y, pion2.x, pion2.y);
-        if (__cuCabsSqf(_cuCsubf(pion1, pion2)) > F(0.00000001))
-        {
-            ++uiError;
-        }
+            appGeneral(_T("Cond[%d]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i, 
+                oldAll[i].x, oldAll[i].y, toBeCompareAll.x, toBeCompareAll.y);
+            if (__cuCabsSqf(_cuCsubf(oldAll[i], toBeCompareAll)) > F(0.00000001))
+            {
+                ++uiError;
+            }
 
-        appGeneral(_T("Rho: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), rhon1.x, rhon1.y, rhon2.x, rhon2.y);
-        if (__cuCabsSqf(_cuCsubf(rhon1, rhon2)) > F(0.00000001))
-        {
-            ++uiError;
-        }
-
-        appGeneral(_T("Chiral[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), chiralfirstSite1.x, chiralfirstSite1.y, chiralfirstSite2.x, chiralfirstSite2.y);
-        if (__cuCabsSqf(_cuCsubf(chiralfirstSite1, chiralfirstSite2)) > F(0.00000001))
-        {
-            ++uiError;
-        }
-
-        appGeneral(_T("Pion[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), pionfirstSite1.x, pionfirstSite1.y, pionfirstSite2.x, pionfirstSite2.y);
-        if (__cuCabsSqf(_cuCsubf(pionfirstSite1, pionfirstSite2)) > F(0.00000001))
-        {
-            ++uiError;
-        }
-
-        appGeneral(_T("Rho[0]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), rhonfirstSite1.x, rhonfirstSite1.y, rhonfirstSite2.x, rhonfirstSite2.y);
-        if (__cuCabsSqf(_cuCsubf(rhonfirstSite1, rhonfirstSite2)) > F(0.00000001))
-        {
-            ++uiError;
+            appGeneral(_T("Cond[%d] at 0: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i,
+                oldPosition0[i].x, oldPosition0[i].y, toBeComparePosition0.x, toBeComparePosition0.y);
+            if (__cuCabsSqf(_cuCsubf(oldPosition0[i], toBeComparePosition0)) > F(0.00000001))
+            {
+                ++uiError;
+            }
         }
     }
-
-    //pGauge->DebugPrintMe();
 
     appSafeDelete(pFermion2);
 

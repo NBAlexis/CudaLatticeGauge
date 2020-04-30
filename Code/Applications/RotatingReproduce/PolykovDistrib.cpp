@@ -442,8 +442,15 @@ INT MeasurePolyakovDist(CParameters& params)
             case EDJ_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCC, Chiral);
-                _CLG_EXPORT_CHIRAL(pCC, Pion);
-                _CLG_EXPORT_CHIRAL(pCC, Rhon);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma1);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma2);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma3);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma4);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma5);
+                _CLG_EXPORT_CHIRAL(pCC, Gamma45);
+                _CLG_EXPORT_CHIRAL(pCC, GammaX);
+                _CLG_EXPORT_CHIRAL(pCC, GammaY);
+
                 if (uiOmega == iStartOmega)
                 {
                     TArray<Real> lstRadius;
@@ -505,8 +512,14 @@ INT MeasurePolyakovDist(CParameters& params)
                 if (NULL != pCC)
                 {
                     _CLG_EXPORT_CHIRAL(pCC, Chiral);
-                    _CLG_EXPORT_CHIRAL(pCC, Pion);
-                    _CLG_EXPORT_CHIRAL(pCC, Rhon);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma1);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma2);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma3);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma4);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma5);
+                    _CLG_EXPORT_CHIRAL(pCC, Gamma45);
+                    _CLG_EXPORT_CHIRAL(pCC, GammaX);
+                    _CLG_EXPORT_CHIRAL(pCC, GammaY);
                 }
 
                 if (uiOmega == iStartOmega)

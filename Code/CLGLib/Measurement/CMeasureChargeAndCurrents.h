@@ -4,6 +4,8 @@
 // DESCRIPTION:
 // This is measurement for some charge and current densities
 //
+//  -- Discarded
+//
 // REVISION:
 //  [05/28/2019 nbale]
 //=============================================================================
