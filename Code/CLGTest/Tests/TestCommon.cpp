@@ -92,6 +92,8 @@ UINT TestSmallMatrix(CParameters&)
     return 0;
 }
 
+//already tested
+#if 0
 UINT TestQuickAxpy(CParameters&)
 {
     CFieldFermionWilsonSquareSU3* pF0 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -135,6 +137,7 @@ UINT TestQuickAxpy(CParameters&)
     appGeneral(_T("res = %f %f  t=%f (ms)\n"), res.x, res.y, timer2.Elapsed());
     return 0;
 }
+#endif
 
 UINT TestDirichletDOperator(CParameters&)
 {
@@ -187,7 +190,7 @@ __REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators);
 
-__REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
+//__REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
 __REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition);
 
