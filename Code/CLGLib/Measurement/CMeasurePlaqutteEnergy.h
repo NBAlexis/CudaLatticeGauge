@@ -30,8 +30,6 @@ public:
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
-protected:
-
     TArray<Real> m_lstData;
 };
 

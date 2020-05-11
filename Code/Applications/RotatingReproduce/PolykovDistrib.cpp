@@ -14,6 +14,7 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_Chiral,
     EDJ_AngularMomentum,
     EDJ_ChiralAndFermionMomentum,
+    EDJ_PlaqutteEnergy,
     )
 
 
@@ -225,6 +226,7 @@ INT MeasurePolyakovDist(CParameters& params)
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAMomentumStochastic* pJF = dynamic_cast<CMeasureAMomentumStochastic*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    CMeasurePlaqutteEnergy * pPE = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
 
     appSetLogDate(FALSE);
 
@@ -380,6 +382,11 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                 }
                 break;
+                case EDJ_PlaqutteEnergy:
+                {
+                    pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                break;
             }
 
             if ((iEndN - uiN + 1) % uiNewLine == 0)
@@ -533,6 +540,13 @@ INT MeasurePolyakovDist(CParameters& params)
                     sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
                 }
+            }
+            break;
+            case EDJ_PlaqutteEnergy:
+            {
+                CCString sFileName;
+                sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
+                WriteStringFile(sFileName, ExportRealArray(pPE->m_lstData));
             }
             break;
             default:
