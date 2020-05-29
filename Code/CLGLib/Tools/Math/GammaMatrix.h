@@ -256,6 +256,7 @@ extern "C" {
         */
         __device__ __inline__ void Print() const
         {
+            #pragma unroll
             for (BYTE row = 0; row < 4; ++row)
             {
                 const CLGComplex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
@@ -294,6 +295,7 @@ extern "C" {
         {
             gammaMatrix ret;
 
+            #pragma unroll
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
@@ -311,6 +313,7 @@ extern "C" {
         {
             gammaMatrix ret;
 
+            #pragma unroll
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
@@ -396,6 +399,7 @@ public:
     __device__ static void CreateGammaMatrix(EGammaMatrixSet eSet, gammaMatrix* gmarray)
     {
         //Gamma matrix is not initialized
+        #pragma unroll
         for (UINT i = 0; i < EGM_MAX; ++i)
         {
             gmarray[i].Reset();
@@ -485,6 +489,7 @@ public:
 
         gmarray[CHARGECONJG] = gmarray[GAMMA4]._mult(gmarray[GAMMA2]);
 
+        #pragma unroll
         for (UINT i = 0; i < EGM_MAX; ++i)
         {
             gmarray[i].CalculateNextSymmetricIndex();

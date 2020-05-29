@@ -46,6 +46,7 @@ _kernelDotAndGatherXYAMomentumJL(
 #pragma region JL
 
     //idir = mu
+    #pragma unroll
     for (UINT idir = 0; idir < 2; ++idir)
     {
         //=========================
@@ -212,6 +213,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
 #pragma region JL
 
     //idir = mu
+    #pragma unroll
     for (UINT idir = 0; idir < 2; ++idir)
     {
         //=========================
@@ -349,6 +351,7 @@ _kernelDotAndGatherXYAMomentumJPure(
 #pragma region JL
 
     //idir = mu
+    #pragma unroll
     for (UINT idir = 0; idir < 2; ++idir)
     {
         //=========================
@@ -490,6 +493,7 @@ _kernelDotAndGatherXYAMomentumJJM(
 #pragma region JL
 
     //idir = mu
+    #pragma unroll
     for (UINT idir = 0; idir < 2; ++idir)
     {
         //=========================

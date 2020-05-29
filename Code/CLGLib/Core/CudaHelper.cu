@@ -33,6 +33,7 @@ _CLG_LAUNCH_BOUND_SINGLE
 _kernelCreateMatrix(/*gammaMatrix* pDirac,*/ gammaMatrix* pChiral, deviceSU3* pGenerator)
 {
     gammaMatrixSet::CreateGammaMatrix(EGMS_Chiral, pChiral);
+    #pragma unroll
     for (int i = 0; i < 9; ++i)
     {
         pGenerator[i] = deviceSU3::makeSU3Generator(i);

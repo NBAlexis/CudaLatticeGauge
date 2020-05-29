@@ -357,6 +357,7 @@ extern "C" {
         __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3Spin(BYTE spinIndex)
         {
             deviceWilsonVectorSU3 ret;
+            #pragma unroll
             for (BYTE bySp = 0; bySp < 4; ++bySp)
             {
                 if (bySp == spinIndex)
@@ -374,6 +375,7 @@ extern "C" {
         __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3SpinColor(BYTE spinIndex, BYTE colorIndex)
         {
             deviceWilsonVectorSU3 ret;
+            #pragma unroll
             for (BYTE bySp = 0; bySp < 4; ++bySp)
             {
                 if (bySp == spinIndex)

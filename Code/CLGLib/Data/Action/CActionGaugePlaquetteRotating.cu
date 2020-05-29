@@ -230,7 +230,7 @@ _kernelAddForce4PlaqutteTermSU3_XYZ(
 
     betaOverN = betaOverN * F(-0.5);
     deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
-
+    #pragma unroll
     for (UINT idir = 0; idir < 3; ++idir)
     {
         if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))

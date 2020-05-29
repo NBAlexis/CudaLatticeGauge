@@ -73,6 +73,7 @@ _kernelDFermionWilsonSquareSU3_DR(
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
     //idir = mu
+    #pragma unroll
     for (UINT idir = 0; idir < 2; ++idir)
     {
         //=========================
