@@ -69,6 +69,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.h
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
@@ -104,6 +105,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/EnumGather.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CRationalApproximation.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/GammaMatrix.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CudaComplexFunction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.h
@@ -158,6 +160,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp

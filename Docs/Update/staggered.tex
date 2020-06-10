@@ -1,0 +1,141 @@
+\subsection{\label{sec:staggered_fermion}\index{staggered fermion}\index{Kogut-Susskind fermion}Staggered Fermion}
+
+\subsubsection{\label{sec:jordanWigner1D}The D=1 staggered fermion and Jordan-Wigner transformation}
+
+One way to introduce fermion is to use the Ising action (which is particularly useful in quantum computer simulation of $\mathbb{Z}_2$ lattice gauge~\cite{staggeredfermionInQuamtumSimulation}). The Jordan-Wigner transformation of $D=1$ Ising model is famous, now considering $D=1$ $XY$ model
+\begin{equation}
+\begin{split}
+&H=\frac{1}{4a}\sum _n \left(\sigma _x(n)\sigma _x(n+1)+\sigma _y(n)\sigma _y(n+1)\right)
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\phi ^{\dagger}(n)=\sigma ^+(n)\left\{\prod _{m<n}(-\sigma _z(n))\right\},\;\;\phi (n)=\left\{\prod _{m<n}(-\sigma _z(n))\right\}\sigma ^-(n),\;\;\sigma ^{\pm}=\frac{\sigma _x\pm i\sigma _y}{2}
+\end{split}
+\end{equation}
+one can verify that $\phi$ is fermion
+\begin{equation}
+\begin{split}
+&\{\phi (x),\phi^{\dagger} (y)\} = \delta _{xy},\;\; \{\phi^{\dagger} (x),\phi^{\dagger} (y)\}=\{\phi (x),\phi (y)\}=0
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&H=\frac{1}{2a}\sum _n \left(\phi ^{\dagger}(n)\phi(n+1) -\phi ^{\dagger}(n+1)\phi(n)\right)
+\end{split}
+\end{equation}
+with EoM same as naive discretized fermion
+\begin{equation}
+\begin{split}
+&\dot{\phi}(n)=-i[\phi (n), H]=\frac{1}{2a} \left(\phi (n+1)-\phi (n-1)\right)
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:naivestaggered}The relationship between the naive fermion and staggered fermion}
+
+Consider the naive discretized \textbf{massless} fermion
+\begin{equation}
+\begin{split}
+&S_F=a^4\sum _n\sum _{\mu}\frac{\bar{\psi}(n)\gamma _{\mu}U_{\mu}(n) \psi (n+\mu) + \bar{\psi}(n) \gamma _{\mu}U_{-\mu}(n)\psi (n-\mu)}{2a}
+\end{split}
+\end{equation}
+
+Although $\gamma$ matrix can mix different component of the spinor, one can however, reorder the component, for example
+\begin{equation}
+\begin{split}
+&\bar{\psi}(n)\gamma _x \psi (n+x)=\begin{pmatrix} \phi _x(n) \\ \phi _y(n) \\ \phi _z(n) \\ \phi _t(n) \end{pmatrix} \begin{pmatrix} 0 & 0 & 0 & -i \\ 0 & 0 & -i & 0\\ 0 & i & 0 & 0 \\ i & 0 & 0 & 0 \end{pmatrix} \begin{pmatrix} \phi _t(n+x) \\ \phi _z(n+x) \\ \phi _y(n+x) \\ \phi _x(n+x) \end{pmatrix}
+\end{split}
+\end{equation}
+
+One can see $\phi _x$ only couple to $\phi _x$. \textbf{It can be shown that, such reorder is independent of path from any given starting site.}
+
+To show that, just start from $\phi _i(n)$, reorder $\phi _i(n+\mu)$ based on $\phi _i(n)$, then $\phi _i(n+\mu + \nu)$ based on $\phi _i(n+\mu)$, then $\phi _i(n + \nu)$ based on $\phi _i(n+\mu + \nu)$ then $\phi _i(n)$ based on $\phi _i(n+\nu)$ (a loop), use the fact that there are always even number of $\gamma _{\mu}$ for any $\mu$ in a loop, and $\gamma _{\mu}^2=1$, so \textbf{a loop-reorder will not change the order of component}, which result in \textbf{reorder is independent of path}, and therefore \textbf{$\psi (x)$ on each site has an ambiguous reorder}.
+
+$\bullet$ An easy reorder
+
+Since it has been proved that reorder is independent of path, the reorder only depend on the coordinate $(x,y,z,t)$. An easy way is to define $\psi (n)=\gamma _1^x\gamma _2^y\gamma _3^z\gamma _4^t \chi (n)$. Note that, for $i\neq j$, $\gamma _i \gamma _j = -\gamma j \gamma _i$, \textbf{so there is a sign due to commutate gamma matrix}
+\begin{equation}
+\begin{split}
+&\chi (n)=\gamma _4^t  \gamma _3^z \gamma _2^y  \gamma _1^x\psi (n)\\
+&\bar{\chi}(n) \chi (n+y)= \bar{\psi} (n)\gamma _1^x \gamma _2^y \gamma _3^z \gamma _4^t \gamma _4^t  \gamma _3^z \gamma _2^{y+1}  \gamma _1^x\psi (n + y)=(-1)^x \bar{\psi} (n) \gamma _y \psi (n+y)\\
+&\bar{\chi}(n) \chi (n+z)= \bar{\psi} (n)\gamma _1^x \gamma _2^y \gamma _3^z \gamma _4^t \gamma _4^t  \gamma _3^{z+1} \gamma _2^y  \gamma _1^x\psi (n + y)=(-1)^{x+y} \bar{\psi} (n) \gamma _z \psi (n+z)\\
+\end{split}
+\end{equation}
+Defining $\eta_{\mu}(x)$ so that ~(\textbf{Note that $\mu$ in $eta _{\mu}(x)$ can be $\mu=5$})
+\begin{equation}
+\begin{split}
+&\eta _{\mu}(x) = (-1)^{\sum _{\nu < \mu} x_{\nu}}\\
+&\eta _{\mu}(x)\bar{\chi}(n) \chi (n+\mu)= \bar{\psi}(n) \gamma _{\mu} \psi (n+\mu)\\
+\end{split}
+\end{equation}
+
+Note that, it hold with massive fermions that the naive discretization can be written as
+\begin{equation}
+\begin{split}
+&S_F=a^4\sum _n\left\{\sum _{\mu}\eta _{\mu}(n)\bar{\chi}(n) \frac{U_{\mu}(n) \chi (n+\mu) - U_{-\mu}(n)\chi (n-\mu)}{2a} + m \bar{\chi}(n)\chi (n)\right\}
+\end{split}
+\end{equation}
+
+\textbf{Here $\chi$ is still a 4-component spinor, which is in fact a reorder of $\psi (n)$, the components of $\chi$ do NOT mix with each other}. Now by the fact each component of $\chi$ is equivalent (degenerate),
+\begin{equation}
+\begin{split}
+&S_F=a^4\sum _n\sum _{\alpha}\left\{\sum _{\mu}\eta _{\mu}(n)\bar{\chi}_{\alpha}(n) \frac{U_{\mu}(n) \chi_{\alpha} (n+\mu) - U_{-\mu}(n)\chi _{\alpha}(n-\mu)}{2a} + m \bar{\chi}_{\alpha}(n)\chi_{\alpha} (n)\right\}\\
+&=4a^4\sum _n\left\{\sum _{\mu}\eta _{\mu}(n)\bar{\chi}(n) \frac{U_{\mu}(n) \chi (n+\mu) - U_{-\mu}(n)\chi (n-\mu)}{2a} + m \bar{\chi}(n)\chi (n)\right\}\\
+\end{split}
+\end{equation}
+
+In the last line, we redefine $\chi(x)$ as a scalar (1-component) field.
+
+\textcolor[rgb]{0,0,1}{\textbf{Kogut-Susskind staggered fermion is just naive discretized fermion.}}
+
+\subsubsection{\label{sec:staggeredchiral}Symmetries of the staggered fermions}
+
+Now we concentrate on
+\begin{equation}
+\begin{split}
+&D_{st}(n|m)=m\delta _{m,n} + \sum _{\mu}\eta _{\mu}(n)\frac{U_{\mu}(n) \delta _{n,n+\mu} - U_{-\mu}(n)\delta _{n,n-\mu}}{2a}\\
+\end{split}
+\end{equation}
+
+$\bullet$ $D_{st}$ is $\gamma _5$-hermiticity
+
+\begin{equation}
+\begin{split}
+&D_{st}^{\dagger}(n|m)=\eta _5(\textcolor[rgb]{1,0,0}{n}) D_{st}^{\dagger}(n|m) \eta _5(\textcolor[rgb]{1,0,0}{m})\\
+\end{split}
+\end{equation}
+
+
+$\bullet$ \textbf{massless} case is \textbf{anti-hermitian traceless}
+
+\begin{equation}
+\begin{split}
+&D_{st}^{\dagger}(n|m)=-D_{st}(n|m)\\
+\end{split}
+\end{equation}
+
+$\bullet$ Chiral symmetry
+
+The \textbf{massless} $S_F$ is unchanged under transformation
+\begin{equation}
+\begin{split}
+&\chi (n) \to \exp ( i \alpha \eta _5(n))\chi (n),\;\; \bar{\chi} (n) \to \bar{\chi} (n) \exp ( i \alpha \eta _5(n))
+\end{split}
+\end{equation}
+
+Just note that they are somehow different, the chiral symmetry is from $\gamma _{\mu} \exp(i\alpha \gamma _5)=\exp(-i\alpha \gamma _5) \gamma _{\mu}$, and the chiral symmetry of staggered fermion is from $\eta _{\mu} \exp(i\alpha \eta _5(n+\mu))=\exp(i\alpha \eta _5(n+\mu)) \eta _{\mu} = \exp(-i\alpha \eta _5(n)) \eta _{\mu}$.
+
+$\bullet$ Sign problem of the staggered fermions
+
+Let $D_{st}(m=0)=U^{\dagger}\Lambda U$ where $\Lambda$ is diagonal, $U$ is unitary. $D^{\dagger}_{st}(m=0)=U^{\dagger}\Lambda ^{\dagger} U=-D_{st}(m=0)=-U^{\dagger}\Lambda U$, so $\Lambda$ is a diagonal matrix with $\Lambda ^{\dagger} = - \Lambda$, $\Lambda$ should be pure imaginary number.
+
+Then, use $D=U^{\dagger}\Lambda U + m U^{\dagger} U = U^{\dagger} \left(\Lambda + m\right)U$, and $\det [D]=\det [U^{\dagger}] \det [\Lambda + m] \det[U]$. And use $\det[U^{\dagger}]=\det[U^{-1}]=1/\det[U]$, one find $\det[D_{st}]=\det[\Lambda + m]$, where $\Lambda$ is pure imaginary number, and $m\geq 0$ is real number. One find \textbf{the eigenvalues of $D_{st}$ are complex number with real part exactly the mass.}
+
+\textcolor[rgb]{1,0,0}{I know the sum of eigenvalues is real number, but how to prove they are complex conjugate pairs?}
+
+\textcolor[rgb]{0,0,1}{\textbf{It has been proved that $\det [D_{st}]\geq m $, so one do not worry about the sign problem, even with a single flavour. And It is a consequence of (i) massless case is anti-hermitian traceless; (ii) the massive case is $\eta_5$-hermiticity.}}
+
+
+

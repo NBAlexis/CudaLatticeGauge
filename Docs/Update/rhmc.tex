@@ -1,0 +1,27 @@
+\subsection{\label{sec:rhmc}\index{RHMC}The RHMC for staggered fermion}
+
+From now on, we consider $N_f=2+1$. Two key quantities should be calculated.
+
+$\bullet$ Calculate the action
+
+\begin{equation}
+\begin{split}
+&\exp(-S)=\left(\det [D_{st}(m_{ud})]\right)^{\frac{1}{2}}\left(\det [D_{st}(m_s)]\right)^{\frac{1}{4}} \exp (-S_G)\\
+\end{split}
+\end{equation}
+
+The problem is how to evaluate $\left(\det [D]\right)^{\alpha}$.
+
+\subsubsection{\label{sec:rationalapproximation}The \index{rational approximation}rational approximation and Remes algorithm}
+
+The first thing to do is to find a rational approximation of a function, here we use \index{Remes algorithm}Remes algorithm as proposed by Ref.
+
+The Remes algorithm is implemented in Mathematica, which finds
+\begin{equation}
+\begin{split}
+&g(x)=c+\sum _i \frac{a_i}{x+b_i}\approx f(x),
+\end{split}
+\end{equation}
+in an interval.
+
+

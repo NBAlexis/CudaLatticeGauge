@@ -29,7 +29,7 @@ public:
     UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
-
+    UBOOL IsFermion() const override { return TRUE; }
     class CFieldFermionWilsonSquareSU3* m_pFerimionField;
 };
 

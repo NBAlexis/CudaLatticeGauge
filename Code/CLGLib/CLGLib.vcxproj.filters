@@ -347,6 +347,12 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\CRationalApproximation.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureAction.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -418,6 +424,9 @@
     </ClCompile>
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp">
       <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="Measurement\CMeasureAction.cpp">
+      <Filter>Measurement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

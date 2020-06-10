@@ -226,8 +226,9 @@ INT MeasurePolyakovDist(CParameters& params)
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAMomentumStochastic* pJF = dynamic_cast<CMeasureAMomentumStochastic*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CMeasurePlaqutteEnergy * pPE = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-
+    CMeasureAction * pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList[0]);
+    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
     appSetLogDate(FALSE);
 
     CFieldFermionWilsonSquareSU3* pF1 = NULL;
@@ -244,6 +245,10 @@ INT MeasurePolyakovDist(CParameters& params)
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
         CCommonData::m_fOmega = fOmega * uiOmega;
+        if (NULL != pAG)
+        {
+            pAG->SetOmega(CCommonData::m_fOmega);
+        }
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();
         pCC->Reset();

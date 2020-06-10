@@ -71,6 +71,12 @@ Dmitry~Shcherbakov et. al.
   integrators: the Schwinger model case}}.
 \newblock 2015, arXiv:1512.03812.
 
+\bibitem{staggeredfermionInQuamtumSimulation}
+Yukari~Yamauchi Henry~Lamm, Scott~Lawrence.
+\newblock \href{http://arxiv.org/abs/1903.08807}{{General Methods for Digital
+  Quantum Simulation of Gauge Theories}}.
+\newblock {\em Phys. Rev. D}, 100:034518, 2019, arXiv:1903.08807.
+
 \bibitem{templates}
 R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,
   V.~Eijkhout, R.~Pozo, C.~Romine, and H.~Van der Vorst.

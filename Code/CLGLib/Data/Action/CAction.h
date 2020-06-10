@@ -54,6 +54,8 @@ public:
 
     BYTE GetActionId() const { return m_byActionId; }
 
+    virtual UBOOL IsFermion() const { return FALSE; }
+
 protected:
 
     class CLatticeData* m_pOwner;

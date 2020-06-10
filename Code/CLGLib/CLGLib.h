@@ -197,6 +197,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 
 #include "Tools/Math/CLinearAlgebraHelper.h"
 #include "Tools/Math/CLGFFT.h"
+#include "Tools/Math/CRationalApproximation.h"
 
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"
@@ -248,6 +249,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"
+#include "Measurement/CMeasureAction.h"
 #include "Measurement/CMeasureMesonCorrelator.h"
 #include "Measurement/CMeasureAMomentumJG.h"
 #include "Measurement/CMeasureAMomentumJF.h"

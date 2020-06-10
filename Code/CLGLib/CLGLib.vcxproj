@@ -66,6 +66,7 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingLandauLosAlamos.h" />
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
+    <ClInclude Include="Measurement\CMeasureAction.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
@@ -101,6 +102,7 @@
     <ClInclude Include="Tools\EnumGather.h" />
     <ClInclude Include="Tools\Math\CLGFFT.h" />
     <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h" />
+    <ClInclude Include="Tools\Math\CRationalApproximation.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
@@ -136,6 +138,7 @@
     <CudaCompile Include="Measurement\CMeasure.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />

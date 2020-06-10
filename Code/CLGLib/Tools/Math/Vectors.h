@@ -354,39 +354,45 @@ extern "C" {
             return ret;
         }
 
+#define makeOneWilsonVectorSU3SpinUnroll(bySp) \
+                if (bySp == spinIndex) \
+                { \
+                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3Vector(); \
+                } \
+                else \
+                { \
+                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector(); \
+                }
+
         __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3Spin(BYTE spinIndex)
         {
             deviceWilsonVectorSU3 ret;
-            #pragma unroll
-            for (BYTE bySp = 0; bySp < 4; ++bySp)
-            {
-                if (bySp == spinIndex)
-                {
-                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3Vector();
-                }
-                else
-                {
-                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector();
-                }
-            }
+            //#pragma unroll unroll in header is unkown pragma
+            makeOneWilsonVectorSU3SpinUnroll(0);
+            makeOneWilsonVectorSU3SpinUnroll(1);
+            makeOneWilsonVectorSU3SpinUnroll(2);
+            makeOneWilsonVectorSU3SpinUnroll(3);
             return ret;
         }
+
+#define makeOneWilsonVectorSU3SpinColorUnroll(bySp) \
+                if (bySp == spinIndex) \
+                { \
+                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3VectorColor(colorIndex); \
+                } \
+                else \
+                { \
+                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector(); \
+                }
 
         __device__ __inline__ static deviceWilsonVectorSU3 makeOneWilsonVectorSU3SpinColor(BYTE spinIndex, BYTE colorIndex)
         {
             deviceWilsonVectorSU3 ret;
-            #pragma unroll
-            for (BYTE bySp = 0; bySp < 4; ++bySp)
-            {
-                if (bySp == spinIndex)
-                {
-                    ret.m_d[bySp] = deviceSU3Vector::makeOneSU3VectorColor(colorIndex);
-                }
-                else
-                {
-                    ret.m_d[bySp] = deviceSU3Vector::makeZeroSU3Vector();
-                }
-            }
+            //#pragma unroll unroll in header is unkown pragma
+            makeOneWilsonVectorSU3SpinColorUnroll(0);
+            makeOneWilsonVectorSU3SpinColorUnroll(1);
+            makeOneWilsonVectorSU3SpinColorUnroll(2);
+            makeOneWilsonVectorSU3SpinColorUnroll(3);
             return ret;
         }
 

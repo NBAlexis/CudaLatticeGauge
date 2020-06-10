@@ -253,10 +253,12 @@ extern "C" {
         /*
         * We are on device. Do not use thie function...
         * this is on device, so use print
+        * If you want to debug it again, copy the result to host and print
+        * Do not call this
         */
         __device__ __inline__ void Print() const
         {
-            #pragma unroll
+            //#pragma unroll
             for (BYTE row = 0; row < 4; ++row)
             {
                 const CLGComplex cv = _make_cuComplex(3 == m_byZ4[row] ? F(0.0) : (F(1.0) - m_byZ4[row]), 0 == m_byZ4[row] ? F(0.0) : (F(2.0) - m_byZ4[row]));
@@ -295,7 +297,9 @@ extern "C" {
         {
             gammaMatrix ret;
 
-            #pragma unroll
+            //unroll is not recognized in header files
+            //since this is not frequently called, just do not unroll
+            //#pragma unroll
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
@@ -313,7 +317,9 @@ extern "C" {
         {
             gammaMatrix ret;
 
-            #pragma unroll
+            //unroll is not recognized in header files
+            //since this is not frequently called, just do not unroll
+            //#pragma unroll
             for (int row = 0; row < 4; ++row)
             {
                 ret.m_uiIndex[row] = other.m_uiIndex[m_uiIndex[row]];
@@ -399,7 +405,9 @@ public:
     __device__ static void CreateGammaMatrix(EGammaMatrixSet eSet, gammaMatrix* gmarray)
     {
         //Gamma matrix is not initialized
-        #pragma unroll
+        //unroll is not recognized in header files
+        //since this is not frequently called, just do not unroll
+        //#pragma unroll
         for (UINT i = 0; i < EGM_MAX; ++i)
         {
             gmarray[i].Reset();
@@ -489,7 +497,9 @@ public:
 
         gmarray[CHARGECONJG] = gmarray[GAMMA4]._mult(gmarray[GAMMA2]);
 
-        #pragma unroll
+        //#pragma unroll
+        //unroll is not recognized in header files
+        //since this is not frequently called, just do not unroll
         for (UINT i = 0; i < EGM_MAX; ++i)
         {
             gmarray[i].CalculateNextSymmetricIndex();
