@@ -45,6 +45,7 @@ CLatticeData::CLatticeData()
 {
     m_pFieldCache = new CFieldCache();
     memset(m_pFermionSolver, 0, sizeof(CSLASolver*) * _kMaxFieldCount);
+    memset(m_pFermionMultiShiftSolver, 0, sizeof(CMultiShiftSolver*) * _kMaxFieldCount);
 }
 
 CLatticeData::~CLatticeData()
@@ -96,6 +97,7 @@ CLatticeData::~CLatticeData()
     for (BYTE byField = 0; byField < _kMaxFieldCount; ++byField)
     {
         appSafeDelete(m_pFermionSolver[byField]);
+        appSafeDelete(m_pFermionMultiShiftSolver[byField]);
     }
     appSafeDelete(m_pGaugeSmearing);
     appSafeDelete(m_pGaugeFixing);
@@ -105,13 +107,28 @@ void CLatticeData::CreateFermionSolver(const CCString& sSolver, const CParameter
 {
     CBase* pSolver = appCreate(sSolver);
     m_pFermionSolver[byFieldId] = dynamic_cast<CSLASolver*>(pSolver);
-    if (NULL == m_pFermionSolver)
+    if (NULL == m_pFermionSolver[byFieldId])
     {
         appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
         _FAIL_EXIT;
     }
     m_pFermionSolver[byFieldId]->Configurate(param);
     m_pFermionSolver[byFieldId]->AllocateBuffers(pFermionField);
+
+    appGeneral(_T("Create sparse linear algebra solver: %s \n"), sSolver.c_str());
+}
+
+void CLatticeData::CreateMultiShiftSolver(const CCString& sSolver, const CParameters& param, const CField* pFermionField, BYTE byFieldId)
+{
+    CBase* pSolver = appCreate(sSolver);
+    m_pFermionMultiShiftSolver[byFieldId] = dynamic_cast<CMultiShiftSolver*>(pSolver);
+    if (NULL == m_pFermionMultiShiftSolver[byFieldId])
+    {
+        appCrucial(_T("Create Fermion Solver %s failed!\n"), sSolver.c_str());
+        _FAIL_EXIT;
+    }
+    m_pFermionMultiShiftSolver[byFieldId]->Configurate(param);
+    m_pFermionMultiShiftSolver[byFieldId]->AllocateBuffers(pFermionField);
 
     appGeneral(_T("Create sparse linear algebra solver: %s \n"), sSolver.c_str());
 }
@@ -257,6 +274,12 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
         {
             sRet = sRet + sTab + _T("Solver : \n");
             sRet = sRet + m_pFermionSolver[i]->GetInfos(sTab + _T("    "));
+        }
+
+        if (NULL != m_pFermionMultiShiftSolver[i])
+        {
+            sRet = sRet + sTab + _T("Multi Shift Solver : \n");
+            sRet = sRet + m_pFermionMultiShiftSolver[i]->GetInfos(sTab + _T("    "));
         }
     }
 

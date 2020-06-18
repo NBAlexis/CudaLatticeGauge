@@ -595,6 +595,20 @@ void CCLGLibManager::CreateSolver(class CParameters& params) const
     m_pLatticeData->CreateFermionSolver(sSolverName, params, pField, static_cast<BYTE>(byFieldId));
 }
 
+void CCLGLibManager::CreateMultiShiftSolver(class CParameters& params) const
+{
+    CCString sSolverName = _T("CMultiShiftGMRES");
+    params.FetchStringValue(_T("SolverName"), sSolverName);
+    INT byFieldId = 2;
+    params.FetchValueINT(_T("SolverForFieldId"), byFieldId);
+    CField* pField = m_pLatticeData->GetFieldById(static_cast<BYTE>(byFieldId));
+    if (NULL == pField)
+    {
+        appCrucial(_T("Solver must be created for a specified field!\n"));
+    }
+    m_pLatticeData->CreateMultiShiftSolver(sSolverName, params, pField, static_cast<BYTE>(byFieldId));
+}
+
 void CCLGLibManager::CreateGaugeSmearing(class CParameters& params) const
 {
     CCString sSmearingName = _T("CGaugeSmearingAPEStout");
@@ -736,6 +750,21 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         {
             CParameters solver = params.GetParameter(sSolverName);
             CreateSolver(solver);
+        }
+    }
+
+    if (params.Exist(_T("MSSolver")))
+    {
+        CParameters solver = params.GetParameter(_T("MSSolver"));
+        CreateMultiShiftSolver(solver);
+    }
+    for (INT i = 0; i < _kMaxFieldCount; ++i)
+    {
+        CCString sSolverName = _T("MSSolver") + appIntToString(i);
+        if (params.Exist(sSolverName))
+        {
+            CParameters solver = params.GetParameter(sSolverName);
+            CreateMultiShiftSolver(solver);
         }
     }
 

@@ -74,6 +74,7 @@ protected:
     void CreateUpdator(class CParameters& params) const;
     void CreateMeasurement(class CParameters& params);
     void CreateSolver(class CParameters& params) const;
+    void CreateMultiShiftSolver(class CParameters& params) const;
     void CreateGaugeSmearing(class CParameters& params) const;
     void CreateGaugeFixing(class CParameters& params) const;
 
@@ -115,6 +116,11 @@ inline class CFileSystem* appGetFileSystem()
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId)
 {
     return appGetLattice()->m_pFermionSolver[byFieldId];
+}
+
+inline class CMultiShiftSolver* appGetMultiShiftSolver(BYTE byFieldId)
+{
+    return appGetLattice()->m_pFermionMultiShiftSolver[byFieldId];
 }
 
 inline class CGaugeSmearing* appGetGaugeSmearing()

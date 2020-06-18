@@ -90,8 +90,8 @@ typedef TSimpleDoubleLinkedList<CClass> ClassList;
 class CLGAPI CBase
 {
 public:
-    CBase() { ; }
-    virtual ~CBase() { ; }
+    CBase() { }
+    virtual ~CBase() { }
     virtual const CClass* GetClass() const { return NULL; }
 };
 

@@ -1,0 +1,92 @@
+\subsection{\label{sec:Multishift}The \index{multi-shift solver}multi-shift solver}
+
+The multi-shift solver are used to solve $(A+a_n)x=b$ for different $a_n$ at once.
+
+Note that, it is only possible when $A$ is on the numerator, for example, when using Arnoldi or Lanczos algorithm.
+
+\subsubsection{\label{sec:MultishiftGMRES}The multi-shift version of GMRES}
+
+We still use Algorithm~\ref{alg.ArnoldiModifiedGS} to build ${\bf v}_i$, such that
+\begin{equation}
+\begin{split}
+&{\bf v}_i^*\cdot {\bf v}_j=\delta _{ij},\;\;A{\bf v}_{i-1}=\sum _{j=0}^i h[j,i-1]{\bf v}_j,\\
+\end{split}
+\end{equation}
+holds.
+
+However, now we want to solve
+\begin{equation}
+\begin{split}
+&((A+a_n)v)_k=v_{k+1}H
+\end{split}
+\label{eq.multishiftgmres1}
+\end{equation}
+For that to happen, we need
+\begin{equation}
+\begin{split}
+&A{\bf v}_{i-1} = \sum _{j=0}^i h[j,i-1]{\bf v}_j \to (A+a_n){\bf v}_{i-1} = \sum _{j=0}^i \left( h[j,i-1] + a_n \delta _{j,i-1}\right){\bf v}_j
+\end{split}
+\end{equation}
+Note that the sum over $j$ will contain ${\bf v}_{i-1}$, so simply use $\hat{H}=h[j,i-1]+a_n \delta _{j,i-1}$ instead of $H=h[j,i-1]$ one will arrive at Eq.~\ref{eq.multishiftgmres1}.
+
+When considering the restart, one should assume the residue of the shifted system is collinear to the seed system, $\hat{r}_n = \beta _n r$ which can be guaranteed when $x_0=0$ and for the first iteration, $\hat{r}_n^{k=0}=r=b$, where $k$ is index of restart, $r$ is the residue of seed system.
+
+For the second iteration (after the first restart), to make sure again $\hat{r}_n = \beta _n r$, one need to solve
+\begin{equation}
+\begin{split}
+&\beta = |{\bf r}^{k-1}|\\
+&{\bf z}_{m+1}=\beta {\bf e}_1 - H_{ (m+1)\times m}\cdot {\bf y}_m\\
+&\left(\hat{H}_{(m+1)\times m} | {\bf z}_{m+1}\right)_{(m+1)\times (m+1)} \cdot \left(\begin{array}{c}\hat{y}_m \\ \beta _n^k\end{array}\right) = \beta _n^{k-1} \beta {\bf e}_1
+\end{split}
+\end{equation}
+where $k$ is the index of restart, ${\bf r}$ is the residue of the seed system (zero shift system), $\hat{y}_m$ is the solution of $argmin (\beta ^{k-1} {\bf e}_1 - H y_m )$ (GMRES of seed system).
+
+Then, $x_n=x_n+\sum _j \hat{y}_j v_j$.
+
+It can be summarized as~\cite{shiftedGMRES}. Let the seed system be $Ax=b$, than
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}=0,{\bf x}_n=0,{\bf r}={\bf b},\beta _n=1$
+\For{$i=0$ to $k-1$}
+    \State ${\bf r}={\bf b}-A{\bf x}$, $\beta = |{\bf r}|$
+    \State Solve $A{\bf x}={\bf b}$, obtain ${\bf v}_m$, $H_{m+1,m}$ and $y_m$
+    \State Update ${\bf x}$ use ${\bf v}_m$ and $y_m$ as ${\bf x}={\bf x}+\sum {\bf v}_j y_j$
+    \State $z_{m+1}=\beta {\bf e}_1 - H_{m+1,m} y_m$
+    \For{$n=0$ to $n$}
+        \State The left $(m+1)\times m$ of $\hat{H}_{m+1,m+1}$ is $H_{m+1,m}+ a_n \mathbb{I}_{m,m}$
+        \State The right column of $\hat{H}_{m+1,m+1}$ is $z_{m+1}$
+        \State Solve $\hat{H}_{m+1,m+1} \hat{y}_{m+1} = \beta _n \beta {\bf e}_1$
+        \Comment{use QR factorization or Givens rotation}
+        \State Update $\beta _n = \hat{y}_{m+1}[m+1]$
+        \Comment{$\beta _n$ is complex number}
+        \State Update ${\bf x}_n$ use ${\bf v}_m$ and first $m$ element of $\hat{y}_{m+1}$ as ${\bf x}_n={\bf x}_n+\sum {\bf v}_j \hat{y}_j$
+    \EndFor
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.GEMRES.shifted}shifted GMRES}
+\end{algorithm}
+
+\subsubsection{\label{sec:MultishiftFOM}The multi-shift FOM}
+
+FOM is very like GMRES, but \textcolor[rgb]{0,0,1}{for the shifted system, FOM is tested to be much faster}. It can be summarized as~\cite{shiftedFOM}
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}_n=0,{\bf r}^{(k=0)}={\bf b},\beta _n=|{\bf b}|$
+\For{$i=0$ to $k-1$}
+    \State Solve Krylov space for $A{\bf x}={\bf b}$, obtain ${\bf v}_m,{\bf v}_{m+1}$ and $H_{m,m+1}$
+    \Comment{Not solve $\beta {\bf e}_1-Hy$}
+    \State ${\bf r}^{(k)}={\bf v}_{m+1}$
+    \For{$n=0$ to $n$}
+        \If {$|\beta _n| > \epsilon$}
+        \Comment{$\beta _n$ is complex number}
+            \State Solve $\left(H_{m,m}+a_n \mathbb{I}_m\right)y_m=\beta _n {\bf e}_1$
+            \Comment{use Givens rotation}
+            \State $\beta _n = y_m[m] - h[m,m+1]$
+            \State Update ${\bf x}_n$ use ${\bf v}_m$ and $y_m$ as ${\bf x}_n={\bf x}_n+\sum {\bf v}_j y_j$
+        \EndIf
+    \EndFor
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.FOM.shifted}shifted FOM}
+\end{algorithm}
+where $H_{m,m}$ is the upper $m\times m$ square matrix of $H_{m,m+1}$, and $h[m,m+1]$ is the last element of $H_{m,m+1}$.

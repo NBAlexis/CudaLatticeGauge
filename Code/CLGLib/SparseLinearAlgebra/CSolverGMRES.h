@@ -46,7 +46,7 @@ protected:
 
     CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];
     CLGComplex m_y[_kMaxStep];
-    CLGComplex m_g[_kMaxStep + 1];
+    CLGComplex m_g[_kMaxStep];
 
     TArray<class CField*> m_lstVectors;
 

@@ -17,7 +17,7 @@ class CLGAPI CSLASolver : public CBase
 {
 public:
 
-    CSLASolver() : m_pOwner(NULL) , m_bAbsoluteAccuracy(FALSE) { ; }
+    CSLASolver() : m_pOwner(NULL) , m_bAbsoluteAccuracy(FALSE) { }
 
     virtual void Configurate(const CParameters& param) = 0;
 

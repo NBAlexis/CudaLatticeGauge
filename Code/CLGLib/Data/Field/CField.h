@@ -109,6 +109,7 @@ public:
 #pragma region Other useful operators
 
     /**
+    * return me^* \cdot other
     * pDeviceBuffer is a Real array, with length of [thread count]
     * Using pDeviceBuffer, we make sure Dot function is a constant function as it should be.
     * The final result of dot, should be sum of pDeviceBuffer

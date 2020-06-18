@@ -104,6 +104,18 @@ Charles F. Van~Loan Gene H.~Golub.
 \newblock {Matrix computations}.
 \newblock 1996.
 
+\bibitem{shiftedGMRES}
+Andreas Frommer and Uwe~Gl$\rm \ddot{a}$ssner.
+\newblock \href{http://dx.doi.org/10.1137/s1064827596304563}{{Restarted GMRES
+  for Shifted Linear Systems}}.
+\newblock {\em SIAM Journal on Scientific Computing}, 19:15--26, 1998.
+
+\bibitem{shiftedFOM}
+V.~Simoncini.
+\newblock \href{http://dx.doi.org/10.1023/a:1026000105893}{{Restarted Full
+  Orthogonalization Method for Shifted Linear Systems}}.
+\newblock {\em BIT Numerical Mathematics}, 43:459--466, 2003.
+
 \bibitem{CornellGaugeFixing}
 C.~T. H.~Davies et. al.
 \newblock \href{http://dx.doi.org/10.1103/PhysRevD.37.1581}{{Fourier

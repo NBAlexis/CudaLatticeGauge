@@ -23,6 +23,7 @@ public:
     ~CLatticeData();
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
+    void CreateMultiShiftSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
     void OnUpdatorConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) const;
     void OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const;
     //void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
@@ -82,6 +83,7 @@ public:
     class CIndexData* m_pIndexCache;
 
     class CSLASolver* m_pFermionSolver[_kMaxFieldCount];
+    class CMultiShiftSolver* m_pFermionMultiShiftSolver[_kMaxFieldCount];
 
     class CGaugeSmearing* m_pGaugeSmearing;
     class CGaugeFixing* m_pGaugeFixing;

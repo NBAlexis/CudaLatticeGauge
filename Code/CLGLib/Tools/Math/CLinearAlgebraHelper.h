@@ -47,7 +47,7 @@ public:
         _kAllocateMatrixNumber = 7,
     };
 
-    CLinearAlgebraHelper(UINT uiDim);
+    CLinearAlgebraHelper(UINT uiDim, UINT uiPreAllocate = _kAllocateMatrixNumber);
     ~CLinearAlgebraHelper();
 
     static void TestSmallMatrix();
@@ -134,11 +134,25 @@ public:
 
 #pragma endregion
 
+    /**
+     * Square matrix QR Factorization
+     * House holder
+     */
     void QRFactorization(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT uiDim);
+
+    /**
+     * Not square matrix, QR Factorization
+     */
     void ThinQRFactorization(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT dx, UINT dy);
+
+    /**
+     * Assume R is a up-traingular dx * dx matrix (length of row, length of xdim is dx, it can be dx * dx + n)
+     * Calculate R^{-1} on Y, which is a dk * dx matrix (batched solve, put y1,y2,y3 as a 3 * dx matrix)
+     */
     static void SolveY(CLGComplex* Y, const CLGComplex* R, UINT dk, UINT dx);
 
     void RotateHenssenberg(CLGComplex* H, CLGComplex* B, UINT dmH) const;
+    void RotateHenssenberg(CLGComplex* H, CLGComplex* B, UINT dmX, UINT dmY) const;
     void RotateHenssenbergHost(CLGComplex* H, CLGComplex* B, UINT dmH);
 
     void QRFactorizationHost(CLGComplex* Q, CLGComplex* R, const CLGComplex* T, UINT uiDim);
@@ -190,6 +204,9 @@ protected:
 
     UINT m_uiDim;
 
+    /**
+     * Transform matrix T (dx * dx) matrix, to Henssenberg form, using house holding
+     */
     void Henssenberg(CLGComplex* T, UINT dx);
 
     /**

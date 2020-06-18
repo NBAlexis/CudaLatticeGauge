@@ -11,7 +11,7 @@
 
 __BEGIN_NAMESPACE
 
-CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim)
+CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim, UINT uiPreAllocate)
     : m_uiDim(uiDim)
     , m_pDeviceIntBuffer(NULL)
     , m_pDeviceFloatBuffer(NULL)
@@ -34,7 +34,7 @@ CLinearAlgebraHelper::CLinearAlgebraHelper(UINT uiDim)
     checkCudaErrors(cudaMalloc((void**)&m_pOneDeviceC, sizeof(CLGComplex)));
 
     //5 is enough
-    AddTempMatrix(_kAllocateMatrixNumber);
+    AddTempMatrix(uiPreAllocate);
 }
 
 CLinearAlgebraHelper::~CLinearAlgebraHelper()
@@ -2693,6 +2693,16 @@ void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT 
     {
         dim3 thread(dm - i, 1, 1);
         _kernelLeftGivenHessenberg << <block, thread >> > (i + 1, i, H, Y, dm);
+    }
+}
+
+void CLinearAlgebraHelper::RotateHenssenberg(CLGComplex* H, CLGComplex* Y, UINT dmX, UINT dmY) const
+{
+    dim3 block(1, 1, 1);
+    for (UINT i = 0; i < dmY - 1; ++i)
+    {
+        dim3 thread(dmX - i, 1, 1);
+        _kernelLeftGivenHessenberg << <block, thread >> > (i + 1, i, H, Y, dmX);
     }
 }
 

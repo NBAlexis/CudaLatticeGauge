@@ -63,8 +63,8 @@ int main(int argc, char * argv[])
             CCString sFileNameLoad;
             CCString sFileNameSave;
 
-            sFileNameLoad.Format(_T("%sMatching_%d.con"), sLoadPrefix, iIndex);
-            sFileNameSave.Format(_T("%sMatching_%d.cco"), sSavePrefix, iIndex);
+            sFileNameLoad.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), iIndex);
+            sFileNameSave.Format(_T("%sMatching_%d.cco"), sSavePrefix.c_str(), iIndex);
 
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileNameLoad, EFFT_CLGBin);
             appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileNameSave);

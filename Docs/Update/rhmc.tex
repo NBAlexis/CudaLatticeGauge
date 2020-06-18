@@ -10,7 +10,7 @@ $\bullet$ Calculate the action
 \end{split}
 \end{equation}
 
-The problem is how to evaluate $\left(\det [D]\right)^{\alpha}$.
+The problem is how to evaluate $\left(\det [D]\right)^{\alpha}$. Before that, we have to prepare some tools.
 
 \subsubsection{\label{sec:rationalapproximation}The \index{rational approximation}rational approximation and Remes algorithm}
 
@@ -22,6 +22,56 @@ The Remes algorithm is implemented in Mathematica, which finds
 &g(x)=c+\sum _i \frac{a_i}{x+b_i}\approx f(x),
 \end{split}
 \end{equation}
-in an interval.
+in an interval. This have been implemented in Mathematica so we use the result of Mathematica directly.
 
+\subsubsection{\label{sec:multishiftsolver}The \index{multi shift solver}multi shift solver}
 
+Another tool is to solve $(A + c_i) {\bf x} = {\bf b}$ quickly with different $c_i$.
+
+We follow Ref, to modify the QMR algorithm.
+
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}^0$ be the initial guess
+\Comment{For example, use ${\bf b}$ as trail solution and start.}
+\State ${\bf v}_0 = \omega _ 0 = {\bf b}- A {\bf x}$.
+\State $\mu _0 = |{\bf v}|$, $\delta _0 = c_{-1}=c_0=1$
+\State ${\bf s}_{-1}={\bf s}_0={\bf p}_{-2}={\bf p}_{-1}={\bf v}_{-1}=\omega _{-1}$
+\For{$i=0$ to $r$}
+    \State $\rho =|{\bf v}_i|$, $\eta  = |\omega _i|$ ${\bf v}_i={\bf v}_i / \rho $, $\omega _i = \omega _i / \eta$
+    \State $\delta _i = {\bf v}_i^{\dagger} \omega _i$
+    \State $\alpha  = {\bf v}_i^{\dagger} A \omega _i / \delta _i$
+    \State $\beta = \eta \delta _m / \delta _{m-1}$, $\gamma = \rho \delta _m / \delta _{m-1}$
+    \State ${\bf v}_{i+1}=A {\bf v}_i -\alpha {\bf v}_i - \beta {\bf v}_{i-1}$
+    \State ${\omega}_{i+1}=A^{\dagger} {\omega}_i -\alpha^* {\omega}_i - \beta^* {\omega}_{i-1}$
+    \State ${\bf r}_h={\bf r}^*$ (Note, that we use $r^*$ as in \cite{sparselinearbook1} which is tested to be better.)
+    \For{$j=0$ to $itera$}
+        \State $\rho = {\bf r}_h^* \cdot {\bf r}_j$
+        \If {$j=0$}
+            \State ${\bf p}={\bf r}$
+        \Else
+            \State $\beta = \alpha \times \rho / (\omega \times \rho_p)$
+            \State ${\bf p}={\bf r}+\beta\left({\bf p}-\omega {\bf v}\right)$
+        \EndIf
+        \State ${\bf v}=(A+c_i){\bf p}$
+        \State $\alpha = \rho / \left({\bf r}_h^*\cdot {\bf v}\right)$
+        \State ${\bf s}={\bf r}-\alpha {\bf v}$
+        \If {$0\neq j$ and $0=\mod(j,5)$}
+            \State $er=\|{\bf s}\|$
+            \Comment {Check deviation every 5 steps}
+            \If {$er<\epsilon$}
+
+                \Return ${\bf x}$
+            \EndIf
+        \EndIf
+        \State ${\bf t}=(A+c_i){\bf s}$
+        \State $\omega = {\bf s}^*\cdot {\bf t}/\|{\bf t}\|$
+        \State ${\bf r}={\bf s}-\omega {\bf t}$
+        \State ${\bf x}={\bf x}+\alpha {\bf p}+\omega {\bf s}$
+        \State $\rho _p=\rho$
+        \Comment {Preserve the last calculated $\rho$ become we still need it}
+    \EndFor
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.BiCGStabExplicit}BiCGStab with explicit $c_i$.}
+\end{algorithm}

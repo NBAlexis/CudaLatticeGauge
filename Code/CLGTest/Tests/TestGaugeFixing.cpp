@@ -141,22 +141,22 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
         pCC->Reset();
         pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
 
-        for (UINT i = 0; i < CMeasureChiralCondensate::_kCondMeasureCount; ++i)
+        for (UINT i1 = 0; i1 < CMeasureChiralCondensate::_kCondMeasureCount; ++i1)
         {
             //reset, so, the index is 0
-            const CLGComplex toBeCompareAll = pCC->m_lstCondAll[i][0];
-            const CLGComplex toBeComparePosition0 = pCC->m_lstCond[i][0];
+            const CLGComplex toBeCompareAll = pCC->m_lstCondAll[i1][0];
+            const CLGComplex toBeComparePosition0 = pCC->m_lstCond[i1][0];
 
-            appGeneral(_T("Cond[%d]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i, 
-                oldAll[i].x, oldAll[i].y, toBeCompareAll.x, toBeCompareAll.y);
-            if (__cuCabsSqf(_cuCsubf(oldAll[i], toBeCompareAll)) > F(0.00000001))
+            appGeneral(_T("Cond[%d]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i1, 
+                oldAll[i1].x, oldAll[i1].y, toBeCompareAll.x, toBeCompareAll.y);
+            if (__cuCabsSqf(_cuCsubf(oldAll[i1], toBeCompareAll)) > F(0.00000001))
             {
                 ++uiError;
             }
 
-            appGeneral(_T("Cond[%d] at 0: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i,
-                oldPosition0[i].x, oldPosition0[i].y, toBeComparePosition0.x, toBeComparePosition0.y);
-            if (__cuCabsSqf(_cuCsubf(oldPosition0[i], toBeComparePosition0)) > F(0.00000001))
+            appGeneral(_T("Cond[%d] at 0: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i1,
+                oldPosition0[i1].x, oldPosition0[i1].y, toBeComparePosition0.x, toBeComparePosition0.y);
+            if (__cuCabsSqf(_cuCsubf(oldPosition0[i1], toBeComparePosition0)) > F(0.00000001))
             {
                 ++uiError;
             }
