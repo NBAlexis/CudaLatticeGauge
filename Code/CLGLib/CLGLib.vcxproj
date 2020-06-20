@@ -87,12 +87,14 @@
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftFOM.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftGMRES.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftSolver.h" />
+    <ClInclude Include="SparseLinearAlgebra\CMultiShiftBiCGStab.h" />
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverBiCGstab.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGCR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGCRODR.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRES.h" />
     <ClInclude Include="SparseLinearAlgebra\CSolverGMRESMDR.h" />
+    <ClInclude Include="SparseLinearAlgebra\CSolverTFQMR.h" />
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
@@ -144,7 +146,9 @@
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp" />

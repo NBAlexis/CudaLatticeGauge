@@ -29,62 +29,64 @@
 \contentsline {subsection}{\numberline {3.1}Krylov subspace}{26}{subsection.3.1}% 
 \contentsline {subsection}{\numberline {3.2}GMRES}{26}{subsection.3.2}% 
 \contentsline {subsection}{\numberline {3.3}GCR}{30}{subsection.3.3}% 
-\contentsline {subsection}{\numberline {3.4} GCRO-DR and GMRES-MDR}{32}{subsection.3.4}% 
-\contentsline {subsubsection}{\numberline {3.4.1}Brief introduction to deflation preconditioner}{32}{subsubsection.3.4.1}% 
-\contentsline {subsubsection}{\numberline {3.4.2}Brief intro to GCRO-DR}{33}{subsubsection.3.4.2}% 
-\contentsline {subsubsection}{\numberline {3.4.3}The choice of deflation subspace}{34}{subsubsection.3.4.3}% 
-\contentsline {subsubsection}{\numberline {3.4.4}Eigen solver}{36}{subsubsection.3.4.4}% 
-\contentsline {subsubsection}{\numberline {3.4.5}Implementation of GCRO-DR}{41}{subsubsection.3.4.5}% 
-\contentsline {subsubsection}{\numberline {3.4.6}Implement of GCRO-DR}{42}{subsubsection.3.4.6}% 
-\contentsline {subsubsection}{\numberline {3.4.7}Implement of GMRES-MDR}{44}{subsubsection.3.4.7}% 
-\contentsline {subsubsection}{\numberline {3.4.8}Test of GCRO-DR and GMRES-MDR}{44}{subsubsection.3.4.8}% 
-\contentsline {subsection}{\numberline {3.5}Even-odd preconditioner}{44}{subsection.3.5}% 
-\contentsline {subsection}{\numberline {3.6}The multi-shift solver}{46}{subsection.3.6}% 
-\contentsline {subsubsection}{\numberline {3.6.1}The multi-shift version of GMRES}{46}{subsubsection.3.6.1}% 
-\contentsline {subsubsection}{\numberline {3.6.2}The multi-shift FOM}{47}{subsubsection.3.6.2}% 
-\contentsline {section}{\numberline {4}Miscellaneous topics}{49}{section.4}% 
-\contentsline {subsection}{\numberline {4.1}Gauge Fixing}{49}{subsection.4.1}% 
-\contentsline {subsubsection}{\numberline {4.1.1}Introduction of FFT before start}{49}{subsubsection.4.1.1}% 
-\contentsline {subsubsection}{\numberline {4.1.2}Cornell Gauge Fixing and FFT accelerated}{50}{subsubsection.4.1.2}% 
-\contentsline {subsubsection}{\numberline {4.1.3}Los Alamos Gauge Fixing and over relaxation}{51}{subsubsection.4.1.3}% 
-\contentsline {subsubsection}{\numberline {4.1.4}Coulomb Gauge}{53}{subsubsection.4.1.4}% 
-\contentsline {subsubsection}{\numberline {4.1.5}Logarithm definition}{53}{subsubsection.4.1.5}% 
-\contentsline {section}{\numberline {5}Measurement}{55}{section.5}% 
-\contentsline {subsection}{\numberline {5.1}Plaquette Energy}{55}{subsection.5.1}% 
-\contentsline {subsection}{\numberline {5.2}Meson Correlator}{55}{subsection.5.2}% 
-\contentsline {subsubsection}{\numberline {5.2.1}Meson Wave Function}{55}{subsubsection.5.2.1}% 
-\contentsline {subsubsection}{\numberline {5.2.2}Meson Correlator}{55}{subsubsection.5.2.2}% 
-\contentsline {subsubsection}{\numberline {5.2.3}Sources}{57}{subsubsection.5.2.3}% 
-\contentsline {subsubsection}{\numberline {5.2.4}Summary of parameters}{60}{subsubsection.5.2.4}% 
-\contentsline {subsubsection}{\numberline {5.2.5}Gauge smearing}{61}{subsubsection.5.2.5}% 
-\contentsline {subsection}{\numberline {5.3}Chiral Condensate of Wilson fermion}{62}{subsection.5.3}% 
-\contentsline {subsubsection}{\numberline {5.3.1}Wall source}{62}{subsubsection.5.3.1}% 
-\contentsline {subsubsection}{\numberline {5.3.2}Decay constant}{62}{subsubsection.5.3.2}% 
-\contentsline {subsubsection}{\numberline {5.3.3}Effective Quark Mass}{62}{subsubsection.5.3.3}% 
-\contentsline {subsection}{\numberline {5.4}Stochastic Methods}{62}{subsection.5.4}% 
-\contentsline {subsubsection}{\numberline {5.4.1}For condensations}{62}{subsubsection.5.4.1}% 
-\contentsline {subsubsection}{\numberline {5.4.2}For densities}{63}{subsubsection.5.4.2}% 
-\contentsline {section}{\numberline {6}Programming}{65}{section.6}% 
-\contentsline {subsection}{\numberline {6.1}cuda}{65}{subsection.6.1}% 
-\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{65}{subsubsection.6.1.1}% 
-\contentsline {subsubsection}{\numberline {6.1.2}device member function}{65}{subsubsection.6.1.2}% 
-\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{68}{subsubsection.6.1.3}% 
-\contentsline {section}{\numberline {7}Testing}{71}{section.7}% 
-\contentsline {subsection}{\numberline {7.1}random number}{71}{subsection.7.1}% 
-\contentsline {section}{\numberline {8}Applications}{72}{section.8}% 
-\contentsline {subsection}{\numberline {8.1}Rotating Frame}{72}{subsection.8.1}% 
-\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{73}{subsubsection.8.1.1}% 
-\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{75}{subsubsection.8.1.2}% 
-\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{79}{subsubsection.8.1.3}% 
-\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{81}{subsubsection.8.1.4}% 
-\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{82}{subsubsection.8.1.5}% 
-\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{87}{subsubsection.8.1.6}% 
-\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{88}{subsubsection.8.1.7}% 
-\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{96}{subsubsection.8.1.8}% 
-\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{96}{subsubsection.8.1.9}% 
-\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{97}{subsubsection.8.1.10}% 
-\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{97}{subsubsection.8.1.11}% 
-\contentsline {subsection}{\numberline {8.2}Sample Producer}{98}{subsection.8.2}% 
-\contentsline {subsection}{\numberline {8.3}Data Analyse}{98}{subsection.8.3}% 
-\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{98}{subsubsection.8.3.1}% 
-\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{99}{subsubsection.8.3.2}% 
+\contentsline {subsection}{\numberline {3.4}TFQMR}{32}{subsection.3.4}% 
+\contentsline {subsection}{\numberline {3.5} GCRO-DR and GMRES-MDR}{33}{subsection.3.5}% 
+\contentsline {subsubsection}{\numberline {3.5.1}Brief introduction to deflation preconditioner}{34}{subsubsection.3.5.1}% 
+\contentsline {subsubsection}{\numberline {3.5.2}Brief intro to GCRO-DR}{35}{subsubsection.3.5.2}% 
+\contentsline {subsubsection}{\numberline {3.5.3}The choice of deflation subspace}{36}{subsubsection.3.5.3}% 
+\contentsline {subsubsection}{\numberline {3.5.4}Eigen solver}{37}{subsubsection.3.5.4}% 
+\contentsline {subsubsection}{\numberline {3.5.5}Implementation of GCRO-DR}{43}{subsubsection.3.5.5}% 
+\contentsline {subsubsection}{\numberline {3.5.6}Implement of GCRO-DR}{44}{subsubsection.3.5.6}% 
+\contentsline {subsubsection}{\numberline {3.5.7}Implement of GMRES-MDR}{46}{subsubsection.3.5.7}% 
+\contentsline {subsubsection}{\numberline {3.5.8}Test of GCRO-DR and GMRES-MDR}{46}{subsubsection.3.5.8}% 
+\contentsline {subsection}{\numberline {3.6}Even-odd preconditioner}{46}{subsection.3.6}% 
+\contentsline {subsection}{\numberline {3.7}The multi-shift solver}{48}{subsection.3.7}% 
+\contentsline {subsubsection}{\numberline {3.7.1}The multi-shift version of GMRES}{48}{subsubsection.3.7.1}% 
+\contentsline {subsubsection}{\numberline {3.7.2}The multi-shift FOM}{49}{subsubsection.3.7.2}% 
+\contentsline {subsubsection}{\numberline {3.7.3}The multi-shift BiCGStab}{50}{subsubsection.3.7.3}% 
+\contentsline {section}{\numberline {4}Miscellaneous topics}{53}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Gauge Fixing}{53}{subsection.4.1}% 
+\contentsline {subsubsection}{\numberline {4.1.1}Introduction of FFT before start}{53}{subsubsection.4.1.1}% 
+\contentsline {subsubsection}{\numberline {4.1.2}Cornell Gauge Fixing and FFT accelerated}{54}{subsubsection.4.1.2}% 
+\contentsline {subsubsection}{\numberline {4.1.3}Los Alamos Gauge Fixing and over relaxation}{55}{subsubsection.4.1.3}% 
+\contentsline {subsubsection}{\numberline {4.1.4}Coulomb Gauge}{57}{subsubsection.4.1.4}% 
+\contentsline {subsubsection}{\numberline {4.1.5}Logarithm definition}{57}{subsubsection.4.1.5}% 
+\contentsline {section}{\numberline {5}Measurement}{59}{section.5}% 
+\contentsline {subsection}{\numberline {5.1}Plaquette Energy}{59}{subsection.5.1}% 
+\contentsline {subsection}{\numberline {5.2}Meson Correlator}{59}{subsection.5.2}% 
+\contentsline {subsubsection}{\numberline {5.2.1}Meson Wave Function}{59}{subsubsection.5.2.1}% 
+\contentsline {subsubsection}{\numberline {5.2.2}Meson Correlator}{59}{subsubsection.5.2.2}% 
+\contentsline {subsubsection}{\numberline {5.2.3}Sources}{61}{subsubsection.5.2.3}% 
+\contentsline {subsubsection}{\numberline {5.2.4}Summary of parameters}{64}{subsubsection.5.2.4}% 
+\contentsline {subsubsection}{\numberline {5.2.5}Gauge smearing}{65}{subsubsection.5.2.5}% 
+\contentsline {subsection}{\numberline {5.3}Chiral Condensate of Wilson fermion}{66}{subsection.5.3}% 
+\contentsline {subsubsection}{\numberline {5.3.1}Wall source}{66}{subsubsection.5.3.1}% 
+\contentsline {subsubsection}{\numberline {5.3.2}Decay constant}{66}{subsubsection.5.3.2}% 
+\contentsline {subsubsection}{\numberline {5.3.3}Effective Quark Mass}{66}{subsubsection.5.3.3}% 
+\contentsline {subsection}{\numberline {5.4}Stochastic Methods}{66}{subsection.5.4}% 
+\contentsline {subsubsection}{\numberline {5.4.1}For condensations}{66}{subsubsection.5.4.1}% 
+\contentsline {subsubsection}{\numberline {5.4.2}For densities}{67}{subsubsection.5.4.2}% 
+\contentsline {section}{\numberline {6}Programming}{69}{section.6}% 
+\contentsline {subsection}{\numberline {6.1}cuda}{69}{subsection.6.1}% 
+\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{69}{subsubsection.6.1.1}% 
+\contentsline {subsubsection}{\numberline {6.1.2}device member function}{69}{subsubsection.6.1.2}% 
+\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{72}{subsubsection.6.1.3}% 
+\contentsline {section}{\numberline {7}Testing}{75}{section.7}% 
+\contentsline {subsection}{\numberline {7.1}random number}{75}{subsection.7.1}% 
+\contentsline {section}{\numberline {8}Applications}{76}{section.8}% 
+\contentsline {subsection}{\numberline {8.1}Rotating Frame}{76}{subsection.8.1}% 
+\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{77}{subsubsection.8.1.1}% 
+\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{79}{subsubsection.8.1.2}% 
+\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{83}{subsubsection.8.1.3}% 
+\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{85}{subsubsection.8.1.4}% 
+\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{86}{subsubsection.8.1.5}% 
+\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{91}{subsubsection.8.1.6}% 
+\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{92}{subsubsection.8.1.7}% 
+\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{100}{subsubsection.8.1.8}% 
+\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{100}{subsubsection.8.1.9}% 
+\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{101}{subsubsection.8.1.10}% 
+\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{101}{subsubsection.8.1.11}% 
+\contentsline {subsection}{\numberline {8.2}Sample Producer}{102}{subsection.8.2}% 
+\contentsline {subsection}{\numberline {8.3}Data Analyse}{102}{subsection.8.3}% 
+\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{102}{subsubsection.8.3.1}% 
+\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{103}{subsubsection.8.3.2}% 

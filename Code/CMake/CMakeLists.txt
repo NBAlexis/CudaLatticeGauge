@@ -87,12 +87,17 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Platform/CFile.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Platform/PlatformIncs.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Platform/PlatformDefine.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftGMRES.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftSolver.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftBiCGStab.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSLASolver.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverBiCGstab.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGCR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGCRODR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRES.h
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverTFQMR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/CYAMLParser.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CBitFlag.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CCString.h
@@ -161,7 +166,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftGMRES.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftBiCGStab.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverTFQMR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.cpp
@@ -221,6 +230,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGammaMatrixSpeed.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestCommon.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestMultiShiftSolver.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRandom.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRotation.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp

@@ -90,3 +90,56 @@ FOM is very like GMRES, but \textcolor[rgb]{0,0,1}{for the shifted system, FOM i
 \caption{\label{alg.FOM.shifted}shifted FOM}
 \end{algorithm}
 where $H_{m,m}$ is the upper $m\times m$ square matrix of $H_{m,m+1}$, and $h[m,m+1]$ is the last element of $H_{m,m+1}$.
+
+\subsubsection{\label{sec:MultishiftBiCGStab}The multi-shift BiCGStab}
+
+The speed of BiCGStab-m is similar as multi-shift GMRES. However, for a fixed number of shift, the memory is fixed~(the accuracy is independent of memory)
+
+The algorithm is from Ref.~\cite{shiftedBiCGStab}, which can be written as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}^{(n)}=0$,${\bf s}={\bf s}^{(n)}={\bf r}={\bf b}$, ${\bf w}_0={\bf w}={\bf r}^{\dagger}$, ${\bf s}_A=A{\bf s}$
+\State $\beta=\alpha =0$, $\delta = {\bf w}_0^{\dagger}{\bf r}$, $\phi = \frac{{\bf w}_0^{\dagger}{\bf s}_A}{\delta}$
+\Comment {$\beta,\alpha,\delta,\phi \in \mathbb{C}$}
+\State $\beta ^{(n)}=\zeta ^{(n)}=\zeta _p^{(n)}=\rho ^{(n)}=\chi ^{(n)}=s^{(n)}=1$
+\Comment {$\beta ^{(n)},\zeta ^{(n)},\zeta _p^{(n)},\rho ^{(n)},\chi ^{(n)}\in \mathbb{C}, s^{(n)}\in \mathbb{R}$}
+\For{$i=0$ to $m$}
+    \State $\beta _1 = -\frac{1}{\phi}$
+    \For {$n=0$ to $n$ with $s^{(n)}>\epsilon$}
+        \If {$i=0$}
+            \State $\zeta ^{(n)}=\frac{1}{1-a_n \beta _1}$
+            \State $\beta ^{(n)}=\zeta ^{(n)} \beta _1$
+        \Else
+            \State $\zeta_p = \zeta_p^{(n)}$, $\zeta_p^{(n)}=\zeta ^{(n)}$, $d=\zeta _p \beta$
+            \State $\zeta ^{(n)}=\frac{d \zeta_p^{(n)}}{\alpha \beta _ 1 (\zeta _p-\zeta_p^{(n)})+d(1-a_n \beta _1)}$
+            \State $\beta ^{(n)}=\frac{\beta _1 \zeta ^{(n)}}{\zeta_p^{(n)}}$
+        \EndIf
+    \EndFor
+    \State $\beta=\beta_1$
+    \State ${\bf w}={\bf r}-\beta {\bf s}_A$, ${\bf w}_A=A{\bf w}$
+    \State $\chi = \frac{{\bf w}_A^{\dagger} {\bf w}}{{\bf w}_A^{\dagger}{\bf w}_A}$
+    \For {$n=0$ to $n$ with $s^{(n)}>\epsilon$}
+        \State $d=\frac{1}{1+a_n \chi}$, $\chi ^{(n)}=\frac{\chi}{d}$
+        \State $d_1=\chi ^{(n)}\rho ^{(n)}$, $d_2=d_1 \zeta ^{(n)}$
+        \State ${\bf x}^{(n)}={\bf x}^{(n)}-\beta ^{(n)}{\bf s}^{(n)}+d_2 {\bf w}$
+        \State ${\bf s}^{(n)}={\bf s}^{(n)}-\frac{d_2}{\beta ^{(n)}}{\bf w}+\frac{d_1 \zeta _p^{(n)}}{\beta ^{(n)}} {\bf r}$
+        \State $\rho ^{(n)}=\frac{\rho ^{(n)}}{d}$
+    \EndFor
+    \State ${\bf r}={\bf w}-\chi {\bf w}_A$
+    \State $\delta _1={\bf w}_0^{\dagger} {\bf r}$, $\alpha = -\frac{\beta \delta _1}{\delta \chi}$, $\delta = \delta _1$
+    \For {$n=0$ to $n$ with $s^{(n)}>\epsilon$}
+        \State $\alpha ^{(n)}=\frac{\alpha \beta ^{(n)}\zeta ^{(n)}}{\beta \zeta_p ^{(n)}}$
+        \State ${\bf s}^{(n)}= \zeta ^{(n)}\rho ^{(n)} {\bf r}+ \alpha ^{(n)}{\bf s}^{(n)}$
+        \State $s^{(n)}=|{\bf s}^{(n)}|$
+    \EndFor
+    \State ${\bf s}={\bf r}+\alpha ({\bf s}-\chi {\bf s}_A)$
+    \Comment {If $|{\bf s}|$ is small, quit.}
+    \State ${\bf s}_A=A{\bf s}$
+    \State $\phi = \frac{{\bf w}_0^{\dagger} {\bf s}_A}{\delta}$
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.BiCGStab.shifted}multi-shift BiCGStab}
+\end{algorithm}
+
+\textcolor[rgb]{0,0,1}{It is tested that multi-shift FOM is faster than BiCGStab and GMRES. However, the memory usage of FOM and GMRES grow with $m$, the dimension of Krylov space, and grow as $n$ vectors, the number of shifted $a_n$ as $m+n$. The memory of BiCGStab does not grow with accuracy but grow with $2n$ vectors.}
+

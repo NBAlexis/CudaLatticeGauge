@@ -44,7 +44,7 @@ There are GCR, ORTHOMIN, ORTHODIR. Both GCR and ORTHOMIN have oscillation (teste
         \If {$\|{\bf r}\| < \epsilon$}
             \Return $\bf x$
             \Comment {Success}
-        \EndIf        
+        \EndIf
         \State ${\bf p}_{j+1}=A{\bf p}_j$
         \For{$k=j-l+1$ to $j$}
             \State $\beta = (A{\bf p}_k)^*\cdot A^2{\bf p}_j / \|A{\bf p}_k\|^2$
@@ -59,4 +59,77 @@ There are GCR, ORTHOMIN, ORTHODIR. Both GCR and ORTHOMIN have oscillation (teste
 \caption{incomplete GCR with restart}
 \end{algorithm}
 
-\textbf{Note that, GCR is much slower than GMRES and BiCGStab. A strategy to improve the speed is to restart quickly.}
+\textbf{Note that, GCR is much slower than GMRES and BiCGStab. A strategy to improve the speed is to restart quickly.} 
+
+\subsection{\label{sec:TFQMR}TFQMR}
+
+The QMR and TFQMR is based on \index{Lanczos process}Lanczos process~\cite{sparselinearbook1}
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State Prepare two vectors ${\bf v}_1^{\dagger}{\bf w}_1=1$
+\State $\beta=\delta =0$, $w_0 = v_0=1$
+\For{$i=0$ to $m$}
+    \State ${\bf u}=A {\bf v}_i$
+    \State $\alpha = {\bf u}^{\dagger} {\bf w}_i$
+    \State ${\bf v}_{i+1}={\bf u}-\alpha {\bf v}_{i}-\beta {\bf v}_{i-1}$
+    \State ${\bf w}_{i+1}=A^{\dagger}{\bf w}_j-\alpha {\bf w}_{j}-\delta {\bf w}_{i-1}$
+    \State $l={\bf v}_{i+1}^{\dagger} {\bf w}_{i+1}$
+    \State $\delta = \sqrt{|l|}, \beta = l / \delta$
+    \State ${\bf w}_{i+1} = {\bf w}_{i+1}/\beta, {\bf v}_{i+1} = {\bf v}_{i+1} / \delta$
+    \State $T[i+1,i+1]=\alpha,T[i+2,i+1]=\beta,T[i+1,i+2]=\delta$
+\EndFor
+\State $T[m+1,m+1]=(A{\bf v}_{m+1})^{\dagger} {\bf w}_{m+1}$
+\end{algorithmic}
+\caption{\label{alg.Lanczos}Lanczos process}
+\end{algorithm}
+
+Let $T_m$ be the $m\times m$ part of $T_{m+1,m+1}$, one have
+\begin{equation}
+\begin{split}
+&AV_m=V_mT_m+T[m,m+1]{\bf e}_m^T {\bf v}_{m+1}\\
+&A^{\dagger}W_m=W_mT_m^{\dagger}+T[m+1,m]{\bf e}_m^T {\bf w}_{m+1}\\
+&W_m^{T}AV_m=T_m\\
+\end{split}
+\end{equation}
+
+Use $AV_m=V_mT_m+T[m,m+1]{\bf e}_m^T {\bf v}_{m+1}$, one can implement a GMRES method, which is called QMR, or one can implement a FOM method, which is called two sided Lanczos method.
+
+In the \index{TFQMR}TFQMR, one no need to calculate $A^{\dagger}$~(There are also methods making use of the $\gamma _5$-hermiticity to simplify this.), which can be summarized as
+\begin{algorithm}[H]
+\begin{algorithmic}
+\State ${\bf x}={\bf x}_0$ is the initial guess
+\For{$i=0$ to $r$}
+\Comment{Restart}
+    \State ${\bf u}={\bf w}={\bf b}-A{\bf x}_0$, ${\bf d}=0$, ${\bf r}={\bf u}^*$
+    \State ${\bf v}=A {\bf u}, {\bf u}_A= {\bf v}$
+    \State $\theta=0, \tau = |{\bf u}|$
+    \Comment {$\theta , \tau \in \mathbb{R}$}
+    \State $\rho = {\bf r}^{\dagger} {\bf u}, \alpha=\eta = 0$
+    \Comment {$\rho , \alpha, \eta \in \mathbb{C}$}
+    \For{$m=0$ to $\ldots$}
+        \If {$m$ is even}
+            \State $\alpha = \frac{\rho}{{\bf r}^{\dagger} {\bf v}}$
+        \EndIf
+        \State ${\bf w}={\bf w}-\alpha {\bf u}_A$
+        \State ${\bf d}={\bf u}+\frac{\eta \theta}{\alpha}{\bf d}$
+        \State $\theta = \frac{|{\bf w}|^2}{\tau ^2}$, $c=\frac{1}{1+\theta}$, $\tau=\tau \times \sqrt{\theta c}$, $\eta = c\alpha$
+        \Comment {$c\in \mathbb{R}$}
+        \State ${\bf x}={\bf x}+\eta {\bf d}$
+        \If {$m$ is odd}
+            \State $\rho ' = {\bf r}^{\dagger} {\bf w}$, $\beta = \frac{\rho '}{\rho}$, $\rho = \rho '$
+            \Comment {If $\rho$ is too small, stop}
+            \State ${\bf u}={\bf w}+\beta {\bf u}$
+            \State ${\bf v}=\beta ({\bf u}_A + \beta {\bf v})$
+            \State ${\bf u}_A = A {\bf u}$
+            \State ${\bf v}={\bf u}_A + {\bf v}$
+        \Else
+            \State ${\bf u}={\bf u} - \alpha {\bf v}$
+            \State ${\bf u}_A = A {\bf u}$
+        \EndIf
+        \State Use ${\bf r}^{\dagger}{\bf v}<\epsilon$ to check whether to stop
+    \EndFor
+    \State ${\bf x}_0={\bf x}$
+\EndFor
+\end{algorithmic}
+\caption{\label{alg.TFQMR}TFQMR}
+\end{algorithm}

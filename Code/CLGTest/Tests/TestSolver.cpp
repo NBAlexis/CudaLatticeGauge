@@ -109,6 +109,8 @@ __REGIST_TEST(TestSolver, Solver, TestSolverGCR);
 
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODR);
 
+__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR);
+
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
 
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode);

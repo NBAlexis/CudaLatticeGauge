@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -15,14 +15,14 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 264
-    SaveStartIndex : 2037
-    OmegaSep : 7
-    OmegaStart : 7
-    MaxOmega : 0.04914
-    MinNt : 5
-    MaxNt : 5
-    SavePrefix : ./5283161/NC5283161_
+    EquvibStep : 109
+    SaveStartIndex : 2891
+    OmegaSep : 18
+    OmegaStart : 18
+    MaxOmega : 0.126
+    MinNt : 3
+    MaxNt : 3
+    SavePrefix : ./46016/N46016_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -36,7 +36,7 @@ JobThermal:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -51,8 +51,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    Nt5FileName : ./5283161/NC5283161_Rotate_Nt5_O7_2037.con
-    Nt5Polyakov : 0.5840781403
+    Nt3FileName : ./46016/N46016_Rotate_Nt3_O18_2891.con
+    Nt3Polyakov : 0.988625871930
 
     # 55150
     # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
@@ -102,7 +102,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.161
+        Hopping : 0.16
         FieldId : 2
         PoolNumber : 2
         Period : [0, 0, 1, -1]
@@ -117,7 +117,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.283
+        Beta : 4.60
         Omega : 0.0
 
     Action2:
@@ -182,14 +182,14 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\CLGConfigs\_f46316\Nt3
+    SubFolderPrefix : G:\CLGConfigs\f46316\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
     SavePrefix : N46316_
-    CSVSavePrefix : G:\CLGConfigs\_f46016\Polyakov\N46316_
+    CSVSavePrefix : G:\CLGConfigs\f46316\Polyakov\N46316_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -301,7 +301,7 @@ JobPolyakovDist:
     Measure5:
 
         MeasureName : CMeasureAction
-        FermiomFieldCount : 25
+        FermiomFieldCount : 9
 
     # Action is only needed for CMeasureAction measurement
     ActionListLength : 2
@@ -323,23 +323,23 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    Nt : 5
-    OmegaStart : 6
-    OmegaEnd : 10
-    IndexStart : 2001
-    IndexEnd : 2300
+    Nt : 4
+    OmegaStart : 1
+    OmegaEnd : 1
+    IndexStart : 201
+    IndexEnd : 2500
 
     SubFolder : 1
-    SubFolderPrefix : G:\Extrapolation\5283161Nt5\Nt5
-    LoadPrefix : NC5283161_
-    SavePrefix : ./5283161/GF/GFN5283161_
-    UseLogADefinition : 0
-    OnlyCheck : 0
+    SubFolderPrefix : G:\UsingCLGConfig\502161Nt4\GFLog
+    LoadPrefix : GF1502161_
+    SavePrefix : G:\UsingCLGConfig\502161Nt4\GFLog\O1\GF1502161_
+    UseLogADefinition : 1
+    OnlyCheck : 1
     CheckAndFix : 0
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [18, 18, 8, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -361,16 +361,16 @@ JobGaugeFixing:
 
     GaugeFixing:
 
-        # Name : CGaugeFixingCoulombCornell
-        # Alpha : 0.1
-        # MaxIterate : 180000
-        # Accuracy : 0.000000000001
-        # FFT : 0
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.1
+        MaxIterate : 180000
+        Accuracy : 0.000000000001
+        FFT : 0
 
-        Name : CGaugeFixingCoulombLosAlamos
-        Omega : 1.5
-        CheckErrorStep : 200
-        MaxIterate : 20000
+        # Name : CGaugeFixingCoulombLosAlamos
+        # Omega : 1.5
+        # CheckErrorStep : 200
+        # MaxIterate : 20000
 
 
 JobAugular:

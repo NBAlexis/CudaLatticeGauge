@@ -26,6 +26,7 @@ UINT TestMultiShiftSolver(CParameters& params)
     constants.AddItem(_make_cuComplex(F(0.5), F(0.0)));
     constants.AddItem(_make_cuComplex(F(0.0), F(1.0)));
     constants.AddItem(_make_cuComplex(F(0.5), F(0.5)));
+    constants.AddItem(_make_cuComplex(F(1.0), F(-1.0)));
     TArray<CField*> resultFields;
     for (INT i = 0; i < constants.Num(); ++i)
     {
@@ -111,4 +112,6 @@ UINT TestMultiShiftSolver(CParameters& params)
 
 __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverGMRES);
 __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverFOM);
+__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverBiCGStab);
+
 

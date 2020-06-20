@@ -362,6 +362,12 @@
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftFOM.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CSolverTFQMR.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseLinearAlgebra\CMultiShiftBiCGStab.h">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -441,6 +447,12 @@
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp">
+      <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
   </ItemGroup>

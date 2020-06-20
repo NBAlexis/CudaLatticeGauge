@@ -116,6 +116,12 @@ V.~Simoncini.
   Orthogonalization Method for Shifted Linear Systems}}.
 \newblock {\em BIT Numerical Mathematics}, 43:459--466, 2003.
 
+\bibitem{shiftedBiCGStab}
+B.~Jegerlehner.
+\newblock \href{http://arxiv.org/abs/hep-lat/9612014}{{Krylov space solvers for
+  shifted linear systems}}.
+\newblock 1996, arXiv:hep-lat/9612014.
+
 \bibitem{CornellGaugeFixing}
 C.~T. H.~Davies et. al.
 \newblock \href{http://dx.doi.org/10.1103/PhysRevD.37.1581}{{Fourier

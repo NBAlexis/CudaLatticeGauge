@@ -372,6 +372,59 @@ TestSolverBiCGStabLowMode:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+TestSolverTFQMR:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1
+
+        FieldId : 2
+
+        PoolNumber : 8
+
+    Solver:
+
+        SolverName : CSolverTFQMR
+        SolverForFieldId : 2
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 50
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 10
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
+        Restart : 3
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+
 TestMSSolverGMRES:
 
     Dim : 4
@@ -490,4 +543,61 @@ TestMSSolverFOM:
         Accuracy : 0.0000000000001
         Restart : 15
         ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+TestMSSolverBiCGStab:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 4
+
+    FermionFieldCount : 1
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+        Period : [0, 0, 1, 1]
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.2
+
+        FieldId : 2
+
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 10
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00000001
         AbsoluteAccuracy : 1
