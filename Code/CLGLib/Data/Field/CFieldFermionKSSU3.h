@@ -56,6 +56,7 @@ public:
     CLGComplex Dot(const CField* other) const override;
 
     //pGauge must be gauge SU3
+    //These are for Sparse linear algebra
     void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
@@ -63,41 +64,50 @@ public:
     UBOOL InverseDdagger(const CField* pGauge) override;
     UBOOL InverseDDdagger(const CField* pGauge) override;
     void ApplyGamma(EGammaMatrix eGamma) override;
-    void PrepareForHMC(const CFieldGauge* pGauge) override;
 
+    //These are truely D or InverseD etc.
+
+    /**
+     * Use to calculate action, it is (D^+D)^{-1/4}
+     */
+    virtual void D_MD(const CField* pGauge);
+    virtual void D0(const CField* pGauge);
+    virtual void D_MC(const CField* pGauge);
+    void PrepareForHMC(const CFieldGauge* pGauge) override;
     UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+
     void InitialAsSource(const SFermionSource& sourceData) override;
     void SaveToFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT& uiSize) const override;
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
     CCString GetInfos(const CCString& tab) const override;
 
-    void SetKai(Real fKai);
+    void SetMass(Real f2am);
 
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+
+    /**
+     * We only use pDphi alone
+     */
     void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
 
     deviceSU3Vector* m_pDeviceData;
 
 protected:
 
-    Real m_fKai;
-};
+    Real m_f2am;
 
-class CLGAPI CFieldMatrixOperationKSSU3 : public CFieldMatrixOperation
-{
-public:
-    CFieldMatrixOperationKSSU3();
-    ~CFieldMatrixOperationKSSU3();
+    // r(x) = x^{1/4} use to prepare for HMC
+    CRatinalApproximation m_rMC;
 
-    //real left = (res,left)
-    void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY) override;
+    // r(x) = x^{-1/2} use to calculate force and action
+    CRatinalApproximation m_rMD;
 
-    deviceSU3Vector** m_pResBuffer;
-    deviceSU3Vector** m_pLeftBuffer;
-    deviceSU3Vector** m_pHostResBuffer;
-    deviceSU3Vector** m_pHostLeftBuffer;
+    //phi _i and Dst0 phi _i
+    deviceSU3Vector** m_pRationalFieldPointers;
+
+    Real* m_pMDNumerator;
 };
 
 __END_NAMESPACE

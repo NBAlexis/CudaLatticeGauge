@@ -4,19 +4,19 @@ VerboseOutput : datetime
 ShowDeviceInformation : 0
 ShowParameterContent : 1
 BeforeEquvibStep : 0
-EquvibStep :    28
-OnlyMeasure : 0
+EquvibStep :    500
+OnlyMeasure : 1
 DoSmearing : 0
-DoMeasureFermion : 0
+DoMeasureFermion : 1
 # If Only Measure, for SaveIndexStart + 1 to SaveIndexStart + EquvibStep
 # If running, save start from SaveIndexStart + 1
-SaveIndexStart : 322
-SavePrefix : ./535161/535161_
+SaveIndexStart : 0
+SavePrefix : G:\Extrapolation\502161Nt4\Matching/502161_
 # SavePrefix : D:\NotUsingCLGCon\Nx14_49016\25153Nt3\Matching\25153_
 
 Dim : 4
 Dir : 4
-LatticeLength : [26, 26, 12, 48]
+LatticeLength : [18, 18, 8, 32]
 
 # LatticeLength : [14, 14, 6, 24]
 
@@ -57,9 +57,9 @@ Gauge:
 
     FieldName : CFieldGaugeSU3
     # FieldInitialType : EFIT_Random
-    FieldInitialType : EFIT_ReadFromFile
-    GaugeFileType : EFFT_CLGBin
-    GaugeFileName : ./535161/535161_Matching_322.con
+    # FieldInitialType : EFIT_ReadFromFile
+    # GaugeFileType : EFFT_CLGBin
+    # GaugeFileName : ./5283161/5283161_Matching_488.con
 
     Period : [1, 1, 1, 1]
 
@@ -75,7 +75,7 @@ FermionField1:
 Action1:
    
     ActionName : CActionGaugePlaquette
-    Beta : 5.35
+    Beta : 5.02
 
 
 Action2:

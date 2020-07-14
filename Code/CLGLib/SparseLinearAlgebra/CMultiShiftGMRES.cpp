@@ -203,7 +203,9 @@ UBOOL CMultiShiftGMRES::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>
             }
         }
 
-        fMaxError = m_fBeta;
+        //The unshifted system is always the last to converge, use m_fBeta may overestimate
+        //fMaxError = m_fBeta;
+        fMaxError = F(0.0);
         for (INT n = 0; n < pFieldX.Num(); ++n)
         {
 

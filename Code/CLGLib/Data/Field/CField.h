@@ -47,6 +47,8 @@ __DEFINE_ENUM(EFieldOperator,
     EFO_F_InverseDdagger,
     EFO_F_InverseDDdagger,
 
+    EFO_F_RationalD,
+
     EFO_ForceDWORD = 0x7fffffff,
     )
 
@@ -126,7 +128,7 @@ public:
 
     virtual CField* GetCopy() const = 0;
 
-    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* otherParameter = NULL) = 0;
 
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return FALSE; }

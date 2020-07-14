@@ -368,6 +368,9 @@
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftBiCGStab.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionFermionKS.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -454,6 +457,9 @@
     </ClCompile>
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp">
       <Filter>SparseLinearAlgebra</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Action\CActionFermionKS.cpp">
+      <Filter>Data\Action</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

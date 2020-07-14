@@ -31,6 +31,7 @@
     <ClInclude Include="Core\CudaHelperFunctions.h" />
     <ClInclude Include="Data\Action\CAction.h" />
     <ClInclude Include="Data\Action\CActionFermion.h" />
+    <ClInclude Include="Data\Action\CActionFermionKS.h" />
     <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
@@ -143,6 +144,7 @@
     <CudaCompile Include="Measurement\CMeasure.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />

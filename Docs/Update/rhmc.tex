@@ -22,56 +22,190 @@ The Remes algorithm is implemented in Mathematica, which finds
 &g(x)=c+\sum _i \frac{a_i}{x+b_i}\approx f(x),
 \end{split}
 \end{equation}
-in an interval. This have been implemented in Mathematica so we use the result of Mathematica directly.
+in an interval. This have been implemented in Mathematica so we use the result of Mathematica directly. An example is
+\begin{lstlisting}
+<< FunctionApproximations\`; \\
+res1 = Apart[MiniMaxApproximation[1/Sqrt[x], \{x, \{0.003, 1\}, 3, 3\}][[2]][[1]]] \\
+Join[\{Part[res1, 1]\}, Table[Numerator[Part[res1, n]], {n, 2, 4}], Table[Denominator[Part[res1, n]] /. x -> 0, \{n, 2, 4\}]]
+\end{lstlisting}
 
-\subsubsection{\label{sec:multishiftsolver}The \index{multi shift solver}multi shift solver}
+\subsubsection{\label{sec:hmcofrhmc}The RHMC with \texorpdfstring{$N_f=2$}{Nf=2}}
 
-Another tool is to solve $(A + c_i) {\bf x} = {\bf b}$ quickly with different $c_i$.
+Similar as the HMC, the first step is to rewrite the action use a Boson field~(pseudo-fermion field), still starting with
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\left(\det D_{st}\right)^{\frac{1}{4}}\exp \left(-S_G[U]\right)\\
+\end{split}
+\end{equation}
+\textbf{Note that the $1/4$ dose NOT come from the $1/4$ in Eq.~(\ref{eq.naivestaggeredaction}), it is to deal with the $4$ doublers.} With
+\begin{equation}
+\begin{split}
+&D_{st}(n|m)=2m\delta _{m,n} + \sum _{\mu}\eta _{\mu}(n)\left(U_{\mu}(n) \delta _{n,n+\mu} - U_{-\mu}(n)\delta _{n,n-\mu}\right)\\
+\end{split}
+\end{equation}
 
-We follow Ref, to modify the QMR algorithm.
+It is very interesting that, although stated in many literatures, this is \textbf{\textcolor[rgb]{1,0,0}{not}} the true \index{fourth root}fourth root method. The true fourth root method is after the `pseudofermion' step. First, just like the usual HMC to evaluate
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \left(\det D_{st} \right)\exp \left(-S_G[U]\right)\\
+\end{split}
+\end{equation}
+For $N_f=2$, before the 4th root, it is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \left(\det D_{st}^{\dagger}D_{st} \right)\exp \left(-S_G[U]\right)\\
+\end{split}
+\end{equation}
+Note that because $D_{st0}$ for massless is anti-Hermitian, $D_{st}^{\dagger}D_{st}=-\frac{1}{4a^2}D_{st0}^2+m^2$, for simplicity we denote $A=-D_{st0}^2+m^2$ (with a rescale of $\psi$ assumed), using
+\begin{equation}
+\begin{split}
+&\det A = \frac{1}{ \det A^{-1} }=\int \mathcal{D}[\phi] \exp (-\phi^{\dagger} A^{-1} \phi).\\
+\end{split}
+\end{equation}
+For $N_f=2$ it is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-1} \phi \right)
+\end{split}
+\end{equation}
 
-\begin{algorithm}[H]
-\begin{algorithmic}
-\State ${\bf x}^0$ be the initial guess
-\Comment{For example, use ${\bf b}$ as trail solution and start.}
-\State ${\bf v}_0 = \omega _ 0 = {\bf b}- A {\bf x}$.
-\State $\mu _0 = |{\bf v}|$, $\delta _0 = c_{-1}=c_0=1$
-\State ${\bf s}_{-1}={\bf s}_0={\bf p}_{-2}={\bf p}_{-1}={\bf v}_{-1}=\omega _{-1}$
-\For{$i=0$ to $r$}
-    \State $\rho =|{\bf v}_i|$, $\eta  = |\omega _i|$ ${\bf v}_i={\bf v}_i / \rho $, $\omega _i = \omega _i / \eta$
-    \State $\delta _i = {\bf v}_i^{\dagger} \omega _i$
-    \State $\alpha  = {\bf v}_i^{\dagger} A \omega _i / \delta _i$
-    \State $\beta = \eta \delta _m / \delta _{m-1}$, $\gamma = \rho \delta _m / \delta _{m-1}$
-    \State ${\bf v}_{i+1}=A {\bf v}_i -\alpha {\bf v}_i - \beta {\bf v}_{i-1}$
-    \State ${\omega}_{i+1}=A^{\dagger} {\omega}_i -\alpha^* {\omega}_i - \beta^* {\omega}_{i-1}$
-    \State ${\bf r}_h={\bf r}^*$ (Note, that we use $r^*$ as in \cite{sparselinearbook1} which is tested to be better.)
-    \For{$j=0$ to $itera$}
-        \State $\rho = {\bf r}_h^* \cdot {\bf r}_j$
-        \If {$j=0$}
-            \State ${\bf p}={\bf r}$
-        \Else
-            \State $\beta = \alpha \times \rho / (\omega \times \rho_p)$
-            \State ${\bf p}={\bf r}+\beta\left({\bf p}-\omega {\bf v}\right)$
-        \EndIf
-        \State ${\bf v}=(A+c_i){\bf p}$
-        \State $\alpha = \rho / \left({\bf r}_h^*\cdot {\bf v}\right)$
-        \State ${\bf s}={\bf r}-\alpha {\bf v}$
-        \If {$0\neq j$ and $0=\mod(j,5)$}
-            \State $er=\|{\bf s}\|$
-            \Comment {Check deviation every 5 steps}
-            \If {$er<\epsilon$}
+The true fourth root method is taken here as
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \left(\det A \right)^{\frac{N_f}{4}}\exp \left(-S_G[U]\right)\\
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-\frac{N_f}{4}} \phi \right)\\
+\end{split}
+\end{equation}
+Note that the fourth root is just to remove doublers, so for $N_f=2$, it is $A^{1/2}$ in spite that $A=D^{\dagger}D$ already considered $N_f=2$.
 
-                \Return ${\bf x}$
-            \EndIf
-        \EndIf
-        \State ${\bf t}=(A+c_i){\bf s}$
-        \State $\omega = {\bf s}^*\cdot {\bf t}/\|{\bf t}\|$
-        \State ${\bf r}={\bf s}-\omega {\bf t}$
-        \State ${\bf x}={\bf x}+\alpha {\bf p}+\omega {\bf s}$
-        \State $\rho _p=\rho$
-        \Comment {Preserve the last calculated $\rho$ become we still need it}
-    \EndFor
-\EndFor
-\end{algorithmic}
-\caption{\label{alg.BiCGStabExplicit}BiCGStab with explicit $c_i$.}
-\end{algorithm}
+In the following, we concentrate on
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-\frac{1}{2}} \phi \right)\\
+\end{split}
+\end{equation}
+
+$\bullet$ Pseudofermion refreshment of staggered fermion
+
+\textbf{\textcolor[rgb]{1,0,0}{Note! The refreshment of staggered fermion use a different action!} It can be summarized as $Z_{MC}\approx Z_{MD}$, where $Z_{MC}$ is to refresh the pseudofermion, $Z_{MD}$ is for molecular dynamic.}
+\begin{equation}
+\begin{split}
+&Z_{MC}=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} \left(A^{-\frac{1}{4}}\right)^2 \phi \right)\\
+&Z_{MD}=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} r_2(A) \phi \right)\\
+\end{split}
+\end{equation}
+where $r_2(A)\approx A^{-\frac{1}{2}}$.
+
+Then, the refreshment step is:
+
+Let $\chi$ be random \textbf{complex} numbers according to $\exp (-\chi ^{\dagger}\chi)$. Let $A^{-\frac{1}{4}}\phi=\chi$, $\phi$ is the random \textbf{complex} number satisfying distribution we want ($\exp (-\phi^{\dagger} \left(A^{-\frac{1}{4}}\right)^{\dagger} A^{-\frac{1}{4}} \phi)$). So, first get $\chi$ and then let $\phi = A^{\textcolor[rgb]{1,0,0}{+}\frac{1}{4}}\chi$.
+
+$\bullet$ MD step of staggered fermion
+
+Let $A^{-\frac{1}{2}}=c_0+\sum _i \frac{\alpha _i }{A+\beta _i} $, it is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-c_0\phi ^{\dagger} \phi -\sum_i \phi ^{\dagger}\frac{\alpha _i }{A+\beta _i} \phi\right)
+\end{split}
+\end{equation}
+then
+\begin{equation}
+\begin{split}
+&F=-iT_a \frac{\partial }{\partial \omega _a}\left(\sum_i \phi ^{\dagger}\frac{\alpha _i }{A+\beta _i} \phi\right)\\
+&=-iT_a \sum_i \left(\phi ^{\dagger}\frac{\alpha _i }{(A+\beta _i)^2} \frac{\partial }{\partial \omega _a} A \phi\right)\\
+\end{split}
+\end{equation}
+\textbf{The order of matrix product is wrong}, it is in fact
+\begin{equation}
+\begin{split}
+&F=-iT_a \sum_i \left(\phi ^{\dagger}\frac{\sqrt{\alpha _i} }{(A+\beta _i)} \left(\frac{\partial }{\partial \omega _a} A \right) \frac{\sqrt{\alpha _i} }{(A+\beta _i)} \phi\right)\\
+\end{split}
+\end{equation}
+Now, let $\phi _{i} =  \frac{\sqrt{\alpha _i} }{(A+\beta _i)} \phi$, it is
+\begin{equation}
+\begin{split}
+&F=-iT_a \sum _i \phi _{i}^{\dagger} \left(\frac{\partial }{\partial \omega _a} A \right) \phi _{i}\\
+\end{split}
+\end{equation}
+\textbf{Note it is not $\phi ' =  \sum _i \frac{\sqrt{\alpha _i} }{(M+\beta _i)} \phi$ because generally, $\phi _{i}^{\dagger} A' \phi _{j} \neq 0$}
+
+To calculate the $A'$ we use
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial \omega _a}A = \left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{st0}\right)D_{st0}+D^{\dagger}_{st0}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i = \phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{st0}\right)\phi _{i,d}+\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\\
+&=\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right)^{\dagger}+\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right)\\
+&=2{\rm Re}\left[\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right]
+\end{split}
+\end{equation}
+with $\phi _{i,d}=D_{st0}\phi _i$.
+
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial \omega _a}  D_{st0}=\sum _{\mu}\left(\eta _{\mu}(n)\left(\frac{\partial }{\partial \omega _a}U_{\mu}(n)\right) \delta _{n,n+\mu} - \textcolor[rgb]{1,0,0}{\eta _{\mu}(n+\mu)}\left(\frac{\partial }{\partial \omega _a} U^{\dagger}_{\mu}(n)\right)\delta _{n+\mu,n}\right)\\
+&=i\eta _{\mu}(n)\left(\left(T_aU_{\mu}(n)\right) \delta _{n,n+\mu} + \left(U^{\dagger}_{\mu}(n)T_a^{\dagger}\right)\delta _{n+\mu,n}\right)\\
+\end{split}
+\end{equation}
+note that the $\eta _{\mu} (n+\mu)$ follows $\delta _{\textcolor[rgb]{1,0,0}{n+\mu},n}$. The last step we use $\eta _{\mu}(n+\mu)=\eta_{\mu}(n)$.
+The $T_a^{\dagger}$ is not convenient, so let
+\begin{equation}
+\begin{split}
+&\phi _A = \phi _i, \phi _B = T_aU_{\mu}(n)\phi _i\\
+&\phi _C = \phi _{i,d}, \phi _D = T_aU_{\mu}(n)\phi _{i,a}\\
+\end{split}
+\end{equation}
+it is
+\begin{equation}
+\begin{split}
+&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i = i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)-i\eta(n)\left(\phi _B^{\dagger}(n+\mu)\phi _C(n) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right)\\
+&=i\eta (n)\left\{\left(\phi _C^{\dagger}(n)\phi _B(n+\mu)-\phi _B^{\dagger}(n+\mu)\phi _C(n)\right)+\left( \phi _A^{\dagger}(n)\phi _D(n+\mu)-\phi _D^{\dagger}(n+\mu)\phi _A(n)\right)\right\}\\
+&=-2\eta (n) {\rm Im}\left[\phi _C^{\dagger}(n)\phi _B(n+\mu) - \phi _A^{\dagger}(n)\phi _D(n+\mu)\right]\\
+&=-2\eta (n) {\rm Im}\left[\phi _{i,d}^{\dagger}T_aU_{\mu}(n) \delta _{n,n+\mu}\phi _i - \phi _i^{\dagger}(n)T_aU_{\mu}(n)\delta _{n,n+\mu}\phi _{i,d}\right]\\
+\end{split}
+\end{equation}
+let $M(n|m)=U_{\mu}(n) \delta _{n,n+\mu}$, it is
+\begin{equation}
+\begin{split}
+&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i = -2\eta (n) {\rm Imtr}\left[T_a\left((M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right)\right]\\
+\end{split}
+\end{equation}
+One can verify that for any matrix \textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&2i \sum _a T_a {\rm Im tr}[T_a M] = -2 i \sum _a T_a {\rm Re tr}[i T_a M] = \{M\}_{TA}\\
+&2i \sum _a T_a {\rm Im tr}[i T_a M] = 2 i \sum _a T_a {\rm Re tr}[T_a M] = \{i M\}_{TA}\\
+\end{split}
+\end{equation}
+}
+so
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=-iT_a \sum _i \phi _{i}^{\dagger} \left(\frac{\partial }{\partial \omega _a} A \right) \phi _{i}\\
+&=\eta _{\mu}(n) \sum _a \sum _i 2i T_a{\rm Imtr}\left[T_a\left((M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right)\right]\\
+&=\eta _{\mu}(n) \sum _i \left\{(M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right\}_{TA}
+\end{split}
+\label{eq.staggeredformnf2}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\phi _i = \frac{\sqrt{\alpha _i} }{(D_{st}^{\dagger}D_{st})+\beta _i} \\
+&\phi _{i,d}=\textcolor[rgb]{1,0,0}{D_{st0}}\phi _i\\
+&M(n|m)=U_{\mu}(n) \delta _{n,n+\mu}\\
+\end{split}
+\end{equation}
+
+Here is the summary of $N_f=2$ RHMC for staggered fermion
+\begin{enumerate}
+  \item Refresh $\phi$ using $\phi = (D_{st}^{\dagger}D_{st})^{\frac{1}{4}}\chi$, where $\chi$ is random Gaussian complex field.
+  \item Calculate force using Eq.~(\ref{eq.staggeredformnf2}).
+  \item Metropolis step.
+\end{enumerate}
+
+Some tips on RHMC of staggered fermions:
+
+\begin{itemize}
+  \item Let $r_1(M)\approx M^{a}$, $r_2(M)\approx M^{b}$, $r_1(M)$ is generally less accurate than $(r_2(M))^{1/b}$ when $b>1$.
+  \item For $N_f=2+1$, there are other optimizations.
+\end{itemize}

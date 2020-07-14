@@ -31,6 +31,7 @@
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
     <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
     <ClCompile Include="Tests\TestCommon.cpp" />
+    <ClCompile Include="Tests\TestKSUpdator.cpp" />
     <ClCompile Include="Tests\TestMultiShiftSolver.cpp" />
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestRotation.cpp" />

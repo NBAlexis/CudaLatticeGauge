@@ -38,6 +38,23 @@ __BEGIN_NAMESPACE
 class CLGAPI CRatinalApproximation
 {
 public:
+    CRatinalApproximation() : m_uiDegree(0), m_fC(F(0.0))
+    {
+        
+    }
+
+    CRatinalApproximation(TArray<Real> parameters)
+    {
+        m_uiDegree = parameters.Num() / 2;
+        assert(static_cast<INT>(m_uiDegree * 2 + 1) == parameters.Num());
+
+        m_fC = parameters[0];
+        for (UINT i = 0; i < m_uiDegree; ++i)
+        {
+            m_lstA.AddItem(parameters[1 + i]);
+            m_lstB.AddItem(parameters[1 + m_uiDegree + i]);
+        }
+    }
 
     CRatinalApproximation(UINT uiDegree, TArray<Real> parameters)
         : m_uiDegree(uiDegree)
@@ -50,9 +67,34 @@ public:
         }
     }
 
+    CRatinalApproximation(const CRatinalApproximation& other)
+        : m_uiDegree(other.m_uiDegree)
+        , m_fC(other.m_fC)
+    {
+        for (UINT i = 0; i < other.m_uiDegree; ++i)
+        {
+            m_lstA.AddItem(other.m_lstA[i]);
+            m_lstB.AddItem(other.m_lstB[i]);
+        }
+    }
+
     ~CRatinalApproximation()
     {
 
+    }
+
+    void Initial(TArray<Real> parameters)
+    {
+        m_lstA.RemoveAll();
+        m_lstB.RemoveAll();
+        m_uiDegree = parameters.Num() / 2;
+        assert(static_cast<INT>(m_uiDegree * 2 + 1) == parameters.Num());
+        m_fC = parameters[0];
+        for (UINT i = 0; i < m_uiDegree; ++i)
+        {
+            m_lstA.AddItem(parameters[1 + i]);
+            m_lstB.AddItem(parameters[1 + m_uiDegree + i]);
+        }
     }
 
     /**

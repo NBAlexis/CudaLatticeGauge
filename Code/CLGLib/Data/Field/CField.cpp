@@ -45,6 +45,48 @@ CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
     return NULL;
 }
 
+UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGauge, const class CRatinalApproximation* pRational)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return FALSE;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    if (NULL == pRational)
+    {
+        return FALSE;
+    }
+    if (pRational->m_uiDegree < 1)
+    {
+        return FALSE;
+    }
+    CMultiShiftSolver* solver = appGetMultiShiftSolver(m_byFieldId);
+    if (NULL == solver)
+    {
+        return FALSE;
+    }
+    TArray<CField*> solutions;
+    TArray<CLGComplex> shifts;
+    for (UINT i = 0; i < pRational->m_uiDegree; ++i)
+    {
+        CField* pPooled = appGetLattice()->GetPooledFieldById(m_byFieldId);
+        solutions.AddItem(pPooled);
+        shifts.AddItem(_make_cuComplex(pRational->m_lstB[i], F(0.0)));
+    }
+
+    solver->Solve(solutions, shifts, this, pFieldSU3, op);
+
+    ScalarMultply(pRational->m_fC);
+
+    for (UINT i = 0; i < pRational->m_uiDegree; ++i)
+    {
+        Axpy(pRational->m_lstA[i], solutions[i]);
+        solutions[i]->Return();
+    }
+    return TRUE;
+}
+
 __END_NAMESPACE
 
 //=============================================================================

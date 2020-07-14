@@ -1,3 +1,4 @@
 *.bak
 /ExperimentMathematicaScripts/*.nb
 /Docs/Miscellaneous/GaugeFixing.log
+/Docs/Update/*.log

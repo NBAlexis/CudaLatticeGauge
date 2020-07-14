@@ -110,8 +110,91 @@ UINT TestMultiShiftSolver(CParameters& params)
     return uiError;
 }
 
+UINT TestMultiShiftSolverKS(CParameters& params)
+{
+    TArray<Real> oneOver2;
+    TArray<Real> _oneOver2;
+    TArray<Real> oneOver4;
+    TArray<Real> _oneOver4;
+
+    params.FetchValueArrayReal(_T("OneOver2"), oneOver2);
+    params.FetchValueArrayReal(_T("MinusOneOver2"), _oneOver2);
+    params.FetchValueArrayReal(_T("OneOver4"), oneOver4);
+    params.FetchValueArrayReal(_T("MinusOneOver4"), _oneOver4);
+    Real fMaxError = F(0.000001);
+    params.FetchValueReal(_T("ExpectedErr"), fMaxError);
+
+    CRatinalApproximation R1Over2(oneOver2);
+    CRatinalApproximation R_1Over2(_oneOver2);
+    CRatinalApproximation R1Over4(oneOver4);
+    CRatinalApproximation R_1Over4(_oneOver4);
+
+    const CField* pField = appGetLattice()->GetFieldById(2);
+    const CField* pGauge = appGetLattice()->m_pGaugeField;
+    const Real fLengthOfPhi = pField->Dot(pField).x;
+    CFieldFermion* pFieldCopy = dynamic_cast<CFieldFermion*>(pField->GetCopy());
+
+    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over2);
+    Real fLength2 = pFieldCopy->Dot(pFieldCopy).x;
+    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over2);
+    pFieldCopy->AxpyMinus(pField);
+    Real fLength3 = pFieldCopy->Dot(pFieldCopy).x;
+    UINT uiError = 0;
+    if (fLength3 > fMaxError)
+    {
+        uiError++;
+    }
+    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/2}phi|^2 = %2.18f, |D^{-1/2}D^{1/2}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+
+    pField->CopyTo(pFieldCopy);
+
+    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over4);
+    fLength2 = pFieldCopy->Dot(pFieldCopy).x;
+    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over4);
+    pFieldCopy->AxpyMinus(pField);
+    fLength3 = pFieldCopy->Dot(pFieldCopy).x;
+    if (fLength3 > fMaxError)
+    {
+        uiError++;
+    }
+    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/4}phi|^2 = %2.18f, |D^{-1/4}D^{1/4}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+
+    pField->CopyTo(pFieldCopy);
+
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over2);
+    fLength2 = pFieldCopy->Dot(pFieldCopy).x;
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over2);
+    pFieldCopy->AxpyMinus(pField);
+    fLength3 = pFieldCopy->Dot(pFieldCopy).x;
+    if (fLength3 > fMaxError)
+    {
+        uiError++;
+    }
+    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/2}phi|^2 = %2.18f, |DD^{-1/2}DD^{1/2}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+
+    pField->CopyTo(pFieldCopy);
+
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over4);
+    fLength2 = pFieldCopy->Dot(pFieldCopy).x;
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over4);
+    pFieldCopy->AxpyMinus(pField);
+    fLength3 = pFieldCopy->Dot(pFieldCopy).x;
+    if (fLength3 > fMaxError)
+    {
+        uiError++;
+    }
+    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/4}phi|^2 = %2.18f, |DD^{-1/4}DD^{1/4}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+
+    appSafeDelete(pFieldCopy);
+    return uiError;
+}
+
 __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverGMRES);
 __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverFOM);
 __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverBiCGStab);
+
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverGMRES);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverFOM);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverBiCGStab);
 
 

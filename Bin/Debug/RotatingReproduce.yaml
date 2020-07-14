@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_GaugeFixing
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -15,14 +15,14 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 109
-    SaveStartIndex : 2891
-    OmegaSep : 18
-    OmegaStart : 18
-    MaxOmega : 0.126
-    MinNt : 3
-    MaxNt : 3
-    SavePrefix : ./46016/N46016_
+    EquvibStep : 242
+    SaveStartIndex : 1566
+    OmegaSep : 7
+    OmegaStart : 7
+    MaxOmega : 0.04095
+    MinNt : 6
+    MaxNt : 6
+    SavePrefix : ./535161/NC535161_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -32,11 +32,11 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [0.23678336057057213316, 0.2617541192345786797, 0.2622757572482202809, 0.31744431234437960887, 0.43215713739769772614, 0.4859714936621504564, 0.5274323871405974491, 0.6232650612105935261, 0.6537054604720478081, 0.7134004301013204984, 0.7646509733567870362]
+    Polyakovs : [0.8227229233022786497, 0.832292135453446207, 0.8169561496439082449, 0.8991770875102522207, 0.9525136501331361778, 0.836703721988687248, 0.90990638602, 1.000650246742295528, 0.9987982398318660517, 1.033217114082467280, 1.0854434675617218120, 1.0672871040142541996, 1.180570161592429052, 1.1707922303915185983, 1.2069379969820151653, 1.225616375550248996, 1.251965102933444795, 1.279163077897875913, 1.304752282082590190, 1.324690363974395414, 1.392928136780839122]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [26, 26, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -51,8 +51,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    Nt3FileName : ./46016/N46016_Rotate_Nt3_O18_2891.con
-    Nt3Polyakov : 0.988625871930
+    Nt6FileName : ./535161/NC535161_Rotate_Nt6_O7_1566.con
+    Nt6Polyakov : 0.447453249787
 
     # 55150
     # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
@@ -102,7 +102,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.161
         FieldId : 2
         PoolNumber : 2
         Period : [0, 0, 1, -1]
@@ -117,7 +117,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.60
+        Beta : 5.35
         Omega : 0.0
 
     Action2:
@@ -134,7 +134,7 @@ JobThermal:
         MaxStep : 1
 
         # SolverName : CSLASolverGMRES
-        # MaxDim : 15
+        MaxDim : 15
 
         # SolverName : CSLASolverGCRODR
         # Accuracy : 0.000001
@@ -167,29 +167,29 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.63
-    OmegaRange : 0.133
-    StartOmega : 19
-    EndOmega : 19
+    GaugeBate : 4.90
+    OmegaRange : 0.14
+    StartOmega : 0
+    EndOmega : 20
     StartN : 101
-    EndN : 10000
+    EndN : 6000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
-    DistributionJob : EDJ_PlaqutteEnergy
+    DistributionJob : EDJ_Polyakov
     FermionMomentum : 1
-    StochasticFieldCount : 9
+    StochasticFieldCount : 16
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\CLGConfigs\f46316\Nt3
+    SubFolderPrefix : G:\CLGConfigs\f49016\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : N46316_
-    CSVSavePrefix : G:\CLGConfigs\f46316\Polyakov\N46316_
+    SavePrefix : N49016_
+    CSVSavePrefix : G:\CLGConfigs\f49016\Polyakov\N49016_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -304,16 +304,16 @@ JobPolyakovDist:
         FermiomFieldCount : 9
 
     # Action is only needed for CMeasureAction measurement
-    ActionListLength : 2
-    Action1:
+    # ActionListLength : 2
+    # Action1:
    
-        ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.63
-        Omega : 0.0
+    #     ActionName : CActionGaugePlaquetteRotating
+    #     Beta : 4.63
+    #     Omega : 0.0
 
-    Action2:
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
+    # Action2:
+    #     ActionName : CActionFermionWilsonNf2
+    #     FieldId : 2
 
 JobGaugeFixing:
 

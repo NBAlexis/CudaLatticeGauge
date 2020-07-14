@@ -34,6 +34,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelperFunctions.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermion.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionWilsonNf2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
@@ -165,6 +166,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftGMRES.cpp

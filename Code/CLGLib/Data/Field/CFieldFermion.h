@@ -44,7 +44,7 @@ public:
     */
     virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
 
-    UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override
+    UBOOL ApplyOperator(EFieldOperator op, const CField * otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override
     {
         switch (op)
         {
@@ -78,6 +78,16 @@ public:
                 return FALSE;
             }
             return InverseDDdagger(otherfield);
+        case EFO_F_RationalD:
+            {
+                class CRatinalApproximation* pRA = (class CRatinalApproximation*)(pOtherParameters);
+                if (NULL == pRA)
+                {
+                    appCrucial(_T("ApplyOperator, the operator %s with CRatinalApproximation null.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
+                    return FALSE;
+                }
+                return RationalApproximation(EFO_F_D, otherfield, pRA);
+            }
         default:
             appCrucial(_T("ApplyOperator, the operator %s is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
             return FALSE;
@@ -96,14 +106,16 @@ public:
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
     virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const = 0;
 
+    virtual UBOOL RationalApproximation(EFieldOperator op, const CField* pGauge, const class CRatinalApproximation* pRational);
+
 #pragma region real operators
 
     /**
     * It seems no need to create a "Foprt" class like Bridge++
     */
-    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+    virtual void DOperator(void* pTargetBuffer, const void * pBuffer, const void * pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;
-    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const = 0;
+    virtual void DerivateDOperator(void* pForce, const void * pDphi, const void * pDDphi, const void * pGaugeBuffer) const = 0;
 
 #pragma endregion
 
@@ -113,8 +125,8 @@ public:
     /**
      * For even odd preconditioner
      */
-    virtual void WriteEvenSites(const CFieldFermion* , const CFieldGauge* , UBOOL ) { appCrucial(_T("Not implemented.\n")); }
-    virtual void WriteBackEvenSites(CFieldFermion* , const CFieldGauge* , UBOOL ) const { appCrucial(_T("Not implemented.\n")); }
+    virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
+    virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
 
 protected:
 
@@ -124,7 +136,7 @@ protected:
         return FALSE;
     }
 
-    virtual UBOOL InverseDdagger_eo(const CField* )
+    virtual UBOOL InverseDdagger_eo(const CField*)
     {
         appCrucial(_T("Not implemented.\n"));
         return FALSE;
