@@ -88,6 +88,73 @@ _kernelCalculateGaugeSpin(
     }
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateJGSurf(
+    SSmallInt4 sCenter, 
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pGauge,
+    const deviceSU3* __restrict__ pE,
+    const deviceSU3* __restrict__ pAphys,
+    Real* pBuffer,
+    Real fBetaOverN)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+
+    if (!site.IsDirichlet())
+    {
+        const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+        const BYTE uiDir2 = uiDir * 2;
+        const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
+        const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+
+        Real fRes = F(0.0);
+        for (BYTE dir = 0; dir < 3; ++dir)
+        {
+            //p_i A_j = U_i(n) A_j(n+i) U_i^+(n) - U_i^+(n-i) A_j(n-i) U_i(n-i)
+            //const UINT x_m_i_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
+            const UINT x_p_i_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
+
+            //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
+            //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
+            //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
+            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, dir));
+            deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, x_p_i_Gauge, 1));
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, x_p_i_Gauge, 0).MulRealC(fY));
+            a.MulDagger(u);
+            u.Mul(a);
+            //E_i (x p_i A_y  - y p_i A_x)
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            fRes += u.ReTr();
+
+            //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
+            //- y p_i A_x : -U_i^+(n-i) A_x(n-i) U_i(n-i)
+            /*
+            u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_i_Gauge, dir);
+            a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 1);
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 0).MulRealC(fY));
+            a.Mul(u);
+            u.DaggerMul(a);
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            fRes -= u.ReTr();
+            */
+            a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            fRes -= u.ReTr();
+        }
+
+        //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN);
+    }
+}
+
 /**
  * Use Apure directly
  */
@@ -189,7 +256,8 @@ _kernelMomemtumJGChen(
             res = _cuCaddf(res, beforeTrace.Tr());
         }
 
-        res = cuCmulf_cr(res, fBetaOverN * F(0.5));
+        //res = cuCmulf_cr(res, fBetaOverN * F(0.5));
+        res = cuCmulf_cr(res, fBetaOverN);
         atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
     }
 }
@@ -212,8 +280,8 @@ _kernelMomentumJGChenDpureA(
     const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
     const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
 
-    const UINT x_m_x_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 0];
-    const UINT x_m_y_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 1];
+    //const UINT x_m_x_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 0];
+    //const UINT x_m_y_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 1];
     const UINT x_p_x_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 0 + uiDir];
     const UINT x_p_y_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 1 + uiDir];
 
@@ -232,12 +300,15 @@ _kernelMomentumJGChenDpureA(
         pXcrossDpureA[uiLinkIndex].Add(u);
 
         //U_x^+(n-x) A_dir(n-x) U_x(n-x)
-        u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_x_Gauge, 0);
-        a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_x_Gauge, idir);
-        a.Mul(u);
-        u.DaggerMul(a);
-        u.MulReal(fmY);
-        pXcrossDpureA[uiLinkIndex].Sub(u);
+        //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_x_Gauge, 0);
+        //a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_x_Gauge, idir);
+        //a.Mul(u);
+        //u.DaggerMul(a);
+        //u.MulReal(fmY);
+        //pXcrossDpureA[uiLinkIndex].Sub(u);
+        a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir);
+        a.MulReal(fmY - fmX);
+        pXcrossDpureA[uiLinkIndex].Sub(a);
 
         //U_y(n) A_dir(n+y)U_y^+(n)
         u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
@@ -248,12 +319,12 @@ _kernelMomentumJGChenDpureA(
         pXcrossDpureA[uiLinkIndex].Sub(u);
 
         //U_y^+(n-y) A_dir(n-y) U_y(n-y)
-        u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_y_Gauge, 1);
-        a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_y_Gauge, idir);
-        a.Mul(u);
-        u.DaggerMul(a);
-        u.MulReal(fmX);
-        pXcrossDpureA[uiLinkIndex].Add(u);
+        //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_y_Gauge, 1);
+        //a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_y_Gauge, idir);
+        //a.Mul(u);
+        //u.DaggerMul(a);
+        //u.MulReal(fmX);
+        //pXcrossDpureA[uiLinkIndex].Add(u);
     }
 }
 
@@ -432,6 +503,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         }
         else
         {
+#pragma region Spin
+
             _kernelCalculateGaugeSpin << <block, threads >> > (
                 pESU3->m_pDeviceData, 
                 pAphysSU3->m_pDeviceData, 
@@ -463,6 +536,49 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
                 );
             }
+
+#pragma endregion
+
+#pragma region Surf
+
+            _ZeroXYPlane(m_pDeviceDataBuffer);
+            _kernelCalculateJGSurf << <block, threads >> > (
+                CCommonData::m_sCenter,
+                m_byFieldId,
+                pGaugeSU3->m_pDeviceData,
+                pESU3->m_pDeviceData,
+                pAphysSU3->m_pDeviceData,
+                m_pDeviceDataBuffer,
+                fBetaOverN);
+            _AverageXYPlane(m_pDeviceDataBuffer);
+            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaGetLastError());
+
+            for (UINT i = 1; i < _HC_Ly; ++i)
+            {
+                for (UINT j = 1; j < _HC_Lx; ++j)
+                {
+                    m_lstResJGSurf.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+                }
+            }
+
+            if (m_bMeasureDistribution)
+            {
+                XYDataToRdistri_R(
+                    m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_uiMaxR, FALSE, m_byFieldId);
+
+                checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+                FillDataWithR_R(
+                    m_lstJGSurf, m_lstJGSurfInner, m_lstJGSurfAll, m_lstR,
+                    m_pHostDistributionJG, m_pHostDistributionR,
+                    m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, FALSE
+                );
+            }
+
+#pragma endregion
+
+#pragma region Chen
 
             _ZeroXYPlane(m_pDeviceDataBuffer);
 
@@ -506,6 +622,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
                 checkCudaErrors(cudaGetLastError());
             }
+
+#pragma endregion
 
             if (m_bMeasureApprox)
             {
@@ -624,6 +742,12 @@ void CMeasureAMomentumJG::Report()
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS);
 
         appGeneral(_T("\n===================================================\n"));
+        appGeneral(_T("=========== Angular Momentum JGSurf of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("===================================================\n"));
+
+        ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGSurf);
+
+        appGeneral(_T("\n===================================================\n"));
         appGeneral(_T("=========== Angular Momentum JG Chen of sites ==========\n"), CCommonData::m_sCenter.x);
         appGeneral(_T("===================================================\n"));
 
@@ -659,6 +783,7 @@ void CMeasureAMomentumJG::Reset()
     m_lstResJGChen.RemoveAll();
     m_lstResJGChenApprox.RemoveAll();
     m_lstResJGChenApprox2.RemoveAll();
+    m_lstResJGSurf.RemoveAll();
 
     m_lstR.RemoveAll();
     m_lstJG.RemoveAll();
@@ -666,6 +791,7 @@ void CMeasureAMomentumJG::Reset()
     m_lstJGChen.RemoveAll();
     m_lstJGChenApprox.RemoveAll();
     m_lstJGChenApprox2.RemoveAll();
+    m_lstJGSurf.RemoveAll();
 
     m_lstJGAll.RemoveAll();
     m_lstJGInner.RemoveAll();
@@ -677,6 +803,8 @@ void CMeasureAMomentumJG::Reset()
     m_lstJGChenApproxInner.RemoveAll();
     m_lstJGChenApprox2All.RemoveAll();
     m_lstJGChenApprox2Inner.RemoveAll();
+    m_lstJGSurfAll.RemoveAll();
+    m_lstJGSurfInner.RemoveAll();
 }
 
 __END_NAMESPACE

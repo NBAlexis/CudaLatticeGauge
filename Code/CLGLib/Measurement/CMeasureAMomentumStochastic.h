@@ -5,7 +5,11 @@
 // NOTE:
 //
 // JL :     Ji decomposition orbit angular momentum, (1/i) psidagger r x D psi
+//             It is 2 kappa gamma4 (x(Ty^+-Ty^-) - y(Tx^+-Tx^-)).
+//
 // JS :     Ji decomposition spin angular momentum, (1/2) psidagger Sigma psi
+//             It is -2 kappa { 0.5 i sigma12 [(1 - gamma4) T+ - (1 + gamma4) T-] }
+//
 // JLPure : Chen decomposition orbit angular momentum, (1/i) psidagger r x Dpure psi
 // JLJM :   Jaffe¨CManohar decomposition orbit angular momentum, (1/i) psidagger r x partial psi, not gauge inv.
 //          at Coulomb gauge, JLJM = JLPure

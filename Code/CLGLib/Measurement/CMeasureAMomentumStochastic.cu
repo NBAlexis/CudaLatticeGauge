@@ -188,6 +188,8 @@ _kernelDotAndGatherXYAMomentumJL(
 
 /**
  * Simplified to not support !Naive, the gamma4 is multplied at last
+ * y(T^+ - T^-) - x(T^+ - T^-)
+ * Note fmy = -static_cast<Real>(sSite4.y - sCenter.y) = -y
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJL_Simple(
@@ -588,6 +590,9 @@ _kernelDotAndGatherXYAMomentumJJM(
     atomicAdd(&resultXYPlaneJL[uiXY], cDotRes.x);
 }
 
+/**
+ * -i gamma4 sigma12
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS(
     const deviceWilsonVectorSU3 * __restrict__ pLeft,
@@ -617,7 +622,9 @@ _kernelDotAndGatherXYAMomentumJS(
  * JS = (gamma4-1) T+  +  (1+gamma4) T-
  * Note that, the T+ term multiply 0.5, it is in fact -0.5, that is -0.5(1-gamma4)T+
  *
- * Still need a "- kappa"
+ * 0.5 i sigma12 [(1 - gamma4) T+ - (1 + gamma4) T-]
+ *
+ * Still need a "2 kappa"
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS_Exp(
@@ -712,6 +719,9 @@ _kernelAMomentumInitialDist(
     }
 }
 
+/**
+ * 2 gamma4 (x Ay - y Ax)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJPot(
     const deviceWilsonVectorSU3* __restrict__ pLeft,
