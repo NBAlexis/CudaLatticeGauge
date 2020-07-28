@@ -44,7 +44,7 @@ _kernelDFermionWilsonSquareSU3(
 {
     intokernaldir;
 
-    const gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix & gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
     if (bDDagger)
@@ -56,7 +56,7 @@ _kernelDFermionWilsonSquareSU3(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
+        const gammaMatrix & gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -162,7 +162,7 @@ _kernelDWilsonForceSU3(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
+        const gammaMatrix & gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);

@@ -167,6 +167,8 @@ static __device__ __inline__ deviceSU3 _device1PlaqutteTermMM(
 
 /**
 * Product of 3 terms
+* U(uiBIa)_{byDira} . U(uiBIb)_{byDirb} . U(uiBIc)_{byDirc}
+* To calcuate staple
 */
 static __device__ __inline__ deviceSU3 _deviceGetSTTerm(
     const deviceSU3* __restrict__ pDeviceData,

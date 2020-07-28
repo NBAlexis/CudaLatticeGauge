@@ -87,6 +87,9 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
                         pF2, pF1,
                         0 == j, uiFieldCount == j + 1);
                 }
+
+                pF1->Return();
+                pF2->Return();
             }
         }
     }

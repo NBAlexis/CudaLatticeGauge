@@ -347,6 +347,9 @@ public:
     static Real m_fOmega;
     static SSmallInt4 m_sCenter;
 
+    //Use for acceleration, Since the fermion fields are copied,
+    static Real m_fG;
+
     static UINT m_uiMaxThreadPerBlock;
 };
 

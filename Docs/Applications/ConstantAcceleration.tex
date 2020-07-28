@@ -1,0 +1,174 @@
+\subsection{\label{sec:ConstantAcceleration}Constant Acceleration}
+
+\subsubsection{\label{sec:discretizationAcceleration}Discretization}
+
+The metric of constant acceleration $g$ at ${\bf z}$ direction is
+\begin{equation}
+\begin{split}
+&g_{\mu\nu}=\left(\begin{array}{cccc} 1-g^2 t^2 & 0 & 0 & g t \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ g t & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-\det (g_{\mu\nu})}=i\\
+\end{split}
+\end{equation}
+The analytical extension is simply add $-2$ to $g_{00}$, \begin{equation}
+\begin{split}
+&g_{\mu\nu}=\left(\begin{array}{cccc} -1-g^2 t^2 & 0 & 0 & g t \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ g t & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-\det (g_{\mu\nu})}=1\\
+\end{split}
+\end{equation}
+Then
+\begin{equation}
+\begin{split}
+&\mathcal{L}=\frac{1}{2g_{YM}^2}\left(\sum _{ijkl=0}^3 \delta_{ij}\delta_{kl}{\rm tr}[F_{ik}F_{jl}]+2g^2 t^2 {\rm tr}\left[F_{01}^2+F_{02}^2\right]\right.\\
+&\left.+4g t\left({\rm tr}[F_{01}F_{13}]+{\rm tr}[F_{02}F_{23}]\right)\right).
+\end{split}
+\end{equation}
+And
+\begin{equation}
+\begin{split}
+&i\int d^4 x \sqrt{-\det (g_{\mu\nu})}\mathcal{L}=-\frac{1}{2g_{YM}^2}\int d^4x \left(\sum _{ijkl=0}^3 \delta_{ij}\delta_{kl}{\rm tr}[F_{ik}F_{jl}]+2g^2 t^2 {\rm tr}\left[F_{01}^2+F_{02}^2\right]\right.\\
+&\left.+4g t\left({\rm tr}[F_{01}F_{13}]+{\rm tr}[F_{02}F_{23}]\right)\right).
+\end{split}
+\end{equation}
+Let $\exp (i\int d^4 x \mathcal{L}) \to \exp (-S_F)$, it is
+\begin{equation}
+\begin{split}
+&S_G=\frac{1}{2g_{YM}^2}\int d^4x \left(\sum _{ijkl=0}^3 \delta_{ij}\delta_{kl}{\rm tr}[F_{ik}F_{jl}]+2g^2 t^2 {\rm tr}\left[F_{01}^2+F_{02}^2\right]\right.\\
+&\left.+4g t\left({\rm tr}[F_{01}F_{13}]+{\rm tr}[F_{02}F_{23}]\right)\right).
+\end{split}
+\end{equation}
+
+The discretized version is then
+\begin{equation}
+\begin{split}
+&\sum _{ijkl=0}^3 \delta_{ij}\delta_{kl}{\rm tr}[F_{ik}F_{jl}] = 2\sum _{\mu>\nu}{\rm tr}[F_{\mu\nu}^2]\\
+&{\rm Retr}[1-U_{\mu\nu}]={\rm Retr}[1-\bar{U}_{\mu\nu}]=2{\rm tr}[F_{\mu\nu}^2]\\
+&{\rm Retr}V_{\mu\nu\rho}]=4{\rm tr}[F_{\mu\nu}F_{\nu\rho}]\\
+&S_G= a^4 \frac{\beta}{N_c}\sum _n \left(\sum _{\mu>\nu}{\rm Retr}[1-U_{\mu\nu}]+g^2 t^2 \left({\rm Retr}[1-\bar{U}_{14}]+{\rm Retr}[1-\bar{U}_{24}]\right)\right.\\
+&\left.+g t\left({\rm Retr}[V_{413}]+{\rm Retr}[V_{423}]\right)\right).\\
+\end{split}
+\end{equation}
+Note that ${\rm Retr}[1-U_{\mu\nu}]={\rm Retr}[1-U_{\nu\mu}]$, ${\rm Retr}[V_{\mu\nu\rho}]={\rm Retr}[V_{\rho\nu\mu}]$
+
+For the fermions, we choose
+\begin{equation}
+\begin{split}
+&e_0=i(1,0,0,g t), \;\; e_1=i(0,1,0,0),\\
+&e_2=i(0,0,1,0),\;\; e_3=i(0,0,0,1).\\
+\end{split}
+\end{equation}
+one can verify $\delta _{ab}=e_a^{\mu}e_b^{\nu}g^E_{\mu\nu}$.
+
+The only non-zero derivative of metric is $\partial g_{11} / \partial x_1=-2g^2 t$, $\partial g_{14} / \partial x_1 = g$, so the non-zero Christoffel connection are \begin{equation}
+\begin{split}
+&\Gamma _{1,14}=\frac{1}{2}\left(\frac{\partial g^{11}}{\partial x_4}+\frac{\partial g^{14}}{\partial x_1}-\frac{\partial g^{14}}{\partial x_1}\right)\\
+&\Gamma _{4,11}=\frac{1}{2}\left(\frac{\partial g^{41}}{\partial x_1}+\frac{\partial g^{41}}{\partial x_1}-\frac{\partial g^{11}}{\partial x_4}\right)\\
+&\Gamma _{1,41}=\frac{1}{2}\left(\frac{\partial g^{14}}{\partial x_1}+\frac{\partial g^{11}}{\partial x_4}-\frac{\partial g^{41}}{\partial x_1}\right)\\
+&\Gamma _{1,11}=\frac{1}{2}\left(\frac{\partial g^{11}}{\partial x_1}\right)\\
+&\\
+&\Gamma _{1,14}=\frac{1}{2}\left(\frac{\partial g^{14}}{\partial x_1}-\frac{\partial g^{14}}{\partial x_1}\right)=0\\
+&\Gamma _{4,11}=\frac{1}{2}\left(\frac{\partial g^{41}}{\partial x_1}+\frac{\partial g^{41}}{\partial x_1}\right)=g\\
+&\Gamma _{1,41}=\frac{1}{2}\left(\frac{\partial g^{14}}{\partial x_1}-\frac{\partial g^{41}}{\partial x_1}\right)=0\\
+&\Gamma _{1,11}=\frac{1}{2}\left(\frac{\partial g^{11}}{\partial x_1}\right)=-g^2t\\
+\end{split}
+\end{equation}
+Then $\Gamma ^i_{jk}=g_{i l}\Gamma _{l,jk}$, $jk$ can only be $11$.
+\begin{equation}
+\begin{split}
+&\Gamma ^1_{11}=\sum _n g_{1 n}\Gamma _{n,11}=g_{11}\Gamma _{1,11}+g_{14}\Gamma _{4,11}=-1\times (-g^2t) + (-g t)\times g =0\\
+\end{split}
+\end{equation}
+The only non-zero is $\Gamma ^4_{11}$.
+\begin{equation}
+\begin{split}
+&w_{\mu ij}=g_{\alpha \beta}e_i^{\alpha}(\partial _{\mu}e_j^{\beta}+\Gamma ^{\beta}_{\mu\nu}e_j^{\nu})\\
+\end{split}
+\end{equation}
+The $\mu$ of $w$ can only be $1$.
+\begin{equation}
+\begin{split}
+&w_{1 ij}=g_{\alpha \beta}e_i^{\alpha}(\partial _{t}e_j^{\beta}+\Gamma ^{\beta}_{1\nu}e_j^{\nu})\\
+&=g_{\alpha 4}e_i^{\alpha}(\partial _{t}e_j^{z}+\Gamma ^{4}_{11}e_j^{t})\\
+&=g_{1 4}e_i^{t}(\partial _{t}e_j^{z}+\Gamma ^{4}_{11}e_j^{t})+g_{4 4}e_i^{z}(\partial _{t}e_j^{z}+\Gamma ^{4}_{11}e_j^{t})\\
+&=g_{1 4}e_i^{t}(\partial _{t}e_j^{z}-ge_j^{t})+g_{4 4}e_i^{z}(\partial _{t}e_j^{z}-ge_j^{t})\\
+\end{split}
+\end{equation}
+Just look at $\partial _{t}e_j^{z}-ge_j^{t}$, for any $j$, it is zero. So $w=0$.
+
+So the result is just
+\begin{equation}
+\begin{split}
+&D_g=\left[i\gamma ^{\mu}\left((\partial _{\mu}+ieA_{\mu})-\frac{i}{4}\sigma ^{ij}w_{\mu ij}\right)-m\right]
+\end{split}
+\end{equation}
+with $\gamma ^{\mu}=\gamma ^i e_i^{\mu}$ and $w=0$. It is
+\begin{equation}
+\begin{split}
+&D_g=\left[-\sum _i \gamma ^i\left(\partial _i+ieA_i\right)-gt \gamma _0\left(\partial _z+ieA_z\right) -m\right]
+\end{split}
+\end{equation}
+As a summary the Wick rotation is
+\begin{equation}
+\begin{split}
+&-S_F=i\int d^4 x \sqrt{-g_{\alpha \beta}}\bar{\psi } D_a \psi\\
+&S_F=\int d^4 x_E \bar{\psi } \left[\gamma _1 (\partial _x+ieA_x)+\gamma _2(\partial _y+ieA_y)+\gamma _3 (\partial _z+ieA_z)+\gamma _4 (\partial _{\tau}+ieA_{\tau})+m\right.\\
+&\left.+gt \gamma _4 \left(\partial _z+ieA_z\right)\right] \psi\\
+\end{split}
+\end{equation}
+The first line is Wilson-Dirac operator, satisfying $\gamma _5$ - hermiticity, the last line is discretized as
+\begin{equation}
+\begin{split}
+&\left(\gamma _4\frac{U_{\mu}(n)\delta _{n,n+\mu}-U_{-\mu}(n)\delta _{n,n-\mu}}{2a}\right)^{\dagger}\\
+&=\left(\frac{\delta _{n,n+\mu}^{\dagger}U^{\dagger}_{\mu}(n)-\delta _{n,n-\mu} ^{\dagger}U^{\dagger}_{-\mu}(n)}{2a}\right)\gamma _4^{\dagger}\\
+&=\left(\frac{\delta _{n+\mu,n}U_{-\mu}(n + \mu)-\delta _{n-\mu,n} U_{\mu}(n-\mu)}{2a}\right)\gamma _4\\
+\end{split}
+\end{equation}
+Do the shift then resemble, it is
+\begin{equation}
+\begin{split}
+&=\left(\frac{\delta _{n,n-\mu}U_{-\mu}(n)-\delta _{n,n+\mu} U_{\mu}(n)}{2a}\right)\gamma _4\\
+&=\gamma _4\left(\frac{\delta _{n,n-\mu}U_{-\mu}(n)-\delta _{n,n+\mu} U_{\mu}(n)}{2a}\right)=-\left(\gamma _4\frac{U_{\mu}(n)\delta _{n,n+\mu}-U_{-\mu}(n)\delta _{n,n-\mu}}{2a}\right)\\
+\end{split}
+\end{equation}
+So it is anti-hermiticity, note that $\gamma _5 \gamma _4 \gamma _5 = - \gamma _4$, it is then $\gamma _5$ - hermiticity.
+
+\subsubsection{\label{sec:forceAcceleration}Force}
+
+\begin{itemize}
+  \item Gauge force
+\end{itemize}
+
+The $\bar{U}_{\mu\nu}$ term:
+
+\begin{equation}
+\begin{split}
+&\sum _n f(n){\rm Retr}[1-\bar{U}_{\mu, \nu}(n)]=\sum _n\frac{f(n)+f(n+a\mu)+f(n+a\nu)+f(n+a\mu+a\nu)}{4}{\rm Retr}[1-U_{\mu\nu}(n)]\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&g^2 t^2 {\rm Retr}[1-\bar{U}_{4,1}(n)]=g^2\frac{t^2 + (t+1)^2 + t^2 + (t+1)^2}{4}{\rm Retr}[1-U_{4,1}(n)]=\frac{g^2(2t^2+2t+1)}{2}{\rm Retr}[1-U_{4,1}(n)]\\
+&g^2 t^2 {\rm Retr}[1-\bar{U}_{4,2}(n)]=\frac{g^2(2t^2+2t+1)}{2}{\rm Retr}[1-U_{4,2}(n)]\\
+\end{split}
+\end{equation}
+Then
+\begin{equation}
+\begin{split}
+&g(n)=\frac{g^2(2t^2+2t+1)}{2}\\
+&\sum _ng(n){\rm Retr}[1-U_{\mu,\nu}(n)]=N\times N_c-\sum _n {\rm Retr}\left[U_{\mu}(n)\Sigma ^{\dagger}_{\mu}(n)\right]\\
+&\Sigma _{\mu}(n,\nu)=g(n)U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)+g(n-a\nu)U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)\\
+\end{split}
+\end{equation}
+Note that there is no sum over $\nu$, and $\nu=1$ or $\nu=2$.
+
+\textcolor[rgb]{1,0,0}{\textbf{Note that, if we put rotation and constant acceleration together, $f(n)$ function will not touch the Dirichlet boundary condition, while the $g(n)$ function will. So although $g(n)$ and $g(n-a\nu)$ have the same form $\frac{g^2(2t^2+2t+1)}{2}$, we will not combine them, because it is possible $g(n)=0$ for Dirichlet boundary.}}
+
+Finally
+\begin{equation}
+\begin{split}
+&F_{\mu=1,2}(n)=-\frac{\beta}{2N_c}\left\{U_{\mu}(n)\Sigma _{\mu}^{\dagger}(n,4)\right\}_{TA},\;\;F_3=0\\
+&F_{4}(n)=-\frac{\beta}{2N_c}\left\{U_{4}(n)\sum _{i=1,2}\Sigma _{4}^{\dagger}(n,i)\right\}_{TA}\\
+\end{split}
+\end{equation}
+
+The $V_{\mu\nu\rho}$ force is derived in the `Rotation' chapter.
+

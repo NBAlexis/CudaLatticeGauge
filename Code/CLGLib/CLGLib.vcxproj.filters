@@ -371,6 +371,12 @@
     <ClInclude Include="Data\Action\CActionFermionKS.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteAcceleration.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -578,6 +584,12 @@
       <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

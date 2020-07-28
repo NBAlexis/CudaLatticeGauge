@@ -10,6 +10,7 @@ namespace CLGMakeWriter
         EArcSM52,
         EArcSM61,
         EArcSM70,
+        EArcSM75,
     }
 
     class CMakeWritter
@@ -30,6 +31,9 @@ namespace CLGMakeWriter
 
             //V100
             "compute_70",
+
+            //RTX2060-2080
+            "compute_75",
         };
 
         readonly static string[] CodeNames =
@@ -42,6 +46,9 @@ namespace CLGMakeWriter
 
             //V100
             "sm_70",
+
+            //RTX2060-2080
+            "sm_75",
         };
 
         public void WritteTheFile(string sSolDir, CProjFile projFile, Dictionary<string, CProjFile> excutables)
@@ -209,6 +216,28 @@ set_target_properties( CLGLib
 
             sContent += "target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)\n";
             sContent += "target_link_libraries(ConfigurationCompresser CLGLib)\n";
+
+            #endregion
+
+            #region Add ConstAcc
+
+            CProjFile constaccProj = excutables["ConstAcc"];
+
+            sContent += "\n\n\n# ==================== \n# ConstAcc \n# =================\n\n";
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConstAcc)\n";
+            sContent += "add_executable(ConstAcc \n    ";
+            foreach (string sFileName in constaccProj.m_lstAllHeaderFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
+            }
+            foreach (string sFileName in constaccProj.m_lstAllCppFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
+            }
+            sContent += ")\n\n";
+
+            sContent += "target_compile_features(ConstAcc PUBLIC cxx_std_14)\n";
+            sContent += "target_link_libraries(ConstAcc CLGLib)\n";
 
             #endregion
 

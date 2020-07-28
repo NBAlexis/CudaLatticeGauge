@@ -38,6 +38,9 @@ namespace CLGMakeWriter
             string projConfigurationCompresserPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser" });
             string projConfigurationCompresserFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser/ConfigurationCompresser.vcxproj" });
 
+            string projConstAccPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc" });
+            string projConstAccFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc/ConstAcc.vcxproj" });
+
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -70,7 +73,8 @@ namespace CLGMakeWriter
             apps.Add("RotatingReproduce", new CProjFile(projRotatingFilePath, projRotatingPath));
             apps.Add("MatchingRho", new CProjFile(projMatchingRhoFilePath, projMatchingRhoPath));
             apps.Add("ConfigurationCompresser", new CProjFile(projConfigurationCompresserFilePath, projConfigurationCompresserPath));
-            
+            apps.Add("ConstAcc", new CProjFile(projConstAccFilePath, projConstAccPath));
+
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 
             Console.WriteLine("work done, press enter to exit...");
