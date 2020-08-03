@@ -30,7 +30,7 @@ _kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr)
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
         {
             pDevicePtr[uiLinkIndex] = zero;
@@ -56,7 +56,7 @@ _kernelStapleAtSiteSU3CacheIndex_D(
     //Real test_force = F(0.0);
     betaOverN = betaOverN * F(-0.5);
     const UINT plaqLengthm1 = plaqLength - 1;
-    UINT plaqCountAll = plaqCount * plaqLengthm1;
+    const UINT plaqCountAll = plaqCount * plaqLengthm1;
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -64,10 +64,10 @@ _kernelStapleAtSiteSU3CacheIndex_D(
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
         //there are 6 staples, each is sum of two plaquttes
-        for (int i = 0; i < plaqCount; ++i)
+        for (BYTE i = 0; i < plaqCount; ++i)
         {
             BYTE diricCount = 0;
-            SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
+            const SIndex& first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             if (first.IsDirichlet())
             {
                 ++diricCount;
@@ -80,9 +80,9 @@ _kernelStapleAtSiteSU3CacheIndex_D(
                 toAdd.Dagger();
             }
 
-            for (int j = 1; j < plaqLengthm1; ++j)
+            for (BYTE j = 1; j < plaqLengthm1; ++j)
             {
-                SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
+                const SIndex& nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
                 if (nextlink.IsDirichlet())
                 {
                     ++diricCount;

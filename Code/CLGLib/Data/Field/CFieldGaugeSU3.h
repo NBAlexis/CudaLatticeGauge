@@ -82,6 +82,8 @@ public:
 
     void CalculateE_Using_U(CFieldGauge* pResoult) const override;
 
+    void CalculateNablaE_Using_U(CFieldGauge* pResoult) const override;
+
 #pragma endregion
 
     void ExpMult(Real a, CField* U) const override;

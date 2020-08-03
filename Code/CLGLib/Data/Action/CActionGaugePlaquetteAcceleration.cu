@@ -317,7 +317,6 @@ _kernelAddForceChairTermSU3_Term423_2_Acc(
 
 CActionGaugePlaquetteAcceleration::CActionGaugePlaquetteAcceleration()
     : CAction()
-    , m_fG(F(0.0))
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
@@ -355,9 +354,25 @@ void CActionGaugePlaquetteAcceleration::Initial(class CLatticeData* pOwner, cons
     m_fBetaOverN = fBeta;
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
-    Real fOmega = 0.1f;
-    param.FetchValueReal(_T("AccG"), fOmega);
-    CCommonData::m_fG = fOmega;
+    Real fG = 0.1f;
+    param.FetchValueReal(_T("AccG"), fG);
+    CCommonData::m_fG = fG;
+
+    TArray<INT> centerArray;
+    param.FetchValueArrayINT(_T("Center"), centerArray);
+    if (centerArray.Num() > 3)
+    {
+        SSmallInt4 sCenter;
+        sCenter.x = static_cast<SBYTE>(centerArray[0]);
+        sCenter.y = static_cast<SBYTE>(centerArray[1]);
+        sCenter.z = static_cast<SBYTE>(centerArray[2]);
+        sCenter.w = static_cast<SBYTE>(centerArray[3]);
+        CCommonData::m_sCenter = sCenter;
+    }
+    else
+    {
+        CCommonData::m_sCenter.w = 0;
+    }
 }
 
 void CActionGaugePlaquetteAcceleration::SetBeta(Real fBeta)
@@ -457,7 +472,6 @@ Real CActionGaugePlaquetteAcceleration::Energy(UBOOL bBeforeEvolution, const cla
 
 void CActionGaugePlaquetteAcceleration::SetG(Real fG)
 { 
-    m_fG = fG;
     CCommonData::m_fG = fG;
 }
 
@@ -465,7 +479,7 @@ CCString CActionGaugePlaquetteAcceleration::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteAcceleration\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fG) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }
 

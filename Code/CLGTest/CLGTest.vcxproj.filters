@@ -26,9 +26,6 @@
     <ClCompile Include="Tests\TestBoundary.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestRotation.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestGaugeFixing.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
@@ -42,6 +39,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Tests\TestKSUpdator.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Tests\TestRotationAcc.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,9 +78,6 @@
     <None Include="..\..\Bin\Debug\TestSuit_GaugeFixing.yaml">
       <Filter>YAMLs</Filter>
     </None>
-    <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml">
-      <Filter>YAMLs</Filter>
-    </None>
     <None Include="..\..\Bin\Debug\TestSuit_Solver.yaml">
       <Filter>YAMLs</Filter>
     </None>
@@ -88,6 +85,9 @@
       <Filter>YAMLs</Filter>
     </None>
     <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_RotationAcc.yaml">
       <Filter>YAMLs</Filter>
     </None>
   </ItemGroup>

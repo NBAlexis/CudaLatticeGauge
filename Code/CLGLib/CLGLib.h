@@ -231,6 +231,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldFermionWilsonSquareSU3DEven.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3DREven.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3Acc.h"
+#include "Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.h"
 #include "Data/Field/CFieldFermionKSSU3.h"
 
 
@@ -242,6 +243,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Action/CActionGaugePlaquetteRotating.h"
 #include "Data/Action/CActionFermionKS.h"
 #include "Data/Action/CActionGaugePlaquetteAcceleration.h"
+#include "Data/Action/CActionGaugePlaquetteRigidAcc.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"

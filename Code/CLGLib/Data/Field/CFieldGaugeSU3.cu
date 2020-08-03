@@ -540,6 +540,47 @@ _kernelTransformToE(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateNablaE(
+    const deviceSU3* __restrict__ pDeviceData,
+    const SIndex* __restrict__ pCachedPlaqutte,
+    BYTE plaqLength, BYTE plaqCount,
+    BYTE byFieldId, deviceSU3* pRes)
+{
+    intokernalInt4;
+    const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+
+    //i=0: 12
+    //  1: 13
+    //  2: 14
+    //  3: 23
+    //  4: 24
+    //  5: 34  
+
+    UINT uiResLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+
+    pRes[uiResLinkIdx] = deviceSU3::makeSU3Zero();
+    #pragma unroll
+    for (BYTE dir = 0; dir < 3; ++dir)
+    {
+        //we need 2, 4 and 5
+        BYTE byPlaqIdx = (dir + 1) << 1;
+        if (byPlaqIdx > 5) byPlaqIdx = 5;
+
+        deviceSU3 toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+
+        const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
+        const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex;
+
+        toMul.MulDagger(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteN_m_nu, byPlaqIdx, plaqLength, plaqCount));
+        pRes[uiResLinkIdx].Add(toMul);
+    }
+
+    pRes[uiResLinkIdx].SubReal(F(3.0));
+}
+
 /**
  * U = exp(A)
  */
@@ -1027,6 +1068,26 @@ void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const
 
     preparethread;
     _kernelTransformToE << <block, threads >> > (m_pDeviceData, pUField->m_pDeviceData);
+}
+
+void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult) const
+{
+    if (NULL == pResoult || EFT_GaugeSU3 != pResoult->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: U field is not SU3");
+        return;
+    }
+
+    CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(pResoult);
+
+    preparethread;
+    _kernelCalculateNablaE << <block, threads >> > (
+        m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
+        m_byFieldId,
+        pUField->m_pDeviceData);
 }
 
 void CFieldGaugeSU3::DebugPrintMe() const

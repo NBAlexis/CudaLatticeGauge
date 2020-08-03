@@ -64,7 +64,7 @@ static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3(
         : pBuffer[idx.m_uiSiteIndex];
 }
 
-static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3T(
+static __device__ __inline__ const deviceWilsonVectorSU3& _deviceGetFermionBCWilsonSU3T(
     const deviceWilsonVectorSU3* __restrict__ pBuffer,
     const SIndex& idx,
     BYTE byFieldId)

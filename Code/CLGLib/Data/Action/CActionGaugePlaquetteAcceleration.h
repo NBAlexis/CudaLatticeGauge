@@ -32,11 +32,9 @@ public:
     CCString GetInfos(const CCString &tab) const override;
 
     void SetBeta(Real fBeta);
-    void SetG(Real fOmega);
+    static void SetG(Real fOmega);
     //void SetCenter(const SSmallInt4 &newCenter);
     //Real GetEnergyPerPlaqutte() const;
-
-    Real m_fG;
 
 protected:
 

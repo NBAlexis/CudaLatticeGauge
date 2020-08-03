@@ -85,7 +85,7 @@ public:
 * Note: for baked plaqutte index, the bond if is set to SIndex
 * If it is a "new SIndex" instead, remember to set the m_byTag
 */
-static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3(
+static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3(
     const deviceSU3* __restrict__ pBuffer,
     const SIndex& idx)
 {
@@ -100,7 +100,7 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3(
 * If the bond is on surface, return the Dirichlet
 * else, return the element
 */
-static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3Dir(
+static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3Dir(
     const deviceSU3* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
@@ -180,6 +180,38 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu2(
     res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_p_mu, byNu).MulRealC(F(0.5)));
     res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu).MulRealC(F(0.5)));
     return res;
+}
+
+
+static __device__ __inline__ deviceSU3 _devicePlaqutte(
+    const deviceSU3* __restrict__ pDeviceData,
+    const SIndex* __restrict__ pCachedPlaqutte,
+    UINT uiSiteIndex,
+    BYTE plaqIdx, //0-5, as 12, 13, 14, 23, 24, 34
+    BYTE plaqLength, //Always 4
+    BYTE plaqCountAll //Always 24
+    )
+{
+    SIndex first = pCachedPlaqutte[plaqIdx * plaqLength + uiSiteIndex * plaqCountAll];
+    deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+    if (first.NeedToDagger())
+    {
+        toAdd.Dagger();
+    }
+    for (BYTE j = 1; j < plaqLength; ++j)
+    {
+        first = pCachedPlaqutte[plaqIdx * plaqLength + j + uiSiteIndex * plaqCountAll];
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        if (first.NeedToDagger())
+        {
+            toAdd.MulDagger(toMul);
+        }
+        else
+        {
+            toAdd.Mul(toMul);
+        }
+    }
+    return toAdd;
 }
 
 #pragma endregion

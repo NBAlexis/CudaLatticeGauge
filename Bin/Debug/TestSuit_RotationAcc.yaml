@@ -1,0 +1,349 @@
+
+TestRotation:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 10, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 7
+    ExpectedRes : 0.69
+    CacheStaple : 0
+    BeforeEquvibStep : 1
+    EquvibStep : 5
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        ##SolverName : CSLASolverGMRES
+        ##SolverForFieldId : 2
+        ##MaxDim : 20
+        ##Accuracy : 0.00001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    Measure2:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+
+    Measure3:
+
+        MeasureName : CMeasureAMomentumJF
+        FieldId : 2
+        ShowResult : 1
+        Naive : 1
+        Exponential : 0
+
+    Measure4:
+
+        MeasureName : CMeasureChargeAndCurrents
+        FieldId : 2
+        ShowResult : 1
+
+    Measure5:
+
+        MeasureName : CMeasureTopologicChargeXY
+        FieldId : 2
+        ShowResult : 1
+        GaugeSmearing : 1
+
+    Measure6:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 2
+        ShowResult : 1
+
+    Measure7:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 5
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        Alpha : 0.1
+        Iterate : 3
+        ProjIterate : 6
+
+
+TestAcceleration:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 3
+    ExpectedRes : 0.43
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3Acc
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteAcceleration
+        Beta : 5.0
+        AccG : 0.1
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        # SolverName : CSLASolverGMRES
+        # SolverForFieldId : 2
+        # MaxDim : 20
+        # Accuracy : 0.0000001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 1
+
+    Measure3:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 4
+        ShowResult : 1
+        MeasureDist : 1
+
+
+TestRigidAcceleration:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 3
+    ExpectedRes : 0.43
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+        NestedStep : 3
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 0, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+       FieldName : CFieldFermionWilsonSquareSU3DRigidAcc
+       FieldInitialType : EFIT_RandomGaussian
+       Hopping : 0.16
+       FieldId : 2
+       PoolNumber : 26
+       Period : [1, 1, 0, -1]
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.1
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.0000001
+
+        # SolverName : CSLASolverGMRES
+        # SolverForFieldId : 2
+        # MaxDim : 20
+        # Accuracy : 0.0000001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 1
+
+    Measure3:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 4
+        ShowResult : 1
+        MeasureDist : 1

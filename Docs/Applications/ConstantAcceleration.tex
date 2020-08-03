@@ -172,3 +172,159 @@ Finally
 
 The $V_{\mu\nu\rho}$ force is derived in the `Rotation' chapter.
 
+\subsubsection{\label{sec:AnotherAcceleration}Rigid Acceleration}
+
+Another metric of constant acceleration $g$ at ${\bf z}$ direction is
+\begin{equation}
+\begin{split}
+&g_{\mu\nu}=\left(\begin{array}{cccc} \left(1 + gz\right)^2 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-\det (g_{\mu\nu})}=(1+gz)\\
+\end{split}
+\end{equation}
+The tangent space Wick rotation yields, 
+\begin{equation}
+\begin{split}
+&g_{\mu\nu}=\left(\begin{array}{cccc} -\left(1 + gz\right)^2 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-\det (g_{\mu\nu})}=i(1+gz)\\
+\end{split}
+\end{equation}
+Then
+\begin{equation}
+\begin{split}
+&S_G=\frac{1}{2g_{YM}^2}(1+g z)2\left(F_{12}^2+F_{13}^2+F_{23}^2+(1+g z)^2F_{01}^2+(1+g z)^2F_{02}^2+(1+g z)^2F_{03}^2\right)\\
+&=\frac{\beta}{N_c}(1+g z){\rm Retr}\left[3-\bar{U}_{12}-\bar{U}_{13}-\bar{U}_{23}+(1+g z)^2\left(3-\bar{U}_{41}-\bar{U}_{42}-\bar{U}_{43}\right)\right]\\
+\end{split}
+\end{equation}
+Since every plaquette is related to coordinate, we use $\bar{U}$ for every coordinate.
+
+
+The Dirac equation becomes
+\begin{equation}
+\begin{split}
+&D=(1+gz)\left[\frac{1}{1+gz}\gamma ^4D_4+\gamma ^iD_i+i\frac{g}{2(1+gz)}\gamma _4 \sigma ^{43}+m\right]\\
+&=\left[\gamma ^4D_4+(1+gz)\gamma ^iD_i+i\frac{g}{2}\gamma _4 \sigma ^{43}+m(1+gz)\right]\\
+\end{split}
+\end{equation}
+
+As usual, the $\gamma _4$ term is realized as chemical potential $\mu = \frac{ig}{2}\sigma ^{43}$,
+\begin{equation}
+\begin{split}
+&D(n|m)=(1+gz)-\kappa (1+gz)\sum _{i = 1,2,3} T_i \\
+&-\kappa \left(e^{\frac{i}{2}ag \sigma ^{12} } (1-\gamma^E _4) U_{\tau}(n)\delta _{n+\tau, m} + e^{-\frac{i}{2}ag \sigma ^{12} } (1+\gamma^E _4) U_{-\tau}(n)\delta _{n-\tau, m}\right),\\
+T_{i}&\equiv (1-\gamma _i^E)U_{i}(n)\delta _{n+i,m}+(1+\gamma _i^E)U_{-i}(n)\delta _{n-i,m},\\
+\end{split}
+\end{equation}
+
+The detail of the last term, we start from
+\begin{equation}
+\begin{split}
+&\gamma ^4D_4+i\frac{g}{2}\gamma _4 \sigma ^{43}\\
+\end{split}
+\end{equation}
+The $D_{\mu}$ in Wilson-Dirac operator is
+\begin{equation}
+\begin{split}
+&\left(\partial _{\mu} + iA_{\mu}(n)\right)\psi(n)\approx  \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a}\\
+& -\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi (n)}{2a} \to 0 \\
+& \gamma _{\mu}  \left(\partial _{\mu} + iA_{\mu}(n)\right)\psi(n) \\
+&\approx \gamma _{\mu}  \frac{U_{\mu}(n)\psi(n+a\mu)-U_{-\mu}(n)\psi(n-a\mu)}{2a} -\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi (n)}{2a}\\
+&=\frac{\psi}{a} -   \frac{(1+\gamma _{\mu})U_{\mu}(n)\psi(n+a\mu)+(1-\gamma _{\mu})U_{-\mu}(n)\psi(n-a\mu)}{2a}
+\end{split}
+\end{equation}
+The $4$ $\frac{\psi}{a}$ combined with $m$ is $\frac{am\textcolor[rgb]{0,0,1}{+4}}{a}$, this is why the $\kappa$ has this $4$.
+
+Now, we have
+\begin{equation}
+\begin{split}
+&D=m(1+gz)+3(1+gz)\frac{1}{a} + \frac{1}{a} - (1+g z)\sum _{\mu = x,y,z}\frac{(1+\gamma _{\mu})U_{\mu}(n)\psi(n+a\mu)+(1-\gamma _{\mu})U_{-\mu}(n)\psi(n-a\mu)}{2a}\\
+&- \frac{(1+\gamma _{t})U_{t}(n)\psi(n+at)+(1-\gamma _{t})U_{-t}(n)\psi(n-at)}{2a}\textcolor[rgb]{1,0,0}{-}i\frac{g}{2} \sigma ^{43}\gamma _4
+\end{split}
+\end{equation}
+The `-' of last term is from anti-commutation. Then
+\begin{equation}
+\begin{split}
+&D=(1+gz)(m+4\frac{1}{a}) - \frac{gz}{a} - (1+g z)\sum _{\mu = x,y,z}\frac{(1+\gamma _{\mu})U_{\mu}(n)\psi(n+a\mu)+(1-\gamma _{\mu})U_{-\mu}(n)\psi(n-a\mu)}{2a}\\
+&- \frac{(1+\gamma _{t})U_{t}(n)\psi(n+at)+(1-\gamma _{t})U_{-t}(n)\psi(n-at)}{2a}\textcolor[rgb]{1,0,0}{+}i\frac{g}{2} \sigma ^{\textcolor[rgb]{1,0,0}{34}}\gamma _4
+\end{split}
+\end{equation}
+Still let $\kappa = \frac{1}{2am + 8}$
+\begin{equation}
+\begin{split}
+&2a\kappa D=(1+gz) - 2gz\kappa - \kappa(1+g z)\sum _{\mu = x,y,z}\left((1+\gamma _{\mu})U_{\mu}(n)\psi(n+a\mu)+(1-\gamma _{\mu})U_{-\mu}(n)\psi(n-a\mu)\right)\\
+&- \kappa\left((1+\gamma _{t})U_{t}(n)\psi(n+at)+(1-\gamma _{t})U_{-t}(n)\psi(n-at)\right)+ia\kappa g \sigma ^{34}\gamma _4
+\end{split}
+\end{equation}
+
+Still use
+\begin{equation}
+\begin{split}
+& -\frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)-2\psi (n)}{2a} \to 0 \\
+& \psi (n) \to \frac{U_{\mu}(n)\psi(n+a\mu)+U_{-\mu}(n)\psi(n-a\mu)}{2}
+\end{split}
+\end{equation}
+The last term is
+\begin{equation}
+\begin{split}
+&\kappa \gamma _4 ia g \sigma ^{43} \psi (n)\\
+&-\approx \kappa \left( \frac{ -iag \sigma ^{34}}{2}\right) ( \gamma _4 U_{\mu}(n) \psi (n+\tau) + \gamma _4 U_{-\mu}(n) \psi (n-\tau)) \\
+&\approx -\kappa \left( \frac{ -iag \sigma ^{34}}{2}\right)  ( \gamma _4 U_{\mu}(n) \psi (n+\tau) + \gamma _4 U_{-\mu}(n) \psi (n-\tau) \textcolor[rgb]{0.8,0.3,0}{- U_{\mu}(n)\psi (n+\tau) + U_{-\mu}(n)\psi (n-\tau)}) \\
+&=-\kappa\left( \frac{ -iag \sigma ^{34}}{2}\right) \left((\gamma _4-1)U_{\mu}(n)\psi (n+\tau) +(\gamma _4+1) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&= -\kappa \left(\frac{-iag \sigma ^{34}}{2} (\gamma _4-1)U_{\mu}(n)\psi (n+\tau) + \frac{-iag \sigma ^{34}}{2} (\gamma _4+1) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&= -\kappa \left(\frac{iag \sigma ^{34}}{2} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + \frac{-iag \sigma ^{34}}{2} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+\end{split}
+\end{equation}
+Then $D_t +  \gamma _4 i \frac{g}{2} \sigma ^{43} \psi (n)$ is
+\begin{equation}
+\begin{split}
+&= -\kappa \left(\left(1+\frac{iag \sigma ^{34}}{2}\right) (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + \left(1-\frac{iag \sigma ^{34}}{2}\right) (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+&\approx -\kappa \left(e^{\frac{iag \sigma ^{34}}{2}} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + e^{-\frac{iag \sigma ^{34}}{2}} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+\end{split}
+\end{equation}
+
+Finally
+\begin{equation}
+\begin{split}
+&D=1+gz- 2gz\kappa - \kappa(1+g z)\sum _{\mu = x,y,z}\left((1+\gamma _{\mu})U_{\mu}(n)\psi(n+a\mu)+(1-\gamma _{\mu})U_{-\mu}(n)\psi(n-a\mu)\right)\\
+&-\kappa \left(e^{\frac{iag \sigma ^{34}}{2}} (1-\gamma _4)U_{\mu}(n)\psi (n+\tau) + e^{-\frac{iag \sigma ^{34}}{2}} (1+\gamma _4) U_{-\mu}(n) \psi (n-\tau)\right)\\
+\end{split}
+\end{equation}
+
+To implement it, note $(\sigma ^{34})^2=1$
+\begin{equation}
+\begin{split}
+&e^{\pm i x \sigma ^{34}} =\cos (x \sigma ^{34}) \pm i \sin (x\sigma ^{34}) = \cos (x) \pm i \sigma ^{34}\sin (x)\\
+\end{split}
+\end{equation}
+
+\textbf{\textcolor[rgb]{1,0,0}{We have sign problem here. There is an $\mathcal{O}(a)$ sign problem: $f(n)(1-\gamma _{\mu})U_{\mu}(n)\delta _{n,n+\mu}+f(n+\mu)(1+\gamma _{\mu})U_{\mu}^{-1}(n)\delta _{n+\mu,n}$ such that $f(n)\neq f(n+\mu)$. There is another chemical potential like sign problem, $i\gamma _4 \sigma ^{34}$ is NOT $\gamma _5$ -hermitian.}}
+
+\subsubsection{\label{sec:ForceRigidAcc}Force Terms}
+
+The force term of gauge field is obtained by
+\begin{equation}
+\begin{split}
+&\sum _n f(n){\rm Retr}[1-\bar{U}_{\mu, \nu}(n)]=\sum _n\frac{f(n)+f(n+a\mu)+f(n+a\nu)+f(n+a\mu+a\nu)}{4}{\rm Retr}[1-U_{\mu\nu}(n)]\\
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\Sigma _{\mu}(n,\nu)=g(n)U_{\nu}(n)U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)+g(n-a\nu)U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)\\
+\end{split}
+\end{equation}
+
+The force of Fermion field is
+\begin{equation}
+\begin{split}
+&\frac{\partial D}{\partial \omega _{\mu}^a}=-i\kappa M_a,\\
+&\frac{\partial}{\partial \omega_a} \left(\phi ^{\dagger}\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right)=-2\kappa{\rm Im}\left[\left(\phi _1 ^{\dagger} M \phi _2\right)\right]\\
+&\phi _1=\left(\left(\hat{D}\hat{D}^{\dagger}\right)^{-1}\phi\right),\;\;
+ \phi _2=D^{-1}\phi,\\
+\end{split}
+\end{equation}
+And use
+\begin{equation}
+\begin{split}
+&D(U_{\mu}(n))=f(n)(1-\gamma _{\mu})U_{\mu}(n)\delta _{n,n+\mu}+f(n)(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n,n-\mu}\\
+&=f(n)(1-\gamma _{\mu})U_{\mu}(n)\delta _{n,n+\mu}+f(n)(1+\gamma _{\mu})U_{\mu}^{-1}(n-\mu)\delta _{n,n-\mu}\\
+&=f(n)(1-\gamma _{\mu})U_{\mu}(n)\delta _{n,n+\mu}+f(n+\mu)(1+\gamma _{\mu})U_{\mu}^{-1}(n)\delta _{n+\mu,n}\\
+\end{split}
+\end{equation}

@@ -12,16 +12,16 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 50
-    EquvibSkip : 50
-    EquvibStep : 200
+    BeforeEquvibStep : 100
+    EquvibSkip : 100
+    EquvibStep : 900
     SaveStartIndex : 0
     AccSep : 10
     AccStart : 0
-    MaxAcc : 0.24
+    MaxAcc : 0.3
     MinNt : 4
     MaxNt : 4
-    SavePrefix : ./50161/ACC50161_
+    SavePrefix : ./45162/ACC45162_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -101,7 +101,7 @@ JobSimulate:
 
         FieldName : CFieldFermionWilsonSquareSU3Acc
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.161
+        Hopping : 0.162
         FieldId : 2
         PoolNumber : 2
         Period : [1, 1, 1, -1]
@@ -114,7 +114,7 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquetteAcceleration
-        Beta : 5.0
+        Beta : 4.5
         AccG : 0.0
 
     Action2:
@@ -134,7 +134,7 @@ JobSimulate:
         MaxDim : 15
 
         # SolverName : CSLASolverGCRODR
-        # Accuracy : 0.000001
+        Accuracy : 0.000001
         # MDim : 26
         # KDim : 5
         # RecalculateR : 5

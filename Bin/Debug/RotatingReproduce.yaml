@@ -172,10 +172,10 @@ JobPolyakovDist:
     StartOmega : 0
     EndOmega : 10
     StartN : 201
-    EndN : 300
+    EndN : 1800
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_AngularMomentum
-    FermionMomentum : 1
+    FermionMomentum : 0
     StochasticFieldCount : 16
     StochasticGaussian : 1
     CheckGaugeFixing : 0
@@ -189,7 +189,7 @@ JobPolyakovDist:
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
     SavePrefix : GFN535161_
-    CSVSavePrefix : F:\CppWorkingFolder\ThermalCircle\Extropolation\AngularAndCond\535161New\F100\GFN535161_
+    CSVSavePrefix : F:\CppWorkingFolder\ThermalCircle\Extropolation\AngularAndCond\535161New\GaugeAngular\GFN535161_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 

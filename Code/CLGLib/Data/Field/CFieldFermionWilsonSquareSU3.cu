@@ -59,16 +59,16 @@ _kernelDFermionWilsonSquareSU3(
         const gammaMatrix & gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex & x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        const SIndex & x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex & x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
-        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        const deviceSU3 & x_Gauge_element = pGauge[linkIndex];
         deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
         x_m_mu_Gauge_element.Dagger();
 
@@ -155,8 +155,8 @@ _kernelDWilsonForceSU3(
 {
     intokernaldir;
 
-    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
-    const deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
+    const deviceWilsonVectorSU3 & x_Left  = pInverseDDdagger[uiSiteIndex];
+    const deviceWilsonVectorSU3 & x_Right = pInverseD[uiSiteIndex];
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -167,12 +167,12 @@ _kernelDWilsonForceSU3(
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+        const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
-        const deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+        const deviceWilsonVectorSU3 & x_p_mu_Right = pInverseD[x_p_mu_Fermion.m_uiSiteIndex];
         deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
 
-        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        const deviceSU3& x_Gauge_element = pGauge[linkIndex];
 
         deviceWilsonVectorSU3 right1(x_p_mu_Right);
         right1.Sub(gammaMu.MulWilsonC(right1));

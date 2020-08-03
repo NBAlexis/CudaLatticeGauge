@@ -62,7 +62,15 @@ public:
      */
     virtual void TransformToU() = 0;
 
+    /**
+     * E_i(n) = U_{4i}(n) for i = 0,1,2
+     */
     virtual void CalculateE_Using_U(CFieldGauge* pResoult) const = 0;
+
+    /**
+     * X_0(n) = nabla E
+     */
+    virtual void CalculateNablaE_Using_U(CFieldGauge* pResoult) const = 0;
 
 #pragma endregion
 

@@ -100,7 +100,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     CCommonData::m_sCenter.x = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lx] / 2);
     CCommonData::m_sCenter.y = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Ly] / 2);
     CCommonData::m_sCenter.z = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lz] / 2);
-    CCommonData::m_sCenter.w = 0;
+    CCommonData::m_sCenter.w = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lt] / 2);
     m_InitialCache.constIntegers[ECI_Volume] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_Volume_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);

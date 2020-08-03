@@ -107,6 +107,7 @@ protected:
     TArray<Real> m_lstResJGChenApprox;
     TArray<Real> m_lstResJGChenApprox2;
     TArray<Real> m_lstResJGSurf;
+    TArray<Real> m_lstResJGPot;
 
     UBOOL m_bMeasureSpin;
     CFieldGauge* m_pE;
@@ -146,6 +147,11 @@ public:
     TArray<Real> m_lstJGSurfInner;
     //jg surf as function of R
     TArray<Real> m_lstJGSurf;
+
+    TArray<Real> m_lstJGPotAll;
+    TArray<Real> m_lstJGPotInner;
+    //jg surf as function of R
+    TArray<Real> m_lstJGPot;
 };
 
 __END_NAMESPACE

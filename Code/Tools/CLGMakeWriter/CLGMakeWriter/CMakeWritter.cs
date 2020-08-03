@@ -1,6 +1,6 @@
-
 using System.Collections.Generic;
 using System.IO;
+
 
 namespace CLGMakeWriter
 {
@@ -19,6 +19,12 @@ namespace CLGMakeWriter
         public EArch m_eArch = EArch.EArcSM61;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
+
+        //turn it off, recently we will not use this
+        public bool m_bHasCompresser = false;
+
+        //turn it off, we have sign problem here
+        public bool m_bHasConstAcc = false;
         
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };
         readonly static string[] ArchNames = 
@@ -199,45 +205,53 @@ set_target_properties( CLGLib
 
             #region Add Compresser
 
-            CProjFile compresserProj = excutables["ConfigurationCompresser"];
-
-            sContent += "\n\n\n# ==================== \n# ConfigurationCompresser \n# =================\n\n";
-            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser)\n";
-            sContent += "add_executable(ConfigurationCompresser \n    ";
-            foreach (string sFileName in compresserProj.m_lstAllHeaderFiles)
+            if (m_bHasCompresser)
             {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
-            }
-            foreach (string sFileName in compresserProj.m_lstAllCppFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
-            }
-            sContent += ")\n\n";
+                CProjFile compresserProj = excutables["ConfigurationCompresser"];
 
-            sContent += "target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)\n";
-            sContent += "target_link_libraries(ConfigurationCompresser CLGLib)\n";
+                sContent += "\n\n\n# ==================== \n# ConfigurationCompresser \n# =================\n\n";
+                sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser)\n";
+                sContent += "add_executable(ConfigurationCompresser \n    ";
+                foreach (string sFileName in compresserProj.m_lstAllHeaderFiles)
+                {
+                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
+                }
+
+                foreach (string sFileName in compresserProj.m_lstAllCppFiles)
+                {
+                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
+                }
+
+                sContent += ")\n\n";
+
+                sContent += "target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)\n";
+                sContent += "target_link_libraries(ConfigurationCompresser CLGLib)\n";
+            }
 
             #endregion
 
             #region Add ConstAcc
 
-            CProjFile constaccProj = excutables["ConstAcc"];
-
-            sContent += "\n\n\n# ==================== \n# ConstAcc \n# =================\n\n";
-            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConstAcc)\n";
-            sContent += "add_executable(ConstAcc \n    ";
-            foreach (string sFileName in constaccProj.m_lstAllHeaderFiles)
+            if (m_bHasConstAcc)
             {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
-            }
-            foreach (string sFileName in constaccProj.m_lstAllCppFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
-            }
-            sContent += ")\n\n";
+                CProjFile constaccProj = excutables["ConstAcc"];
 
-            sContent += "target_compile_features(ConstAcc PUBLIC cxx_std_14)\n";
-            sContent += "target_link_libraries(ConstAcc CLGLib)\n";
+                sContent += "\n\n\n# ==================== \n# ConstAcc \n# =================\n\n";
+                sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConstAcc)\n";
+                sContent += "add_executable(ConstAcc \n    ";
+                foreach (string sFileName in constaccProj.m_lstAllHeaderFiles)
+                {
+                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
+                }
+                foreach (string sFileName in constaccProj.m_lstAllCppFiles)
+                {
+                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
+                }
+                sContent += ")\n\n";
+
+                sContent += "target_compile_features(ConstAcc PUBLIC cxx_std_14)\n";
+                sContent += "target_link_libraries(ConstAcc CLGLib)\n";
+            }
 
             #endregion
 
