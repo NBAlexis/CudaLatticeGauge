@@ -284,8 +284,10 @@ UINT CIndexSquare::GetDecompose(UINT volumn)
 {
     TArray<UINT> factors = _getFactors(volumn);
     TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
-    const UINT maxThreadPerBlock = deviceConstraints[1]; //we only use 1 dimension, so it is the constraint of blockDim.x
-
+    UINT maxThreadPerBlock = deviceConstraints[1]; //we only use 1 dimension, so it is the constraint of blockDim.x
+#if _CLG_USE_LAUNCH_BOUND
+    maxThreadPerBlock = (maxThreadPerBlock > _CLG_LAUNCH_MAX_THREAD) ? _CLG_LAUNCH_MAX_THREAD : maxThreadPerBlock;
+#endif
     UINT uiMax = 1;
     for (INT i = 0; i < factors.Num(); ++i)
     {

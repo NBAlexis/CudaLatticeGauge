@@ -11,7 +11,7 @@
 #ifndef _CFILE_H_
 #define _CFILE_H_
 
-#pragma TODO (use boost::filesystem)
+//#pragma TODO (use boost::filesystem)
 
 
 __BEGIN_NAMESPACE

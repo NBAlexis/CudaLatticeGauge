@@ -59,7 +59,11 @@ _kernelCalculateA3D(
     }
 }
 
+#if _CLG_DEBUG
+__global__ void _CLG_LAUNCH_BOUND_HALF
+#else
 __global__ void _CLG_LAUNCH_BOUND
+#endif
 _kernelCalculateA3DLog(
     SBYTE uiT,
     const deviceSU3* __restrict__ pU,
@@ -75,7 +79,8 @@ _kernelCalculateA3DLog(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     //No need to calcuate A4, since we don't need it
-    for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+#pragma unroll
+    for (BYTE dir = 0; dir < 3; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;

@@ -350,7 +350,11 @@ _kernelTransformToIA_D(
     }
 }
 
+#if _CLG_DEBUG
+__global__ void _CLG_LAUNCH_BOUND_HALF
+#else
 __global__ void _CLG_LAUNCH_BOUND
+#endif
 _kernelTransformToIALog_D(
     deviceSU3* pDeviceData)
 {
@@ -392,7 +396,11 @@ _kernelTransformToU_D(
     }
 }
 
+#if _CLG_DEBUG
+__global__ void _CLG_LAUNCH_BOUND_HALF
+#else
 __global__ void _CLG_LAUNCH_BOUND
+#endif
 _kernelTransformToU_DLog(
     deviceSU3* pDeviceData)
 {

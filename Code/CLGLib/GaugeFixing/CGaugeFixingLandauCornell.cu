@@ -56,7 +56,11 @@ _kernelCalculateA(
     }
 }
 
+#if _CLG_DEBUG
+__global__ void _CLG_LAUNCH_BOUND_HALF
+#else
 __global__ void _CLG_LAUNCH_BOUND
+#endif
 _kernelCalculateALog(
     const deviceSU3* __restrict__ pU,
     Real* pA11,
