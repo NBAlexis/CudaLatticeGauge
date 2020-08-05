@@ -35,6 +35,7 @@
     <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteAcceleration.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteBoost.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldFermionKSSU3.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.h" />
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.h" />
@@ -132,9 +134,11 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteBoost.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.cu" />
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.cu" />

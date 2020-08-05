@@ -1,30 +1,30 @@
 //=============================================================================
-// FILENAME : CFieldFermionWilsonSquareSU3Acc.h
+// FILENAME : CFieldFermionWilsonSquareSU3Boost.h
 // 
 // DESCRIPTION:
 //
 // Dirichlet and rotation
 //
 // REVISION:
-//  [07/27/2020 nbale]
+//  [08/03/2020 nbale]
 //=============================================================================
 
-#ifndef _CFIELDFERMIONWILSONSQUARESU3ACC_H_
-#define _CFIELDFERMIONWILSONSQUARESU3ACC_H_
+#ifndef _CFIELDFERMIONWILSONSQUARESU3BOOST_H_
+#define _CFIELDFERMIONWILSONSQUARESU3BOOST_H_
 
 //Not sure this is faster, need to test
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CFieldFermionWilsonSquareSU3Acc)
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionWilsonSquareSU3Boost)
 
-class CLGAPI CFieldFermionWilsonSquareSU3Acc : public CFieldFermionWilsonSquareSU3
+class CLGAPI CFieldFermionWilsonSquareSU3Boost : public CFieldFermionWilsonSquareSU3
 {
-    __CLGDECLARE_FIELD(CFieldFermionWilsonSquareSU3Acc)
+    __CLGDECLARE_FIELD(CFieldFermionWilsonSquareSU3Boost)
 
 public:
 
-    CFieldFermionWilsonSquareSU3Acc()
+    CFieldFermionWilsonSquareSU3Boost()
         : CFieldFermionWilsonSquareSU3()
     {
     }

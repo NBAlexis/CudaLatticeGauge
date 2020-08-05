@@ -161,7 +161,7 @@ _kernelDFermionWilsonSquareSU3_DRigAcc_T(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
-    Real fG,
+    Real fG2,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -179,9 +179,16 @@ _kernelDFermionWilsonSquareSU3_DRigAcc_T(
 
     const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix& sigma43 = __chiralGamma[SIGMA12];
-    const Real fhalfG = fG * F(0.5);
-    deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    const gammaMatrix& sigma43 = __chiralGamma[SIGMA43];
+
+    deviceWilsonVectorSU3 result = pDeviceData[uiSiteIndex];
+    if (bDDagger)
+    {
+        result = gamma5.MulWilsonC(result);
+    }
+    result = sigma43.MulWilsonC(result);
+    result = gamma4.MulWilsonC(result);
+    result.MulReal(-fG2);
 
     //idir = mu, we have x, y and t term but no z term
     //=========================
@@ -216,40 +223,31 @@ _kernelDFermionWilsonSquareSU3_DRigAcc_T(
     //U(x,mu) phi(x+ mu)
     deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     u_phi_x_p_m.Sub(gamma4.MulWilsonC(u_phi_x_p_m));
-    deviceWilsonVectorSU3 cospart = u_phi_x_p_m.MulRealC(kai * _cos(fhalfG));
-    //sinpart This was cos(g) + i sigma34 sin(g), so is cos(g) - i sigma43 sin(g)
-    u_phi_x_p_m.MulComp(_make_cuComplex(F(0.0), - kai * _sin(fhalfG)));
-    cospart.Add(sigma43.MulWilsonC(u_phi_x_p_m));
 
     if (x_p_mu_Fermion.NeedToOpposite())
     {
         //printf("OppositeT x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
         //k(cos_m_1 - i sin sigma34)(1-gamma4)
-        result.Sub(cospart);
+        result.Sub(u_phi_x_p_m);
     }
     else
     {
         //-k(cos_m_1 - i sin sigma34)(1-gamma4)
-        result.Add(cospart);
+        result.Add(u_phi_x_p_m);
     }
 
     //U^{dagger}(x-mu) phi(x-mu)
     deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
-
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
-    deviceWilsonVectorSU3 cospart2 = u_dagger_phi_x_m_m.MulRealC(kai * _cos(fhalfG));
-    //sinpart 
-    u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), kai * _sin(fhalfG)));
-    cospart2.Add(sigma43.MulWilsonC(u_dagger_phi_x_m_m));
 
     if (x_m_mu_Fermion.NeedToOpposite())
     {
         //-k(cos_m_1+isin)(1+gamma4)
-        result.Sub(cospart2);
+        result.Sub(u_dagger_phi_x_m_m);
     }
     else
     {
-        result.Add(cospart2);
+        result.Add(u_dagger_phi_x_m_m);
     }
 
     //result = phi(x) - kai sum _mu result
@@ -258,7 +256,7 @@ _kernelDFermionWilsonSquareSU3_DRigAcc_T(
     {
         result = gamma5.MulWilsonC(result);
     }
-
+    result.MulReal(kai);
     //==============================
     //res = [gamma5 (orig - term3 - result) gamma5] * coeff
     //    = [gamma5 orig gamma5] * coeff - [gamma5 (term3 + result) gamma5] * coeff
@@ -303,11 +301,16 @@ _kernelDWilsonForceSU3_DRigAcc_XYZ(
 
     const deviceWilsonVectorSU3 x_Left(_deviceGetFermionBCWilsonSU3(pInverseDDdagger, sSite, byFieldId));
     const deviceWilsonVectorSU3 x_Right(_deviceGetFermionBCWilsonSU3(pInverseD, sSite, byFieldId));
-    const Real fOnePlusGZ = F(1.0) + sSite4.z * fG;
+    Real fOnePlusGZ = F(1.0) + sSite4.z * fG;
 
     #pragma unroll
-    for (UINT idir = 0; idir < 3; ++idir)
+    for (UINT idir = 0; idir < 4; ++idir)
     {
+        if (3 == idir)
+        {
+            fOnePlusGZ = F(1.0);
+        }
+
         //x, mu
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         const SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
@@ -349,81 +352,6 @@ _kernelDWilsonForceSU3_DRigAcc_XYZ(
 
         pForce[linkIndex].Add(forceOfThisLink);
     }
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelDWilsonForceSU3_DRigAcc_T(
-    const deviceWilsonVectorSU3* __restrict__ pInverseD,
-    const deviceWilsonVectorSU3* __restrict__ pInverseDDdagger,
-    const deviceSU3* __restrict__ pGauge,
-    const SIndex* __restrict__ pFermionMove,
-    deviceSU3* pForce,
-    Real fKai,
-    Real fG,
-    BYTE byFieldId)
-{
-    intokernalInt4;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix& sigma43 = __chiralGamma[SIGMA12];
-
-    //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
-
-    //If one of the sites is on surface, it has no contribution.
-    //Note that, the bond on surface is equivelant to both sites on surface.
-
-    if (x_p_mu_Fermion.IsDirichlet() || sSite.IsDirichlet())
-    {
-        return;
-    }
-
-    //====================
-    //Get things
-    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
-    deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
-    //all not on surface
-    deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
-
-    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
-
-    const Real fFac = (x_p_mu_Fermion.NeedToOpposite() ? F(-1.0) : F(1.0)) * fKai;
-    const Real fAng = F(0.5) * fG;
-    //In Rotation, we calculate with 3 parts: (1) fermion, (2) Omega term, (3) Omega^2 term
-    //So, with exp, we need to subtract the 't' contribution from step (1)
-    //Here, we do not have such step, so:
-    //const Real fCos = fFac * (_cos(fAng) - F(1.0)); is wrong
-    const Real fCos = fFac * _cos(fAng);
-    const Real fSin = fFac * _sin(fAng);
-;
-    //first term has same sign as _Y function (-1)
-    //we already use fFac = -1 or 1
-    //if (x_p_mu_Fermion.NeedToOpposite())
-    //{
-    //    fSin = -fSin;
-    //    fCos = -fCos;
-    //}
-
-    x_p_mu_Right.Sub(gamma4.MulWilsonC(x_p_mu_Right));
-    deviceWilsonVectorSU3 x_p_mu_Right_real = x_p_mu_Right.MulRealC(fCos);
-    x_p_mu_Right.MulComp(_make_cuComplex(F(0.0), -fSin));
-    x_p_mu_Right = sigma43.MulWilsonC(x_p_mu_Right);
-    x_p_mu_Right_real.Add(x_p_mu_Right);
-    deviceSU3 mid = deviceSU3::makeSU3Contract(x_Left, x_p_mu_Right_real);
-
-    x_Right.Add(gamma4.MulWilsonC(x_Right));
-    deviceWilsonVectorSU3 x_Right_real = x_Right.MulRealC(fCos);
-    x_Right.MulComp(_make_cuComplex(F(0.0), fSin));
-    x_Right = sigma43.MulWilsonC(x_Right);
-    x_Right_real.Add(x_Right);
-    mid.Add(deviceSU3::makeSU3Contract(x_Right_real, x_p_mu_Left));
-
-    deviceSU3 forceOfThisLink = x_Gauge_element.MulC(mid);
-    forceOfThisLink.Ta();
-    pForce[linkIndex].Add(forceOfThisLink);
 }
 
 #pragma endregion
@@ -492,19 +420,19 @@ void CFieldFermionWilsonSquareSU3DRigidAcc::DerivateDOperator(void* pForce, cons
         m_fKai,
         CCommonData::m_fG,
         m_byFieldId);
-
-    _kernelDWilsonForceSU3_DRigAcc_T << <block, threads >> > (
-        pDphiBuffer,
-        pDDphiBuffer,
-        pGauge,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        pForceSU3,
-        m_fKai,
-        CCommonData::m_fG,
-        m_byFieldId);
 }
 
 #pragma endregion
+
+void CFieldFermionWilsonSquareSU3DRigidAcc::InitialOtherParameters(CParameters& params)
+{
+    CFieldFermionWilsonSquareSU3D::InitialOtherParameters(params);
+
+    Real fG2 = F(0.2);
+    params.FetchValueReal(_T("G2"), fG2);
+    m_fG2 = fG2;
+}
+
 
 void CFieldFermionWilsonSquareSU3DRigidAcc::CopyTo(CField* U) const
 {
@@ -515,6 +443,7 @@ CCString CFieldFermionWilsonSquareSU3DRigidAcc::GetInfos(const CCString &tab) co
 {
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DRigidAcc\n");
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
+    sRet = sRet + tab + _T("G2 : ") + appFloatToString(m_fG2) + _T("\n");
     return sRet;
 }
 

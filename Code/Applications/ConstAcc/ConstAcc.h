@@ -12,6 +12,7 @@
 
 __DEFINE_ENUM(EAccJob,
     EAJ_Simulate,
+    EAJ_SimulateBoost,
     EAJ_MeasureGauge,
     )
 

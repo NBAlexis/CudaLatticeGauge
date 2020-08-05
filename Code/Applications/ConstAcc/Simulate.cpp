@@ -112,7 +112,7 @@ INT SimulateAcc(CParameters& params)
             polykovX_nx.AddItem(a);
         }
 
-        CActionGaugePlaquetteAcceleration* pGauageAction = dynamic_cast<CActionGaugePlaquetteAcceleration*>(appGetLattice()->GetActionById(1));
+        //CActionGaugePlaquetteAcceleration* pGauageAction = dynamic_cast<CActionGaugePlaquetteAcceleration*>(appGetLattice()->GetActionById(1));
         CCString sHeader;
         sHeader.Format(_T("Nt%d"), uiNt);
         appSetLogHeader(sHeader);
@@ -145,10 +145,11 @@ INT SimulateAcc(CParameters& params)
         if (bNeedBake && iBeforeEquib > 0)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-            if (NULL != pGauageAction)
-            {
-                pGauageAction->SetG(F(0.0));
-            }
+            CCommonData::m_fG = F(0.0);
+            //if (NULL != pGauageAction)
+            //{
+            //    pGauageAction->SetG(F(0.0));
+            //}
             appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
@@ -186,10 +187,11 @@ INT SimulateAcc(CParameters& params)
             appSetLogHeader(sHeader);
             appGeneral(_T("\n========= Acc=%f  ==========\n"), fSep * uiOmega);
 
-            if (NULL != pGauageAction)
-            {
-                pGauageAction->SetG(fSep * uiOmega);
-            }
+            //if (NULL != pGauageAction)
+            //{
+            //    pGauageAction->SetG(fSep * uiOmega);
+            //}
+            CCommonData::m_fG = fSep * uiOmega;
 
             if (bAdditive)
             {

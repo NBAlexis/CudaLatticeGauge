@@ -27,8 +27,7 @@ public:
 
     CFieldFermionWilsonSquareSU3DRigidAcc()
         : CFieldFermionWilsonSquareSU3D()
-        , m_bNaive(TRUE)
-        , m_bExponential(FALSE)
+        , m_fG2(F(0.1))
     {
     }
 
@@ -36,11 +35,10 @@ public:
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
     void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
 
-    //void InitialOtherParameters(CParameters& params) override;
+    void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString &tab) const override;
-
-    UBOOL m_bNaive;
-    UBOOL m_bExponential;
+    void SetG2(Real fG2) { m_fG2 = fG2; }
+    Real m_fG2;
 };
 
 __END_NAMESPACE

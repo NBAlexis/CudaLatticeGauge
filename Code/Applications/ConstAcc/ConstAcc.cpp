@@ -33,6 +33,12 @@ int main(int argc, char * argv[])
         res = SimulateAcc(workingParam1);
     }
     break;
+    case EAJ_SimulateBoost:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateBoost"));
+        res = SimulateAcc(workingParam1);
+    }
+    break;
     case EAJ_MeasureGauge:
     {
         //CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
