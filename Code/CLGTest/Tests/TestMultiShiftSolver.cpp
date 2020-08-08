@@ -144,7 +144,7 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     {
         uiError++;
     }
-    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/2}phi|^2 = %2.18f, |D^{-1/2}D^{1/2}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/2}phi|^2 = %2.18f, |D^{-1/2}D^{1/2}phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
 
     pField->CopyTo(pFieldCopy);
 
@@ -157,7 +157,7 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     {
         uiError++;
     }
-    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/4}phi|^2 = %2.18f, |D^{-1/4}D^{1/4}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+    appGeneral(_T("|phi|^2 = %2.18f, |D^{1/4}phi|^2 = %2.18f, |D^{-1/4}D^{1/4}phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
 
     pField->CopyTo(pFieldCopy);
 
@@ -170,7 +170,7 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     {
         uiError++;
     }
-    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/2}phi|^2 = %2.18f, |DD^{-1/2}DD^{1/2}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/2}phi|^2 = %2.18f, |DD^{-1/2}DD^{1/2}phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
 
     pField->CopyTo(pFieldCopy);
 
@@ -183,7 +183,7 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     {
         uiError++;
     }
-    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/4}phi|^2 = %2.18f, |DD^{-1/4}DD^{1/4}phi-phi|^2 = %2.18f"), fLengthOfPhi, fLength2, fLength3);
+    appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/4}phi|^2 = %2.18f, |DD^{-1/4}DD^{1/4}phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
 
     appSafeDelete(pFieldCopy);
     return uiError;

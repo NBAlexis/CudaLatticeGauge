@@ -31,7 +31,7 @@ void CActionFermionKS::Initial(CLatticeData* pOwner, const CParameters& param, B
     m_pFerimionField = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetFieldById(static_cast<BYTE>(iFieldId)));
     if (NULL == m_pFerimionField)
     {
-        appCrucial(_T("CActionFermionWilsonNf2 work with only CFieldFermionWilsonSquareSU3!\n"));
+        appCrucial(_T("CActionFermionKS work with only CFieldFermionWilsonSquareSU3!\n"));
     }
 }
 
@@ -50,12 +50,19 @@ UBOOL CActionFermionKS::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldG
 
 Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
 {
-    //(D^-1 phi)^2
+    //[ (DD)^(-1/4) phi ]^2
+    
+    //CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
+    //assert(NULL != pPooled);
+    //m_pFerimionField->CopyTo(pPooled);
+    //pPooled->D_EN(pGauge);
+    //const CLGComplex res = pPooled->Dot(pPooled);
+
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
-    assert(NULL != pPooled);
     m_pFerimionField->CopyTo(pPooled);
     pPooled->D_MD(pGauge);
     const CLGComplex res = pPooled->Dot(m_pFerimionField);
+
     appDetailed(_T("CActionFermionKS : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);
 
     pPooled->Return();
@@ -64,8 +71,7 @@ Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGau
 
 CCString CActionFermionKS::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldFermionKSSU3\n");
+    CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
     return sRet;
 }
 

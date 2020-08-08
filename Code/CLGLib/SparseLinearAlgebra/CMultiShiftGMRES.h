@@ -41,6 +41,7 @@ protected:
     Real m_fAccuracy;
     Real m_fBeta;
     UBOOL m_bUseCudaForSmallMatrix;
+    UBOOL m_bCheckAddSystem;
 
     CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];
     CLGComplex m_hCopy[(_kMaxStep + 1) * (_kMaxStep + 1)];

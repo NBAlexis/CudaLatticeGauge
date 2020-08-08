@@ -73,6 +73,8 @@ public:
     virtual void D_MD(const CField* pGauge);
     virtual void D0(const CField* pGauge);
     virtual void D_MC(const CField* pGauge);
+    virtual void D_EN(const CField* pGauge);
+
     void PrepareForHMC(const CFieldGauge* pGauge) override;
     UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
 
@@ -103,6 +105,9 @@ protected:
 
     // r(x) = x^{-1/2} use to calculate force and action
     CRatinalApproximation m_rMD;
+
+    // r(x) = x^{-1/4} use to calculate energy
+    CRatinalApproximation m_rEN;
 
     //phi _i and Dst0 phi _i
     deviceSU3Vector** m_pRationalFieldPointers;

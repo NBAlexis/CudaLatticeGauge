@@ -43,7 +43,11 @@ class CLGAPI CLinearAlgebraHelper
 public:
     enum 
     {
-        _kMaxSmallDim = 32, 
+#if _CLG_DEBUG
+        _kMaxSmallDim = 22,
+#else
+        _kMaxSmallDime = 32,
+#endif
         _kAllocateMatrixNumber = 7,
     };
 

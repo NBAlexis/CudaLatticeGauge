@@ -70,19 +70,19 @@ _kernelAdd4PlaqutteTermSU3(
 {
     //intokernalInt4;
     SSmallInt4 sSite4;
-    UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
-    UINT _iz_idx = (threadIdx.y + blockIdx.y * blockDim.y);
+    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
+    const UINT _iz_idx = (threadIdx.y + blockIdx.y * blockDim.y);
 
     sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx);
     sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx);
     sSite4.z = static_cast<SBYTE>(_iz_idx / 3);
     sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z);
-    UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
-    BYTE idx0 = _iz_idx % 3;
+    const UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
+    const BYTE idx0 = _iz_idx % 3;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
-    UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
-    UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
+    const UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
+    const UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
     
     //i=0: 12
     //  1: 13
@@ -91,7 +91,7 @@ _kernelAdd4PlaqutteTermSU3(
     //  4: 24
     //  5: 34
     //0->2, 1->4, 2->5
-    BYTE idx = (2 == idx0) ? 5 : ((idx0 + 1) * 2);
+    const BYTE idx = (2 == idx0) ? 5 : ((idx0 + 1) * 2);
 
     //Real resThisThread = F(0.0);
 
@@ -229,7 +229,7 @@ _kernelAddForce4PlaqutteTermSU3_XYZ(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     betaOverN = betaOverN * F(-0.5);
-    deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
     #pragma unroll
     for (UINT idir = 0; idir < 3; ++idir)
     {
@@ -237,10 +237,10 @@ _kernelAddForce4PlaqutteTermSU3_XYZ(
         {
             continue;
         }
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         //mu = idir, nu = 4, i = mu
-        deviceSU3 stap(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
+        const deviceSU3 stap(_deviceStapleTerm123(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
         deviceSU3 force(pDeviceData[linkIndex]);
         force.MulDagger(stap);
         force.Ta();
@@ -262,14 +262,14 @@ _kernelAddForce4PlaqutteTermSU3_T(
     //UINT uiDir = _DC_Dir;
 
     betaOverN = betaOverN * F(-0.5);
-    deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
 
     const BYTE idir = 3;
     if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
     {
         return;
     }
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
     //mu = idir, nu = i = sum _1-3
     deviceSU3 stap(_deviceStapleTerm4(pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0));
@@ -301,7 +301,7 @@ _kernelAddForceChairTermSU3_Term1_1(
     //===============
     //+x Omega V412
     //add force for mu=4
-    UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
@@ -331,7 +331,7 @@ _kernelAddForceChairTermSU3_Term1_2(
     //===============
     //+x Omega V412
     //add force for mu=4
-    UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
@@ -361,7 +361,7 @@ _kernelAddForceChairTermSU3_Term1_3(
     //===============
     //+x Omega V412
     //add force for mu=4
-    UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
@@ -391,7 +391,7 @@ _kernelAddForceChairTermSU3_Term2_1(
     //===============
     //+x Omega V432
     //add force for mu=4
-    UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
@@ -421,7 +421,7 @@ _kernelAddForceChairTermSU3_Term2_2(
     //===============
     //+x Omega V432
     //add force for mu=4
-    UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
@@ -451,7 +451,7 @@ _kernelAddForceChairTermSU3_Term2_3(
     //===============
     //+x Omega V432
     //add force for mu=4
-    UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
@@ -481,7 +481,7 @@ _kernelAddForceChairTermSU3_Term3_1(
     //===============
     //-y Omega V421
     //add force for mu=4
-    UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
@@ -512,7 +512,7 @@ _kernelAddForceChairTermSU3_Term3_2(
     //===============
     //-y Omega V421
     //add force for mu=4
-    UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
@@ -542,7 +542,7 @@ _kernelAddForceChairTermSU3_Term3_3(
     //===============
     //-y Omega V421
     //add force for mu=4
-    UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
@@ -573,7 +573,7 @@ _kernelAddForceChairTermSU3_Term4_1(
     //===============
     //-y Omega V431
     //add force for mu=4
-    UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
@@ -604,7 +604,7 @@ _kernelAddForceChairTermSU3_Term4_2(
     //===============
     //-y Omega V431
     //add force for mu=4
-    UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
@@ -635,7 +635,7 @@ _kernelAddForceChairTermSU3_Term4_3(
     //===============
     //-y Omega V431
     //add force for mu=4
-    UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
@@ -665,7 +665,7 @@ _kernelAddForceChairTermSU3_Term5_1(
 
     //===============
     //+Omega^2 xy V142
-    UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
@@ -694,7 +694,7 @@ _kernelAddForceChairTermSU3_Term5_2(
 
     //===============
     //+Omega^2 xy V142
-    UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
@@ -724,7 +724,7 @@ _kernelAddForceChairTermSU3_Term5_3(
 
     //===============
     //+Omega^2 xy V142
-    UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {

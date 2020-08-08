@@ -81,6 +81,7 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("TestSuit_Boundary.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_FileIO.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_FermionUpdator.yaml"), params);
+    CYAMLParser::ParseFile(_T("TestSuit_FermionUpdatorKS.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_GaugeFixing.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_RotationAcc.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_Solver.yaml"), params);
@@ -93,6 +94,7 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Boundary.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_FileIO.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_FermionUpdator.yaml"), params);
+    CYAMLParser::ParseFile(_T("../Debug/TestSuit_FermionUpdatorKS.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_GaugeFixing.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_RotationAcc.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Solver.yaml"), params);

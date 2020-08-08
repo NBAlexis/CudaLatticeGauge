@@ -241,10 +241,10 @@ _kernelCacheEtaMu(BYTE* pCached)
     intokernalInt4;
     pCached[uiSiteIndex] =
           ((sSite4.EtaOdd(4) ? 1 : 0) << 4)
-        & ((sSite4.EtaOdd(3) ? 1 : 0) << 3)
-        & ((sSite4.EtaOdd(2) ? 1 : 0) << 2)
-        & ((sSite4.EtaOdd(1) ? 1 : 0) << 1)
-        &  (sSite4.EtaOdd(0) ? 1 : 0);
+        | ((sSite4.EtaOdd(3) ? 1 : 0) << 3)
+        | ((sSite4.EtaOdd(2) ? 1 : 0) << 2)
+        | ((sSite4.EtaOdd(1) ? 1 : 0) << 1)
+        |  (sSite4.EtaOdd(0) ? 1 : 0);
 }
 
 

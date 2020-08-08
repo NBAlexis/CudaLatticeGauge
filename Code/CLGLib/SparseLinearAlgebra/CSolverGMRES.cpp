@@ -70,6 +70,13 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     {
         m_fAccuracy = fValue;
     }
+
+    //We do not need to initialize the entries of H matrix since they are never visited.
+    //Note: This is not the case for Multi-shifted GMRES
+    //for (UINT i = 0; i < _kMaxStep * (_kMaxStep + 1); ++i)
+    //{
+    //    m_h[i] = _zeroc;
+    //}
 }
 
 void CSLASolverGMRES::AllocateBuffers(const CField* )

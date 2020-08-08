@@ -49,6 +49,7 @@
     <None Include="..\..\Bin\Debug\TestSuit_Common.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdator.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_FermionUpdatorKS.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FileIO.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_GaugeFixing.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Random.yaml" />

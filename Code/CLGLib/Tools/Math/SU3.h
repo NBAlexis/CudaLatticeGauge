@@ -380,7 +380,7 @@ extern "C" {
         }
 
         /**
-        * This is not right left^{dagger}
+        * This is right left^{dagger} for column SU3 vector with spin index summed
         * Let left = L1,L2,L3 right = R1, R2, R3
         * li = sum _{spin}Li
         * ri = sum _{spin}Ri
@@ -496,6 +496,8 @@ extern "C" {
 
         /**
          * Another version of makeSU3Contract without spin sum
+         * if v = {{},{},{}}, column vector
+         * This is right.left^+
          */
         __device__ __inline__ static deviceSU3 makeSU3ContractV(const deviceSU3Vector& left, const deviceSU3Vector& right)
         {

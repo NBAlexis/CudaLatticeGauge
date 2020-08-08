@@ -20,6 +20,7 @@ CMultiShiftGMRES::CMultiShiftGMRES()
     , m_fAccuracy(F(0.000001))
     , m_fBeta(F(0.0))
     , m_bUseCudaForSmallMatrix(FALSE)
+    , m_bCheckAddSystem(FALSE)
     , m_pHelper(NULL)
     , m_pDeviceY(NULL)
     , m_pDeviceZ(NULL)
@@ -72,6 +73,16 @@ void CMultiShiftGMRES::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+    }
+    iValue = 0;
+    if (param.FetchValueINT(_T("CheckAddSystem"), iValue))
+    {
+        m_bCheckAddSystem = (0 != iValue);
+    }
+
+    for (UINT i = 0; i < _kMaxStep * (_kMaxStep + 1); ++i)
+    {
+        m_h[i] = _zeroc;
     }
 }
 
@@ -258,6 +269,7 @@ UBOOL CMultiShiftGMRES::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>
                 fMaxError = fErrorN;
             }
             appParanoiac(_T("CMultiShiftGMRES::Solve deviation: ----  last beta0 %d = %8.15f\n"), n, fErrorN);
+
             for (UINT j = 0; j < m_uiMaxDim; ++j)
             {
                 pFieldX[n]->Axpy(m_yhat[j], m_lstVectors[j]);

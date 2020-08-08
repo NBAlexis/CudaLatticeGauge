@@ -133,7 +133,7 @@ To calculate the $A'$ we use
 \begin{equation}
 \begin{split}
 &\frac{\partial }{\partial \omega _a}A = \left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{st0}\right)D_{st0}+D^{\dagger}_{st0}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\\
-&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i = \phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{st0}\right)\phi _{i,d}+\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{st0}\right)\phi _{i,d}+\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\\
 &=\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right)^{\dagger}+\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right)\\
 &=2{\rm Re}\left[\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i\right]
 \end{split}
@@ -143,31 +143,31 @@ with $\phi _{i,d}=D_{st0}\phi _i$.
 \begin{equation}
 \begin{split}
 &\frac{\partial }{\partial \omega _a}  D_{st0}=\sum _{\mu}\left(\eta _{\mu}(n)\left(\frac{\partial }{\partial \omega _a}U_{\mu}(n)\right) \delta _{n,n+\mu} - \textcolor[rgb]{1,0,0}{\eta _{\mu}(n+\mu)}\left(\frac{\partial }{\partial \omega _a} U^{\dagger}_{\mu}(n)\right)\delta _{n+\mu,n}\right)\\
-&=i\eta _{\mu}(n)\left(\left(T_aU_{\mu}(n)\right) \delta _{n,n+\mu} + \left(U^{\dagger}_{\mu}(n)T_a^{\dagger}\right)\delta _{n+\mu,n}\right)\\
+&=i\eta _{\mu}(n)\left(\left(T_aU_{\mu}(n)\right) \delta _{n,n+\mu} + \left(U^{\dagger}_{\mu}(n)T_a\right)\delta _{n+\mu,n}\right)\\
 \end{split}
 \end{equation}
 note that the $\eta _{\mu} (n+\mu)$ follows $\delta _{\textcolor[rgb]{1,0,0}{n+\mu},n}$. The last step we use $\eta _{\mu}(n+\mu)=\eta_{\mu}(n)$.
-The $T_a^{\dagger}$ is not convenient, so let
+The $T_a=T_a^{\dagger}$, let
 \begin{equation}
 \begin{split}
 &\phi _A = \phi _i, \phi _B = T_aU_{\mu}(n)\phi _i\\
-&\phi _C = \phi _{i,d}, \phi _D = T_aU_{\mu}(n)\phi _{i,a}\\
+&\phi _C = \phi _{i,d}, \phi _D = T_aU_{\mu}(n)\phi _{i,d}\\
 \end{split}
 \end{equation}
 it is
 \begin{equation}
 \begin{split}
-&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i = i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\\
-&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)-i\eta(n)\left(\phi _B^{\dagger}(n+\mu)\phi _C(n) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right)\\
-&=i\eta (n)\left\{\left(\phi _C^{\dagger}(n)\phi _B(n+\mu)-\phi _B^{\dagger}(n+\mu)\phi _C(n)\right)+\left( \phi _A^{\dagger}(n)\phi _D(n+\mu)-\phi _D^{\dagger}(n+\mu)\phi _A(n)\right)\right\}\\
-&=-2\eta (n) {\rm Im}\left[\phi _C^{\dagger}(n)\phi _B(n+\mu) - \phi _A^{\dagger}(n)\phi _D(n+\mu)\right]\\
-&=-2\eta (n) {\rm Im}\left[\phi _{i,d}^{\dagger}T_aU_{\mu}(n) \delta _{n,n+\mu}\phi _i - \phi _i^{\dagger}(n)T_aU_{\mu}(n)\delta _{n,n+\mu}\phi _{i,d}\right]\\
+&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i = i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu) \phi _A(n)\right)\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right)-i\eta(n)\left(\phi _B^{\dagger}(n+\mu)\phi _C(n) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\\
+&=i\eta (n)\left\{\left(\phi _C^{\dagger}(n)\phi _B(n+\mu)-\phi _B^{\dagger}(n+\mu)\phi _C(n)\right)+\left( \phi _D^{\dagger}(n+\mu)\phi _A(n)-\phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\right\}\\
+&=-2\eta (n) {\rm Im}\left[\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right]\\
+&=-2\eta (n) {\rm Im}\left[\phi _{i,d}^{\dagger}T_aU_{\mu}(n) \delta _{n,n+\mu}\phi _i + \phi _{i,d}^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)T_a\delta _{n+\mu,n}\phi _i\right]\\
 \end{split}
 \end{equation}
 let $M(n|m)=U_{\mu}(n) \delta _{n,n+\mu}$, it is
 \begin{equation}
 \begin{split}
-&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{st0}\right)\phi _i = -2\eta (n) {\rm Imtr}\left[T_a\left((M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right)\right]\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i = -2\eta (n) {\rm Imtr}\left\{T_a  \left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+T_a \left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}\\
 \end{split}
 \end{equation}
 One can verify that for any matrix \textcolor[rgb]{0,0,1}{
@@ -182,17 +182,16 @@ so
 \begin{equation}
 \begin{split}
 &F_{\mu}(n)=-iT_a \sum _i \phi _{i}^{\dagger} \left(\frac{\partial }{\partial \omega _a} A \right) \phi _{i}\\
-&=\eta _{\mu}(n) \sum _a \sum _i 2i T_a{\rm Imtr}\left[T_a\left((M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right)\right]\\
-&=\eta _{\mu}(n) \sum _i \left\{(M\phi _i)\phi _{i,d}^{\dagger} - (M\phi _{i,d})\phi _i^{\dagger}\right\}_{TA}
+&=\eta _{\mu}(n) \sum _a \sum _i 2i T_a{\rm Imtr}\left\{T_a  \left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+T_a \left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}\\
+&=\eta _{\mu}(n) \sum _i \left\{\left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+\left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}_{TA}
 \end{split}
 \label{eq.staggeredformnf2}
 \end{equation}
 with
 \begin{equation}
 \begin{split}
-&\phi _i = \frac{\sqrt{\alpha _i} }{(D_{st}^{\dagger}D_{st})+\beta _i} \\
+&\phi _i = \frac{\sqrt{\alpha _i} }{(D_{st}^{\dagger}D_{st})+\beta _i} \phi,\;\;\alpha _i,\beta _i \in A^{-\frac{1}{2}}\\
 &\phi _{i,d}=\textcolor[rgb]{1,0,0}{D_{st0}}\phi _i\\
-&M(n|m)=U_{\mu}(n) \delta _{n,n+\mu}\\
 \end{split}
 \end{equation}
 

@@ -12,8 +12,6 @@
 
 #include "CLGLib_Private.h"
 
-#define _MATRIX_BOUND 2
-
 __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CFieldFermionKSSU3)
@@ -55,19 +53,19 @@ _kernelDFermionKS(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
         //x, mu
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
-        deviceSU3 x_Gauge_element = pGauge[linkIndex];
+        const deviceSU3& x_Gauge_element = pGauge[linkIndex];
         deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
         x_m_mu_Gauge_element.Dagger();
 
@@ -210,22 +208,22 @@ _kernelDFermionKSForce(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         //x, mu
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
 
         for (UINT uiR = 0; uiR < uiRational; ++uiR)
         {
             const deviceSU3Vector* phi_i = pFermionPointers[uiR];
             const deviceSU3Vector* phi_id = pFermionPointers[uiR + uiRational];
 
-            deviceSU3Vector left = pGauge[linkIndex].MulVector(phi_i[uiSiteIndex]);
-            deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(left, phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
+            deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
+            deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_id[uiSiteIndex], toContract);
 
-            left = pGauge[linkIndex].MulVector(phi_id[uiSiteIndex]);
-            thisTerm.Sub(deviceSU3::makeSU3ContractV(left, phi_i[x_p_mu_Fermion.m_uiSiteIndex]));
+            toContract = pGauge[linkIndex].MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
+            thisTerm.Add(deviceSU3::makeSU3ContractV(toContract, phi_i[uiSiteIndex]));
 
             if (x_p_mu_Fermion.NeedToOpposite())
             {
@@ -237,7 +235,7 @@ _kernelDFermionKSForce(
             }
 
             thisTerm.Ta();
-            pForce[linkIndex].Add(thisTerm);
+            pForce[linkIndex].Sub(thisTerm);
         }
     }
 
@@ -280,6 +278,11 @@ void CFieldFermionKSSU3::D0(const CField* pGauge)
 void CFieldFermionKSSU3::D_MC(const CField* pGauge)
 {
     RationalApproximation(EFO_F_DDdagger, pGauge, &m_rMC);
+}
+
+void CFieldFermionKSSU3::D_EN(const CField* pGauge)
+{
+    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rEN);
 }
 
 /**
@@ -577,6 +580,9 @@ void CFieldFermionKSSU3::InitialOtherParameters(CParameters& params)
     params.FetchValueArrayReal(_T("MC"), coeffs);
     m_rMC.Initial(coeffs);
 
+    params.FetchValueArrayReal(_T("EN"), coeffs);
+    m_rEN.Initial(coeffs);
+
     if (NULL != m_pRationalFieldPointers)
     {
         checkCudaErrors(cudaFree(m_pRationalFieldPointers));
@@ -637,6 +643,7 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
     pField->m_f2am = m_f2am;
     pField->m_rMC = m_rMC;
     pField->m_rMD = m_rMD;
+    pField->m_rEN = m_rEN;
 
     if (NULL != pField->m_pMDNumerator)
     {

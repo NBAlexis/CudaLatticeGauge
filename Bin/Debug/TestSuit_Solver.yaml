@@ -429,7 +429,7 @@ TestMSSolverGMRES:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -658,12 +658,12 @@ TestMSKSSolverGMRES:
         SolverName : CMultiShiftGMRES
         SolverForFieldId : 2
         ## cuda is even slower
-        UseCudaForSmallMatrix : 0
+        UseCudaForSmallMatrix : 1
         ## Check Accuracy every DiviationStep steps
         MaxDim : 20
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000000000001
-        Restart : 100
+        Accuracy : 0.00000001
+        Restart : 200
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
@@ -726,7 +726,7 @@ TestMSKSSolverFOM:
         ## Check Accuracy every DiviationStep steps
         MaxDim : 30
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.0000000000001
+        Accuracy : 0.00000001
         Restart : 100
         ## 0 is recommanded
         AbsoluteAccuracy : 1

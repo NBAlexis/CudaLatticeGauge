@@ -39,17 +39,17 @@ _kernelDFermionWilsonSquareSU3_DR(
     CLGComplex cCoeff)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega * kai;
-    Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega * kai;
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega * kai;
+    const Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega * kai;
 
     deviceWilsonVectorSU3 right_element = bDDagger ? gamma5.MulWilsonC(pDeviceData[uiSiteIndex]) : pDeviceData[uiSiteIndex];
 
@@ -80,17 +80,17 @@ _kernelDFermionWilsonSquareSU3_DR(
         //get things
 
         //x, mu
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+        const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
         deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
         x_m_mu_Gauge_element.Dagger();
 
@@ -258,7 +258,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         pResultData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
@@ -280,7 +280,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
         return;
     }
 
-    const gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 right_element = bDDagger ?
         gamma5.MulWilsonC(pDeviceData[uiSiteIndex]) : pDeviceData[uiSiteIndex];
 
@@ -337,33 +337,33 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix gammaMu = __chiralGamma[GAMMA1];
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gammaMu = __chiralGamma[GAMMA1];
 
-    Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
+    const Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
     x_m_mu_Gauge_element.Dagger();
 
@@ -476,18 +476,18 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix gammaMu = __chiralGamma[GAMMA2];
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gammaMu = __chiralGamma[GAMMA2];
 
-    Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
+    const Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     //idir = mu, we have x, y and t term but no z term
@@ -495,17 +495,17 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     //get things
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
     x_m_mu_Gauge_element.Dagger();
 
@@ -608,30 +608,30 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gammaMu = __chiralGamma[GAMMA3];
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gammaMu = __chiralGamma[GAMMA3];
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
     x_m_mu_Gauge_element.Dagger();
 
@@ -647,7 +647,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     //hopping terms
 
     //U(x,mu) phi(x+ mu)
-    deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
+    const deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     if (x_p_mu_Fermion.NeedToOpposite())
     {
         //printf("OppositeZ x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
@@ -663,7 +663,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     }
 
     //U^{dagger}(x-mu) phi(x-mu)
-    deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
+    const deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
     if (x_m_mu_Fermion.NeedToOpposite())
     {
         result.Sub(u_dagger_phi_x_m_m);
@@ -714,17 +714,17 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
 {
     intokernalInt4;
 
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
-    Real fhalfOmega = fOmega * F(0.5);
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
+    const Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
     //idir = mu, we have x, y and t term but no z term
@@ -732,17 +732,17 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     //get things
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
 
-    SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
     x_m_mu_Gauge_element.Dagger();
 
@@ -1308,13 +1308,13 @@ _kernelDWilsonForceSU3_DR_X_Naive(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
-    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
-    SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
     //If one of the sites is on surface, it has no contribution.
     //Note that, the bond on surface is equivelant to both sites on surface.
@@ -1335,13 +1335,13 @@ _kernelDWilsonForceSU3_DR_X_Naive(
 
     //====================
     //Get things
-    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
     x_p_mu_Right.MulReal(-fYOmega);
     x_p_mu_Right = gamma4.MulWilsonC(x_p_mu_Right);
@@ -1371,13 +1371,13 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
-    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
-    SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
     //If one of the sites is on surface, it has no contribution.
     //Note that, the bond on surface is equivelant to both sites on surface.
@@ -1398,13 +1398,13 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
 
     //====================
     //Get things
-    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
     x_p_mu_Right.MulReal(fXOmega);
     x_p_mu_Right = gamma4.MulWilsonC(x_p_mu_Right);
@@ -1434,13 +1434,13 @@ _kernelDWilsonForceSU3_DR_X(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y) * fOmega;
-    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
-    SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
     //If one of the sites is on surface, it has no contribution.
     //Note that, the bond on surface is equivelant to both sites on surface.
@@ -1461,13 +1461,13 @@ _kernelDWilsonForceSU3_DR_X(
 
     //====================
     //Get things
-    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
     //(1-gamma4)Y
     x_p_mu_Right.MulReal(fYOmega);
@@ -1499,13 +1499,13 @@ _kernelDWilsonForceSU3_DR_Y(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x) * fOmega;
-    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
-    SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
     //If one of the sites is on surface, it has no contribution.
     //Note that, the bond on surface is equivelant to both sites on surface.
@@ -1526,13 +1526,13 @@ _kernelDWilsonForceSU3_DR_Y(
 
     //====================
     //Get things
-    const deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    const deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
     //-(1-gamam4)X
     x_p_mu_Right.MulReal(-fXOmega);
@@ -1563,14 +1563,14 @@ _kernelDWilsonForceSU3_DR_T(
     BYTE byFieldId)
 {
     intokernalInt4;
-    UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
 
     //x, mu
-    UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
-    SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
     //If one of the sites is on surface, it has no contribution.
     //Note that, the bond on surface is equivelant to both sites on surface.
@@ -1582,18 +1582,18 @@ _kernelDWilsonForceSU3_DR_T(
 
     //====================
     //Get things
-    deviceWilsonVectorSU3 x_Left(pInverseDDdagger[uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_Left = pInverseDDdagger[uiSiteIndex];
     deviceWilsonVectorSU3 x_Right(pInverseD[uiSiteIndex]);
     //all not on surface
     deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
-    deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+    const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
-    deviceSU3 x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex]; // _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir); //pGauge[linkIndex];
 
-    Real fFac = (x_p_mu_Fermion.NeedToOpposite() ? F(-1.0) : F(1.0)) * fKai;
-    Real fAng = F(0.5) * fOmega;
-    Real fCos = fFac * (_cos(fAng) - F(1.0));
-    Real fSin = fFac * _sin(fAng);
+    const Real fFac = (x_p_mu_Fermion.NeedToOpposite() ? F(-1.0) : F(1.0)) * fKai;
+    const Real fAng = F(0.5) * fOmega;
+    const Real fCos = fFac * (_cos(fAng) - F(1.0));
+    const Real fSin = fFac * _sin(fAng);
 ;
     //first term has same sign as _Y function (-1)
     //we already use fFac = -1 or 1

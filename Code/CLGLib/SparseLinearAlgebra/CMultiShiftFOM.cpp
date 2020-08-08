@@ -115,7 +115,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         beta0Length.AddItem(F(1.0));
     }
 
-    appParanoiac(_T("-- CMultiShiftGMRES::Solve start operator: %s-- fLength = %f --\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str(), fBLength);
+    appParanoiac(_T("-- CMultiShiftFOM::Solve start operator: %s-- fLength = %f --\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str(), fBLength);
 
     //set initial gauss x0 = b or pStart
     for (INT i = 0; i < cn.Num(); ++i)
@@ -208,7 +208,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
             {
                 fMaxError = fErrorN;
             }
-            appParanoiac(_T("CMultiShiftGMRES::Solve deviation: ----  last beta0 %d = %8.15f\n"), n, fErrorN);
+            appParanoiac(_T("CMultiShiftFOM::Solve deviation: ----  last beta0 %d = %8.15f\n"), n, fErrorN);
             for (UINT j = 0; j < m_uiMaxDim; ++j)
             {
                 pFieldX[n]->Axpy(m_y[j], m_lstVectors[j]);
@@ -218,7 +218,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         //Stop if beta is very small
         if (fMaxError < m_fAccuracy * fBLength)
         {
-            appParanoiac(_T("CMultiShiftGMRES::Solve deviation: ---- finished ----. last beta = %8.15f\n"), fMaxError);
+            appParanoiac(_T("CMultiShiftFOM::Solve deviation: ---- finished ----. last beta = %8.15f\n"), fMaxError);
             pR->Return();
             pW->Return();
             for (UINT k = 0; k < m_uiMaxDim; ++k)
@@ -229,10 +229,10 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
             return TRUE;
         }
 
-        appParanoiac(_T("CMultiShiftGMRES::Solve deviation: ----  last beta = %8.15f\n"), fMaxError);
+        appParanoiac(_T("CMultiShiftFOM::Solve deviation: ----  last beta = %8.15f\n"), fMaxError);
     }
 
-    appGeneral(_T("CSLASolverGMRES::Solve failed: last divation = %8.15f\n"), fMaxError);
+    appGeneral(_T("CMultiShiftFOM::Solve failed: last divation = %8.15f\n"), fMaxError);
     pR->Return();
     pW->Return();
     for (UINT i = 0; i < m_uiMaxDim; ++i)

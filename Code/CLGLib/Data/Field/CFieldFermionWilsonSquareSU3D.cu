@@ -44,7 +44,7 @@ _kernelDFermionWilsonSquareSU3_D(
     intokernalInt4;
     BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex & sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (sIdx.IsDirichlet())
     {
         pResultData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3(); 
@@ -52,7 +52,7 @@ _kernelDFermionWilsonSquareSU3_D(
         return;
     }
 
-    gammaMatrix gamma5 = __chiralGamma[GAMMA5];
+    const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
     if (bDDagger)
@@ -64,15 +64,15 @@ _kernelDFermionWilsonSquareSU3_D(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
+        const gammaMatrix& gammaMu = __chiralGamma[GAMMA1 + idir];
 
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
@@ -169,7 +169,7 @@ _kernelDWilsonForceSU3_D(
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceWilsonVectorSU3 x_Left(_deviceGetFermionBCWilsonSU3(pInverseDDdagger, sSite, byFieldId));
     const deviceWilsonVectorSU3 x_Right(_deviceGetFermionBCWilsonSU3(pInverseD, sSite, byFieldId));
 
@@ -178,7 +178,7 @@ _kernelDWilsonForceSU3_D(
     {
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        SIndex x_p_mu_Fermion = pFermionMove[linkIndex * 2];
+        const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2];
 
         //If one of the sites is on surface, it has no contribution.
         //Note that, the bond on surface is equivelant to both sites on surface.
@@ -192,13 +192,13 @@ _kernelDWilsonForceSU3_D(
         else
         {
             //Get Gamma mu
-            gammaMatrix gammaMu = __chiralGamma[GAMMA1 + idir];
+            const gammaMatrix& gammaMu = __chiralGamma[GAMMA1 + idir];
 
             //SIndex x_m_mu_Gauge = __idx->_deviceGaugeIndexWalk(uiSiteIndex, -(idir + 1));
              // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
             //all not on surface
-            const deviceWilsonVectorSU3 x_p_mu_Right(pInverseD[x_p_mu_Fermion.m_uiSiteIndex]);
+            const deviceWilsonVectorSU3& x_p_mu_Right = pInverseD[x_p_mu_Fermion.m_uiSiteIndex];
             deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
             //deviceWilsonVectorSU3 x_p_mu_Right = _deviceGetFermionBCWilsonSU3(pInverseD, x_p_mu_Fermion, byFieldId);
             //deviceWilsonVectorSU3 x_p_mu_Left = _deviceGetFermionBCWilsonSU3(pInverseDDdagger, x_p_mu_Fermion, byFieldId);
