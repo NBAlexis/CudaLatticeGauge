@@ -61,6 +61,11 @@ namespace CLGMakeWriter
         {
             string sContent = "cmake_minimum_required(VERSION 3.8 FATAL_ERROR)\n\n";
 
+            sContent += "if (DEFINED NVCCROOT)\n";
+            sContent += "    set(CMAKE_CUDA_COMPILER ${NVCCROOT})\n";
+            sContent += "    MESSAGE(\"CMAKE_CUDA_COMPILER = ${CMAKE_CUDA_COMPILER}\")\n";
+            sContent += "endif()\n\n";
+
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
