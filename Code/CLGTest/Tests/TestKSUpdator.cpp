@@ -49,9 +49,9 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    appGeneral(_T("accept (%d/60) : expected >= 50. HDiff = %f : expected < 0.3\n (exp(-0.3) is 74%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/43) : expected >= 35. HDiff = %f : expected < 0.3\n (exp(-0.3) is 74%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
-    if (uiAccept < 50)
+    if (uiAccept < 35)
     {
         ++uiError;
     }

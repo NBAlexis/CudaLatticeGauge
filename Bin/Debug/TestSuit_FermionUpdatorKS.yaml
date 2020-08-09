@@ -12,7 +12,7 @@ TestFermionUpdatorKS:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
+    ExpectedRes : 0.427
 
     Updator:
 
@@ -98,7 +98,7 @@ TestFermionUpdatorKSNestedForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
+    ExpectedRes : 0.427
 
     Updator:
 
@@ -110,8 +110,8 @@ TestFermionUpdatorKSNestedForceGradient:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
-        NestedStep : 10
+        IntegratorStep : 8
+        NestedStep : 8
 
     Gauge:
     
