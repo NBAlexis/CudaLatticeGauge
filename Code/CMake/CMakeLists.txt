@@ -38,6 +38,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionWilsonNf2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteAcceleration.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.h
@@ -50,6 +51,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.h
@@ -133,9 +135,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteAcceleration.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.cu
