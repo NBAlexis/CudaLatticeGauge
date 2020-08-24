@@ -280,10 +280,10 @@ void CFieldFermionKSSU3::D_MC(const CField* pGauge)
     RationalApproximation(EFO_F_DDdagger, pGauge, &m_rMC);
 }
 
-void CFieldFermionKSSU3::D_EN(const CField* pGauge)
-{
-    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rEN);
-}
+//void CFieldFermionKSSU3::D_EN(const CField* pGauge)
+//{
+//    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rEN);
+//}
 
 /**
 * generate phi by gaussian random.
@@ -580,8 +580,8 @@ void CFieldFermionKSSU3::InitialOtherParameters(CParameters& params)
     params.FetchValueArrayReal(_T("MC"), coeffs);
     m_rMC.Initial(coeffs);
 
-    params.FetchValueArrayReal(_T("EN"), coeffs);
-    m_rEN.Initial(coeffs);
+    //params.FetchValueArrayReal(_T("EN"), coeffs);
+    //m_rEN.Initial(coeffs);
 
     if (NULL != m_pRationalFieldPointers)
     {
@@ -643,7 +643,7 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
     pField->m_f2am = m_f2am;
     pField->m_rMC = m_rMC;
     pField->m_rMD = m_rMD;
-    pField->m_rEN = m_rEN;
+    //pField->m_rEN = m_rEN;
 
     if (NULL != pField->m_pMDNumerator)
     {

@@ -389,6 +389,15 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorMultiLevelNestedOmelyan.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
+    <ClInclude Include="Update\Continous\CIntegratorNested11Stage.h">
+      <Filter>Update\Continous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -478,6 +487,15 @@
     </ClCompile>
     <ClCompile Include="Data\Action\CActionFermionKS.cpp">
       <Filter>Data\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedOmelyan.cpp">
+      <Filter>Update\Continous</Filter>
+    </ClCompile>
+    <ClCompile Include="Update\Continous\CIntegratorNested11Stage.cpp">
+      <Filter>Update\Continous</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

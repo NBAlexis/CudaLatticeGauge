@@ -126,6 +126,9 @@
     <ClInclude Include="Update\Continous\CIntegrator.h" />
     <ClInclude Include="Update\Continous\CIntegratorForceGradient.h" />
     <ClInclude Include="Update\Continous\CIntegratorLeapFrog.h" />
+    <ClInclude Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.h" />
+    <ClInclude Include="Update\Continous\CIntegratorMultiLevelNestedOmelyan.h" />
+    <ClInclude Include="Update\Continous\CIntegratorNested11Stage.h" />
     <ClInclude Include="Update\Continous\CIntegratorNestedLeapFrog.h" />
     <ClInclude Include="Update\Continous\CIntegratorNestedOmelyan.h" />
     <ClInclude Include="Update\Continous\CIntegratorNestedForceGradient.h" />
@@ -164,6 +167,9 @@
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedOmelyan.cpp" />
+    <ClCompile Include="Update\Continous\CIntegratorNested11Stage.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedLeapFrog.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorNestedOmelyan.cpp" />

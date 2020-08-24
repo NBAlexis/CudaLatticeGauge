@@ -73,7 +73,6 @@ public:
     virtual void D_MD(const CField* pGauge);
     virtual void D0(const CField* pGauge);
     virtual void D_MC(const CField* pGauge);
-    virtual void D_EN(const CField* pGauge);
 
     void PrepareForHMC(const CFieldGauge* pGauge) override;
     UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
@@ -100,14 +99,16 @@ protected:
 
     Real m_f2am;
 
-    // r(x) = x^{1/4} use to prepare for HMC
+    // r(x) = x^{1/4} use to prepare for Nf=2
+    // r(x) = x^{3/8} use as s quark for Nf=2+1
+    // r(x) = (x+dm/x)^{-1/4} use as u,d quark for Nf=2+1
     CRatinalApproximation m_rMC;
 
-    // r(x) = x^{-1/2} use to calculate force and action
+    // r(x) = x^{-1/2} use to calculate force and action for Nf=2
+    // r(x) = x^{-3/4} use to s quark for Nf=2+1 for Nf=2
+    // r(x) = (x+dm/x)^{1/2} use as u,d quark for Nf=2+1
     CRatinalApproximation m_rMD;
 
-    // r(x) = x^{-1/4} use to calculate energy
-    CRatinalApproximation m_rEN;
 
     //phi _i and Dst0 phi _i
     deviceSU3Vector** m_pRationalFieldPointers;

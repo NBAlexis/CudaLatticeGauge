@@ -25,7 +25,7 @@ public:
 
     void Evaluate() override;
 
-    void NestedEvaluate(UBOOL bLast);
+    //void NestedEvaluate(UBOOL bLast);
 
     CCString GetInfos(const CCString& sTab) const override;
 

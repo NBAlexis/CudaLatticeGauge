@@ -194,7 +194,7 @@ _kernalBakeBondInfoPeriodicDirichletBoundary(
 
 CBoundaryConditionPeriodicAndDirichletSquare::CBoundaryConditionPeriodicAndDirichletSquare() : CBoundaryCondition()
 {
-    for (UINT i = 0; i < _kMaxFieldCount; ++i)
+    for (UINT i = 0; i < kMaxFieldCount; ++i)
     {
         m_FieldBC[i].x = 0;
         m_FieldBC[i].y = 0;
@@ -207,7 +207,7 @@ CBoundaryConditionPeriodicAndDirichletSquare::CBoundaryConditionPeriodicAndDiric
 
 void CBoundaryConditionPeriodicAndDirichletSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
 {
-    assert(byFieldId < _kMaxFieldCount);
+    assert(byFieldId < kMaxFieldCount);
     m_FieldBC[byFieldId] = bc.m_sPeriodic;
 }
 

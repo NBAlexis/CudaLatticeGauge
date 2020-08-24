@@ -100,8 +100,7 @@ inline class CCudaHelper* appGetCudaHelper();
 
 enum 
 {
-    kMaxFieldCount = 8, 
-    kMaxActionCount = 8, 
+    kMaxActionCount = 16, 
     kMaxPlaqutteCache = 32,
 };
 

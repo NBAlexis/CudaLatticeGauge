@@ -12,7 +12,9 @@
 UINT TestFermionUpdatorKS(CParameters& sParam)
 {
     Real fExpected = F(0.392);
-#if !_CLG_DEBUG
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedResDebug"), fExpected);
+#else
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 #endif
     CMeasurePlaqutteEnergy* pMeasure = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
@@ -21,7 +23,9 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
         return 1;
     }
 
-    appGetLattice()->m_pUpdator->Update(3, FALSE);
+    appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
+    appGetLattice()->m_pUpdator->Update(3, TRUE);
+    appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
 
     pMeasure->Reset();
 #if !_CLG_DEBUG
@@ -67,4 +71,12 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 
 __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKS);
 __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradient);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradientNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNested11StageNf2p1MultiField);
+
+
+
 

@@ -20,8 +20,8 @@ __constant__ CIndexData* __idx;
 __constant__ gammaMatrix __chiralGamma[EGM_MAX];
 __constant__ deviceSU3 __SU3Generators[9];
 
-__constant__ CField* __fieldPointers[_kMaxFieldCount];
-__constant__ CFieldBoundary* __boundaryFieldPointers[_kMaxFieldCount];
+__constant__ CField* __fieldPointers[kMaxFieldCount];
+__constant__ CFieldBoundary* __boundaryFieldPointers[kMaxFieldCount];
 
 #pragma region Kernels
 
@@ -457,7 +457,7 @@ void CCudaHelper::SetDeviceIndex(class CIndexData* pIdx) const
 
 void CCudaHelper::SetFieldPointers()
 {
-    for (BYTE i = 0; i < _kMaxFieldCount; ++i)
+    for (BYTE i = 0; i < kMaxFieldCount; ++i)
     {
         CField * pField = appGetLattice()->GetFieldById(i);
         if (NULL == pField)
@@ -488,8 +488,8 @@ void CCudaHelper::SetFieldPointers()
         }
     }
 
-    checkCudaErrors(cudaMemcpyToSymbol(__fieldPointers, m_deviceFieldPointers, sizeof(CField*) * _kMaxFieldCount));
-    checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundary*) * _kMaxFieldCount));
+    checkCudaErrors(cudaMemcpyToSymbol(__fieldPointers, m_deviceFieldPointers, sizeof(CField*) * kMaxFieldCount));
+    checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundary*) * kMaxFieldCount));
 }
 
 TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()

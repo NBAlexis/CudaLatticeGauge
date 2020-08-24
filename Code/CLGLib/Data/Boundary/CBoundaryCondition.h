@@ -67,7 +67,7 @@ protected:
     * 0 For Dirichlet, 1 and -1 for periodic and anti-periodic
     * Note that the gauge field id is 1
     */
-    SSmallInt4 m_FieldBC[_kMaxFieldCount];
+    SSmallInt4 m_FieldBC[kMaxFieldCount];
 
 };
 

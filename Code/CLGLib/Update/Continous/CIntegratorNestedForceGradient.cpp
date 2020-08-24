@@ -44,7 +44,14 @@ void CIntegratorNestedForceGradient::Evaluate()
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
-        NestedEvaluate(FALSE);
+        if (m_bInnerLeapFrog)
+        {
+            NestedEvaluateLeapfrog(FALSE);
+        }
+        else
+        {
+            NestedEvaluate(FALSE);
+        }
 
         // middle step
         m_pForceField->Zero();
@@ -67,13 +74,29 @@ void CIntegratorNestedForceGradient::Evaluate()
 
         if (uiStep < m_uiStepCount)
         {
-            NestedEvaluate(FALSE);
+            if (m_bInnerLeapFrog)
+            {
+                NestedEvaluateLeapfrog(FALSE);
+            }
+            else
+            {
+                NestedEvaluate(FALSE);
+            }
+            
             appDetailed("  Force Gradient sub step %d\n", uiStep);
             UpdatePF(f1Over3Estep, ESP_InTrajectory);
         }
         else
         {
-            NestedEvaluate(TRUE);
+            if (m_bInnerLeapFrog)
+            {
+                NestedEvaluateLeapfrog(TRUE);
+            }
+            else
+            {
+                NestedEvaluate(TRUE);
+            }
+            
             appDetailed("  Force Gradient last step %d\n", uiStep);
             UpdatePF(f1Over6Estep, ESP_EndTrajectory);
         }

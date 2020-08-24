@@ -743,7 +743,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         CParameters solver = params.GetParameter(_T("Solver"));
         CreateSolver(solver);
     }
-    for (INT i = 0; i < _kMaxFieldCount; ++i)
+    for (INT i = 0; i < kMaxFieldCount; ++i)
     {
         CCString sSolverName = _T("Solver") + appIntToString(i);
         if (params.Exist(sSolverName))
@@ -758,7 +758,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         CParameters solver = params.GetParameter(_T("MSSolver"));
         CreateMultiShiftSolver(solver);
     }
-    for (INT i = 0; i < _kMaxFieldCount; ++i)
+    for (INT i = 0; i < kMaxFieldCount; ++i)
     {
         CCString sSolverName = _T("MSSolver") + appIntToString(i);
         if (params.Exist(sSolverName))

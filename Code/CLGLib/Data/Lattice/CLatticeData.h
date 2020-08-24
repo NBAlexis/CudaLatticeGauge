@@ -82,8 +82,8 @@ public:
     class CIndex* m_pIndex;
     class CIndexData* m_pIndexCache;
 
-    class CSLASolver* m_pFermionSolver[_kMaxFieldCount];
-    class CMultiShiftSolver* m_pFermionMultiShiftSolver[_kMaxFieldCount];
+    class CSLASolver* m_pFermionSolver[kMaxFieldCount];
+    class CMultiShiftSolver* m_pFermionMultiShiftSolver[kMaxFieldCount];
 
     class CGaugeSmearing* m_pGaugeSmearing;
     class CGaugeFixing* m_pGaugeFixing;

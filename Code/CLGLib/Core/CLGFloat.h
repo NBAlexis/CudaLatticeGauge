@@ -165,6 +165,18 @@
 //typically, 0.3-0.5 - arXiv:002.4232
 #define OmelyanLambda2 (F(0.38636665500756728))
 
+//11 Stage, from 10.1016/s0010-4655(02)00754-3
+//Velocity version, Variant 8
+#define _11Stage_Rho (F(0.2539785108410595))
+#define _11Stage_Theta (F(-0.03230286765269967))
+#define _11Stage_VarTheta (F(0.08398315262876693))
+#define _11Stage_Lambda (F(0.6822365335719091))
+
+#define _11Stage_VarThetaP (F(0.2750081212332419))
+#define _11Stage_LambdaP (F(-0.1347950099106792))
+#define _11Stage_RhoP (F(-0.08442961950707149))
+#define _11Stage_ThetaP (F(0.3549000571574260))
+
 __BEGIN_NAMESPACE
 
 //NOTE, _Complex is already a keyword in GCC

@@ -1,0 +1,269 @@
+\subsection{\label{StaggeredFermionSpectrum}Staggered Fermion Spectrum}
+
+\subsubsection{\label{InterpretationOfStaggeredFermion}\index{interpretation Of staggered fermion}\index{staggered quark}Interpretation Of Staggered Fermion}
+
+Start with the Lagrangian
+\begin{equation}
+\begin{split}
+&S_F=\frac{1}{2a}\sum _{\mu}\eta _{\mu}(n)\left(\bar{\chi} (n)U_{\mu}(n) \chi(n+\mu) - \bar{\chi}(n) U_{-\mu}(n)\chi(n-\mu)\right)+m\bar{\chi}\chi\\
+\end{split}
+\end{equation}
+which is also ($\eta _{\mu}(n)=\eta _{\mu}(n+\mu)$) 
+\begin{equation}
+\begin{split}
+&S_F=\frac{1}{2a}\sum _{\mu}\eta _{\mu}(n)\left(\bar{\chi} (n)U_{\mu}(n) \chi(n+\mu) - \bar{\chi}(n+\mu) U_{\mu}^{\dagger}(n)\chi(n)\right)+m\bar{\chi}\chi\\
+\end{split}
+\end{equation}
+Following Ref.~\cite{staggeredQuarks}, the quark is defined on a $2^4$ hypercube on a even lattice, defining
+\begin{equation}
+\begin{split}
+&n_{\mu}=2h_{\mu}+s_{\mu},\;\;h_{\mu}=0,1,2,\ldots N_{\mu}/2-1,\;\;s_{\mu}=0,1\\
+\end{split}
+\end{equation}
+Without gauge field, the transform is
+\begin{equation}
+\begin{split}
+&q_{\alpha,a}(h)=\frac{1}{C\sqrt{C}}\sum _{s_{\mu}} (\Gamma _{s})_{\alpha,a}V_{s}(2h)\chi (2h+s),\;\;\bar{q}_{\alpha,a}(h)=\frac{1}{C\sqrt{C}}\sum _{s} \bar{\chi} (2h+s)V^{\dagger}_{s}(2h)(\Gamma _{s}^{\dagger})_{\alpha,a}\\
+&\Gamma _{s}=\gamma _1^{s_x}\gamma _2^{s_y}\gamma _3^{s_z}\gamma _4^{s_t}\\
+\end{split}
+\end{equation}
+where $C=2^{d-2}$, $\Gamma _{s}$ is a $C^2 \times C^2$ matrix, and we write the case $d=4$, and
+\begin{equation}
+\begin{split}
+&V_{s}(2h)=\left(U_{x}(2h)\right)^{s_x}\left(U_{y}(2h+s_x{\bf x})\right)^{s_y}\left(U_{z}(2h +s_x{\bf x}+s_y{\bf y})\right)^{s_z}\left(U_{t}(2h+s_x{\bf x}+s_y{\bf y}+s_z{\bf z})\right)^{s_t}
+\end{split}
+\end{equation}
+\textbf{$V_s(2h)$ is the Wilson line link $2h$ to $2h+s$. But, there are in fact many Wilson lines can link $2h$ to $2h+s$, do we have a free choice here?}
+
+Note that $V_s^{\dagger}(2h)V_s=1$.
+
+\subsubsection{\label{QuarkGoBackToStaggered}Go Back To Staggered Fermion}
+
+Consider $\sum _a \bar{q}_aq_a$, which is $\sum _{\alpha,a} \bar{q}q$. One can verify that
+\begin{equation}
+\begin{split}
+&\sum _{\alpha,a} \bar{q}(2h)q(2h) = \frac{1}{16}\sum _s \bar{\chi}(2h+s)\chi (2h+s)
+\end{split}
+\end{equation}
+If one don't care about the $\mathcal{O}(a)$ terms, then the 
+\textcolor[rgb]{0,0.5,0}{
+\begin{equation}
+\begin{split}
+&\sum _{\alpha_1,\alpha _2,a} \bar{q}_{\alpha_1,a}(2h)(\gamma _{\mu})_{\alpha_1,\alpha_2} q_{\alpha _2,a}(2h) = \frac{1}{16} \eta _{\mu}(s)\sum _{t} \left(\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}}
+where $t$ is $\{s_{i}\}\setminus s_{\mu}$, for example, when $\mu=x$, $t=(0,t_y,t_z,t_t)$ with $t_{y,z,t}=0,1$.
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I} \left(q(2h+2\mu)-q(2h-2\mu)\right) \\
+&=\textcolor[rgb]{0,0,1}{\eta _{\mu}(s)\frac{1}{16}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)} + \eta _{\mu}(s)\frac{1}{16}\sum _{t} \bar{\chi}(2h+t)\chi (2h+t+3\mu)\\
+&-\eta _{\mu}(s)\frac{1}{16}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t-2\mu) \textcolor[rgb]{0,0,1}{- \eta_{\mu} (s)\frac{1}{16}\sum _{t} \bar{\chi}(2h+t)\chi (2h+t-\mu)}
+\end{split}
+\end{equation}
+The $3\mu$ term is at higher order, note that
+\begin{equation}
+\begin{split}
+&\partial ^2 \to \frac{f(n+\mu)+f(n-\mu)-2f(n)}{2a^2}
+\end{split}
+\end{equation}
+To see it clearly, we use
+\begin{equation}
+\begin{split}
+&\sum _{\alpha_1,\alpha _2,a_1,a_2} \bar{q}_{\alpha_1,a_1}(2h)(\gamma _5)_{\alpha_1,\alpha_2} (\gamma _5^*\gamma _{\mu}^*)_{a_1,a_2}q_{\alpha _2,a_2}(2h) \\
+&= \frac{1}{16} \eta _{\mu}(s)\sum _{t} \left(\textcolor[rgb]{1,0,0}{-}\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\label{eq.staggeredquark1}
+\end{equation}
+The gamma matrices in the taste space is denoted as $\tau$, so we have
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h+2\mu) - \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h+2\mu)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)\\
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h-2\mu) + \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h-2\mu)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\\
+\end{split}
+\label{eq.staggeredquark2}
+\end{equation}
+So
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h+2\mu) - \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h+2\mu)\\
+&-\left(\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h-2\mu) + \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h-2\mu)\right)+2\bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)-\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\\
+&+\frac{1}{8} \eta _{\mu}(s)\sum _{t} \left(-\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\label{eq.staggeredquark3}
+\end{equation}
+which is
+\begin{equation}
+\begin{split}
+&4a\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau}\nabla _{\mu} q(2h) - 4a^2\bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* \Delta _{\mu}q(2h)\\
+&=\frac{1}{8} \eta _{\mu}(s)\sum _{t} \left\{\bar{\chi}(2h+t)\chi (2h+t+\mu)-\bar{\chi}(2h+t+\mu)\chi (2h+t)\right.\\
+&+\left.\bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)-\bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\right\}
+\end{split}
+\label{eq.staggeredquark4}
+\end{equation}
+Omitting the $\mathcal{O}(a)$ term, it go back to the original action.
+
+\subsubsection{\label{StaggeredMesonOperators}\index{staggered meson}Staggered Meson Operators}
+
+The meson operators come from group theory. The meson operator can be written compactly as
+\begin{equation}
+\begin{split}
+&\bar{\chi}(x) S(x,x')\chi (x')
+\end{split}
+\end{equation}
+where $S$ is a weight function, or a phase function, or a sign function.
+
+In the following, we follow Ref.~\cite{staggeredMeson}.
+
+For the reason of interpolation of quarks, we allow the spatial coordinate to be different, but require them to be in a unit cube. Also, usually, we require $t$ be the same. That is something like
+\begin{equation}
+\begin{split}
+&M(t)=\sum _{{\bf x},{\bf x}'\in \Box}\bar{\chi}_{c}({\bf x},t) S({\bf x},{\bf x}')\chi _c({\bf x}', t)
+\end{split}
+\end{equation}
+where $c$ is color index.
+
+With the definition~(\textcolor[rgb]{0,0,1}{\textbf{Note that $D$ here is not Dirac operator but merely a shift operator}})
+\begin{equation}
+\begin{split}
+&D_{{\bf A}}\phi ({\bf x})=\sum _{\delta _1=\pm 1} \sum _{\delta _2=\pm 1}\sum _{\delta _3=\pm 1}\phi ({\bf x}+ \sum _{x,y,z}A_i\delta _i {\bf e}_i)
+\end{split}
+\end{equation}
+Usually, one can write
+\begin{equation}
+\begin{split}
+&M(t)=\sum _{{\bf A} \in \mbox{\mancube}}S({\bf A}) M_{{\bf A},{\bf A}+\delta}(t)\\
+&M_{{\bf A},{\bf B}}=\sum _{{\bf x}\in \mathbb{Z}^3} D_{{\bf A}}\bar{\chi}_c(2{\bf x})D_{{\bf B}}\chi_c(2{\bf x})\\
+\end{split}
+\end{equation}
+\textcolor[rgb]{0,0,1}{\textbf{Note that, sum of ${\bf A}$ vector run over all $2^3$ corners of the cube, the ${\bf B}={\bf A}+\delta $ vector is mod 2, i.e. also in the unit cube.}}
+
+This $M(t)$ correspond to a sum of two terms
+\begin{equation}
+\begin{split}
+&M(t)=\sum _{{\bf y}\in \mathbb{Z}^3 / 2}\left(\bar{q}\gamma _S \otimes \tau _F q+\bar{q} \gamma _S \gamma _4 \gamma _5 \otimes \tau _F \tau _4\tau _5 q\right)
+\end{split}
+\end{equation}
+where $\tau$ are taste gamma matrices. (\textbf{Note that, in the previous subsection, we use $\tau =\gamma$, in Eqs.~(\ref{eq.staggeredquark1} - \ref{eq.staggeredquark4}), it is always $\gamma ^*$, so here we directly define \textcolor[rgb]{0,0,1}{$\tau _{\mu}=\gamma _{\mu}^*$}})
+
+$\gamma _S$ and $\tau _F$ are related to $\delta$ as
+\begin{equation}
+\begin{split}
+&\gamma _S = \gamma _1^{S_x}\gamma _2^{S_y}\gamma _z^{S_z}\gamma _4^{S_t},\;\;\tau _F = \tau _1^{F_x}\tau _2^{F_y}\tau _z^{F_z}\tau _4^{F_t},\;\;\delta = S+F
+\end{split}
+\end{equation}
+
+The pion and rhon are listed in Table.~\ref{tab:staggeredMeson} (This table is copied from Ref.~\cite{staggeredMeson})
+\begin{table}
+\begin{center}
+\begin{tabular}{c|c|ccc|ccc}
+\hline
+ & & & $P=+\sigma _s$ & & & $P=-\sigma _s$ & \\
+$S({\bf x})$ & ${\bf \delta}$ & $M$ & $J^{PC}_R$ & $\gamma _S\otimes \tau _F$ & $M$ & $J^{PC}_R$ & $\gamma _S\otimes \tau _F$\\
+\hline
+$1$                                         & $0$                             & $f_0$    & $0^{++}_S$ & $\mathbb{I}\otimes \mathbb{I}$               & $\pi$    & $0^{-+}_A$ &  $\gamma_4\gamma _5\otimes \tau _4\tau _5$ \\
+$\eta _4 \xi _4$                            & $0$                             & ?        & $0^{+-}_A$ & $\gamma _4 \otimes \tau _4$                  & $\pi$    & $0^{-+}_A$ &  $\gamma _5 \otimes \tau _5$ \\
+$\eta _k \xi _k \epsilon$                   & $0$                             & $a_1$    & $1^{++}_A$ & $\gamma _k\gamma _5 \otimes \tau _k\tau _5$  & $\rho$   & $1^{--}_A$ &  $\gamma _k\gamma _4 \otimes \tau _k\tau _4$ \\
+$\eta _4 \xi _4\eta _k \xi _k \epsilon$     & $0$                             & $b_1$    & $1^{+-}_A$ & $\gamma _l\gamma _m \otimes \tau _l\tau _m$  & $\rho$   & $1^{--}_A$ &  $\gamma _k \otimes \tau _k$ \\
+$\eta _k$                                   & ${\bf e}_k$                     & $\omega$ & $1^{--}_S$ & $\gamma _k\otimes \mathbb{I}$                & $b_1$    & $1^{+-}_A$ & $\gamma _l\gamma _m\otimes \tau _4\tau _5$ \\
+$\eta _4\xi _4\eta _k$                      & ${\bf e}_k$                     & $\rho$   & $1^{--}_A$ & $\gamma _k\gamma _4\otimes \tau _4$          & $a_1$    & $1^{++}_A$ & $\gamma _k\gamma _5\otimes \tau _5$ \\
+$\xi _k\epsilon $                           & ${\bf e}_k$                     & $\pi$    & $0^{-+}_A$ & $\gamma _5 \otimes \tau _k\tau _5$           & ?        & $0^{+-}_A$ & $\gamma _4 \otimes \tau _k \tau _4$ \\
+$\eta _4\xi_4\xi_k\epsilon$                 & ${\bf e}_k$                     & $\pi$    & $0^{-+}_A$ & $\gamma _4\gamma _5\otimes \tau _l \tau _m$  & $a_0$    & $0^{++}_A$ & $\mathbb{I}\otimes \tau _k$ \\
+$\eta _k\xi _k \eta _l \epsilon$            & ${\bf e}_l$                     & $\rho$   & $1^{--}_A$ & $\gamma _m\gamma _4\otimes \tau _k \tau _5$  & $a_1$    & $1^{++}_A$ & $\gamma _m\gamma _5\otimes \tau _k\tau _4$ \\
+$\eta_4\xi_4\eta_k\xi_k\eta_l\epsilon$      & ${\bf e}_l$                     & $\rho$   & $1^{--}_A$ & $\gamma _m \otimes \tau _l\tau _m$           & $b_1$    & $1^{+-}_A$ & $\gamma _k\gamma _l \otimes \tau _k$ \\
+$\eta _k\eta _l \epsilon _{klm}$            & ${\bf e}_k+{\bf e}_l$           & $h_1$    & $1^{+-}_S$ & $\gamma _k\gamma _l\otimes \mathbb{I}$       & $\rho$   & $1^{--}_A$ & $\gamma _m\otimes \tau _4\tau _5$ \\
+$\eta_4\xi_4\eta _k\eta _l \epsilon _{klm}$ & ${\bf e}_k+{\bf e}_l$           & $a_1$    & $1^{++}_A$ & $\gamma _m\gamma _5\otimes \tau _4$          & $\rho$   & $1^{--}_A$ & $\gamma _m\gamma _4\otimes \tau _5$ \\
+$\xi _k\xi _l \epsilon _{klm}$              & ${\bf e}_k+{\bf e}_l$           & $a_0$    & $0^{++}_A$ & $\mathbb{I}\otimes \tau _k\tau _l$           & $\pi$    & $0^{-+}_A$ & $\gamma _4\gamma _5\otimes \tau _m$ \\
+$\eta_4\xi_4\xi _k\xi _l \epsilon _{klm}$   & ${\bf e}_k+{\bf e}_l$           & ?        & $0^{+-}_A$ & $\gamma _4\otimes \tau _m\tau _5$            & $\pi$    & $0^{-+}_A$ & $\gamma _5\otimes \tau _m\tau _4$ \\
+$\eta _m\xi _m\eta _k\xi _l$                & ${\bf e}_k+{\bf e}_l$           & $b_1$    & $1^{+-}_A$ & $\gamma _k\gamma _l\otimes \tau _l \tau _m$  & $\rho$   & $1^{--}_A$ & $\gamma _l\otimes \tau _k$ \\
+$\eta_4\xi_4\eta _m\xi _m\eta _k\xi _l$     & ${\bf e}_k+{\bf e}_l$           & $a_1$    & $1^{++}_A$ & $\gamma _l\gamma _5\otimes \tau _k \tau _5$  & $\rho$   & $1^{--}_A$ & $\gamma _l\gamma _4\otimes \tau _k\tau _4$ \\
+$\eta _1\eta _2\eta _3$                     & ${\bf e}_x+{\bf e}_y+{\bf e}_z$ & $\eta$   & $0^{-+}_S$ & $\gamma _4\gamma _5\otimes \mathbb{I}$       & $a_0$    & $0^{++}_A$ & $\mathbb{I}\otimes \tau _4\tau _5$ \\
+$\eta_4\xi_4\eta _1\eta _2\eta _3$          & ${\bf e}_x+{\bf e}_y+{\bf e}_z$ & $\pi$    & $0^{-+}_A$ & $\gamma _5\otimes \tau _4$                   & ?        & $0^{+-}_A$ & $\gamma _4\otimes \tau _5$ \\
+$\eta_k\xi_k\epsilon\eta _1\eta _2\eta _3$  & ${\bf e}_x+{\bf e}_y+{\bf e}_z$ & $\rho$   & $1^{--}_A$ & $\gamma _k\gamma _4\otimes \tau _4\tau _5$   & $a_1$    & $1^{++}_A$ & $\gamma _k\gamma _5\otimes \tau _k\tau _4$ \\
+$\eta_4\xi_4\eta_k\xi_k\epsilon\eta _1\eta _2\eta _3$ & ${\bf e}_x+{\bf e}_y+{\bf e}_z$ & $\rho$ & $1^{--}_A$ & $\gamma_k\otimes\tau_l\tau_m$        & $b_1$    & $1^{+-}_A$ & $\gamma _l\gamma _m\otimes \tau _k$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab:staggeredMeson}$R=S,A$ means singlet or adjoint. For $P=-\sigma _s$, spin matrix is $\gamma _S\gamma _4\gamma _5$, taste matrix is $\tau _F\tau _4\tau _5$. $k,l,m=1,2,3$ or $k,l,m=x,y,z$ with $k\neq l\neq m$. \textcolor[rgb]{1,0,0}{If we do not have s quark, how can we have $\eta$, $\omega$, $f_0$ and $h_1$?}}
+\end{table}
+
+The $\eta,\xi,\epsilon$ in Table~\ref{tab:staggeredMeson} are
+\begin{equation}
+\begin{split}
+&\eta_{\mu}(n)=(-1)^{\sum _{i<\mu} n_i},\;\;\xi _{\mu}(n)=(-1)^{\sum _{i\geq \mu}^4 n_i},\;\;\eta _{\mu}(\nu)=\xi _{\nu}(\mu),\\
+&\epsilon (n) = (-1)^{\sum _{i=1}^4 n_i}=\eta _5, 
+\end{split}
+\end{equation}
+and $\epsilon _{ijk}$ is the Levi-Civita tensor.
+
+\subsubsection{\label{CoulombWallSource}\index{Coulomb Wall Source}Coulomb Wall Source}
+
+For 
+\begin{equation}
+\begin{split}
+&O_{\Gamma}(n)= \bar{\psi} ^{f_1} (n)\Gamma \psi ^{f_2} (n)\,\;\;\gamma _4 \Gamma ^{\dagger}\gamma _4=\Gamma \\
+&\bar{O}_{\Gamma}(n)=\bar{\psi} ^{f_2} (n)\Gamma \psi ^{f_1} (n).\\
+\end{split}
+\end{equation}
+
+Recall that, for any fermion~(Grassmann variable), one have
+\begin{equation}
+\begin{split}
+&C(n|m)=\langle O_{\Gamma}(n)\bar{O}_{\Gamma}(m)\rangle _F=\langle \bar{\psi} ^{f_1} (n)\Gamma \psi ^{f_2} (n)\bar{\psi} ^{f_2} (m)\Gamma \psi ^{f_1}(m)\rangle _F\\
+&=-{\rm tr} \left[\Gamma  D^{-1}_{f_1}(n|m)\Gamma  D^{-1}_{f_2}(m|n)\right]
+\end{split}
+\end{equation}
+The trace is acting on quantum number indices such as spin index or color index. 
+
+\textbf{The $D^{-1}(n|m)$ is the $(n,m)$ element of matrix $D^{-1}$ which is often called \index{propagator}propagator, connecting a source at $m$ and a sink at $n$}.
+
+In the case of Wilson fermion, the Fourier transformed correlation function
+\begin{equation}
+\begin{split}
+&\sum _{\bf x} e^{-i a{\bf x} {\bf p}}C({\bf 0},0|{\bf x},t)\propto \exp (-a t \sqrt{m^2+{\bf p}^2})\left(1+\mathcal{O}(\exp (-a t \Delta E))\right)
+\end{split}
+\end{equation}
+
+The case of staggered fermion is different, but one can see in the case of ${\bf p}=0$, one wants to calculate $\sum _{\bf x} C({\bf 0},0|{\bf x},t)$. Therefore
+\begin{equation}
+\begin{split}
+&G({\bf x},t)= D^{-1}({\bf x},t|{\bf 0},0)\\
+&\sum _{\bf x}C({\bf 0},0|{\bf x},t) = -{\rm tr}\left[\Gamma G^T({\bf x},t) \Gamma G({\bf x},t)\right]
+\end{split}
+\end{equation}
+
+Now we go back to the staggered fermion. To simplify the calculation, one use the wall source, which in fact correspond to a modified meson operator defined as
+\begin{equation}
+\begin{split}
+&\tilde{M}_{{\bf A},{\bf B}}= \sum _{\bf x}\bar{\chi}_c(2{\bf x}+{\bf A}) \sum _{\bf y}\chi _c (2{\bf y}+{\bf B})\\
+&\tilde{M}(t) = \sum _{\bf A} S({\bf A})\tilde{M}_{{\bf A},{\bf A}+\delta}
+\end{split}
+\end{equation}
+\textbf{\textcolor[rgb]{0,0,1}{$\tilde{M}(t)$ carries same quantum number as $M(t)$~\cite{staggeredMeson}.}} Then
+\begin{equation}
+\begin{split}
+&C(t)=\langle \tilde{M}_{\delta}(t) \overline{\tilde{M} _{\delta}(0)}\rangle \\
+&= \sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\langle \sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1+{\bf A}_1,t) \sum _{\bf y _1}\chi _{c_1} (2{\bf y}_1+{\bf A}_1+\delta,t)  \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\rangle\\
+&=-\sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\langle \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0)\sum _{\bf y _1}\chi _{c_1} (2{\bf y}_1+{\bf A}_1+\delta,t)   \sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1+{\bf A}_1,t) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\rangle\\
+\end{split}
+\end{equation}
+here each $\bar{\chi}_{c_1}(2{\bf x}_1+{\bf A}_1,t) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)$ is $64$ propagators, need to solved by $8$ sources. Since it is a \index{wall source}wall source, to make sure \textbf{gauge invariance}, this correlator should be measured in \textcolor[rgb]{0,0,1}{\textbf{Coulomb gauge}}. How to fix the gauge is introduced in Sec.~\ref{sec:CoulombGauge}.
+
+The expression of the sources are
+\begin{equation}
+\begin{split}
+&s_{\bf A}({\bf n}, t) = \sum _{{\bf x}} \delta _{2{\bf x}+{\bf A},{\bf n}}\delta _{t,n_4}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{Fitofstaggeredcorrelator}Fit of staggered correlator}
+
+The correlator contains two meson propagators, so the fitting is
+\begin{equation}
+\begin{split}
+&C(t)=A_+ \left(\exp(-m_+t)+\exp (-m_+(L_t-t))\right) + (-1)^t A_- \left(\exp(-m_-t)+\exp (-m_-(L_t-t))\right)\\
+\end{split}
+\end{equation}
+where $m_{\pm}$ is the mass of $P=\pm \sigma _s$.

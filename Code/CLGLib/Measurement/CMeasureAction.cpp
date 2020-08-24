@@ -35,13 +35,13 @@ void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, co
             for (UINT j = 0; j < m_iFermionFieldCount; ++j)
             {
                 appGetLattice()->m_pActionList[i]->PrepareForHMC(pAcceptGauge, 0);
-                fToBeAdd += appGetLattice()->m_pActionList[i]->Energy(TRUE, pAcceptGauge);
+                fToBeAdd += appGetLattice()->m_pActionList[i]->Energy(FALSE, pAcceptGauge);
             }
             plaqutteEneregy += (fToBeAdd / m_iFermionFieldCount);
         }
         else
         {
-            plaqutteEneregy += appGetLattice()->m_pActionList[i]->Energy(TRUE, pAcceptGauge);
+            plaqutteEneregy += appGetLattice()->m_pActionList[i]->Energy(FALSE, pAcceptGauge);
         }
         
     }

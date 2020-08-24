@@ -32,6 +32,8 @@ public:
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     CCString GetInfos(const CCString &tab) const override;
 
+    void SetAutoCorrection(UBOOL bAutoCorrection) override { m_bMetropolis = bAutoCorrection; }
+
 protected:
 
     UBOOL m_bMetropolis;

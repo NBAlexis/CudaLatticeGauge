@@ -68,7 +68,7 @@ _kernalBakeBondInfo_Torus(BYTE* pDeviceData)
 
 CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondition()
 {
-    for (UINT i = 0; i < _kMaxFieldCount; ++i)
+    for (UINT i = 0; i < kMaxFieldCount; ++i)
     {
         m_FieldBC[i].x = 1;
         m_FieldBC[i].y = 1;
@@ -81,7 +81,7 @@ CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondit
 
 void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
 {
-    assert(byFieldId < _kMaxFieldCount);
+    assert(byFieldId < kMaxFieldCount);
     m_FieldBC[byFieldId] = bc.m_sPeriodic;
 }
 

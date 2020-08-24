@@ -45,8 +45,8 @@ CLatticeData::CLatticeData()
     , m_pGaugeFixing(NULL)
 {
     m_pFieldCache = new CFieldCache();
-    memset(m_pFermionSolver, 0, sizeof(CSLASolver*) * _kMaxFieldCount);
-    memset(m_pFermionMultiShiftSolver, 0, sizeof(CMultiShiftSolver*) * _kMaxFieldCount);
+    memset(m_pFermionSolver, 0, sizeof(CSLASolver*) * kMaxFieldCount);
+    memset(m_pFermionMultiShiftSolver, 0, sizeof(CMultiShiftSolver*) * kMaxFieldCount);
 }
 
 CLatticeData::~CLatticeData()
@@ -95,7 +95,7 @@ CLatticeData::~CLatticeData()
     appSafeDelete(m_pIndexCache);
     appSafeDelete(m_pRandom);
     appSafeDelete(m_pMeasurements);
-    for (BYTE byField = 0; byField < _kMaxFieldCount; ++byField)
+    for (BYTE byField = 0; byField < kMaxFieldCount; ++byField)
     {
         appSafeDelete(m_pFermionSolver[byField]);
         appSafeDelete(m_pFermionMultiShiftSolver[byField]);
@@ -269,7 +269,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
 
-    for (INT i = 0; i < _kMaxFieldCount; ++i)
+    for (INT i = 0; i < kMaxFieldCount; ++i)
     {
         if (NULL != m_pFermionSolver[i])
         {

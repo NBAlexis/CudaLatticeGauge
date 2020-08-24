@@ -77,6 +77,13 @@ Yukari~Yamauchi Henry~Lamm, Scott~Lawrence.
   Quantum Simulation of Gauge Theories}}.
 \newblock {\em Phys. Rev. D}, 100:034518, 2019, arXiv:1903.08807.
 
+\bibitem{staggeredRHMC}
+M.A. Clark and A.D. Kennedy.
+\newblock \href{http://dx.doi.org/10.1103/PhysRevD.75.011502}{{Accelerating
+  Staggered Fermion Dynamics with the Rational Hybrid Monte Carlo (RHMC)
+  Algorithm}}.
+\newblock {\em Phys. Rev. D}, 75:011502, 2007, arXiv:hep-lat/0610047.
+
 \bibitem{templates}
 R.~Barrett, M.~Berry, T.~F. Chan, J.~Demmel, J.~Donato, J.~Dongarra,
   V.~Eijkhout, R.~Pozo, C.~Romine, and H.~Van der Vorst.
@@ -133,6 +140,18 @@ K.~Schilling H.~Suman.
 \newblock \href{http://arxiv.org/abs/hep-lat/9306018}{{A Comperative Study of
   Gauge Fixing Procedures on the Connection Machines CM2 and CM5}}.
 \newblock 1993, arXiv:hep-lat/9306018.
+
+\bibitem{staggeredQuarks}
+H.~Kluberg-Stern, A.~Morel, O.~Napoly, and B.~Petersson.
+\newblock \href{http://dx.doi.org/10.1016/0550-3213(83)90501-1}{{Flavors of
+  Lagrangian Susskind Fermions}}.
+\newblock {\em Nucl. Phys. B}, 220:447--470, 1983.
+
+\bibitem{staggeredMeson}
+N.~Ishizuka, M.~Fukugita, H.~Mino, M.~Okawa, and A.~Ukawa.
+\newblock \href{http://dx.doi.org/10.1016/0550-3213(94)90475-8}{{Operator
+  dependence of hadron masses for Kogut-Susskind quarks on the lattice}}.
+\newblock {\em Nucl. Phys. B}, 411:875--902, 1994.
 
 \bibitem{rotation}
 Y.~Hirono A.~Yamamoto.

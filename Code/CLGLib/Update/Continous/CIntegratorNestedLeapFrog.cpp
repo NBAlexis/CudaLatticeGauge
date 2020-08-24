@@ -28,42 +28,19 @@ void CIntegratorNestedLeapFrog::Evaluate()
     {
         if (uiStep < m_uiStepCount)
         {
-            NestedEvaluate(FALSE);
+            NestedEvaluateLeapfrog(FALSE);
             UpdatePF(m_fEStep, ESP_InTrajectory);
             appDetailed("  leap frog sub step %d\n", uiStep);
         }
         else
         {
-            NestedEvaluate(TRUE);
+            NestedEvaluateLeapfrog(TRUE);
             UpdatePF(fHalfPstep, ESP_EndTrajectory);
             appDetailed("  leap frog last step %d\n", uiStep);
         }
     }
 
     FinishEvaluate();
-}
-
-void CIntegratorNestedLeapFrog::NestedEvaluate(UBOOL bLast)
-{
-    const Real fHalfPstep = F(0.5) * m_fNestedStepLength;
-    UpdatePG(fHalfPstep, FALSE);
-    appDetailed("  leap frog nested sub step 0\n");
-
-    for (UINT uiStep = 1; uiStep < m_uiNestedStep + 1; ++uiStep)
-    {
-        UpdateU(m_fNestedStepLength);
-
-        if (uiStep < m_uiNestedStep)
-        {
-            UpdatePG(m_fNestedStepLength, FALSE);
-            appDetailed("  leap frog nested sub step %d\n", uiStep);
-        }
-        else
-        {
-            UpdatePG(fHalfPstep, bLast);
-            appDetailed("  leap frog nested last step %d\n", uiStep);
-        }
-    }
 }
 
 CCString CIntegratorNestedLeapFrog::GetInfos(const CCString& sTab) const

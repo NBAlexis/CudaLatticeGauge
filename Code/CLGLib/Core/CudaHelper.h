@@ -18,7 +18,7 @@ __BEGIN_NAMESPACE
 
 enum 
 {
-    kContentLength = 256, _kMaxFieldCount = 8,
+    kContentLength = 256, kMaxFieldCount = 16,
 };
 
 extern __constant__ UINT _constIntegers[kContentLength];
@@ -27,8 +27,8 @@ extern __constant__ Real _constFloats[kContentLength];
 /**
 * Note that, the pointers are copyied here. So the virtual functions should not be used!
 */
-extern __constant__ class CField* __fieldPointers[_kMaxFieldCount];
-extern __constant__ class CFieldBoundary* __boundaryFieldPointers[_kMaxFieldCount];
+extern __constant__ class CField* __fieldPointers[kMaxFieldCount];
+extern __constant__ class CFieldBoundary* __boundaryFieldPointers[kMaxFieldCount];
 
 extern __constant__ class CRandom* __r;
 extern __constant__ class CIndexData* __idx;
@@ -176,7 +176,7 @@ public:
         
         //checkCudaErrors(cudaFree(m_pIndexBuffer));
 
-        for (UINT i = 0; i < _kMaxFieldCount; ++i)
+        for (UINT i = 0; i < kMaxFieldCount; ++i)
         {
             if (NULL != m_deviceFieldPointers[i])
             {
@@ -200,8 +200,8 @@ public:
     //struct SIndex* m_pIndexBuffer;
     CLGComplex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
-    class CField * m_deviceFieldPointers[_kMaxFieldCount];
-    class CFieldBoundary * m_deviceBoundaryFieldPointers[_kMaxFieldCount];
+    class CField * m_deviceFieldPointers[kMaxFieldCount];
+    class CFieldBoundary * m_deviceBoundaryFieldPointers[kMaxFieldCount];
 
     //thread per grid ( = volumn)
     UINT m_uiThreadCount;

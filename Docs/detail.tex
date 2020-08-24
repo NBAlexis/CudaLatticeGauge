@@ -2,10 +2,10 @@
 \usepackage{geometry}
 
 \newcommand{\citeu}[1]{$^{\mbox{\protect \scriptsize \cite{#1}}}$}
-\usepackage{amssymb}
-\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage{bm}
+%\usepackage{bm}
 \usepackage{epsf}
 \usepackage{ifxetex}
 \usepackage[numbers,sort&compress]{natbib}% 此命令要放在设置hyperref的命令之前
@@ -13,7 +13,7 @@
 \usepackage{float}
 \usepackage{dcolumn}   % needed for some tables
 \usepackage{bm}        % for math
-\usepackage{amssymb}   % for math
+\usepackage{amssymb}   % for math - conflict with stix
 \usepackage{slashed}   % for Dirac Slash
 \usepackage{amsmath}   % for mutiline eqn
 \usepackage{simplewick} % for contraction
@@ -26,8 +26,13 @@
 \usepackage{listings}
 \usepackage{xcolor}
 
-\usepackage{amsmath}
-\usepackage{amssymb}
+% special symbols
+\usepackage{manfnt}
+%\usepackage{cypriot}
+%\usepackage{stix}
+
+%\usepackage{amsmath}
+%\usepackage{amssymb}
 %\usepackage{ctex}  %就是在这里引入了ctex宏包，下面就可以直接输入中文编译之后就可以正常输出啦
 
 \usepackage{algorithm,algpseudocode}
@@ -157,6 +162,8 @@
 \input "Measurement/ChiralCondensateOfWilsonFermion.tex"
 
 \input "Measurement/Stochastic.tex"
+
+\input "Measurement/StaggeredFermiomSpectrum.tex"
 
 \clearpage
 

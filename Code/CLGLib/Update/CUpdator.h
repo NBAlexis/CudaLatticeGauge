@@ -60,6 +60,8 @@ public:
         m_bTestHDiff = bTestHDiff;
     }
 
+    virtual void SetAutoCorrection(UBOOL bAutoCorrection) = 0;
+
     Real GetHDiff() const
     {
         if (0 == m_lstHDiff.Num())

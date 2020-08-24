@@ -14,7 +14,7 @@ The problem is how to evaluate $\left(\det [D]\right)^{\alpha}$. Before that, we
 
 \subsubsection{\label{sec:rationalapproximation}The \index{rational approximation}rational approximation and Remes algorithm}
 
-The first thing to do is to find a rational approximation of a function, here we use \index{Remes algorithm}Remes algorithm as proposed by Ref.
+The first thing to do is to find a rational approximation of a function, here we use \index{Remes algorithm}Remes algorithm as proposed by Ref.~\cite{staggeredRHMC}
 
 The Remes algorithm is implemented in Mathematica, which finds
 \begin{equation}
@@ -30,6 +30,8 @@ Join[\{Part[res1, 1]\}, Table[Numerator[Part[res1, n]], {n, 2, 4}], Table[Denomi
 \end{lstlisting}
 
 \subsubsection{\label{sec:hmcofrhmc}The RHMC with \texorpdfstring{$N_f=2$}{Nf=2}}
+
+We mainly follow Ref.~\cite{staggeredRHMC}.
 
 Similar as the HMC, the first step is to rewrite the action use a Boson field~(pseudo-fermion field), still starting with
 \begin{equation}
@@ -56,7 +58,7 @@ For $N_f=2$, before the 4th root, it is
 &Z=\int \mathcal{D}[U] \left(\det D_{st}^{\dagger}D_{st} \right)\exp \left(-S_G[U]\right)\\
 \end{split}
 \end{equation}
-Note that because $D_{st0}$ for massless is anti-Hermitian, $D_{st}^{\dagger}D_{st}=-\frac{1}{4a^2}D_{st0}^2+m^2$, for simplicity we denote $A=-D_{st0}^2+m^2$ (with a rescale of $\psi$ assumed), using
+Note that because $D_{st0}$ for massless is anti-Hermitian, $D_{st}^{\dagger}D_{st}=-\frac{1}{4a^2}D_{st0}^2+m^2$, for simplicity we denote $A=-D_{st0}^2+4a^2m^2$ (with a rescale of $\psi$ assumed), using
 \begin{equation}
 \begin{split}
 &\det A = \frac{1}{ \det A^{-1} }=\int \mathcal{D}[\phi] \exp (-\phi^{\dagger} A^{-1} \phi).\\
@@ -208,3 +210,50 @@ Some tips on RHMC of staggered fermions:
   \item Let $r_1(M)\approx M^{a}$, $r_2(M)\approx M^{b}$, $r_1(M)$ is generally less accurate than $(r_2(M))^{1/b}$ when $b>1$.
   \item For $N_f=2+1$, there are other optimizations.
 \end{itemize}
+
+\subsubsection{\label{sec:hmcofrhmcnf2p1}The RHMC with \texorpdfstring{$N_f=2+1$}{Nf=2+1}}
+
+Before we continue, it is necessary to extend the nested integrator, here we use Force gradient because it is the best one, a two level integrator is introduced in Sec.~\ref{sec:MultiRateUpdator}, which is modified as
+\begin{equation}
+\begin{split}
+&\Delta (h) =\exp (\frac{h}{6} S_F)\Delta _m (\frac{h}{2m})\exp(\frac{2}{3}h S_F+\frac{1}{72}h^3 C_F)\Delta _m(\frac{h}{2m}) \exp (\frac{h}{6} S_F),\\
+&\Delta _m(\textcolor[rgb]{1,0,0}{h})=\left(\exp(\frac{h}{6 } S_G)\exp(\frac{h}{2}T)\exp\left(\frac{2}{3}h S_G+\frac{1}{72}h^3 C_G\right)\exp(\frac{h}{2}T)\exp(\frac{h}{6}S_G)\right)^m.\\
+\end{split}
+\end{equation}
+
+The Lagrangian of $N_f=2+1$ is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi _1^{\dagger} A_{ud}^{-\frac{1}{2}} \phi _1 -\phi _2 ^{\dagger} A_s^{-\frac{1}{4}} \phi _2\right)\\
+\end{split}
+\end{equation}
+where $A=D^{\dagger}D$~(Note that it is always $A^{-\frac{N_f}{4}}$). Which is also
+\begin{equation}
+\begin{split}
+&Z= \left(\det \left[A_{ud}\right]\right)^{\frac{1}{2}}\left(\det \left[A_{s}\right]\right)^{\frac{1}{4}}\int \mathcal{D}[U]  \exp \left(-S_G[U]\right)\\
+& = \frac{\left(\det \left[A_{ud}\right]\right)^{\frac{1}{2}}}{\left(\det \left[A_{ud}\right]\right)^{\frac{1}{2}}}\left(\det \left[A_{s}\right]\right)^{\frac{3}{4}}\int \mathcal{D}[U]  \exp \left(-S_G[U]\right)\\
+& = \left(\det \left[\frac{A_{ud}}{A_{ud}}\right]\right)^{\frac{1}{2}}\left(\det \left[A_{s}\right]\right)^{\frac{3}{4}}\int \mathcal{D}[U]  \exp \left(-S_G[U]\right)\\
+&=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi _1^{\dagger} \left(\frac{A_{s}}{A_{ud}}\right)^{\frac{1}{2}} \phi _1 -\phi _2 ^{\dagger} A_s^{-\frac{3}{4}} \phi _2\right)\\
+\end{split}
+\end{equation}
+using $A_{ud,s}=-D_{st0}^2+4a^2m_{ud,s}^2$, so $A_s=A_{ud}+4a^2(m_s^2-m_{ud}^2)$. Defining $\delta m^2 = m_s^2-m_{ud}^2$, it is
+\begin{equation}
+\begin{split}
+&Z= \int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi _1^{\dagger} \left(\frac{A_{ud}+4a^2\delta m^2}{A_{ud}}\right)^{\frac{1}{2}} \phi _1 -\phi _2 ^{\dagger} A_s^{-\frac{3}{4}} \phi _2\right)\\
+\end{split}
+\end{equation}
+This is called \index{mass precondition}`mass precondition', the force from the $D_{ud}$ is much smaller and one can have a three level nested integrator. Defining
+\begin{equation}
+\begin{split}
+&r_{1,MC}(x) =  \left(\frac{x+4a^2\delta m^2}{x}\right)^{-\frac{1}{4}},\;\;r_{2,MC}(x)=  x^{\frac{3}{8}}\\
+&r_{1,MD}(x) =  \left(\frac{x+4a^2\delta m^2}{x}\right)^{\frac{1}{2}},\;\;r_{2,MD}(x)=  x^{-\frac{3}{4}}\\
+\end{split}
+\end{equation}
+All the other steps are same as $N_f=2$.
+
+\subsubsection{\label{sec:multifieldOptimization}Multi field Optimization}
+
+The multi-level nested integrator is useless compared with multi field optimization. Instead of evaluating $\bar{\psi} A \psi$, one use $\sum _i^{\alpha} \bar{\psi _i} A^{\frac{1}{\alpha}} \psi _i$. Typically, the force from the $s$ quark is much larger than the mass preconditioned $u,d$ quarks, so we can use $\sum _{i=1,2,3} \bar{\psi _i} A^{-\frac{1}{4}} \psi _i$ instead of $\bar{\psi} A^{-\frac{3}{4}} \psi$. And then use a nested integrator.
+
+\textbf{\textcolor[rgb]{0,0,1}{I don't know why but it is tested that Omelyan nested with leapfrog is the best choice, better than approximate force gradient.}}
+

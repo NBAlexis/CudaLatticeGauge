@@ -291,7 +291,10 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Update/Continous/CIntegratorForceGradient.h"
 #include "Update/Continous/CIntegratorNestedLeapFrog.h"
 #include "Update/Continous/CIntegratorNestedOmelyan.h"
+#include "Update/Continous/CIntegratorNested11Stage.h"
 #include "Update/Continous/CIntegratorNestedForceGradient.h"
+#include "Update/Continous/CIntegratorMultiLevelNestedOmelyan.h"
+#include "Update/Continous/CIntegratorMultiLevelNestedForceGradient.h"
 #include "Update/Continous/CHMC.h"
 
 #include "Core/CLGLibManager.h"

@@ -38,19 +38,40 @@ void CIntegratorNestedOmelyan::Evaluate()
 
     for (UINT uiStep = 1; uiStep < m_uiStepCount + 1; ++uiStep)
     {
-        NestedEvaluate(FALSE);
-        UpdatePF(m_fEStep * (F(1.0) - m_f2Lambda), ESP_InTrajectory);
+        if (m_bInnerLeapFrog)
+        {
+            NestedEvaluateLeapfrog(FALSE);
+        }
+        else
+        {
+            NestedEvaluate(FALSE);
+        }
         
+        UpdatePF(m_fEStep * (F(1.0) - m_f2Lambda), ESP_InTrajectory);
 
         if (uiStep < m_uiStepCount)
         {
-            NestedEvaluate(FALSE);
+            if (m_bInnerLeapFrog)
+            {
+                NestedEvaluateLeapfrog(FALSE);
+            }
+            else
+            {
+                NestedEvaluate(FALSE);
+            }
             appDetailed("  Omelyan sub step %d\n", uiStep);
             UpdatePF(m_fEStep * m_f2Lambda, ESP_InTrajectory);
         }
         else
         {
-            NestedEvaluate(TRUE);
+            if (m_bInnerLeapFrog)
+            {
+                NestedEvaluateLeapfrog(TRUE);
+            }
+            else
+            {
+                NestedEvaluate(TRUE);
+            }
             appDetailed("  Omelyan last step %d\n", uiStep);
             UpdatePF(m_f2Lambda * fHalfEstep, ESP_EndTrajectory);
         }
