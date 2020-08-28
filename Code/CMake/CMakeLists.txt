@@ -134,6 +134,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegrator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorLeapFrog.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedForceGradient.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedOmelyan.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNested11Stage.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.h
@@ -191,6 +194,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverTFQMR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedForceGradient.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedOmelyan.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNested11Stage.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedLeapFrog.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorNestedOmelyan.cpp
