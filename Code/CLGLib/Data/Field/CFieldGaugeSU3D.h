@@ -214,6 +214,63 @@ static __device__ __inline__ deviceSU3 _devicePlaqutte(
     return toAdd;
 }
 
+/**
+ * pDir[] is dirs of path, the dir is:
+ *  x,y,z,t : 1,2,3,4
+ *  -x,-y,-z,-t: -1,-2,-3,-4
+ */
+static __device__ __inline__ deviceSU3 _deviceLink(
+    const deviceSU3* __restrict__ pDeviceData,
+    UINT uiStartBigIdx, BYTE byLength, BYTE byFieldId,
+    const INT* __restrict__ pDir)
+{
+    const UINT uiDir1 = _DC_Dir;
+    const UINT uiDir2 = uiDir1 * 2;
+    deviceSU3 sRet;
+    for (BYTE i = 0; i < byLength; ++i)
+    {
+        //printf("i = %d dirs = %d\n", static_cast<INT>(i), pDir[i]);
+        
+        UBOOL bDagger = FALSE;
+        const BYTE byDir = pDir[i] > 0 ? 
+            static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
+        //printf("i = %d dirs = %d\n", static_cast<INT>(i), static_cast<INT>(byDir));
+        if (pDir[i] < 0) //Move
+        {
+            bDagger = TRUE;
+            uiStartBigIdx = __idx->m_pWalkingTable[uiStartBigIdx * uiDir2 + byDir];
+        }
+
+        if (0 == i)
+        {
+            sRet = _deviceGetGaugeBCSU3Dir(pDeviceData, uiStartBigIdx, byDir);
+            if (bDagger)
+            {
+                sRet.Dagger();
+            }
+        }
+        else
+        {
+            if (bDagger)
+            {
+                sRet.MulDagger(_deviceGetGaugeBCSU3Dir(pDeviceData, uiStartBigIdx, byDir));
+            }
+            else
+            {
+                sRet.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiStartBigIdx, byDir));
+            }
+        }
+
+        if (pDir[i] > 0) //Move
+        {
+            uiStartBigIdx = __idx->m_pWalkingTable[uiStartBigIdx * uiDir2 + byDir + uiDir1];
+        }
+        
+    }
+
+    return sRet;
+}
+
 #pragma endregion
 
 __END_NAMESPACE

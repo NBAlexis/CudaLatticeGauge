@@ -190,7 +190,7 @@ TestAngularMomentum:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 6]
+    LatticeLength : [6, 6, 4, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1

@@ -102,7 +102,7 @@ _kernelCalculateJGSurf(
     intokernalOnlyInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (!site.IsDirichlet())
     {
@@ -146,7 +146,7 @@ _kernelCalculateJGSurf(
             a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
-            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(a);
             fRes -= u.ReTr();
         }
 
@@ -155,6 +155,10 @@ _kernelCalculateJGSurf(
     }
 }
 
+/**
+ * This is (nabla . E) r x A
+ * In z-dir this is (nabla . E) (x Ay - y Ax)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGPot(
     SSmallInt4 sCenter,
@@ -168,13 +172,13 @@ _kernelCalculateJGPot(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-
+    const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
     if (!site.IsDirichlet())
     {
         const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
         const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
 
-        deviceSU3 nablaE(_deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, 3));
+        deviceSU3 nablaE(pE[uiNablaE]);
         deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
         a.MulReal(fX);
         a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
@@ -276,19 +280,21 @@ _kernelMomemtumJGChen(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
-    CLGComplex res = _zeroc;
+    Real res = F(0.0);
     if (!site.IsDirichlet())
     {
         //only calculate x,y,z
         for (BYTE dir = 0; dir < uiDir - 1; ++dir)
         {
-            deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(pXcrossDpureA[_deviceGetLinkIndex(uiSiteIndex, dir)]);
-            res = _cuCaddf(res, beforeTrace.Tr());
+            deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir);
+            beforeTrace.Mul(pXcrossDpureA[_deviceGetLinkIndex(uiSiteIndex, dir)]);
+            res += beforeTrace.ReTr(); // _cuCaddf(res, beforeTrace.Tr());
         }
 
         //res = cuCmulf_cr(res, fBetaOverN * F(0.5));
-        res = cuCmulf_cr(res, fBetaOverN);
-        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
+        //res = cuCmulf_cr(res, fBetaOverN);
+        //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res * fBetaOverN);
     }
 }
 
@@ -657,7 +663,9 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
 #pragma region JGPot
 
+            //checkCudaErrors(cudaGetLastError());
             pGaugeSU3->CalculateNablaE_Using_U(m_pE);
+            //checkCudaErrors(cudaGetLastError());
             _ZeroXYPlane(m_pDeviceDataBuffer);
             _kernelCalculateJGPot << <block, threads >> > (
                 CCommonData::m_sCenter,

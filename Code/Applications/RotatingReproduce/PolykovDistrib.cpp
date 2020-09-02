@@ -31,7 +31,9 @@ void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
 
 #endif
 
-CCString ExportComplexArray(const TArray<CLGComplex> lst)
+#if USELESS
+
+CCString ExportComplexArray(const TArray<CLGComplex>& lst)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     CCString sSaveString = _T("");
@@ -57,7 +59,7 @@ CCString ExportComplexArray(const TArray<CLGComplex> lst)
     return sSaveString;
 }
 
-CCString ExportComplexArray2(const TArray<TArray<CLGComplex>> lst)
+CCString ExportComplexArray2(const TArray<TArray<CLGComplex>>& lst)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     CCString sSaveString = _T("");
@@ -87,7 +89,7 @@ CCString ExportComplexArray2(const TArray<TArray<CLGComplex>> lst)
     return sSaveString;
 }
 
-CCString ExportRealArray(const TArray<Real> lst)
+CCString ExportRealArray(const TArray<Real>& lst)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     CCString sSaveString = _T("");
@@ -104,7 +106,7 @@ CCString ExportRealArray(const TArray<Real> lst)
     return sSaveString;
 }
 
-CCString ExportRealArray2(const TArray<TArray<Real>> lst)
+CCString ExportRealArray2(const TArray<TArray<Real>>& lst)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     CCString sSaveString = _T("");
@@ -124,9 +126,167 @@ CCString ExportRealArray2(const TArray<TArray<Real>> lst)
     return sSaveString;
 }
 
+#endif
+
 void WriteStringFile(const CCString& sFileName, const CCString& sContent)
 {
     appGetFileSystem()->WriteAllText(sFileName, sContent);
+}
+
+void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.Num(); ++i)
+    {
+        _gcvt_s(str, 50, lst[i], iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        file << _T(" ");
+        file << sReal;
+        if (i != lst.GetCount() - 1)
+        {
+            file << _T(",");
+        }
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Real>>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            _gcvt_s(str, 50, lst[i][j], iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            file << _T(" ");
+            file << sReal;
+            if (j != lst[i].GetCount() - 1)
+            {
+                file << _T(",");
+            }
+        }
+        file << _T("\n");
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileComplexArray(const CCString& sFileName, const TArray<CLGComplex>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.Num(); ++i)
+    {
+        _gcvt_s(str, 50, lst[i].x, iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        _gcvt_s(str, 50, lst[i].y, iDigital);
+        CCString sImg = CCString(str);
+        sImg = sImg.Replace(_T("e"), _T("*^"));
+        CCString sMid = _T(" + ");
+        if (sImg.Left(1) == _T("-"))
+        {
+            sImg = sImg.Right(sImg.GetLength() - 1);
+            sMid = _T(" - ");
+        }
+
+        file << _T(" ");
+        file << sReal;
+        file << sMid;
+        file << sImg;
+        if (i == lst.GetCount() - 1)
+        {
+            file << _T(" I");
+        }
+        else
+        {
+            file << _T(" I,");
+        }
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    
+    TCHAR str[50];
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            _gcvt_s(str, 50, lst[i][j].x, iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            _gcvt_s(str, 50, lst[i][j].y, iDigital);
+            CCString sImg = CCString(str);
+            sImg = sImg.Replace(_T("e"), _T("*^"));
+            CCString sMid = _T(" + ");
+            if (sImg.Left(1) == _T("-"))
+            {
+                sImg = sImg.Right(sImg.GetLength() - 1);
+                sMid = _T(" - ");
+            }
+            file << _T(" ");
+            file << sReal;
+            file << sMid;
+            file << sImg;
+            if (j == lst[i].GetCount() - 1)
+            {
+                file << _T(" I");
+            }
+            else
+            {
+                file << _T(" I,");
+            }
+        }
+        file << _T("\n");
+    }
+    file.flush();
+    file.close();
 }
 
 void AppendStringFile(const CCString& sFileName, const CCString& sContent)
@@ -428,7 +588,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     {
                         lstR.AddItem(_hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
                     }
-                    WriteStringFile(sFileNameWrite1, ExportRealArray(lstR));
+                    WriteStringFileRealArray(sFileNameWrite1, lstR);
                 }
 
                 TArray<TArray<CLGComplex>> polyakovOmgR;
@@ -448,7 +608,7 @@ INT MeasurePolyakovDist(CParameters& params)
                 }
                 lstPolyIn.AddItem(polyIn);
                 lstPolyOut.AddItem(polyOut);
-                WriteStringFile(sFileNameWrite2, ExportComplexArray2(polyakovOmgR));
+                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
             }
             break;
             case EDJ_Chiral:
@@ -472,7 +632,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
+                    WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -503,7 +663,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
+                    WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -547,7 +707,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_angularR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFile(sRadiousFile, ExportRealArray(lstRadius));
+                    WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
             }
             break;
@@ -555,7 +715,7 @@ INT MeasurePolyakovDist(CParameters& params)
             {
                 CCString sFileName;
                 sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
-                WriteStringFile(sFileName, ExportRealArray(pPE->m_lstData));
+                WriteStringFileRealArray(sFileName, pPE->m_lstData);
             }
             break;
             default:
@@ -573,8 +733,8 @@ INT MeasurePolyakovDist(CParameters& params)
             CCString sFileNameWrite2;
             sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
             sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-            WriteStringFile(sFileNameWrite1, ExportComplexArray2(lstPolyIn));
-            WriteStringFile(sFileNameWrite2, ExportComplexArray2(lstPolyOut));
+            WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
+            WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
         }
         break;
         case EDJ_Chiral:

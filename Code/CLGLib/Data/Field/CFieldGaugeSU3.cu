@@ -544,15 +544,17 @@ _kernelTransformToE(
     }
 }
 
+/**
+ * This is wrong! the order of the plaqutte must be considered
+ * This is to make sure gauge transform is g(x) nabla E g^+(n)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateNablaE(
     const deviceSU3* __restrict__ pDeviceData,
-    const SIndex* __restrict__ pCachedPlaqutte,
-    BYTE plaqLength, BYTE plaqCount,
     BYTE byFieldId, deviceSU3* pRes)
 {
     intokernalInt4;
-    const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
+    //const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
 
@@ -570,15 +572,33 @@ _kernelCalculateNablaE(
     for (BYTE dir = 0; dir < 3; ++dir)
     {
         //we need 2, 4 and 5
-        BYTE byPlaqIdx = (dir + 1) << 1;
-        if (byPlaqIdx > 5) byPlaqIdx = 5;
+        //BYTE byPlaqIdx = (dir + 1) << 1;
+        //if (byPlaqIdx > 5) byPlaqIdx = 5;
 
-        deviceSU3 toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+        INT dirs[4];
+        //deviceSU3 toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+        dirs[0] = dir + 1;
+        dirs[1] = 4;
+        dirs[2] = dir;
+        dirs[2] = -dirs[2] - 1;
+        dirs[3] = -4;
+        deviceSU3 toMul(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLink(pDeviceData, uiBigIdx, 4, byFieldId, dirs)
+        );
 
-        const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex;
+        //const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
+        //const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex;
 
-        toMul.MulDagger(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteN_m_nu, byPlaqIdx, plaqLength, plaqCount));
+        //
+        dirs[0] = 4;
+        dirs[1] = dir;
+        dirs[1] = -dirs[1] - 1;
+        dirs[2] = -4;
+        dirs[3] = dir + 1;
+        toMul.MulDagger(
+            _deviceLink(pDeviceData, uiBigIdx, 4, byFieldId, dirs)
+        );
         pRes[uiResLinkIdx].Add(toMul);
     }
 
@@ -1091,9 +1111,6 @@ void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult) const
     preparethread;
     _kernelCalculateNablaE << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-        appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
-        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         m_byFieldId,
         pUField->m_pDeviceData);
 }

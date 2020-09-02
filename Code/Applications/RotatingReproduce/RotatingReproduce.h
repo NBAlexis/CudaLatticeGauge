@@ -48,9 +48,9 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##In.AddItem(measureName->m_lst##lstName##Inner[j]); \
     lstName##All.AddItem(measureName->m_lst##lstName##All[j]); \
 } \
-WriteStringFile(sFileNameWrite##lstName, ExportRealArray2(lstName##OverR)); \
-WriteStringFile(sFileNameWrite##lstName##In, ExportRealArray(lstName##In)); \
-WriteStringFile(sFileNameWrite##lstName##All, ExportRealArray(lstName##All));
+WriteStringFileRealArray2(sFileNameWrite##lstName, lstName##OverR); \
+WriteStringFileRealArray(sFileNameWrite##lstName##In, lstName##In); \
+WriteStringFileRealArray(sFileNameWrite##lstName##All, lstName##All);
 
 
 enum ECondList
@@ -86,8 +86,8 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##OverR.AddItem(thisConfiguration); \
     lstName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
 } \
-WriteStringFile(sFileNameWrite##lstName, ExportComplexArray2(lstName##OverR)); \
-WriteStringFile(sFileNameWrite##lstName##All, ExportComplexArray(lstName##All)); 
+WriteStringFileComplexArray2(sFileNameWrite##lstName, lstName##OverR); \
+WriteStringFileComplexArray(sFileNameWrite##lstName##All, lstName##All); 
 
 
 //=============================================================================

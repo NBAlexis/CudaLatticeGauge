@@ -15,7 +15,7 @@ JobSimulate:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibStep : 300
-    SaveStartIndex : 28
+    SaveStartIndex : 90
 
     SavePrefix : ./5005002/5005002_
 
@@ -45,8 +45,8 @@ JobSimulate:
         InnerLeapfrog : 1
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 10
-        NestedStep : 15
+        IntegratorStep : 6
+        NestedStep : 30
 
     Gauge:
 
@@ -54,7 +54,7 @@ JobSimulate:
         # FieldInitialType : EFIT_Random
         FieldInitialType : EFIT_ReadFromFile
         GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./5005002/5005002_Matching_28.con
+        GaugeFileName : ./5005002/5005002_Matching_97.con
 
         Period : [1, 1, 1, 1]
 

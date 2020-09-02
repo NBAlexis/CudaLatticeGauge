@@ -42,6 +42,10 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJFLJM2 = F(0.0);
     Real fJFPot1 = F(0.0);
     Real fJFPot2 = F(0.0);
+    Real fJGSurf1 = F(0.0);
+    Real fJGSurf2 = F(0.0);
+    Real fJGPot1 = F(0.0);
+    Real fJGPot2 = F(0.0);
 
     //====== Step 1 ========
     //Gauge fixing to Coulomb
@@ -62,6 +66,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJG1 = pJG->m_lstJGAll[0];
     fJGS1 = pJG->m_lstJGSAll[0];
     fJGChen1 = pJG->m_lstJGChenAll[0];
+    fJGSurf1 = pJG->m_lstJGSurfAll[0];
+    fJGPot1 = pJG->m_lstJGPotAll[0];
     fJGChenApprox1 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
     fJGChenApprox21 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2All[0] : F(0.0);
     fJFL1 = pJF->m_lstJLAll[0];
@@ -73,6 +79,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJG1In = pJG->m_lstJGInner[0];
     Real fJGS1In = pJG->m_lstJGSInner[0];
     Real fJGChen1In = pJG->m_lstJGChenInner[0];
+    Real fJGSurf1In = pJG->m_lstJGSurfInner[0];
+    Real fJGPot1In = pJG->m_lstJGPotInner[0];
     Real fJGChenApprox1In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxInner[0] : F(0.0);
     Real fJGChenApprox21In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2Inner[0] : F(0.0);
     Real fJFL1In = pJF->m_lstJLInner[0];
@@ -98,6 +106,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     fJG2 = pJG->m_lstJGAll[0];
     fJGS2 = pJG->m_lstJGSAll[0];
     fJGChen2 = pJG->m_lstJGChenAll[0];
+    fJGSurf2 = pJG->m_lstJGSurfAll[0];
+    fJGPot2 = pJG->m_lstJGPotAll[0];
     fJGChenApprox2 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
     fJGChenApprox22 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2All[0] : F(0.0);
     fJFL2 = pJF->m_lstJLAll[0];
@@ -109,6 +119,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     Real fJG2In = pJG->m_lstJGInner[0];
     Real fJGS2In = pJG->m_lstJGSInner[0];
     Real fJGChen2In = pJG->m_lstJGChenInner[0];
+    Real fJGSurf2In = pJG->m_lstJGSurfInner[0];
+    Real fJGPot2In = pJG->m_lstJGPotInner[0];
     Real fJGChenApprox2In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxInner[0] : F(0.0);
     Real fJGChenApprox22In = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApprox2Inner[0] : F(0.0);
     Real fJFL2In = pJF->m_lstJLInner[0];
@@ -163,6 +175,21 @@ UINT TestAngularMomentum(CParameters& sParam)
         ++uiError;
     }
 
+    if (appAbs(fJGChen1 - fJGChen2) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fJGSurf1 - fJGSurf2) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fJGPot1 - fJGPot2) > F(0.000001))
+    {
+        ++uiError;
+    }
+
     if (appAbs(fJFL1 - fJFL2) > F(0.000001))
     {
         ++uiError;
@@ -201,6 +228,21 @@ UINT TestAngularMomentum(CParameters& sParam)
         ++uiError;
     }
 
+    if (appAbs(fJGChen1In - fJGChen2In) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fJGSurf1In - fJGSurf2In) > F(0.000001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fJGPot1In - fJGPot2In) > F(0.000001))
+    {
+        ++uiError;
+    }
+
     if (appAbs(fJFL1In - fJFL2In) > F(0.000001))
     {
         ++uiError;
@@ -232,6 +274,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGeneral(_T("Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1, fJG2, appAbs(fJG1 - fJG2));
     appGeneral(_T("Wa Decompose JGS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGS1, fJGS2, appAbs(fJGS1 - fJGS2));
     appGeneral(_T("Chen Decompose JGChen: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChen1, fJGChen2, appAbs(fJGChen1 - fJGChen2));
+    appGeneral(_T("JGSurf: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGSurf1, fJGSurf2, appAbs(fJGSurf1 - fJGSurf2));
+    appGeneral(_T("JGPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGPot1, fJGPot2, appAbs(fJGPot1 - fJGPot2));
     appGeneral(_T("Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox1, fJGChenApprox2, appAbs(fJGChenApprox1 - fJGChenApprox2));
     appGeneral(_T("Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox21, fJGChenApprox22, appAbs(fJGChenApprox21 - fJGChenApprox22));
 
@@ -247,16 +291,18 @@ UINT TestAngularMomentum(CParameters& sParam)
     //For Ji, Chen, Wak decomp, Sq (JFS) is the same
     //So, JFL + JG = Chen:  JFPure (Lq) + JGS + JGChen = Wak: JFL(Lq) + JGS + JGChen + JFPot
     //So, JG = JGS + JGChen + JFPot
-    appGeneral(_T("JFPure - JFL - JFPot = %2.12f (JFPure:%2.12f, JFL:%2.12f, JFPot:%2.12f)\n"), fJFLPure1 - fJFL1 - fJFPot1, fJFLPure1, fJFL1, fJFPot1);
-    appGeneral(_T("JG, JGS+JGChen-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 + fJGChen1 - fJFPot1);
-    appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 - fJFPot1);
-    appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 + fJFLJM1 - fJFL1);
+    //appGeneral(_T("JFPure - JFL - JFPot = %2.12f (JFPure:%2.12f, JFL:%2.12f, JFPot:%2.12f)\n"), fJFLPure1 - fJFL1 - fJFPot1, fJFLPure1, fJFL1, fJFPot1);
+    //appGeneral(_T("JG, JGS+JGChen-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 + fJGChen1 - fJFPot1);
+    //appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 - fJFPot1);
+    //appGeneral(_T("JG, JGS+JGChenApprox-JFPot, %2.12f, %2.12f\n"), fJG1, fJGS1 - fJGChenApprox1 + fJFLJM1 - fJFL1);
     appGeneral(_T("JGChen 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChen1, fJGChen2, fJGChen3, fJGChen4, fJGChen5);
     appGeneral(_T("JGChen Approx 1,2,3,4,5 = %f, %f, %f, %f, %f\n"), fJGChenApprox1, fJGChenApprox2, fJGChenApprox3, fJGChenApprox4, fJGChenApprox5);
 
     appGeneral(_T("Inner Ji Decompose JG: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJG1In, fJG2In, appAbs(fJG1In - fJG2In));
     appGeneral(_T("Inner Wa Decompose JGS: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGS1In, fJGS2In, appAbs(fJGS1In - fJGS2In));
     appGeneral(_T("Inner Chen Decompose JGChen: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGChen1In, fJGChen2In, appAbs(fJGChen1In - fJGChen2In));
+    appGeneral(_T("Inner JGSurf: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGSurf1In, fJGSurf2In, appAbs(fJGSurf1In - fJGSurf2In));
+    appGeneral(_T("Inner JGPot: Coulomb = %2.12f  vs  Random = %2.12f\n    delta = %2.12f\n"), fJGPot1In, fJGPot2In, appAbs(fJGPot1In - fJGPot2In));
     appGeneral(_T("Inner Chen Decompose JGChen Approx: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox1In, fJGChenApprox2In, appAbs(fJGChenApprox1In - fJGChenApprox2In));
     appGeneral(_T("Inner Chen Decompose JGChen Approx2: Coulomb = %2.12f  vs  Random = %2.12f\n    delta(!=0) = %2.12f\n"), fJGChenApprox21In, fJGChenApprox22In, appAbs(fJGChenApprox21In - fJGChenApprox22In));
 
