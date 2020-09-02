@@ -301,3 +301,19 @@ add_executable(MatchingRho
 
 target_compile_features(MatchingRho PUBLIC cxx_std_14)
 target_link_libraries(MatchingRho CLGLib)
+
+
+
+# ==================== 
+# Staggered Spectrum 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)
+add_executable(StaggeredSpectrum 
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.h
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Simulate.cpp
+    )
+
+target_compile_features(StaggeredSpectrum PUBLIC cxx_std_14)
+target_link_libraries(StaggeredSpectrum CLGLib)

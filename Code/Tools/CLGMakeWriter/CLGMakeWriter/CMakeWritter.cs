@@ -260,6 +260,28 @@ set_target_properties( CLGLib
 
             #endregion
 
+            #region Staggered Spectrum
+
+            CProjFile staggeredSpectrumProj = excutables["StaggeredSpectrum"];
+
+            sContent += "\n\n\n# ==================== \n# Staggered Spectrum \n# =================\n\n";
+            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)\n";
+            sContent += "add_executable(StaggeredSpectrum \n    ";
+            foreach (string sFileName in staggeredSpectrumProj.m_lstAllHeaderFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/" + sFileName + "\n    ";
+            }
+            foreach (string sFileName in staggeredSpectrumProj.m_lstAllCppFiles)
+            {
+                sContent += "${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/" + sFileName + "\n    ";
+            }
+            sContent += ")\n\n";
+
+            sContent += "target_compile_features(StaggeredSpectrum PUBLIC cxx_std_14)\n";
+            sContent += "target_link_libraries(StaggeredSpectrum CLGLib)\n";
+
+            #endregion
+
             sContent = sContent.Replace("\r\n", "\n");
             sContent = sContent.Replace("\n\r", "\n");
             sContent = sContent.Replace("\r", "\n");

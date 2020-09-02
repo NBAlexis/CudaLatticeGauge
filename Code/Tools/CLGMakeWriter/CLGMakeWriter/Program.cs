@@ -41,6 +41,9 @@ namespace CLGMakeWriter
             string projConstAccPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc" });
             string projConstAccFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc/ConstAcc.vcxproj" });
 
+            string projStaggeredSpectrumPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/StaggeredSpectrum" });
+            string projStaggeredSpectrumFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/StaggeredSpectrum/StaggeredSpectrum.vcxproj" });
+
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -74,6 +77,7 @@ namespace CLGMakeWriter
             apps.Add("MatchingRho", new CProjFile(projMatchingRhoFilePath, projMatchingRhoPath));
             apps.Add("ConfigurationCompresser", new CProjFile(projConfigurationCompresserFilePath, projConfigurationCompresserPath));
             apps.Add("ConstAcc", new CProjFile(projConstAccFilePath, projConstAccPath));
+            apps.Add("StaggeredSpectrum", new CProjFile(projStaggeredSpectrumFilePath, projStaggeredSpectrumPath));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 
