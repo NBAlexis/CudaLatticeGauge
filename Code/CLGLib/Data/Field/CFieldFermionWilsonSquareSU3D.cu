@@ -80,7 +80,10 @@ _kernelDFermionWilsonSquareSU3_D(
         deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
         //deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
         deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-        x_m_mu_Gauge_element.Dagger();
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
 
         //deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
         //deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];

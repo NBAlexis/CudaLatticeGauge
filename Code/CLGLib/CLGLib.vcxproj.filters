@@ -398,6 +398,12 @@
     <ClInclude Include="Update\Continous\CIntegratorNested11Stage.h">
       <Filter>Update\Continous</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3R.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h">
+      <Filter>Data\Boundary</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -633,6 +639,12 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3R.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu">
+      <Filter>Data\Boundary</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

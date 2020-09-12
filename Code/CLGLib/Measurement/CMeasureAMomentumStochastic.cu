@@ -65,7 +65,10 @@ _kernelDotAndGatherXYAMomentumJL(
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
         deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
         deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-        x_m_mu_Gauge_element.Dagger();
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
 
         deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
         deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);
@@ -234,7 +237,10 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
         deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
         deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-        x_m_mu_Gauge_element.Dagger();
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
 
         deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
         deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);
@@ -405,7 +411,11 @@ _kernelDotAndGatherXYAMomentumJPure(
         }
 
         deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-        x_m_mu_Gauge_element.Dagger();
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
+        
         //U^{dagger}(x-mu) phi(x-mu)
         phi_right = x_m_mu_Gauge_element.MulWilsonVector(_deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId));
         if (x_m_mu_Fermion.NeedToOpposite())
@@ -641,8 +651,8 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
 
 #pragma region JS
 
@@ -654,17 +664,20 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     const BYTE idir = 3;
     UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-    const SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-    const SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     const deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     const deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId);
     const deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, x_m_mu_Fermion, byFieldId);

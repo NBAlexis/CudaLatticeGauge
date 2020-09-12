@@ -90,6 +90,7 @@ public:
     void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) override;
     void BakeEtaMuTable(class CIndexData* pData) override;
     UINT GetPlaqutteCount() const override;
+
 };
 
 #pragma region device Functions

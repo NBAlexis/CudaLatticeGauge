@@ -62,7 +62,7 @@ public:
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
     Real CheckRes(const CFieldGauge* pGauge) override;
-    void GaugeFixingOneTimeSlice(deviceSU3* pResGauge, SBYTE uiT);
+    void GaugeFixingOneTimeSlice(deviceSU3* pResGauge, SBYTE uiT, BYTE byFieldId);
     
     CCString GetInfos(const CCString& sTab) const override;
 

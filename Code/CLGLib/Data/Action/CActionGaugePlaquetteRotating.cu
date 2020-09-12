@@ -890,10 +890,10 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     }
     m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
 
-    const CFieldGaugeSU3D* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3D*>(pGauge);
+    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     if (NULL == pGaugeSU3)
     {
-        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3-Dirichlet now.\n"));
+        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
         return m_fNewEnergy;
     }
 

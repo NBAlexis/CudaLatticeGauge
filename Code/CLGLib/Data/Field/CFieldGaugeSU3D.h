@@ -133,6 +133,59 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirSIndex(
+    const deviceSU3* __restrict__ pBuffer,
+    const SIndex& idx,
+    BYTE byFieldId)
+{
+    deviceSU3 ret = idx.IsDirichlet() ?
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+        ]
+        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+    if (idx.NeedToDagger())
+    {
+        ret.Dagger();
+    }
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirOneSIndex(
+    const deviceSU3* __restrict__ pBuffer,
+    const SIndex& idx)
+{
+    if (idx.IsDirichlet())
+    {
+        return deviceSU3::makeSU3Id();
+    }
+    if (idx.NeedToDagger())
+    {
+        return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)].DaggerC();
+    }
+
+    return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+}
+
+/**
+ * Note that, when get zero instead of one, it is minus not dagger
+ */
+static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZeroSIndex(
+    const deviceSU3* __restrict__ pBuffer,
+    const SIndex& idx)
+{
+    if (idx.IsDirichlet())
+    {
+        return deviceSU3::makeSU3Zero();
+    }
+    if (idx.NeedToDagger())
+    {
+        return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)].MulRealC(F(-1.0));
+    }
+
+    return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+}
+
 /**
  * calculate D_mu A _nu = Delta _mu + [A_mu, A _nu]
  * Use U now to calculate A pure
@@ -141,12 +194,15 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
 static __device__ __inline__ deviceSU3 _deviceDPureMu(
     const deviceSU3* __restrict__ piA, 
     const deviceSU3* __restrict__ piApure,
+    const SSmallInt4& sSite4,
     UINT uiBigIdx,
     BYTE byMu,
-    BYTE byNu)
+    BYTE byNu,
+    BYTE byFieldId)
 {
     //i a D A = (A_nu (n) - A_nu (n-mu)) + iApure _mu A _nu - i A _nu Apure _mu
-    const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
+    const UINT uiSiteBig_m_mu = __idx->_deviceGetBigIndex(
+        _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1));
 
     deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu); //Apure _mu
     deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu); //A _nu
@@ -154,7 +210,8 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu(
     res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu)); //Apure _mu A _nu
     res.Sub(res2); //[Apure, A]
     res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
-    res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu));
+    res.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(piA, 
+        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]));
     return res;
 }
 
@@ -164,21 +221,27 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu(
 static __device__ __inline__ deviceSU3 _deviceDPureMu2(
     const deviceSU3* __restrict__ piA,
     const deviceSU3* __restrict__ piApure,
+    const SSmallInt4& sSite4,
     UINT uiBigIdx,
     BYTE byMu,
-    BYTE byNu)
+    BYTE byNu,
+    BYTE byFieldId)
 {
     //i a D A = (A_nu (n+mu) - A_nu (n-mu))/2 + iApure _mu A _nu - i A _nu Apure _mu
-    const UINT uiSiteBig_m_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + byMu];
-    const UINT uiSiteBig_p_mu = __idx->m_pWalkingTable[uiBigIdx * _DC_Dir * 2 + _DC_Dir + byMu];
+    const UINT uiSiteBig_m_mu = __idx->_deviceGetBigIndex(
+        _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1));
+    const UINT uiSiteBig_p_mu = __idx->_deviceGetBigIndex(
+        _deviceSmallInt4OffsetC(sSite4, byMu + 1));
 
     deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu); //Apure _mu
     deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu); //A _nu
     res2.Mul(res); //A _nu Apure _mu
     res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu)); //Apure _mu A _nu
     res.Sub(res2); //[Apure, A]
-    res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_p_mu, byNu).MulRealC(F(0.5)));
-    res.Sub(_deviceGetGaugeBCSU3DirZero(piA, uiSiteBig_m_mu, byNu).MulRealC(F(0.5)));
+    res.Add(_deviceGetGaugeBCSU3DirZeroSIndex(piA, 
+        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_p_mu * _DC_Dir + byNu]).MulRealC(F(0.5)));
+    res.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(piA, 
+        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]).MulRealC(F(0.5)));
     return res;
 }
 
@@ -226,11 +289,15 @@ static __device__ __inline__ deviceSU3 _deviceLink(
 {
     const UINT uiDir1 = _DC_Dir;
     const UINT uiDir2 = uiDir1 * 2;
-    deviceSU3 sRet;
+    //length can be 0
+    deviceSU3 sRet = deviceSU3::makeSU3Id();
     for (BYTE i = 0; i < byLength; ++i)
     {
         //printf("i = %d dirs = %d\n", static_cast<INT>(i), pDir[i]);
-        
+        if (0 == pDir[i])
+        {
+            continue;
+        }
         UBOOL bDagger = FALSE;
         const BYTE byDir = pDir[i] > 0 ? 
             static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
@@ -270,6 +337,10 @@ static __device__ __inline__ deviceSU3 _deviceLink(
 
     return sRet;
 }
+
+
+
+
 
 #pragma endregion
 

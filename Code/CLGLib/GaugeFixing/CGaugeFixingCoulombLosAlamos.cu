@@ -15,6 +15,7 @@ __BEGIN_NAMESPACE
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGOdd_S(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
@@ -23,7 +24,7 @@ _kernelCalculateGOdd_S(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
@@ -39,12 +40,11 @@ _kernelCalculateGOdd_S(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex3D].AddDagger(__idx->_deviceIsBondOnSurface(p_m_mu, dir) ? su3Id : pU[uiLinkIndex2]);
+        pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
     pG[uiSiteIndex3D].MulReal(fOmega);
@@ -54,6 +54,7 @@ _kernelCalculateGOdd_S(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGEven_S(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
@@ -62,7 +63,7 @@ _kernelCalculateGEven_S(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
@@ -78,12 +79,11 @@ _kernelCalculateGEven_S(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex3D].AddDagger(__idx->_deviceIsBondOnSurface(p_m_mu, dir) ? su3Id : pU[uiLinkIndex2]);
+        pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
     pG[uiSiteIndex3D].MulReal(fOmega);
@@ -97,6 +97,7 @@ _kernelCalculateGEven_S(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformOdd_S(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
@@ -104,7 +105,7 @@ _kernelGaugeTransformOdd_S(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
@@ -126,8 +127,9 @@ _kernelGaugeTransformOdd_S(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
             {
                 const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
-                const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-                const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+
+                const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+                const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
                 if (!site_p_mu.IsDirichlet())
                 {
                     pGauge[uiLinkDir].MulDagger(pGx[site_p_mu.m_uiSiteIndex / _DC_Lt]);
@@ -139,6 +141,7 @@ _kernelGaugeTransformOdd_S(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformEven_S(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
@@ -146,7 +149,7 @@ _kernelGaugeTransformEven_S(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
@@ -168,8 +171,9 @@ _kernelGaugeTransformEven_S(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
             {
                 const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
-                const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-                const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+
+                const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+                const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
                 if (!site_p_mu.IsDirichlet())
                 {
                     pGauge[uiLinkDir].MulDagger(pGx[site_p_mu.m_uiSiteIndex / _DC_Lt]);
@@ -181,6 +185,7 @@ _kernelGaugeTransformEven_S(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DTOdd(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
@@ -188,7 +193,7 @@ _kernelGaugeTransform3DTOdd(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     if (!sSite4.IsOdd())
     {
@@ -205,14 +210,19 @@ _kernelGaugeTransform3DTOdd(
         }
     }
 
-    const UINT p_m_t = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 3];
+    const SSmallInt4 p_m_t_site = _deviceSmallInt4OffsetC(sSite4, -4);
+    const SIndex& link_m_t = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_t_site) * uiDir + 3];
+    const SIndex& site_m_t = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_t_site)];
 
-    if (!__idx->_deviceIsBondOnSurface(p_m_t, 3))
+    if (!link_m_t.IsDirichlet() && !site_m_t.IsDirichlet())
     {
-        const SIndex site_m_t = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_t];
-        if (!site_m_t.IsDirichlet())
+        const UINT uiLinkIndex2 = _deviceGetLinkIndex(link_m_t.m_uiSiteIndex, 3);
+        if (link_m_t.NeedToDagger())
         {
-            const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
+            pGauge[uiLinkIndex2].Mul(pGx[uiSiteIndex3D]);
+        }
+        else
+        {
             pGauge[uiLinkIndex2].MulDagger(pGx[uiSiteIndex3D]);
         }
     }
@@ -220,6 +230,7 @@ _kernelGaugeTransform3DTOdd(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DTEven(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
@@ -227,7 +238,7 @@ _kernelGaugeTransform3DTEven(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     if (sSite4.IsOdd())
     {
@@ -244,14 +255,19 @@ _kernelGaugeTransform3DTEven(
         }
     }
 
-    const UINT p_m_t = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 3];
+    const SSmallInt4 p_m_t_site = _deviceSmallInt4OffsetC(sSite4, -4);
+    const SIndex& link_m_t = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_t_site) * uiDir + 3];
+    const SIndex& site_m_t = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_t_site)];
 
-    if (!__idx->_deviceIsBondOnSurface(p_m_t, 3))
+    if (!link_m_t.IsDirichlet() && !site_m_t.IsDirichlet())
     {
-        const SIndex site_m_t = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_t];
-        if (!site_m_t.IsDirichlet())
+        const UINT uiLinkIndex2 = _deviceGetLinkIndex(link_m_t.m_uiSiteIndex, 3);
+        if (link_m_t.NeedToDagger())
         {
-            const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
+            pGauge[uiLinkIndex2].Mul(pGx[uiSiteIndex3D]);
+        }
+        else
+        {
             pGauge[uiLinkIndex2].MulDagger(pGx[uiSiteIndex3D]);
         }
     }
@@ -308,6 +324,7 @@ _kernelCalculateASpace_S(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateCoulombDivation_S(
+    BYTE byFieldId,
     SBYTE uiT,
     Real* pDeviceRes,
     const Real* __restrict__ pA11,
@@ -334,7 +351,7 @@ _kernelCalculateCoulombDivation_S(
     CLGComplex g23 = _zeroc;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
 
     for (BYTE dir = 0; dir < uiDir - 1; ++dir)
     {
@@ -348,17 +365,28 @@ _kernelCalculateCoulombDivation_S(
             g23 = _cuCsubf(g23, pA23[uiLinkIndex3D]);
         }
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
         const UINT uiLinkIndex2_3D = (site_m_mu.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + dir;
 
-        if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
+        if (!site_m_mu.IsDirichlet())
         {
-            g11 = g11 + pA11[uiLinkIndex2_3D];
-            g12 = _cuCaddf(g12, pA12[uiLinkIndex2_3D]);
-            g13 = _cuCaddf(g13, pA13[uiLinkIndex2_3D]);
-            g22 = g22 + pA22[uiLinkIndex2_3D];
-            g23 = _cuCaddf(g23, pA23[uiLinkIndex2_3D]);
+            if (site_m_mu.NeedToDagger())
+            {
+                g11 = g11 + pA11[uiLinkIndex2_3D];
+                g12 = _cuCsubf(g12, pA12[uiLinkIndex2_3D]);
+                g13 = _cuCsubf(g13, pA13[uiLinkIndex2_3D]);
+                g22 = g22 + pA22[uiLinkIndex2_3D];
+                g23 = _cuCsubf(g23, pA23[uiLinkIndex2_3D]);
+            }
+            else
+            {
+                g11 = g11 + pA11[uiLinkIndex2_3D];
+                g12 = _cuCaddf(g12, pA12[uiLinkIndex2_3D]);
+                g13 = _cuCaddf(g13, pA13[uiLinkIndex2_3D]);
+                g22 = g22 + pA22[uiLinkIndex2_3D];
+                g23 = _cuCaddf(g23, pA23[uiLinkIndex2_3D]);
+            }
         }
     }
 
@@ -445,10 +473,10 @@ Real CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-    return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData);
+    return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData, pGauge->m_byFieldId);
 }
 
-Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge)
+Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
 {
     Real fRes = F(0.0);
     preparethread_S;
@@ -464,6 +492,7 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
             m_pA23);
 
         _kernelCalculateCoulombDivation_S << <block, threads >> > (
+            byFieldId,
             uiT,
             _D_RealThreadBuffer,
             m_pA11,
@@ -473,10 +502,10 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
             m_pA23);
         fRes += appAbs(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz) / (3 * _HC_Volume_xyz));
     }
-    return fRes;
+    return fRes / _HC_Lt;
 }
 
-Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT)
+Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
 {
     preparethread_S;
 
@@ -490,6 +519,7 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __
         m_pA23);
 
     _kernelCalculateCoulombDivation_S << <block, threads >> > (
+        byFieldId,
         uiT,
         _D_RealThreadBuffer,
         m_pA11,
@@ -512,13 +542,13 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixing(CFieldGauge* pResGauge)
 
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
     {
-        GaugeFixingForT(pDeviceBufferPointer, uiT);
+        GaugeFixingForT(pDeviceBufferPointer, uiT, pResGauge->m_byFieldId);
     }
 
     //appGeneral(_T("Gauge fixing failed with last error = %f\n"), fTheta);
 }
 
-void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPointer, SBYTE uiT)
+void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPointer, SBYTE uiT, BYTE byFieldId)
 {
     preparethread_S;
     m_iIterate = 0;
@@ -528,7 +558,7 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
         //check res
         if (0 == m_iIterate % m_iCheckErrorStep)
         {
-            const Real fTheta = CheckResDeviceBufferOnlyT(pDeviceBufferPointer, uiT);
+            const Real fTheta = CheckResDeviceBufferOnlyT(pDeviceBufferPointer, uiT, byFieldId);
             appDetailed(_T("Iterate : %d, error = %2.12f\n"), m_iIterate, fTheta);
             if (fTheta < m_fAccuracy)
             {
@@ -536,13 +566,13 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
             }
         }
 
-        _kernelCalculateGOdd_S << <block, threads >> > (uiT, pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformOdd_S << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
-        _kernelGaugeTransform3DTOdd << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
+        _kernelCalculateGOdd_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_pG);
+        _kernelGaugeTransformOdd_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        _kernelGaugeTransform3DTOdd << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
 
-        _kernelCalculateGEven_S << <block, threads >> > (uiT, pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformEven_S << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
-        _kernelGaugeTransform3DTEven << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
+        _kernelCalculateGEven_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_pG);
+        _kernelGaugeTransformEven_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        _kernelGaugeTransform3DTEven << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
 
         ++m_iIterate;
     }

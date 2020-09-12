@@ -58,16 +58,19 @@ _kernelDFermionWilsonSquareSU3_Acc(
         //x, mu
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        SIndex x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
 
-        SIndex x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        SIndex x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
         deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
-        x_m_mu_Gauge_element.Dagger();
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
 
         deviceWilsonVectorSU3 x_p_mu_Fermion_element = pDeviceData[x_p_mu_Fermion.m_uiSiteIndex];
         deviceWilsonVectorSU3 x_m_mu_Fermion_element = pDeviceData[x_m_mu_Fermion.m_uiSiteIndex];

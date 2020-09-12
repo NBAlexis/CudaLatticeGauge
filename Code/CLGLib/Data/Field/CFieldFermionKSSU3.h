@@ -85,11 +85,24 @@ public:
 
     void SetMass(Real f2am);
 
-    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+    //============================
+    //Override these two functions for KS
+    virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const;
+    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
+    //============================
 
     /**
-     * We only use pDphi alone
+     * Do not override me
+     */
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
+    {
+        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    }
+
+    /**
+     * DerivateDOperator not implemented for KS
      */
     void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
 

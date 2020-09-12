@@ -50,9 +50,14 @@ INT GaugeFixing(CParameters& params)
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("CheckSubFolder"), iVaule);
+    UBOOL bCheckSubFolder = 0 != iVaule;
+
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
+
 
     CCString sLoadPrefix;
     params.FetchStringValue(_T("LoadPrefix"), sLoadPrefix);
@@ -61,6 +66,10 @@ INT GaugeFixing(CParameters& params)
     CCString sSubFolderPrefix;
     params.FetchStringValue(_T("SubFolderPrefix"), sSubFolderPrefix);
     appGeneral(_T("sub folder prefix: %s\n"), sSubFolderPrefix.c_str());
+
+    CCString sCheckSubFolderPrefix;
+    params.FetchStringValue(_T("CheckSubFolderPrefix"), sCheckSubFolderPrefix);
+    appGeneral(_T("checkgauge sub folder prefix: %s\n"), sCheckSubFolderPrefix.c_str());
 
     if (bOnlyCheck)
     {
@@ -71,7 +80,14 @@ INT GaugeFixing(CParameters& params)
             for (UINT uiIndex = iIndexStart; uiIndex <= iIndexEnd; ++uiIndex)
             {
                 CCString sSaveFile;
-                sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                if (!bCheckSubFolder)
+                {
+                    sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                }
+                else
+                {
+                    sSaveFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix, uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                }
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
 
                 const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);

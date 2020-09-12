@@ -41,19 +41,17 @@ _kernelGaugeTransformRandom(
 {
     intokernalInt4;
 
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const deviceSU3 left(pGx[uiSiteIndex]);
 
-    for (BYTE dir = 0; dir < uiDir; ++dir)
+    for (BYTE dir = 0; dir < _DC_Dir; ++dir)
     {
         if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
         {
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
-            const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+            SSmallInt4 sWalking = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][__idx->_deviceGetBigIndex(sWalking)];
             if (!site_p_mu.IsDirichlet())
             {
                 res.MulDagger(pGx[site_p_mu.m_uiSiteIndex]);

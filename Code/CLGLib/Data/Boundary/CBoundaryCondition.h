@@ -59,6 +59,12 @@ public:
     */
     virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const = 0;
 
+    /**
+     * For the glue of links, we must bake the target.
+     * For example, 0,0,0,5 _1 can be map to 0,1,0,0 _2^+
+     */
+    virtual void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const = 0;
+
     virtual UBOOL NeedToFixBoundary() const { return FALSE; }
 
 protected:

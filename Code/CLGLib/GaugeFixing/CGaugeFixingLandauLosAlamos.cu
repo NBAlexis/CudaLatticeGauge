@@ -15,6 +15,7 @@ __BEGIN_NAMESPACE
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGAL(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
     deviceSU3* pG)
@@ -22,7 +23,7 @@ _kernelCalculateGAL(
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
@@ -39,12 +40,11 @@ _kernelCalculateGAL(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex].AddDagger(__idx->_deviceIsBondOnSurface(p_m_mu, dir) ? su3Id : pU[uiLinkIndex2]);
+        pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
     pG[uiSiteIndex].MulReal(fOmega);
@@ -54,6 +54,7 @@ _kernelCalculateGAL(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGOdd(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
     deviceSU3* pG)
@@ -61,7 +62,7 @@ _kernelCalculateGOdd(
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
@@ -78,12 +79,11 @@ _kernelCalculateGOdd(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex].AddDagger(__idx->_deviceIsBondOnSurface(p_m_mu, dir) ? su3Id : pU[uiLinkIndex2]);
+        pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
     pG[uiSiteIndex].MulReal(fOmega);
@@ -93,6 +93,7 @@ _kernelCalculateGOdd(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGEven(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
     deviceSU3* pG)
@@ -100,7 +101,7 @@ _kernelCalculateGEven(
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
@@ -117,12 +118,11 @@ _kernelCalculateGEven(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex].AddDagger(__idx->_deviceIsBondOnSurface(p_m_mu, dir) ? su3Id : pU[uiLinkIndex2]);
+        pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
     pG[uiSiteIndex].MulReal(fOmega);
@@ -135,13 +135,14 @@ _kernelCalculateGEven(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformAL(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const deviceSU3 left(pGx[uiSiteIndex]);
 
@@ -151,11 +152,12 @@ _kernelGaugeTransformAL(
         {
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
-            const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+
+            const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+            const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
             if (!site_p_mu.IsDirichlet())
             {
-                res.MulDagger(pGx[site_p_mu.m_uiSiteIndex]);
+                pGauge[uiLinkDir].MulDagger(pGx[site_p_mu.m_uiSiteIndex]);
             }
 
             pGauge[uiLinkDir] = left.MulC(res);
@@ -169,13 +171,14 @@ _kernelGaugeTransformAL(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformOdd(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
@@ -201,8 +204,8 @@ _kernelGaugeTransformOdd(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
             {
                 UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
-                const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-                const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+                const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+                const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
                 if (!site_p_mu.IsDirichlet())
                 {
                     pGauge[uiLinkDir].MulDagger(pGx[site_p_mu.m_uiSiteIndex]);
@@ -214,13 +217,14 @@ _kernelGaugeTransformOdd(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformEven(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
@@ -242,8 +246,8 @@ _kernelGaugeTransformEven(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
             {
                 UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
-                const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-                const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+                const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+                const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
                 if (!site_p_mu.IsDirichlet())
                 {
                     pGauge[uiLinkDir].MulDagger(pGx[site_p_mu.m_uiSiteIndex]);
@@ -302,6 +306,7 @@ _kernelCalculateAAll(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateLandauDivation(
+    BYTE byFieldId,
     Real* pDeviceRes,
     const Real* __restrict__ pA11,
     const CLGComplex* __restrict__ pA12,
@@ -327,7 +332,7 @@ _kernelCalculateLandauDivation(
     CLGComplex g23 = _zeroc;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
@@ -341,17 +346,28 @@ _kernelCalculateLandauDivation(
             g23 = _cuCsubf(g23, pA23[uiLinkIndex]);
         }
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
         const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
 
-        if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
+        if (!site_m_mu.IsDirichlet())
         {
-            g11 = g11 + pA11[uiLinkIndex2];
-            g12 = _cuCaddf(g12, pA12[uiLinkIndex2]);
-            g13 = _cuCaddf(g13, pA13[uiLinkIndex2]);
-            g22 = g22 + pA22[uiLinkIndex2];
-            g23 = _cuCaddf(g23, pA23[uiLinkIndex2]);
+            if (site_m_mu.NeedToDagger())
+            {
+                g11 = g11 - pA11[uiLinkIndex2];
+                g12 = _cuCsubf(g12, pA12[uiLinkIndex2]);
+                g13 = _cuCsubf(g13, pA13[uiLinkIndex2]);
+                g22 = g22 - pA22[uiLinkIndex2];
+                g23 = _cuCsubf(g23, pA23[uiLinkIndex2]);
+            }
+            else
+            {
+                g11 = g11 + pA11[uiLinkIndex2];
+                g12 = _cuCaddf(g12, pA12[uiLinkIndex2]);
+                g13 = _cuCaddf(g13, pA13[uiLinkIndex2]);
+                g22 = g22 + pA22[uiLinkIndex2];
+                g23 = _cuCaddf(g23, pA23[uiLinkIndex2]);
+            }
         }
     }
 
@@ -430,6 +446,7 @@ Real CGaugeFixingLandauLosAlamos::CheckRes(const CFieldGauge* pGauge)
         m_pA23);
 
     _kernelCalculateLandauDivation << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
         _D_RealThreadBuffer,
         m_pA11,
         m_pA12,
@@ -483,10 +500,10 @@ void CGaugeFixingLandauLosAlamos::GaugeFixing(CFieldGauge* pResGauge)
             }
         }
 
-        _kernelCalculateGOdd << <block, threads >> > (pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformOdd << <block, threads >> > (m_pG, pDeviceBufferPointer);
-        _kernelCalculateGEven << <block, threads >> > (pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformEven << <block, threads >> > (m_pG, pDeviceBufferPointer);
+        _kernelCalculateGOdd << <block, threads >> > (pResGauge->m_byFieldId, pDeviceBufferPointer, m_fOmega, m_pG);
+        _kernelGaugeTransformOdd << <block, threads >> > (pResGauge->m_byFieldId, m_pG, pDeviceBufferPointer);
+        _kernelCalculateGEven << <block, threads >> > (pResGauge->m_byFieldId, pDeviceBufferPointer, m_fOmega, m_pG);
+        _kernelGaugeTransformEven << <block, threads >> > (pResGauge->m_byFieldId, m_pG, pDeviceBufferPointer);
 
         //_kernelCalculateGAL << <block, threads >> > (pDeviceBufferPointer, m_fOmega, m_pG);
         //_kernelGaugeTransformAL << <block, threads >> > (m_pG, pDeviceBufferPointer);

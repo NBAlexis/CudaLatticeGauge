@@ -268,7 +268,6 @@ UINT TestRigidAcceleration(CParameters& sParam)
     return uiError;
 }
 
-
 UINT TestBoost(CParameters& sParam)
 {
     Real fExpected = F(0.38);
@@ -356,6 +355,86 @@ UINT TestBoost(CParameters& sParam)
     return uiError;
 }
 
+UINT TestRotationKS(CParameters& sParam)
+{
+    Real fExpected = F(0.65);
+
+    INT iVaule = 2;
+    sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
+    const UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    iVaule = 10;
+    sParam.FetchValueINT(_T("EquvibStep"), iVaule);
+    const UINT iAfterEquib = static_cast<UINT>(iVaule);
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedResDebug"), fExpected);
+#else
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+#endif
+
+    CMeasurePlaqutteEnergy* pMeasure = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    if (NULL == pMeasure)
+    {
+        return 1;
+    }
+    CIndexData::DebugPrintWalkingTable();
+
+#if _CLG_DEBUG
+    appGetLattice()->m_pUpdator->Update(1, FALSE);
+#else
+    appGetLattice()->m_pUpdator->Update(iBeforeEquib, FALSE);
+#endif
+
+    //Measure
+    pMeasure->Reset();
+
+    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
+#if _CLG_DEBUG
+    appGetLattice()->m_pUpdator->Update(3, TRUE);
+#else
+    appGetLattice()->m_pUpdator->Update(iAfterEquib, TRUE);
+#endif
+
+    const Real fRes = pMeasure->m_fLastRealResult;
+    appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
+    UINT uiError = 0;
+#if _CLG_DEBUG
+    if (appAbs(fRes - fExpected) > F(0.15))
+#else
+    if (appAbs(fRes - fExpected) > F(0.02))
+#endif
+    {
+        ++uiError;
+    }
+
+    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+#if _CLG_DEBUG
+    appGeneral(_T("accept (%d/5) : expected >= 4. HDiff = %f : expected < 1\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+#else
+    appGeneral(_T("accept (%d/25) : expected >= 23. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+#endif
+
+#if _CLG_DEBUG
+    if (uiAccept < 4)
+#else
+    if (uiAccept < 23)
+#endif
+    {
+        ++uiError;
+    }
+
+#if _CLG_DEBUG
+    if (fHDiff > F(1.0))
+#else
+    if (fHDiff > F(0.1))
+#endif
+    {
+        ++uiError;
+    }
+
+    return uiError;
+}
+
 __REGIST_TEST(TestRotation, Updator, TestRotation);
 __REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 
@@ -363,6 +442,8 @@ __REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 __REGIST_TEST(TestRigidAcceleration, Updator, TestRigidAcceleration);
 
 __REGIST_TEST(TestBoost, Updator, TestBoost);
+
+__REGIST_TEST(TestRotationKS, Updator, TestRotationKS);
 
 //=============================================================================
 // END OF FILE

@@ -112,6 +112,7 @@ public:
 
     /**
     * It seems no need to create a "Foprt" class like Bridge++
+    * TODO: this only support single gauge field...
     */
     virtual void DOperator(void* pTargetBuffer, const void * pBuffer, const void * pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;

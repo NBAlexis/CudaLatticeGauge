@@ -203,6 +203,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Boundary/CBoundaryCondition.h"
 #include "Data/Boundary/CBoundaryConditionTorusSquare.h"
 #include "Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h"
+#include "Data/Boundary/CBoundaryConditionProjectivePlaneSquare.h"
 #include "Data/Lattice/CIndex.h"
 #include "Data/Lattice/CIndexSquare.h"
 #include "Data/Lattice/CIndexData.h"
@@ -234,6 +235,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3Boost.h"
 #include "Data/Field/CFieldFermionKSSU3.h"
+#include "Data/Field/CFieldFermionKSSU3R.h"
 
 
 //=====================================================

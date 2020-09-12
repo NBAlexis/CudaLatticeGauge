@@ -70,7 +70,7 @@ public:
 
     /**
     * Now the functional of the Index is data-based.
-    * All index walking thing is cached here
+    * All index walking thing is cached and BakeMappingTable
     */
     virtual void BakeAllIndexBuffer(class CIndexData* pData) = 0;
 

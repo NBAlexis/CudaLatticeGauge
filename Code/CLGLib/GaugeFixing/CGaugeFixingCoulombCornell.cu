@@ -110,6 +110,7 @@ _kernelCalculateA3DLog(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAGradient3D(
+    BYTE byFieldId,
     SBYTE uiT,
     Real* pGamma11,
     CLGComplex* pGamma12,
@@ -131,7 +132,7 @@ _kernelCalculateAGradient3D(
     pGamma23[uiSiteIndex3D] = _zeroc;
     
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
     if (site.IsDirichlet())
@@ -152,17 +153,29 @@ _kernelCalculateAGradient3D(
             pGamma23[uiSiteIndex3D] = _cuCsubf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex3D]);
         }
 
-        const UINT p_m_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        const UINT uiLinkIndex2_3D = (site_m_mu.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + dir;
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
+        const UINT uiLinkIndex2_3D = (p_m_mu_dir.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + dir;
 
-        if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
+        //if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
+        if (!p_m_mu_dir.IsDirichlet())
         {
-            pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] + pA11[uiLinkIndex2_3D];
-            pGamma12[uiSiteIndex3D] = _cuCaddf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
-            pGamma13[uiSiteIndex3D] = _cuCaddf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
-            pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] + pA22[uiLinkIndex2_3D];
-            pGamma23[uiSiteIndex3D] = _cuCaddf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex2_3D]);
+            if (p_m_mu_dir.NeedToDagger())
+            {
+                pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] - pA11[uiLinkIndex2_3D];
+                pGamma12[uiSiteIndex3D] = _cuCsubf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
+                pGamma13[uiSiteIndex3D] = _cuCsubf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
+                pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] - pA22[uiLinkIndex2_3D];
+                pGamma23[uiSiteIndex3D] = _cuCsubf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex2_3D]);
+            }
+            else
+            {
+                pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] + pA11[uiLinkIndex2_3D];
+                pGamma12[uiSiteIndex3D] = _cuCaddf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
+                pGamma13[uiSiteIndex3D] = _cuCaddf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
+                pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] + pA22[uiLinkIndex2_3D];
+                pGamma23[uiSiteIndex3D] = _cuCaddf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex2_3D]);
+            }
         }
     }
 }
@@ -208,6 +221,7 @@ _kernelCalculateG3D(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3D(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
@@ -215,7 +229,7 @@ _kernelGaugeTransform3D(
     intokernalInt4_S;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     const deviceSU3 left(pGx[uiSiteIndex3D]);
@@ -226,8 +240,10 @@ _kernelGaugeTransform3D(
         {
             const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
-            const UINT p_p_mu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
-            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_p_mu];
+
+            const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+            const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
+
             if (!site_p_mu.IsDirichlet())
             {
                 res.MulDagger(pGx[(site_p_mu.m_uiSiteIndex / _DC_Lt)]);
@@ -244,14 +260,15 @@ _kernelGaugeTransform3D(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransform3DT(
+    BYTE byFieldId,
     SBYTE uiT,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
     intokernalInt4_S;
 
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
@@ -264,14 +281,20 @@ _kernelGaugeTransform3DT(
         }
     }
 
-    const UINT p_m_t = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 3];
+    const SSmallInt4 p_m_t_site = _deviceSmallInt4OffsetC(sSite4, -4);
+    const UINT p_m_t_bi = __idx->_deviceGetBigIndex(p_m_t_site);
+    const SIndex& site_m_t_point = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][p_m_t_bi];
+    const SIndex& site_m_t = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][p_m_t_bi * _DC_Dir + 3];
     
-    if (!__idx->_deviceIsBondOnSurface(p_m_t, 3))
+    if (!site_m_t.IsDirichlet() && !site_m_t_point.IsDirichlet()) 
     {
-        const SIndex site_m_t = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_t];
-        if (!site_m_t.IsDirichlet())
+        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
+        if (site_m_t.NeedToDagger())
         {
-            const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
+            pGauge[uiLinkIndex2].Mul(pGx[uiSiteIndex3D]);
+        }
+        else
+        {
             pGauge[uiLinkIndex2].MulDagger(pGx[uiSiteIndex3D]);
         }
     }
@@ -457,11 +480,11 @@ void CGaugeFixingCoulombCornell::GaugeFixing(CFieldGauge* pResGauge)
     deviceSU3* pDeviceBufferPointer = pGaugeSU3->m_pDeviceData;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
     {
-        GaugeFixingOneTimeSlice(pDeviceBufferPointer, uiT);
+        GaugeFixingOneTimeSlice(pDeviceBufferPointer, uiT, pGaugeSU3->m_byFieldId);
     }
 }
 
-void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBufferPointer, SBYTE uiT)
+void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBufferPointer, SBYTE uiT, BYTE byFieldId)
 {
     preparethread_S;
     m_iIterate = 0;
@@ -494,6 +517,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
         }
 
         _kernelCalculateAGradient3D << <block, threads >> > (
+            byFieldId,
             uiT,
             m_pGamma11,
             m_pGamma12,
@@ -564,8 +588,8 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
             m_pGamma22,
             m_pGamma23,
             m_fAlpha);
-        _kernelGaugeTransform3D << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
-        _kernelGaugeTransform3DT << <block, threads >> > (uiT, m_pG, pDeviceBufferPointer);
+        _kernelGaugeTransform3D << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        _kernelGaugeTransform3DT << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
         ++m_iIterate;
     }
 
@@ -609,6 +633,7 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
         }
 
         _kernelCalculateAGradient3D << <block, threads >> > (
+            pGauge->m_byFieldId,
             uiT,
             m_pGamma11,
             m_pGamma12,

@@ -106,8 +106,8 @@ _kernelCalculateJGSurf(
 
     if (!site.IsDirichlet())
     {
-        const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-        const BYTE uiDir2 = uiDir * 2;
+        //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+        //const BYTE uiDir2 = uiDir * 2;
         const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
         const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
 
@@ -115,16 +115,18 @@ _kernelCalculateJGSurf(
         for (BYTE dir = 0; dir < 3; ++dir)
         {
             //p_i A_j = U_i(n) A_j(n+i) U_i^+(n) - U_i^+(n-i) A_j(n-i) U_i(n-i)
-            //const UINT x_m_i_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-            const UINT x_p_i_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir + uiDir];
+            const SSmallInt4 x_p_i_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+            const UINT x_p_i_bi = __idx->_deviceGetBigIndex(x_p_i_site);
+            const SIndex& x_p_i_x_idx = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_i_bi * 4 + 0];
+            const SIndex& x_p_i_y_idx = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_i_bi * 4 + 1];
 
             //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
             //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
             //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
             deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, dir));
-            deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, x_p_i_Gauge, 1));
+            deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
             a.MulReal(fX);
-            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, x_p_i_Gauge, 0).MulRealC(fY));
+            a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
             a.MulDagger(u);
             u.Mul(a);
             //E_i (x p_i A_y  - y p_i A_x)
@@ -194,6 +196,7 @@ _kernelCalculateJGPot(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMomemtumJGChenApprox(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pApure,
     const deviceSU3* __restrict__ pAphys,
@@ -215,9 +218,9 @@ _kernelMomemtumJGChenApprox(
         //only calculate x,y,z
         for (BYTE dir = 0; dir < uiDir - 1; ++dir)
         {
-            deviceSU3 DxAphys = _deviceDPureMu(pAphys, pApure, uiBigIdx, 0, dir);
+            deviceSU3 DxAphys = _deviceDPureMu(pAphys, pApure, sSite4, uiBigIdx, 0, dir, byFieldId);
             DxAphys.MulReal(fmY);
-            deviceSU3 DyAphys = _deviceDPureMu(pAphys, pApure, uiBigIdx, 1, dir);
+            deviceSU3 DyAphys = _deviceDPureMu(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
             res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys).Tr());
@@ -230,6 +233,7 @@ _kernelMomemtumJGChenApprox(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMomemtumJGChenApprox2(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pApure,
     const deviceSU3* __restrict__ pAphys,
@@ -251,9 +255,9 @@ _kernelMomemtumJGChenApprox2(
         //only calculate x,y,z
         for (BYTE dir = 0; dir < uiDir - 1; ++dir)
         {
-            deviceSU3 DxAphys = _deviceDPureMu2(pAphys, pApure, uiBigIdx, 0, dir);
+            deviceSU3 DxAphys = _deviceDPureMu2(pAphys, pApure, sSite4, uiBigIdx, 0, dir, byFieldId);
             DxAphys.MulReal(fmY);
-            deviceSU3 DyAphys = _deviceDPureMu2(pAphys, pApure, uiBigIdx, 1, dir);
+            deviceSU3 DyAphys = _deviceDPureMu2(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
             res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys).Tr());
@@ -306,20 +310,22 @@ _kernelMomentumJGChenDpureA(
     deviceSU3* pXcrossDpureA,
     const deviceSU3* __restrict__ pGauge,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter)
+    SSmallInt4 sCenter,
+    BYTE byFieldId)
 {
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const BYTE uiDir2 = uiDir * 2;
+    //const BYTE uiDir2 = uiDir * 2;
     const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
     const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
 
-    //const UINT x_m_x_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 0];
-    //const UINT x_m_y_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 1];
-    const UINT x_p_x_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 0 + uiDir];
-    const UINT x_p_y_Gauge = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + 1 + uiDir];
+
+    const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
+    const SSmallInt4 x_p_y_site = _deviceSmallInt4OffsetC(sSite4, 2);
+    const UINT x_p_x_bi4 = __idx->_deviceGetBigIndex(x_p_x_site) * _DC_Dir;
+    const UINT x_p_y_bi4 = __idx->_deviceGetBigIndex(x_p_y_site) * _DC_Dir;
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir - 1; ++idir)
@@ -327,9 +333,12 @@ _kernelMomentumJGChenDpureA(
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         pXcrossDpureA[uiLinkIndex] = deviceSU3::makeSU3Zero();
 
+        const SIndex& x_p_x_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_x_bi4 + idir + 1];
+        const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir + 1];
+
         //U_x(n) A_dir(n+x)U_x^+(n)
         deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 0));
-        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, x_p_x_Gauge, idir));
+        deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmY);
@@ -348,7 +357,7 @@ _kernelMomentumJGChenDpureA(
 
         //U_y(n) A_dir(n+y)U_y^+(n)
         u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
-        a = _deviceGetGaugeBCSU3DirZero(pAphys, x_p_y_Gauge, idir);
+        a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmX);
@@ -622,7 +631,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 pDpureA->m_pDeviceData,
                 pGaugeSU3->m_pDeviceData,
                 pAphysSU3->m_pDeviceData,
-                CCommonData::m_sCenter
+                CCommonData::m_sCenter,
+                pAphysSU3->m_byFieldId
                 );
             _kernelMomemtumJGChen << <block, threads >> > (
                 pESU3->m_pDeviceData,
@@ -712,6 +722,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 _ZeroXYPlane(m_pDeviceDataBuffer);
 
                 _kernelMomemtumJGChenApprox << <block, threads >> > (
+                    pAphysSU3->m_byFieldId,
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -751,6 +762,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 _ZeroXYPlane(m_pDeviceDataBuffer);
 
                 _kernelMomemtumJGChenApprox2 << <block, threads >> > (
+                    pAphysSU3->m_byFieldId,
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,

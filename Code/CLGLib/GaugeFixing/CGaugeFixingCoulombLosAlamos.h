@@ -48,10 +48,10 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
-    void GaugeFixingForT(deviceSU3* pResGauge, SBYTE uiT);
+    void GaugeFixingForT(deviceSU3* pResGauge, SBYTE uiT, BYTE byFieldId);
     Real CheckRes(const CFieldGauge* pGauge) override;
-    Real CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge);
-    Real CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT);
+    Real CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId);
+    Real CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId);
     CCString GetInfos(const CCString& sTab) const override;
 
     UINT m_pHDecomp[6];

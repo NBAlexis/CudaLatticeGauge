@@ -17,10 +17,12 @@ __CLGIMPLEMENT_CLASS(CBoundaryConditionPeriodicAndDirichletSquare)
 
 #pragma region device functions
 
-static __device__ __inline__ BYTE _deviceToggleBitInverse(BYTE value, BYTE toggle)
-{
-    return (value & (~toggle)) | ((~value) & toggle);
-}
+//This is XOR...
+//static __device__ __inline__ BYTE _deviceToggleBitInverse(BYTE value, BYTE toggle)
+//{
+//    //return (value & (~toggle)) | ((~value) & toggle);
+//    return value ^ toggle;
+//}
 
 /**
 * This function is not using
@@ -65,12 +67,18 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             {
                 bPassEdge = TRUE;
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+
+                if (0 == bc.m_byData4[uiDir])
+                {
+                    realCoord.m_byData4[uiDir] = 0;
+                }
             }
 
             if (0 == bc.m_byData4[uiDir])
             {
                 bBoundary = TRUE;
-                byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
+                //byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
+                byRegionId = byRegionId ^ (1 << uiDir);
             }
             else if (bPassEdge)
             {
@@ -86,12 +94,18 @@ _kernalBakeEdgePeriodicDirichletBoundary(
             {
                 bPassEdge = TRUE;
                 realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+
+                if (0 == bc.m_byData4[uiDir])
+                {
+                    realCoord.m_byData4[uiDir] = _constIntegers[ECI_Lx + uiDir] - 1;
+                }
             }
 
             if (0 == bc.m_byData4[uiDir])
             {
                 bBoundary = TRUE;
-                byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
+                //byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
+                byRegionId = byRegionId ^ (1 << (uiDir + 4));
             }
             else if (bPassEdge) //realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
             {
@@ -187,6 +201,131 @@ _kernalBakeBondInfoPeriodicDirichletBoundary(
             pDeviceData[idxAll * _DC_Dir + i] = 0;
         }
         //printf("idx = %d,%d,%d,%d, not dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
+    }
+}
+
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernalBakeBoundGlue_DBC(
+    SSmallInt4 bc,
+    SIndex* pDeviceData,
+    const SSmallInt4* __restrict__ pMapping,
+    uint3 mods)
+{
+    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+
+    SSmallInt4 realCoord(pMapping[idxAll]);
+    //realCoord.x = static_cast<SBYTE>(idxAll / mods.x) - CIndexData::kCacheIndexEdge;
+    //realCoord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y) - CIndexData::kCacheIndexEdge;
+    //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
+    //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
+
+    //SSmallInt4 orig = realCoord;
+
+    SBYTE signchange = 1;
+    BYTE byRegionId = 0;
+    UBOOL bBoundary = FALSE;
+    UBOOL bPassDirichletEdge = FALSE;
+    BYTE tagBoundDir = 0;
+    for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
+    {
+        if (realCoord.m_byData4[uiDir] <= 0)
+        {
+            UBOOL bPassEdge = FALSE;
+            //printf("-- coord[uiDir]=%d --\n", static_cast<INT>(realCoord.m_byData4[uiDir]));
+            if (realCoord.m_byData4[uiDir] < 0)
+            {
+                bPassEdge = TRUE;
+                realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+                if (0 == bc.m_byData4[uiDir])
+                {
+                    bPassDirichletEdge = TRUE;
+                    realCoord.m_byData4[uiDir] = 0;
+                }
+            }
+
+            if (0 == bc.m_byData4[uiDir])
+            {
+                bBoundary = TRUE;
+                //byRegionId = _deviceToggleBitInverse(byRegionId, 1 << uiDir);
+                byRegionId = byRegionId ^ (1 << uiDir);
+                tagBoundDir |= (1 << uiDir);
+            }
+            else if (bPassEdge)
+            {
+                //printf("bc=%d\n", static_cast<INT>(bc.m_byData4[uiDir]));
+                signchange = signchange * bc.m_byData4[uiDir];
+            }
+
+        }
+        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1)
+        {
+            UBOOL bPassEdge = FALSE;
+            if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+            {
+                bPassEdge = TRUE;
+                realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+                if (0 == bc.m_byData4[uiDir])
+                {
+                    bPassDirichletEdge = TRUE;
+                    realCoord.m_byData4[uiDir] = _constIntegers[ECI_Lx + uiDir] - 1;
+                }
+            }
+
+            if (0 == bc.m_byData4[uiDir])
+            {
+                bBoundary = TRUE;
+                //byRegionId = _deviceToggleBitInverse(byRegionId, 1 << (uiDir + 4));
+                byRegionId = byRegionId ^ (1 << (uiDir + 4));
+                tagBoundDir |= (1 << uiDir);
+            }
+            else if (bPassEdge) //realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+            {
+                //printf("bc=%d\n", static_cast<INT>(bc.m_byData4[uiDir]));
+                signchange = signchange * bc.m_byData4[uiDir];
+            }
+        }
+    }
+
+    const UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
+
+    for (BYTE byDir = 0; byDir < _DC_Dir; ++byDir)
+    {
+        pDeviceData[idxAll * _DC_Dir + byDir] = SIndex(uiSiteIndex);
+        pDeviceData[idxAll * _DC_Dir + byDir].m_byDir = byDir;
+
+        //Bound should never have anti-periodic boundary condition?
+        pDeviceData[idxAll * _DC_Dir + byDir].m_byTag = signchange < 0 ? _kDaggerOrOpposite : 0;
+        //if (signchange < 0)
+        //{
+        //    printf("sign change\n");
+        //}
+        pDeviceData[idxAll * _DC_Dir + byDir].m_byReginId = byRegionId;
+
+        if (bPassDirichletEdge)
+        {
+            assert(0 != byRegionId);
+            //printf("We have dirichlet bc %d %d %d %d\n", orig.x, orig.y, orig.z, orig.w);
+            pDeviceData[idxAll * _DC_Dir + byDir].m_byTag |= _kDirichlet;
+        }
+        else if (bBoundary)
+        {
+            assert(0 != byRegionId);
+
+            UBOOL bReallyOnBoundary = FALSE;
+            for (BYTE byDir2 = 0; byDir2 < _DC_Dir; ++byDir2)
+            {
+                if (byDir2 != byDir)
+                {
+                    bReallyOnBoundary = bReallyOnBoundary || (tagBoundDir & (1 << byDir2));
+                }
+            }
+
+            if (bReallyOnBoundary)
+            {
+                pDeviceData[idxAll * _DC_Dir + byDir].m_byTag |= _kDirichlet;
+            }
+        }
     }
 }
 
@@ -299,6 +438,29 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4
     biggerLatticeMod.z = biggerLattice.w;
 
     _kernalBakeBondInfoPeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[1], deviceBuffer, deviceMappingTable, biggerLatticeMod);
+}
+
+void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
+{
+    uint4 biggerLattice;
+    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+    uint3 biggerLatticeMod;
+
+    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+    dim3 threads(threadPerSite, 1, 1);
+    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+
+    //appGeneral(_T("block=%d, %d, %d, thread= %d, %d, %d\n"), blocks.x, blocks.y, blocks.z, threads.x, threads.y, threads.z);
+
+    biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
+    biggerLatticeMod.z = biggerLattice.w;
+
+    _kernalBakeBoundGlue_DBC << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, deviceMappingTable, biggerLatticeMod);
 }
 
 __END_NAMESPACE

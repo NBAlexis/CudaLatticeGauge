@@ -61,7 +61,28 @@ UINT TestBoundary(CParameters& sParam)
     return uiError;
 }
 
+UINT TestBoundaryMapping(CParameters& sParam)
+{
+    CIndexData::DebugEdgeMapping(1);
+    CIndexData::DebugEdgeGlue(1);
+
+    appGeneral(_T("action1: %2.20f\n"), appGetLattice()->m_pActionList[0]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    appGeneral(_T("action2: %2.20f\n"), appGetLattice()->m_pActionList[1]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
+
+    CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
+    appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStape);
+    appGeneral(_T("staple: %2.20f\n"), appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(CCommonData::m_fBeta / F(3.0), pStape));
+
+
+    appSafeDelete(pStape);
+
+    return 0;
+}
+
 __REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
+__REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping);
 
 
 //=============================================================================

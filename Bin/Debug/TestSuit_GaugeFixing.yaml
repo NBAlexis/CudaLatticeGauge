@@ -215,9 +215,9 @@ TestGaugeFixingCoulombCornellDR:
         SolverForFieldId : 2
         MDim : 25
         KDim : 5
-        RecalculateR : 5
+        RecalculateR : 3
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.00001
+        Accuracy : 0.0000001
 
         Restart : 100
         AbsoluteAccuracy : 1
@@ -292,7 +292,7 @@ TestGaugeFixingCoulombLosAlamosDR:
         KDim : 5
         RecalculateR : 5
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.00001
+        Accuracy : 0.0000001
 
         Restart : 100
         AbsoluteAccuracy : 1

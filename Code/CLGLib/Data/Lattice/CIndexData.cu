@@ -14,59 +14,6 @@ __BEGIN_NAMESPACE
 
 #pragma region kernels
 
-__global__ void _CLG_LAUNCH_BOUND
-_kernelPrintWalkingTable()
-{
-    UINT bigIndex = threadIdx.x + blockDim.x * blockIdx.x;
-
-    SSmallInt4 coord = __idx->_deviceBigIndexToInt4(bigIndex);
-
-    UINT neightbouridx1 = __idx->m_pWalkingTable[bigIndex * _DC_Dir * 2 + 0];
-    SSmallInt4 mappingIdx1 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[1][neightbouridx1].m_uiSiteIndex);
-    UINT neightbouridx2 = __idx->m_pWalkingTable[bigIndex * _DC_Dir * 2 + 2];
-    SSmallInt4 mappingIdx2 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[1][neightbouridx2].m_uiSiteIndex);
-    UINT neightbouridx3 = __idx->m_pWalkingTable[bigIndex * _DC_Dir * 2 + 5];
-    SSmallInt4 mappingIdx3 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[1][neightbouridx3].m_uiSiteIndex);
-    UINT neightbouridx4 = __idx->m_pWalkingTable[bigIndex * _DC_Dir * 2 + 7];
-    SSmallInt4 mappingIdx4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[1][neightbouridx4].m_uiSiteIndex);
-
-    printf("coord: (%d,%d,%d,%d) - \n%d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d)\n",
-        coord.x, coord.y, coord.z, coord.w, 
-        0, mappingIdx1.x, mappingIdx1.y, mappingIdx1.z, mappingIdx1.w,
-        2, mappingIdx2.x, mappingIdx2.y, mappingIdx2.z, mappingIdx2.w,
-        5, mappingIdx3.x, mappingIdx3.y, mappingIdx3.z, mappingIdx3.w,
-        7, mappingIdx4.x, mappingIdx4.y, mappingIdx4.z, mappingIdx4.w
-    );
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelDebugPlaqutteTable()
-{
-    intokernal;
-
-    if (123 == uiSiteIndex)
-    {
-        SSmallInt4 myself = __deviceSiteIndexToInt4(uiSiteIndex);
-        printf("me = %d, %d, %d, %d\n", myself.x, myself.y, myself.z, myself.w);
-
-        UINT uiListIdx = uiSiteIndex
-            * __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx]
-            * __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
-
-        for (UINT i = 0; 
-            i < __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] 
-            * __idx->m_pSmallData[CIndexData::kPlaqLengthIdx]; ++i)
-        {
-            SSmallInt4 coord = __deviceSiteIndexToInt4(__idx->m_pPlaqutteCache[uiListIdx + i].m_uiSiteIndex);
-            printf("%s%s(%d,%d,%d,%d)_(%d)\n",
-                (__idx->m_pPlaqutteCache[uiListIdx + i].m_byTag & _kDaggerOrOpposite ? "-" : "+"),
-                (__idx->m_pPlaqutteCache[uiListIdx + i].IsDirichlet() ? "D" : ""),
-                coord.x, coord.y, coord.z, coord.w,
-                __idx->m_pPlaqutteCache[uiListIdx + i].m_byDir);
-        }
-    }
-}
-
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateLinkCount(
@@ -132,27 +79,158 @@ UINT inline _GetDecompose(UINT volumn)
 
 void CIndexData::DebugPrintWalkingTable()
 {
-    uint4 biggerLattice;
-    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
-    //uint3 biggerLatticeMod;
+    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
+                      * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                      * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+                      * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+    UINT* tb = (UINT*)malloc(sizeof(UINT) * uiSize * 2 * _HC_Dir);
+    SIndex* stb = (SIndex*)malloc(sizeof(SIndex) * uiSize);
+    checkCudaErrors(cudaMemcpy(tb, appGetLattice()->m_pIndexCache->m_pWalkingTable, sizeof(UINT) * uiSize * 2 * _HC_Dir, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(stb, appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[1], sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
+    const UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
+    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
+    {
+        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
 
-    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    const UINT threadPerSite = _GetDecompose(uiVolumn);
-    dim3 threads(threadPerSite, 1, 1);
-    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+        const UINT neightbouridx1 = tb[uiBigIdx * _HC_Dir * 2 + 0];
+        const SSmallInt4 mappingIdx1 = __hostSiteIndexToInt4(stb[neightbouridx1].m_uiSiteIndex);
+        const UINT neightbouridx2 = tb[uiBigIdx * _HC_Dir * 2 + 2];
+        const SSmallInt4 mappingIdx2 = __hostSiteIndexToInt4(stb[neightbouridx2].m_uiSiteIndex);
+        const UINT neightbouridx3 = tb[uiBigIdx * _HC_Dir * 2 + 5];
+        const SSmallInt4 mappingIdx3 = __hostSiteIndexToInt4(stb[neightbouridx3].m_uiSiteIndex);
+        const UINT neightbouridx4 = tb[uiBigIdx * _HC_Dir * 2 + 7];
+        const SSmallInt4 mappingIdx4 = __hostSiteIndexToInt4(stb[neightbouridx4].m_uiSiteIndex);
 
-    appGeneral(_T("decomp %d x %d = %d\n"), threads.x, blocks.x, uiVolumn);
+        appGeneral(_T("coord: (%d,%d,%d,%d)  -  %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d)\n"),
+            coord.x, coord.y, coord.z, coord.w,
+            0, mappingIdx1.x, mappingIdx1.y, mappingIdx1.z, mappingIdx1.w,
+            2, mappingIdx2.x, mappingIdx2.y, mappingIdx2.z, mappingIdx2.w,
+            5, mappingIdx3.x, mappingIdx3.y, mappingIdx3.z, mappingIdx3.w,
+            7, mappingIdx4.x, mappingIdx4.y, mappingIdx4.z, mappingIdx4.w
+        );
+    }
+    appSetLogDate(bLogDate);
 
-    _kernelPrintWalkingTable << <blocks, threads >> > ();
+    appSafeFree(tb);
+    appSafeFree(stb);
 }
 
 void CIndexData::DebugPlaqutteTable()
 {
-    preparethread;
-    _kernelDebugPlaqutteTable << <block, threads >> > ();
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+
+    for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)
+    {
+        const SSmallInt4 myself = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T("me = %d, %d, %d, %d\n"), myself.x, myself.y, myself.z, myself.w);
+
+        const UINT uiListIdx = uiSite * uiPlaqPerSite * uiPlaqLength;
+
+        for (UINT i = 0; i < uiPlaqPerSite; ++i)
+        {
+            for (UINT j = 0; j < uiPlaqLength; ++j)
+            {
+                const UINT uiIdx = uiListIdx + i * uiPlaqLength + j;
+                const SIndex& idx = cache[uiListIdx + uiIdx];
+                const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+
+                appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+                    (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+                    (idx.m_byTag & _kDirichlet ? "D" : ""),
+                    coord.x, coord.y, coord.z, coord.w,
+                    idx.m_byDir);
+            }
+            appGeneral(_T("\n"));
+        }
+    }
+    appSafeFree(cache);
+}
+
+void CIndexData::DebugEdgeMapping(BYTE byFieldId)
+{
+    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+
+    SIndex* tb = (SIndex*)malloc(sizeof(SIndex) * uiSize);
+
+    checkCudaErrors(cudaMemcpy(tb, 
+        appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[byFieldId], 
+        sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
+
+    const UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
+    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
+    {
+        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
+        INT x = static_cast<INT>(coord.x);
+        INT y = static_cast<INT>(coord.y);
+        INT z = static_cast<INT>(coord.z);
+        INT t = static_cast<INT>(coord.w);
+        if (x < 0 || x >= static_cast<INT>(_HC_Lx)
+         || y < 0 || y >= static_cast<INT>(_HC_Ly)
+         || z < 0 || z >= static_cast<INT>(_HC_Lz)
+         || t < 0 || t >= static_cast<INT>(_HC_Lt))
+        {
+            const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(tb[uiBigIdx].m_uiSiteIndex);
+            appGeneral(_T("coord: (%d,%d,%d,%d)=(%d,%d,%d,%d)\n"),
+                coord.x, coord.y, coord.z, coord.w,
+                mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w);
+        }
+    }
+    appSetLogDate(bLogDate);
+
+    appSafeFree(tb);
+}
+
+void CIndexData::DebugEdgeGlue(BYTE byFieldId)
+{
+    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+
+    SIndex* tb = (SIndex*)malloc(sizeof(SIndex) * uiSize * _HC_Dir);
+    checkCudaErrors(cudaMemcpy(tb,
+        appGetLattice()->m_pIndexCache->m_pIndexLinkToSIndex[byFieldId],
+        sizeof(SIndex) * uiSize * _HC_Dir, cudaMemcpyDeviceToHost));
+
+    const UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
+    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
+    {
+        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
+        INT x = static_cast<INT>(coord.x);
+        INT y = static_cast<INT>(coord.y);
+        INT z = static_cast<INT>(coord.z);
+        INT t = static_cast<INT>(coord.w);
+        if (x < 0 || x >= static_cast<INT>(_HC_Lx)
+            || y < 0 || y >= static_cast<INT>(_HC_Ly)
+            || z < 0 || z >= static_cast<INT>(_HC_Lz)
+            || t < 0 || t >= static_cast<INT>(_HC_Lt))
+        {
+            for (BYTE byDir = 0; byDir < _HC_Dir; ++byDir)
+            {
+                const SIndex& idx = tb[uiBigIdx * _HC_Dir + byDir];
+                const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+                appGeneral(_T("(%d,%d,%d,%d)_%d=(%d,%d,%d,%d)_%d%s "),
+                    coord.x, coord.y, coord.z, coord.w, byDir,
+                    mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w,
+                    idx.m_byDir, (idx.m_byTag & _kDaggerOrOpposite) ? _T("+") : _T(""));
+            }
+            appGeneral(_T("\n"));
+        }
+    }
+    appSetLogDate(bLogDate);
+
+    appSafeFree(tb);
 }
 
 void CIndex::CalculateSiteCount(class CIndexData* pData) const

@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_GaugeFixing
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -167,14 +167,14 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.35
-    OmegaRange : 0.0585
+    GaugeBate : 5.283
+    OmegaRange : 0.0702
     StartOmega : 0
     EndOmega : 10
     StartN : 201
-    EndN : 2000
+    EndN : 3200
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
-    DistributionJob : EDJ_AngularMomentum
+    DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 16
     StochasticGaussian : 1
@@ -182,14 +182,14 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\UsingCLGConfig\535161\GF
+    SubFolderPrefix : G:\Extrapolation\5283161Nt5\Nt5
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : GFN535161_
-    CSVSavePrefix : F:\CppWorkingFolder\ThermalCircle\Extropolation\AngularAndCond\535161New\GaugeAngular\GFN535161_
+    SavePrefix : NC5283161_
+    CSVSavePrefix : G:\Extrapolation\5283161Nt5\Polyakov\NC5283161_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -200,7 +200,7 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [26, 26, 12, 6]
+    LatticeLength : [22, 22, 10, 5]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -323,23 +323,25 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    Nt : 6
-    OmegaStart : 2
-    OmegaEnd : 2
-    IndexStart : 1801
-    IndexEnd : 2000
+    Nt : 5
+    OmegaStart : 0
+    OmegaEnd : 10
+    IndexStart : 201
+    IndexEnd : 3200
 
     SubFolder : 1
-    SubFolderPrefix : ./535161
-    LoadPrefix : NC535161_
-    SavePrefix : ./535161/GF/GFN535161_
+    SubFolderPrefix : G:\Configurations\5283161GF
+    LoadPrefix : GFN5283161_
+    CheckSubFolder : 1
+    CheckSubFolderPrefix : G:\Configurations\5283161GF
+    SavePrefix : GFN5283161_
     UseLogADefinition : 0
-    OnlyCheck : 0
+    OnlyCheck : 1
     CheckAndFix : 0
 
     Dim : 4
     Dir : 4
-    LatticeLength : [26, 26, 12, 6]
+    LatticeLength : [22, 22, 10, 5]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1

@@ -49,6 +49,8 @@ public:
     UBOOL NeedToFixBoundary() const override { return TRUE; }
 
     void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const override;
+
+    void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const override;
 };
 
 __END_NAMESPACE

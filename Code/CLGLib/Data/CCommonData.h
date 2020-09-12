@@ -165,6 +165,42 @@ __DEFINE_ENUM(ESolverPhase,
             }
             return sSum & 1;
         }
+
+        __device__ void Add(const SSmallInt4& other)
+        {
+            x = x + other.x;
+            y = y + other.y;
+            z = z + other.z;
+            w = w + other.w;
+        }
+
+        __device__ SSmallInt4 AddC(const SSmallInt4& other) const
+        {
+            SSmallInt4 ret;
+            ret.x = x + other.x;
+            ret.y = y + other.y;
+            ret.z = z + other.z;
+            ret.w = w + other.w;
+            return ret;
+        }
+
+        __device__ void Sub(const SSmallInt4& other)
+        {
+            x = x - other.x;
+            y = y - other.y;
+            z = z - other.z;
+            w = w - other.w;
+        }
+
+        __device__ SSmallInt4 SubC(const SSmallInt4& other) const
+        {
+            SSmallInt4 ret;
+            ret.x = x - other.x;
+            ret.y = y - other.y;
+            ret.z = z - other.z;
+            ret.w = w - other.w;
+            return ret;
+        }
         
     };
 #if defined(__cplusplus)
@@ -222,13 +258,29 @@ __device__ __inline__ static SSmallInt4 __deviceSiteIndexToInt4(UINT siteIndex)
     xyzt.w = static_cast<SBYTE>((siteIndex % _DC_MultZ));
     return xyzt;
 }
+
 __device__ __inline__ static SSmallInt4 __deviceLinkIndexToInt4(UINT linkIndex)
 {
     return __deviceSiteIndexToInt4(linkIndex / _DC_Dir);
 }
+
 __device__ __inline__ static SSmallInt4 __deviceFatIndexToInt4(UINT fatIndex)
 {
     return __deviceSiteIndexToInt4(fatIndex / (_DC_Dir + 1));
+}
+
+#pragma endregion
+
+#pragma region Host functions
+
+inline static SSmallInt4 __hostSiteIndexToInt4(UINT siteIndex)
+{
+    SSmallInt4 xyzt;
+    xyzt.x = static_cast<SBYTE>(siteIndex / _HC_MultX);
+    xyzt.y = static_cast<SBYTE>((siteIndex % _HC_MultX) / _HC_MultY);
+    xyzt.z = static_cast<SBYTE>((siteIndex % _HC_MultY) / _HC_MultZ);
+    xyzt.w = static_cast<SBYTE>((siteIndex % _HC_MultZ));
+    return xyzt;
 }
 
 #pragma endregion
@@ -238,6 +290,7 @@ enum
 {
     _kDaggerOrOpposite  = 0x01,
     _kDirichlet         = 0x02,
+    _kGlue              = 0x04,
 };
 
 #define _SINDEX(longlongdata) ((SIndex*)&longlongdata)

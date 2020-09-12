@@ -74,7 +74,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_Step1(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -191,7 +194,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_Step1(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -283,7 +289,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_Step1(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -376,7 +385,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step1(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -496,7 +508,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_Step2(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_m_mu_Fermion, byFieldId);
@@ -618,7 +633,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_Step2(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_m_mu_Fermion, byFieldId);
@@ -722,7 +740,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_Step2(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_m_mu_Fermion, byFieldId);
@@ -826,7 +847,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step2(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pResultData, x_m_mu_Fermion, byFieldId);
@@ -1089,7 +1113,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_WriteEven(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1203,7 +1230,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_WriteEven(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1300,7 +1330,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_WriteEven(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1396,7 +1429,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteEven(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1527,7 +1563,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_WriteBack(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1639,7 +1678,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_WriteBack(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1735,7 +1777,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_WriteBack(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);
@@ -1832,7 +1877,10 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteBack(
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
     deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
-    x_m_mu_Gauge_element.Dagger();
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
 
     deviceWilsonVectorSU3 x_p_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_p_mu_Fermion, byFieldId);
     deviceWilsonVectorSU3 x_m_mu_Fermion_element = _deviceGetFermionBCWilsonSU3(pDeviceData, x_m_mu_Fermion, byFieldId);

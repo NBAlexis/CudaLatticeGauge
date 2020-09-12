@@ -187,6 +187,7 @@ public:
 
     inline void SetLogDate(UBOOL bLog) { m_bLogDate = bLog; }
     inline void SetLogHeader(const CCString& sHeader) { m_sTraceHeader = sHeader; }
+    inline UBOOL GetLogDate() const { return m_bLogDate; }
 
 private:
 
@@ -222,6 +223,11 @@ inline void appSetTracer(EVerboseLevel eLevel, const CCString& filename)
 inline void appFlushLog()
 {
     GTracer.Flush();
+}
+
+inline UBOOL appGetLogDate()
+{
+    return GTracer.GetLogDate();
 }
 
 inline void appSetLogDate(UBOOL bLog)

@@ -63,9 +63,12 @@ public:
 
         //region id is a byte, so max is 256
         checkCudaErrors(cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
-        checkCudaErrors(cudaMalloc((void**)&m_pIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount));
-        
+
+        checkCudaErrors(cudaMalloc((void**)&m_pDeviceIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount));
+        checkCudaErrors(cudaMalloc((void**)&m_pDeviceIndexLinkToSIndex, sizeof(SIndex*) * kMaxFieldCount));
         memset(m_pIndexPositionToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
+        memset(m_pIndexLinkToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
+
         memset(m_pGaugeMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pFermionMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
 
@@ -99,6 +102,11 @@ public:
                 checkCudaErrors(cudaFree(m_pIndexPositionToSIndex[i]));
                 m_pIndexPositionToSIndex[i] = NULL;
             }
+            if (NULL != m_pIndexPositionToSIndex[i])
+            {
+                checkCudaErrors(cudaFree(m_pIndexLinkToSIndex[i]));
+                m_pIndexLinkToSIndex[i] = NULL;
+            }
             if (NULL != m_pGaugeMoveCache[i])
             {
                 checkCudaErrors(cudaFree(m_pGaugeMoveCache[i]));
@@ -112,6 +120,7 @@ public:
         }
 
         checkCudaErrors(cudaFree(m_pDeviceIndexPositionToSIndex));
+        checkCudaErrors(cudaFree(m_pDeviceIndexLinkToSIndex));
     }
 
     __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx) const
@@ -135,6 +144,11 @@ public:
     __device__ __inline__ SIndex _deviceGetMappingIndex(const SSmallInt4& inSite, BYTE byFieldId) const
     {
         return m_pDeviceIndexPositionToSIndex[byFieldId][_deviceGetBigIndex(inSite)];
+    }
+
+    __device__ __inline__ SIndex _deviceGetMappingLink(const SSmallInt4& inSite, BYTE byDir, BYTE byFieldId) const
+    {
+        return m_pDeviceIndexLinkToSIndex[byFieldId][_deviceGetBigIndex(inSite) * 4 + byDir];
     }
 
     __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byDir) const
@@ -240,6 +254,10 @@ public:
 
     static void DebugPlaqutteTable();
 
+    static void DebugEdgeMapping(BYTE byFieldId);
+
+    static void DebugEdgeGlue(BYTE byFieldId);
+
     //=============================================================
     //Small Data
     UINT* m_pSmallData;
@@ -257,8 +275,12 @@ public:
 
     //extend site position to SIndex mapping (i.e. m_pIndexPositionToSIndex[index])
     SIndex* m_pIndexPositionToSIndex[kMaxFieldCount];
+    SIndex* m_pIndexLinkToSIndex[kMaxFieldCount];
+
     //used for device function
     SIndex** m_pDeviceIndexPositionToSIndex;
+    //similar as m_pDeviceIndexPositionToSIndex, but with link
+    SIndex** m_pDeviceIndexLinkToSIndex;
 
     //16*site
     SIndex* m_pPlaqutteCache;
@@ -292,6 +314,93 @@ static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, co
         + (sSite.y + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultY]
         + (sSite.z + CIndexData::kCacheIndexEdge) * pSmallData[CIndexData::kMultZ]
         + (sSite.w + CIndexData::kCacheIndexEdge);
+}
+
+static __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx, const UINT* __restrict__ pSmallData)
+{
+    SSmallInt4 coord;
+    coord.x = static_cast<SBYTE>(uiBigIdx / pSmallData[CIndexData::kMultX]) - CIndexData::kCacheIndexEdge;
+    coord.y = static_cast<SBYTE>((uiBigIdx % pSmallData[CIndexData::kMultX]) / pSmallData[CIndexData::kMultY]) - CIndexData::kCacheIndexEdge;
+    coord.z = static_cast<SBYTE>((uiBigIdx % pSmallData[CIndexData::kMultY]) / pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
+    coord.w = static_cast<SBYTE>(uiBigIdx % pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
+    return coord;
+}
+
+/**
+ * dir = 1,2,3,4 for +x,+y,+z,+t
+ * dir = -1,-2,-3,-4 for -x,-y,-z,-t
+ */
+static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(
+    const SSmallInt4& sStart, INT dir)
+{
+    SSmallInt4 ret = sStart;
+    if (0 == dir)
+    {
+        return ret;
+    }
+    const INT idx = dir < 0 ? (-dir - 1) : (dir - 1);
+    ret.m_byData4[idx] = ret.m_byData4[idx] + (dir > 0 ? 1 : (-1));
+    return ret;
+}
+
+static __device__ __inline__ void _deviceSmallInt4Offset(SSmallInt4& sStart, INT dir)
+{
+    if (0 != dir)
+    {
+        const INT idx = dir < 0 ? (-dir - 1) : (dir - 1);
+        sStart.m_byData4[idx] = sStart.m_byData4[idx] + (dir > 0 ? 1 : (-1));
+    }
+}
+
+static __device__ __inline__ void _deviceSmallInt4Offset(
+    SSmallInt4& sStart, INT* path, BYTE byLength)
+{
+    for (BYTE i = 0; i < byLength; ++i)
+    {
+        if (0 == path[i])
+        {
+            continue;
+        }
+        const INT idx = path[i] < 0 ? (-path[i] - 1) : (path[i] - 1);
+        sStart.m_byData4[idx] = sStart.m_byData4[idx] + (path[i] > 0 ? 1 : (-1));
+    }
+}
+
+static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(
+    const SSmallInt4& sStart, INT* path, BYTE byLength)
+{
+    SSmallInt4 ret = sStart;
+    for (BYTE i = 0; i < byLength; ++i)
+    {
+        if (0 == path[i])
+        {
+            continue;
+        }
+        const INT idx = path[i] < 0 ? (-path[i] - 1) : (path[i] - 1);
+        ret.m_byData4[idx] = ret.m_byData4[idx] + (path[i] > 0 ? 1 : (-1));
+    }
+    return ret;
+}
+
+#pragma endregion
+
+#pragma region Host Functions
+
+inline static SSmallInt4 _hostBigIndexToInt4(UINT uiBigIdx)
+{
+    const UINT uiMX = (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+    const UINT uiMY = (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+    const UINT uiMZ = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+
+    SSmallInt4 coord;
+    coord.x = static_cast<SBYTE>(uiBigIdx / uiMX) - CIndexData::kCacheIndexEdge;
+    coord.y = static_cast<SBYTE>((uiBigIdx % uiMX) / uiMY) - CIndexData::kCacheIndexEdge;
+    coord.z = static_cast<SBYTE>((uiBigIdx % uiMY) / uiMZ) - CIndexData::kCacheIndexEdge;
+    coord.w = static_cast<SBYTE>(uiBigIdx % uiMZ) - CIndexData::kCacheIndexEdge;
+    return coord;
 }
 
 #pragma endregion

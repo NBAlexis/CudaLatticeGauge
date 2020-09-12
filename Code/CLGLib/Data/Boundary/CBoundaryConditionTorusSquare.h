@@ -28,6 +28,8 @@ public:
     void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) override;
 
     void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const override;
+
+    void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const override;
 };
 
 __END_NAMESPACE

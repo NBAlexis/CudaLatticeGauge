@@ -587,9 +587,6 @@ _kernelCalculateNablaE(
             _deviceLink(pDeviceData, uiBigIdx, 4, byFieldId, dirs)
         );
 
-        //const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIdx * uiDir2 + dir];
-        //const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex;
-
         //
         dirs[0] = 4;
         dirs[1] = dir;
