@@ -514,6 +514,7 @@ _kernelTransformToIALog(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformToE(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pRes)
 {
@@ -531,7 +532,7 @@ _kernelTransformToE(
             //find clover F
             //res = _deviceClover(pDeviceData, uiBigIdx, 3, dir);
             //test not using clover
-            res = _device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx);
+            res = _device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx, sSite4, byFieldId);
             //res.iIm2();
             //not using clover not multiply 0.25
             //res.MulReal(F(0.125));
@@ -555,7 +556,7 @@ _kernelCalculateNablaE(
 {
     intokernalInt4;
     //const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
 
     //i=0: 12
@@ -584,7 +585,7 @@ _kernelCalculateNablaE(
         dirs[3] = -4;
         deviceSU3 toMul(
             //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
-            _deviceLink(pDeviceData, uiBigIdx, 4, byFieldId, dirs)
+            _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
         );
 
         //
@@ -594,7 +595,7 @@ _kernelCalculateNablaE(
         dirs[2] = -4;
         dirs[3] = dir + 1;
         toMul.MulDagger(
-            _deviceLink(pDeviceData, uiBigIdx, 4, byFieldId, dirs)
+            _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
         );
         pRes[uiResLinkIdx].Add(toMul);
     }
@@ -1092,7 +1093,7 @@ void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const
     CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(pResoult);
 
     preparethread;
-    _kernelTransformToE << <block, threads >> > (m_pDeviceData, pUField->m_pDeviceData);
+    _kernelTransformToE << <block, threads >> > (pUField->m_byFieldId, m_pDeviceData, pUField->m_pDeviceData);
 }
 
 void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult) const

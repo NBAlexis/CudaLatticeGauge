@@ -55,36 +55,18 @@ protected:
 
 #pragma region device functions
 
-/**
- * U_{mu,nu}(n)+U^+_{-mu,nu}(n)+U^+_{mu,-nu}(n)+U_{-mu,-nu}(n)
- * or
- * U_{mu,nu}(n)+U_{nu,-mu}(n)+U_{-nu,mu}(n)+U_{-mu,-nu}(n) <--- we are using this one
- * or
- * U_{mu,nu}(n)+U_{mu,nu}(n-mu)+U_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu)
- *
- */
-static __device__ __inline__ deviceSU3 _deviceClover(const deviceSU3* __restrict__ pGaugeField, UINT uiBigIdx, BYTE mu, BYTE nu)
-{
-    deviceSU3 ret(_device1PlaqutteTermPP(pGaugeField, mu, nu, uiBigIdx));
-    ret.Add(_device1PlaqutteTermMM(pGaugeField, mu, nu, uiBigIdx));
-    ret.Add(_device1PlaqutteTermPM(pGaugeField, nu, mu, uiBigIdx));
-    ret.Add(_device1PlaqutteTermMP(pGaugeField, nu, mu, uiBigIdx));
-
-    return ret;
-}
-
-static __device__ __inline__ Real _deviceTrImClover(const deviceSU3* __restrict__ pGaugeField, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE rho, BYTE sigma)
+static __device__ __inline__ Real _deviceTrImClover(const deviceSU3* __restrict__ pGaugeField, BYTE byFieldId, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE rho, BYTE sigma)
 {
     return deviceSU3::TrIm(
-        _deviceClover(pGaugeField, uiBigIdx, mu, nu),
-        _deviceClover(pGaugeField, uiBigIdx, rho, sigma));
+        _deviceClover(pGaugeField, sSite4, uiBigIdx, mu, nu, byFieldId),
+        _deviceClover(pGaugeField, sSite4, uiBigIdx, rho, sigma, byFieldId));
 }
 
-static __device__ __inline__ Real _deviceTopologicalCharge(const deviceSU3* __restrict__ pGaugeField, UINT uiBigIdx)
+static __device__ __inline__ Real _deviceTopologicalCharge(const deviceSU3* __restrict__ pGaugeField, BYTE byFieldId, const SSmallInt4& sSite4, UINT uiBigIdx)
 {
-    Real ret = _deviceTrImClover(pGaugeField, uiBigIdx, 0, 1, 2, 3);
-    ret -= _deviceTrImClover(pGaugeField, uiBigIdx, 0, 2, 1, 3);
-    ret += _deviceTrImClover(pGaugeField, uiBigIdx, 0, 3, 1, 2);
+    Real ret = _deviceTrImClover(pGaugeField, byFieldId, sSite4, uiBigIdx, 0, 1, 2, 3);
+    ret -= _deviceTrImClover(pGaugeField, byFieldId, sSite4, uiBigIdx, 0, 2, 1, 3);
+    ret += _deviceTrImClover(pGaugeField, byFieldId, sSite4, uiBigIdx, 0, 3, 1, 2);
     return OneOver32PI2 * F(2.0) * ret;
 }
 

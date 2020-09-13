@@ -37,7 +37,6 @@ public:
     CIndexData()
         : m_pSmallData(NULL)
         , m_byRegionTable(NULL)
-        , m_pWalkingTable(NULL)
         , m_pMappingTable(NULL)
         , m_pBondInfoTable(NULL)
         , m_pPlaqutteCache(NULL)
@@ -48,10 +47,6 @@ public:
         , m_uiLinkNumber(1)
     {
         checkCudaErrors(cudaMalloc((void**)&m_pSmallData, sizeof(UINT) * kCacheIndexSmallDataCount));
-        checkCudaErrors(cudaMalloc((void**)&m_pWalkingTable, sizeof(UINT)
-            * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge) 
-            * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge)
-            * _HC_Dir * 2));
         checkCudaErrors(cudaMalloc((void**)&m_pMappingTable, sizeof(SSmallInt4)
             * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
             * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge) ));
@@ -79,7 +74,6 @@ public:
     ~CIndexData()
     {
         checkCudaErrors(cudaFree(m_pSmallData));
-        checkCudaErrors(cudaFree(m_pWalkingTable));
         checkCudaErrors(cudaFree(m_pMappingTable));
         checkCudaErrors(cudaFree(m_byRegionTable));
         checkCudaErrors(cudaFree(m_pBondInfoTable));
@@ -167,21 +161,6 @@ public:
     //        [_deviceIndexWalkBI(byFieldId, _deviceGetBigIndex(inSite), uiWalkDir)];
     //}
 
-    //__device__ __inline__ SIndex _deviceIndexWalkDouble(
-    //    BYTE byFieldId, const SSmallInt4& inSite,
-    //    SBYTE uiWalkDir1, SBYTE uiWalkDir2) const
-    //{
-    //    //walking
-    //    UINT uiMoved = m_pWalkingTable
-    //        [
-    //            _deviceGetBigIndex(inSite) * 2 * _DC_Dir
-    //            + (uiWalkDir1 > 0) ? (uiWalkDir1 - 1) : (_DC_Dir - uiWalkDir1 - 1)
-    //        ];
-    //    uiMoved = m_pWalkingTable
-    //        [
-    //            uiMoved * 2 * _DC_Dir
-    //            + (uiWalkDir2 > 0) ? (uiWalkDir2 - 1) : (_DC_Dir - uiWalkDir2 - 1)
-    //        ];
 
     //    return m_pDeviceIndexPositionToSIndex[byFieldId]
     //        [_deviceIndexWalkDoubleBI(
@@ -190,54 +169,6 @@ public:
     //            uiWalkDir1, 
     //            uiWalkDir2
     //        )];
-    //}
-
-    //__device__ __inline__ UINT _deviceIndexWalkBI(
-    //    BYTE byFieldId, UINT uiBigIndex,
-    //    SBYTE uiWalkDir) const
-    //{
-    //    //walking
-    //    return m_pWalkingTable
-    //        [
-    //            uiBigIndex * 2 * _DC_Dir
-    //            + (uiWalkDir > 0) ? (uiWalkDir - 1) : (_DC_Dir - uiWalkDir + 1)
-    //        ];
-    //}
-
-    //__device__ __inline__ UINT _deviceIndexWalkDoubleBI(
-    //    BYTE byFieldId, UINT uiBigIndex,
-    //    SBYTE uiWalkDir1, SBYTE uiWalkDir2) const
-    //{
-    //    //walking
-    //    UINT uiMoved = m_pWalkingTable
-    //        [
-    //            uiBigIndex * 2 * _DC_Dir
-    //            + (uiWalkDir1 > 0) ? (uiWalkDir1 - 1) : (_DC_Dir - uiWalkDir1 + 1)
-    //        ];
-    //    return m_pWalkingTable
-    //        [
-    //            uiMoved * 2 * _DC_Dir
-    //            + (uiWalkDir2 > 0) ? (uiWalkDir2 - 1) : (_DC_Dir - uiWalkDir2 + 1)
-    //        ];
-    //}
-
-    //__device__ void _deviceIndexWalkChain(
-    //    BYTE byFieldId, const SSmallInt4& inSite,
-    //    const SBYTE* __restrict__ uiWalkDir, 
-    //    SIndex* res, 
-    //    BYTE byCount) const
-    //{
-    //    //map to Index Position
-    //    UINT idxPos = _deviceGetBigIndex(inSite);
-    //    for (BYTE i = 0; i < byCount; ++i)
-    //    {
-    //        BYTE dirNow = uiWalkDir[i];
-    //        //walking
-    //        dirNow = (dirNow > 0) ? (dirNow - 1) : static_cast<BYTE>(_DC_Dir - dirNow + 1);
-    //        idxPos = m_pWalkingTable[idxPos * 2 * _DC_Dir + dirNow];
-    //        //return a SIndex
-    //        res[i] = m_pDeviceIndexPositionToSIndex[byFieldId][idxPos];
-    //    }
     //}
 
     __device__ __inline__ UINT _devcieExchangeBoundaryFieldSiteIndexBI(BYTE byField, UINT bigIdx) const
@@ -250,8 +181,6 @@ public:
         return NULL == m_byRegionTable ? 0 : m_byRegionTable[site.m_byReginId];
     }
 
-    static void DebugPrintWalkingTable();
-
     static void DebugPlaqutteTable();
 
     static void DebugEdgeMapping(BYTE byFieldId);
@@ -263,13 +192,6 @@ public:
     UINT* m_pSmallData;
     UINT* m_byRegionTable;
 
-    /**
-    * extend site * dir * 2
-    * cached the neighbours of a site, cached as a index of m_pWalkingTable[index]
-    * N-mu is m_pWalkingTable[N * DIR * 2 + mu]
-    * N+mu is m_pWalkingTable[N * DIR * 2 + DIR + mu]
-    */
-    UINT* m_pWalkingTable;
     SSmallInt4* m_pMappingTable;
     BYTE* m_pBondInfoTable;
 
@@ -325,6 +247,11 @@ static __device__ __inline__ SSmallInt4 _deviceBigIndexToInt4(UINT uiBigIdx, con
     coord.w = static_cast<SBYTE>(uiBigIdx % pSmallData[CIndexData::kMultZ]) - CIndexData::kCacheIndexEdge;
     return coord;
 }
+
+#define __fwd(dir) (dir + 1)
+#define __bck(dir) (-static_cast<INT>(dir) - 1)
+#define __bi(site) __idx->_deviceGetBigIndex(site)
+#define __bi4(site) __idx->_deviceGetBigIndex(site) * _DC_Dir
 
 /**
  * dir = 1,2,3,4 for +x,+y,+z,+t

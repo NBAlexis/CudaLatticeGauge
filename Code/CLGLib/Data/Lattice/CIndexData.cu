@@ -77,44 +77,44 @@ UINT inline _GetDecompose(UINT volumn)
     return uiMax;
 }
 
-void CIndexData::DebugPrintWalkingTable()
-{
-    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
-                      * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
-                      * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
-                      * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
-    UINT* tb = (UINT*)malloc(sizeof(UINT) * uiSize * 2 * _HC_Dir);
-    SIndex* stb = (SIndex*)malloc(sizeof(SIndex) * uiSize);
-    checkCudaErrors(cudaMemcpy(tb, appGetLattice()->m_pIndexCache->m_pWalkingTable, sizeof(UINT) * uiSize * 2 * _HC_Dir, cudaMemcpyDeviceToHost));
-    checkCudaErrors(cudaMemcpy(stb, appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[1], sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
-    const UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
-    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
-    {
-        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
-
-        const UINT neightbouridx1 = tb[uiBigIdx * _HC_Dir * 2 + 0];
-        const SSmallInt4 mappingIdx1 = __hostSiteIndexToInt4(stb[neightbouridx1].m_uiSiteIndex);
-        const UINT neightbouridx2 = tb[uiBigIdx * _HC_Dir * 2 + 2];
-        const SSmallInt4 mappingIdx2 = __hostSiteIndexToInt4(stb[neightbouridx2].m_uiSiteIndex);
-        const UINT neightbouridx3 = tb[uiBigIdx * _HC_Dir * 2 + 5];
-        const SSmallInt4 mappingIdx3 = __hostSiteIndexToInt4(stb[neightbouridx3].m_uiSiteIndex);
-        const UINT neightbouridx4 = tb[uiBigIdx * _HC_Dir * 2 + 7];
-        const SSmallInt4 mappingIdx4 = __hostSiteIndexToInt4(stb[neightbouridx4].m_uiSiteIndex);
-
-        appGeneral(_T("coord: (%d,%d,%d,%d)  -  %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d)\n"),
-            coord.x, coord.y, coord.z, coord.w,
-            0, mappingIdx1.x, mappingIdx1.y, mappingIdx1.z, mappingIdx1.w,
-            2, mappingIdx2.x, mappingIdx2.y, mappingIdx2.z, mappingIdx2.w,
-            5, mappingIdx3.x, mappingIdx3.y, mappingIdx3.z, mappingIdx3.w,
-            7, mappingIdx4.x, mappingIdx4.y, mappingIdx4.z, mappingIdx4.w
-        );
-    }
-    appSetLogDate(bLogDate);
-
-    appSafeFree(tb);
-    appSafeFree(stb);
-}
+//void CIndexData::DebugPrintWalkingTable()
+//{
+//    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
+//                      * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+//                      * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+//                      * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+//    UINT* tb = (UINT*)malloc(sizeof(UINT) * uiSize * 2 * _HC_Dir);
+//    SIndex* stb = (SIndex*)malloc(sizeof(SIndex) * uiSize);
+//    checkCudaErrors(cudaMemcpy(tb, appGetLattice()->m_pIndexCache->m_pWalkingTable, sizeof(UINT) * uiSize * 2 * _HC_Dir, cudaMemcpyDeviceToHost));
+//    checkCudaErrors(cudaMemcpy(stb, appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[1], sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
+//    const UBOOL bLogDate = appGetLogDate();
+//    appSetLogDate(FALSE);
+//    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
+//    {
+//        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
+//
+//        const UINT neightbouridx1 = tb[uiBigIdx * _HC_Dir * 2 + 0];
+//        const SSmallInt4 mappingIdx1 = __hostSiteIndexToInt4(stb[neightbouridx1].m_uiSiteIndex);
+//        const UINT neightbouridx2 = tb[uiBigIdx * _HC_Dir * 2 + 2];
+//        const SSmallInt4 mappingIdx2 = __hostSiteIndexToInt4(stb[neightbouridx2].m_uiSiteIndex);
+//        const UINT neightbouridx3 = tb[uiBigIdx * _HC_Dir * 2 + 5];
+//        const SSmallInt4 mappingIdx3 = __hostSiteIndexToInt4(stb[neightbouridx3].m_uiSiteIndex);
+//        const UINT neightbouridx4 = tb[uiBigIdx * _HC_Dir * 2 + 7];
+//        const SSmallInt4 mappingIdx4 = __hostSiteIndexToInt4(stb[neightbouridx4].m_uiSiteIndex);
+//
+//        appGeneral(_T("coord: (%d,%d,%d,%d)  -  %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d) %d=(%d,%d,%d,%d)\n"),
+//            coord.x, coord.y, coord.z, coord.w,
+//            0, mappingIdx1.x, mappingIdx1.y, mappingIdx1.z, mappingIdx1.w,
+//            2, mappingIdx2.x, mappingIdx2.y, mappingIdx2.z, mappingIdx2.w,
+//            5, mappingIdx3.x, mappingIdx3.y, mappingIdx3.z, mappingIdx3.w,
+//            7, mappingIdx4.x, mappingIdx4.y, mappingIdx4.z, mappingIdx4.w
+//        );
+//    }
+//    appSetLogDate(bLogDate);
+//
+//    appSafeFree(tb);
+//    appSafeFree(stb);
+//}
 
 void CIndexData::DebugPlaqutteTable()
 {

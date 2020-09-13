@@ -11,7 +11,7 @@
 
 UINT TestRotation(CParameters& sParam)
 {
-    const Real fExpected = F(0.65);
+    Real fExpected = F(0.65);
 
     INT iVaule = 2;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
@@ -20,7 +20,9 @@ UINT TestRotation(CParameters& sParam)
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
     const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
-    //sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+#if !_CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+#endif
 
     //we calculate staple energy from beta = 1 - 6
     //CActionGaugePlaquette * pAction = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
@@ -48,7 +50,7 @@ UINT TestRotation(CParameters& sParam)
     
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
 #if _CLG_DEBUG
-    appGetLattice()->m_pUpdator->Update(3, TRUE);
+    appGetLattice()->m_pUpdator->Update(4, TRUE);
 #else
     appGetLattice()->m_pUpdator->Update(iAfterEquib, TRUE);
 #endif
@@ -376,7 +378,6 @@ UINT TestRotationKS(CParameters& sParam)
     {
         return 1;
     }
-    CIndexData::DebugPrintWalkingTable();
 
 #if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(1, FALSE);

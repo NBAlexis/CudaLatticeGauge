@@ -63,12 +63,14 @@ UINT TestBoundary(CParameters& sParam)
 
 UINT TestBoundaryMapping(CParameters& sParam)
 {
-    CIndexData::DebugEdgeMapping(1);
-    CIndexData::DebugEdgeGlue(1);
+    //CIndexData::DebugEdgeMapping(1);
+    //CIndexData::DebugEdgeGlue(1);
 
     appGeneral(_T("action1: %2.20f\n"), appGetLattice()->m_pActionList[0]->Energy(
         FALSE, appGetLattice()->m_pGaugeField, NULL));
     appGeneral(_T("action2: %2.20f\n"), appGetLattice()->m_pActionList[1]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    appGeneral(_T("action3: %2.20f\n"), appGetLattice()->m_pActionList[2]->Energy(
         FALSE, appGetLattice()->m_pGaugeField, NULL));
 
     CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());

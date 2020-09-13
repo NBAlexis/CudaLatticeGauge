@@ -61,7 +61,7 @@ public:
  */
 static __device__ __inline__ deviceSU3 _deviceVXXTau(
     const deviceSU3* __restrict__ pDeviceData,
-    UINT uiStartBigIdx, BYTE byFieldId,
+    const SSmallInt4& sStartSite, BYTE byFieldId,
     UBOOL bXorY, UBOOL bPlusMu, UBOOL bPlusTau)
 {
     const INT iMu = bXorY ? (bPlusMu ? 1 : -1) : (bPlusMu ? 2 : -2);
@@ -71,17 +71,17 @@ static __device__ __inline__ deviceSU3 _deviceVXXTau(
     dir1[0] = iMu;
     dir1[1] = iMu;
     dir1[2] = iTau;
-    deviceSU3 sRet = _deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1);
+    deviceSU3 sRet = _deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1);
     
     dir1[0] = iMu;
     dir1[1] = iTau;
     dir1[2] = iMu;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iTau;
     dir1[1] = iMu;
     dir1[2] = iMu;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     sRet.MulReal(OneOver3);
     return sRet;
@@ -119,7 +119,7 @@ static __device__ __inline__ Real _deviceEta124(const SSmallInt4& sSite)
 
 static __device__ __inline__ deviceSU3 _deviceVXYT(
     const deviceSU3* __restrict__ pDeviceData,
-    UINT uiStartBigIdx, BYTE byFieldId,
+    const SSmallInt4& sStartSite, BYTE byFieldId,
     UBOOL bPlusX, UBOOL bPlusY, UBOOL bPlusTau)
 {
     const INT iX = bPlusX ? 1 : -1;
@@ -128,22 +128,22 @@ static __device__ __inline__ deviceSU3 _deviceVXYT(
     INT dir1[3];
 
     dir1[0] = iX; dir1[1] = iY; dir1[2] = iT;
-    deviceSU3 sRet(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    deviceSU3 sRet(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iX; dir1[1] = iT; dir1[2] = iY;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iY; dir1[1] = iX; dir1[2] = iT;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iY; dir1[1] = iT; dir1[2] = iX;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iT; dir1[1] = iX; dir1[2] = iY;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     dir1[0] = iT; dir1[1] = iY; dir1[2] = iX;
-    sRet.Add(_deviceLink(pDeviceData, uiStartBigIdx, 3, byFieldId, dir1));
+    sRet.Add(_deviceLink(pDeviceData, sStartSite, 3, byFieldId, dir1));
 
     sRet.MulReal(OneOver6);
     return sRet;

@@ -73,50 +73,82 @@ static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_XY(
     BYTE byFieldId,
     UINT uiBigIndex, BYTE mu, BYTE nu)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
-    const UINT uiBIDir2 = uiBigIndex * uiDir2;
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBIDir2 + mu + uiDir1];
-    const UINT uiN_p_nu = __idx->m_pWalkingTable[uiBIDir2 + nu + uiDir1];
-    const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBIDir2 + nu];
-    const UINT uiN_p_mu_m_nu = __idx->m_pWalkingTable[uiN_m_nu * uiDir2 + mu + uiDir1];
-    const SSmallInt4 sSiteN_m_nu = __deviceSiteIndexToInt4(
-        __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex
-    );
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
+
+    //n->nu
+    //n_p_nu->mu
+    //n_p_mu->nu +
+    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+    SIndex n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
+    n_p_mu__nu.m_byTag = n_p_mu__nu.m_byTag ^ _kDaggerOrOpposite;
+
     deviceSU3 left(
-        _deviceGetSTTerm(
-            pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
-        ));
+        //_deviceGetSTTerm(
+        //    byFieldId, pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
+        //)
+        _deviceGetSTTerm(byFieldId, pDeviceData, n__nu, n_p_nu__mu, n_p_mu__nu)
+    );
     left.MulReal(_deviceGnAcc(sSite, fGsq));
 
-    left.Add(_deviceGetSTTerm(
-            pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
-        ).MulRealC(_deviceGnAcc(sSiteN_m_nu, fGsq)));
+
+    const UINT n_m_nu_bi = __bi(n_m_nu);
+    const UINT n_m_nu_bi4 = n_m_nu_bi * _DC_Dir;
+    SIndex n_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
+    n_m_nu__nu.m_byTag = n_m_nu__nu.m_byTag ^ _kDaggerOrOpposite;
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
+    const SIndex& n_p_mu_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu_m_nu) + nu];
+
+    const SIndex& site_n_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][n_m_nu_bi];
+    
+    left.Add(
+        //_deviceGetSTTerm(
+        //    byFieldId, pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
+        //)
+        _deviceGetSTTerm(byFieldId, pDeviceData, n_m_nu__nu, n_m_nu__mu, n_p_mu_m_nu__nu)        
+        .MulRealC(_deviceGnAcc(__deviceSiteIndexToInt4(site_n_m_nu.m_uiSiteIndex), fGsq)));
 
     return left;
 }
 
 static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_T(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
     Real fGsq,
     UINT uiBigIndex, BYTE mu, BYTE nu)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
-    const UINT uiBIDir2 = uiBigIndex * uiDir2;
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBIDir2 + mu + uiDir1];
-    const UINT uiN_p_nu = __idx->m_pWalkingTable[uiBIDir2 + nu + uiDir1];
-    const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBIDir2 + nu];
-    const UINT uiN_p_mu_m_nu = __idx->m_pWalkingTable[uiN_m_nu * uiDir2 + mu + uiDir1];
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
+
+    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+    SIndex n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
+    n_p_mu__nu.m_byTag = n_p_mu__nu.m_byTag ^ _kDaggerOrOpposite;
+
+    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
+    SIndex n_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
+    n_m_nu__nu.m_byTag = n_m_nu__nu.m_byTag ^ _kDaggerOrOpposite;
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
+    const SIndex& n_p_mu_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu_m_nu) + nu];
 
     deviceSU3 left(
-        _deviceGetSTTerm(
-            pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
-        ));
-    left.Add(_deviceGetSTTerm(
-        pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
-    ));
+        //_deviceGetSTTerm(
+        //    pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
+        //)
+        _deviceGetSTTerm(byFieldId, pDeviceData, n__nu, n_p_nu__mu, n_p_mu__nu)
+    );
+    left.Add(
+    //    _deviceGetSTTerm(
+    //    pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
+    //)
+    _deviceGetSTTerm(byFieldId, pDeviceData, n_m_nu__nu, n_m_nu__mu, n_p_mu_m_nu__nu)
+    );
 
     left.MulReal(_deviceGnAcc(sSite, fGsq));
 
@@ -129,7 +161,7 @@ static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_T(
 static __device__ __inline__ Real _deviceHi_Acc(
     const SSmallInt4& site, const SSmallInt4& site2)
 {
-    return (site.w + site2.w);
+    return (site.w + site2.w) * F(0.5);
 }
 
 /**
@@ -137,22 +169,25 @@ static __device__ __inline__ Real _deviceHi_Acc(
 * mu nu
 * - +,
 */
-static __device__ __inline__ deviceSU3 _deviceStapleS1_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleS1_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
-    const UINT uiBIDir2 = uiBigIndex * uiDir2;
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
 
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBIDir2 + mu + uiDir1];
-    const UINT uiN_p_nu = __idx->m_pWalkingTable[uiBIDir2 + nu + uiDir1];
+    const UINT uiN_p_nu = __bi(n_p_nu);
 
-    const UINT uiSiteN_p_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_nu].m_uiSiteIndex;
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_p_nu * _DC_Dir + mu];
+    const SIndex& n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
 
-    deviceSU3 ret(_deviceS1(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_p_nu, mu));
-    ret.MulDagger(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_p_mu, nu));
+    const UINT uiSiteN_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_nu].m_uiSiteIndex;
+
+    deviceSU3 ret(_deviceS1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
+    ret.MulDagger(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_mu__nu, byFieldId));
 
     ret.MulReal(_deviceHi_Acc(sSite, __deviceSiteIndexToInt4(uiSiteN_p_nu)));
 
@@ -164,21 +199,25 @@ static __device__ __inline__ deviceSU3 _deviceStapleS1_Acc(const deviceSU3* __re
 * mu nu
 * + +
 */
-static __device__ __inline__ deviceSU3 _deviceStapleS2_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleS2_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
+    const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite, __bck(mu));
+    const SSmallInt4 n_m_mu_p_nu = _deviceSmallInt4OffsetC(n_m_mu, __fwd(nu));
 
-    const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + nu];
-    const UINT uiN_m_nu_p_mu = __idx->m_pWalkingTable[uiN_m_nu * uiDir2 + mu + uiDir1];
+    const UINT uiN_m_nu = __bi(n_m_mu);
 
-    const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_m_nu].m_uiSiteIndex;
+    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_nu * _DC_Dir + mu];
+    const SIndex& n_m_mu_p_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_mu_p_nu) + nu];
 
-    deviceSU3 ret(_deviceS2(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_nu, mu));
-    ret.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_nu_p_mu, nu));
+    const UINT uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu].m_uiSiteIndex;
+
+    deviceSU3 ret(_deviceS2(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu__mu, byFieldId));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu_p_nu__nu, byFieldId));
 
     ret.MulReal(_deviceHi_Acc(sSite, __deviceSiteIndexToInt4(uiSiteN_m_nu)));
 
@@ -190,22 +229,27 @@ static __device__ __inline__ deviceSU3 _deviceStapleS2_Acc(const deviceSU3* __re
 * nu mu
 * + +
 */
-static __device__ __inline__ deviceSU3 _deviceStapleS3_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleS3_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData, const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
 
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + mu + uiDir1];
-    const UINT uiN_p_mu_p_nu = __idx->m_pWalkingTable[uiN_p_mu * uiDir2 + nu + uiDir1];
-    const UINT uiN_p_nu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + nu + uiDir1];
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
 
-    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu].m_uiSiteIndex;
-    const UINT uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu_p_nu].m_uiSiteIndex;
+    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + mu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
 
-    deviceSU3 ret(_deviceGetGaugeBCSU3Dir(pDeviceData, uiBigIndex, nu));
-    ret.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_p_nu, mu));
-    ret.Mul(_deviceS3(pDeviceData, uiBigIndex, mu, nu, rho));
+    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu].m_uiSiteIndex;
+    const UINT uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu].m_uiSiteIndex;
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n__nu, byFieldId));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
+    ret.Mul(_deviceS3(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
 
     ret.MulReal(_deviceHi_Acc(
         __deviceSiteIndexToInt4(uiSiteN_p_mu),
@@ -220,22 +264,28 @@ static __device__ __inline__ deviceSU3 _deviceStapleS3_Acc(const deviceSU3* __re
 * nu mu
 * - +
 */
-static __device__ __inline__ deviceSU3 _deviceStapleS4_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleS4_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData, const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
+    
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_m_nu = __bi(n_p_mu_m_nu);
+    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
 
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + mu + uiDir1];
-    const UINT uiN_p_mu_m_nu = __idx->m_pWalkingTable[uiN_p_mu * uiDir2 + nu];
-    const UINT uiN_m_nu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + nu];
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
+    const SIndex& n_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
 
-    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu].m_uiSiteIndex;
-    const UINT uiSiteN_p_mu_m_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu_m_nu].m_uiSiteIndex;
+    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu].m_uiSiteIndex;
+    const UINT uiSiteN_p_mu_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_m_nu].m_uiSiteIndex;
 
-    deviceSU3 ret(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_nu, nu));
-    ret.DaggerMul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_nu, mu));
-    ret.Mul(_deviceS4(pDeviceData, uiBigIndex, mu, nu, rho));
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu__nu, byFieldId));
+    ret.DaggerMul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu__mu, byFieldId));
+    ret.Mul(_deviceS4(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
 
     ret.MulReal(_deviceHi_Acc(__deviceSiteIndexToInt4(uiSiteN_p_mu),
         __deviceSiteIndexToInt4(uiSiteN_p_mu_m_nu)));
@@ -248,22 +298,26 @@ static __device__ __inline__ deviceSU3 _deviceStapleS4_Acc(const deviceSU3* __re
 * mu mu, + -
 *
 */
-static __device__ __inline__ deviceSU3 _deviceStapleT1_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleT1_Acc(BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData, const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
+    const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
 
-    const UINT uiN_p_mu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + mu + uiDir1];
-    const UINT uiN_p_nu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + nu + uiDir1];
-    const UINT uiN_p_mu_p_nu = __idx->m_pWalkingTable[uiN_p_mu * uiDir2 + nu + uiDir1];
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
 
-    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu].m_uiSiteIndex;
-    const UINT uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_p_mu_p_nu].m_uiSiteIndex;
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+    const SIndex& n__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + mu];
 
-    deviceSU3 ret(_deviceGetGaugeBCSU3Dir(pDeviceData, uiBigIndex, mu));
-    ret.Mul(_deviceT1(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.MulDagger(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_p_nu, mu));
+    const UINT uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu].m_uiSiteIndex;
+    const UINT uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu].m_uiSiteIndex;
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n__mu, byFieldId));
+    ret.Mul(_deviceT1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.MulDagger(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
 
     ret.MulReal(_deviceHi_Acc(
         __deviceSiteIndexToInt4(uiSiteN_p_mu),
@@ -277,21 +331,26 @@ static __device__ __inline__ deviceSU3 _deviceStapleT1_Acc(const deviceSU3* __re
 * mu mu, - +
 *
 */
-static __device__ __inline__ deviceSU3 _deviceStapleT2_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleT2_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData, const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    const UINT uiDir1 = _DC_Dir;
-    const UINT uiDir2 = uiDir1 * 2;
+    const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite, __bck(mu));
+    const SSmallInt4 n_m_mu_p_nu = _deviceSmallInt4OffsetC(n_m_mu, __fwd(nu));
 
-    const UINT uiN_m_mu = __idx->m_pWalkingTable[uiBigIndex * uiDir2 + mu];
-    const UINT uiN_m_mu_p_nu = __idx->m_pWalkingTable[uiN_m_mu * uiDir2 + nu + uiDir1];
+    const UINT uiN_m_mu = __bi(n_m_mu);
+    const UINT uiN_m_mu_p_nu = __bi(n_m_mu_p_nu);
 
-    const UINT uiSiteN_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_m_mu].m_uiSiteIndex;
-    const UINT uiSiteN_m_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[1][uiN_m_mu_p_nu].m_uiSiteIndex;
+    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu * _DC_Dir + mu];
+    const SIndex& n_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu_p_nu * _DC_Dir + mu];
 
-    deviceSU3 ret(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_mu, mu));
-    ret.DaggerMul(_deviceT2(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.Mul(_deviceGetGaugeBCSU3Dir(pDeviceData, uiN_m_mu_p_nu, mu));
+    const UINT uiSiteN_m_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu].m_uiSiteIndex;
+    const UINT uiSiteN_m_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu_p_nu].m_uiSiteIndex;
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu__mu, byFieldId));
+    ret.DaggerMul(_deviceT2(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu_p_nu__mu, byFieldId));
 
     ret.MulReal(_deviceHi_Acc(
         __deviceSiteIndexToInt4(uiSiteN_m_mu),
@@ -305,14 +364,16 @@ static __device__ __inline__ deviceSU3 _deviceStapleT2_Acc(const deviceSU3* __re
 * _deviceChairTerm1,2,3 for partial mu, nu, rho
 * For partial mu, the staple is (1/8)(s1+s2+s3+s4)
 */
-static __device__ __inline__ deviceSU3 _deviceStapleChairTerm1_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleChairTerm1_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    deviceSU3 ret(_deviceStapleS1_Acc(pDeviceData, sSite, uiBigIndex, mu, nu, rho));
-    ret.Add(_deviceStapleS2_Acc(pDeviceData, sSite, uiBigIndex, mu, nu, rho));
-    ret.Add(_deviceStapleS3_Acc(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.Add(_deviceStapleS4_Acc(pDeviceData, uiBigIndex, mu, nu, rho));
+    deviceSU3 ret(_deviceStapleS1_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Add(_deviceStapleS2_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Add(_deviceStapleS3_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Add(_deviceStapleS4_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
     return ret;
 }
 
@@ -321,13 +382,15 @@ static __device__ __inline__ deviceSU3 _deviceStapleChairTerm1_Acc(const deviceS
 * _deviceChairTerm1,2,3 for partial mu, nu, rho
 * It is (1/8) * (T1+T2 + T1(mu<->rho) + T2(mu<->rho))
 */
-static __device__ __inline__ deviceSU3 _deviceStapleChairTerm2_Acc(const deviceSU3* __restrict__ pDeviceData,
+static __device__ __inline__ deviceSU3 _deviceStapleChairTerm2_Acc(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData, const SSmallInt4& sSite,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho)
 {
-    deviceSU3 ret(_deviceStapleT1_Acc(pDeviceData, uiBigIndex, mu, nu, rho));
-    ret.Add(_deviceStapleT2_Acc(pDeviceData,  uiBigIndex, mu, nu, rho));
-    ret.Add(_deviceStapleT1_Acc(pDeviceData, uiBigIndex, rho, nu, mu));
-    ret.Add(_deviceStapleT2_Acc(pDeviceData, uiBigIndex, rho, nu, mu));
+    deviceSU3 ret(_deviceStapleT1_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Add(_deviceStapleT2_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Add(_deviceStapleT1_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, rho, nu, mu));
+    ret.Add(_deviceStapleT2_Acc(byFieldId, pDeviceData, sSite, uiBigIndex, rho, nu, mu));
     return ret;
 }
 

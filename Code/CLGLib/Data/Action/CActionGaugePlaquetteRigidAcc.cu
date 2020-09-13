@@ -39,15 +39,15 @@ _kernelEnergy_RigidAcc(
 
     const Real OnePlusGZ = fG * sSite4.z + F(1.0);
     const Real OnePlusGZSq = OnePlusGZ * OnePlusGZ;
-    deviceSU3 toSub(_deviceClover(pDeviceData, uiBigIdx, 3, 0));
-    toSub.Add(_deviceClover(pDeviceData, uiBigIdx, 3, 1));
-    toSub.Add(_deviceClover(pDeviceData, uiBigIdx, 3, 2));
+    deviceSU3 toSub(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 0, byFieldId));
+    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 1, byFieldId));
+    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 2, byFieldId));
 
 
     toSub.MulReal(OnePlusGZSq); //Now this is (1+gz)^2(U14 + U24 + U34)
-    toSub.Add(_deviceClover(pDeviceData, uiBigIdx, 0, 1));
-    toSub.Add(_deviceClover(pDeviceData, uiBigIdx, 0, 2));
-    toSub.Add(_deviceClover(pDeviceData, uiBigIdx, 1, 2));
+    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 1, byFieldId));
+    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 2, byFieldId));
+    toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 1, 2, byFieldId));
     //Now this is U12 + U13 + U23 + (1+gz)^2(U14 + U24 + U34)
 
     const Real toAdd = F(9.0) + F(9.0) * OnePlusGZSq - toSub.ReTr() * F(0.25);

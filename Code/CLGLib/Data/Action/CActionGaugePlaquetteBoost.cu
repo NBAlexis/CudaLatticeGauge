@@ -86,6 +86,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Chair_Boost(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     Real betaOverN, Real fG,
     Real* results)
@@ -98,11 +99,11 @@ _kernelAddChairTermSU3_Chair_Boost(
 
     //===============
     //V413
-    const Real fV413 = _deviceChairTerm(pDeviceData, 3, 0, 2, uiN);
+    const Real fV413 = _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 2, uiN);
 
     //===============
     //V423
-    const Real fV423 = _deviceChairTerm(pDeviceData, 3, 1, 2, uiN);
+    const Real fV423 = _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 2, uiN);
 
     results[uiSiteIndex] = (fV413 + fV423) * betaOverN * fG;
 }
@@ -133,8 +134,8 @@ _kernelAddForce4PlaqutteTermSU3_Boost(
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
             //mu = idir, nu = i = sum _1-3
-            deviceSU3 stap(_deviceStapleTerm_Boost(pDeviceData, uiBigIdx, idir, 0));
-            stap.Add(_deviceStapleTerm_Boost(pDeviceData, uiBigIdx, idir, 1));
+            deviceSU3 stap(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 0));
+            stap.Add(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 1));
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(stap);
             force.Ta();
@@ -146,7 +147,7 @@ _kernelAddForce4PlaqutteTermSU3_Boost(
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
             //mu = idir, nu = 4, i = mu
-            deviceSU3 stap(_deviceStapleTerm_Boost(pDeviceData, uiBigIdx, idir, 3));
+            deviceSU3 stap(_deviceStapleTerm_Boost(byFieldId, pDeviceData, sSite4, uiBigIdx, idir, 3));
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(stap);
             force.Ta();
@@ -162,6 +163,7 @@ _kernelAddForce4PlaqutteTermSU3_Boost(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term413_3_Boost(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -176,7 +178,8 @@ _kernelAddForceChairTermSU3_Term413_3_Boost(
     //g t V413
     //add force for rho=3
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         2, 0, 3);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);
@@ -187,6 +190,7 @@ _kernelAddForceChairTermSU3_Term413_3_Boost(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term413_4_Boost(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     deviceSU3 *pForceData,
     Real betaOverN, Real fG)
@@ -201,7 +205,8 @@ _kernelAddForceChairTermSU3_Term413_4_Boost(
     //g t V413
     //add force for mu=4
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         3, 0, 2);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);
@@ -212,6 +217,7 @@ _kernelAddForceChairTermSU3_Term413_4_Boost(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term413_1_Boost(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     deviceSU3 *pForceData,
     Real betaOverN, Real fG)
@@ -227,7 +233,8 @@ _kernelAddForceChairTermSU3_Term413_1_Boost(
     //add force for nu=1
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         3, 0, 2);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);
@@ -238,6 +245,7 @@ _kernelAddForceChairTermSU3_Term413_1_Boost(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term423_3_Boost(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -252,7 +260,8 @@ _kernelAddForceChairTermSU3_Term423_3_Boost(
     //g t V413
     //add force for rho=3
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         2, 1, 3);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);
@@ -263,6 +272,7 @@ _kernelAddForceChairTermSU3_Term423_3_Boost(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term423_4_Boost(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -277,7 +287,8 @@ _kernelAddForceChairTermSU3_Term423_4_Boost(
     //g t V413
     //add force for mu=4
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm1_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         3, 1, 2);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);
@@ -288,6 +299,7 @@ _kernelAddForceChairTermSU3_Term423_4_Boost(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term423_2_Boost(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -303,7 +315,8 @@ _kernelAddForceChairTermSU3_Term423_2_Boost(
     //add force for nu=1
     UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(pDeviceData, uiBigIdx,
+    const deviceSU3 staple_term = _deviceStapleChairTerm2_Boost(byFieldId, pDeviceData, 
+        sSite4, uiBigIdx,
         3, 1, 2);
     deviceSU3 force(pDeviceData[uiLink]);
     force.MulDagger(staple_term);

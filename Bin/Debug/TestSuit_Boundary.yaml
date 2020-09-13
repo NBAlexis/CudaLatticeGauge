@@ -93,8 +93,8 @@ TestBoundaryMapping:
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ##ActionListLength : 1
-    ActionListLength : 2
-    FermionFieldCount : 1
+    ActionListLength : 3
+    FermionFieldCount : 2
     MeasureListLength : 1
     ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
@@ -136,6 +136,25 @@ TestBoundaryMapping:
         PoolNumber : 26
         Period : [0, 0, 1, -1]
 
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3R
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        #2am
+        Mass : 0.5
+        FieldId : 3
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
     BoundaryFermionField1:
 
         FieldName : CFieldBoundaryWilsonSquareSU3
@@ -149,6 +168,17 @@ TestBoundaryMapping:
         Restart : 20
         AbsoluteAccuracy : 1
 
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 100
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
@@ -158,6 +188,11 @@ TestBoundaryMapping:
     Action2:
         ActionName : CActionFermionWilsonNf2
         FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
 
     Measure1:
 

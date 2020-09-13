@@ -39,7 +39,7 @@ _kernelDFermionKS_R_XYTerm(
 {
     intokernalInt4;
 
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
     Real eta_tau = (1 == ((pEtaTable[uiSiteIndex] >> 3) & 1)) ? F(-1.0) : F(1.0);
     const Real fNvOmega = (bXorY
@@ -54,7 +54,7 @@ _kernelDFermionKS_R_XYTerm(
         const UBOOL bPlusTau = (0 != (idx & 2));
 
         deviceSU3Vector right = _deviceOffsetXXTau(pDeviceData, sSite4, byFieldId, bXorY, bPlusMu, bPlusTau);
-        right = _deviceVXXTau(pGauge, uiBigIdx, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(right);
+        right = _deviceVXXTau(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(right);
         
         if (bPlusMu)
         {
@@ -100,7 +100,7 @@ _kernelDFermionKS_R_XYTau_Term(
 {
     intokernalInt4;
 
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
     Real eta124 = _deviceEta124(sSite4);
 
@@ -112,7 +112,7 @@ _kernelDFermionKS_R_XYTau_Term(
         const UBOOL bPlusT = (0 != (idx & 4));
 
         deviceSU3Vector right = _deviceOffsetXYTau(pDeviceData, sSite4, byFieldId, bPlusX, bPlusY, bPlusT);
-        right = _deviceVXYT(pGauge, uiBigIdx, byGaugeFieldId, bPlusX, bPlusY, bPlusT).MulVector(right);
+        right = _deviceVXYT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT).MulVector(right);
 
         result.Add(right);
     }
@@ -162,7 +162,7 @@ _kernelDFermionKSForce_R_XYTerm(
     INT iEtaShift, BYTE byContribution)
 {
     intokernalInt4;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     //y Dx and -x Dy
     const Real fNv = (0 == byMu)
@@ -180,8 +180,8 @@ _kernelDFermionKSForce_R_XYTerm(
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
-    const deviceSU3 vnn1 = _deviceLink(pGauge, uiBigIdx, Llength, 1, Ldirs);
-    const deviceSU3 vnn2 = _deviceLink(pGauge, uiBigIdx, Rlength, 1, Rdirs);
+    const deviceSU3 vnn1 = _deviceLink(pGauge, sSite4, Llength, 1, Ldirs);
+    const deviceSU3 vnn2 = _deviceLink(pGauge, sSite4, Rlength, 1, Rdirs);
 
     for (BYTE byFieldId = 0; byFieldId < uiRational; ++byFieldId)
     {
@@ -248,7 +248,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength)
 {
     intokernalInt4;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
     //=================================
     // 1. Find n1, n2
@@ -261,8 +261,8 @@ _kernelDFermionKSForce_R_XYTau_Term(
     const Real eta124 = _deviceEta124(siten1);
     //=================================
     // 2. Find V(n,n1), V(n,n2)
-    const deviceSU3 vnn1 = _deviceLink(pGauge, uiBigIdx, Llength, 1, Ldirs);
-    const deviceSU3 vnn2 = _deviceLink(pGauge, uiBigIdx, Rlength, 1, Rdirs);
+    const deviceSU3 vnn1 = _deviceLink(pGauge, sSite4, Llength, 1, Ldirs);
+    const deviceSU3 vnn2 = _deviceLink(pGauge, sSite4, Rlength, 1, Rdirs);
 
     for (BYTE byFieldId = 0; byFieldId < uiRational; ++byFieldId)
     {

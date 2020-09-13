@@ -201,7 +201,7 @@ __DEFINE_ENUM(ESolverPhase,
             ret.w = w - other.w;
             return ret;
         }
-        
+
     };
 #if defined(__cplusplus)
 }
@@ -346,6 +346,13 @@ extern "C" {
         __device__ __inline__ UBOOL NeedToDagger() const { return 0 != (_kDaggerOrOpposite & m_byTag); }
         __device__ __inline__ UBOOL NeedToOpposite() const { return 0 != (_kDaggerOrOpposite & m_byTag); }
         __device__ __inline__ UBOOL IsDirichlet() const { return 0 != (_kDirichlet & m_byTag); }
+
+        __device__ __inline__ SIndex DaggerC() const
+        {
+            SIndex ret = *this;
+            ret.m_byTag = ret.m_byTag ^ _kDaggerOrOpposite;
+            return ret;
+        }
 
         union 
         {

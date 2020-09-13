@@ -43,21 +43,21 @@ _kernelCalculateAngularMomentumJG(
 
         //===============
         //+x Omega V412
-        const Real fV412 = fX * _deviceChairTerm(pDeviceData, 3, 0, 1, uiN);
+        const Real fV412 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
         //===============
         //+x Omega V432
-        const Real fV432 = fX * _deviceChairTerm(pDeviceData, 3, 2, 1, uiN);
+        const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
         const Real fY = -(sSite4.y - sCenter.y);
 
         //===============
         //-y Omega V421
-        const Real fV421 = fY * _deviceChairTerm(pDeviceData, 3, 1, 0, uiN);
+        const Real fV421 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
         //===============
         //-y Omega V431
-        const Real fV431 = fY * _deviceChairTerm(pDeviceData, 3, 2, 0, uiN);
+        const Real fV431 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }

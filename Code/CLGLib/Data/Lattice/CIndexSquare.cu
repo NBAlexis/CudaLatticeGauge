@@ -30,6 +30,7 @@ _kernalBakeSmallData(UINT* pDeviceData)
     pDeviceData[CIndexData::kPlaqPerLinkIdx] = 2 * (_DC_Dim - 1);
 }
 
+/**
 __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeWalkingTable(UINT* pDeviceData, uint3 mods)
 {
@@ -55,6 +56,7 @@ _kernalBakeWalkingTable(UINT* pDeviceData, uint3 mods)
         pDeviceData[idxAll * 2 * _DC_Dir + i] = movingCoord.x * mods.x + movingCoord.y * mods.y + movingCoord.z * mods.z + movingCoord.w;
     }
 }
+*/
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeMappingTable(SSmallInt4* pDeviceData, uint3 mods)
@@ -362,22 +364,19 @@ _kernelCacheGaugeMove(SIndex* pCached,
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCacheFermionMove(SIndex* pCached, 
-    const UINT* __restrict__ pWalkingTable,
     const SIndex* __restrict__ pMappingTable,
     const UINT* __restrict__ pSmallDataTable)
 {
     intokernalInt4;
 
-    const UINT uiDir = _DC_Dir;
-    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
-    for (UINT i = 0; i < uiDir; ++i)
+    for (UINT i = 0; i < _DC_Dir; ++i)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, i);
         //first element is right, second element is left.
         pCached[linkIndex * 2]
-            = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i + uiDir]];
+            = pMappingTable[_deviceGetBigIndex(_deviceSmallInt4OffsetC(sSite4, __fwd(i)), pSmallDataTable)];
         pCached[linkIndex * 2 + 1]
-            = pMappingTable[pWalkingTable[uiBigSiteIndex * 2 * uiDir + i]];
+            = pMappingTable[_deviceGetBigIndex(_deviceSmallInt4OffsetC(sSite4, __bck(i)), pSmallDataTable)];
     }
 }
 
@@ -470,7 +469,7 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
     //bake small data
     _kernalBakeSmallData << <1, 1 >> > (pData->m_pSmallData);
     //bake walking index
-    _kernalBakeWalkingTable << <blocks, threads >> > (pData->m_pWalkingTable, biggerLatticeMod);
+    //_kernalBakeWalkingTable << <blocks, threads >> > (pData->m_pWalkingTable, biggerLatticeMod);
 
     //bake index mappings
     for (BYTE i = 1; i < kMaxFieldCount; ++i)
@@ -523,19 +522,12 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
         checkCudaErrors(cudaMalloc((void**)&pData->m_pPlaqutteCache, sizeof(SIndex) * _HC_Volume * (_HC_Dim * (_HC_Dim - 1) / 2) * 4));
         checkCudaErrors(cudaMalloc((void**)&pData->m_pStappleCache, sizeof(SIndex) * _HC_Volume * _HC_Dim * (2 * (_HC_Dim - 1)) * 3));
 
-        //bake plaqutte per site
-        //_kernelBakePlaqIndexAtSite2 << <block, threads >> > (
-        //    pData->m_pPlaqutteCache, pData->m_pWalkingTable, 
-        //    pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData, pData->m_pBondInfoTable);
-        
+        //bake plaqutte per site       
         _kernelBakePlaqIndexAtSite << <block, threads >> > (
             pData->m_pPlaqutteCache, pData->m_pIndexLinkToSIndex[byFieldId], 
             pData->m_pSmallData, pData->m_pBondInfoTable);
 
         //bake plaqutte per link
-        //_kernelBakePlaqIndexAtLink2 << <block, threads >> > (pData->m_pStappleCache, pData->m_pWalkingTable, 
-        //    pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData, pData->m_pBondInfoTable);
-
         _kernelBakePlaqIndexAtLink << <block, threads >> > (
             pData->m_pStappleCache, pData->m_pIndexLinkToSIndex[byFieldId], 
             pData->m_pSmallData, pData->m_pBondInfoTable);
@@ -551,17 +543,11 @@ void CIndexSquare::BakeMoveIndex(CIndexData* pData, BYTE byFieldId)
     checkCudaErrors(cudaMalloc((void**)&pData->m_pGaugeMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir));
     checkCudaErrors(cudaMalloc((void**)&pData->m_pFermionMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir * 2));
 
-    //_kernelCacheGaugeMove << <block, threads >> > (
-    //    pData->m_pGaugeMoveCache[byFieldId], 
-    //    pData->m_pWalkingTable, 
-    //    pData->m_pIndexPositionToSIndex[1], 
-    //    pData->m_pSmallData,
-    //    pData->m_pBondInfoTable);
     _kernelCacheGaugeMove << <block, threads >> > (
         pData->m_pGaugeMoveCache[byFieldId],
         pData->m_pIndexLinkToSIndex[1],
         pData->m_pSmallData);
-    _kernelCacheFermionMove << <block, threads >> > (pData->m_pFermionMoveCache[byFieldId], pData->m_pWalkingTable, pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+    _kernelCacheFermionMove << <block, threads >> > (pData->m_pFermionMoveCache[byFieldId], pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
 }
 
 void CIndexSquare::BakeEtaMuTable(class CIndexData* pData)

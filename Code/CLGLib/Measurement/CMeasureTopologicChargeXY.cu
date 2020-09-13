@@ -28,7 +28,7 @@ _kernelTopoChargeClover(
     Real fRes = F(0.0);
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
-        fRes = _deviceTopologicalCharge(pDeviceBuffer, uiN);
+        fRes = _deviceTopologicalCharge(pDeviceBuffer, byFieldId, sSite4, uiN);
     }
 
     pResBuffer[uiSiteIndex] = fRes;
@@ -88,7 +88,7 @@ void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGaug
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     preparethread;
-    _kernelTopoChargeClover << <block, threads >>>(pGaugeSU3->m_pDeviceData, m_byFieldId, _D_RealThreadBuffer);
+    _kernelTopoChargeClover << <block, threads >>>(pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId, _D_RealThreadBuffer);
 
     _ZeroXYPlane(m_pXYDeviceDensity);
     _kernelTopoChargeSumOverZT<<<block, threads>>>(_D_RealThreadBuffer, m_pXYDeviceDensity);
