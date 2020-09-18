@@ -26,6 +26,21 @@ UINT TestGammaMatrix(CParameters& )
     return 0;
 }
 
+UINT TestGamma5Hermiticity(CParameters& param)
+{
+    //test Ddagger
+    INT iG5 = 0;
+    param.FetchValueINT(_T("GAMM5Test"), iG5);
+
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    UINT uiErrors = pF1->TestGamma5Hermitian(pGauge, 0 != iG5);
+    //CCudaHelper::DebugFunction();
+    pF1->Return();
+
+    return uiErrors;
+}
+
 //930 - 990 ms
 //__REGIST_TEST(TestGammaMatrix, Misc, TestGammaMatrixSpeed);
 
@@ -34,6 +49,8 @@ UINT TestDebugFunction(CParameters&)
     CCudaHelper::DebugFunction();
     return 0;
 }
+
+__REGIST_TEST(TestGamma5Hermiticity, Misc, TestGamm5Hermiticity);
 
 __REGIST_TEST(TestDebugFunction, Misc, TestDebug);
 

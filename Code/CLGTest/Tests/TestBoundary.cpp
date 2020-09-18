@@ -63,27 +63,81 @@ UINT TestBoundary(CParameters& sParam)
 
 UINT TestBoundaryMapping(CParameters& sParam)
 {
-    //CIndexData::DebugEdgeMapping(1);
-    //CIndexData::DebugEdgeGlue(1);
+    UINT uiError = 0;
 
-    appGeneral(_T("action1: %2.20f\n"), appGetLattice()->m_pActionList[0]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
-    appGeneral(_T("action2: %2.20f\n"), appGetLattice()->m_pActionList[1]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
-    appGeneral(_T("action3: %2.20f\n"), appGetLattice()->m_pActionList[2]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    //Real fE = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0));
+    //CIndexData::DebugEdgeMapping(1, SSmallInt4(-1, -1, 0, 1));
+    //CIndexData::DebugEdgeGlue(1, SSmallInt4(-1, -1, 0, 1));
+    CIndexData::DebugEdgeMapping(2, SSmallInt4(-1, -1, 0, 1));
+
+#if 0
+
+    const Real fExpE1 = F(14656.11807458415933069773);
+    const Real fExpE2 = F(6518.69394147992716170847);
+    const Real fExpE3 = F(1162.42726703186121994804);
+    const Real fExpE4 = F(14498.55613259701931383461);
+
+    const Real fEnergy1 = appGetLattice()->m_pActionList[0]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL);
+    const Real fEnergy2 = appGetLattice()->m_pActionList[1]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL);
+    const Real fEnergy3 = appGetLattice()->m_pActionList[2]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL);
 
     CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
     appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStape);
-    appGeneral(_T("staple: %2.20f\n"), appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(CCommonData::m_fBeta / F(3.0), pStape));
+    const Real fEnergy4 = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(
+        CCommonData::m_fBeta / F(3.0), pStape);
+
+    if (appAbs(fEnergy1 - fExpE1) < F(0.000000001))
+    {
+        appGeneral(_T("action1 delta: %2.20f\n"), fEnergy1 - fExpE1);
+    }
+    else
+    {
+        ++uiError;
+        appGeneral(_T("action1: %2.20f expecting: %2.20f\n"), fEnergy1, fExpE1);
+    }
+    
+    if (appAbs(fEnergy2 - fExpE2) < F(0.000000001))
+    {
+        appGeneral(_T("action2 delta: %2.20f\n"), fEnergy2 - fExpE2);
+    }
+    else
+    {
+        ++uiError;
+        appGeneral(_T("action2: %2.20f expecting: %2.20f\n"), fEnergy2, fExpE2);
+    }
+
+    if (appAbs(fEnergy3 - fExpE3) < F(0.000000001))
+    {
+        appGeneral(_T("action3 delta: %2.20f\n"), fEnergy3 - fExpE3);
+    }
+    else
+    {
+        ++uiError;
+        appGeneral(_T("action3: %2.20f expecting: %2.20f\n"), fEnergy3, fExpE3);
+    }
+
+    if (appAbs(fEnergy4 - fExpE4) < F(0.000000001))
+    {
+        appGeneral(_T("staple delta: %2.20f\n"), fEnergy4 - fExpE4);
+    }
+    else
+    {
+        ++uiError;
+        appGeneral(_T("staple: %2.20f expecting: %2.20f\n"), fEnergy4, fExpE4);
+    }
 
 
     appSafeDelete(pStape);
+#endif
 
-    return 0;
+    return uiError;
 }
 
 __REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
+__REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary);
 __REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping);
 
 

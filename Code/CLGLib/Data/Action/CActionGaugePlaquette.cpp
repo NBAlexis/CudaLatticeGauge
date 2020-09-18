@@ -16,7 +16,7 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquette)
 
 CActionGaugePlaquette::CActionGaugePlaquette()
     : CAction()
-    //, m_bUsing4PlaqutteEnergy(FALSE)
+    , m_bCloverEnergy(FALSE)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
@@ -28,7 +28,14 @@ void CActionGaugePlaquette::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpda
 {
     if (0 == uiUpdateIterate)
     {
-        m_fLastEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+        if (m_bCloverEnergy)
+        {
+            m_fLastEnergy = pGauge->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
+        }
+        else
+        {
+            m_fLastEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+        }
     }
 }
 
@@ -54,14 +61,14 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
     m_fBetaOverN = fBeta;
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
-    //INT iUsing4Plaq = 0;
-    //if (param.FetchValueINT(_T("Using4Plaqutte"), iUsing4Plaq))
-    //{
-    //    if (1 == iUsing4Plaq)
-    //    {
-    //        m_bUsing4PlaqutteEnergy = TRUE;
-    //    }
-    //}
+    INT iUsing4Plaq = 0;
+    if (param.FetchValueINT(_T("CloverEnergy"), iUsing4Plaq))
+    {
+        if (1 == iUsing4Plaq)
+        {
+            m_bCloverEnergy = TRUE;
+        }
+    }
 }
 
 void CActionGaugePlaquette::SetBeta(Real fBeta)
@@ -90,9 +97,17 @@ Real CActionGaugePlaquette::Energy(UBOOL bBeforeEvolution, const class CFieldGau
     {
         return m_fLastEnergy;
     }
+
     if (NULL == pStable)
     {
-        m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+        if (m_bCloverEnergy)
+        {
+            m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
+        }
+        else
+        {
+            m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+        }
     }
     else
     {

@@ -44,6 +44,8 @@ _kernelDFermionWilsonSquareSU3(
 {
     intokernaldir;
 
+    //const SSmallInt4 test = __deviceSiteIndexToInt4(uiSiteIndex);
+
     const gammaMatrix & gamma5 = __chiralGamma[GAMMA5];
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
@@ -65,6 +67,24 @@ _kernelDFermionWilsonSquareSU3(
 
         const SIndex & x_p_mu_Fermion = pFermionMove[2 * linkIndex];
         const SIndex & x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+        //=====================
+        //check links
+        //const SSmallInt4 site1 = __deviceSiteIndexToInt4(uiSiteIndex);
+        //const SSmallInt4 site2 = __deviceSiteIndexToInt4(x_p_mu_Fermion.m_uiSiteIndex);
+        //const SSmallInt4 site3 = __deviceSiteIndexToInt4(x_m_mu_Fermion.m_uiSiteIndex);
+
+        //if (site1.x == 0 && site1.y == 3 && site1.z == 0 && site1.w == 0
+        //    && site2.x == 3 && site2.y == 0 && site2.z == 0 && site2.w == 0)
+        //{
+        //    printf("link1 = %d\n", linkIndex);
+        //}
+
+        //if (site3.x == 0 && site3.y == 3 && site3.z == 0 && site3.w == 0
+        //    && site1.x == 3 && site1.y == 0 && site1.z == 0 && site1.w == 0)
+        //{
+        //    printf("link2 = %d\n", _deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir));
+        //}
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
@@ -172,10 +192,19 @@ _kernelDWilsonForceSU3(
 
         const SIndex& x_p_mu_Fermion = pFermionMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
-        const deviceWilsonVectorSU3 & x_p_mu_Right = pInverseD[x_p_mu_Fermion.m_uiSiteIndex];
-        deviceWilsonVectorSU3 x_p_mu_Left(pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex]);
+        const deviceWilsonVectorSU3& x_p_mu_Right = pInverseD[x_p_mu_Fermion.m_uiSiteIndex];
+        const deviceWilsonVectorSU3& x_p_mu_Left = pInverseDDdagger[x_p_mu_Fermion.m_uiSiteIndex];
 
         const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+
+        //if (961 == linkIndex)
+        //{
+        //    const SSmallInt4 s0 = __deviceSiteIndexToInt4(240);
+        //    const SSmallInt4 s1 = __deviceSiteIndexToInt4(uiSiteIndex);
+        //    const SSmallInt4 s2 = __deviceSiteIndexToInt4(x_p_mu_Fermion.m_uiSiteIndex);
+        //    printf("s0 = %d, %d, %d, %d, s1 = %d, %d, %d, %d, s2 = %d, %d, %d, %d;\n", 
+        //        s0.x, s0.y, s0.z, s0.w, s1.x, s1.y, s1.z, s1.w, s2.x, s2.y, s2.z, s2.w);
+        //}
 
         deviceWilsonVectorSU3 right1(x_p_mu_Right);
         right1.Sub(gammaMu.MulWilsonC(right1));
@@ -1238,6 +1267,150 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger_eo(const CField* pGauge)
         return FALSE;
     }
     return InverseDdagger_eo(pGauge);
+}
+
+#pragma endregion
+
+#pragma region Test Gamma5 Hermitian
+
+UINT CFieldFermionWilsonSquareSU3::TestGamma5Hermitian(const CFieldGauge* pGauge, UBOOL bTestGamma5) const
+{
+    const UINT uiVolume = _HC_Volume;
+    const UINT uiRealVolume = 12 * uiVolume;
+    CLGComplex* matrixElement = (CLGComplex*)malloc(sizeof(CLGComplex) * uiRealVolume * uiRealVolume);
+    CLGComplex* matrixElementd = NULL;
+    if (bTestGamma5)
+    {
+        matrixElementd = (CLGComplex*)malloc(sizeof(CLGComplex) * uiRealVolume * uiRealVolume);
+    }
+    deviceWilsonVectorSU3* hostData = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * uiVolume);
+    CFieldFermionWilsonSquareSU3* v = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+
+    for (UINT i = 0; i < uiVolume; ++i)
+    {
+        const SSmallInt4 point = __hostSiteIndexToInt4(i);
+        for (UINT j = 0; j < 12; ++j)
+        {
+            SFermionSource source;
+            source.m_byColorIndex = static_cast<BYTE>(j % 3);
+            source.m_bySpinIndex = static_cast<BYTE>(j / 3);
+            source.m_eSourceType = EFS_Point;
+            source.m_sSourcePoint = point;
+            v->InitialAsSource(source);
+            v->D(pGauge);
+            if (!bTestGamma5)
+            {
+                v->ApplyGamma(GAMMA5);
+            }
+
+            checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceWilsonVectorSU3) * uiVolume, cudaMemcpyDeviceToHost));
+
+            const UINT x = i * 12 + j;
+            for (UINT k = 0; k < uiVolume; ++k)
+            {
+                matrixElement[(12 * k +  0) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[0];
+                matrixElement[(12 * k +  1) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[1];
+                matrixElement[(12 * k +  2) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[2];
+
+                matrixElement[(12 * k +  3) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[0];
+                matrixElement[(12 * k +  4) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[1];
+                matrixElement[(12 * k +  5) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[2];
+
+                matrixElement[(12 * k +  6) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[0];
+                matrixElement[(12 * k +  7) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[1];
+                matrixElement[(12 * k +  8) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[2];
+
+                matrixElement[(12 * k +  9) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[0];
+                matrixElement[(12 * k + 10) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[1];
+                matrixElement[(12 * k + 11) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[2];
+            }
+
+            if (bTestGamma5)
+            {
+                v->InitialAsSource(source);
+                v->Ddagger(pGauge);
+
+                checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceWilsonVectorSU3) * uiVolume, cudaMemcpyDeviceToHost));
+
+                for (UINT k = 0; k < uiVolume; ++k)
+                {
+                    matrixElementd[(12 * k +  0) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[0];
+                    matrixElementd[(12 * k +  1) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[1];
+                    matrixElementd[(12 * k +  2) * uiRealVolume + x] = hostData[k].m_d[0].m_ve[2];
+
+                    matrixElementd[(12 * k +  3) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[0];
+                    matrixElementd[(12 * k +  4) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[1];
+                    matrixElementd[(12 * k +  5) * uiRealVolume + x] = hostData[k].m_d[1].m_ve[2];
+
+                    matrixElementd[(12 * k +  6) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[0];
+                    matrixElementd[(12 * k +  7) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[1];
+                    matrixElementd[(12 * k +  8) * uiRealVolume + x] = hostData[k].m_d[2].m_ve[2];
+
+                    matrixElementd[(12 * k +  9) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[0];
+                    matrixElementd[(12 * k + 10) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[1];
+                    matrixElementd[(12 * k + 11) * uiRealVolume + x] = hostData[k].m_d[3].m_ve[2];
+                }
+            }
+
+            appGeneral(_T("%d / %d have been done\n"), x, uiRealVolume);
+        }
+    }
+
+    UINT uiE = 0;
+    UINT uiWrong = 0;
+    //List all results
+    for (UINT i = 0; i < uiRealVolume * uiRealVolume; ++i)
+    {
+        const UINT x = i / uiRealVolume;
+        const UINT y = i % uiRealVolume;
+        const SSmallInt4 xSite = __hostSiteIndexToInt4(x / 12);
+        const SSmallInt4 ySite = __hostSiteIndexToInt4(y / 12);
+        const UINT daggerIdx = y * uiRealVolume + x;
+        const BYTE cx = (x % 12) % 3;
+        const BYTE sx = (x % 12) / 3;
+        const BYTE cy = (y % 12) % 3;
+        const BYTE sy = (y % 12) / 3;
+
+        if (_cuCabsf(matrixElement[i]) > F(0.0000001))
+        {
+            ++uiE;
+            if (bTestGamma5)
+            {
+                if (appAbs(matrixElement[i].x - matrixElementd[daggerIdx].x) > F(0.0000001)
+                 || appAbs(matrixElement[i].y + matrixElementd[daggerIdx].y) > F(0.0000001))
+                {
+                    ++uiWrong;
+                    appGeneral(_T("[(%d, %d, %d, %d)_(%d %d)-(%d, %d, %d, %d)_(%d %d)]: D = %f + %f I   Ddagger = %f + %f I\n"),
+                        xSite.x, xSite.y, xSite.z, xSite.w, cx, sx,
+                        ySite.x, ySite.y, ySite.z, ySite.w, cy, sy,
+                        matrixElement[i].x, matrixElement[i].y,
+                        matrixElement[daggerIdx].x, matrixElement[daggerIdx].y);
+                }
+            }
+            else
+            {
+                if (appAbs(matrixElement[i].x - matrixElement[daggerIdx].x) > F(0.0000001)
+                    || appAbs(matrixElement[i].y + matrixElement[daggerIdx].y) > F(0.0000001))
+                {
+                    ++uiWrong;
+                    appGeneral(_T("[(%d, %d, %d, %d)_(%d %d)-(%d, %d, %d, %d)_(%d %d)]: D = %f + %f I   Ddagger = %f + %f I\n"),
+                        xSite.x, xSite.y, xSite.z, xSite.w, cx, sx,
+                        ySite.x, ySite.y, ySite.z, ySite.w, cy, sy,
+                        matrixElement[i].x, matrixElement[i].y,
+                        matrixElement[daggerIdx].x, matrixElement[daggerIdx].y);
+                }
+            }
+        }
+    }
+    v->Return();
+    appSafeFree(matrixElement);
+    if (bTestGamma5)
+    {
+        appSafeFree(matrixElementd);
+    }
+    appSafeFree(hostData);
+    appGeneral(_T("%d none zero element checked, %d wrong found...\n"), uiE, uiWrong);
+    return uiWrong;
 }
 
 #pragma endregion

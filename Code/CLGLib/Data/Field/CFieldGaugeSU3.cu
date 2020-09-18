@@ -338,6 +338,82 @@ _kernelPlaqutteEnergySU3CacheIndex(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergySU3_UseClover(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    Real fBetaOverN,
+    Real* results)
+{
+    intokernalInt4;
+
+    Real fRes = F(0.0);
+    for (BYTE byDir1 = 0; byDir1 < _DC_Dir; ++byDir1)
+    {
+        for (BYTE byDir2 = byDir1 + 1; byDir2 < _DC_Dir; ++byDir2)
+        {
+            //For any strange boundary condition, U_{mu,nu}=U_{nu,mu}^+ should be TRUE!
+            //if (byDir1 != byDir2)
+            //{
+                fRes += _deviceCloverRetr(pDeviceData, sSite4, __bi(sSite4), byDir1, byDir2, byFieldId);
+            //}
+        }
+    }
+    fRes = F(18.0) - F(0.25) * fRes;
+    results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergySU3_TestSym(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    Real fBetaOverN,
+    Real* results)
+{
+    intokernalInt4;
+
+    Real fRes = F(0.0);
+    for (BYTE byDir1 = 0; byDir1 < _DC_Dir; ++byDir1)
+    {
+        for (BYTE byDir2 = 0; byDir2 < _DC_Dir; ++byDir2)
+        {
+            if (byDir1 != byDir2)
+            {
+                fRes += _device1PlaqutteTermPP(pDeviceData, byDir1, byDir2, __bi(sSite4), sSite4, byFieldId).ReTr();
+            }
+        }
+    }
+    fRes = F(36.0) - fRes;
+    results[uiSiteIndex] = fRes * fBetaOverN * F(0.5);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPlaqutteEnergySU3_TestEdge(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    Real fBetaOverN,
+    Real* results)
+{
+    intokernalInt4;
+
+    Real fRes = F(0.0);
+    if (0 == sSite4.z && 0 == sSite4.w)
+    {
+        if (0 == sSite4.y)// && 0 != sSite4.y && sSite4.y != _DC_Ly - 1)
+        {
+            fRes = _device1PlaqutteTermMM(pDeviceData, 0, 1, __bi(sSite4), sSite4, byFieldId).ReTr();
+            fRes = F(3.0) - fRes;
+        }
+        if (_DC_Ly - 1 == sSite4.y)// && 0 != sSite4.y && sSite4.y != _DC_Ly - 1)
+        {
+            fRes = _device1PlaqutteTermPP(pDeviceData, 0, 1, __bi(sSite4), sSite4, byFieldId).ReTr();
+            fRes = F(3.0) - fRes;
+        }
+    }
+    
+    results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergyUsingStableSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     const deviceSU3 * __restrict__ pStableData,
@@ -955,6 +1031,41 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
+        betaOverN,
+        _D_RealThreadBuffer);
+
+    //Real fRet = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    //_kernelPlaqutteEnergySU3_TestEdge << <block, threads >> > (
+    //    m_byFieldId,
+    //    m_pDeviceData,
+    //    betaOverN,
+    //    _D_RealThreadBuffer);
+    //Real* testBuffer = (Real*)malloc(sizeof(Real) * _HC_Volume);
+
+    //checkCudaErrors(cudaMemcpy(testBuffer, _D_RealThreadBuffer, sizeof(Real) * _HC_Volume, cudaMemcpyDeviceToHost));
+
+    //for (UINT i = 0; i < _HC_Volume; ++i)
+    //{
+    //    SSmallInt4 site = __hostSiteIndexToInt4(i);
+    //    if (0 == site.z && 0 == site.w)
+    //    {
+    //        appGeneral(_T("%d %d: %2.20f\n"), site.x, site.y, testBuffer[i]);
+    //    }
+    //}
+
+    //appSafeFree(testBuffer);
+
+    return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
+{
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+
+    preparethread;
+    _kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
+        m_byFieldId,
+        m_pDeviceData,
         betaOverN,
         _D_RealThreadBuffer);
 

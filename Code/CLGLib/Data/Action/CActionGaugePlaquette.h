@@ -34,6 +34,7 @@ public:
 
     void SetBeta(Real fBeta);
     //Real GetEnergyPerPlaqutte() const;
+    UBOOL m_bCloverEnergy;
 
 protected:
 

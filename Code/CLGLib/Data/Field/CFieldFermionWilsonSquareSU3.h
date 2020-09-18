@@ -83,6 +83,7 @@ public:
     CCString GetInfos(const CCString &tab) const override;
 
     void SetKai(Real fKai);
+    UINT TestGamma5Hermitian(const CFieldGauge* pGauge, UBOOL bTestGamma5 = FALSE) const;
 
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;

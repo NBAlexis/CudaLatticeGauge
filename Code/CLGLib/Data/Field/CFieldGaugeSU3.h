@@ -48,6 +48,7 @@ public:
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
     void MakeRandomGenerator() override;
     Real CalculatePlaqutteEnergy(Real betaOverN) const override;
+    Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
     Real CalculateKinematicEnergy() const override;
 

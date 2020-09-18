@@ -33,7 +33,7 @@ _kernelAdd4PlaqutteTermSU3_Test(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    if (__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].IsDirichlet())
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].IsDirichlet())
     {
         results[uiSiteIndex] = F(0.0);
         return;
@@ -139,7 +139,7 @@ _kernelAddChairTermSU3_Term12(
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
-    if (__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         results[uiSiteIndex] = F(0.0);
         return;
@@ -767,6 +767,7 @@ _kernelAddForceChairTermSU3_Term5_3(
 CActionGaugePlaquetteRotating::CActionGaugePlaquetteRotating()
     : CAction()
     , m_fOmega(F(0.0))
+    , m_bCloverEnergy(FALSE)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
@@ -820,6 +821,15 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
         sCenter.w = static_cast<SBYTE>(centerArray[3]);
         CCommonData::m_sCenter = sCenter;
     }
+
+    INT iUsing4Plaq = 0;
+    if (param.FetchValueINT(_T("CloverEnergy"), iUsing4Plaq))
+    {
+        if (1 == iUsing4Plaq)
+        {
+            m_bCloverEnergy = TRUE;
+        }
+    }
 }
 
 void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
@@ -835,7 +845,7 @@ void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
 UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
     pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
-
+    
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
     if (NULL == pGaugeSU3 || NULL == pForceSU3)
@@ -852,7 +862,6 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
     _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    
     _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
@@ -911,8 +920,15 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     {
         return m_fLastEnergy;
     }
-    m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
-
+    if (m_bCloverEnergy)
+    {
+        m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
+    }
+    else
+    {
+        m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
+    }
+    
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     if (NULL == pGaugeSU3)
     {

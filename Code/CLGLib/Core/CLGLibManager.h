@@ -216,11 +216,6 @@ inline class CCString GetCLGVersion()
     return sRet;
 }
 
-__host__ __inline__ static UINT _hostGetSiteIndex(const SSmallInt4& coord)
-{
-    return static_cast<UINT>(coord.x * _HC_MultX + coord.y * _HC_MultY + coord.z * _HC_MultZ + coord.w);
-}
-
 __END_NAMESPACE
 
 #endif //#ifndef _CLGLIBMANAGER_H_

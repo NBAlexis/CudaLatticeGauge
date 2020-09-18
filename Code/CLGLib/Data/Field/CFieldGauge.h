@@ -33,6 +33,11 @@ public:
 
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const = 0;
 
+    /**
+     * For some strange boundary condition
+     */
+    virtual Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const = 0;
+
     virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const = 0;
 
     virtual Real CalculateKinematicEnergy() const = 0;

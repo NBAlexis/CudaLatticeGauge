@@ -152,7 +152,39 @@ void CIndexData::DebugPlaqutteTable()
     appSafeFree(cache);
 }
 
-void CIndexData::DebugEdgeMapping(BYTE byFieldId)
+void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
+{
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+    UINT uiSite = _hostGetSiteIndex(sSite);
+    appGeneral(_T("me = %d, %d, %d, %d\n"), sSite.x, sSite.y, sSite.z, sSite.w);
+
+    const UINT uiListIdx = uiSite * uiPlaqPerSite * uiPlaqLength;
+
+    for (UINT i = 0; i < uiPlaqPerSite; ++i)
+    {
+        for (UINT j = 0; j < uiPlaqLength; ++j)
+        {
+            const UINT uiIdx = uiListIdx + i * uiPlaqLength + j;
+            const SIndex& idx = cache[uiListIdx + uiIdx];
+            const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+
+            appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+                (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+                (idx.m_byTag & _kDirichlet ? "D" : ""),
+                coord.x, coord.y, coord.z, coord.w,
+                idx.m_byDir);
+        }
+        appGeneral(_T("\n"));
+    }
+    appSafeFree(cache);
+}
+
+void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)
 {
     const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
                     * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
@@ -179,10 +211,17 @@ void CIndexData::DebugEdgeMapping(BYTE byFieldId)
          || z < 0 || z >= static_cast<INT>(_HC_Lz)
          || t < 0 || t >= static_cast<INT>(_HC_Lt))
         {
-            const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(tb[uiBigIdx].m_uiSiteIndex);
-            appGeneral(_T("coord: (%d,%d,%d,%d)=(%d,%d,%d,%d)\n"),
-                coord.x, coord.y, coord.z, coord.w,
-                mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w);
+            if ( (-1 == xyzt.x || coord.x == xyzt.x)
+              && (-1 == xyzt.y || coord.y == xyzt.y)
+              && (-1 == xyzt.z || coord.z == xyzt.z)
+              && (-1 == xyzt.w || coord.w == xyzt.w)
+                )
+            {
+                const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(tb[uiBigIdx].m_uiSiteIndex);
+                appGeneral(_T("coord: (%d,%d,%d,%d)=(%d,%d,%d,%d)\n"),
+                    coord.x, coord.y, coord.z, coord.w,
+                    mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w);
+            }
         }
     }
     appSetLogDate(bLogDate);
@@ -190,7 +229,7 @@ void CIndexData::DebugEdgeMapping(BYTE byFieldId)
     appSafeFree(tb);
 }
 
-void CIndexData::DebugEdgeGlue(BYTE byFieldId)
+void CIndexData::DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt)
 {
     const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
                     * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
@@ -216,16 +255,23 @@ void CIndexData::DebugEdgeGlue(BYTE byFieldId)
             || z < 0 || z >= static_cast<INT>(_HC_Lz)
             || t < 0 || t >= static_cast<INT>(_HC_Lt))
         {
-            for (BYTE byDir = 0; byDir < _HC_Dir; ++byDir)
+            if ((-1 == xyzt.x || coord.x == xyzt.x)
+                && (-1 == xyzt.y || coord.y == xyzt.y)
+                && (-1 == xyzt.z || coord.z == xyzt.z)
+                && (-1 == xyzt.w || coord.w == xyzt.w)
+                )
             {
-                const SIndex& idx = tb[uiBigIdx * _HC_Dir + byDir];
-                const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
-                appGeneral(_T("(%d,%d,%d,%d)_%d=(%d,%d,%d,%d)_%d%s "),
-                    coord.x, coord.y, coord.z, coord.w, byDir,
-                    mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w,
-                    idx.m_byDir, (idx.m_byTag & _kDaggerOrOpposite) ? _T("+") : _T(""));
+                for (BYTE byDir = 0; byDir < _HC_Dir; ++byDir)
+                {
+                    const SIndex& idx = tb[uiBigIdx * _HC_Dir + byDir];
+                    const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+                    appGeneral(_T("(%d,%d,%d,%d)_%d=(%d,%d,%d,%d)_%d%s "),
+                        coord.x, coord.y, coord.z, coord.w, byDir,
+                        mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w,
+                        idx.m_byDir, (idx.m_byTag & _kDaggerOrOpposite) ? _T("+") : _T(""));
+                }
+                appGeneral(_T("\n"));
             }
-            appGeneral(_T("\n"));
         }
     }
     appSetLogDate(bLogDate);

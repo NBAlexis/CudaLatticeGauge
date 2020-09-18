@@ -164,7 +164,7 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
 
             pResult[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
             pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiPlaq) ? _kDirichlet : 0;
-            pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
+            pResult[iListIndex].m_byTag = pResult[iListIndex].m_byTag ^ _kDaggerOrOpposite; //Since this is inside lattice, | or ^ are both OK
             ++iListIndex;
         }
     }
@@ -350,8 +350,8 @@ _kernelCacheGaugeMove(SIndex* pCached,
     //const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
     for (UINT i = 0; i < uiDir; ++i)
     {
-        SSmallInt4 sWalking = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(i) - 1);
-        UINT uiBigIdx = _deviceGetBigIndex(sWalking, pSmallDataTable);
+        const SSmallInt4 sWalking = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(i) - 1);
+        const UINT uiBigIdx = _deviceGetBigIndex(sWalking, pSmallDataTable);
         //const UINT uiBigIdx = pWalkingTable[uiBigSiteIndex * 2 * uiDir + i];
         //pCached[uiSiteIndex * uiDir + i] = pMappingTable[uiBigIdx];
         //pCached[uiSiteIndex * uiDir + i].m_byDir = i;

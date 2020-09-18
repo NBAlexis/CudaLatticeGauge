@@ -181,11 +181,13 @@ public:
         return NULL == m_byRegionTable ? 0 : m_byRegionTable[site.m_byReginId];
     }
 
+    static void DebugPlaqutteTable(const SSmallInt4& sSite);
+
     static void DebugPlaqutteTable();
 
-    static void DebugEdgeMapping(BYTE byFieldId);
+    static void DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt);
 
-    static void DebugEdgeGlue(BYTE byFieldId);
+    static void DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt);
 
     //=============================================================
     //Small Data

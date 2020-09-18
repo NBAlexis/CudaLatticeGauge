@@ -56,6 +56,8 @@ Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CF
     m_pFerimionField->CopyTo(pPooled);
     pPooled->InverseD(pGauge);
     const CLGComplex res = pPooled->Dot(pPooled);
+    //pPooled->InverseDDdagger(pGauge);
+    //const CLGComplex res = m_pFerimionField->Dot(pPooled);
     appDetailed(_T("CActionFermionWilsonNf2 : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);
 
     pPooled->Return();

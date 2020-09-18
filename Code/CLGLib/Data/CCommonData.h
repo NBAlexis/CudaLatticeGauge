@@ -283,6 +283,11 @@ inline static SSmallInt4 __hostSiteIndexToInt4(UINT siteIndex)
     return xyzt;
 }
 
+inline static UINT _hostGetSiteIndex(const SSmallInt4& coord)
+{
+    return static_cast<UINT>(coord.x * _HC_MultX + coord.y * _HC_MultY + coord.z * _HC_MultZ + coord.w);
+}
+
 #pragma endregion
 
 //at most 8 tags
