@@ -53,6 +53,12 @@ public:
     */
     virtual void ElementNormalize() = 0;
 
+    /**
+     * Use to simplify the implementation of gauge force
+     */
+    virtual void SetOneDirectionUnity(BYTE byDir) = 0;
+    virtual void SetOneDirectionZero(BYTE byDir) = 0;
+
 #pragma endregion
 
 #pragma region Test Functions to test gauge invarience of angular momentum
@@ -78,6 +84,7 @@ public:
     virtual void CalculateNablaE_Using_U(CFieldGauge* pResoult) const = 0;
 
 #pragma endregion
+
 
     UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real, void* otherParameter = NULL) override
     {

@@ -115,6 +115,100 @@ _kernelDFermionKS(
 }
 
 /**
+ * For some strange boundary condition
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKSPlusEta(
+    const deviceSU3Vector* __restrict__ pDeviceData,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    deviceSU3Vector* pResultData,
+    Real f2am,
+    BYTE byFieldId,
+    UBOOL bDDagger,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernaldir;
+
+    deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
+    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
+
+    //idir = mu
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        //x, mu
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+        //This is in fact, -1 * eta(n + mu)
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+
+        //Assuming periodic
+        //get U(x,mu), U^{dagger}(x-mu), 
+        const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+        deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
+        if (x_m_mu_Gauge.NeedToDagger())
+        {
+            x_m_mu_Gauge_element.Dagger();
+        }
+
+        //U(x,mu) phi(x+ mu)
+        deviceSU3Vector u_phi_x_p_m = x_Gauge_element.MulVector(pDeviceData[x_p_mu_Fermion.m_uiSiteIndex]);
+        if (x_p_mu_Fermion.NeedToOpposite())
+        {
+            u_phi_x_p_m.MulReal(F(-1.0) * eta_mu);
+        }
+        else
+        {
+            u_phi_x_p_m.MulReal(eta_mu);
+        }
+
+        //U^{dagger}(x-mu) phi(x-mu)
+        deviceSU3Vector u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulVector(pDeviceData[x_m_mu_Fermion.m_uiSiteIndex]);
+        u_dagger_phi_x_m_m.MulReal(eta_mu2);
+        if (x_m_mu_Fermion.NeedToOpposite())
+        {
+            u_phi_x_p_m.Add(u_dagger_phi_x_m_m);
+        }
+        else
+        {
+            u_phi_x_p_m.Sub(u_dagger_phi_x_m_m);
+        }
+        //u_phi_x_p_m.MulReal(eta_mu);
+        result.Add(u_phi_x_p_m);
+    }
+
+    pResultData[uiSiteIndex].MulReal(f2am);
+    if (bDDagger)
+    {
+        pResultData[uiSiteIndex].Sub(result);
+    }
+    else
+    {
+        pResultData[uiSiteIndex].Add(result);
+    }
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        pResultData[uiSiteIndex].MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        pResultData[uiSiteIndex].MulComp(cCoeff);
+        break;
+    }
+}
+
+/**
  * Calculate Force
  */
 __global__ void _CLG_LAUNCH_BOUND
@@ -179,20 +273,38 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
     preparethread;
-    _kernelDFermionKS << <block, threads >> > (
-        pSource,
-        pGauge,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pEtaMu,
-        pTarget,
-        f2am,
-        m_byFieldId,
-        bDagger,
-        eOCT,
-        fRealCoeff,
-        cCmpCoeff);
-
+    if (m_bEachSiteEta)
+    {
+        _kernelDFermionKSPlusEta << <block, threads >> > (
+            pSource,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pEtaMu,
+            pTarget,
+            f2am,
+            m_byFieldId,
+            bDagger,
+            eOCT,
+            fRealCoeff,
+            cCmpCoeff);
+    }
+    else
+    {
+        _kernelDFermionKS << <block, threads >> > (
+            pSource,
+            pGauge,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pEtaMu,
+            pTarget,
+            f2am,
+            m_byFieldId,
+            bDagger,
+            eOCT,
+            fRealCoeff,
+            cCmpCoeff);
+    }
 }
 
 void CFieldFermionKSSU3::DerivateDOperator(void* pForce, const void * pDphi, const void * pDDphi, const void * pGaugeBuffer) const
@@ -493,6 +605,7 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, UINT uiDesiredT, BYTE byCo
 
 CFieldFermionKSSU3::CFieldFermionKSSU3()
     : CFieldFermion()
+    , m_bEachSiteEta(FALSE)
     , m_f2am(F(0.01))
     , m_pRationalFieldPointers(NULL)
     , m_pMDNumerator(NULL)
@@ -568,6 +681,10 @@ void CFieldFermionKSSU3::InitialOtherParameters(CParameters& params)
         appCrucial(_T("CFieldFermionKSSU3: Mass is nearly 0!\n"));
     }
 
+    INT iEachEta = 0;
+    params.FetchValueINT(_T("EachSiteEta"), iEachEta);
+    m_bEachSiteEta = (0 != iEachEta);
+
     TArray<Real> coeffs;
     params.FetchValueArrayReal(_T("MD"), coeffs);
     m_rMD.Initial(coeffs);
@@ -638,6 +755,7 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
     pField->m_f2am = m_f2am;
     pField->m_rMC = m_rMC;
     pField->m_rMD = m_rMD;
+    pField->m_bEachSiteEta = m_bEachSiteEta;
     //pField->m_rEN = m_rEN;
 
     if (NULL != pField->m_pMDNumerator)
@@ -782,6 +900,74 @@ void CFieldFermionKSSU3::D0(const CField* pGauge)
         FALSE, EOCT_None, F(1.0), _onec);
 
     pPooled->Return();
+}
+
+UINT CFieldFermionKSSU3::TestAntiHermitian(const CFieldGauge* pGauge) const
+{
+    const UINT uiVolume = _HC_Volume;
+    const UINT uiRealVolume = 3 * uiVolume;
+    CLGComplex* matrixElement = (CLGComplex*)malloc(sizeof(CLGComplex) * uiRealVolume * uiRealVolume);
+    deviceSU3Vector* hostData = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * uiVolume);
+    CFieldFermionKSSU3* v = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+
+    for (UINT i = 0; i < uiVolume; ++i)
+    {
+        const SSmallInt4 point = __hostSiteIndexToInt4(i);
+        for (UINT j = 0; j < 3; ++j)
+        {
+            SFermionSource source;
+            source.m_byColorIndex = static_cast<BYTE>(j);
+            source.m_eSourceType = EFS_Point;
+            source.m_sSourcePoint = point;
+            v->InitialAsSource(source);
+            v->D0(pGauge);
+
+            checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceSU3Vector) * uiVolume, cudaMemcpyDeviceToHost));
+
+            const UINT x = i * 3 + j;
+            for (UINT k = 0; k < uiVolume; ++k)
+            {
+                matrixElement[(3 * k + 0) * uiRealVolume + x] = hostData[k].m_ve[0];
+                matrixElement[(3 * k + 1) * uiRealVolume + x] = hostData[k].m_ve[1];
+                matrixElement[(3 * k + 2) * uiRealVolume + x] = hostData[k].m_ve[2];
+            }
+            appGeneral(_T("%d / %d have been done\n"), x, uiRealVolume);
+        }
+    }
+
+    UINT uiE = 0;
+    UINT uiWrong = 0;
+    //List all results
+    for (UINT i = 0; i < uiRealVolume * uiRealVolume; ++i)
+    {
+        const UINT x = i / uiRealVolume;
+        const UINT y = i % uiRealVolume;
+        const SSmallInt4 xSite = __hostSiteIndexToInt4(x / 3);
+        const SSmallInt4 ySite = __hostSiteIndexToInt4(y / 3);
+        const UINT daggerIdx = y * uiRealVolume + x;
+        const BYTE cx = x % 3;
+        const BYTE cy = y % 3;
+
+        if (_cuCabsf(matrixElement[i]) > F(0.0000001))
+        {
+            ++uiE;
+            if (appAbs(matrixElement[i].x + matrixElement[daggerIdx].x) > F(0.0000001)
+             || appAbs(matrixElement[i].y - matrixElement[daggerIdx].y) > F(0.0000001))
+            {
+                ++uiWrong;
+                appGeneral(_T("[(%d, %d, %d, %d)_(%d)-(%d, %d, %d, %d)_(%d)]: D = %f + %f I   Ddagger = %f + %f I\n"),
+                    xSite.x, xSite.y, xSite.z, xSite.w, cx, 
+                    ySite.x, ySite.y, ySite.z, ySite.w, cy, 
+                    matrixElement[i].x, matrixElement[i].y,
+                    matrixElement[daggerIdx].x, matrixElement[daggerIdx].y);
+            }
+        }
+    }
+    v->Return();
+    appSafeFree(matrixElement);
+    appSafeFree(hostData);
+    appGeneral(_T("%d none zero element checked, %d wrong found...\n"), uiE, uiWrong);
+    return uiWrong;
 }
 
 //Kai should be part of D operator

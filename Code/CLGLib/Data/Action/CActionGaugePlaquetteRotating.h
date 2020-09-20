@@ -39,6 +39,7 @@ public:
 
     Real m_fOmega;
     UBOOL m_bCloverEnergy;
+    UBOOL m_bShiftHalfCoord;
 
 protected:
 

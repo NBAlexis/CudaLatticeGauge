@@ -281,6 +281,8 @@ static __device__ __inline__ deviceSU3 _devicePlaqutte(
  * pDir[] is dirs of path, the dir is:
  *  x,y,z,t : 1,2,3,4
  *  -x,-y,-z,-t: -1,-2,-3,-4
+ *
+ * NOTE: This function assumes the boundary is always unity
  */
 static __device__ __inline__ deviceSU3 _deviceLink(
     const deviceSU3* __restrict__ pDeviceData,
@@ -304,18 +306,36 @@ static __device__ __inline__ deviceSU3 _deviceLink(
             bDagger = TRUE;
             _deviceSmallInt4Offset(sStartSite, pDir[i]);
         }
-        SIndex newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(sStartSite) * _DC_Dir + byDir];
-        if (bDagger)
-        {
-            newLink.m_byTag = newLink.m_byTag ^ _kDaggerOrOpposite;
-        }
+        const SIndex& newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(sStartSite) + byDir];
+
         if (0 == i)
         {
-            sRet = _deviceGetGaugeBCSU3DirSIndex(pDeviceData, newLink, byFieldId);
+            if (!newLink.IsDirichlet())
+            {
+                sRet = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
+                if ( (newLink.NeedToDagger() && !bDagger)
+                 || (!newLink.NeedToDagger() && bDagger)
+                    )
+                {
+                    sRet.Dagger();
+                }
+            }
         }
         else
         {
-            sRet.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, newLink, byFieldId));
+            if (!newLink.IsDirichlet())
+            {
+                if ((newLink.NeedToDagger() && !bDagger)
+                || (!newLink.NeedToDagger() && bDagger)
+                    )
+                {
+                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+                else
+                {
+                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+            }
         }
 
         if (pDir[i] > 0) //Move

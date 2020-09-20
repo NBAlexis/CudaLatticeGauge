@@ -446,6 +446,9 @@ __REGIST_TEST(TestBoost, Updator, TestBoost);
 
 __REGIST_TEST(TestRotationKS, Updator, TestRotationKS);
 
+//Need more exploration
+__REGIST_TEST(TestRotationKS, Updator, TestRotationProjectivePlane);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

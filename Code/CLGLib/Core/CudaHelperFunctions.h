@@ -34,12 +34,14 @@
 #define _CLG_LAUNCH_(n,m)  __launch_bounds__(n, m)
 #define _CLG_LAUNCH_BOUND_(n)  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD / n, n)
 #define _CLG_LAUNCH_BOUND_HALF  __launch_bounds__(_CLG_LAUNCH_MAX_THREADHALF, 1)
+#define _CLG_LAUNCH_BOUND_DIV(n)  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD / n, 1)
 #define _CLG_LAUNCH_BOUND  __launch_bounds__(_CLG_LAUNCH_MAX_THREAD, 1)
 #define _CLG_LAUNCH_BOUND_SINGLE __launch_bounds__(1, 1)
 #else
 #define _CLG_LAUNCH_(n,m)
 #define _CLG_LAUNCH_BOUND_(n)
 #define _CLG_LAUNCH_BOUND_HALF
+#define _CLG_LAUNCH_BOUND_DIV(n)
 #define _CLG_LAUNCH_BOUND
 #define _CLG_LAUNCH_BOUND_SINGLE
 #endif

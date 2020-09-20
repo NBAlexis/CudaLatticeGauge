@@ -40,6 +40,10 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     params.FetchValueINT(_T("DebugForce"), iDebugForce);
     m_bDebugForce = (0 != iDebugForce);
 
+    INT iBindDir = 0;
+    params.FetchValueINT(_T("BindDir"), iBindDir);
+    m_byBindDir = static_cast<BYTE>(iBindDir);
+
     m_pGaugeField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
     m_pGaugeField->m_pOwner = pLattice;
     m_pGaugeField->InitialField(EFIT_Zero);
@@ -70,6 +74,7 @@ void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
     if (!bLastAccepted || 0 == uiStep)
     {
         m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField);
+        m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
         m_bStapleCached = FALSE;
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -81,6 +86,7 @@ void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
 
     //generate a random momentum field to start
     m_pMomentumField->MakeRandomGenerator();
+    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -99,8 +105,13 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
 
 void CIntegrator::UpdateU(Real fStep) const
 {
+    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+
     //U(k) = exp (i e P) U(k-1)
     m_pMomentumField->ExpMult(fStep, m_pGaugeField);
+
+    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -110,6 +121,8 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
     m_pForceField->Zero();
     checkCudaErrors(cudaDeviceSynchronize());
 
+    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
@@ -117,19 +130,27 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
+    m_pForceField->SetOneDirectionZero(m_byBindDir);
+    
     //P = P + e F
     m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
     m_pMomentumField->Axpy(fStep, m_pForceField);
+    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
 void CIntegrator::FinishEvaluate() const
 {
     m_pGaugeField->ElementNormalize();
+    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
 }
 
 Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
 {
+    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+
     Real retv = m_pMomentumField->CalculateKinematicEnergy();
 
 #if _CLG_DEBUG

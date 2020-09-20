@@ -68,13 +68,13 @@ UINT TestBoundaryMapping(CParameters& sParam)
     //Real fE = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0));
     //CIndexData::DebugEdgeMapping(1, SSmallInt4(-1, -1, 0, 1));
     //CIndexData::DebugEdgeGlue(1, SSmallInt4(-1, -1, 0, 1));
-    CIndexData::DebugEdgeMapping(2, SSmallInt4(-1, -1, 0, 1));
+    //CIndexData::DebugEdgeMapping(2, SSmallInt4(-1, -1, 0, 1));
 
-#if 0
+#if 1
 
     const Real fExpE1 = F(14656.11807458415933069773);
     const Real fExpE2 = F(6518.69394147992716170847);
-    const Real fExpE3 = F(1162.42726703186121994804);
+    const Real fExpE3 = F(1167.37873127234047387901);
     const Real fExpE4 = F(14498.55613259701931383461);
 
     const Real fEnergy1 = appGetLattice()->m_pActionList[0]->Energy(
@@ -137,7 +137,9 @@ UINT TestBoundaryMapping(CParameters& sParam)
 }
 
 __REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
+
 __REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary);
+
 __REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping);
 
 

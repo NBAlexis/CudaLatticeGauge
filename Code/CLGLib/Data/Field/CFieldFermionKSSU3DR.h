@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldFermionKSSU3R.h
+// FILENAME : CFieldFermionKSSU3DR.h
 // 
 // DESCRIPTION:
 // This is the class for Kogut-Susskind staggered fermions
@@ -11,16 +11,16 @@
 //  [09/05/2020 nbale]
 //=============================================================================
 
-#ifndef _CFIELDFERMIONKSSU3R_H_
-#define _CFIELDFERMIONKSSU3R_H_
+#ifndef _CFIELDFERMIONKSSU3DR_H_
+#define _CFIELDFERMIONKSSU3DR_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CFieldFermionKSSU3R)
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionKSSU3DR)
 
-class CLGAPI CFieldFermionKSSU3R : public CFieldFermionKSSU3
+class CLGAPI CFieldFermionKSSU3DR : public CFieldFermionKSSU3D
 {
-    __CLGDECLARE_FIELD(CFieldFermionKSSU3R)
+    __CLGDECLARE_FIELD(CFieldFermionKSSU3DR)
 
 public:
 
@@ -87,30 +87,43 @@ static __device__ __inline__ deviceSU3 _deviceVXXTau(
     return sRet;
 }
 
-static __device__ __inline__ deviceSU3Vector _deviceOffsetXXTau(
-    const deviceSU3Vector* __restrict__ pDeviceData,
-    SSmallInt4 sStart, BYTE byFieldId,
-    UBOOL bXorY, UBOOL bPlusMu, UBOOL bPlusTau)
-{
-    if (bXorY)
-    {
-        sStart.x = sStart.x + (bPlusMu ? 2 : -2);
-    }
-    else
-    {
-        sStart.y = sStart.y + (bPlusMu ? 2 : -2);
-    }
-    sStart.w = sStart.w + (bPlusTau ? 1 : -1);
-    //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
-    const SIndex sTargetBigIndex = __idx->_deviceGetMappingIndex(sStart, byFieldId);
-
-    deviceSU3Vector ret = pDeviceData[sTargetBigIndex.m_uiSiteIndex];
-    if (sTargetBigIndex.NeedToOpposite())
-    {
-        ret.Opposite();
-    }
-    return ret;
-}
+/**
+ * The eta tau is already multiplied.
+ */
+//static __device__ __inline__ deviceSU3Vector _deviceOffsetXXTau(
+//    const deviceSU3Vector* __restrict__ pDeviceData,
+//    const BYTE* __restrict__ pEtaTable,
+//    SSmallInt4 sStart, BYTE byFieldId, UINT uiStartSiteIndex,
+//    UBOOL bXorY, UBOOL bPlusMu, UBOOL bPlusTau)
+//{
+//    if (bXorY)
+//    {
+//        sStart.x = sStart.x + (bPlusMu ? 2 : -2);
+//    }
+//    else
+//    {
+//        sStart.y = sStart.y + (bPlusMu ? 2 : -2);
+//    }
+//    sStart.w = sStart.w + (bPlusTau ? 1 : -1);
+//    //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
+//    const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sStart)];
+//
+//    deviceSU3Vector ret = pDeviceData[sTargetBigIndex.m_uiSiteIndex];
+//    if (sTargetBigIndex.NeedToOpposite())
+//    {
+//        ret.Opposite();
+//    }
+//    if (bPlusTau)
+//    {
+//        ret.MulReal((1 == ((pEtaTable[uiStartSiteIndex] >> 3) & 1)) ? F(-1.0) : F(1.0));
+//    }
+//    else
+//    {
+//        ret.MulReal((1 == ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1)) ? F(-1.0) : F(1.0));
+//    }
+//
+//    return ret;
+//}
 
 static __device__ __inline__ Real _deviceEta124(const SSmallInt4& sSite)
 {

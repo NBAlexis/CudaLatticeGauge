@@ -455,15 +455,14 @@ TestRotationKS:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 4]
+    LatticeLength : [8, 8, 8, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ActionListLength : 2
-    # ActionListLength : 5
+    ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
@@ -477,22 +476,28 @@ TestRotationKS:
         DebugForce : 1
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
+        # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
         IntegratorStep : 15
         NestedStep : 10
+        # BindDir : 10
 
     Gauge:
     
-        FieldName : CFieldGaugeSU3
-        # FieldInitialType : EFIT_Random
-        FieldInitialType : EFIT_Identity
-        Period : [1, 1, 1, 1]
+        FieldName : CFieldGaugeSU3D
+        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_Identity
+        Period : [0, 0, 1, 1]
         
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -502,7 +507,7 @@ TestRotationKS:
         FieldId : 2
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [0, 0, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -515,7 +520,7 @@ TestRotationKS:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -525,7 +530,7 @@ TestRotationKS:
         FieldId : 3
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [0, 0, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -538,7 +543,7 @@ TestRotationKS:
     FermionField3:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -548,7 +553,7 @@ TestRotationKS:
         FieldId : 4
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [0, 0, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -561,7 +566,7 @@ TestRotationKS:
     FermionField4:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -571,7 +576,7 @@ TestRotationKS:
         FieldId : 5
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [0, 0, 1, -1]
 
         # MC is to prepare
         # 4a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
@@ -596,7 +601,7 @@ TestRotationKS:
         SolverForFieldId : 2
         DiviationStep : 100
         MaxStep : 50
-        Accuracy : 0.0001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -612,7 +617,7 @@ TestRotationKS:
         SolverForFieldId : 3
         DiviationStep : 100
         MaxStep : 50
-        Accuracy : 0.0001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -621,7 +626,7 @@ TestRotationKS:
         SolverForFieldId : 4
         DiviationStep : 100
         MaxStep : 50
-        Accuracy : 0.0001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver4:
@@ -630,16 +635,16 @@ TestRotationKS:
         SolverForFieldId : 5
         DiviationStep : 100
         MaxStep : 50
-        Accuracy : 0.0001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     Action1:
    
         # ActionName : CActionGaugePlaquette
         ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 1
+        CloverEnergy : 0
         Beta : 4.5
-        Omega : 0.0
+        Omega : 0.2
 
     Action2:
 
@@ -656,10 +661,231 @@ TestRotationKS:
         ActionName : CActionFermionKS
         FieldId : 4
 
-    # Action5:
+    Action5:
 
-        # ActionName : CActionFermionKS
-        # FieldId : 5
+        ActionName : CActionFermionKS
+        FieldId : 5
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+TestRotationProjectivePlane:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 4
+    MeasureListLength : 1
+    ExpectedResDebug : 0.413
+    ExpectedRes : 0.487
+    CacheStaple : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        DebugForce : 1
+        InnerLeapfrog : 1
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorType : CIntegratorOmelyan
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 75
+        NestedStep : 10
+        BindDir : 3
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+        
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 3
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField3:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 4
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField4:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        #2am
+        Mass : 0.1
+        FieldId : 5
+        PoolNumber : 15
+
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
+        MC : [0.9988776027442932, -0.0006048425258523454, -0.007474052537327324, -0.050125636831114, 0.002915674710566969, 0.027921962272665187, 0.15288658498030255]
+
+        # MD is to calculate force
+        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{1/2}
+        MD : [1.0017043047437033, 0.018926025885869273, 0.03710444286611928, 0.0615256743746604, 0.0007928125852341372, 0.012883942266637766, 0.08873533812604463]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0001
+        Restart : 15
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    MSSolver3:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 4
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    MSSolver4:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 5
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        # ActionName : CActionGaugePlaquette
+        ActionName : CActionGaugePlaquetteRotating
+        CloverEnergy : 0
+        ShiftCoord : 1
+        Beta : 4.5
+        Omega : 0.2
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
+
+    Action4:
+
+        ActionName : CActionFermionKS
+        FieldId : 4
+
+    Action5:
+
+        ActionName : CActionFermionKS
+        FieldId : 5
 
     Measure1:
 

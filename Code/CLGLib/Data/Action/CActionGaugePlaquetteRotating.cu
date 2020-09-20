@@ -15,7 +15,373 @@ __BEGIN_NAMESPACE
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotating)
 
 
+#pragma region test shift coord
+
+static __device__ __inline__ Real _deviceHiShifted(
+    const SSmallInt4& center,
+    const SSmallInt4& site, const SSmallInt4& site2,
+    const SIndex& uiSiteBI, const SIndex& uiSite2BI, BYTE i)
+{
+    if (0 == i)
+    {
+        const Real fX1 = uiSiteBI.IsDirichlet() ? F(0.0)
+            : static_cast<Real>(site.x - center.x + F(0.5));
+        const Real fX2 = uiSite2BI.IsDirichlet() ? F(0.0)
+            : static_cast<Real>(site2.x - center.x + F(0.5));
+        return fX1 + fX2;
+    }
+    else if (1 == i)
+    {
+        const Real fY1 = uiSiteBI.IsDirichlet() ? F(0.0)
+            : static_cast<Real>(site.y - center.y + F(0.5));
+        const Real fY2 = uiSite2BI.IsDirichlet() ? F(0.0)
+            : static_cast<Real>(site2.y - center.y + F(0.5));
+        return -fY1 - fY2;
+    }
+    const Real fX1 = uiSiteBI.IsDirichlet() ? F(0.0)
+        : static_cast<Real>(site.x - center.x + F(0.5));
+    const Real fX2 = uiSite2BI.IsDirichlet() ? F(0.0)
+        : static_cast<Real>(site2.x - center.x + F(0.5));
+    const Real fY1 = uiSiteBI.IsDirichlet() ? F(0.0)
+        : static_cast<Real>(site.y - center.y + F(0.5));
+    const Real fY2 = uiSite2BI.IsDirichlet() ? F(0.0)
+        : static_cast<Real>(site2.y - center.y + F(0.5));
+    return fX1 * fY1 + fX2 * fY2;
+}
+
+
+static __device__ __inline__ deviceSU3 _deviceStapleS1Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, mu + 1);
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, nu + 1);
+    const UINT uiN_p_nu = __bi(n_p_nu);
+    const SIndex& n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_p_nu * _DC_Dir + mu];
+    const SIndex& uiSiteN_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_nu];
+
+    deviceSU3 ret(_deviceS1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
+    ret.MulDagger(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_mu__nu, byFieldId));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        sSite,
+        __deviceSiteIndexToInt4(uiSiteN_p_nu.m_uiSiteIndex),
+        __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex], uiSiteN_p_nu, i));
+
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleS2Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    const SSmallInt4 n_m_nu_p_mu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
+    const UINT uiN_m_nu = __bi(n_m_nu);
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_nu * _DC_Dir + mu];
+    const SIndex& n_m_nu_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_nu_p_mu) + nu];
+
+    const SIndex& uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu];
+
+    deviceSU3 ret(_deviceS2(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu__mu, byFieldId));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu_p_mu__nu, byFieldId));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        sSite,
+        __deviceSiteIndexToInt4(uiSiteN_m_nu.m_uiSiteIndex),
+        __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex], uiSiteN_m_nu, i));
+
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleS3Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
+
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
+
+    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu];
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n__nu, byFieldId));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
+    ret.Mul(_deviceS3(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        __deviceSiteIndexToInt4(uiSiteN_p_mu.m_uiSiteIndex),
+        __deviceSiteIndexToInt4(uiSiteN_p_mu_p_nu.m_uiSiteIndex),
+        uiSiteN_p_mu, uiSiteN_p_mu_p_nu, i));
+
+    return ret;
+
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleS4Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_p_mu, __bck(nu));
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_m_nu = __bi(n_p_mu_m_nu);
+    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
+
+    const SIndex& n_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
+
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_m_nu];
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu__nu, byFieldId));
+    ret.DaggerMul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_nu__mu, byFieldId));
+    ret.Mul(_deviceS4(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        __deviceSiteIndexToInt4(uiSiteN_p_mu.m_uiSiteIndex),
+        __deviceSiteIndexToInt4(uiSiteN_p_mu_m_nu.m_uiSiteIndex),
+        uiSiteN_p_mu, uiSiteN_p_mu_m_nu, i));
+
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleT1Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
+    const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
+
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
+
+    const SIndex& n__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + mu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu];
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n__mu, byFieldId));
+    ret.Mul(_deviceT1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.MulDagger(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        __deviceSiteIndexToInt4(uiSiteN_p_mu.m_uiSiteIndex),
+        __deviceSiteIndexToInt4(uiSiteN_p_mu_p_nu.m_uiSiteIndex),
+        uiSiteN_p_mu, uiSiteN_p_mu_p_nu, i));
+
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleT2Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite, __bck(mu));
+    const SSmallInt4 n_m_mu_p_nu = _deviceSmallInt4OffsetC(n_m_mu, __fwd(nu));
+
+    const UINT uiN_m_mu = __bi(n_m_mu);
+    const UINT uiN_m_mu_p_nu = __bi(n_m_mu_p_nu);
+
+    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu * _DC_Dir + mu];
+    const SIndex& n_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu_p_nu * _DC_Dir + mu];
+
+    const SIndex& uiSiteN_m_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu];
+    const SIndex& uiSiteN_m_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu_p_nu];
+
+    deviceSU3 ret(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu__mu, byFieldId));
+    ret.DaggerMul(_deviceT2(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
+    ret.Mul(_deviceGetGaugeBCSU3DirSIndex(pDeviceData, n_m_mu_p_nu__mu, byFieldId));
+
+    ret.MulReal(_deviceHiShifted(sCenter,
+        __deviceSiteIndexToInt4(uiSiteN_m_mu.m_uiSiteIndex),
+        __deviceSiteIndexToInt4(uiSiteN_m_mu_p_nu.m_uiSiteIndex),
+        uiSiteN_m_mu, uiSiteN_m_mu_p_nu, i));
+
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleChairTerm1Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    deviceSU3 ret(_deviceStapleS1Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    ret.Add(_deviceStapleS2Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    ret.Add(_deviceStapleS3Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    ret.Add(_deviceStapleS4Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    return ret;
+}
+
+static __device__ __inline__ deviceSU3 _deviceStapleChairTerm2Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+{
+    deviceSU3 ret(_deviceStapleT1Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    ret.Add(_deviceStapleT2Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    ret.Add(_deviceStapleT1Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, i));
+    ret.Add(_deviceStapleT2Shifted(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, i));
+    return ret;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddChairTermSU3_Term12_Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    Real betaOverN, Real fOmega,
+    Real* results)
+{
+    intokernalInt4;
+
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
+    {
+        results[uiSiteIndex] = F(0.0);
+        return;
+    }
+
+    betaOverN = F(0.125) * betaOverN;
+    const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5)) * fOmega;
+
+    //===============
+    //+x Omega V412
+    const Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+
+    //===============
+    //+x Omega V432
+    const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+
+    results[uiSiteIndex] = (fV412 /*+ fV432*/) * betaOverN;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForceChairTermSU3_Term1_1_Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmega)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+
+    //===============
+    //+x Omega V412
+    //add force for dir=4
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    {
+        const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+            3, 0, 1, 0);
+        deviceSU3 force4(pDeviceData[uiLink4]);
+        force4.MulDagger(staple_term1_4);
+        force4.Ta();
+        force4.MulReal(betaOverN);
+        pForceData[uiLink4].Add(force4);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForceChairTermSU3_Term1_2_Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmega)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+
+    //===============
+    //+x Omega V412
+    //add force for dir=2
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    {
+        const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+            1, 0, 3, 0);
+        deviceSU3 force2(pDeviceData[uiLink2]);
+        force2.MulDagger(staple_term1_2);
+        force2.Ta();
+        force2.MulReal(betaOverN);
+        pForceData[uiLink2].Add(force2);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForceChairTermSU3_Term1_3_Shifted(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmega)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+
+    //===============
+    //+x Omega V412
+    //add force for dir=x
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    {
+        const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+            3, 0, 1, 0);
+        deviceSU3 force1(pDeviceData[uiLink1]);
+        force1.MulDagger(staple_term1_1);
+        force1.Ta();
+        force1.MulReal(betaOverN);
+        pForceData[uiLink1].Add(force1);
+    }
+}
+
+#pragma endregion
+
 #pragma region kernels
+
+#pragma region Clover terms
 
 /**
 * This is slower, just for testing
@@ -125,6 +491,80 @@ _kernelAdd4PlaqutteTermSU3(
 
 
 /**
+*
+*/
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForce4PlaqutteTermSU3_XYZ(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmegaSq)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    betaOverN = betaOverN * F(-0.5);
+    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+#pragma unroll
+    for (UINT idir = 0; idir < 3; ++idir)
+    {
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        {
+            continue;
+        }
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        //mu = idir, nu = 4, i = mu
+        const deviceSU3 stap(_deviceStapleTerm123(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
+        deviceSU3 force(pDeviceData[linkIndex]);
+        force.MulDagger(stap);
+        force.Ta();
+        force.MulReal(betaOverN);
+        pForceData[linkIndex].Add(force);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddForce4PlaqutteTermSU3_T(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmegaSq)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //UINT uiDir = _DC_Dir;
+
+    betaOverN = betaOverN * F(-0.5);
+    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+
+    const BYTE idir = 3;
+    if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+    {
+        return;
+    }
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+    //mu = idir, nu = i = sum _1-3
+    deviceSU3 stap(_deviceStapleTerm4(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0));
+    stap.Add(_deviceStapleTerm4(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 1));
+    stap.Add(_deviceStapleTerm123(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 2, 2));
+    deviceSU3 force(pDeviceData[linkIndex]);
+    force.MulDagger(stap);
+    force.Ta();
+    force.MulReal(betaOverN);
+    pForceData[linkIndex].Add(force);
+}
+
+#pragma endregion
+
+#pragma region Chair Energy
+
+/**
 * Split into 3 functions to avoid max-register problem
 */
 __global__ void _CLG_LAUNCH_BOUND
@@ -219,75 +659,10 @@ _kernelAddChairTermSU3_Term5(
     results[uiSiteIndex] = fV142 * betaOverN;
 }
 
-/**
-* 
-*/
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForce4PlaqutteTermSU3_XYZ(
-    BYTE byFieldId,
-    const deviceSU3 * __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
-    deviceSU3 *pForceData,
-    Real betaOverN, Real fOmegaSq)
-{
-    intokernalInt4;
 
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+#pragma endregion
 
-    betaOverN = betaOverN * F(-0.5);
-    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
-    #pragma unroll
-    for (UINT idir = 0; idir < 3; ++idir)
-    {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
-        {
-            continue;
-        }
-        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-
-        //mu = idir, nu = 4, i = mu
-        const deviceSU3 stap(_deviceStapleTerm123(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
-        deviceSU3 force(pDeviceData[linkIndex]);
-        force.MulDagger(stap);
-        force.Ta();
-        force.MulReal(betaOverN);
-        pForceData[linkIndex].Add(force);
-    }
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForce4PlaqutteTermSU3_T(
-    BYTE byFieldId,
-    const deviceSU3 * __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
-    deviceSU3 *pForceData,
-    Real betaOverN, Real fOmegaSq)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    //UINT uiDir = _DC_Dir;
-
-    betaOverN = betaOverN * F(-0.5);
-    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
-
-    const BYTE idir = 3;
-    if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
-    {
-        return;
-    }
-    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-
-    //mu = idir, nu = i = sum _1-3
-    deviceSU3 stap(_deviceStapleTerm4(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0));
-    stap.Add(_deviceStapleTerm4(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 1));
-    stap.Add(_deviceStapleTerm123(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 2, 2));
-    deviceSU3 force(pDeviceData[linkIndex]);
-    force.MulDagger(stap);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[linkIndex].Add(force);
-}
+#pragma region Chair force
 
 /**
 * Split to 15 functions to avoid max-regcount
@@ -308,7 +683,7 @@ _kernelAddForceChairTermSU3_Term1_1(
 
     //===============
     //+x Omega V412
-    //add force for mu=4
+    //add force for dir=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
@@ -339,7 +714,7 @@ _kernelAddForceChairTermSU3_Term1_2(
 
     //===============
     //+x Omega V412
-    //add force for mu=4
+    //add force for dir=2
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
@@ -370,7 +745,7 @@ _kernelAddForceChairTermSU3_Term1_3(
 
     //===============
     //+x Omega V412
-    //add force for mu=4
+    //add force for dir=x
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
@@ -763,11 +1138,223 @@ _kernelAddForceChairTermSU3_Term5_3(
 
 #pragma endregion
 
+#pragma endregion
+
+#if 1
+
+#pragma region Detailed about chair terms
+
+static __device__ __inline__ Real _deviceSiteCoeff(
+    const SSmallInt4& sSite4, const SSmallInt4& sCenterSite, BYTE byType)
+{
+    return F(1.0);
+    if (0 == byType)
+    {
+        return sSite4.x - sCenterSite.x + F(0.5);
+    }
+
+    return F(0.0);
+}
+
+static __device__ __inline__ Real _deviceOneChairLoop(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 start,
+    INT mu, INT nu, INT rho
+    )
+{
+    const INT path[6] = { mu, nu, -mu, rho, -nu, -rho};
+    return _deviceLink(pDeviceData, start, 6, byFieldId, path).ReTr();
+}
+
+static __device__ __inline__ deviceSU3 _deviceChairStapleMu(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 start, const SSmallInt4& sCenter,
+    INT mu, INT nu, INT rho)
+{
+    SSmallInt4 siteA = start;
+    siteA = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteA)].m_uiSiteIndex);
+    SSmallInt4 siteB = _deviceSmallInt4OffsetC(start, -nu);
+    siteB = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteB)].m_uiSiteIndex);
+
+    const INT path1[5] = { rho, nu, -rho, mu, -nu };
+    deviceSU3 linkV = _deviceLink(pDeviceData, start, 5, byFieldId, path1);
+    linkV.MulReal(_deviceSiteCoeff(siteA, sCenter, 0));
+
+    const INT path2[5] = { rho, -nu, -rho, mu, nu };
+    linkV.Add(_deviceLink(pDeviceData, start, 5, byFieldId, path2)
+        .MulRealC(_deviceSiteCoeff(siteB, sCenter, 0)));
+    return linkV;
+}
+
+static __device__ __inline__ deviceSU3 _deviceChairStapleNu(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 start, const SSmallInt4& sCenter,
+    INT mu, INT nu, INT rho)
+{
+    SSmallInt4 sStart2 = start;
+    if (nu < 0)
+    {
+        sStart2 = _deviceSmallInt4OffsetC(start, -nu);
+    }
+    SSmallInt4 siteA = _deviceSmallInt4OffsetC(sStart2, -mu);
+    siteA = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteA)].m_uiSiteIndex);
+    SSmallInt4 siteB = _deviceSmallInt4OffsetC(sStart2, -rho);
+    siteB = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteB)].m_uiSiteIndex);
+
+    const INT path1[5] = { -mu, rho, nu, -rho, mu };
+    deviceSU3 linkV = _deviceLink(pDeviceData, start, 5, byFieldId, path1);
+    linkV.MulReal(_deviceSiteCoeff(siteA, sCenter, 0));
+
+    const INT path2[5] = { -rho, mu, nu, -mu, rho };
+    linkV.Add(_deviceLink(pDeviceData, start, 5, byFieldId, path2)
+        .MulRealC(_deviceSiteCoeff(siteB, sCenter, 0)));
+    return linkV;
+}
+
+static __device__ __inline__ deviceSU3 _deviceChairStapleRho(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 start, const SSmallInt4& sCenter,
+    INT mu, INT nu, INT rho)
+{
+    SSmallInt4 siteA = start;
+    siteA = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteA)].m_uiSiteIndex);
+    SSmallInt4 siteB = _deviceSmallInt4OffsetC(start, -nu);
+    siteB = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteB)].m_uiSiteIndex);
+
+    const INT path1[5] = { mu, nu, -mu, rho, -nu }; 
+    deviceSU3 linkV = _deviceLink(pDeviceData, start, 5, byFieldId, path1);
+    linkV.MulReal(_deviceSiteCoeff(siteA, sCenter, 0));
+
+    const INT path2[5] = { mu, -nu, -mu, rho, nu };
+    linkV.Add(_deviceLink(pDeviceData, start, 5, byFieldId, path2)
+        .MulRealC(_deviceSiteCoeff(siteB, sCenter, 0)));
+    return linkV;
+}
+
+static __device__ __inline__ deviceSU3 _deviceChairStapleRho2(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 start, const SSmallInt4& sCenter,
+    INT mu, INT nu, INT rho)
+{
+    SSmallInt4 siteA = _deviceSmallInt4OffsetC(start, rho);
+    siteA = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteA)].m_uiSiteIndex);
+    SSmallInt4 siteB = _deviceSmallInt4OffsetC(siteA, -nu);
+    siteB = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siteB)].m_uiSiteIndex);
+
+    const INT path1[5] = { nu, rho, mu, -nu, -mu };
+    deviceSU3 linkV = _deviceLink(pDeviceData, start, 5, byFieldId, path1);
+    linkV.MulReal(_deviceSiteCoeff(siteA, sCenter, 0));
+
+    const INT path2[5] = { -nu, rho, mu, nu, -mu };
+    linkV.Add(_deviceLink(pDeviceData, start, 5, byFieldId, path2)
+        .MulRealC(_deviceSiteCoeff(siteB, sCenter, 0)));
+    return linkV;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddLoopsForEachSite(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    Real betaOverN, Real fOmega,
+    Real* results)
+{
+    intokernalInt4;
+
+    const Real fXOmega = _deviceSiteCoeff(sSite4, sCenterSite, 0) * fOmega;
+    Real fLoop1 = _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, 2);
+    //fLoop1 = fLoop1 + _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, 2);
+    //fLoop1 = fLoop1 + _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, -2);
+    //fLoop1 = fLoop1 + _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, -2);
+    results[uiSiteIndex] = fLoop1 * betaOverN * fXOmega;
+
+    if (0 == sSite4.x && 0 == sSite4.y && 0 == sSite4.z && 0 == sSite4.w)
+    {
+        printf("loop1a _00 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, 2));
+        printf("loop1b _00 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, 2));
+        printf("loop1b _00 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, -2));
+        printf("loop1b _00 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, -2));
+    }
+
+    if (3 == sSite4.x && 3 == sSite4.y && 0 == sSite4.z && 0 == sSite4.w)
+    {
+        printf("loop1a _33 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, 2));
+        printf("loop1b _33 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, 2));
+        printf("loop1b _33 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, 1, -2));
+        printf("loop1b _33 = %f\n", _deviceOneChairLoop(byFieldId, pDeviceData, sSite4, 4, -1, -2));
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAddLoopsForceForEachSite(
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sCenterSite,
+    deviceSU3* pForceData,
+    Real betaOverN, Real fOmega)
+{
+    intokernalInt4;
+    //const Real fXOmega = _deviceSiteCoeff(sSite4, sCenterSite, 0) * fOmega;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    betaOverN = betaOverN * F(0.5);
+
+    //Mu
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    {
+        deviceSU3 force4 = _deviceChairStapleMu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, 2);
+        //force4.Add(_deviceChairStapleMu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, 2));
+        //force4.Add(_deviceChairStapleMu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, -2));
+        //force4.Add(_deviceChairStapleMu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, -2));
+        force4.MulDagger(pDeviceData[uiLink4]);
+        force4.Ta();
+        force4.MulReal(betaOverN * fOmega);
+        pForceData[uiLink4].Add(force4);
+    }
+
+    //Nu
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    {
+        deviceSU3 force1 = _deviceChairStapleNu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, 2);
+        force1.Add(_deviceChairStapleNu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, 2));
+        force1.Sub(_deviceChairStapleNu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, -2));
+        force1.Sub(_deviceChairStapleNu(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, -2));
+        force1.MulDagger(pDeviceData[uiLink1]);
+        force1.Ta();
+        force1.MulReal(betaOverN * fOmega);
+        pForceData[uiLink1].Sub(force1);
+    }
+
+    //Rho
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    {
+        deviceSU3 force2 = _deviceChairStapleRho(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, 2);
+        force2.Add(_deviceChairStapleRho(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, 2));
+        force2.Sub(_deviceChairStapleRho2(byFieldId, pDeviceData, sSite4, sCenterSite, 4, -1, 2));
+        force2.Sub(_deviceChairStapleRho2(byFieldId, pDeviceData, sSite4, sCenterSite, 4, 1, 2));
+        force2.MulDagger(pDeviceData[uiLink2]);
+        force2.Ta();
+        force2.MulReal(betaOverN * fOmega);
+        pForceData[uiLink2].Sub(force2);
+    }
+}
+
+#pragma endregion
+
+#endif
 
 CActionGaugePlaquetteRotating::CActionGaugePlaquetteRotating()
     : CAction()
     , m_fOmega(F(0.0))
     , m_bCloverEnergy(FALSE)
+    , m_bShiftHalfCoord(FALSE)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
@@ -830,6 +1417,10 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
             m_bCloverEnergy = TRUE;
         }
     }
+
+    INT iShiftCoord = 0;
+    param.FetchValueINT(_T("ShiftCoord"), iShiftCoord);
+    m_bShiftHalfCoord = (0 != iShiftCoord);
 }
 
 void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
@@ -845,7 +1436,7 @@ void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
 UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
     pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
-    
+
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
     if (NULL == pGaugeSU3 || NULL == pForceSU3)
@@ -855,57 +1446,74 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
     }
 
     preparethread;
-
-    _kernelAddForce4PlaqutteTermSU3_XYZ << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForce4PlaqutteTermSU3_XYZ << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForce4PlaqutteTermSU3_T << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+    if (!m_bShiftHalfCoord)
+    {
+        //_kernelAddLoopsForceForEachSite << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        //    pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_2 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term1_1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_3 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term1_2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term1_3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_2 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term2_1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_3 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term2_2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term2_3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_2 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term3_1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_3 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term3_2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term3_3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_2 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term4_1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_3 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term4_2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_1 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        _kernelAddForceChairTermSU3_Term4_3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_2 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        _kernelAddForceChairTermSU3_Term5_1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_3 << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        _kernelAddForceChairTermSU3_Term5_2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term5_3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+    }
+    else
+    {
+        _kernelAddLoopsForceForEachSite << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        //_kernelAddForceChairTermSU3_Term1_2_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        //    pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        //_kernelAddForceChairTermSU3_Term1_3_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        //    pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    }
 
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
@@ -920,6 +1528,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     {
         return m_fLastEnergy;
     }
+
     if (m_bCloverEnergy)
     {
         m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
@@ -945,51 +1554,77 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     //    m_fBetaOverN,
     //    m_fOmega * m_fOmega,
     //    _D_RealThreadBuffer);
-
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
     dim3 block2 = block;
     block2.y = block.y * 3;
     _kernelAdd4PlaqutteTermSU3 << <block2, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData, 
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega * m_fOmega,
-            _D_RealThreadBuffer);
-
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    _kernelAddChairTermSU3_Term12 << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega,
-        _D_RealThreadBuffer);
-
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    _kernelAddChairTermSU3_Term34 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega,
-        _D_RealThreadBuffer);
-
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    _kernelAddChairTermSU3_Term5 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         CCommonData::m_sCenter,
         m_fBetaOverN,
         m_fOmega * m_fOmega,
         _D_RealThreadBuffer);
 
     m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    if (m_bShiftHalfCoord)
+    {
+        _kernelAddLoopsForEachSite << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    }
+    else
+    {
+        //_kernelAddLoopsForEachSite << <block, threads >> > (
+        //    pGaugeSU3->m_byFieldId,
+        //    pGaugeSU3->m_pDeviceData,
+        //    CCommonData::m_sCenter,
+        //    m_fBetaOverN,
+        //    m_fOmega,
+        //    _D_RealThreadBuffer);
+
+        //m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term12 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term34 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term5 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega * m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    }
+
 
     return m_fNewEnergy;
 }

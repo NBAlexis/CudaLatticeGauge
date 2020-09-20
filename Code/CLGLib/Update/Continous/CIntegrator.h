@@ -25,7 +25,8 @@ class CLGAPI CIntegrator : public CBase
 {
 public:
     CIntegrator() 
-        : m_uiStepCount(1)
+        : m_byBindDir(0)
+        , m_uiStepCount(1)
         , m_fEStep(0)
         , m_bDebugForce(FALSE)
         , m_bStapleCached(FALSE)
@@ -66,7 +67,8 @@ public:
     UINT GetStepCount() const { return m_uiStepCount; }
 
 protected:
-    
+
+    BYTE m_byBindDir;
     UINT m_uiStepCount;
     Real m_fEStep;
     UBOOL m_bDebugForce;

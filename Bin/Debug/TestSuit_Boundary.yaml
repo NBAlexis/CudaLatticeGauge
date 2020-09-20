@@ -159,10 +159,10 @@ TestBoundaryMapping:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [6, 6, 4, 4]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -190,7 +190,7 @@ TestBoundaryMapping:
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -213,11 +213,11 @@ TestBoundaryMapping:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
-
+        
         #2am
         Mass : 0.5
         FieldId : 3

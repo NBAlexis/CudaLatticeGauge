@@ -67,6 +67,9 @@ public:
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
 
+    void SetOneDirectionUnity(BYTE byDir) override;
+    void SetOneDirectionZero(BYTE byDir) override;
+
 #pragma endregion
 
 #pragma region Test Functions to test gauge invarience of angular momentum

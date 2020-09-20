@@ -714,6 +714,62 @@ _kernelTransformToULog(
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSetOneDirUnity(deviceSU3* pDeviceData, BYTE byDir)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        if (0 != ((1 << dir) & byDir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            pDeviceData[uiLinkIndex] = deviceSU3::makeSU3Id();
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSetOneDirZero(deviceSU3* pDeviceData, BYTE byDir)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        if (0 != ((1 << dir) & byDir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            pDeviceData[uiLinkIndex] = deviceSU3::makeSU3Zero();
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND_SINGLE
+_kernelSetOneDirUnityPoint(deviceSU3* pDeviceData, UINT uiSiteIndex, BYTE byDir)
+{
+    for (BYTE dir = 0; dir < 4; ++dir)
+    {
+        if (0 != ((1 << dir) & byDir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            pDeviceData[uiLinkIndex] = deviceSU3::makeSU3Id();
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND_SINGLE
+_kernelSetOneDirZeroPoint(deviceSU3* pDeviceData, UINT uiSiteIndex, BYTE byDir)
+{
+    for (BYTE dir = 0; dir < 4; ++dir)
+    {
+        if (0 != ((1 << dir) & byDir))
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+            pDeviceData[uiLinkIndex] = deviceSU3::makeSU3Zero();
+        }
+    }
+}
+
 #pragma endregion
 
 void CFieldGaugeSU3::AxpyPlus(const CField* x)
@@ -1096,6 +1152,47 @@ Real CFieldGaugeSU3::CalculateKinematicEnergy() const
     preparethread;
     _kernelCalculateKinematicEnergySU3 << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+void CFieldGaugeSU3::SetOneDirectionUnity(BYTE byDir)
+{
+    if (0 == (byDir & 15))
+    {
+        return;
+    }
+    preparethread;
+    _kernelSetOneDirUnity << <block, threads >> >(m_pDeviceData, byDir);
+
+    //for (SBYTE byz = 0; byz < _HC_Lz; ++byz)
+    //{
+    //    for (SBYTE byw = 0; byw < _HC_Lt; ++byw)
+    //    {
+    //        _kernelSetOneDirUnityPoint <<<1,1>>>(m_pDeviceData, _hostGetSiteIndex(SSmallInt4(0, 0, byz, byw)), 15);
+    //        _kernelSetOneDirUnityPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(0, 3, byz, byw)), 15);
+    //        _kernelSetOneDirUnityPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(3, 0, byz, byw)), 15);
+    //        _kernelSetOneDirUnityPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(3, 3, byz, byw)), 15);
+    //    }
+    //}
+}
+
+void CFieldGaugeSU3::SetOneDirectionZero(BYTE byDir)
+{
+    if (0 == (byDir & 15))
+    {
+        return;
+    }
+    preparethread;
+    _kernelSetOneDirZero << <block, threads >> > (m_pDeviceData, byDir);
+    //for (SBYTE byz = 0; byz < _HC_Lz; ++byz)
+    //{
+    //    for (SBYTE byw = 0; byw < _HC_Lt; ++byw)
+    //    {
+    //        _kernelSetOneDirZeroPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(0, 0, byz, byw)), 15);
+    //        _kernelSetOneDirZeroPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(0, 3, byz, byw)), 15);
+    //        _kernelSetOneDirZeroPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(3, 0, byz, byw)), 15);
+    //        _kernelSetOneDirZeroPoint << <1, 1 >> > (m_pDeviceData, _hostGetSiteIndex(SSmallInt4(3, 3, byz, byw)), 15);
+    //    }
+    //}
 }
 
 CFieldGaugeSU3::CFieldGaugeSU3() : CFieldGauge()

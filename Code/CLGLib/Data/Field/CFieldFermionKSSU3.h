@@ -65,6 +65,9 @@ public:
     UBOOL InverseDDdagger(const CField* pGauge) override;
     void ApplyGamma(EGammaMatrix eGamma) override;
 
+    //================= test anti-hermitian =========
+    UINT TestAntiHermitian(const CFieldGauge* pGauge) const;
+
     //These are truely D or InverseD etc.
 
     /**
@@ -109,6 +112,10 @@ public:
     deviceSU3Vector* m_pDeviceData;
 
 protected:
+
+    //For some strange boundary condition
+    //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
+    UBOOL m_bEachSiteEta;
 
     Real m_f2am;
 
