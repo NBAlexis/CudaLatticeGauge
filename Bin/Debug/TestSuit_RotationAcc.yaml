@@ -675,14 +675,14 @@ TestRotationProjectivePlane:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ActionListLength : 1
+    ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
@@ -696,12 +696,11 @@ TestRotationProjectivePlane:
         DebugForce : 1
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
-        IntegratorType : CIntegratorOmelyan
-        # IntegratorType : CIntegratorNestedOmelyan
+        # IntegratorType : CIntegratorOmelyan
+        IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 75
+        IntegratorStep : 20
         NestedStep : 10
-        BindDir : 3
 
     Gauge:
     
@@ -717,7 +716,7 @@ TestRotationProjectivePlane:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -727,7 +726,9 @@ TestRotationProjectivePlane:
         FieldId : 2
         PoolNumber : 15
 
-        Period : [0, 0, 1, -1]
+        EachSiteEta : 1
+
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -740,7 +741,7 @@ TestRotationProjectivePlane:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -749,8 +750,8 @@ TestRotationProjectivePlane:
         Mass : 0.5
         FieldId : 3
         PoolNumber : 15
-
-        Period : [0, 0, 1, -1]
+        EachSiteEta : 1
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -763,7 +764,7 @@ TestRotationProjectivePlane:
     FermionField3:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -772,8 +773,8 @@ TestRotationProjectivePlane:
         Mass : 0.5
         FieldId : 4
         PoolNumber : 15
-
-        Period : [0, 0, 1, -1]
+        EachSiteEta : 1
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}
@@ -786,7 +787,7 @@ TestRotationProjectivePlane:
     FermionField4:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -795,8 +796,8 @@ TestRotationProjectivePlane:
         Mass : 0.1
         FieldId : 5
         PoolNumber : 15
-
-        Period : [0, 0, 1, -1]
+        EachSiteEta : 1
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # 4a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
@@ -819,9 +820,9 @@ TestRotationProjectivePlane:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 2
-        DiviationStep : 100
-        MaxStep : 50
-        Accuracy : 0.00001
+        DiviationStep : 10
+        MaxStep : 500
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -835,34 +836,34 @@ TestRotationProjectivePlane:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 3
-        DiviationStep : 100
+        DiviationStep : 10
         MaxStep : 50
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
 
     MSSolver3:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 4
-        DiviationStep : 100
+        DiviationStep : 10
         MaxStep : 50
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
 
     MSSolver4:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 5
-        DiviationStep : 100
+        DiviationStep : 30
         MaxStep : 50
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
 
     Action1:
    
         # ActionName : CActionGaugePlaquette
         ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 0
+        CloverEnergy : 1
         ShiftCoord : 1
         Beta : 4.5
         Omega : 0.2

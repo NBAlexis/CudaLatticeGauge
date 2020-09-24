@@ -86,7 +86,7 @@ INT GaugeFixing(CParameters& params)
                 }
                 else
                 {
-                    sSaveFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix, uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sSaveFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 }
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
 

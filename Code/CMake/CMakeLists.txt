@@ -5,6 +5,13 @@ if (DEFINED NVCCROOT)
     MESSAGE("CMAKE_CUDA_COMPILER = ${CMAKE_CUDA_COMPILER}")
 endif()
 
+set(CUDA_CMP compute_61)
+set(CUDA_SM sm_61)
+if (DEFINED CUDASM)
+    set(CUDA_CMP compute_.${CUDASM})
+    set(CUDA_SM sm_.${CUDASM})")
+endif()
+
 project(CLG LANGUAGES CXX CUDA)
 
 set(CMAKE_GENERATOR_PLATFORM x64)
@@ -21,7 +28,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-s
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
 add_definitions(-D_CLG_DOUBLEFLOAT=1)
-MESSAGE("Note: double float is enabled, arch is compute_61 and sm_61.")
+MESSAGE("Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.")
 MESSAGE("CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}")
 MESSAGE("CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}")
 
@@ -56,6 +63,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.h
@@ -149,6 +158,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.cu
@@ -240,7 +251,7 @@ target_link_libraries(CLGLib -lcurand)
 target_link_libraries(CLGLib -lcufft)
 
 # To enable the double, the minimum arch is 6.0
-target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=compute_61,code=sm_61>)
+target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)
 
 
 
@@ -293,6 +304,7 @@ target_link_libraries(RotatingReproduce CLGLib)
 
 
 
+
 # ==================== 
 # MatchingRho 
 # =================
@@ -308,8 +320,9 @@ target_link_libraries(MatchingRho CLGLib)
 
 
 
+
 # ==================== 
-# Staggered Spectrum 
+# StaggeredSpectrum 
 # =================
 
 include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)
@@ -321,3 +334,21 @@ add_executable(StaggeredSpectrum
 
 target_compile_features(StaggeredSpectrum PUBLIC cxx_std_14)
 target_link_libraries(StaggeredSpectrum CLGLib)
+
+
+
+
+# ==================== 
+# StaggeredRotation 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation)
+add_executable(StaggeredRotation 
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.h
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate.cpp
+    )
+
+target_compile_features(StaggeredRotation PUBLIC cxx_std_14)
+target_link_libraries(StaggeredRotation CLGLib)
+

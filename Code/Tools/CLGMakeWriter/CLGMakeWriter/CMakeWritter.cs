@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -66,6 +67,14 @@ namespace CLGMakeWriter
             sContent += "    MESSAGE(\"CMAKE_CUDA_COMPILER = ${CMAKE_CUDA_COMPILER}\")\n";
             sContent += "endif()\n\n";
 
+            sContent += string.Format("set(CUDA_CMP {0})\n", ArchNames[(int)m_eArch]);
+            sContent += string.Format("set(CUDA_SM {0})\n", CodeNames[(int)m_eArch]);
+
+            sContent += "if (DEFINED CUDASM)\n";
+            sContent += "    set(CUDA_CMP compute_.${CUDASM})\n";
+            sContent += "    set(CUDA_SM sm_.${CUDASM})\")\n";
+            sContent += "endif()\n\n";
+
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
@@ -85,14 +94,13 @@ namespace CLGMakeWriter
             if (m_bDouble)
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-                sContent += string.Format("MESSAGE(\"Note: double float is enabled, arch is {0} and {1}.\")\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
             }
             else
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
-                sContent += string.Format("MESSAGE(\"Note: double float NOT is enabled, arch is {0} and {1}.\")\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
             }
-            
+            sContent += "MESSAGE(\"Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
+
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";
 
@@ -130,7 +138,7 @@ set_target_properties( CLGLib
             sContent += "target_link_libraries(CLGLib -lcufft)\n";
 
             sContent += "\n# To enable the double, the minimum arch is 6.0\n";
-            sContent += string.Format("target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch={0},code={1}>)\n\n", ArchNames[(int)m_eArch], CodeNames[(int)m_eArch]);
+            sContent += "target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)\n\n";
 
             #endregion
 
@@ -158,127 +166,23 @@ set_target_properties( CLGLib
 
             #endregion
 
-            #region Add Application/RotatingReproduce
+            #region Add Applications
 
-            CProjFile rotatingProj = excutables["RotatingReproduce"];
-
-            sContent += "\n\n\n# ==================== \n# RotatingReproduce \n# =================\n\n";
-
-            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)\n";
-            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
-
-            sContent += "add_executable(RotatingReproduce \n    ";
-            foreach (string sFileName in rotatingProj.m_lstAllHeaderFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/" + sFileName + "\n    ";
-            }
-            foreach (string sFileName in rotatingProj.m_lstAllCppFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/" + sFileName + "\n    ";
-            }
-            sContent += ")\n\n";
-
-            sContent += "target_compile_features(RotatingReproduce PUBLIC cxx_std_14)\n";
-            sContent += "target_link_libraries(RotatingReproduce CLGLib)\n";
-
-            #endregion
-
-            #region Add Matching
-
-            CProjFile matchingProj = excutables["MatchingRho"];
-
-            sContent += "\n\n\n# ==================== \n# MatchingRho \n# =================\n\n";
-
-            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/MatchingRho)\n";
-            //sContent += "add_subdirectory(${PROJECT_SOURCE_DIR}/CLGTest)\n\n";
-
-            sContent += "add_executable(MatchingRho \n    ";
-            foreach (string sFileName in matchingProj.m_lstAllHeaderFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/MatchingRho/" + sFileName + "\n    ";
-            }
-            foreach (string sFileName in matchingProj.m_lstAllCppFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/MatchingRho/" + sFileName + "\n    ";
-            }
-            sContent += ")\n\n";
-
-            sContent += "target_compile_features(MatchingRho PUBLIC cxx_std_14)\n";
-            sContent += "target_link_libraries(MatchingRho CLGLib)\n";
-
-            #endregion
-
-            #region Add Compresser
+            sContent += AddApplication(excutables["RotatingReproduce"]);
+            sContent += AddApplication(excutables["MatchingRho"]);
 
             if (m_bHasCompresser)
             {
-                CProjFile compresserProj = excutables["ConfigurationCompresser"];
-
-                sContent += "\n\n\n# ==================== \n# ConfigurationCompresser \n# =================\n\n";
-                sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser)\n";
-                sContent += "add_executable(ConfigurationCompresser \n    ";
-                foreach (string sFileName in compresserProj.m_lstAllHeaderFiles)
-                {
-                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
-                }
-
-                foreach (string sFileName in compresserProj.m_lstAllCppFiles)
-                {
-                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConfigurationCompresser/" + sFileName + "\n    ";
-                }
-
-                sContent += ")\n\n";
-
-                sContent += "target_compile_features(ConfigurationCompresser PUBLIC cxx_std_14)\n";
-                sContent += "target_link_libraries(ConfigurationCompresser CLGLib)\n";
+                sContent += AddApplication(excutables["ConfigurationCompresser"]);
             }
-
-            #endregion
-
-            #region Add ConstAcc
 
             if (m_bHasConstAcc)
             {
-                CProjFile constaccProj = excutables["ConstAcc"];
-
-                sContent += "\n\n\n# ==================== \n# ConstAcc \n# =================\n\n";
-                sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/ConstAcc)\n";
-                sContent += "add_executable(ConstAcc \n    ";
-                foreach (string sFileName in constaccProj.m_lstAllHeaderFiles)
-                {
-                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
-                }
-                foreach (string sFileName in constaccProj.m_lstAllCppFiles)
-                {
-                    sContent += "${PROJECT_SOURCE_DIR}/Applications/ConstAcc/" + sFileName + "\n    ";
-                }
-                sContent += ")\n\n";
-
-                sContent += "target_compile_features(ConstAcc PUBLIC cxx_std_14)\n";
-                sContent += "target_link_libraries(ConstAcc CLGLib)\n";
+                sContent += AddApplication(excutables["ConstAcc"]);
             }
 
-            #endregion
-
-            #region Staggered Spectrum
-
-            CProjFile staggeredSpectrumProj = excutables["StaggeredSpectrum"];
-
-            sContent += "\n\n\n# ==================== \n# Staggered Spectrum \n# =================\n\n";
-            sContent += "include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)\n";
-            sContent += "add_executable(StaggeredSpectrum \n    ";
-            foreach (string sFileName in staggeredSpectrumProj.m_lstAllHeaderFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/" + sFileName + "\n    ";
-            }
-            foreach (string sFileName in staggeredSpectrumProj.m_lstAllCppFiles)
-            {
-                sContent += "${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/" + sFileName + "\n    ";
-            }
-            sContent += ")\n\n";
-
-            sContent += "target_compile_features(StaggeredSpectrum PUBLIC cxx_std_14)\n";
-            sContent += "target_link_libraries(StaggeredSpectrum CLGLib)\n";
+            sContent += AddApplication(excutables["StaggeredSpectrum"]);
+            sContent += AddApplication(excutables["StaggeredRotation"]);
 
             #endregion
 
@@ -291,6 +195,30 @@ set_target_properties( CLGLib
 
             //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
             //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
+        }
+
+        protected string AddApplication(CProjFile addProj)
+        {
+            string sAppName = addProj.m_sName;
+
+            var sRet = string.Format("\n\n\n# ==================== \n# {0} \n# =================\n\n", sAppName);
+            sRet += string.Format("include_directories({1}/Applications/{0})\n", sAppName, "${PROJECT_SOURCE_DIR}");
+            sRet += string.Format("add_executable({0} \n    ", sAppName);
+            foreach (string sFileName in addProj.m_lstAllHeaderFiles)
+            {
+                sRet += string.Format("{1}/Applications/{0}/" + sFileName + "\n    ", sAppName, "${PROJECT_SOURCE_DIR}");
+            }
+
+            foreach (string sFileName in addProj.m_lstAllCppFiles)
+            {
+                sRet += string.Format("{1}/Applications/{0}/" + sFileName + "\n    ", sAppName, "${PROJECT_SOURCE_DIR}");
+            }
+
+            sRet += ")\n\n";
+
+            sRet += string.Format("target_compile_features({0} PUBLIC cxx_std_14)\n", sAppName);
+            sRet += string.Format("target_link_libraries({0} CLGLib)\n\n", sAppName);
+            return sRet;
         }
     }
 }

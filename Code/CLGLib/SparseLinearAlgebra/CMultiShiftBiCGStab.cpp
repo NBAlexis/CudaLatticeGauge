@@ -61,6 +61,7 @@ void CMultiShiftBiCGStab::ReleaseBuffers()
 
 UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
+    UBOOL bOldDate = appGetLogDate();
     appSetLogDate(FALSE);
     TArray<CLGComplex> betas;
     TArray<CLGComplex> zeta;
@@ -237,6 +238,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pS->Return();
     pSA->Return();
     pWA->Return();
+    appSetLogDate(bOldDate);
     return bDone;
 }
 

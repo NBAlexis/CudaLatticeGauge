@@ -282,7 +282,8 @@ TestAnitiHermiticity:
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -310,12 +311,12 @@ TestAnitiHermiticity:
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3D
+        FieldName : CFieldGaugeSU3
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 
-        Period : [0, 0, 1, 1]
+        Period : [1, 1, 1, 1]
         
     GaugeBoundary:
 
@@ -324,7 +325,7 @@ TestAnitiHermiticity:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -336,7 +337,7 @@ TestAnitiHermiticity:
         FieldId : 2
         PoolNumber : 15
 
-        Period : [0, 0, 1, -1]
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/8}

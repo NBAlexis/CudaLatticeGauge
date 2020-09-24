@@ -28,22 +28,6 @@ namespace CLGMakeWriter
             string projCLGTestFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj" });
             string projCLGTestFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj.filters" });
 
-            string projRotatingPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce" });
-            string projRotatingFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/RotatingReproduce.vcxproj" });
-            //string projRotatingFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/RotatingReproduce/CLGTest.vcxproj.filters" });
-
-            string projMatchingRhoPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho" });
-            string projMatchingRhoFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/MatchingRho/MatchingRho.vcxproj" });
-
-            string projConfigurationCompresserPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser" });
-            string projConfigurationCompresserFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConfigurationCompresser/ConfigurationCompresser.vcxproj" });
-
-            string projConstAccPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc" });
-            string projConstAccFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/ConstAcc/ConstAcc.vcxproj" });
-
-            string projStaggeredSpectrumPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/StaggeredSpectrum" });
-            string projStaggeredSpectrumFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../Applications/StaggeredSpectrum/StaggeredSpectrum.vcxproj" });
-
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)
              || !File.Exists(projCLGLibFilterPath)
@@ -54,30 +38,21 @@ namespace CLGMakeWriter
                 return;
             }
 
-            if (!File.Exists(projRotatingFilePath))
-            {
-                Console.WriteLine("Failed...cannot find rotating project...");
-                return;
-            }
-
-
-            List<string> applicationProjFiles = new List<string>();
-            List<string> applicationProjDirs = new List<string>();
-
             //gather applications
 
-            CProjFile clgLibProj = new CProjFile(projCLGLibFilePath, projCLGLibPath);
+            CProjFile clgLibProj = new CProjFile("CLGLib", projCLGLibFilePath, projCLGLibPath);
             int[] versionNumber = clgLibProj.FindVersionNumber();
             Console.WriteLine(versionNumber[0].ToString() + "." + versionNumber[1].ToString());
 
             CMakeWritter writer = new CMakeWritter();
             Dictionary<string, CProjFile> apps = new Dictionary<string, CProjFile>();
-            apps.Add("CLGTest", new CProjFile(projCLGTestFilePath, projCLGTestPath));
-            apps.Add("RotatingReproduce", new CProjFile(projRotatingFilePath, projRotatingPath));
-            apps.Add("MatchingRho", new CProjFile(projMatchingRhoFilePath, projMatchingRhoPath));
-            apps.Add("ConfigurationCompresser", new CProjFile(projConfigurationCompresserFilePath, projConfigurationCompresserPath));
-            apps.Add("ConstAcc", new CProjFile(projConstAccFilePath, projConstAccPath));
-            apps.Add("StaggeredSpectrum", new CProjFile(projStaggeredSpectrumFilePath, projStaggeredSpectrumPath));
+            apps.Add("CLGTest", new CProjFile("CLGTest", projCLGTestFilePath, projCLGTestPath));
+            apps.Add("RotatingReproduce", new CProjFile("RotatingReproduce"));
+            apps.Add("MatchingRho", new CProjFile("MatchingRho"));
+            apps.Add("ConfigurationCompresser", new CProjFile("ConfigurationCompresser"));
+            apps.Add("ConstAcc", new CProjFile("ConstAcc"));
+            apps.Add("StaggeredSpectrum", new CProjFile("StaggeredSpectrum"));
+            apps.Add("StaggeredRotation", new CProjFile("StaggeredRotation"));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 
