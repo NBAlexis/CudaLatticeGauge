@@ -67,12 +67,12 @@ namespace CLGMakeWriter
             sContent += "    MESSAGE(\"CMAKE_CUDA_COMPILER = ${CMAKE_CUDA_COMPILER}\")\n";
             sContent += "endif()\n\n";
 
-            sContent += string.Format("set(CUDA_CMP {0})\n", ArchNames[(int)m_eArch]);
-            sContent += string.Format("set(CUDA_SM {0})\n", CodeNames[(int)m_eArch]);
+            sContent += string.Format("set(CUDA_CMP \"{0}\")\n", ArchNames[(int)m_eArch]);
+            sContent += string.Format("set(CUDA_SM \"{0}\")\n", CodeNames[(int)m_eArch]);
 
             sContent += "if (DEFINED CUDASM)\n";
-            sContent += "    set(CUDA_CMP compute_.${CUDASM})\n";
-            sContent += "    set(CUDA_SM sm_.${CUDASM})\")\n";
+            sContent += "    set(CUDA_CMP \"compute_${CUDASM}\")\n";
+            sContent += "    set(CUDA_SM \"sm_${CUDASM}\")\n";
             sContent += "endif()\n\n";
 
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";
