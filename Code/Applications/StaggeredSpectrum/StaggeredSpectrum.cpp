@@ -33,6 +33,15 @@ int main(int argc, char * argv[])
         res = SimulateStaggered(workingParam1);
     }
     break;
+    case ESSJ_Measure:
+    {
+        CParameters workingParam2 = params.GetParameter(_T("JobMeasure"));
+        res = Measurement(workingParam2);
+    }
+    break;
+    default:
+
+    break;
     }
 
     return res;

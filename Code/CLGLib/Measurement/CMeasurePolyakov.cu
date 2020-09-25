@@ -52,12 +52,12 @@ _kernelStaticPotentialCorrelatorOfSite(
     UINT* counter,  CLGComplex* correlator)
 {
     UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
-    SBYTE uiZ = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y);
+    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
+    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
+    INT uiZ = static_cast<INT>(threadIdx.y + blockIdx.y * blockDim.y);
     UINT uiXYZ = uiXY * _DC_Lz + uiZ;
     const UINT uiCenter = (sCenter.x * _DC_Ly + sCenter.y) * _DC_Lz + sCenter.z;
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX) 
+    INT uiC = (sCenter.x - uiX) * (sCenter.x - uiX) 
              + (sCenter.y - uiY) * (sCenter.y - uiY) 
              + (sCenter.z - uiZ) * (sCenter.z - uiZ);
 
@@ -70,11 +70,49 @@ _kernelStaticPotentialCorrelatorOfSite(
     }
 }
 
+/**
+ * Block.x = x * Ly + y, Thread.x = Lz
+ * Block.y = shift xy, Thread.z = shift z
+ */
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelStaticPotentialCorrelatorOfSite2(
+    const CLGComplex* __restrict__ traceXYZ, UINT uiMax,
+    UINT* counter, CLGComplex* correlator)
+{
+    INT uiX = static_cast<INT>(blockIdx.x / _DC_Ly);
+    INT uiY = static_cast<INT>(blockIdx.x % _DC_Ly);
+    INT uiZ = static_cast<INT>(threadIdx.x);
+
+    INT uiShiftX = static_cast<INT>(blockIdx.y / _DC_Ly) - static_cast<INT>(_DC_Lx >> 1);
+    INT uiShiftY = static_cast<INT>(blockIdx.y % _DC_Ly) - static_cast<INT>(_DC_Ly >> 1);
+    INT uiShiftZ = static_cast<INT>(threadIdx.y);
+
+    INT uiX2 = (uiX + uiShiftX + static_cast<INT>(_DC_Lx)) % static_cast<INT>(_DC_Lx);
+    INT uiY2 = (uiY + uiShiftY + static_cast<INT>(_DC_Ly)) % static_cast<INT>(_DC_Ly);
+    INT uiZ2 = (uiZ + uiShiftZ + static_cast<INT>(_DC_Lz)) % static_cast<INT>(_DC_Lz);
+
+    INT uiXYZ1 = blockIdx.x * _DC_Lz + uiZ;
+    INT uiXYZ2 = ((uiX2 * _DC_Ly) + uiY2) * _DC_Lz + uiZ2;
+
+    INT uiC = (uiX2 - uiX) * (uiX2 - uiX)
+            + (uiY2 - uiY) * (uiY2 - uiY)
+            + (uiZ2 - uiZ) * (uiZ2 - uiZ);
+
+    if (uiC < uiMax)
+    {
+        CLGComplex correlatorres = _cuCmulf(traceXYZ[uiXYZ1], _cuConjf(traceXYZ[uiXYZ2]));
+        atomicAdd(&counter[uiC], 1);
+        atomicAdd(&correlator[uiC].x, correlatorres.x);
+        atomicAdd(&correlator[uiC].y, correlatorres.y);
+    }
+}
+
 __global__ void
 _CLG_LAUNCH_BOUND
 _kernelAverageStaticPotentialCorrelatorOfSite(UINT* counter, CLGComplex* correlator)
 {
-    const UINT uiIdx = threadIdx.x;
+    const UINT uiIdx = threadIdx.x + blockIdx.x * blockDim.x;
     if (counter[uiIdx] > 0)
     {
         correlator[uiIdx].x =
@@ -173,6 +211,8 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
+    //_HC_DecompX * _HC_DecompLx =  Lx * Ly
+    //_HC_DecompY * _HC_DecompLy = Lz
     dim3 block1(_HC_DecompX, _HC_DecompY, 1); 
     dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
 
@@ -187,13 +227,25 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
     _kernelPolyakovTraceOfSite << <block1, threads1 >> > (m_pTmpLoop, m_pTraceRes, m_pTmpDeviceSum);
 
     _kernelInitialStaticPotentialCorrelatorOfSite << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);
-    _kernelStaticPotentialCorrelatorOfSite << <block1, threads1 >> > (
+
+    //========= It is impossible to calculate every pairs of sites
+    //_kernelStaticPotentialCorrelatorOfSite << <block1, threads1 >> > (
+    //    m_pTraceRes,
+    //    CCommonData::m_sCenter,
+    //    m_uiMaxLengthSq,
+    //    m_pCorrelatorCounter,
+    //    m_pCorrelator
+    //);
+    
+    dim3 block3(_HC_Lx * _HC_Ly, _HC_Lx * _HC_Ly, 1);
+    dim3 threads3(_HC_Lz, _HC_Lz / 2, 1);
+    _kernelStaticPotentialCorrelatorOfSite2 << <block3, threads3 >> > (
         m_pTraceRes,
-        CCommonData::m_sCenter,
         m_uiMaxLengthSq,
         m_pCorrelatorCounter,
         m_pCorrelator
-    );
+        );
+
     _kernelAverageStaticPotentialCorrelatorOfSite << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);
 
 

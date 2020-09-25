@@ -17,11 +17,12 @@ __DEFINE_ENUM(EStaggeredSpectrumJob,
     )
 
 __DEFINE_ENUM(EStaggeredSpectrumMeasure,
-    ESSM_Mass,
-    ESSM_Vr,
-    )
+    ESSM_Polyakov,
+    ESSM_Correlator,
+)
 
 extern INT SimulateStaggered(CParameters& params);
+extern INT Measurement(CParameters& params);
 
 //=============================================================================
 // END OF FILE

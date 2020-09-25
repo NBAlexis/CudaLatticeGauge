@@ -1,4 +1,4 @@
-# ESSJ_Simulate, 
+# ESSJ_Simulate, ESSJ_Measure
 StaggeredSpectrumJob : ESSJ_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
@@ -15,20 +15,20 @@ JobSimulate:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibStep : 300
-    SaveStartIndex : 90
+    SaveStartIndex : 0
 
-    SavePrefix : ./5005002/5005002_
+    SavePrefix : ./500205/500205_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 32]
+    LatticeLength : [12, 12, 12, 24]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 9
-    FermionFieldCount : 8
+    ActionListLength : 5
+    FermionFieldCount : 4
     MeasureListLength : 1
     CacheStaple : 0
 
@@ -45,16 +45,16 @@ JobSimulate:
         InnerLeapfrog : 1
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 6
-        NestedStep : 30
+        IntegratorStep : 10
+        NestedStep : 20
 
     Gauge:
 
         FieldName : CFieldGaugeSU3
-        # FieldInitialType : EFIT_Random
-        FieldInitialType : EFIT_ReadFromFile
-        GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./5005002/5005002_Matching_97.con
+        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_ReadFromFile
+        # GaugeFileType : EFFT_CLGBin
+        # GaugeFileName : ./5005002/5005002_Matching_97.con
 
         Period : [1, 1, 1, 1]
 
@@ -71,7 +71,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.1
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
 
@@ -94,7 +94,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.1
+        Mass : 0.2
         FieldId : 3
         PoolNumber : 15
 
@@ -117,7 +117,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.1
+        Mass : 0.2
         FieldId : 4
         PoolNumber : 15
 
@@ -140,111 +140,19 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.1
+        Mass : 0.05
         FieldId : 5
         PoolNumber : 15
 
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # This is x^{1/16}
-        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        # This is (x+0.0375/x)^{-1/4}
+        MC : [0.9883908285644297, -0.006904795410014326, 0.011951446614057276]
 
         # MD is to calculate force
-        # This is x^{-1/8}
-        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-    FermionField5:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.1
-        FieldId : 6
-        PoolNumber : 15
-
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/16}
-        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
-
-        # MD is to calculate force
-        # This is x^{-1/8}
-        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-    FermionField6:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.1
-        FieldId : 7
-        PoolNumber : 15
-
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/16}
-        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
-
-        # MD is to calculate force
-        # This is x^{-1/8}
-        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-    FermionField7:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        #2am
-        Mass : 0.02
-        FieldId : 8
-        PoolNumber : 15
-
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{-1/8}
-        MC : [0.9999936927757987, -0.0003079453410473041, -0.0008899492209764302, 0.0012533559834371423, 0.006693810959196772]
-
-        # MD is to calculate force
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{1/4}
-        MD : [1.0000118745458264, 0.000987472388513293, 0.001408604989399177, 0.0007284223273155633, 0.005450162144534143]
-        
-    FermionField8:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        #2am
-        Mass : 0.02
-        FieldId : 9
-        PoolNumber : 15
-
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{-1/4}
-        MC : [0.9999936927757987, -0.0003079453410473041, -0.0008899492209764302, 0.0012533559834371423, 0.006693810959196772]
-
-        # MD is to calculate force
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{1/2}
-        MD : [1.0000118745458264, 0.000987472388513293, 0.001408604989399177, 0.0007284223273155633, 0.005450162144534143]
+        # This is (x+0.0375/x)^{1/2}
+        MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
 
     MSSolver:
 
@@ -290,10 +198,191 @@ JobSimulate:
         Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
-    MSSolver5:
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
+
+    Action4:
+
+        ActionName : CActionFermionKS
+        FieldId : 4
+
+    Action5:
+
+        ActionName : CActionFermionKS
+        FieldId : 5
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+JobMeasure:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    StartN : 1
+    EndN : 1000
+    # {ESSM_Polyakov, ESSM_Correlator}
+    MeasureType : ESSM_Polyakov
+    SavePrefix : ./500205/500205_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 24]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 5
+    FermionFieldCount : 4
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+
+        DebugForce : 1
+        InnerLeapfrog : 1
+        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        NestedStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_ReadFromFile
+        # GaugeFileType : EFFT_CLGBin
+        # GaugeFileName : ./5005002/5005002_Matching_97.con
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/16}
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+
+        # MD is to calculate force
+        # This is x^{-1/8}
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.2
+        FieldId : 3
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/16}
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+
+        # MD is to calculate force
+        # This is x^{-1/8}
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+
+    FermionField3:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.2
+        FieldId : 4
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/16}
+        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+
+        # MD is to calculate force
+        # This is x^{-1/8}
+        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+
+    FermionField4:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.05
+        FieldId : 5
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is (x+0.0375/x)^{-1/4}
+        MC : [0.9883908285644297, -0.006904795410014326, 0.011951446614057276]
+
+        # MD is to calculate force
+        # This is (x+0.0375/x)^{1/2}
+        MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
+
+    MSSolver:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 6
+        SolverForFieldId : 2
         DiviationStep : 100
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 500
@@ -301,10 +390,10 @@ JobSimulate:
         Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
-    MSSolver6:
+    MSSolver2:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 7
+        SolverForFieldId : 3
         DiviationStep : 100
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 500
@@ -312,10 +401,10 @@ JobSimulate:
         Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
-    MSSolver7:
+    MSSolver3:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 8
+        SolverForFieldId : 4
         DiviationStep : 100
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 500
@@ -323,10 +412,10 @@ JobSimulate:
         Accuracy : 0.0001
         AbsoluteAccuracy : 1
 
-    MSSolver8:
+    MSSolver4:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 9
+        SolverForFieldId : 5
         DiviationStep : 100
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 500
@@ -359,27 +448,6 @@ JobSimulate:
         ActionName : CActionFermionKS
         FieldId : 5
 
-    Action6:
-
-        ActionName : CActionFermionKS
-        FieldId : 6
-
-    Action7:
-
-        ActionName : CActionFermionKS
-        FieldId : 7
-
-    Action8:
-
-        ActionName : CActionFermionKS
-        FieldId : 8
-
-    Action9:
-
-        ActionName : CActionFermionKS
-        FieldId : 9
-
     Measure1:
 
-        MeasureName : CMeasurePlaqutteEnergy
-
+        MeasureName : CMeasurePolyakov

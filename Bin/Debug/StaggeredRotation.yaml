@@ -36,7 +36,7 @@ JobSimulate:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 9
+    ActionListLength : 5
     FermionFieldCount : 8
     MeasureListLength : 1
     CacheStaple : 0
@@ -81,7 +81,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -112,7 +112,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -143,7 +143,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
@@ -175,7 +175,7 @@ JobSimulate:
 
         # 2am
         # Mass : 0.4
-        Mass : 0.04
+        Mass : 0.05
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
@@ -190,7 +190,7 @@ JobSimulate:
         # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
 
         # MC is to prepare
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{-1/4}
+        # 4a^2 delta M = 0.2-0.0016, this is (x+0.1584/x)^{-1/4}
         MC : [0.9954200040793925, -0.0019049833369309411, -0.03345424156420637, 0.006091992871008849, 0.07739721196324048]
 
         # MD is to calculate force
