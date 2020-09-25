@@ -328,6 +328,7 @@ target_link_libraries(MatchingRho CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)
 add_executable(StaggeredSpectrum 
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.h
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Measurement.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Simulate.cpp
     )

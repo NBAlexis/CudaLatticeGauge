@@ -16,7 +16,7 @@ __CLGIMPLEMENT_CLASS(CFieldFermionKSSU3R)
 
 #pragma region DOperator
 
-
+/*
 static __device__ __inline__ deviceSU3 _deviceXXT_PP(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sStartSite, BYTE byFieldId, BYTE byMu)
@@ -87,6 +87,7 @@ static __device__ __inline__ deviceSU3 _deviceXXT_MM(
     ret.Dagger();
     return ret;
 }
+*/
 
 static __device__ __inline__ deviceSU3 _deviceVXXTauOptimized(
     const deviceSU3* __restrict__ pDeviceData,
