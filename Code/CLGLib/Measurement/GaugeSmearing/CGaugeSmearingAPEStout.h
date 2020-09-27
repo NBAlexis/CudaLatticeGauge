@@ -22,8 +22,7 @@ public:
 
     CGaugeSmearingAPEStout() 
         : CGaugeSmearing()
-        , m_fRhoS(F(0.1))
-        , m_fRhoT(F(0.0))
+        , m_fRho(F(0.1))
         , m_bHasT(FALSE)
         , m_uiIterate(1) {  }
 
@@ -31,8 +30,7 @@ public:
     void GaugeSmearing(class CFieldGauge* pGauge, CFieldGauge* pStaple) override;
     CCString GetInfos(const CCString& sTab) const override;
 
-    Real m_fRhoS;
-    Real m_fRhoT;
+    Real m_fRho;
     UBOOL m_bHasT;
     UINT m_uiIterate;
 };

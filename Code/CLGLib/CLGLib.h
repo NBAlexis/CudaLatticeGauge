@@ -273,6 +273,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureTopologicChargeXY.h"
 #include "Measurement/CMeasurePolyakovXY.h"
 #include "Measurement/CMeasurePolyakov.h"
+#include "Measurement/CMeasureWilsonLoop.h"
 #include "Measurement/CMeasureChiralCondensate.h"
 #include "Measurement/CMeasureAMomentumStochastic.h"
 

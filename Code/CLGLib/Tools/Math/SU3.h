@@ -1166,6 +1166,15 @@ extern "C" {
          * Cabbibo-Marinari Projection
          * Only one iteration can make it SU3, however, 6 iteration makes it large trace
          * NOTE: It has been tested using Mathematica, the trace is not increasing...
+         *
+         * Note for iteration:
+         * u1 = m.cmproj()
+         * m1 = u1.m
+         * u2 = m1.cmproj().u1
+         * m3 = u2.m
+         * u3 = m3.cmproj().u2
+         * ...
+         * retr(u3.m)>retr(u2.m)>retr(u1.m), where u1,u2,u3 are su3, m is random matrix
          */
         __device__ __inline__ void CabbiboMarinariProj(/*BYTE ite = 1*/)
         {

@@ -1,5 +1,5 @@
 # ESSJ_Simulate, ESSJ_Measure
-StaggeredSpectrumJob : ESSJ_Simulate
+StaggeredSpectrumJob : ESSJ_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -238,11 +238,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    StartN : 1
-    EndN : 1000
+    StartN : 201
+    EndN : 1200
     # {ESSM_Polyakov, ESSM_Correlator}
     MeasureType : ESSM_Polyakov
-    SavePrefix : ./500205/500205_
+    SavePrefix : G:\Configurations\Matching\_f46316\46316_
+    CSVSavePrefix : ./46316_
 
     Dim : 4
     Dir : 4
@@ -450,4 +451,18 @@ JobMeasure:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakov
+        MeasureName : CMeasureWilsonLoop
+
+    GaugeSmearing:
+
+        # SmearingName : CGaugeSmearingAPEProj
+        # AlphaLeft : 2.3
+        # AlphaRight : 1.0
+        # Iterate : 50
+        # Cabibbo : 1
+        # ProjIterate : 8
+
+        SmearingName : CGaugeSmearingAPEStout
+        Rho : 0.1
+        HasT : 1
+        Iterate : 100

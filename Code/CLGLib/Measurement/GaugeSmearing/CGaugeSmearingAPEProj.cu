@@ -13,14 +13,13 @@ __BEGIN_NAMESPACE
 
 #pragma region kernel
 
-__global__ void
-_CLG_LAUNCH_BOUND
+__global__ void _CLG_LAUNCH_BOUND
 _kernelAPEProjSU3(
     deviceSU3* gauge,
     const deviceSU3* __restrict__ staple,
-    Real fAlpha,
-    BYTE byProjItera
-)
+    Real fAlphaLeft,
+    Real fAlphaRight,
+    BYTE byProjItera)
 {
     intokernaldir;
 
@@ -28,10 +27,48 @@ _kernelAPEProjSU3(
     {
         UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         deviceSU3 omega = staple[uiLinkIndex];
-        omega.MulReal(fAlpha * F(0.16666666666666666666666666666667));
-        gauge[uiLinkIndex].MulReal(F(1.0) - fAlpha);
+        omega.MulReal(fAlphaRight);
+        gauge[uiLinkIndex].MulReal(fAlphaLeft);
         gauge[uiLinkIndex].Add(omega);
         gauge[uiLinkIndex].Proj(byProjItera);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAPEProjSU3CM(
+    deviceSU3* gauge,
+    const deviceSU3* __restrict__ staple,
+    Real fAlphaLeft,
+    Real fAlphaRight,
+    BYTE byIteration)
+{
+    intokernaldir;
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        deviceSU3 omega = staple[uiLinkIndex];
+        omega.MulReal(fAlphaRight);
+        gauge[uiLinkIndex].MulReal(fAlphaLeft);
+        gauge[uiLinkIndex].Add(omega);
+
+        //omega is not used, so use omega as m
+        omega = gauge[uiLinkIndex];
+        deviceSU3 u = omega;
+        u.CabbiboMarinariProj();
+        gauge[uiLinkIndex] = u;
+        for (BYTE byIt = 1; byIt < byIteration; ++byIt)
+        {
+            //when it=1, this is u1.m
+            //when it=2, this is u2.u1.m ...
+            omega = u.MulC(omega);
+            u = omega;
+            u.CabbiboMarinariProj();
+
+            //when it=1, this is u2.u1
+            //when it=2, this is u3.u2.u1
+            gauge[uiLinkIndex] = u.MulC(gauge[uiLinkIndex]);
+        }
     }
 }
 
@@ -43,9 +80,13 @@ __CLGIMPLEMENT_CLASS(CGaugeSmearingAPEProj)
 void CGaugeSmearingAPEProj::Initial(class CLatticeData* pOwner, const CParameters& params)
 {
     m_pOwner = pOwner;
-    if (!params.FetchValueReal(_T("Alpha"), m_fAlpha))
+    if (!params.FetchValueReal(_T("AlphaLeft"), m_fAlphaLeft))
     {
-        appCrucial(_T("CGaugeSmearingAPEProj: alpha not set, set to 0.1 by defualt."));
+        appCrucial(_T("CGaugeSmearingAPEProj: AlphaLeft not set, set to 1.0 by defualt."));
+    }
+    if (!params.FetchValueReal(_T("AlphaRight"), m_fAlphaRight))
+    {
+        appCrucial(_T("CGaugeSmearingAPEProj: AlphaRight not set, set to 0.1 by defualt."));
     }
 
     INT iValue;
@@ -75,7 +116,10 @@ void CGaugeSmearingAPEProj::Initial(class CLatticeData* pOwner, const CParameter
         appCrucial(_T("CGaugeSmearingAPEProj: ProjIterate not correct, set to 6 by defualt."));
     }
 
-    appGeneral(_T(" ---- CGaugeSmearingAPEProj created with alpha = %f, iterate = %d, ProjIterate = %d\n"), m_fAlpha, m_uiIterate, m_byProjIterate);
+    INT iCMProj = 0;
+    params.FetchValueINT(_T("Cabibbo"), iCMProj);
+    m_bCMProj = (0 != iCMProj);
+    appGeneral(_T(" ---- CGaugeSmearingAPEProj created with u * %f + staple * %f, projectype = %d iterate = %d ProjIterate = %d\n"), m_fAlphaLeft, m_fAlphaRight, m_bCMProj, m_uiIterate, m_byProjIterate);
 }
 
 void CGaugeSmearingAPEProj::GaugeSmearing(CFieldGauge* pGauge, CFieldGauge* pStaple)
@@ -97,14 +141,29 @@ void CGaugeSmearingAPEProj::GaugeSmearing(CFieldGauge* pGauge, CFieldGauge* pSta
     preparethread;
     for (UINT i = 0; i < m_uiIterate; ++i)
     {
-        _kernelAPEProjSU3 << <block, threads >> > (
-            pGaugeSU3->m_pDeviceData,
-            pStapleSU3->m_pDeviceData,
-            m_fAlpha,
-            m_byProjIterate
-            );
+        if (m_bCMProj)
+        {
+            _kernelAPEProjSU3CM << <block, threads >> > (
+                pGaugeSU3->m_pDeviceData,
+                pStapleSU3->m_pDeviceData,
+                m_fAlphaLeft, m_fAlphaRight,
+                m_byProjIterate
+                );
 
-        pGaugeSU3->CalculateOnlyStaple(pStapleSU3);
+            pGaugeSU3->CalculateOnlyStaple(pStapleSU3);
+        }
+        else
+        {
+            _kernelAPEProjSU3 << <block, threads >> > (
+                pGaugeSU3->m_pDeviceData,
+                pStapleSU3->m_pDeviceData,
+                m_fAlphaLeft, m_fAlphaRight,
+                m_byProjIterate
+                );
+
+            pGaugeSU3->CalculateOnlyStaple(pStapleSU3);
+        }
+
     }
 }
 
@@ -112,7 +171,10 @@ CCString CGaugeSmearingAPEProj::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = sRet + tab + _T("Name : CGaugeSmearingAPEProj\n");
-    sRet = sRet + tab + _T("alpha : ") + appFloatToString(m_fAlpha) + _T("\n");
+    sRet = sRet + tab + _T("# u=u*alphaleft + staple*alpharight\n");
+    sRet = sRet + tab + _T("alpha left : ") + appFloatToString(m_fAlphaLeft) + _T("\n");
+    sRet = sRet + tab + _T("alpha rihgt : ") + appFloatToString(m_fAlphaRight) + _T("\n");
+    sRet = sRet + tab + _T("CabibboMarinari : ") + (m_bCMProj ? _T("1\n") : _T("0\n"));
     sRet = sRet + tab + _T("Iterate : ") + appIntToString(static_cast<INT>(m_uiIterate)) + _T("\n");
     sRet = sRet + tab + _T("ProjIterate : ") + appIntToString(static_cast<INT>(m_byProjIterate)) + _T("\n");
     return sRet;

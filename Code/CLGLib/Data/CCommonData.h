@@ -31,6 +31,15 @@
 #define _DC_Lt (_constIntegers[ECI_Lt])
 #define _HC_Lt (appGetCudaHelper()->m_ConstIntegers[ECI_Lt])
 
+#define _DC_Lxi (static_cast<INT>(_constIntegers[ECI_Lx]))
+#define _DC_Lyi (static_cast<INT>(_constIntegers[ECI_Ly]))
+#define _DC_Lzi (static_cast<INT>(_constIntegers[ECI_Lz]))
+#define _DC_Lti (static_cast<INT>(_constIntegers[ECI_Lt]))
+#define _HC_Lxi (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Lx]))
+#define _HC_Lyi (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Ly]))
+#define _HC_Lzi (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Lz]))
+#define _HC_Lti (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Lt]))
+
 #define _DC_Volume (_constIntegers[ECI_Volume])
 #define _HC_Volume (appGetCudaHelper()->m_ConstIntegers[ECI_Volume])
 #define _DC_Volume_xyz (_constIntegers[ECI_Volume_xyz])
@@ -148,7 +157,24 @@ __DEFINE_ENUM(ESolverPhase,
             };
         };
 
-        __device__ UBOOL IsOdd() const
+        __device__ __inline__ INT X() const
+        {
+            return static_cast<INT>(x);
+        }
+        __device__ __inline__ INT Y() const
+        {
+            return static_cast<INT>(y);
+        }
+        __device__ __inline__ INT Z() const
+        {
+            return static_cast<INT>(z);
+        }
+        __device__ __inline__ INT T() const
+        {
+            return static_cast<INT>(w);
+        }
+
+        __device__ __inline__ UBOOL IsOdd() const
         {
             return (x + y + z + w) & 1;
         }
@@ -156,7 +182,7 @@ __DEFINE_ENUM(ESolverPhase,
         /**
          * eta_{mu}(n) = (-1)^{sum (nu<mu)}
          */
-        __device__ UBOOL EtaOdd(BYTE nu) const
+        __device__ __inline__ UBOOL EtaOdd(BYTE nu) const
         {
             SWORD sSum = 0;
             for (BYTE byIdx = 0; byIdx < nu && byIdx < 4; ++byIdx)
@@ -166,7 +192,7 @@ __DEFINE_ENUM(ESolverPhase,
             return sSum & 1;
         }
 
-        __device__ void Add(const SSmallInt4& other)
+        __device__ __inline__ void Add(const SSmallInt4& other)
         {
             x = x + other.x;
             y = y + other.y;
@@ -174,7 +200,7 @@ __DEFINE_ENUM(ESolverPhase,
             w = w + other.w;
         }
 
-        __device__ SSmallInt4 AddC(const SSmallInt4& other) const
+        __device__ __inline__ SSmallInt4 AddC(const SSmallInt4& other) const
         {
             SSmallInt4 ret;
             ret.x = x + other.x;
@@ -184,7 +210,7 @@ __DEFINE_ENUM(ESolverPhase,
             return ret;
         }
 
-        __device__ void Sub(const SSmallInt4& other)
+        __device__ __inline__ void Sub(const SSmallInt4& other)
         {
             x = x - other.x;
             y = y - other.y;
@@ -192,7 +218,7 @@ __DEFINE_ENUM(ESolverPhase,
             w = w - other.w;
         }
 
-        __device__ SSmallInt4 SubC(const SSmallInt4& other) const
+        __device__ __inline__ SSmallInt4 SubC(const SSmallInt4& other) const
         {
             SSmallInt4 ret;
             ret.x = x - other.x;

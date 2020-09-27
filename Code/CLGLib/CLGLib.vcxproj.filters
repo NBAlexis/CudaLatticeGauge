@@ -410,6 +410,9 @@
     <ClInclude Include="Data\Field\CFieldFermionKSSU3R.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasureWilsonLoop.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -657,6 +660,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3R.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu">
+      <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

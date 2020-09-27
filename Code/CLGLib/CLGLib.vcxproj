@@ -89,6 +89,7 @@
     <ClInclude Include="Measurement\CMeasurePolyakov.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
     <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h" />
+    <ClInclude Include="Measurement\CMeasureWilsonLoop.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
@@ -223,6 +224,7 @@
     <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
+    <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />

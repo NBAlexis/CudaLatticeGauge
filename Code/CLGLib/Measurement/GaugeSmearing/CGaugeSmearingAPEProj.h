@@ -22,16 +22,21 @@ public:
 
     CGaugeSmearingAPEProj() 
         : CGaugeSmearing()
-        , m_fAlpha(F(0.1))
+        , m_fAlphaLeft(F(1.0))
+        , m_fAlphaRight(F(0.1))
         , m_uiIterate(1)
-        , m_byProjIterate(6) {  }
+        , m_bCMProj(FALSE)
+        , m_byProjIterate(6)
+    {  }
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeSmearing(class CFieldGauge* pGauge, CFieldGauge* pStaple) override;
     CCString GetInfos(const CCString& sTab) const override;
 
-    Real m_fAlpha;
+    Real m_fAlphaLeft;
+    Real m_fAlphaRight;
     UINT m_uiIterate;
+    UBOOL m_bCMProj;
     BYTE m_byProjIterate;
 };
 

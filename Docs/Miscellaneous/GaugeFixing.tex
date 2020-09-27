@@ -146,7 +146,7 @@ The Los Alamos gauge fixing with over relaxation $\omega $ can be summarized as
     \EndIf
     \State for all odd sites
     \State $G(n)=\sum _{\mu}\left(U_{\mu}(n)+U_{\mu}^{\dagger}(n-\mu)\right)$
-    \State $G(n)=(1-\omega)\mathbb{1}_{3\times 3}+\omega G(n)$
+    \State $G(n)=(1-\omega)\mathbb{I}_{3\times 3}+\omega G(n)$
     \State $G(n)=CabibboMarinariProjection(G(n))$
     \If {n is odd}
         \State $U_{\mu} (n)=G(n)U_{\mu} (n)$
@@ -237,4 +237,4 @@ Similar as the power,
 &\exp (A)=P\exp (D)P^{-1}\\
 \end{split}
 \end{equation}
-where the exponential and logarithm of a diagonal matrix is easy to do.
+where the exponential and logarithm of a diagonal matrix is easy to do. 

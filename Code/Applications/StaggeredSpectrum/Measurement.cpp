@@ -287,12 +287,14 @@ INT Measurement(CParameters& params)
 #pragma endregion
 
     const UINT uiNewLine = (iEndN - iStartN + 1) / 5;
-    CMeasurePolyakov* pPL = dynamic_cast<CMeasurePolyakov*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+    CMeasureWilsonLoop* pPL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     pPL->Reset();
 
 #pragma region Measure
 
-    appGeneral(_T("(*"));
+    appGeneral(_T("(*\n"));
+    appSetLogDate(FALSE);
     for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
     {
         CCString sFileName;
@@ -303,6 +305,8 @@ INT Measurement(CParameters& params)
         {
         case ESSM_Polyakov:
         {
+            appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
+            appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
             if (uiN == iStartN)
             {
@@ -334,6 +338,7 @@ INT Measurement(CParameters& params)
         }
         else
         {
+            appSetLogDate(FALSE);
             appGeneral(_T("="));
         }
 
@@ -355,7 +360,10 @@ INT Measurement(CParameters& params)
             TArray<CLGComplex> thisConfiguration;
             for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
             {
-                thisConfiguration.AddItem(pPL->m_lstC[j * pPL->m_lstR.Num() + i]);
+                for (UINT t = 0; t < _HC_Lt / 2; ++t)
+                {
+                    thisConfiguration.AddItem(pPL->m_lstC[j][i][t]);
+                }
             }
             vrs.AddItem(thisConfiguration);
         }
@@ -377,6 +385,8 @@ INT Measurement(CParameters& params)
     appSetLogDate(TRUE);
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
+
+    appSafeDelete(pStaple);
 
     appQuitCLG();
 
