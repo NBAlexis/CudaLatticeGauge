@@ -100,6 +100,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurementManager.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
@@ -191,6 +192,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelator.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
@@ -330,6 +332,7 @@ target_link_libraries(MatchingRho CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)
 add_executable(StaggeredSpectrum 
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.h
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/GaugeFixing.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Measurement.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Simulate.cpp

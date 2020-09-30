@@ -23,6 +23,7 @@ __DEFINE_ENUM(EStaggeredSpectrumMeasure,
 
 extern INT SimulateStaggered(CParameters& params);
 extern INT Measurement(CParameters& params);
+extern INT StaggeredGaugeFixing(CParameters& params);
 
 //=============================================================================
 // END OF FILE

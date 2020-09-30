@@ -24,6 +24,7 @@ struct SFermionSource
 {
     EFermionSource m_eSourceType;
     SSmallInt4 m_sSourcePoint;
+    //For staggered fermion, spin index is 0-7, for shift of x,y,z
     BYTE m_bySpinIndex;
     BYTE m_byColorIndex;
     CLGComplex m_cOtherParameters1;

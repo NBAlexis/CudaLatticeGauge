@@ -189,6 +189,58 @@ UINT TestFermionUpdatorL(CParameters& sParam)
 __REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale);
 #endif
 
+UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
+{
+    CMeasureMesonCorrelatorStaggered* pMeasure = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    if (NULL == pMeasure)
+    {
+        return 1;
+    }
+
+    UINT uiError = 0;
+
+#if _CLG_DEBUG
+
+    //TArray<Real> lstResExpected;
+    //sParam.FetchValueArrayReal(_T("ExpectedRes"), lstResExpected);
+    //assert(static_cast<UINT>(lstResExpected.Num()) == _HC_Lt - 1);
+    appGetLattice()->m_pUpdator->Update(1, FALSE);
+    appGetLattice()->m_pUpdator->Update(3, TRUE);
+
+    //TArray<Real> lstRes;
+    //appGeneral(_T("res = expected vs test: "));
+
+    //for (UINT i = 1; i < _HC_Lt; ++i)
+    //{
+    //    Real fRes = _hostlog10(pMeasure->m_lstResults[0][i] / pMeasure->m_lstResults[0][0]);
+    //    appGeneral(_T("%f : %f, "), lstResExpected[i - 1], fRes);
+    //    if (appAbs(fRes - lstResExpected[i - 1]) > F(0.2))
+    //    {
+    //        ++uiError;
+    //    }
+    //}
+    //appGeneral(_T("\n"));
+
+#else
+
+    //Real fExpected = F(0.625);
+    //sParam.FetchValueReal(_T("ExpectedResR"), fExpected);
+    //appGetLattice()->m_pUpdator->Update(20, FALSE);
+    //appGetLattice()->m_pUpdator->Update(50, TRUE);
+
+    //const Real fRes = pMeasure->m_lstResults[0][0];
+    //appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+    //if (appAbs(fRes - fExpected) > F(0.005))
+    //{
+    //    return 1;
+    //}
+
+#endif
+    return uiError;
+}
+
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, Updator, TestFermionUpdatorWithMesonCorrelatorStaggered);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

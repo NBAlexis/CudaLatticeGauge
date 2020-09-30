@@ -163,7 +163,7 @@ INT GaugeFixing(CParameters& params)
         }
     }
 
-    appGeneral(_T("\n=====================================\n========= finished! ==========\n"), uiNt);
+    appGeneral(_T("\n=====================================\n========= %d finished! ==========\n"), uiNt);
     appQuitCLG();
 
     return 0;

@@ -583,21 +583,26 @@ _kernelMakePointSourceKS(deviceSU3Vector* pDeviceData, UINT uiDesiredSite, BYTE 
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, UINT uiDesiredT, BYTE byColor, BYTE byFieldID, UINT uiVolumn)
+_kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, 
+    UINT uiDesiredT, UINT uiShift, BYTE byColor, BYTE byFieldID)
 {
     intokernalInt4;
-    const Real fDenominator = F(1.0) / uiVolumn;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][uiBigIdx];
 
-    if (uiDesiredT == sSite4.w && !sIdx.IsDirichlet())
+    pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+    if ( (0 == (sSite4.x & 1))
+      && (0 == (sSite4.y & 1))
+      && (0 == (sSite4.z & 1))
+      && uiDesiredT == sSite4.w)
     {
-        pDeviceData[uiSiteIndex] = deviceSU3Vector::makeOneSU3VectorColor(byColor);
-        pDeviceData[uiSiteIndex].MulReal(fDenominator);
-    }
-    else
-    {
-        pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+        //sSite4 is no longer used
+        sSite4.x = sSite4.x + static_cast<SBYTE>(uiShift & 1);
+        sSite4.y = sSite4.y + static_cast<SBYTE>((uiShift >> 1) & 1);
+        sSite4.z = sSite4.z + static_cast<SBYTE>((uiShift >> 2) & 1);
+        const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][__bi(sSite4)];
+        if (!sIdx.IsDirichlet())
+        {
+            pDeviceData[_deviceGetSiteIndex(sSite4)] = deviceSU3Vector::makeOneSU3VectorColor(byColor);
+        }
     }
 }
 
@@ -720,8 +725,9 @@ void CFieldFermionKSSU3::DebugPrintMe() const
     checkCudaErrors(cudaMemcpy(toprint, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
     for (UINT uiSite = 0; uiSite < m_uiSiteCount; ++uiSite)
     {
-        appGeneral(_T(" --- %d --- {%f %s %f I, %f %s %f I, %f %s %f I}\n"),
-            uiSite,
+        const SSmallInt4 site4 = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T(" --- %d,%d,%d,%d --- {%f %s %f I, %f %s %f I, %f %s %f I}\n"),
+            site4.x, site4.y, site4.z, site4.w,
             toprint[uiSite].m_ve[0].x,
             toprint[uiSite].m_ve[0].y > F(0.0) ? _T("+") : _T("-"),
             appAbs(toprint[uiSite].m_ve[0].y),
@@ -832,7 +838,6 @@ CLGComplex CFieldFermionKSSU3::Dot(const CField* x) const
         return _make_cuComplex(0, 0);
     }
     const CFieldFermionKSSU3* pField = dynamic_cast<const CFieldFermionKSSU3*>(x);
-
     preparethread;
     _kernelDotFermionKS << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
 
@@ -1081,9 +1086,9 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
         _kernelMakeWallSourceKS << <block, threads >> > (
             m_pDeviceData,
             sourceData.m_sSourcePoint.w,
+            sourceData.m_bySpinIndex,
             sourceData.m_byColorIndex,
-            m_byFieldId,
-            appGetLattice()->m_pIndexCache->m_uiSiteXYZ);
+            m_byFieldId);
     }
     break;
     default:

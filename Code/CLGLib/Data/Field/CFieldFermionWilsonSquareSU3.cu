@@ -780,7 +780,6 @@ CLGComplex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
         return _make_cuComplex(0,0);
     }
     const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
-
     preparethread;
     _kernelDotFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
 

@@ -1,4 +1,4 @@
-# ESSJ_Simulate, ESSJ_Measure
+# ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing
 StaggeredSpectrumJob : ESSJ_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
@@ -238,12 +238,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    StartN : 201
-    EndN : 1200
+    StartN : 1
+    EndN : 50
     # {ESSM_Polyakov, ESSM_Correlator}
-    MeasureType : ESSM_Polyakov
-    SavePrefix : G:\Configurations\Matching\_f46316\46316_
-    CSVSavePrefix : ./46316_
+    MeasureType : ESSM_Correlator
+    SavePrefix : ./46616/GF46616_
+    CSVSavePrefix : ./46616_
 
     Dim : 4
     Dir : 4
@@ -255,7 +255,7 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 5
     FermionFieldCount : 4
-    MeasureListLength : 1
+    MeasureListLength : 2
     CacheStaple : 0
 
     Updator:
@@ -380,6 +380,15 @@ JobMeasure:
         # This is (x+0.0375/x)^{1/2}
         MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
 
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 5
+        MaxDim : 30
+        Accuracy : 0.000001
+        Restart : 500
+        AbsoluteAccuracy : 1
+
     MSSolver:
 
         SolverName : CMultiShiftBiCGStab
@@ -453,6 +462,13 @@ JobMeasure:
 
         MeasureName : CMeasureWilsonLoop
 
+    Measure2:
+
+        MeasureName : CMeasureMesonCorrelatorStaggered
+        ShowResult : 0
+        GaugeFixing : 0
+        FieldId : 5
+
     GaugeSmearing:
 
         # SmearingName : CGaugeSmearingAPEProj
@@ -463,6 +479,56 @@ JobMeasure:
         # ProjIterate : 8
 
         SmearingName : CGaugeSmearingAPEStout
-        Rho : 0.1
+        Rho : 0.08
         HasT : 1
-        Iterate : 100
+        Iterate : 150
+
+
+JobGaugeFixing:
+
+    # VerboseLevel : GENERAL DETAILED
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 1
+
+    IndexStart : 867
+    IndexEnd : 1000
+
+    LoadPrefix : G:\Configurations\Matching\_f46616\46616_
+    SavePrefix : ./46616/GF46616_
+    UseLogADefinition : 0
+    OnlyCheck : 0
+    CheckAndFix : 0
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 24]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        Period : [1, 1, 1, 1]
+
+    GaugeFixing:
+
+        # Name : CGaugeFixingCoulombCornell
+        # Alpha : 0.1
+        # MaxIterate : 180000
+        # Accuracy : 0.000000000001
+        # FFT : 0
+
+        Name : CGaugeFixingCoulombLosAlamos
+        Omega : 1.5
+        CheckErrorStep : 200
+        MaxIterate : 20000
+

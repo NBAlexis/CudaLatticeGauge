@@ -289,7 +289,9 @@ INT Measurement(CParameters& params)
     const UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
     CMeasureWilsonLoop* pPL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     pPL->Reset();
+    pMC->Reset();
 
 #pragma region Measure
 
@@ -323,7 +325,7 @@ INT Measurement(CParameters& params)
         break;
         case ESSM_Correlator:
         {
-
+            pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
         }
         break;
         default:
@@ -372,7 +374,22 @@ INT Measurement(CParameters& params)
     break;
     case ESSM_Correlator:
     {
-
+        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
+        {
+            CCString sCSVFile;
+            sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
+            TArray<TArray<Real>> res;
+            for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
+            {
+                TArray<Real> oneConf;
+                for (INT t = 0; t < _HC_Lti - 1; ++t)
+                {
+                    oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
+                }
+                res.AddItem(oneConf);
+            }
+            WriteStringFileRealArray2(sCSVFile, res);
+        }
     }
     break;
     default:

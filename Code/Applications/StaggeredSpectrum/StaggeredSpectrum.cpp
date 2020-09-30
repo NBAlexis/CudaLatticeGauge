@@ -39,6 +39,12 @@ int main(int argc, char * argv[])
         res = Measurement(workingParam2);
     }
     break;
+    case ESSJ_GaugeFixing:
+    {
+        CParameters workingParam2 = params.GetParameter(_T("JobGaugeFixing"));
+        res = StaggeredGaugeFixing(workingParam2);
+    }
+    break;
     default:
 
     break;
