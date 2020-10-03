@@ -8,6 +8,8 @@ EquvibStep :    170
 OnlyMeasure : 0
 DoSmearing : 0
 DoMeasureFermion : 0
+DoMeasureCondensation : 1
+UseZ4 : 0
 # If Only Measure, for SaveIndexStart + 1 to SaveIndexStart + EquvibStep
 # If running, save start from SaveIndexStart + 1
 SaveIndexStart : 632
@@ -122,3 +124,11 @@ Measure2:
     GammaMatrix : [ UNITY, GAMMA51, GAMMA52, GAMMA53, GAMMA54 ]
     FieldId : 2
     ShowResult : 0
+
+Measure3:
+
+    MeasureName : CMeasureChiralCondensate
+    FieldId : 2
+    FieldCount : 25
+    ShowResult : 0
+    MeasureDist : 0

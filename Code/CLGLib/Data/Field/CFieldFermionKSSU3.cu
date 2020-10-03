@@ -584,7 +584,7 @@ _kernelMakePointSourceKS(deviceSU3Vector* pDeviceData, UINT uiDesiredSite, BYTE 
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, 
-    UINT uiDesiredT, UINT uiShift, BYTE byColor, BYTE byFieldID)
+    UINT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
 {
     intokernalInt4;
 
@@ -601,7 +601,7 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData,
         const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][__bi(sSite4)];
         if (!sIdx.IsDirichlet())
         {
-            pDeviceData[_deviceGetSiteIndex(sSite4)] = deviceSU3Vector::makeOneSU3VectorColor(byColor);
+            pDeviceData[_deviceGetSiteIndex(sSite4)] = deviceSU3Vector::makeOneSU3VectorColor(color);
         }
     }
 }

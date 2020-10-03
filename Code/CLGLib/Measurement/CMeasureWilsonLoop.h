@@ -67,6 +67,7 @@ protected:
 public:
 
     TArray<UINT> m_lstR;
+    //m_lstC[conf][r][t]
     TArray<TArray<TArray<CLGComplex>>> m_lstC;
     TArray<TArray<CLGComplex>> m_lstAverageC;
 };

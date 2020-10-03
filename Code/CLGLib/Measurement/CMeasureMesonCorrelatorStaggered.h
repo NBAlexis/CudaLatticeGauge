@@ -23,15 +23,14 @@ public:
     enum { _kMesonCorrelatorType = 20 };
 
     CMeasureMesonCorrelatorStaggered() : CMeasure()
-        , m_pPropogators(NULL)
-        , m_pContract(NULL)
-        , m_pToBeContract(NULL)
+        , m_pDeviceW1(NULL)
+        , m_pDeviceW2(NULL)
         , m_pGaugeFixing(NULL)
-        , m_pFinalPropagators(NULL)
         , m_pDeviceSignTable(NULL)
         , m_pDeviceDeltaTable(NULL)
         , m_pDevicePropogators(NULL)
-        , m_pDeviceResultPropogators(NULL)
+        , m_pDevicePropogatorsEveryTimeSlice(NULL)
+        , m_pResPropogators(NULL)
         , m_uiConfigurationCount(0)
         , m_bGaugeFixing(FALSE)
         , m_bShowResult(FALSE)
@@ -58,26 +57,23 @@ protected:
     BYTE m_pDeltaTable[_kMesonCorrelatorType];
     void InitialSignTable();
 
-    CFieldFermion* m_pSources[24];
+    CFieldFermionKSSU3* m_pW1[24];
+    CFieldFermionKSSU3* m_pW2[24];
+    deviceSU3Vector** m_pDeviceW1;
+    deviceSU3Vector** m_pDeviceW2;
     void CalculateSources(const CFieldGauge* pGauge);
 
-    //(Lt - 2) x 576
-    CLGComplex* m_pPropogators;
-    CFieldFermion* m_pContract;
-    CFieldFermion* m_pToBeContract;
+    //uiSite
     CFieldGauge* m_pGaugeFixing;
-    void CalculatePropogators(const CFieldGauge* pGaugeField);
-
-    //(Lt - 2) x 20
-    CLGComplex* m_pFinalPropagators;
+    void CalculatePropogators();
 
     BYTE* m_pDeviceSignTable;
     BYTE* m_pDeviceDeltaTable;
-    //This is 576 x (Lt - 2)
     CLGComplex* m_pDevicePropogators;
+    CLGComplex* m_pDevicePropogatorsEveryTimeSlice;
+
     //This is 20 x (Lt - 2)
-    CLGComplex* m_pDeviceResultPropogators;
-    void PickPropagatorAndSign();
+    CLGComplex* m_pResPropogators;
 
     void InitialBuffers();
 

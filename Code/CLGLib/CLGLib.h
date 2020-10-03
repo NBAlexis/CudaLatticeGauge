@@ -277,6 +277,8 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureChiralCondensate.h"
 #include "Measurement/CMeasureAMomentumStochastic.h"
 #include "Measurement/CMeasureMesonCorrelatorStaggered.h"
+#include "Measurement/CMeasureChiralCondensateKS.h"
+#include "Measurement/CMeasureConnectedChiralSusceptibilityKS.h"
 
 #include "Measurement/CMeasurementManager.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"

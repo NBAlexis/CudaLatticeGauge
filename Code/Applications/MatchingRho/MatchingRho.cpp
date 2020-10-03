@@ -52,6 +52,14 @@ int main(int argc, char * argv[])
     const UBOOL bMeasureFermion = 0 != iVaule;
 
     iVaule = 0;
+    params.FetchValueINT(_T("DoMeasureCondensation"), iVaule);
+    const UBOOL bMeasureCondensation = 0 != iVaule;
+
+    iVaule = 0;
+    params.FetchValueINT(_T("UseZ4"), iVaule);
+    const UBOOL bZ4 = 0 != iVaule;
+
+    iVaule = 0;
     params.FetchValueINT(_T("CompressedFile"), iVaule);
     const UBOOL bCompressedFile = 0 != iVaule;
 
@@ -88,6 +96,7 @@ int main(int argc, char * argv[])
     //CMeasurePolyakov* pPL = dynamic_cast<CMeasurePolyakov*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureMesonCorrelator* pMC = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+    CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CFieldGaugeSU3* pStaple = NULL;
     if (bDoSmearing)
     {
@@ -230,6 +239,44 @@ int main(int argc, char * argv[])
                     rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                 }
             }
+            else if (bMeasureCondensation)
+            {
+                if (NULL != pCC)
+                {
+                    CFieldFermionWilsonSquareSU3*  pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    CFieldFermionWilsonSquareSU3*  pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    const UINT iFieldCount = pCC->GetFieldCount();
+                    for (UINT i = 0; i < iFieldCount; ++i)
+                    {
+                        if (bZ4)
+                        {
+                            pF1->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1->InitialField(EFIT_RandomGaussian);
+                        }
+                        pF1->FixBoundary();
+                        pF1->CopyTo(pF2);
+                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1->FixBoundary();
+
+                        pCC->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2,
+                            pF1,
+                            0 == i,
+                            iFieldCount == i + 1);
+                    }
+                    pF1->Return();
+                    pF2->Return();
+                }
+                else
+                {
+                    appGeneral(_T("Measurement is not found!\n"));
+                }
+            }
             else
             {
                 pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
@@ -300,6 +347,31 @@ int main(int argc, char * argv[])
         __Show_Correlator(rho2);
         __Show_Correlator(rho3);
         __Show_Correlator(rho0);
+
+        appSetLogDate(TRUE);
+    }
+
+    if ((bOnlyMeasure && bMeasureCondensation) && NULL != pCC)
+    {
+        appSetLogDate(FALSE);
+
+        appGeneral(_T("\n ==================== condensation ==============\n\n")); 
+        appGeneral(_T("{\n")); 
+        for (UINT iConf = 0; iConf < uiAccepCountAfterE; ++iConf) 
+        { 
+            appGeneral(_T("{"));
+            for (UINT iType = 0; iType < CMeasureChiralCondensate::_kCondMeasureCount; ++iType)
+            {
+                appGeneral(_T("%2.18f %s %2.18f I%s"), 
+                    pCC->m_lstCond[iType][iConf].x,
+                    (pCC->m_lstCond[iType][iConf].y < 0) ? _T("-") : _T("+"),
+                    appAbs(pCC->m_lstCond[iType][iConf].y),
+                    ((iType + 1) == CMeasureChiralCondensate::_kCondMeasureCount) ? _T("") : _T(",")
+                    );
+            }
+            appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(",")); 
+        } 
+        appGeneral(_T("}\n")); 
 
         appSetLogDate(TRUE);
     }

@@ -31,15 +31,15 @@ _kernelWilsonLoopCalculateP(
     {
         if (0 == t)
         {
-            UINT uiSiteIndex = uiXYZ_Lt + t;
-            UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+            const UINT uiSiteIndex = uiXYZ_Lt + t;
+            const UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
             res[uiSiteIndex] = pDeviceData[uiLinkIdx];
         }
         else
         {
-            UINT uiSiteIndex1 = uiXYZ_Lt + t - 1;
-            UINT uiSiteIndex2 = uiSiteIndex1 + 1;
-            UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex2, 3);
+            const UINT uiSiteIndex2 = uiXYZ_Lt + t;
+            const UINT uiSiteIndex1 = uiSiteIndex2 - 1;
+            const UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex2, 3);
 
             res[uiSiteIndex2] = res[uiSiteIndex1];
             res[uiSiteIndex2].Mul(pDeviceData[uiLinkIdx]);
@@ -60,12 +60,12 @@ _kernelWilsonLoopCalculateP(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelWilsonLoops(
-    BYTE byFieldId,
+    const BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pP,
     const SSmallInt4 shift, const INT product, const INT linkLength, const UINT shiftLength,
     const INT link1, const INT link2, const INT link3, const INT link4, const INT link5,
-    UINT maxLength, UINT* counter, CLGComplex* correlator)
+    const UINT maxLength, UINT* counter, CLGComplex* correlator)
 {
     intokernalInt4;
     if (0 == sSite4.w || sSite4.w > (_DC_Lt / 2))
@@ -76,6 +76,7 @@ _kernelWilsonLoops(
     deviceSU3 w1 = deviceSU3::makeSU3Id();
     deviceSU3 w2 = deviceSU3::makeSU3Id();
 
+    //with t - 1
     const INT uiStartPolyaIndex = uiSiteIndex - 1;
     SSmallInt4 point1(
         sSite4.x,
@@ -98,9 +99,13 @@ _kernelWilsonLoops(
         point2 = __deviceSiteIndexToInt4(
             __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(point2)].m_uiSiteIndex);
 
+        //(n0,0) to (n0,t)
         deviceSU3 loop = pP[uiStartPolyaIndex];
+        //(n0,t) to (n',t)
         loop.Mul(w2);
+        //(n',t) to (n',0)
         loop.MulDagger(pP[_deviceGetSiteIndex(point2) - 1]);
+        //(n',0) to (n0,0)
         loop.MulDagger(w1);
         CLGComplex res = loop.Tr();
                 
@@ -141,10 +146,9 @@ _kernelAverageWilsonLoop(UINT* counter, CLGComplex* correlator)
     const UINT uiIdx = threadIdx.x * (_DC_Lt / 2) + blockIdx.x;
     if (counter[threadIdx.x] > 0)
     {
-        correlator[uiIdx].x =
-            correlator[uiIdx].x / static_cast<Real>(counter[threadIdx.x]);
-        correlator[uiIdx].y =
-            correlator[uiIdx].y / static_cast<Real>(counter[threadIdx.x]);
+        const Real fcounter = static_cast<Real>(counter[threadIdx.x]);
+        correlator[uiIdx].x = correlator[uiIdx].x / fcounter;
+        correlator[uiIdx].y = correlator[uiIdx].y / fcounter;
     }
 }
 
@@ -320,7 +324,7 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
         {1, 2, 3, 1, 2},
         {2, 3, 1, 2, 3},
-        {1, 3, 2, 1, 3}
+        {3, 1, 2, 3, 1}
     };
 
     for (INT i = 0; i < 19; ++i)
@@ -357,6 +361,7 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
         assert(0 == m_lstR.Num());
         assert(0 == m_lstC.Num());
 
+        //we do not have L^2 < 1 Wilson loop
         for (UINT uiL = 1; uiL < m_uiMaxLengthSq; ++uiL)
         {
             if (m_pHostCorrelatorCounter[uiL] > 0)
@@ -475,9 +480,9 @@ void CMeasureWilsonLoop::Report()
             {
                 if (m_bShowResult)
                 {
-                    LogGeneralComplex(m_lstC[k][i][t]);
+                    LogGeneralComplex(m_lstC[i][k][t]);
                 }
-                averageOfC_R = _cuCaddf(averageOfC_R, m_lstC[k][i][t]);
+                averageOfC_R = _cuCaddf(averageOfC_R, m_lstC[i][k][t]);
             }
             if (m_bShowResult)
             {
@@ -502,9 +507,9 @@ void CMeasureWilsonLoop::Report()
         appGeneral(_T("{\n"));
         for (UINT t = 0; t < halfT; ++t)
         {
-            LogGeneralComplex(m_lstAverageC[k][t]);
+            LogGeneralComplex(m_lstAverageC[k][t], t != halfT - 1);
         }
-        appGeneral(_T("},\n"));
+        appGeneral(_T("}%s\n"), (k == m_lstR.Num() - 1) ? _T("") : _T(","));
     }
     appGeneral(_T("}\n"));
 

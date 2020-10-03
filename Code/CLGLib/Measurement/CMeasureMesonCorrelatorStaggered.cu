@@ -18,60 +18,194 @@ __BEGIN_NAMESPACE
  * block.x = Lt -  2
  * thread.x = 20
  */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelInitialPropagatorsKS(CLGComplex* res)
-{
-    res[threadIdx.x * (_DC_Lt - 1) + blockIdx.x] = _zeroc;
-}
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernelInitialPropagatorsKS(CLGComplex* res)
+//{
+//    res[threadIdx.x * (_DC_Lt - 1) + blockIdx.x] = _zeroc;
+//}
 
 /**
  * block.x = 24
  * thread.x = 24
- * block.y = Lt -  2
+ * block.y = Lt -  1
  * block.z = 20
  */
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernelPickPropagators(
+//    const CLGComplex* __restrict__ propagators,
+//    const BYTE* __restrict__ signTable,
+//    const BYTE* __restrict__ deltaTable,
+//    CLGComplex* res)
+//{
+//    //run for all A, B, C1, C2
+//    const UINT uiA = blockIdx.x;
+//    const UINT uiB = threadIdx.x;
+//    const UINT uiAv = blockIdx.x / 3;
+//    const UINT uiBv = threadIdx.x / 3;
+//    //UINT byC1 = blockIdx.x % 3;
+//    //UINT byC2 = threadIdx.x % 3;
+//
+//    const UINT byT = blockIdx.y;
+//    const UINT uiType = blockIdx.z;
+//    const UINT uiDelta = deltaTable[uiType];
+//    const UINT byA_p_d = (uiAv ^ uiDelta) * 3 + (uiA % 3);
+//    const UINT byB_p_d = (uiBv ^ uiDelta) * 3 + (uiB % 3);
+//
+//    //the coord with t should times 24
+//    //B,0 to A,t this is propagator 2-3
+//    const UINT uiPropagator1 = byT * 1152 + 576 + uiA * 24 + uiB;
+//    //B_p_d,0 tp A_p_d,t this is propagator 1-4
+//    const UINT uiPropagator2 = byT * 1152 + byA_p_d * 24 + byB_p_d;
+//    const CLGComplex propagator = _cuCmulf(_cuConjf(propagators[uiPropagator1]), propagators[uiPropagator2]);
+//    const INT sign = signTable[uiType * 8 + uiAv] + signTable[uiType * 8 + uiBv];
+//    const UINT resIdx = uiType * (_DC_Lt - 1) + byT;
+//    //if (5 == uiType && 1 == byT)
+//    //{
+//    //    printf("A=%d,B=%d,d=%d,sign=%d\n", uiAv, uiBv, uiDelta, sign);
+//    //}
+//    if (sign & 1)
+//    {
+//        //minus sign, but we have a total "-"
+//        atomicAdd(&res[resIdx].x, -propagator.x);
+//        atomicAdd(&res[resIdx].y, -propagator.y);
+//    }
+//    else
+//    {
+//        //plus sign, but we have a total "-"
+//        atomicAdd(&res[resIdx].x, propagator.x);
+//        atomicAdd(&res[resIdx].y, propagator.y);
+//    }
+//}
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPickPropagators(
-    const CLGComplex* __restrict__ propagators,
+    const deviceSU3Vector* __restrict__ const * __restrict__ w1,
+    const deviceSU3Vector* __restrict__ const * __restrict__ w2,
     const BYTE* __restrict__ signTable,
     const BYTE* __restrict__ deltaTable,
+    BYTE byType, BYTE byFieldId,
     CLGComplex* res)
 {
-    //run for all A, B, C1, C2
-    const UINT uiA = blockIdx.x;
-    const UINT uiB = threadIdx.x;
-    const UINT uiAv = blockIdx.x / 3;
-    const UINT uiBv = threadIdx.x / 3;
-    //UINT byC1 = blockIdx.x % 3;
-    //UINT byC2 = threadIdx.x % 3;
+    intokernalInt4;
 
-    const UINT byT = blockIdx.y;
-    const UINT uiType = blockIdx.z;
-    const UINT uiDelta = deltaTable[uiType];
-    const UINT byA_p_d = (uiAv ^ uiDelta) * 3 + (uiA % 3);
-    const UINT byB_p_d = (uiBv ^ uiDelta) * 3 + (uiB % 3);
-
-    //the coord with t should times 24
-    //B,0 to A,t this is propagator 2-3
-    const UINT uiPropagator1 = byT * 1152 + 576 + uiA * 24 + uiB;
-    //B_p_d,0 tp A_p_d,t this is propagator 1-4
-    const UINT uiPropagator2 = byT * 1152 + byA_p_d * 24 + byB_p_d;
-    const CLGComplex propagator = _cuCmulf(_cuConjf(propagators[uiPropagator1]), propagators[uiPropagator2]);
-    const INT sign = signTable[uiType * 8 + uiAv] + signTable[uiType * 8 + uiBv];
-    const UINT resIdx = uiType * (_DC_Lt - 1) + byT;
-
-    if (sign & 1)
+    res[uiSiteIndex] = _zeroc;
+    if (0 == sSite4.w)
     {
-        //minus sign, but we have a total "-"
-        atomicAdd(&res[resIdx].x, propagator.x);
-        atomicAdd(&res[resIdx].y, propagator.y);
+        return;
     }
-    else
+
+    if (0 != (sSite4.x & 1)
+     || 0 != (sSite4.y & 1)
+     || 0 != (sSite4.z & 1))
     {
-        //plus sign, but we have a total "-"
-        atomicAdd(&res[resIdx].x, -propagator.x);
-        atomicAdd(&res[resIdx].y, -propagator.y);
+        return;
     }
+
+    const SBYTE byDelta = static_cast<SBYTE>(deltaTable[byType]);
+    CLGComplex thisSiteSum = _zeroc;
+    //we are picking for t = sSite4.w component
+    //sum over x is sSite4.xyz
+    #pragma unroll
+    for (SBYTE byA1 = 0; byA1 < 8; ++byA1)
+    {
+        const SBYTE byA1_p_delta = byA1 ^ byDelta;
+
+        const SBYTE a1x = byA1 & 1;
+        const SBYTE a1y = (byA1 >> 1) & 1;
+        const SBYTE a1z = (byA1 >> 2) & 1;
+
+        const SBYTE a1pdx = byA1_p_delta & 1;
+        const SBYTE a1pdy = (byA1_p_delta >> 1) & 1;
+        const SBYTE a1pdz = (byA1_p_delta >> 2) & 1;
+
+        #pragma unroll
+        for (SBYTE byA2 = 0; byA2 < 8; ++byA2)
+        {
+            const SBYTE byA2v = byA2 * 3;
+            const SBYTE byA2v_p_delta = (byA2 ^ byDelta) * 3;
+            CLGComplex respropagator = _zeroc;
+
+            #pragma unroll
+            for (SBYTE byShift = 0; byShift < 8; ++byShift)
+            {
+                //shift.xyz = +-1
+                const SBYTE shiftx = ((byShift & 1) << 1) - 1;
+                const SBYTE shifty = (((byShift >> 1) & 1) << 1) - 1;
+                const SBYTE shiftz = (((byShift >> 2) & 1) << 1) - 1;
+
+                const SBYTE shifta1x = shiftx * a1x;
+                const SBYTE shifta1y = shifty * a1y;
+                const SBYTE shifta1z = shiftz * a1z;
+
+                const SBYTE shifta1pdx = shiftx * a1pdx;
+                const SBYTE shifta1pdy = shifty * a1pdy;
+                const SBYTE shifta1pdz = shiftz * a1pdz;
+
+                //Discard the terms outside of the unit cube
+                //So we also do not need to consider the sites outside the lattice
+                if (shifta1x < 0 || shifta1y < 0 || shifta1z < 0
+                 || shifta1pdx < 0 || shifta1pdy < 0 || shifta1pdz < 0)
+                {
+                    continue;
+                }
+                //real shift
+                SSmallInt4 shifted_A1 = sSite4;
+                shifted_A1.x = shifted_A1.x + shifta1x;
+                shifted_A1.y = shifted_A1.y + shifta1y;
+                shifted_A1.z = shifted_A1.z + shifta1z;
+                SSmallInt4 shifted_A1_p_delta = sSite4;
+                shifted_A1_p_delta.x = shifted_A1_p_delta.x + shifta1pdx;
+                shifted_A1_p_delta.y = shifted_A1_p_delta.y + shifta1pdy;
+                shifted_A1_p_delta.z = shifted_A1_p_delta.z + shifta1pdz;
+
+                //const UINT uiSiteShiftedA1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1)].m_uiSiteIndex;
+                //const UINT uiSiteShiftedA1_p_delta = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1_p_delta)].m_uiSiteIndex;;
+                const UINT uiSiteShiftedA1 = _deviceGetSiteIndex(shifted_A1);
+                const UINT uiSiteShiftedA1_p_delta = _deviceGetSiteIndex(shifted_A1_p_delta);
+
+                #pragma unroll
+                for (BYTE c = 0; c < 9; ++c)
+                {
+                    //sink(DA).w1(A2_p_d)
+                    //sink(DA_p_d).w2(A2)
+                    const BYTE c1 = c / 3;
+                    const BYTE c2 = c % 3;
+                    respropagator = _cuCaddf(respropagator,
+                        _cuCmulf(
+                            w1[byA2v_p_delta + c1][uiSiteShiftedA1_p_delta].m_ve[c2]
+                            ,
+                            _cuConjf(
+                              w2[byA2v + c1][uiSiteShiftedA1].m_ve[c2]
+                            )
+                            )
+                        );              
+                }
+            }
+
+            const BYTE sign = signTable[byType * 8 + byA1] + signTable[byType * 8 + byA2];
+            if (sign & 1)
+            {
+                thisSiteSum = _cuCaddf(thisSiteSum, respropagator);
+            }
+            else
+            {
+                thisSiteSum = _cuCsubf(thisSiteSum, respropagator);
+            }
+        }
+    }
+    //printf("just kankan %f + %f\n", thisSiteSum.x, thisSiteSum.y);
+    res[uiSiteIndex] = thisSiteSum;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPickEveryTimeSlice(
+    const CLGComplex* __restrict__ pAll,
+    BYTE byT,
+    CLGComplex* res)
+{
+    const UINT uiVolumnIdx = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
+    const UINT uiSiteIndex = uiVolumnIdx * _DC_Lt + byT;
+    res[uiVolumnIdx] = pAll[uiSiteIndex];
 }
 
 #pragma endregion
@@ -294,134 +428,85 @@ void CMeasureMesonCorrelatorStaggered::CalculateSources(const CFieldGauge* pGaug
             const INT idx = shift * 3 + c;
             SFermionSource source;
             source.m_bySpinIndex = shift;
-            source.m_eSourceType = EFS_Wall;
             source.m_byColorIndex = c;
+            source.m_eSourceType = EFS_Wall;
             source.m_sSourcePoint = SSmallInt4(0, 0, 0, 0);
-            m_pSources[idx]->InitialAsSource(source);
+            m_pW1[idx]->InitialAsSource(source);
             appParanoiac(_T("generating source(%d)...\n"), idx);
-            m_pSources[idx]->InverseDDdagger(pGauge);
+            m_pW1[idx]->InverseDDdagger(pGauge);
+            m_pW1[idx]->CopyTo(m_pW2[idx]);
+
+            m_pW1[idx]->Ddagger(pGauge);
+            m_pW2[idx]->D(pGauge);
         }
     }
 }
 
-void CMeasureMesonCorrelatorStaggered::CalculatePropogators(const CFieldGauge* pGauge)
+void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
 {
-    m_pContract = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-    m_pToBeContract = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-    for (INT i = 1; i < _HC_Lti; ++i)
+    deviceSU3Vector* w1[24];
+    deviceSU3Vector* w2[24];
+    for (BYTE shift = 0; shift < 24; ++shift)
     {
-        appParanoiac(_T("calculating propogator for lt=(%d)...\n"), i);
-        //To optimize: contract(shif1,c1).source(shift2,c2)=contract(shif2,c1).source(shift1,c2)
-        //Can we do this optimization?
-        for (BYTE shift = 0; shift < 8; ++shift)
+        w1[shift] = m_pW1[shift]->m_pDeviceData;
+        w2[shift] = m_pW2[shift]->m_pDeviceData;
+    }
+    checkCudaErrors(cudaMemcpy(m_pDeviceW1, w1, sizeof(deviceSU3Vector*) * 24, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(m_pDeviceW2, w2, sizeof(deviceSU3Vector*) * 24, cudaMemcpyHostToDevice));
+
+    preparethread;
+    dim3 block1 = dim3(block.x, block.y, 1);
+    dim3 thread1 = dim3(threads.x, threads.y, 1);
+    for (INT i = 0; i < _kMesonCorrelatorType; ++i)
+    {
+        _kernelPickPropagators << <block, threads >> > (
+            m_pDeviceW1,
+            m_pDeviceW2,
+            m_pDeviceSignTable,
+            m_pDeviceDeltaTable,
+            static_cast<BYTE>(i),
+            m_byFieldId,
+            m_pDevicePropogators);
+
+
+        for (INT t = 1; t < _HC_Lti; ++t)
         {
-            for (BYTE c = 0; c < 3; ++c)
-            {
-                const INT idx = shift * 3 + c;
-                SFermionSource source;
-                source.m_bySpinIndex = shift;
-                source.m_eSourceType = EFS_Wall;
-                source.m_byColorIndex = c;
-                source.m_sSourcePoint = SSmallInt4(0, 0, 0, static_cast<SBYTE>(i));
-                m_pContract->InitialAsSource(source);
-
-                for (BYTE targetIdx = 0; targetIdx < 24; ++targetIdx)
-                //for (BYTE targetShift = 0; targetShift < 8; ++targetShift)
-                {
-                    //for (BYTE targetC = 0; targetC < 3; ++targetC)
-                    //{
-                        //const BYTE targetIdx = targetShift * 3 + targetC;
-                        m_pSources[targetIdx]->CopyTo(m_pToBeContract);
-                        m_pToBeContract->Ddagger(pGauge);
-                        const CLGComplex prop14 = m_pContract->Dot(m_pToBeContract);
-                        m_pSources[targetIdx]->CopyTo(m_pToBeContract);
-                        m_pToBeContract->D(pGauge);
-                        const CLGComplex prop23 = m_pContract->Dot(m_pToBeContract);
-
-                        const INT totalIdx1 = idx * 24 + targetIdx;
-                        m_pPropogators[(i - 1) * 1152 + totalIdx1] = prop14;
-                        m_pPropogators[(i - 1) * 1152 + totalIdx1 + 576] = prop23;
-                    //}
-                }
-            }
+            _kernelPickEveryTimeSlice << <block1, thread1 >> > (
+                m_pDevicePropogators, 
+                static_cast<BYTE>(t), 
+                m_pDevicePropogatorsEveryTimeSlice);
+            const CLGComplex sum = appGetCudaHelper()->ReduceComplex(
+                m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz);
+            m_pResPropogators[i * (_HC_Lti - 1) + t - 1] = sum;
+            //appParanoiac(_T("Type=%d t=%d, res = %2.18f + %2.18f\n"), i, t, sum.x, sum.y);
         }
     }
-    m_pContract->Return();
-    m_pToBeContract->Return();
-
-    //appGeneral(_T("{\n"));
-    //for (INT i = 0; i < 24; ++i)
-    //{
-    //    appGeneral(_T("{"));
-    //    for (INT j = 0; j < 24; ++j)
-    //    {
-    //        LogGeneralComplex(m_pPropogators[1152 + i * 24 + j], 23 != j);
-    //    }
-    //    if (23 == i)
-    //    {
-    //        appGeneral(_T("}\n}\n"));
-    //    }
-    //    else
-    //    {
-    //        appGeneral(_T("},\n"));
-    //    }
-    //}
-    //appGeneral(_T("{\n"));
-    //for (INT i = 0; i < 24; ++i)
-    //{
-    //    appGeneral(_T("{"));
-    //    for (INT j = 0; j < 24; ++j)
-    //    {
-    //        LogGeneralComplex(m_pPropogators[1152 + 576 + i * 24 + j], 23 != j);
-    //    }
-    //    if (23 == i)
-    //    {
-    //        appGeneral(_T("}\n}\n"));
-    //    }
-    //    else
-    //    {
-    //        appGeneral(_T("},\n"));
-    //    }
-    //}
-}
-
-void CMeasureMesonCorrelatorStaggered::PickPropagatorAndSign()
-{
-    dim3 block0(_HC_Lt - 1, 1, 1);
-    dim3 threads0(_kMesonCorrelatorType, 1, 1);
-    _kernelInitialPropagatorsKS << <block0, threads0 >> > (m_pDeviceResultPropogators);
-
-    checkCudaErrors(cudaMemcpy(m_pDevicePropogators, m_pPropogators, sizeof(CLGComplex) * 1152 * (_HC_Lt - 1), cudaMemcpyHostToDevice));
-    dim3 block(24, _HC_Lt - 1, _kMesonCorrelatorType);
-    dim3 threads(24, 1, 1);
-
-    _kernelPickPropagators << <block, threads >> > (m_pDevicePropogators, m_pDeviceSignTable, m_pDeviceDeltaTable, m_pDeviceResultPropogators);
-
-    checkCudaErrors(cudaMemcpy(m_pFinalPropagators, m_pDeviceResultPropogators, sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1), cudaMemcpyDeviceToHost));
 }
 
 void CMeasureMesonCorrelatorStaggered::InitialBuffers()
 {
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceSignTable, sizeof(BYTE) * _kMesonCorrelatorType * 8));
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceDeltaTable, sizeof(BYTE) * _kMesonCorrelatorType));
-    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(CLGComplex) * 1152 * (_HC_Lt - 1)));
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceResultPropogators, sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceW1, sizeof(deviceSU3Vector*) * 24));
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceW2, sizeof(deviceSU3Vector*) * 24));
+    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(CLGComplex) * _HC_Volume));
+    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogatorsEveryTimeSlice, sizeof(CLGComplex) * _HC_Volume_xyz));
 
-    m_pPropogators = (CLGComplex*)(malloc(sizeof(CLGComplex) * 1152 * (_HC_Lt - 1)));
-    m_pFinalPropagators = (CLGComplex*)(malloc(sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
+    m_pResPropogators = (CLGComplex*)(malloc(sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
 }
 
 #pragma endregion
 
 CMeasureMesonCorrelatorStaggered::~CMeasureMesonCorrelatorStaggered()
 {
+    checkCudaErrors(cudaFree(m_pDeviceW1));
+    checkCudaErrors(cudaFree(m_pDeviceW2));
     checkCudaErrors(cudaFree(m_pDeviceSignTable));
     checkCudaErrors(cudaFree(m_pDeviceDeltaTable));
     checkCudaErrors(cudaFree(m_pDevicePropogators));
-    checkCudaErrors(cudaFree(m_pDeviceResultPropogators));
+    checkCudaErrors(cudaFree(m_pDevicePropogatorsEveryTimeSlice));
 
-    appSafeFree(m_pPropogators);
-    appSafeFree(m_pFinalPropagators);
+    appSafeFree(m_pResPropogators);
     appSafeDelete(m_pGaugeFixing);
 }
 
@@ -444,7 +529,8 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
 {
     for (BYTE i = 0; i < 24; ++i)
     {
-        m_pSources[i] = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        m_pW1[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        m_pW2[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     }
 
     if (m_bGaugeFixing)
@@ -462,15 +548,13 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
             appGetLattice()->m_pGaugeFixing->GaugeFixing(m_pGaugeFixing);
         }
         CalculateSources(m_pGaugeFixing);
-        CalculatePropogators(m_pGaugeFixing);
+        CalculatePropogators();
     }
     else
     {
         CalculateSources(pGaugeField);
-        CalculatePropogators(pGaugeField);
+        CalculatePropogators();
     }
-
-    PickPropagatorAndSign();
 
     //========== extract result ===========
     if (m_bShowResult)
@@ -487,7 +571,7 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
         TArray<CLGComplex> thisType;
         for (INT j = 0; j < _HC_Lti - 1; ++j)
         {
-            const CLGComplex& res = m_pFinalPropagators[i * (_HC_Lt - 1) + j];
+            const CLGComplex& res = m_pResPropogators[i * (_HC_Lt - 1) + j];
             if (m_bShowResult)
             {
                 LogGeneralComplex(res);
@@ -504,8 +588,10 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
 
     for (BYTE i = 0; i < 24; ++i)
     {
-        m_pSources[i]->Return();
+        m_pW1[i]->Return();
+        m_pW2[i]->Return();
     }
+    ++m_uiConfigurationCount;
 }
 
 void CMeasureMesonCorrelatorStaggered::Average(UINT)
@@ -521,7 +607,7 @@ void CMeasureMesonCorrelatorStaggered::Report()
     m_lstAverageResults.RemoveAll();
     for (INT ty = 0; ty < _kMesonCorrelatorType; ++ty)
     {
-        appGeneral(_T(" ======================= Type:%d=================\n{\n"), ty);
+        appGeneral(_T("(* ======================= Type:%d=================*)\ntabres%d={\n"), ty, ty);
         TArray<Real> thisType;
         for (INT conf = 0; conf < m_lstResults.Num(); ++conf)
         {
@@ -538,7 +624,7 @@ void CMeasureMesonCorrelatorStaggered::Report()
                     thisType[t] = thisType[t] + m_lstResults[conf][ty][t].x;
                 }
             }
-            appGeneral(_T("}%s"), (conf == m_lstResults.Num() - 1) ? _T("\n}\n") : _T(",\n"));
+            appGeneral(_T("}%s"), (conf == m_lstResults.Num() - 1) ? _T("\n};\n") : _T(",\n"));
         }
 
         for (INT t = 0; t < _HC_Lti - 1; ++t)
@@ -549,7 +635,7 @@ void CMeasureMesonCorrelatorStaggered::Report()
     }
 
 
-    appGeneral(_T(" ======================= All Type averages =================\n{\n"));
+    appGeneral(_T("(* ======================= All Type averages =================*)\navr={\n"));
     for (INT ty = 0; ty < _kMesonCorrelatorType; ++ty)
     {
         appGeneral(_T("{"));
@@ -557,7 +643,7 @@ void CMeasureMesonCorrelatorStaggered::Report()
         {
             appGeneral(_T("%2.12f%s"), m_lstAverageResults[ty][t], (t != (_HC_Lti - 2)) ? _T(",") : _T(""));
         }
-        appGeneral(_T("}%s"), ty != 19 ? _T("\n}\n") : _T(",\n"));
+        appGeneral(_T("}%s"), ty == 19 ? _T("\n};\n") : _T(",\n"));
     }
 }
 

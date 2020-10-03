@@ -239,15 +239,8 @@ For staggered fermion, to simplify the calculation, one uses the wall source, wh
 &\tilde{M}(t) = \sum _{\bf A} S({\bf A})\tilde{M}_{{\bf A},{\bf A}+\delta}
 \end{split}
 \end{equation}
-\textbf{\textcolor[rgb]{0,0,1}{$\tilde{M}(t)$ carries same quantum number as $M(t)$~\cite{staggeredMeson}.}} Then
-\begin{equation}
-\begin{split}
-&C(t)=\langle \tilde{M}_{\delta}(t) \overline{\tilde{M} _{\delta}(0)}\rangle \\
-&= \sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\langle \sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1+{\bf A}_1,t) \sum _{\bf y _1}\chi _{c_1} (2{\bf y}_1+{\bf A}_1+\delta,t)  \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\rangle\\
-&=-\sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\\
-&\times \langle \sum _{\bf y _1}\chi _{c_1} (2{\bf y}_1+{\bf A}_1+\delta,t) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0) \sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1+{\bf A}_1,t)  \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \rangle\\
-\end{split}
-\end{equation}
+\textbf{\textcolor[rgb]{0,0,1}{$\tilde{M}(t)$ carries same quantum number as $M(t)$~\cite{staggeredMeson}.}}
+
 Since it is a \index{wall source}wall source, to make sure \textbf{gauge invariance}, this correlator should be measured in \textcolor[rgb]{0,0,1}{\textbf{Coulomb gauge}}. How to fix the gauge is introduced in Sec.~\ref{sec:CoulombGauge}.
 
 The expression of the sources are
@@ -258,6 +251,20 @@ The expression of the sources are
 \end{equation}
 
 \subsubsection{\label{ThePropagatorsOfStaggeredMeson}The propagators of staggered meson}
+
+The correlation function is defined as overlap between \textbf{operator and source} (\textcolor[rgb]{1,0,0}{\textbf{It is fuzzy in literatures, it is my guess, I tried to use source operators also as sink operators, but the result is very bad.}}).
+
+Then
+\begin{equation}
+\begin{split}
+&C(t)=\langle M_{\delta}(t) \overline{\tilde{M} _{\delta}(0)}\rangle \\
+&= \sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\langle \sum _{\bf x _1}D_{\bf A_1}\bar{\chi}_{c_1}(2{\bf x}_1,t)D_{{\bf A}_1+\delta}\chi _{c_1} (2{\bf x}_1,t) \\
+& \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\rangle\\
+\end{split}
+\end{equation}
+
+
+
 
 Eq.~(\ref{eq.WickTherom}) in the case of $4$ Grassman numbers is
 \begin{equation}
@@ -279,7 +286,21 @@ Using $(A^{\dagger})^{-1}=(A^{-1})^{\dagger}$, this is
 \end{split}
 \end{equation}
 
-Use the fact that $D=D_{st0}+m$, $D^{\dagger}=-D_{st0}+m$, $DD^{\dagger}=D^{\dagger}D=m^2-D_{st0}^2$. So $D^{-1}=D^{\dagger} \left(D^{\dagger}D\right)^{-1}$ and $(D^{\dagger})^{-1}=D \left(D^{\dagger}D\right)^{-1}$. Let the inverse of source be $v=\left(D^{\dagger}D\right)^{-1} \phi _{source}$, we need both $\phi _{sink} D^{\dagger}v $ and $\phi _{sink} Dv$.
+So
+\begin{equation}
+\begin{split}
+&C(t)=\langle M_{\delta}(t) \overline{\tilde{M} _{\delta}(0)}\rangle \\
+&=-\sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\sum _{\bf x _1}\\
+&\langle D_{{\bf A}_1+\delta}\chi _{c_1} (2{\bf x}_1,t) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)D_{\bf A_1}\bar{\chi}_{c_1}(2{\bf x}_1,t)\sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \rangle\\
+&=\sum _{\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\sum _{\bf x _1} \left(D_{{\bf A}_1+\delta} \phi_{sink}D^{-1}\phi_{sour}({\bf A}_2+\delta)\right)\left(D_{{\bf A}_1} \phi_{sink}(D^{\dagger})^{-1}\phi_{sour}({\bf A}_2)\right)^*
+\end{split}
+\end{equation}
+
+Use the fact that $D=D_{st0}+m$, $D^{\dagger}=-D_{st0}+m$, $DD^{\dagger}=D^{\dagger}D=m^2-D_{st0}^2$. So $D^{-1}=D^{\dagger} \left(D^{\dagger}D\right)^{-1}$ and $(D^{\dagger})^{-1}=D \left(D^{\dagger}D\right)^{-1}$. Let the inverse of source be $v=\left(D^{\dagger}D\right)^{-1} \phi _{source}$, we need both $D^{\dagger}v $ and $Dv$.
+
+\subsubsection{\label{ImplementationOfSinkOperator}Implementation Of Sink Operator}
+
+As $w_1=D^{\dagger}v$ and $w_2=Dv$ obtained, the effect of sink operator is to pick the element of $w_{1,2}$ vectors.
 
 \subsubsection{\label{Fitofstaggeredcorrelator}Fit of staggered correlator}
 
@@ -333,20 +354,36 @@ It seems incorrect to ignore the color index, and put a $(1,1,1)$ in the source.
 
 $\bullet$ \textbf{Step1: Gauge fixing to Coulomb gauge}
 
-$\bullet$ \textbf{Step2: Build $8$ source fields using $s_{\bf A, c}({\bf n}, 0) = \sum _{{\bf x}} \delta _{2{\bf x}+{\bf A},{\bf n}}\delta _{0,n_4}\delta_{c,c'}$}
+$\bullet$ \textbf{Step2: Build $24$ source fields using $s_{\bf A, c}({\bf n}, 0) = \sum _{{\bf x}} \delta _{2{\bf x}+{\bf A},{\bf n}}\delta _{0,n_4}\delta_{c,c'}$}
 
-$\bullet$ \textbf{Step3: Calculate $3\times 8$ inverse fields using $G _{\bf A, c}=D^{-1}s_{\bf A, c}({\bf n}, 0)$}
+$\bullet$ \textbf{Step3: Calculate $3\times 8$ inverse fields using $v _{\bf A, c}=(D^{\dagger}D)^{-1}s_{\bf A, c}({\bf n}, 0)$}
 
-$\bullet$ \textbf{Step4: The propagator $C_{\bf B,c_2,\bf A,c_1}(t)=S _{\bf B,c_2}^{\dagger}G_{\bf A, c_1}$, we have $576 \times t$ different results for different ${\bf A,B}$, ${c_1,c_2}$ and $t$.}
+$\bullet$ \textbf{Step4: Calculate $w_{1,{\bf A},c}=D^{\dagger}v _{\bf A, c}$ and $w_{2,{\bf A},c}=Dv _{\bf A, c}$.}
 
-$\bullet$ \textbf{Step5: For a given $\delta$, calculate $-\sum _{A,B,c_1,c_2}S(A)S(B)C_{\bf A+\delta,c_1;\bf B +\delta,c_2}(t)C_{\bf A,c_1;\bf B,c_2}(t)$.}
+$\bullet$ \textbf{Step5: Use sink operator to pick elements from $w_1$ and $w_2$ to calculate $\langle D_{\bf A_1+\delta}\chi (\sum \bar{\chi}(2{\bf x}+{\bf A_2}+\delta))\rangle$ and $\langle D_{\bf A_1}\chi (\sum \bar{\chi}(2{\bf x}+{\bf A_2}))\rangle$.}
 
-Some notes:
-
-$\bullet$ \textbf{N1: Real number result}
-
-It can be shown that $C_{\bf B,c_2,\bf A,\textcolor[rgb]{1,0,0}{c_1}}(t)=C_{\bf A,c_2,\bf B,\textcolor[rgb]{1,0,0}{c_1}}(t)$. This make sure the result is a real number.
+\textcolor[rgb]{0,0,1}{\textbf{Note: the result of correlation function is real number not complex number.}}
 
 
-
-
+\begin{table}
+\begin{center}
+\begin{tabular}{cc|cc}
+\hline
+ $\pi$ & & $\rho$ & \\
+$\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _5}$($\pi$PS) & $1.17$ & $\gamma_k\otimes \tau_k$(VT) & $1.71$ \\
+$\gamma _4\gamma _5\otimes \textcolor[rgb]{0,0,1}{\tau _4\tau _5}$($\tilde{\pi}$SC) & $1.75$ & $\gamma_k\gamma_4\otimes \tau_k\tau_4$(PV) & $1.87$ \\
+$\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _k\tau _5}$($\pi_3$) & $2.14$ & $\gamma_k\gamma _4\otimes \tau_4$($\rho_3^A$) & $2.18$ \\
+$\gamma _4\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _l\tau _m}$($\tilde{\pi}_3$) & $2.59$ & $\gamma_m\otimes \tau _l\tau_m$($\rho_6^C$) & $2.27$ \\
+$\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _m\tau _4}$ & $2.67$ & $\gamma_l\gamma _4\otimes \tau_k\tau _4$($\rho_6^B$) & $2.55$ \\
+$\gamma _4\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _m}$ & $2.95$ & $\gamma_m\gamma _4\otimes \tau _k\tau_5$($\rho_6^D$) & $2.55$\\
+$\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\tau _4}$ & $3.22$ & $\gamma_m\gamma _4\otimes \tau_5$ & $2.84$\\
+$\gamma _4\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\mathbb{I}}$($\eta$) & $3.08$ & $\gamma_l\otimes \tau_k$($\rho_6^A$) & $2.91$ \\
+ & & $\gamma_m\otimes \tau _4\tau_5$ & $2.96$ \\
+ & & $\gamma_k\otimes \tau_l\tau _m$($\rho_3^C$) & $3.39$ \\
+ & & $\gamma_k\gamma _4\otimes \tau_k\tau _5$($\rho_3^D$) & $3.94$ \\
+ & & $\gamma_k\gamma _4\otimes \tau_k\tau _5$($\omega$) & $2.59$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab:staggeredMeson2}Tested result with $\beta=5.0,N_f=2,am=0.25,4^3\times 8$ with $20+100$ configurations. The order of mass of pions are same as most of the Refs. In Ref, they find $\pi(\tau _5)<\pi(\tau _4\tau _5)<\pi(\tau _k\tau _5)<\pi(\tau _l\tau _m)<\pi(\tau _m\tau _4)<\pi(\tau _m)<\textcolor[rgb]{1,0,0}{\pi(\tau _4)<\omega}$. In Ref, they find $PS<VT<\textcolor[rgb]{1,0,0}{PV<SC}$ which is only partly consistent. In Ref. they find $\pi < \tilde{\pi} < \pi_3 < \tilde{\pi}_3<\rho_6^A$ which is consistent. In Ref they find $\pi(\tau _5)<\textcolor[rgb]{1,0,0}{\pi(\tau _k\tau _5)<\pi(\tau _4\tau _5)}<\textcolor[rgb]{1,0,0}{\pi(\tau _m\tau _4)<\pi(\tau _l\tau _m)}<\pi(\tau _m)<\textcolor[rgb]{1,0,0}{\pi(\tau _4)<\omega}$.}
+\end{table}

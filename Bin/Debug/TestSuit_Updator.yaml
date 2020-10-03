@@ -122,3 +122,57 @@ TestUpdatorForceGradient:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+TestWilsonLoop:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 24]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        # IntegratorType : CIntegratorOmelyan
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 50
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 6.2
+
+    Measure1:
+
+        MeasureName : CMeasureWilsonLoop
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 1.0
+        AlphaRight : 0.2
+        Iterate : 50
+        Cabibbo : 0
+        ProjIterate : 8
+
+        # SmearingName : CGaugeSmearingAPEStout
+        # Rho : 0.08
+        # HasT : 1
+        # Iterate : 25

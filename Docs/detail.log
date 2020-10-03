@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.8.14)  30 SEP 2020 16:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.8.14)  2 OCT 2020 14:54
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -990,6 +990,9 @@ LaTeX Warning: Label `index' multiply defined.
 
 LaTeX Warning: Label `sec:GaugeFixing' multiply defined.
 
+
+LaTeX Warning: Label `tab:staggeredMeson2' multiply defined.
+
 )
 \openout1 = `detail.aux'.
 
@@ -1317,41 +1320,36 @@ Overfull \hbox (36.05055pt too wide) in paragraph at lines 161--188
  [] 
  []
 
-
-Overfull \hbox (80.61102pt too wide) detected at line 250
-[]
- []
-
-[76] [77] [78] [79] [80]) [81] (programming/cuda.tex
+[76] [77] [78] [79] [80]) [81] [82] (programming/cuda.tex
 Overfull \hbox (2.43213pt too wide) in paragraph at lines 7--8
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/53
 781421/cuda-the-member-field-with-
  []
 
-[82
+[83
 
-] [83]
+] [84]
 Overfull \hbox (11.53699pt too wide) in paragraph at lines 136--137
 []\OT1/cmr/m/n/10.53937 According to [][]https://stackoverflow.com/questions/26
 812913/how-to-implement-device-side-
  []
 
-[84] [85] [86]) [87] (tests/testRandom.tex) [88
+[85] [86] [87]) [88] (tests/testRandom.tex) [89
 
 ]
-(Applications/RotatingFrame.tex [89
+(Applications/RotatingFrame.tex [90
 
-] [90] [91] [92]
+] [91] [92] [93]
 Overfull \hbox (0.1309pt too wide) detected at line 207
 []
  []
 
-[93]
+[94]
 Overfull \hbox (2.78526pt too wide) detected at line 273
 []
  []
 
-[94]
+[95]
 Overfull \hbox (8.27637pt too wide) detected at line 299
 []
  []
@@ -1361,57 +1359,57 @@ Overfull \hbox (22.72751pt too wide) detected at line 318
 []
  []
 
-[95] [96]
+[96] [97]
 Overfull \hbox (8.97845pt too wide) detected at line 385
 []
  []
 
-[97] [98]
+[98] [99]
 Overfull \hbox (18.00261pt too wide) detected at line 495
 []
  []
 
-[99]
+[100]
 Overfull \hbox (31.96808pt too wide) detected at line 518
 []
  []
 
-[100]
+[101]
 Overfull \hbox (18.94774pt too wide) detected at line 578
 []
  []
 
-[101] [102] [103]
+[102] [103] [104]
 Overfull \hbox (0.11786pt too wide) in paragraph at lines 696--697
 []\OT1/cmr/m/n/10.53937 Note that \OT1/cmr/bx/n/10.53937 Both the force from ga
 uge and fermion ac-tion-s are kep-t anti-hermitian
  []
 
-[104]
+[105]
 Overfull \hbox (17.98344pt too wide) detected at line 749
 []
  []
 
-[105] [106] [107]
+[106] [107] [108]
 Overfull \hbox (37.6991pt too wide) detected at line 909
 []
  []
 
-[108] [109]
+[109] [110]
 Overfull \hbox (32.43486pt too wide) detected at line 969
 []
  []
 
-[110]
+[111]
 Overfull \hbox (6.99323pt too wide) detected at line 1040
 []
  []
 
-[111] [112] [113] [114]) (Applications/SampleProducer.tex)
-(Applications/DataAnalyse.tex [115
+[112] [113] [114] [115]) (Applications/SampleProducer.tex)
+(Applications/DataAnalyse.tex [116
 
-] [116])
-(Applications/ConstantAcceleration.tex [117] [118] [119]
+] [117])
+(Applications/ConstantAcceleration.tex [118] [119] [120]
 Overfull \hbox (18.00261pt too wide) detected at line 144
 []
  []
@@ -1421,12 +1419,12 @@ Overfull \hbox (58.96762pt too wide) detected at line 152
 []
  []
 
-[120]
+[121]
 Overfull \hbox (20.86151pt too wide) detected at line 160
 []
  []
 
-[121] [122]
+[122] [123]
 Overfull \hbox (48.91293pt too wide) detected at line 240
 []
  []
@@ -1446,7 +1444,7 @@ Overfull \hbox (2.08768pt too wide) detected at line 273
 []
  []
 
-[123]
+[124]
 Overfull \hbox (15.99406pt too wide) in paragraph at lines 297--298
 [][]\OT1/cmr/bx/n/10.53937 We have sign prob-lem here. There is an $\OMS/cmsy/m
 /n/10.53937 O\OT1/cmr/m/n/10.53937 (\OML/cmm/m/it/10.53937 a\OT1/cmr/m/n/10.539
@@ -1467,10 +1465,10 @@ Overfull \hbox (20.86151pt too wide) detected at line 312
 []
  []
 
-[124]) [125] (detail.ind<<c1956.cmap>><<c1961.cmap>> [126
+[125]) [126] (detail.ind<<c1956.cmap>><<c1961.cmap>> [127
 
 
-] [127
+] [128
 
 ]) (detail.bbl<<c1947.cmap>><<c1958.cmap>><<c1959.cmap>><<c1929.cmap>>
 Underfull \hbox (badness 1270) in paragraph at lines 88--94
@@ -1484,17 +1482,17 @@ Underfull \hbox (badness 1019) in paragraph at lines 88--94
 Meth-od-s.  1994, [][]Avail-able at:
  []
 
-[128
+[129
 
-] [129])
+] [130])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 199.
- [130]
+ [131]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 199.
  (detail.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 199.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 199.
 Package rerunfilecheck Info: File `detail.out' has not changed.
-(rerunfilecheck)             Checksum: 06F6867C0EF2360ED76FD4E7FF6E9B4D;19697.
+(rerunfilecheck)             Checksum: EA0CF0D3E61348AAF0FCBC2C91C377A9;19931.
 
 
 LaTeX Font Warning: Size substitutions with differences
@@ -1509,13 +1507,13 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 199.
  ) 
 Here is how much of TeX's memory you used:
- 30302 strings out of 494838
- 511905 string characters out of 3178224
- 974142 words of memory out of 3000000
- 32475 multiletter control sequences out of 15000+200000
+ 30308 strings out of 494838
+ 512012 string characters out of 3178224
+ 974516 words of memory out of 3000000
+ 32477 multiletter control sequences out of 15000+200000
  555332 words of font info for 112 fonts, out of 3000000 for 9000
  17 hyphenation exceptions out of 8191
- 44i,33n,63p,836b,1888s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 44i,33n,63p,979b,1888s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Windows/Fonts/simsun.ttc><C:/Windows/Fonts/simhei.ttf><C:/Windows/Fonts/s
 imhei.ttf><C:/Windows/Fonts/simhei.ttf><C:/Windows/Fonts/simhei.ttf><C:/Windows
 /Fonts/simsun.ttc><C:/Windows/Fonts/simsun.ttc><C:/Windows/Fonts/simsun.ttc><C:
@@ -1547,9 +1545,9 @@ ype1/public/amsfonts/euler/eufm10.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/
 public/amsfonts/symbols/msam7.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/publ
 ic/amsfonts/symbols/msbm10.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/public/
 amsfonts/symbols/msbm7.pfb>
-Output written on detail.pdf (130 pages, 983148 bytes).
+Output written on detail.pdf (131 pages, 987775 bytes).
 PDF statistics:
- 2393 PDF objects out of 2487 (max. 8388607)
- 922 named destinations out of 1000 (max. 500000)
- 893 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2405 PDF objects out of 2487 (max. 8388607)
+ 926 named destinations out of 1000 (max. 500000)
+ 901 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -82,6 +82,8 @@
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
+    <ClInclude Include="Measurement\CMeasureChiralCondensateKS.h" />
+    <ClInclude Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.h" />
     <ClInclude Include="Measurement\CMeasurementManager.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
@@ -220,6 +222,8 @@
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
     <CudaCompile Include="Measurement\CMeasureAMomentumJF.cu" />
     <CudaCompile Include="Measurement\CMeasureChargeAndCurrents.cu" />
+    <CudaCompile Include="Measurement\CMeasureChiralCondensateKS.cu" />
+    <CudaCompile Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu" />

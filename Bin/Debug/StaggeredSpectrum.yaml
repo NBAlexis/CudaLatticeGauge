@@ -238,12 +238,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    StartN : 1
-    EndN : 50
+    StartN : 201
+    EndN : 450
     # {ESSM_Polyakov, ESSM_Correlator}
     MeasureType : ESSM_Correlator
-    SavePrefix : ./46616/GF46616_
-    CSVSavePrefix : ./46616_
+    SavePrefix : ./500205/GF500205_
+    CSVSavePrefix : ./500205/500205_
 
     Dim : 4
     Dir : 4
@@ -382,11 +382,14 @@ JobMeasure:
 
     Solver:
 
-        SolverName : CSLASolverGMRES
         SolverForFieldId : 5
-        MaxDim : 30
-        Accuracy : 0.000001
-        Restart : 500
+        Restart : 400
+        Accuracy : 0.00000000001
+        SolverName : CSLASolverBiCGStab
+        ## Check Accuracy every DiviationStep steps
+        DiviationStep : 50
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 1
         AbsoluteAccuracy : 1
 
     MSSolver:
@@ -471,17 +474,17 @@ JobMeasure:
 
     GaugeSmearing:
 
-        # SmearingName : CGaugeSmearingAPEProj
-        # AlphaLeft : 2.3
-        # AlphaRight : 1.0
-        # Iterate : 50
-        # Cabibbo : 1
-        # ProjIterate : 8
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 2.3
+        AlphaRight : 1.0
+        Iterate : 20
+        Cabibbo : 0
+        ProjIterate : 8
 
-        SmearingName : CGaugeSmearingAPEStout
-        Rho : 0.08
-        HasT : 1
-        Iterate : 150
+        # SmearingName : CGaugeSmearingAPEStout
+        # Rho : 0.08
+        # HasT : 1
+        # Iterate : 25
 
 
 JobGaugeFixing:
@@ -492,11 +495,11 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    IndexStart : 867
-    IndexEnd : 1000
+    IndexStart : 201
+    IndexEnd : 450
 
-    LoadPrefix : G:\Configurations\Matching\_f46616\46616_
-    SavePrefix : ./46616/GF46616_
+    LoadPrefix : ./500205/500205_
+    SavePrefix : ./500205/GF500205_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
