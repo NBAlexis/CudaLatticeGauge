@@ -780,7 +780,7 @@ TestFermionUpdatorWithMesonCorrelatorStaggered:
     RandomSeed : 1234567
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 1
+    MeasureListLength : 2
     ExpectedRes1 : 9.957547
     ExpectedRes2 : -24.212927
 
@@ -858,6 +858,12 @@ TestFermionUpdatorWithMesonCorrelatorStaggered:
         MeasureName : CMeasureMesonCorrelatorStaggered
         ShowResult : 1
         GaugeFixing : 1
+        FieldId : 2
+
+    Measure2:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        ShowResult : 1
         FieldId : 2
 
     GaugeFixing:

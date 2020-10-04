@@ -422,6 +422,12 @@
     <ClInclude Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -680,6 +686,15 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldGaugeSU3TreeImproved.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu">
+      <Filter>Measurement\GaugeSmearing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>

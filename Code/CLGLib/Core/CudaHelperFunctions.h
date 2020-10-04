@@ -46,10 +46,22 @@
 #define _CLG_LAUNCH_BOUND_SINGLE
 #endif
 
+#if _CLG_DEBUG
+
+#define _FAIL_EXIT \
+appFlushLog(); \
+assert(0); \
+DEVICE_RESET \
+exit(EXIT_FAILURE);
+
+#else
+
 #define _FAIL_EXIT \
 appFlushLog(); \
 DEVICE_RESET \
-exit(EXIT_FAILURE); 
+exit(EXIT_FAILURE);
+
+#endif
 
 
 

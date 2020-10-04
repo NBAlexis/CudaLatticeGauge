@@ -651,6 +651,7 @@ void CMeasureMesonCorrelatorStaggered::Reset()
 {
     m_uiConfigurationCount = 0;
     m_lstResults.RemoveAll();
+    m_lstAverageResults.RemoveAll();
 }
 
 

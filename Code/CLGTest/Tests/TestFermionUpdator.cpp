@@ -192,7 +192,13 @@ __REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale);
 UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
 {
     CMeasureMesonCorrelatorStaggered* pMeasure = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasureMesonCorrelatorStaggeredSimple* pMeasuresimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     if (NULL == pMeasure)
+    {
+        return 1;
+    }
+
+    if (NULL == pMeasuresimple)
     {
         return 1;
     }
@@ -208,10 +214,12 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     //TArray<Real> lstResExpected;
     //sParam.FetchValueArrayReal(_T("ExpectedRes"), lstResExpected);
     //assert(static_cast<UINT>(lstResExpected.Num()) == _HC_Lt - 1);
-    appGetLattice()->m_pUpdator->Update(1, FALSE);
-    appGetLattice()->m_pUpdator->Update(3, TRUE);
+    appGetLattice()->m_pUpdator->Update(3, FALSE);
+    appGetLattice()->m_pUpdator->Update(8, TRUE);
     appGeneral(_T("res1=%f\n"), pMeasure->m_lstAverageResults[0][0]);
     appGeneral(_T("res2=%f\n"), pMeasure->m_lstAverageResults[1][1]);
+    appGeneral(_T("res3=%f\n"), pMeasuresimple->m_lstAverageResults[0][0]);
+    appGeneral(_T("res4=%f\n"), pMeasuresimple->m_lstAverageResults[1][1]);
     //TArray<Real> lstRes;
     //appGeneral(_T("res = expected vs test: "));
 

@@ -24,7 +24,6 @@ public:
         : CGaugeSmearing()
         , m_fAlphaLeft(F(1.0))
         , m_fAlphaRight(F(0.1))
-        , m_uiIterate(1)
         , m_bCMProj(FALSE)
         , m_byProjIterate(6)
     {  }
@@ -35,7 +34,6 @@ public:
 
     Real m_fAlphaLeft;
     Real m_fAlphaRight;
-    UINT m_uiIterate;
     UBOOL m_bCMProj;
     BYTE m_byProjIterate;
 };

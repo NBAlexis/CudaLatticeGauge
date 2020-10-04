@@ -219,6 +219,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldGaugeSU3D.h"
 #include "Data/Field/CFieldGaugeZ2.h"
+#include "Data/Field/CFieldGaugeSU3TreeImproved.h"
 
 //#include "Data/Field/CFieldBoson.h"
 
@@ -277,6 +278,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureChiralCondensate.h"
 #include "Measurement/CMeasureAMomentumStochastic.h"
 #include "Measurement/CMeasureMesonCorrelatorStaggered.h"
+#include "Measurement/CMeasureMesonCorrelatorStaggeredSimple.h"
 #include "Measurement/CMeasureChiralCondensateKS.h"
 #include "Measurement/CMeasureConnectedChiralSusceptibilityKS.h"
 

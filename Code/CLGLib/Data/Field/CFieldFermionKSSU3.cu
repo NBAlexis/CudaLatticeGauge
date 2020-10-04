@@ -583,6 +583,20 @@ _kernelMakePointSourceKS(deviceSU3Vector* pDeviceData, UINT uiDesiredSite, BYTE 
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelMakePointSourceKSOne(deviceSU3Vector* pDeviceData, UINT uiDesiredSite)
+{
+    intokernal;
+    if (uiSiteIndex == uiDesiredSite)
+    {
+        pDeviceData[uiSiteIndex] = deviceSU3Vector::makeOneSU3Vector();
+    }
+    else
+    {
+        pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, 
     UINT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
 {
@@ -601,7 +615,7 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData,
         const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][__bi(sSite4)];
         if (!sIdx.IsDirichlet())
         {
-            pDeviceData[_deviceGetSiteIndex(sSite4)] = deviceSU3Vector::makeOneSU3VectorColor(color);
+            pDeviceData[sIdx.m_uiSiteIndex] = deviceSU3Vector::makeOneSU3VectorColor(color);
         }
     }
 }
@@ -1077,7 +1091,14 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
     case EFS_Point:
     {
         preparethread;
-        _kernelMakePointSourceKS << <block, threads >> > (m_pDeviceData, uiSiteIndex, sourceData.m_byColorIndex);
+        if (sourceData.m_byColorIndex < 3)
+        {
+            _kernelMakePointSourceKS << <block, threads >> > (m_pDeviceData, uiSiteIndex, sourceData.m_byColorIndex);
+        }
+        else
+        {
+            _kernelMakePointSourceKSOne << <block, threads >> > (m_pDeviceData, uiSiteIndex);
+        }
     }
     break;
     case EFS_Wall:

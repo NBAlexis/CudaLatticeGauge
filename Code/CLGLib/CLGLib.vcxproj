@@ -59,6 +59,7 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3D.h" />
+    <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h" />
     <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggered.h" />
+    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
     <ClInclude Include="Measurement\CMeasurePolyakov.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
@@ -157,6 +159,7 @@
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.cu" />
+    <CudaCompile Include="Data\Field\CFieldGaugeSU3TreeImproved.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu" />
@@ -227,10 +230,12 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu" />
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu" />
+    <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGCRODR.cpp" />

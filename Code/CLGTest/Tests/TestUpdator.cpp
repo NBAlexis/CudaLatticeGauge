@@ -91,7 +91,7 @@ UINT TestWilsonLoop(CParameters& sParam)
     CFieldGauge* pStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
 
     //Equilibration
-    appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
+    //appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
 #if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(10, FALSE);
 #else

@@ -239,7 +239,7 @@ JobMeasure:
     ShowParameterContent : 0
 
     StartN : 201
-    EndN : 450
+    EndN : 550
     # {ESSM_Polyakov, ESSM_Correlator}
     MeasureType : ESSM_Correlator
     SavePrefix : ./500205/GF500205_
@@ -474,17 +474,18 @@ JobMeasure:
 
     GaugeSmearing:
 
-        SmearingName : CGaugeSmearingAPEProj
-        AlphaLeft : 2.3
-        AlphaRight : 1.0
-        Iterate : 20
-        Cabibbo : 0
-        ProjIterate : 8
-
-        # SmearingName : CGaugeSmearingAPEStout
-        # Rho : 0.08
-        # HasT : 1
+        # SmearingName : CGaugeSmearingAPEProj
+        # AlphaLeft : 2.3
+        # AlphaRight : 1.0
         # Iterate : 25
+        # Cabibbo : 0
+        # ProjIterate : 8
+        # HasT : 1
+
+        SmearingName : CGaugeSmearingAPEStout
+        Rho : 0.1
+        HasT : 1
+        Iterate : 25
 
 
 JobGaugeFixing:
@@ -495,8 +496,8 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    IndexStart : 201
-    IndexEnd : 450
+    IndexStart : 451
+    IndexEnd : 550
 
     LoadPrefix : ./500205/500205_
     SavePrefix : ./500205/GF500205_

@@ -324,19 +324,19 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 5
-    OmegaStart : 9
+    OmegaStart : 0
     OmegaEnd : 10
-    IndexStart : 3201
-    IndexEnd : 3500
+    IndexStart : 201
+    IndexEnd : 3200
 
     SubFolder : 1
     SubFolderPrefix : G:\Extrapolation\5283161Nt5\Nt5
     LoadPrefix : NC5283161_
     CheckSubFolder : 1
     CheckSubFolderPrefix : G:\Configurations\5283161GF
-    SavePrefix : ./5283161/GFN5283161_
+    SavePrefix : GFN5283161_
     UseLogADefinition : 0
-    OnlyCheck : 0
+    OnlyCheck : 1
     CheckAndFix : 0
 
     Dim : 4
