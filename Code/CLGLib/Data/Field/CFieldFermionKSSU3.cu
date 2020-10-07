@@ -903,6 +903,32 @@ void CFieldFermionKSSU3::D(const CField* pGauge, EOperatorCoefficientType eCoeff
     pPooled->Return();
 }
 
+void CFieldFermionKSSU3::DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+
+    Real fRealCoeff = fCoeffReal;
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    if (EOCT_Minus == eCoeffType)
+    {
+        eCoeffType = EOCT_Real;
+        fRealCoeff = F(-1.0);
+    }
+
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+        FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+
+    pPooled->Return();
+}
+
 void CFieldFermionKSSU3::D0(const CField* pGauge)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
@@ -1016,6 +1042,32 @@ void CFieldFermionKSSU3::Ddagger(const CField* pGauge, EOperatorCoefficientType 
     pPooled->Return();
 }
 
+void CFieldFermionKSSU3::DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+
+    Real fRealCoeff = fCoeffReal;
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    if (EOCT_Minus == eCoeffType)
+    {
+        eCoeffType = EOCT_Real;
+        fRealCoeff = F(-1.0);
+    }
+
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+        TRUE, eCoeffType, fRealCoeff, cCompCoeff);
+
+
+    pPooled->Return();
+}
+
 void CFieldFermionKSSU3::DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
@@ -1038,6 +1090,33 @@ void CFieldFermionKSSU3::DDdagger(const CField* pGauge, EOperatorCoefficientType
         TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
     DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+        FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+
+    pPooled->Return();
+}
+
+void CFieldFermionKSSU3::DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    Real fRealCoeff = fCoeffReal;
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    if (EOCT_Minus == eCoeffType)
+    {
+        eCoeffType = EOCT_Real;
+        fRealCoeff = F(-1.0);
+    }
+    CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+
+    DOperatorKS(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+        TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+    //why only apply coeff in the next step?
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();

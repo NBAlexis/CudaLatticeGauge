@@ -185,6 +185,23 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     }
     appGeneral(_T("|phi|^2 = %2.18f, |DD^{1/4}phi|^2 = %2.18f, |DD^{-1/4}DD^{1/4}phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
 
+
+    //It seems that the rational approximation is very poor
+    //Only when gauge field is set to be 1(cold), the result will be close
+    //Maybe it is because the matrix is not sparse enough? we test on 8x8x8x8
+    //pField->CopyTo(pFieldCopy);
+    //pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over2);
+    //pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over2);
+    //pFieldCopy->D(pGauge);
+    //fLength2 = pFieldCopy->Dot(pFieldCopy).x;
+    //pFieldCopy->AxpyMinus(pField);
+    //fLength3 = pFieldCopy->Dot(pFieldCopy).x;
+    //appGeneral(_T("|phi|^2 = %2.18f, |DD+(DD^{-1/2})^2phi|^2 = %2.18f, |DD+(DD^{-1/2})^2phi-phi|^2 = %2.18f\n"), fLengthOfPhi, fLength2, fLength3);
+    //if (fLength3 > fMaxError)
+    //{
+    //    uiError++;
+    //}
+
     appSafeDelete(pFieldCopy);
     return uiError;
 }
@@ -196,5 +213,6 @@ __REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverBiCGStab);
 __REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverGMRES);
 __REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverFOM);
 __REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverBiCGStab);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverNested);
 
 

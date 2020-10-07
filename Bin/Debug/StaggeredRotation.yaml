@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure
-RotationJob : ESR_Measure
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,12 +17,12 @@ JobSimulate:
     EquvibSkip : 100
     EquvibStep : 500
     SaveStartIndex : 0
-    OmegaSep : 8
+    OmegaSep : 16
     OmegaStart : 0
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./500205/SR500205_
+    SavePrefix : ./500204/SR500204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -175,19 +175,19 @@ JobSimulate:
 
         # 2am
         # Mass : 0.4
-        Mass : 0.05
+        Mass : 0.04
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # This is (x+0.0375/x)^{-1/4}
-        MC : [0.9883908285644297, -0.006904795410014326, 0.011951446614057276]
+        # This is (x+0.0384/x)^{-1/4}
+        MC : [0.988087846183097, -0.0070337572362839966, 0.012149695891461821]
 
         # MD is to calculate force
-        # This is (x+0.0375/x)^{1/2}
-        MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
+        # This is (x+0.0384/x)^{1/2}
+        MD : [1.0192839071626443, 0.015390840632470528, 0.0028328749479887365]
 
 
     Action1:
@@ -195,7 +195,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 4.5
+        Beta : 5.0
         Omega : 0.0
 
     Action2:
@@ -278,13 +278,36 @@ JobSimulate:
 
     MSSolver4:
 
-        SolverName : CMultiShiftBiCGStab
+        # SolverName : CMultiShiftBiCGStab
+        SolverName : CMultiShiftNested
         SolverForFieldId : 5
         # DiviationStep : 20
         DiviationStep : 50
         MaxStep : 500
         Accuracy : 0.001
         AbsoluteAccuracy : 1
+        
+        NestedSolver :
+            SolverForFieldId : 2
+
+            # SolverName : CSLASolverBiCGStab
+            # Accuracy : 0.00000001
+
+            DiviationStep : 50
+            MaxStep : 1
+
+            SolverName : CSLASolverGMRES
+            MaxDim : 25
+
+            # SolverName : CSLASolverGCRODR
+            Accuracy : 0.00000001
+            # MDim : 26
+            # KDim : 5
+            # RecalculateR : 5
+            # DeflateSpace : EEDT_SVD
+
+            Restart : 500
+            AbsoluteAccuracy : 1
 
     Measure1:
 

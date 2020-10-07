@@ -69,6 +69,21 @@ public:
     void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+
+    void DWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    {
+        appCrucial(_T("Not supported for Wilson direct fermion!\n"));
+    }
+
+    void DdaggerWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    {
+        appCrucial(_T("Not supported for Wilson direct fermion!\n"));
+    }
+
+    void DDdaggerWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    {
+        appCrucial(_T("Not supported for Wilson direct fermion!\n"));
+    }
     UBOOL InverseD(const CField* pGauge) override;
     UBOOL InverseDdagger(const CField* pGauge) override;
     UBOOL InverseDDdagger(const CField* pGauge) override;

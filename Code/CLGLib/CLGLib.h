@@ -263,6 +263,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "SparseLinearAlgebra/CMultiShiftGMRES.h"
 #include "SparseLinearAlgebra/CMultiShiftFOM.h"
 #include "SparseLinearAlgebra/CMultiShiftBiCGStab.h"
+#include "SparseLinearAlgebra/CMultiShiftNested.h"
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurePlaqutteEnergy.h"

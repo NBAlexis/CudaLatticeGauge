@@ -49,6 +49,10 @@ __DEFINE_ENUM(EFieldOperator,
 
     EFO_F_RationalD,
 
+    EFO_F_D_WithMass,
+    EFO_F_Ddagger_WithMass,
+    EFO_F_DDdagger_WithMass,
+
     EFO_ForceDWORD = 0x7fffffff,
     )
 

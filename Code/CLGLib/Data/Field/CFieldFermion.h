@@ -89,6 +89,45 @@ public:
                 }
                 return RationalApproximation(EFO_F_D, otherfield, pRA);
             }
+        case EFO_F_D_WithMass:
+            {
+                Real* fMass = (Real*)pOtherParameters;
+                if (NULL == fMass)
+                {
+                    DWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+                else
+                {
+                    DWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+            }
+            return TRUE;
+        case EFO_F_Ddagger_WithMass:
+            {
+                Real* fMass = (Real*)pOtherParameters;
+                if (NULL == fMass)
+                {
+                    DdaggerWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+                else
+                {
+                    DdaggerWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+            }
+            return TRUE;
+        case EFO_F_DDdagger_WithMass:
+            {
+                Real* fMass = (Real*)pOtherParameters;
+                if (NULL == fMass)
+                {
+                    DDdaggerWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+                else
+                {
+                    DDdaggerWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+            }
+            return TRUE;
         default:
             appCrucial(_T("ApplyOperator, the operator %s is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
             return FALSE;
@@ -100,6 +139,9 @@ public:
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
 
     virtual UBOOL InverseD(const CField* pGauge) = 0;
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;

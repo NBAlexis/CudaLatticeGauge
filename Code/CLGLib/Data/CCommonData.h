@@ -441,6 +441,9 @@ public:
     static Real m_fG;
 
     static UINT m_uiMaxThreadPerBlock;
+
+    //No room for other paramters in solvers, so put it here, maybe move to somewhere else later
+    static Real m_fShiftedMass;
 };
 
 __END_NAMESPACE

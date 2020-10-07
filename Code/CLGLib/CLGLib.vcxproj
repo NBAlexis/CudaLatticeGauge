@@ -104,6 +104,7 @@
     <ClInclude Include="Platform\PlatformDefine.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftFOM.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftGMRES.h" />
+    <ClInclude Include="SparseLinearAlgebra\CMultiShiftNested.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftSolver.h" />
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftBiCGStab.h" />
     <ClInclude Include="SparseLinearAlgebra\CSLASolver.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp" />
+    <ClCompile Include="SparseLinearAlgebra\CMultiShiftNested.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />

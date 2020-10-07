@@ -251,9 +251,9 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
     UINT iFieldCount = static_cast<UINT>(iVaule);
 
-    iVaule = 1;
-    params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
-    UBOOL bCheckGaugeFixing = 0 != iVaule;
+    //iVaule = 1;
+    //params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
+    //UBOOL bCheckGaugeFixing = 0 != iVaule;
 
     iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
