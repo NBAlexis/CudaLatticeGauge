@@ -29,7 +29,6 @@
     <ClCompile Include="Tests\TestBoundary.cpp" />
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
-    <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp" />
     <ClCompile Include="Tests\TestCommon.cpp" />
     <ClCompile Include="Tests\TestKSUpdator.cpp" />
     <ClCompile Include="Tests\TestMultiShiftSolver.cpp" />

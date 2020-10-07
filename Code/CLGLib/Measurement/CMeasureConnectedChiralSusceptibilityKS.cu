@@ -34,8 +34,10 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
     SFermionSource sour;
     sour.m_byColorIndex = 0;
     sour.m_eSourceType = EFS_Point;
-    sour.m_sSourcePoint = SSmallInt4(0, 0, 0, 0);
+    sour.m_sSourcePoint = CCommonData::m_sCenter;//SSmallInt4(0, 0, 0, 0);
+    //appGeneral(_T("point1 %d, point2 %d\n"), _hostGetSiteIndex(sour.m_sSourcePoint), _hostGetSiteIndex(CCommonData::m_sCenter));
     m_pSourceZero->InitialAsSource(sour);
+    m_pSourceZero->FixBoundary();
     m_pSourceZero->InverseD(pGaugeField);
     const CLGComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
 

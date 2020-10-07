@@ -20,9 +20,6 @@
     <ClCompile Include="Tests\TestFermionUpdator.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestGammaMatrixSpeed.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestBoundary.cpp">
       <Filter>Tests</Filter>
     </ClCompile>

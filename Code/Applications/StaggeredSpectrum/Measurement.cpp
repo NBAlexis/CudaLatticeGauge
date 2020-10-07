@@ -250,9 +250,9 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("EndN"), iVaule);
     UINT iEndN = static_cast<UINT>(iVaule);
 
-    //iVaule = 10;
-    //params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
-    //UINT iFieldCount = static_cast<UINT>(iVaule);
+    iVaule = 1;
+    params.FetchValueINT(_T("DoSmearing"), iVaule);
+    UBOOL bDoSmearing = (0 != iVaule);
 
     //iVaule = 1;
     //params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
@@ -290,6 +290,7 @@ INT Measurement(CParameters& params)
     CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
     CMeasureWilsonLoop* pPL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+    CMeasureMesonCorrelatorStaggeredSimple* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     pPL->Reset();
     pMC->Reset();
 
@@ -307,8 +308,12 @@ INT Measurement(CParameters& params)
         {
         case ESSM_Polyakov:
         {
-            appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-            appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+            if (bDoSmearing)
+            {
+                appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
+                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+            }
+
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
             if (uiN == iStartN)
             {
@@ -326,6 +331,11 @@ INT Measurement(CParameters& params)
         case ESSM_Correlator:
         {
             pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+        }
+        break;
+        case ESSM_CorrelatorSimple:
+        {
+            pMCSimple->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
         }
         break;
         default:
@@ -385,6 +395,26 @@ INT Measurement(CParameters& params)
                 for (INT t = 0; t < _HC_Lti - 1; ++t)
                 {
                     oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
+                }
+                res.AddItem(oneConf);
+            }
+            WriteStringFileRealArray2(sCSVFile, res);
+        }
+    }
+    break;
+    case ESSM_CorrelatorSimple:
+    {
+        for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+        {
+            CCString sCSVFile;
+            sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
+            TArray<TArray<Real>> res;
+            for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
+            {
+                TArray<Real> oneConf;
+                for (INT t = 0; t < _HC_Lti - 1; ++t)
+                {
+                    oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
                 }
                 res.AddItem(oneConf);
             }

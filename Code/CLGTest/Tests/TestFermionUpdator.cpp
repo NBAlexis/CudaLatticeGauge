@@ -208,13 +208,17 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     sParam.FetchValueReal(_T("ExpectedRes1"), fExpected1);
     Real fExpected2 = F(-24.0);
     sParam.FetchValueReal(_T("ExpectedRes2"), fExpected2);
+    Real fExpected3 = F(9.0);
+    sParam.FetchValueReal(_T("ExpectedRes3"), fExpected3);
+    Real fExpected4 = F(-24.0);
+    sParam.FetchValueReal(_T("ExpectedRes4"), fExpected4);
 
 #if _CLG_DEBUG
 
     //TArray<Real> lstResExpected;
     //sParam.FetchValueArrayReal(_T("ExpectedRes"), lstResExpected);
     //assert(static_cast<UINT>(lstResExpected.Num()) == _HC_Lt - 1);
-    appGetLattice()->m_pUpdator->Update(3, FALSE);
+    appGetLattice()->m_pUpdator->Update(1, FALSE);
     appGetLattice()->m_pUpdator->Update(8, TRUE);
     appGeneral(_T("res1=%f\n"), pMeasure->m_lstAverageResults[0][0]);
     appGeneral(_T("res2=%f\n"), pMeasure->m_lstAverageResults[1][1]);

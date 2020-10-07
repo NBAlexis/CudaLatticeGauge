@@ -37,7 +37,14 @@ public:
     void GaugeFixing(CFieldGauge* pResGauge) override;
     Real CheckRes(const CFieldGauge* pGauge) override { return F(0.0); }
     CCString GetInfos(const CCString& sTab) const override;
-    void AlsoFixingFermion(CFieldFermionWilsonSquareSU3 * pFermion) const;
+
+    /**
+     * Call fix fermion just after gaugefixing, will use the same gauge transform as before
+     * When never gaugefixing is called the gauge transform is randomized
+     */
+    void AlsoFixingFermion(CFieldFermion* pFermion) const;
+    void AlsoFixingFermionWilsonSU3(CFieldFermionWilsonSquareSU3 * pFermion) const;
+    void AlsoFixingFermionKSSU3(CFieldFermionKSSU3* pFermion) const;
     void AlsoFixingAphys(CFieldGauge* pGauge) const;
     deviceSU3* m_pG;
 };

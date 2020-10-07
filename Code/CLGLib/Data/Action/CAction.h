@@ -20,10 +20,10 @@ public:
 
     /**
     * This is called langevin in Bridge++
-    * This is S for specific configuration using for exp(-S)/exp(-S0) update
-    * Because of the presence of Fermions, we can no longer just calculate a local(ultral-local) change os S
     *
     * To set pStable, if energy can be calculate using pre-calculated stables (so this action must be gauge action)
+    * bBeforeEvolution is set to be TRUE if call this just after an update (therefore the energy is already calculate for Metroplis of the last step),
+    * and will return the last result.
     */
     virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) = 0;
 

@@ -239,7 +239,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldFermionKSSU3R.h"
 #include "Data/Field/CFieldFermionKSSU3D.h"
 #include "Data/Field/CFieldFermionKSSU3DR.h"
-
+#include "Data/Field/CFieldFermionKSSU3EM.h"
 
 //=====================================================
 

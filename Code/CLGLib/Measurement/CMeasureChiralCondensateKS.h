@@ -15,13 +15,21 @@ __BEGIN_NAMESPACE
 
 __CLG_REGISTER_HELPER_HEADER(CMeasureChiralCondensateKS)
 
+enum EChiralMeasureTypeKS
+{
+    ChiralKS = 0,
+};
+
 class CLGAPI CMeasureChiralCondensateKS : public CMeasureStochastic
 {
     __CLGDECLARE_CLASS(CMeasureChiralCondensateKS)
 public:
 
     //Only Chiral condensate, others will be added later
-    enum { _kCondMeasureCountKS = 1 };
+    enum
+    {
+        _kCondMeasureCountKS = 1,
+    };
 
     CMeasureChiralCondensateKS()
         : CMeasureStochastic()

@@ -137,7 +137,6 @@ UINT TestQuickAxpy(CParameters&)
     appGeneral(_T("res = %f %f  t=%f (ms)\n"), res.x, res.y, timer2.Elapsed());
     return 0;
 }
-#endif
 
 UINT TestDirichletDOperator(CParameters&)
 {
@@ -147,7 +146,7 @@ UINT TestDirichletDOperator(CParameters&)
     pGauge->FixBoundary();
     pF1->PrepareForHMC(pGauge);
     pF1->CopyTo(pF2);
-    
+
     //pF1->D(appGetLattice()->m_pGaugeField);
     //pF1->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
     //pF1->AxpyMinus(pF2);
@@ -166,6 +165,9 @@ UINT TestDirichletDOperator(CParameters&)
 
     return 0;
 }
+
+#endif
+
 
 UINT TestALogDefinition(CParameters&)
 {
@@ -196,6 +198,105 @@ __REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition);
 
 //__REGIST_TEST(TestDirichletDOperator, Misc, TestRotationOperator);
 
+UINT TestGammaMatrix(CParameters&)
+{
+    CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+
+    for (UINT i = 0; i < 1000; ++i)
+    {
+        for (UINT j = 0; j < EGM_MAX; ++j)
+        {
+            pFermion->ApplyGamma((EGammaMatrix)j);
+        }
+    }
+
+    return 0;
+}
+
+UINT TestGamma5Hermiticity(CParameters& param)
+{
+    //test Ddagger
+    INT iG5 = 0;
+    param.FetchValueINT(_T("GAMM5Test"), iG5);
+
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+    UINT uiErrors = pF1->TestGamma5Hermitian(pGauge, 0 != iG5);
+    //CCudaHelper::DebugFunction();
+    pF1->Return();
+
+    return uiErrors;
+}
+
+UINT TestAnitiHermiticity(CParameters&)
+{
+    //test Ddagger
+    appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+    UINT uiErrors = pF1->TestAntiHermitian(pGauge);
+    //CCudaHelper::DebugFunction();
+    pF1->Return();
+
+    return uiErrors;
+}
+
+//930 - 990 ms
+//__REGIST_TEST(TestGammaMatrix, Misc, TestGammaMatrixSpeed);
+
+UINT TestDebugFunction(CParameters&)
+{
+    CCudaHelper::DebugFunction();
+    return 0;
+}
+
+__REGIST_TEST(TestGamma5Hermiticity, Misc, TestGamm5Hermiticity);
+
+__REGIST_TEST(TestAnitiHermiticity, Misc, TestAnitiHermiticity);
+
+__REGIST_TEST(TestDebugFunction, Misc, TestDebug);
+
+UINT TestGaugeInvarience(CParameters&)
+{
+    UINT uiError = 0;
+    TArray<Real> beforeGaugeTransform;
+    for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
+    {
+        Real fEnergy = appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL);
+        beforeGaugeTransform.AddItem(fEnergy);
+    }
+
+    CGaugeFixingRandom* pRandom = dynamic_cast<CGaugeFixingRandom*>(appGetLattice()->m_pGaugeFixing);
+
+    //make sure the gauge field is really changed
+    CFieldGauge* pGaugeCopy = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
+    pRandom->GaugeFixing(appGetLattice()->m_pGaugeField);
+    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField);
+    CMeasure::LogGeneralComplex(pGaugeCopy->Dot(pGaugeCopy));
+
+    appGetLattice()->m_pGaugeField->CopyTo(pGaugeCopy);
+    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField);
+    CMeasure::LogGeneralComplex(pGaugeCopy->Dot(pGaugeCopy));
+    
+    for (INT j = 0; j < appGetLattice()->m_pOtherFields.Num(); ++j)
+    {
+        pRandom->AlsoFixingFermion(dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(static_cast<BYTE>(j + 2))));
+    }
+
+    for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
+    {
+        Real fEnergy = appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL);
+        appGeneral(_T("Action%d, Before:%2.20f, After:%2.20f\n"), i, beforeGaugeTransform[i], fEnergy);
+        if (appAbs(beforeGaugeTransform[i] - fEnergy) > F(0.0000001))
+        {
+            ++uiError;
+        }
+    }
+
+    return 0;
+}
+
+__REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience);
 
 //=============================================================================
 // END OF FILE

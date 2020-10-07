@@ -63,7 +63,7 @@ _kernelGaugeTransformRandom(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelGaugeTransformFermion(
+_kernelGaugeTransformFermionWilsonSU3(
     const deviceSU3* __restrict__ pGx,
     deviceWilsonVectorSU3* pFermion)
 {
@@ -75,6 +75,22 @@ _kernelGaugeTransformFermion(
     if (!site.IsDirichlet())
     {
         pFermion[uiSiteIndex] = pGx[uiSiteIndex].MulWilsonVector(pFermion[uiSiteIndex]);
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelGaugeTransformFermionKSSU3(
+    const deviceSU3* __restrict__ pGx,
+    deviceSU3Vector* pFermion)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+
+    if (!site.IsDirichlet())
+    {
+        pFermion[uiSiteIndex] = pGx[uiSiteIndex].MulVector(pFermion[uiSiteIndex]); 
     }
 }
 
@@ -127,10 +143,28 @@ void CGaugeFixingRandom::GaugeFixing(CFieldGauge* pResGauge)
     _kernelGaugeTransformRandom << <block, threads >> > (m_pG, pGaugeSU3->m_pDeviceData);
 }
 
-void CGaugeFixingRandom::AlsoFixingFermion(CFieldFermionWilsonSquareSU3* pFermion) const
+void CGaugeFixingRandom::AlsoFixingFermion(CFieldFermion* pFermion) const
+{
+    if (EFT_FermionWilsonSquareSU3 == pFermion->GetFieldType())
+    {
+        AlsoFixingFermionWilsonSU3(dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion));
+    }
+    else if (EFT_FermionStaggeredSU3 == pFermion->GetFieldType())
+    {
+        AlsoFixingFermionKSSU3(dynamic_cast<CFieldFermionKSSU3*>(pFermion));
+    }
+}
+
+void CGaugeFixingRandom::AlsoFixingFermionWilsonSU3(CFieldFermionWilsonSquareSU3* pFermion) const
 {
     preparethread;
-    _kernelGaugeTransformFermion << <block, threads >> > (m_pG, pFermion->m_pDeviceData);
+    _kernelGaugeTransformFermionWilsonSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData);
+}
+
+void CGaugeFixingRandom::AlsoFixingFermionKSSU3(CFieldFermionKSSU3* pFermion) const
+{
+    preparethread;
+    _kernelGaugeTransformFermionKSSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData);
 }
 
 void CGaugeFixingRandom::AlsoFixingAphys(CFieldGauge* pGauge) const

@@ -50,6 +50,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StaggeredSpectrum", "Applic
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StaggeredRotation", "Applications\StaggeredRotation\StaggeredRotation.vcxproj", "{A1A59640-F18A-4BDB-BB46-4A1213E889AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B7501840-96AB-471E-BA14-9E825D0C63C8} = {B7501840-96AB-471E-BA14-9E825D0C63C8}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

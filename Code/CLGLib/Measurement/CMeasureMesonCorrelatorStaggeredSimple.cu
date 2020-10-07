@@ -23,6 +23,7 @@ static __device__ __inline__ SBYTE _deviceStaggeredFermionSimplePhase(const SSma
         ret = 3 - ((sSite.x & 1) << 1)
                 - ((sSite.y & 1) << 1)
                 - ((sSite.z & 1) << 1);
+        printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
         break;
     case 2:
         ret = 3 - (((sSite.x + sSite.y) & 1) << 1)
@@ -53,17 +54,19 @@ _kernelPickPropagatorsSimple(
         return;
     }
     //pick propagator with a phase
+    Real fV = F(0.0);
+    #pragma unroll
+    for (BYTE byC = 0; byC < 3; ++byC)
+    {
+        fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[0]);
+        fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[1]);
+        fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[2]);
+    }
+
     #pragma unroll
     for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
     {
         const Real fPhase = static_cast<Real>(_deviceStaggeredFermionSimplePhase(sSite4, byType));
-        Real fV = F(0.0);
-        for (BYTE byC = 0; byC < 3; ++byC)
-        {
-            fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[0]);
-            fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[1]);
-            fV += __cuCabsSqf(propagator[uiSiteIndex].m_ve[2]);
-        }
         res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + byType] = fV * fPhase;
     }
 }

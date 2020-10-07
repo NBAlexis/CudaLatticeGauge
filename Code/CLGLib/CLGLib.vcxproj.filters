@@ -428,6 +428,9 @@
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3EM.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -696,6 +699,9 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu">
       <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3EM.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

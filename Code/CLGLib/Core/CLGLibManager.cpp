@@ -680,7 +680,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     m_pLatticeData = new CLatticeData();
     m_pFileSystem = new CFileSystem();
     m_pBuffer = new CCudaBuffer();
-
+    UBOOL bGaugeBoundaryFieldCreated = FALSE;
     //Allocate Buffer
     Real fBufferSize = F(0.0);
     if (params.FetchValueReal(_T("AllocateBuffer"), fBufferSize))
@@ -709,6 +709,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CParameters gaugeboundary = params.GetParameter(_T("GaugeBoundary"));
         CreateGaugeBoundaryField(gaugeboundary);
+        bGaugeBoundaryFieldCreated = TRUE;
     }
     checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_FermionFieldLength] > 0)
@@ -798,6 +799,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     InitialIndexBuffer();
     m_pCudaHelper->SetFieldPointers();
     m_pLatticeData->FixAllFieldBoundary();
+
+    if (m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
+    {
+        appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
+    }
 
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
