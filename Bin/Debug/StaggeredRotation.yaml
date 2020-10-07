@@ -1,5 +1,5 @@
-# ESR_Simulate
-RotationJob : ESR_Simulate
+# ESR_Simulate, ESR_Measure
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -22,7 +22,7 @@ JobSimulate:
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./500404/SR500404_
+    SavePrefix : ./500205/SR500205_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -37,7 +37,7 @@ JobSimulate:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     ActionListLength : 5
-    FermionFieldCount : 8
+    FermionFieldCount : 4
     MeasureListLength : 1
     CacheStaple : 0
 
@@ -182,119 +182,20 @@ JobSimulate:
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        # This is (x+0.0375/x)^{-1/4}
+        MC : [0.9883908285644297, -0.006904795410014326, 0.011951446614057276]
 
         # MD is to calculate force
-        # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+        # This is (x+0.0375/x)^{1/2}
+        MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
 
-        # MC is to prepare
-        # 4a^2 delta M = 0.2-0.0016, this is (x+0.1584/x)^{-1/4}
-        MC : [0.9954200040793925, -0.0019049833369309411, -0.03345424156420637, 0.006091992871008849, 0.07739721196324048]
 
-        # MD is to calculate force
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{1/2}
-        MD : [1.0071372518721806, 0.022129001614057283, 0.05117638438512246, 0.0014901190061037451, 0.034011141895562175]
-
-    FermionField5:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.4
-        FieldId : 6
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/16}
-        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
-
-        # MD is to calculate force
-        # This is x^{-1/8}
-        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-    FermionField6:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.4
-        FieldId : 7
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/16}
-        MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
-
-        # MD is to calculate force
-        # This is x^{-1/8}
-        MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
-
-    FermionField7:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        #2am
-        Mass : 0.04
-        FieldId : 8
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{-1/8}
-        MC : [0.9975749767904519, -0.001279946133380046, -0.016327930979787183, 0.005025986150581595, 0.06799965318546186]
-
-        # MD is to calculate force
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{1/4}
-        MD : [1.0045988517803917, 0.0061103348859160135, 0.029574940264410127, 0.0026161121877055424, 0.045351177518635]
-
-    FermionField8:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        #2am
-        Mass : 0.04
-        FieldId : 9
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{-1/8}
-        MC : [0.9975749767904519, -0.001279946133380046, -0.016327930979787183, 0.005025986150581595, 0.06799965318546186]
-
-        # MD is to calculate force
-        # 4a^2 delta M = 0.16-0.0016, this is (x+0.1584/x)^{1/4}
-        MD : [1.0045988517803917, 0.0061103348859160135, 0.029574940264410127, 0.0026161121877055424, 0.045351177518635]
-        
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.0
+        Beta : 4.5
         Omega : 0.0
 
     Action2:
@@ -317,25 +218,6 @@ JobSimulate:
         ActionName : CActionFermionKS
         FieldId : 5
 
-    Action6:
-
-        ActionName : CActionFermionKS
-        FieldId : 6
-
-    Action7:
-
-        ActionName : CActionFermionKS
-        FieldId : 7
-
-    Action8:
-
-        ActionName : CActionFermionKS
-        FieldId : 8
-
-    Action9:
-
-        ActionName : CActionFermionKS
-        FieldId : 9
 
     Solver:
 
@@ -404,38 +286,201 @@ JobSimulate:
         Accuracy : 0.001
         AbsoluteAccuracy : 1
 
-    MSSolver5:
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+
+JobMeasure:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    GaugeBate : 4.84
+    OmegaRange : 0.14
+    StartOmega : 6
+    EndOmega : 20
+    StartN : 101
+    EndN : 500
+    ## EDJKS_Polyakov, EDJKS_Chiral
+    DistributionJob : EDJKS_Chiral
+    FermionMomentum : 0
+    StochasticFieldCount : 1
+    StochasticGaussian : 1
+    CheckGaugeFixing : 0
+    UseZ4 : 0
+    UseLogADefinition : 0
+    SubFolder : 1
+    SubFolderPrefix : F:\CppWorkingFolder\CudaLatticeGauge\Bin\Release\48416
+
+    SavePrefix : N48416_
+    CSVSavePrefix : F:\CppWorkingFolder\CudaLatticeGauge\Bin\Release\48416\N48416_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 3]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 2
+    MeasureListLength : 6
+    CacheStaple : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3D
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 15
+        EachSiteEta : 1
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/16}
+        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+
+        # MD is to calculate force
+        # This is x^{-1/8}
+        # TMD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3DR
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.05
+        FieldId : 3
+        PoolNumber : 15
+        EachSiteEta : 1
+        Period : [0, 0, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/16}
+        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+
+        # MD is to calculate force
+        # This is x^{-1/8}
+        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        CloverEnergy : 0
+        ShiftCoord : 0
+        Beta : 4.84
+        Omega : 0.0
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverForFieldId : 3
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 6
+        SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
         Accuracy : 0.001
         AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
 
-    MSSolver6:
+    MSSolver2:
 
         SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 7
+        SolverForFieldId : 3
         DiviationStep : 20
-        MaxStep : 500
-        Accuracy : 0.001
-        AbsoluteAccuracy : 1
-
-    MSSolver7:
-
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 8
-        DiviationStep : 50
-        MaxStep : 500
-        Accuracy : 0.001
-        AbsoluteAccuracy : 1
-
-    MSSolver8:
-
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 9
-        DiviationStep : 50
         MaxStep : 500
         Accuracy : 0.001
         AbsoluteAccuracy : 1
@@ -444,9 +489,37 @@ JobSimulate:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 1
-        ShowResult : 1
+        ShowResult : 0
+        MeasureDist : 1
 
+    Measure2:
 
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
 
+    Measure3:
 
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 3
+        MeasureDist : 1
+        ShowResult : 0
 
+    Measure4:
+
+        MeasureName : CMeasureConnectedSusceptibilityKS
+        FieldId : 2
+        ShowResult : 0
+
+    Measure5:
+
+        MeasureName : CMeasureConnectedSusceptibilityKS
+        FieldId : 3
+        ShowResult : 0
+
+    Measure6:
+
+        MeasureName : CMeasureAction
+        FieldId : 1
+        ShowResult : 0

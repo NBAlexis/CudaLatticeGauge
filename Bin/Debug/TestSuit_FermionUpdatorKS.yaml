@@ -1060,3 +1060,114 @@ TestFermionUpdatorKSNested11StageNf2p1MultiField:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+
+TestFermionUpdatorWithMesonCorrelatorStaggered:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 2
+    ExpectedRes1 : 9.957547
+    ExpectedRes2 : -24.212927
+    ExpectedRes3 : 9.957547
+    ExpectedRes4 : -24.212927
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        InnerLeapfrog : 1
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        NestedStep : 8
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0001
+        Restart : 15
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftFOM
+        SolverForFieldId : 2
+        ## cuda is even slower...
+        UseCudaForSmallMatrix : 0
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 30
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.01
+        Restart : 100
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+        ## MultiStep : 2
+
+    Measure1:
+
+        MeasureName : CMeasureMesonCorrelatorStaggered
+        ShowResult : 1
+        GaugeFixing : 1
+        FieldId : 2
+
+    Measure2:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        ShowResult : 1
+        FieldId : 2
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.1
+        MaxIterate : 180000
+        Accuracy : 0.0001
+        FFT : 0
+
+

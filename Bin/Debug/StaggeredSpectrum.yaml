@@ -239,10 +239,10 @@ JobMeasure:
     ShowParameterContent : 0
 
     StartN : 201
-    EndN : 550
-    # {ESSM_Polyakov, ESSM_Correlator}
-    MeasureType : ESSM_Correlator
-    SavePrefix : ./500205/GF500205_
+    EndN : 770
+    # {ESSM_Polyakov, ESSM_Correlator, ESSM_CorrelatorSimple}
+    MeasureType : ESSM_CorrelatorSimple
+    SavePrefix : ./500205/500205_
     CSVSavePrefix : ./500205/500205_
 
     Dim : 4
@@ -255,8 +255,9 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 5
     FermionFieldCount : 4
-    MeasureListLength : 2
+    MeasureListLength : 3
     CacheStaple : 0
+    DoSmearing : 1
 
     Updator:
 
@@ -383,13 +384,25 @@ JobMeasure:
     Solver:
 
         SolverForFieldId : 5
-        Restart : 400
-        Accuracy : 0.00000000001
-        SolverName : CSLASolverBiCGStab
-        ## Check Accuracy every DiviationStep steps
+
+        # SolverName : CSLASolverBiCGStab
+        Accuracy : 0.00000001
+
         DiviationStep : 50
-        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 20
+
+        # Staggered fermion not suppot GCRODR yet
+        # SolverName : CSLASolverGCRODR
+        # Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
         AbsoluteAccuracy : 1
 
     MSSolver:
@@ -472,6 +485,12 @@ JobMeasure:
         GaugeFixing : 0
         FieldId : 5
 
+    Measure3:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        ShowResult : 0
+        FieldId : 5
+
     GaugeSmearing:
 
         # SmearingName : CGaugeSmearingAPEProj
@@ -496,8 +515,8 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    IndexStart : 451
-    IndexEnd : 550
+    IndexStart : 651
+    IndexEnd : 770
 
     LoadPrefix : ./500205/500205_
     SavePrefix : ./500205/GF500205_

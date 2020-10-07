@@ -23,7 +23,7 @@ static __device__ __inline__ SBYTE _deviceStaggeredFermionSimplePhase(const SSma
         ret = 3 - ((sSite.x & 1) << 1)
                 - ((sSite.y & 1) << 1)
                 - ((sSite.z & 1) << 1);
-        printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
+        //printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
         break;
     case 2:
         ret = 3 - (((sSite.x + sSite.y) & 1) << 1)

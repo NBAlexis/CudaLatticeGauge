@@ -187,6 +187,127 @@ TestQuickAxpy:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+TestAngularMomentum:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomSeedType : ERST_Timestamp
+    RandomType : ER_Schrage
+    RandomSeed : 7654321
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 2
+    CacheStaple : 0
+    StochasticGaussian : 1
+    UseLogADefinition : 1
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        ## FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombCornell
+        Alpha : 0.08
+        MaxIterate : 3000
+        FFT : 1
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 1
+        ShowResult : 1
+
+    Measure2:
+
+        MeasureName : CMeasureAMomentumStochastic
+        FieldId : 2
+        MeasureDist : 1
+        MeasurePure : 1
+        Exponential : 1
+        Naive : 1
+        ShowResult : 1
+        FieldCount : 1
+
+TestALogDefinition:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 16]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    UseLogADefinition : 1
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
 
 TestGamm5Hermiticity:
    
@@ -324,18 +445,22 @@ TestAnitiHermiticity:
 
     FermionField1:
         
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3
+        # FieldName : CFieldFermionKSSU3R
+        # FFieldName : CFieldFermionKSSU3EM
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        # EachSiteEta : 1
+        EachSiteEta : 1
 
         # 2am
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+
+        Qa2Ez : 0.1
+        Qa2Bz : 0.1
 
         Period : [1, 1, 1, -1]
 
@@ -362,116 +487,41 @@ TestAnitiHermiticity:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-TestAngularMomentum:
 
-    Dim : 4
-    Dir : 4
-    LatticeLength : [6, 6, 4, 4]
-    LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    ThreadAutoDecompose : 1
-    RandomSeedType : ERST_Timestamp
-    RandomType : ER_Schrage
-    RandomSeed : 7654321
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 2
-    CacheStaple : 0
-    StochasticGaussian : 1
-    UseLogADefinition : 1
-
-    Gauge:
-    
-        ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-        Period : [0, 0, 1, 1]
-
-    GaugeBoundary:
-
-        FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-
-        ## FieldName : CFieldFermionWilsonSquareSU3DR
-        FieldName : CFieldFermionWilsonSquareSU3DR
-        FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
-        FieldId : 2
-        PoolNumber : 26
-        Period : [0, 0, 1, -1]
-        ## Default to use Naive discretization (which is faster)
-        Naive : 1
-        Exponential : 1
-
-    BoundaryFermionField1:
-
-        FieldName : CFieldBoundaryWilsonSquareSU3
-        FieldId : 2
-        
-    Action1:
+TestGaugeInvarience:
    
-        ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.0
-        Omega : 0.2
-
-    Action2:
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-
-    GaugeFixing:
-
-        Name : CGaugeFixingCoulombCornell
-        Alpha : 0.08
-        MaxIterate : 3000
-        FFT : 1
-
-    Solver:
-
-        SolverName : CSLASolverGCRODR
-        SolverForFieldId : 2
-        MDim : 25
-        KDim : 5
-        RecalculateR : 5
-        DeflateSpace : EEDT_SVD
-        Accuracy : 0.00001
-
-        Restart : 100
-        AbsoluteAccuracy : 1
-
-    Measure1:
-
-        MeasureName : CMeasureAMomentumJG
-        FieldId : 1
-        MeasureDist : 1
-        MeasureSpin : 1
-        MeasureApprox : 1
-        ShowResult : 1
-
-    Measure2:
-
-        MeasureName : CMeasureAMomentumStochastic
-        FieldId : 2
-        MeasureDist : 1
-        MeasurePure : 1
-        Exponential : 1
-        Naive : 1
-        ShowResult : 1
-        FieldCount : 1
-
-TestALogDefinition:
+    # When DOperator is implemented, use this to check sign problem
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 16]
+    LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    UseLogADefinition : 1
+    ExponentialPrecision : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    # When GAMM5Test = 0, test whether (gamma5.D) is hermitian matrix
+    # When GAMM5Test = 1, test whether implemented D^+ is really (D)^+
+    GAMM5Test : 1
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+        
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 40
 
     Gauge:
     
@@ -482,3 +532,70 @@ TestALogDefinition:
         FieldInitialType : EFIT_Random
 
         Period : [1, 1, 1, 1]
+        
+    GaugeBoundary:
+
+        ActionName : CActionGaugePlaquetteRotating
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 5.0
+        Omega : 0.1
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        # FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3EM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # EachSiteEta : 1
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Qa2Ez : 0.1
+        Qa2Bz : 0.1
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 3
+        Omega : 0.2
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    GaugeFixing:
+
+        Name : CGaugeFixingRandom
+
+    MSSolver:
+
+        SolverName : CMultiShiftFOM
+        SolverForFieldId : 2
+        ## cuda is even slower...
+        UseCudaForSmallMatrix : 0
+        ## Check Accuracy every DiviationStep steps
+        MaxDim : 30
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.0001
+        Restart : 100
+        ## 0 is recommanded
+        AbsoluteAccuracy : 1
+

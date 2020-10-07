@@ -891,3 +891,106 @@ TestRotationProjectivePlane:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+
+TestEMSimple:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.43
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 6
+        NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3EM
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Qa2Ez : 0.2
+        Qa2Bz : 0.2
+
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+        EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+
+    Action2:
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        # SolverName : CSLASolverGMRES
+        # SolverForFieldId : 2
+        # MaxDim : 20
+        # Accuracy : 0.0000001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 50
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+
