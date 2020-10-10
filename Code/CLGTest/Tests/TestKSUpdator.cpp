@@ -76,6 +76,7 @@ __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf
 __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField);
 __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField);
 __REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNested11StageNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSP4);
 
 
 

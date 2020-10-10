@@ -247,6 +247,9 @@ _kernelDFermionKS_PR_XYTau_Term(
         const deviceSU3Vector right = _deviceVXYT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
         .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
+
+        //eta124 of site is almost always -target, so use left or right is same
+        //The only exception is on the boundary
         INT eta124 = bPlusT ? (sSite4.y + sSite4.z): (site_target.y + site_target.z + 1);
         if (sTargetBigIndex.NeedToOpposite())
         {
@@ -412,6 +415,7 @@ _kernelDFermionKSForce_PR_XYTau_Term(
     const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten1)];
     const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten2)];
 
+    //Why use sn2? shouldn't it be sn1?
     const Real eta124 = _deviceEta124(__deviceSiteIndexToInt4(sn2.m_uiSiteIndex));
     //=================================
     // 2. Find V(n,n1), V(n,n2)

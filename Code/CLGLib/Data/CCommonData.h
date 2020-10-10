@@ -20,7 +20,9 @@
 #define _HC_Dim (appGetCudaHelper()->m_ConstIntegers[ECI_Dim])
 
 #define _DC_Dir (_constIntegers[ECI_Dir])
+#define _DC_Diri (static_cast<INT>(_constIntegers[ECI_Dir]))
 #define _HC_Dir (appGetCudaHelper()->m_ConstIntegers[ECI_Dir])
+#define _HC_Diri (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Dir]))
 
 #define _DC_Lx (_constIntegers[ECI_Lx])
 #define _HC_Lx (appGetCudaHelper()->m_ConstIntegers[ECI_Lx])

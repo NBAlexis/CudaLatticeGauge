@@ -622,6 +622,286 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData,
 
 #pragma endregion
 
+
+#pragma region Helper functions to implement higher orders
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKSForce_WithLink(
+    const deviceSU3* __restrict__ pGauge,
+    const BYTE* __restrict__ pEtaTable,
+    deviceSU3* pForce,
+    const deviceSU3Vector* const* __restrict__ pFermionPointers,
+    const Real* __restrict__ pNumerators,
+    UINT uiRational,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    Real fCoefficient,
+    BYTE byEtaIndex,
+    const INT* __restrict__ path,
+    BYTE pathLength)
+{
+    intokernalInt4;
+    INT pathLeft[CFieldFermionKSSU3::_kKSLinkLength];
+    INT pathRight[CFieldFermionKSSU3::_kKSLinkLength];
+    for (BYTE iSeperation = 0; iSeperation <= pathLength; ++iSeperation)
+    {
+        BYTE LLength = 0;
+        BYTE RLength = 0;
+
+        _deviceSeperate(path, iSeperation, pathLength, pathLeft, pathRight, LLength, RLength);
+
+        const UBOOL bHasLeft = (LLength > 0) && (pathLeft[0] > 0);
+        const UBOOL bHasRight = (RLength > 0) && (pathRight[0] > 0);
+
+        if (bHasLeft || bHasRight)
+        {
+            //=================================
+            // 1. Find n1, n2
+            const SSmallInt4 siten1 = _deviceSmallInt4OffsetC(sSite4, pathLeft, LLength);
+            const SSmallInt4 siten2 = _deviceSmallInt4OffsetC(sSite4, pathRight, RLength);
+            const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten1)];
+            const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten2)];
+            INT iEtaMu1 = (pEtaTable[sn1.m_uiSiteIndex] >> byEtaIndex);
+            if (sn1.NeedToOpposite())
+            {
+                iEtaMu1 = iEtaMu1 + 1;
+            }
+            if (sn2.NeedToOpposite())
+            {
+                iEtaMu1 = iEtaMu1 + 1;
+            }
+            //=================================
+            // 2. Find V(n,n1), V(n,n2)
+            const deviceSU3 vnn1 = _deviceLink(pGauge, sSite4, LLength, byGaugeFieldId, pathLeft);
+            const deviceSU3 vnn2 = _deviceLink(pGauge, sSite4, RLength, byGaugeFieldId, pathRight);
+
+            for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
+            {
+                const deviceSU3Vector* phi_i = pFermionPointers[rfieldId];
+                const deviceSU3Vector* phi_id = pFermionPointers[rfieldId + uiRational];
+
+                //=================================
+                // 3. Find phi_{1,2,3,4}(n1), phi_i(n2)
+                deviceSU3Vector phi1 = vnn1.MulVector(phi_id[sn1.m_uiSiteIndex]);
+                deviceSU3Vector phi2 = vnn2.MulVector(phi_i[sn2.m_uiSiteIndex]);
+                //deviceSU3Vector phi3 = vnn1.MulVector(phi_i[sn1.m_uiSiteIndex]);
+                //deviceSU3Vector phi4 = vnn2.MulVector(phi_id[sn2.m_uiSiteIndex]);
+
+                deviceSU3 res = deviceSU3::makeSU3ContractV(phi1, phi2);
+                //This Add is required by partial(D^+D)
+                phi1 = vnn2.MulVector(phi_id[sn2.m_uiSiteIndex]);
+                phi2 = vnn1.MulVector(phi_i[sn1.m_uiSiteIndex]);
+                res.Add(deviceSU3::makeSU3ContractV(phi1, phi2));
+                //res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
+                res.Ta();
+                res.MulReal(fCoefficient * pNumerators[rfieldId]);
+
+                if (bHasLeft)
+                {
+                    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLeft[0] - 1);
+                    if (iEtaMu1 & 1)
+                    {
+                        pForce[linkIndex].Sub(res);
+                    }
+                    else
+                    {
+                        pForce[linkIndex].Add(res);
+                    }
+                }
+
+                if (bHasRight)
+                {
+                    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRight[0] - 1);
+                    if (iEtaMu1 & 1)
+                    {
+                        pForce[linkIndex].Add(res);
+                    }
+                    else
+                    {
+                        pForce[linkIndex].Sub(res);
+                    }
+                }
+            }
+        }
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_OneLink(
+    const deviceSU3Vector* __restrict__ pDeviceData,
+    const deviceSU3* __restrict__ pGauge,
+    const BYTE* __restrict__ pEtaTable,
+    deviceSU3Vector* pResultData,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    Real fCoefficient,
+    const INT* __restrict__ path,
+    BYTE pathLength,
+    BYTE byEtaIdx,
+    UBOOL bDDagger,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+    INT pathBuffer[CFieldFermionKSSU3::_kKSLinkLength];
+    deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
+
+    SSmallInt4 siten = _deviceSmallInt4OffsetC(sSite4, path, pathLength);
+    const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten)];
+    deviceSU3 vn = _deviceLink(pGauge, sSite4, pathLength, byGaugeFieldId, path);
+    INT etamu = (pEtaTable[uiSiteIndex] >> byEtaIdx) & 1;
+    if (sn1.NeedToOpposite())
+    {
+        etamu = etamu + 1;
+    }
+    if (etamu & 1)
+    {
+        result.Sub(vn.MulVector(pDeviceData[sn1.m_uiSiteIndex]));
+    }
+    else
+    {
+        result.Add(vn.MulVector(pDeviceData[sn1.m_uiSiteIndex]));
+    }
+
+    _devicePathDagger(path, pathBuffer, pathLength);
+    siten = _deviceSmallInt4OffsetC(sSite4, pathBuffer, pathLength);
+    const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten)];
+    vn = _deviceLink(pGauge, sSite4, pathLength, byGaugeFieldId, pathBuffer);
+    etamu = (pEtaTable[sn2.m_uiSiteIndex] >> byEtaIdx) & 1;
+    if (sn2.NeedToOpposite())
+    {
+        etamu = etamu + 1;
+    }
+    if (etamu & 1)
+    {
+        result.Add(vn.MulVector(pDeviceData[sn2.m_uiSiteIndex]));
+    }
+    else
+    {
+        result.Sub(vn.MulVector(pDeviceData[sn2.m_uiSiteIndex]));
+    }
+
+    if (bDDagger)
+    {
+        fCoefficient = fCoefficient * F(-1.0);
+    }
+    result.MulReal(fCoefficient);
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        result.MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        result.MulComp(cCoeff);
+        break;
+    }
+
+    pResultData[uiSiteIndex].Add(result);
+}
+
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_OnlyMass(
+    const deviceSU3Vector* __restrict__ pDeviceData,
+    deviceSU3Vector* pResultData,
+    Real fam,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernal;
+    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
+    pResultData[uiSiteIndex].MulReal(fam);
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        pResultData[uiSiteIndex].MulReal(fCoeff);
+        break;
+    case EOCT_Complex:
+        pResultData[uiSiteIndex].MulComp(cCoeff);
+        break;
+    }
+}
+
+
+void CFieldFermionKSSU3::OnlyMass(deviceSU3Vector* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+{
+    preparethread;
+    _kernelDFermionKS_OnlyMass << <block, threads >> > (
+        m_pDeviceData,
+        pTarget,
+        fm,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff
+        );
+}
+
+void CFieldFermionKSSU3::OneLink(
+    const deviceSU3* pGuage, 
+    BYTE byGaugeFieldId, 
+    deviceSU3Vector* pTarget, 
+    Real fCoefficient, 
+    const INT* pDevicePath, 
+    BYTE pathLength,
+    BYTE byEtaIdx,
+    UBOOL bDagger,
+    EOperatorCoefficientType eOCT, 
+    Real fRealCoeff, 
+    const CLGComplex& cCmpCoeff)
+{
+    assert(pathLength <= _kKSLinkLength);
+    preparethread;
+    _kernelDFermionKS_OneLink << <block, threads >> > (
+        m_pDeviceData,
+        pGuage,
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pTarget,
+        m_byFieldId,
+        byGaugeFieldId,
+        fCoefficient,
+        pDevicePath,
+        pathLength,
+        byEtaIdx,
+        bDagger,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff
+        );
+}
+
+void CFieldFermionKSSU3::OneLinkForce(
+    const deviceSU3* pGuage, 
+    BYTE byGaugeFieldId, 
+    deviceSU3* pForce, 
+    Real fCoefficient,
+    const INT* pDevicePath, 
+    BYTE pathLength, 
+    BYTE byEtaIdx) const
+{
+    assert(pathLength <= _kKSLinkLength);
+    preparethread;
+    _kernelDFermionKSForce_WithLink << <block, threads >> > (
+        pGuage,
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pForce,
+        m_pRationalFieldPointers,
+        m_pMDNumerator,
+        m_rMD.m_uiDegree,
+        m_byFieldId,
+        byGaugeFieldId,
+        fCoefficient,
+        byEtaIdx,
+        pDevicePath,
+        pathLength
+        );
+}
+
+#pragma endregion
+
 CFieldFermionKSSU3::CFieldFermionKSSU3()
     : CFieldFermion()
     , m_bEachSiteEta(FALSE)
@@ -1273,6 +1553,8 @@ CCString CFieldFermionKSSU3::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     return sRet;
 }
+
+
 
 __END_NAMESPACE
 

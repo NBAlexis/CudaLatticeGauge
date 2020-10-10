@@ -434,6 +434,9 @@
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftNested.h">
       <Filter>SparseLinearAlgebra</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3P4.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -707,6 +710,9 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3EM.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3P4.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

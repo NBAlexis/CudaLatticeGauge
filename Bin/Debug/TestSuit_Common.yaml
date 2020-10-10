@@ -402,9 +402,9 @@ TestAnitiHermiticity:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -444,8 +444,9 @@ TestAnitiHermiticity:
         FieldName : CFieldBoundaryGaugeSU3
 
     FermionField1:
-        
-        FieldName : CFieldFermionKSSU3
+
+        FieldName : CFieldFermionKSSU3P4
+        # FieldName : CFieldFermionKSSU3
         # FieldName : CFieldFermionKSSU3R
         # FFieldName : CFieldFermionKSSU3EM
 

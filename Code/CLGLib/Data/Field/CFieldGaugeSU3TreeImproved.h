@@ -12,6 +12,10 @@
 // This is also used to define a 'fat' link
 // So the rectangle terms are not included
 //
+// Note2:
+// We use 1/12 x sum_{mu>nu}(6-Retr[rect1]-Retr[rect2]) = 1/12 x [36-sum_{mu>nu} (Retr[rect1]+Retr[rect2]) ]
+// In some litertures, it  is 1/6 x sum_{mu>nu}[ 3 - (Retr[rect1]+Retr[rect2])/2 ]
+//
 // REVISION:
 //  [10/03/2020 nbale]
 //=============================================================================

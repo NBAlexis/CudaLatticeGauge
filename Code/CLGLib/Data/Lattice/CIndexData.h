@@ -296,7 +296,7 @@ static __device__ __inline__ void _deviceSmallInt4Offset(
 }
 
 static __device__ __inline__ SSmallInt4 _deviceSmallInt4OffsetC(
-    const SSmallInt4& sStart, INT* path, BYTE byLength)
+    const SSmallInt4& sStart, const INT* __restrict__ path, BYTE byLength)
 {
     SSmallInt4 ret = sStart;
     for (BYTE i = 0; i < byLength; ++i)

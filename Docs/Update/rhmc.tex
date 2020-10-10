@@ -257,3 +257,11 @@ The multi-level nested integrator is useless compared with multi field optimizat
 
 \textbf{\textcolor[rgb]{0,0,1}{I don't know why but it is tested that Omelyan nested with leapfrog is the best choice, better than approximate force gradient.}}
 
+\subsubsection{\label{sec:TipToImplementHigherOrdersStaggeredFermion}Tip to implement higher orders staggered fermion}
+
+As required by anti-Hermiticity and gauge invarience, for higher orders, we always have
+\begin{equation}
+\begin{split}
+&\bar{\chi}(n_1)U(n_1,n_2)\chi (n_2) - \bar{\chi}(n_2)U^{\dagger}(n_1,n_2)\chi (n_1)\\
+\end{split}
+\end{equation}

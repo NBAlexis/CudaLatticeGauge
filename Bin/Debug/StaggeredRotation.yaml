@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure
-RotationJob : ESR_Simulate
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -325,7 +325,7 @@ JobMeasure:
 
     GaugeBate : 4.84
     OmegaRange : 0.14
-    StartOmega : 6
+    StartOmega : 19
     EndOmega : 20
     StartN : 101
     EndN : 500
