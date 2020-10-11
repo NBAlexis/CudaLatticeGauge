@@ -38,12 +38,21 @@ protected:
 public:
 
     UINT m_uiLt;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE m_f2OverVolumnSqrt;
+#else
     Real m_f2OverVolumnSqrt;
+#endif
     TArray<EGammaMatrix> m_lstGammas;
 
     //When a configuration is generated, result[nt] = (result[nt] * N + newresult[nt])/(N+1), N=N+1,
+#if !_CLG_DOUBLEFLOAT
+    TArray<TArray<DOUBLE>> m_lstResults;
+    TArray<TArray<DOUBLE>> m_lstResultsLastConf;
+#else
     TArray<TArray<Real>> m_lstResults;
     TArray<TArray<Real>> m_lstResultsLastConf;
+#endif
     UINT m_uiResoultCount;
     //This is a complex field at each site
     CLGComplex * m_pDeviceCorrelator;

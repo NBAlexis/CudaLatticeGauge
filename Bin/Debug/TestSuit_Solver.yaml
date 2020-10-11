@@ -596,11 +596,11 @@ TestMSSolverBiCGStab:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 2
-        DiviationStep : 10
+        DiviationStep : 1
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
-        MaxStep : 50
+        MaxStep : 100
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
 
 
@@ -787,11 +787,11 @@ TestMSKSSolverBiCGStab:
 
         SolverName : CMultiShiftBiCGStab
         SolverForFieldId : 2
-        DiviationStep : 50
+        DiviationStep : 10
         ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
         MaxStep : 50
         ## Can NOT be too small, otherwise, will never reached..
-        Accuracy : 0.00000001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
 

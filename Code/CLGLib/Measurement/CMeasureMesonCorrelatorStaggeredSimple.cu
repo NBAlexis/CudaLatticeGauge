@@ -107,7 +107,11 @@ void CMeasureMesonCorrelatorStaggeredSimple::Initial(CMeasurementManager* pOwner
     m_bShowResult = iValue != 0;
 
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(Real) * _HC_Volume * _kMesonCorrelatorTypeSimple));
+#if !_CLG_DOUBLEFLOAT
+    m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * _kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
+#else
     m_pResPropogators = (Real*)malloc(sizeof(Real) * _kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
+#endif
 }
 
 void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
@@ -132,8 +136,13 @@ void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(const CFiel
         {
             _kernelPickEveryTimeSliceSimple << <block1, thread1 >> > (
                 m_pDevicePropogators, byT, byType, _D_RealThreadBuffer);
+#if !_CLG_DOUBLEFLOAT
+            const DOUBLE sum = appGetCudaHelper()->ReduceReal(
+                _D_RealThreadBuffer, _HC_Volume_xyz);
+#else
             const Real sum = appGetCudaHelper()->ReduceReal(
                 _D_RealThreadBuffer, _HC_Volume_xyz);
+#endif
 
             m_pResPropogators[byType * (_HC_Lt - 1) + byT - 1] = sum;
         }
@@ -145,17 +154,29 @@ void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(const CFiel
     {
         appGeneral(_T("==================== correlators ===============\n"));
     }
+#if !_CLG_DOUBLEFLOAT
+    TArray<TArray<DOUBLE>> thisConf;
+#else
     TArray<TArray<Real>> thisConf;
+#endif
     for (INT i = 0; i < _kMesonCorrelatorTypeSimple; ++i)
     {
         if (m_bShowResult)
         {
             appGeneral(_T("Type%d:"), i);
         }
+#if !_CLG_DOUBLEFLOAT
+        TArray<DOUBLE> thisType;
+#else
         TArray<Real> thisType;
+#endif
         for (INT j = 0; j < _HC_Lti - 1; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            const DOUBLE res = m_pResPropogators[i * (_HC_Lt - 1) + j];
+#else
             const Real res = m_pResPropogators[i * (_HC_Lt - 1) + j];
+#endif
             if (m_bShowResult)
             {
                 appGeneral(_T("%2.12f, "), res);
@@ -187,7 +208,11 @@ void CMeasureMesonCorrelatorStaggeredSimple::Report()
     for (INT ty = 0; ty < _kMesonCorrelatorTypeSimple; ++ty)
     {
         appGeneral(_T("(* ======================= Type:%d=================*)\ntabres%d={\n"), ty, ty);
+#if !_CLG_DOUBLEFLOAT
+        TArray<DOUBLE> thisType;
+#else
         TArray<Real> thisType;
+#endif
         for (INT conf = 0; conf < m_lstResults.Num(); ++conf)
         {
             appGeneral(_T("{"));

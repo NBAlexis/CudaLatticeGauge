@@ -45,7 +45,7 @@ UINT TestUpdator(CParameters& sParam)
     }
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
     appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 45)

@@ -24,7 +24,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAngularMomentumJG(
     const deviceSU3* __restrict__ pDeviceData,
     Real* pBuffer, 
-    SSmallInt4 sCenter, 
+    SSmallInt4 sCenter,
     Real betaOverN,
     BYTE byFieldId)
 {
@@ -469,7 +469,11 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
+#if !_CLG_DOUBLEFLOAT
+    const Real fBetaOverN = static_cast<Real>(CCommonData::m_fBeta / static_cast<DOUBLE>(_HC_SUN));
+#else
     const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
+#endif
 
     _ZeroXYPlane(m_pDeviceDataBuffer);
 

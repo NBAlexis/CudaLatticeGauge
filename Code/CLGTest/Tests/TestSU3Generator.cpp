@@ -37,7 +37,7 @@ UINT TestSU3Generator(CParameters& sParam)
         pGauge->InitialField(EFIT_RandomGenerator);
         pGauge2->InitialField(EFIT_SumGenerator);
         average = _cuCaddf(average, pGauge2->DotReal(pGauge));
-        sigma += pGauge->CalculateKinematicEnergy();
+        sigma += static_cast<Real>(pGauge->CalculateKinematicEnergy());
 
         if (0 == (i % 50))
         {

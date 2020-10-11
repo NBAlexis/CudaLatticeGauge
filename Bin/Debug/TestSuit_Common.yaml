@@ -52,6 +52,10 @@ TestOperators:
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
         
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
@@ -292,7 +296,7 @@ TestALogDefinition:
     Dir : 4
     LatticeLength : [16, 16, 16, 16]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -497,9 +501,9 @@ TestGaugeInvarience:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -536,17 +540,13 @@ TestGaugeInvarience:
         
     GaugeBoundary:
 
-        ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 1
-        ShiftCoord : 1
-        Beta : 5.0
-        Omega : 0.1
+        FieldName : CFieldBoundaryGaugeSU3
 
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3EM
+        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3EM
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -574,8 +574,10 @@ TestGaugeInvarience:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 3
-        Omega : 0.2
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 5.0
+        Omega : 0.1
 
     Action2:
 

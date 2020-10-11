@@ -123,7 +123,11 @@ UBOOL CMultiShiftGMRES::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>
     CField* pR = m_lstVectors[0];
 
     //use it to estimate relative error
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fBLength = 1.0;
+#else
     Real fBLength = F(1.0);
+#endif
     if (!m_bAbsoluteAccuracy)
     {
         fBLength = pFieldB->GetLength();//pFieldB->Dot(pFieldB).x;
@@ -160,8 +164,11 @@ UBOOL CMultiShiftGMRES::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>
             pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
             pR->AxpyPlus(pFieldB); //x0 = b-Ax0
         }
-
+#if !_CLG_DOUBLEFLOAT
+        m_fBeta = static_cast<Real>(_sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x));
+#else
         m_fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+#endif
         m_lstVectors[0]->ScalarMultply(F(1.0) / m_fBeta);
         
         for (UINT j = 0; j < m_uiMaxDim; ++j)
@@ -182,7 +189,11 @@ UBOOL CMultiShiftGMRES::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>
             }
 
             //h[j + 1, j] = ||w||
+#if !_CLG_DOUBLEFLOAT
+            const Real fWNorm = static_cast<Real>(_sqrtd(pW->Dot(pW).x));
+#else
             const Real fWNorm = _sqrt(pW->Dot(pW).x);
+#endif
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
             if (j < m_uiMaxDim - 1)

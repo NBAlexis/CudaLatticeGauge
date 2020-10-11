@@ -27,7 +27,7 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow")
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
-add_definitions(-D_CLG_DOUBLEFLOAT=1)
+add_definitions(-D_CLG_DOUBLEFLOAT=0)
 MESSAGE("Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.")
 MESSAGE("CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}")
 MESSAGE("CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}")
@@ -45,7 +45,6 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelperFunctions.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionWilsonNf2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h

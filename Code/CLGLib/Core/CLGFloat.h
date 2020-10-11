@@ -60,6 +60,7 @@
 #else
 //the __function is Intrinsic Functions which can be only used in device
 #define _sqrt sqrtf
+#define _sqrtd sqrt
 #define _log logf
 #define _exp expf
 #define _pow powf
@@ -71,8 +72,12 @@
 
 #define _hostlog logf
 #define _hostlog10 log10f
+#define _hostlogd log
+#define _hostlog10d log10
 #define _hostexp expf
 #define _hostsqrt sqrtf
+#define _hostsqrtd sqrt
+#define _hostexpd exp
 
 #define _atan2 atan2f
 #define _make_cuComplex make_cuComplex

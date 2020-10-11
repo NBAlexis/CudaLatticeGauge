@@ -113,7 +113,11 @@ void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGaug
 
     checkCudaErrors(cudaMemcpy(m_pXYHostDensity, m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
 
+#if !_CLG_DOUBLEFLOAT
+    const Real fCharge = static_cast<Real>(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
+#else
     const Real fCharge = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+#endif
 
     ++m_uiConfigurationCount;
     if (m_bShowResult)

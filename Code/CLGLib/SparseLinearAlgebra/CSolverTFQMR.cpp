@@ -121,7 +121,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
         pV->CopyTo(pAU);
 
         Real thetaSq = F(0.0);
+#if !_CLG_DOUBLEFLOAT
+        Real tau = static_cast<Real>(_sqrtd(pU->Dot(pU).x));
+#else
         Real tau = _sqrt(pU->Dot(pU).x);
+#endif
 
 #if !_CLG_DOUBLEFLOAT
         CLGComplex rho = _cToFloat(pRh->Dot(pU));
@@ -165,8 +169,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
                 pD->ScalarMultply(_cuCmulf(_cuCdivf(_make_cuComplex(thetaSq, F(0.0)), alpha), eta));
                 pD->AxpyPlus(pU);
             }
-
+#if !_CLG_DOUBLEFLOAT
+            thetaSq = static_cast<Real>(pW->Dot(pW).x / (tau * tau));
+#else
             thetaSq = pW->Dot(pW).x / (tau * tau);
+#endif
             const Real cSq = F(1.0) / (1 + thetaSq);
             tau = tau * _sqrt(thetaSq * cSq);
             eta = cuCmulf_cr(alpha, cSq);

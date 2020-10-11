@@ -48,7 +48,11 @@ public:
     void Prepare(UBOOL bLastAccepted, UINT uiStep);
     void UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase);
     void UpdateU(Real fStep) const;
+#if !_CLG_DOUBLEFLOAT
+    virtual DOUBLE GetEnergy(UBOOL bBeforeEvolution) const;
+#else
     virtual Real GetEnergy(UBOOL bBeforeEvolution) const;
+#endif
     virtual CCString GetInfos(const CCString& sTab) const = 0;
     void FinishEvaluate() const;
     virtual void ChangeStepCount(UBOOL bGrow) 

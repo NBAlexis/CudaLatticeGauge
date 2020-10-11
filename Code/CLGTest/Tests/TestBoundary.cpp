@@ -45,7 +45,7 @@ UINT TestBoundary(CParameters& sParam)
     }
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
     appGeneral(_T("accept (%d/25) : expected >= 23. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 
     if (uiAccept < 23)
@@ -77,17 +77,17 @@ UINT TestBoundaryMapping(CParameters& sParam)
     const Real fExpE3 = F(1167.37873127234047387901);
     const Real fExpE4 = F(14498.55613259701931383461);
 
-    const Real fEnergy1 = appGetLattice()->m_pActionList[0]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL);
-    const Real fEnergy2 = appGetLattice()->m_pActionList[1]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL);
-    const Real fEnergy3 = appGetLattice()->m_pActionList[2]->Energy(
-        FALSE, appGetLattice()->m_pGaugeField, NULL);
+    const Real fEnergy1 = static_cast<Real>(appGetLattice()->m_pActionList[0]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    const Real fEnergy2 = static_cast<Real>(appGetLattice()->m_pActionList[1]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    const Real fEnergy3 = static_cast<Real>(appGetLattice()->m_pActionList[2]->Energy(
+        FALSE, appGetLattice()->m_pGaugeField, NULL));
 
     CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
     appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStape);
-    const Real fEnergy4 = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(
-        CCommonData::m_fBeta / F(3.0), pStape);
+    const Real fEnergy4 = static_cast<Real>(appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(
+        CCommonData::m_fBeta / F(3.0), pStape));
 
     if (appAbs(fEnergy1 - fExpE1) < F(0.000000001))
     {

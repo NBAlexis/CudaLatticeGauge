@@ -684,6 +684,13 @@ inline CCString appFloatToString(Real inFloata)
     return CCString(std::to_string(inFloata).c_str());
 }
 
+#if !_CLG_DOUBLEFLOAT
+inline CCString appFloatToString(DOUBLE inFloata)
+{
+    return CCString(std::to_string(inFloata).c_str());
+}
+#endif
+
 /**
 * The thing is, since we don't have custum types (like vector, rotation or so) to sprint
 * Just use the standard one

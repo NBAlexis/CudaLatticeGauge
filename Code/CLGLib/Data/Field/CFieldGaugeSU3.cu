@@ -912,13 +912,50 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
     }
     break;
     case EFFT_CLGBin:
+#if _CLG_DOUBLEFLOAT
+    case EFFT_CLGBinDouble:
+#else
+    case EFFT_CLGBinFloat:
+#endif
     {
         UINT uiSize = static_cast<UINT>(sizeof(Real) * 18 * m_uiLinkeCount);
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         InitialWithByte(data);
         free(data);
     }
+#if _CLG_DOUBLEFLOAT
+    case EFFT_CLGBinFloat:
+    {
+        UINT uiSize = static_cast<UINT>(sizeof(Real) * 18 * m_uiLinkeCount);
+        BYTE* data = (BYTE*)malloc(uiSize);
+        Real* rdata = (Real*)data;
+        FLOAT* fdata = (FLOAT*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
+        {
+            rdata[i] = static_cast<Real>(fdata[i]);
+        }
+        InitialWithByte(data);
+        free(fdata);
+        free(data);
+    }
     break;
+#else
+    case EFFT_CLGBinDouble:
+    {
+        UINT uiSize = static_cast<UINT>(sizeof(Real) * 18 * m_uiLinkeCount);
+        BYTE* data = (BYTE*)malloc(uiSize);
+        Real* rdata = (Real*)data;
+        DOUBLE* ddata = (DOUBLE*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
+        {
+            rdata[i] = static_cast<Real>(ddata[i]);
+        }
+        InitialWithByte(data);
+        free(ddata);
+        free(data);
+    }
+    break;
+#endif
     case EFFT_CLGBinCompressed:
     {
         UINT uiSize = static_cast<UINT>(sizeof(Real) * 9 * m_uiLinkeCount);

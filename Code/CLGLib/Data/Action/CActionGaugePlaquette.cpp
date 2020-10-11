@@ -51,12 +51,21 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
 {
     m_pOwner = pOwner;
     m_byActionId = byId;
-    Real fBeta = 0.1f;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fBeta = 0.1;
+    param.FetchValueDOUBLE(_T("Beta"), fBeta);
+#else
+    Real fBeta = F(0.1);
     param.FetchValueReal(_T("Beta"), fBeta);
+#endif
     CCommonData::m_fBeta = fBeta;
     if (NULL != pOwner->m_pGaugeField && EFT_GaugeSU3 == pOwner->m_pGaugeField->GetFieldType())
     {
+#if !_CLG_DOUBLEFLOAT
+        fBeta = fBeta / 3.0;
+#else
         fBeta = fBeta / F(3.0);
+#endif
     }
     m_fBetaOverN = fBeta;
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
@@ -70,20 +79,31 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
         }
     }
 }
-
+#if !_CLG_DOUBLEFLOAT
+void CActionGaugePlaquette::SetBeta(DOUBLE fBeta)
+#else
 void CActionGaugePlaquette::SetBeta(Real fBeta)
+#endif
 {
     CCommonData::m_fBeta = fBeta;
     if (NULL != m_pOwner->m_pGaugeField && EFT_GaugeSU3 == m_pOwner->m_pGaugeField->GetFieldType())
     {
+#if !_CLG_DOUBLEFLOAT
+        fBeta = fBeta / 3.0;
+#else
         fBeta = fBeta / F(3.0);
+#endif
     }
     m_fBetaOverN = fBeta;
 }
 
 UBOOL CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
+#if !_CLG_DOUBLEFLOAT
+    pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(m_fBetaOverN));
+#else
     pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
+#endif
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
 }

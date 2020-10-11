@@ -123,7 +123,11 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 
             if (!m_bTestHDiff)
             {
+#if !_CLG_DOUBLEFLOAT
+                diff_H = _hostexpd(fDiff);  // Delta H (SA)
+#else
                 diff_H = _hostexp(fDiff);  // Delta H (SA)
+#endif
                 rand = GetRandomReal();
             }
 

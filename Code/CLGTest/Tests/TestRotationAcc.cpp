@@ -68,7 +68,7 @@ UINT TestRotation(CParameters& sParam)
     }
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
+    const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
 #if _CLG_DEBUG
     appGeneral(_T("accept (%d/5) : expected >= 4. HDiff = %f : expected < 1\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 #else

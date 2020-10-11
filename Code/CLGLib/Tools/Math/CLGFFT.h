@@ -51,6 +51,11 @@ public:
     static UBOOL FFT4DWithXYZW(CLGComplex* copied, TArray<INT> dims, UBOOL bForward);
     static UBOOL FFT3D(CLGComplex* res, UBOOL bForward, EFFT_Scale eScale = ES_None);
     static UBOOL FFT4D(CLGComplex* res, UBOOL bForward, EFFT_Scale eScale = ES_None);
+#if !_CLG_DOUBLEFLOAT
+    static UBOOL FFT3DWithXYZDouble(cuDoubleComplex* copied, TArray<INT> dims, UBOOL bForward);
+    static UBOOL FFT4DWithXYZWDouble(cuDoubleComplex* copied, TArray<INT> dims, UBOOL bForward);
+    static UBOOL FFT4DDouble(cuDoubleComplex* res, UBOOL bForward, EFFT_Scale eScale = ES_None);
+#endif
 
     UBOOL FFT3DSU3(deviceSU3* res, UBOOL bForward, EFFT_Scale eScale = ES_None);
     UBOOL FFT4DSU3(deviceSU3* res, UBOOL bForward, EFFT_Scale eScale = ES_None);

@@ -451,6 +451,11 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
     if (!params.FetchValueReal(_T("Accuracy"), m_fAccuracy))
     {
         appGeneral(_T("CGaugeFixingCoulombLosAlamos: Accuracy not set, set to 0.00000000001 by defualt."));
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small, set to be %2.18f\n"), m_fAccuracy);
+        }
     }
 
     INT iValue = static_cast<INT>(m_iMaxIterate);
@@ -476,21 +481,37 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
     checkCudaErrors(cudaMalloc((void**)& m_pA23, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
+#else
 Real CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
+#endif
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CGaugeFixingLandauCornell only implemented with gauge SU3!\n"));
+#if !_CLG_DOUBLEFLOAT
+        return 0.0;
+#else
         return F(0.0);
+#endif
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData, pGauge->m_byFieldId);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
+#else
 Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
+#endif
 {
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fRes = 0.0;
+#else
     Real fRes = F(0.0);
+#endif
     preparethread_S;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
     {
@@ -517,7 +538,11 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
     return fRes / _HC_Lt;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
+#else
 Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
+#endif
 {
     preparethread_S;
 
@@ -570,7 +595,11 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
         //check res
         if (0 == m_iIterate % m_iCheckErrorStep)
         {
+#if !_CLG_DOUBLEFLOAT
+            const DOUBLE fTheta = CheckResDeviceBufferOnlyT(pDeviceBufferPointer, uiT, byFieldId);
+#else
             const Real fTheta = CheckResDeviceBufferOnlyT(pDeviceBufferPointer, uiT, byFieldId);
+#endif
             appDetailed(_T("Iterate : %d, error = %2.12f\n"), m_iIterate, fTheta);
             if (fTheta < m_fAccuracy)
             {

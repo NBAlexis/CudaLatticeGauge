@@ -107,7 +107,11 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
     CField* pR = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
 
     //use it to estimate relative error
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fBLength = 1.0;
+#else
     Real fBLength = F(1.0);
+#endif
     if (!m_bAbsoluteAccuracy)
     {
         fBLength = pFieldB->GetLength();//pFieldB->Dot(pFieldB).x;
@@ -141,7 +145,11 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         pR->CopyTo(m_lstVectors[0]);
         if (0 == i)
         {
+#if !_CLG_DOUBLEFLOAT
+            const Real fBeta = static_cast<Real>(_sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x));
+#else
             const Real fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+#endif
             for (INT n = 0; n < cn.Num(); ++n)
             {
                 beta0[n] = _make_cuComplex(fBeta, F(0.0));
@@ -168,7 +176,11 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
             }
 
             //h[j + 1, j] = ||w||
+#if !_CLG_DOUBLEFLOAT
+            const Real fWNorm = static_cast<Real>(_sqrtd(pW->Dot(pW).x));
+#else
             const Real fWNorm = _sqrt(pW->Dot(pW).x);
+#endif
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
             //v[j + 1] = w / ||w||
             if (j < m_uiMaxDim - 1)

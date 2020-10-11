@@ -40,6 +40,16 @@ _kernelCopyElementCToSU3(deviceSU3* su3, CLGComplex* res, BYTE idx)
     su3[uiSiteIndex].m_me[idx] = res[uiSiteIndex];
 }
 
+#if !_CLG_DOUBLEFLOAT
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScaleDouble(cuDoubleComplex* res, DOUBLE fScale)
+{
+    intokernal;
+    res[uiSiteIndex] = cuCmulf_cd(res[uiSiteIndex], fScale);
+}
+
+#endif
+
 #pragma endregion
 
 UBOOL CCLGFFTHelper::FFT3DWithXYZ(CLGComplex* copied, TArray<INT> dims, UBOOL bForward)
@@ -332,6 +342,129 @@ UBOOL CCLGFFTHelper::FFT4D(CLGComplex* copied, UBOOL bForward, EFFT_Scale eScale
 
     return TRUE;
 }
+
+#if !_CLG_DOUBLEFLOAT
+
+UBOOL CCLGFFTHelper::FFT3DWithXYZDouble(cuDoubleComplex* copied, TArray<INT> dims, UBOOL bForward)
+{
+    cufftHandle plan3d;
+    INT n[3] = { dims[0], dims[1], dims[2] };
+
+    const cufftResult planRes = cufftPlanMany(&plan3d, 3, n,
+        n, 1, 1,
+        n, 1, 1,
+        CUFFT_Z2Z, 1);
+
+    if (CUFFT_SUCCESS != planRes)
+    {
+        appCrucial(_T("cufftPlanMany failed! %d\n"), planRes);
+        return FALSE;
+    }
+
+    const cufftResult res3D = cufftExecZ2Z(plan3d, copied, copied, bForward ? CUFFT_FORWARD : CUFFT_INVERSE);
+    if (CUFFT_SUCCESS != res3D)
+    {
+        appCrucial(_T("cufftResult failed! %d\n"), res3D);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+UBOOL CCLGFFTHelper::FFT4DWithXYZWDouble(cuDoubleComplex* copied, TArray<INT> dims, UBOOL bForward)
+{
+    cufftHandle plan4d1;
+    INT n[3] = { dims[1], dims[2], dims[3] };
+    INT inembed[3] = { dims[1], dims[2], dims[3] };
+    const INT dist = dims[1] * dims[2] * dims[3];
+    cufftHandle plan4d2;
+    INT n2[1] = { dims[0] };
+
+    const cufftResult planRes = cufftPlanMany(&plan4d1, 3, n,
+        inembed, 1, dist,
+        inembed, 1, dist,
+        CUFFT_Z2Z, dims[0]);
+
+    if (CUFFT_SUCCESS != planRes)
+    {
+        appCrucial(_T("cufftPlanMany failed! %d\n"), planRes);
+        return FALSE;
+    }
+
+
+    const cufftResult res4D1 = cufftExecZ2Z(plan4d1, copied, copied, bForward ? CUFFT_FORWARD : CUFFT_INVERSE);
+    if (CUFFT_SUCCESS != res4D1)
+    {
+        appCrucial(_T("cufftResult failed! %d\n"), res4D1);
+        return FALSE;
+    }
+
+    //note that if it was null, it will ignore the stride
+    const cufftResult planRes1 = cufftPlanMany(&plan4d2, 1, n2,
+        n2, dist, 1,
+        n2, dist, 1,
+        CUFFT_Z2Z, dist);
+
+    if (CUFFT_SUCCESS != planRes1)
+    {
+        appCrucial(_T("cufftPlanMany failed! %d\n"), planRes);
+        return FALSE;
+    }
+
+    //in out can be the same
+    const cufftResult res4D2 = cufftExecZ2Z(plan4d2, copied, copied, bForward ? CUFFT_FORWARD : CUFFT_INVERSE);
+    if (CUFFT_SUCCESS != res4D2)
+    {
+        appCrucial(_T("cufftResult failed! %d\n"), res4D2);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+
+UBOOL CCLGFFTHelper::FFT4DDouble(cuDoubleComplex* copied, UBOOL bForward, EFFT_Scale eScale)
+{
+    TArray<INT> dims;
+    dims.AddItem(static_cast<INT>(_HC_Lx));
+    dims.AddItem(static_cast<INT>(_HC_Ly));
+    dims.AddItem(static_cast<INT>(_HC_Lz));
+    dims.AddItem(static_cast<INT>(_HC_Lt));
+    if (!FFT4DWithXYZWDouble(copied, dims, bForward))
+    {
+        return FALSE;
+    }
+
+    if (bForward)
+    {
+        if (ES_1OverNForward == eScale)
+        {
+            preparethread;
+            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _HC_Volume);
+        }
+        else if (ES_1OverSqrtNBoth == eScale)
+        {
+            preparethread;
+            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
+        }
+    }
+    else
+    {
+        if (ES_1OverNInverse == eScale)
+        {
+            preparethread;
+            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _HC_Volume);
+        }
+        else if (ES_1OverSqrtNBoth == eScale)
+        {
+            preparethread;
+            _kernelScaleDouble << <block, threads >> > (copied, 1.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume)));
+        }
+    }
+
+    return TRUE;
+}
+#endif
 
 void CCLGFFTHelper::CheckBuffer()
 {

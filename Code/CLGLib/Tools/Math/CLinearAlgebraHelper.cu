@@ -63,7 +63,7 @@ CLinearAlgebraHelper::~CLinearAlgebraHelper()
     {
         checkCudaErrors(cudaFree(m_pOneDeviceC));
     }
-    for (int i = 0; i < m_lstTmpMatrix.Num(); ++i)
+    for (INT i = 0; i < m_lstTmpMatrix.Num(); ++i)
     {
         checkCudaErrors(cudaFree(m_lstTmpMatrix[i].m_pMatrix));
     }
@@ -73,7 +73,11 @@ void CLinearAlgebraHelper::TestSmallMatrix()
 {
     appSetLogDate(FALSE);
 
+#if _CLG_DEBUG
+    const INT testDim1 = 20;
+#else
     const INT testDim1 = 30;
+#endif
     const INT testDim2 = 15;
     CLinearAlgebraHelper* pHelper = new CLinearAlgebraHelper(testDim1);
     

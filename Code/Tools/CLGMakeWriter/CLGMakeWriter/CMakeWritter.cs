@@ -16,7 +16,7 @@ namespace CLGMakeWriter
 
     class CMakeWritter
     {
-        public bool m_bDouble = true;
+        public bool m_bDouble = false;
         public EArch m_eArch = EArch.EArcSM61;
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;

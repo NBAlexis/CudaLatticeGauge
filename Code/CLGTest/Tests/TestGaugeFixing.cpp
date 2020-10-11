@@ -26,19 +26,19 @@ UINT TestGaugeFixingLandau(CParameters&)
 {
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
     CActionGaugePlaquette* pAction1 = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
-    const Real fBeforeEnergy1 = pAction1->Energy(FALSE, pGauge, NULL);
+    const Real fBeforeEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
 
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
-    const Real fDivation = appGetLattice()->m_pGaugeFixing->CheckRes(pGauge);
-    const Real fAfterEnergy1 = pAction1->Energy(FALSE, pGauge, NULL);
+    const Real fDivation = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
+    const Real fAfterEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
 
     UINT uiError = 0;
-    if (fDivation > F(0.000001))
+    if (fDivation > F(0.00005))
     {
         ++uiError;
     }
 
-    if (abs(fBeforeEnergy1 - fAfterEnergy1) > 0.000001)
+    if (appAbs(fBeforeEnergy1 - fAfterEnergy1) > F(0.005))
     {
         ++uiError;
     }
@@ -61,27 +61,27 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
     pFermion->PrepareForHMCNotRandomize(pGauge);
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
     CActionFermionWilsonNf2* pAction2 = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->GetActionById(2));
-    const Real fEnergy1 = pAction1->Energy(FALSE, pGauge, NULL);
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion;
-    const Real fEnergy2 = pAction2->Energy(FALSE, pGauge, NULL);
+    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
     
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
-    const Real fError = appGetLattice()->m_pGaugeFixing->CheckRes(pGauge);
+    const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
-    const Real fEnergy3 = pAction1->Energy(FALSE, pGauge, NULL);
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion2;
-    const Real fEnergy4 = pAction2->Energy(FALSE, pGauge, NULL);
+    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
 
-    if (fError > F(0.000001))
+    if (fError > F(0.0001))
     {
         ++uiError;
     }
-    if (abs(fEnergy1 - fEnergy3) > 0.000001)
+    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
     {
         ++uiError;
     }
-    if (abs(fEnergy2 - fEnergy4) > 0.000001)
+    if (appAbs(fEnergy2 - fEnergy4) > F(0.001))
     {
         ++uiError;
     }
@@ -178,7 +178,9 @@ __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauLosAlamos);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombLosAlamos);
 
+#if _CLG_DOUBLEFLOAT
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
+#endif
 
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR);
 

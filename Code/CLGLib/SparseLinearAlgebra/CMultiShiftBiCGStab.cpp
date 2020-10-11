@@ -30,7 +30,7 @@ CMultiShiftBiCGStab::~CMultiShiftBiCGStab()
 void CMultiShiftBiCGStab::Configurate(const CParameters& param)
 {
     INT iValue;
-    Real fValue;
+    
     if (param.FetchValueINT(_T("DiviationStep"), iValue))
     {
         m_uiDevationCheck = static_cast<UINT>(iValue);
@@ -50,6 +50,7 @@ void CMultiShiftBiCGStab::Configurate(const CParameters& param)
         m_fAccuracy = dValue;
     }
 #else
+    Real fValue;
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
@@ -162,7 +163,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pW->Axpy(_cToFloat(beta), pSA);
         pW->CopyTo(pWA);
         pWA->ApplyOperator(uiM, pGaugeFeild);
-        const cuDoubleComplex chi = cuCdivf_cd(pWA->Dot(pW), pWA->Dot(pWA).x);
+        const cuDoubleComplex chi = cuCdivf_cd_host(pWA->Dot(pW), pWA->Dot(pWA).x);
         for (INT n = 0; n < cn.Num(); ++n)
         {
             if (sl[n] < m_fAccuracy * fBLength)
@@ -214,7 +215,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
 
         if (0 == (i + 1) % m_uiDevationCheck)
         {
-            Real fMaxErro = _sqrt(pS->Dot(pS).x);
+            DOUBLE fMaxErro = _sqrtd(pS->Dot(pS).x);
             for (INT n = 0; n < cn.Num(); ++n)
             {
                 if (sl[n] < m_fAccuracy * fBLength)
@@ -341,7 +342,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
         pW->Axpy(beta, pSA);
         pW->CopyTo(pWA);
         pWA->ApplyOperator(uiM, pGaugeFeild);
-        const CLGComplex chi = cuCdivf_cr(pWA->Dot(pW), pWA->Dot(pWA).x);
+        const CLGComplex chi = cuCdivf_cr_host(pWA->Dot(pW), pWA->Dot(pWA).x);
         for (INT n = 0; n < cn.Num(); ++n)
         {
             if (sl[n] < m_fAccuracy * fBLength)

@@ -24,14 +24,22 @@ void CMeasureAction::Initial(class CMeasurementManager* pOwner, class CLatticeDa
 
 void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* )
 {
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE plaqutteEneregy = 0.0;
+#else
     Real plaqutteEneregy = F(0.0);
+#endif
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
         if (appGetLattice()->m_pActionList[i]->IsFermion())
         {
             //appGeneral(_T("field count:%d\n"), m_iFermionFieldCount);
+#if !_CLG_DOUBLEFLOAT
+            DOUBLE fToBeAdd = 0.0;
+#else
             Real fToBeAdd = F(0.0);
+#endif
             for (UINT j = 0; j < m_iFermionFieldCount; ++j)
             {
                 appGetLattice()->m_pActionList[i]->PrepareForHMC(pAcceptGauge, 0);
@@ -46,7 +54,11 @@ void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, co
         
     }
 
+#if !_CLG_DOUBLEFLOAT
+    m_lstData.AddItem(static_cast<Real>(plaqutteEneregy));
+#else
     m_lstData.AddItem(plaqutteEneregy);
+#endif
     appParanoiac(_T(" === Action Energy Measured === energy = %f\n"), plaqutteEneregy);
 }
 

@@ -101,7 +101,11 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
     CField* pAAP = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
 
     //use it to estimate relative error
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fBLength = 1.0;
+#else
     Real fBLength = F(1.0);
+#endif
     if (!m_bAbsoluteAccuracy)
     {
         fBLength = pFieldB->Dot(pFieldB).x;
@@ -134,11 +138,12 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
 
             pP[j]->CopyTo(pAP[j]);
             pAP[j]->ApplyOperator(uiM, pGaugeFeild);
-            length_AP[j] = pAP[j]->Dot(pAP[j]).x;
             //appParanoiac(_T("length p = %f ap = %f r = %f\n"), pP[j]->Dot(pP[j]).x, length_AP[j], pR->Dot(pR).x);
 #if !_CLG_DOUBLEFLOAT
+            length_AP[j] = static_cast<Real>(pAP[j]->Dot(pAP[j]).x);
             CLGComplex al = cuCdivf_cr_host(_cToFloat(pAP[j]->Dot(pR)), length_AP[j]);
 #else
+            length_AP[j] = pAP[j]->Dot(pAP[j]).x;
             CLGComplex al = cuCdivf_cr_host(pAP[j]->Dot(pR), length_AP[j]);
 #endif
 
@@ -147,7 +152,11 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
 
             if (0 == ((jj + 1) % m_uiCheckError))
             {
+#if !_CLG_DOUBLEFLOAT
+                fLastDiavation = static_cast<Real>(pR->Dot(pR).x);
+#else
                 fLastDiavation = pR->Dot(pR).x;
+#endif
                 appParanoiac(_T("CSLASolverGCR::Solve deviation: ---- diviation ----. restart = %d itera = %d divation = %f\n"), i, jj, fLastDiavation);
                 if (fLastDiavation < m_fAccuracy * fBLength)
                 {

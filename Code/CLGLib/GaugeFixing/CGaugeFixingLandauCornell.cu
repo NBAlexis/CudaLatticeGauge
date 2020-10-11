@@ -15,6 +15,165 @@ __BEGIN_NAMESPACE
 
 #pragma region Cornell Steepest Descend
 
+#if !_CLG_DOUBLEFLOAT
+/**
+ * A_mu (n) = TA(U _mu (n))/i
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateA(
+    const deviceSU3* __restrict__ pU,
+    DOUBLE* pA11,
+    cuDoubleComplex* pA12,
+    cuDoubleComplex* pA13,
+    DOUBLE* pA22,
+    cuDoubleComplex* pA23)
+{
+    intokernalInt4;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            deviceSU3 su3A(pU[uiLinkIndex]);
+            su3A.Ta();
+            pA11[uiLinkIndex] = static_cast<DOUBLE>(su3A.m_me[0].y);
+            pA12[uiLinkIndex] = _cToDouble(su3A.m_me[1]);
+            pA13[uiLinkIndex] = _cToDouble(su3A.m_me[2]);
+            pA22[uiLinkIndex] = static_cast<DOUBLE>(su3A.m_me[4].y);
+            pA23[uiLinkIndex] = _cToDouble(su3A.m_me[5]);
+        }
+        else
+        {
+            pA11[uiLinkIndex] = 0.0;
+            pA12[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+            pA13[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+            pA22[uiLinkIndex] = 0.0;
+            pA23[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+        }
+    }
+}
+
+#if _CLG_DEBUG
+__global__ void _CLG_LAUNCH_BOUND_HALF
+#else
+__global__ void _CLG_LAUNCH_BOUND
+#endif
+_kernelCalculateALog(
+    const deviceSU3* __restrict__ pU,
+    DOUBLE* pA11,
+    cuDoubleComplex* pA12,
+    cuDoubleComplex* pA13,
+    DOUBLE* pA22,
+    cuDoubleComplex* pA23)
+{
+    intokernalInt4;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            deviceSU3 su3A(pU[uiLinkIndex]);
+            su3A = su3A.Log();
+            pA11[uiLinkIndex] = static_cast<DOUBLE>(su3A.m_me[0].y);
+            pA12[uiLinkIndex] = _cToDouble(su3A.m_me[1]);
+            pA13[uiLinkIndex] = _cToDouble(su3A.m_me[2]);
+            pA22[uiLinkIndex] = static_cast<DOUBLE>(su3A.m_me[4].y);
+            pA23[uiLinkIndex] = _cToDouble(su3A.m_me[5]);
+        }
+        else
+        {
+            pA11[uiLinkIndex] = 0.0;
+            pA12[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+            pA13[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+            pA22[uiLinkIndex] = 0.0;
+            pA23[uiLinkIndex] = make_cuDoubleComplex(0.0, 0.0);
+        }
+    }
+}
+
+/**
+ * Gamma(n) = Delta _{-mu} A(n) = \sum _mu (A_mu(n - mu) - A_mu(n))
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateAGradient(
+    BYTE byFieldId,
+    DOUBLE* pGamma11,
+    cuDoubleComplex* pGamma12,
+    cuDoubleComplex* pGamma13,
+    DOUBLE* pGamma22,
+    cuDoubleComplex* pGamma23,
+    const DOUBLE* __restrict__ pA11,
+    const cuDoubleComplex* __restrict__ pA12,
+    const cuDoubleComplex* __restrict__ pA13,
+    const DOUBLE* __restrict__ pA22,
+    const cuDoubleComplex* __restrict__ pA23)
+{
+    intokernalInt4;
+
+    pGamma11[uiSiteIndex] = 0.0;
+    pGamma12[uiSiteIndex] = make_cuDoubleComplex(0.0, 0.0);
+    pGamma13[uiSiteIndex] = make_cuDoubleComplex(0.0, 0.0);
+    pGamma22[uiSiteIndex] = 0.0;
+    pGamma23[uiSiteIndex] = make_cuDoubleComplex(0.0, 0.0);
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir2 = uiDir * 2;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    if (site.IsDirichlet())
+    {
+        return;
+    }
+
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] - pA11[uiLinkIndex];
+            pGamma12[uiSiteIndex] = cuCsub(pGamma12[uiSiteIndex], pA12[uiLinkIndex]);
+            pGamma13[uiSiteIndex] = cuCsub(pGamma13[uiSiteIndex], pA13[uiLinkIndex]);
+            pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] - pA22[uiLinkIndex];
+            pGamma23[uiSiteIndex] = cuCsub(pGamma23[uiSiteIndex], pA23[uiLinkIndex]);
+        }
+
+        //const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
+        //const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
+        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
+        //if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
+        if (!p_m_mu_dir.IsDirichlet())
+        {
+            const UINT uiLinkIndex2 = _deviceGetLinkIndex(p_m_mu_dir.m_uiSiteIndex, dir);
+            if (p_m_mu_dir.NeedToDagger())
+            {
+                pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] - pA11[uiLinkIndex2];
+                pGamma12[uiSiteIndex] = cuCsub(pGamma12[uiSiteIndex], pA12[uiLinkIndex2]);
+                pGamma13[uiSiteIndex] = cuCsub(pGamma13[uiSiteIndex], pA13[uiLinkIndex2]);
+                pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] - pA22[uiLinkIndex2];
+                pGamma23[uiSiteIndex] = cuCsub(pGamma23[uiSiteIndex], pA23[uiLinkIndex2]);
+            }
+            else
+            {
+                pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] + pA11[uiLinkIndex2];
+                pGamma12[uiSiteIndex] = cuCadd(pGamma12[uiSiteIndex], pA12[uiLinkIndex2]);
+                pGamma13[uiSiteIndex] = cuCadd(pGamma13[uiSiteIndex], pA13[uiLinkIndex2]);
+                pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] + pA22[uiLinkIndex2];
+                pGamma23[uiSiteIndex] = cuCadd(pGamma23[uiSiteIndex], pA23[uiLinkIndex2]);
+            }
+        }
+    }
+}
+
+#else
 /**
  * A_mu (n) = TA(U _mu (n))/i
  */
@@ -131,7 +290,7 @@ _kernelCalculateAGradient(
     {
         return;
     }
-    
+
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
@@ -172,18 +331,32 @@ _kernelCalculateAGradient(
     }
 }
 
+#endif
+
+
+
 /**
  * g(x)=exp(-i a Delta A)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateG(
     deviceSU3* pG,
+#if !_CLG_DOUBLEFLOAT
+    const DOUBLE* __restrict__ pGamma11,
+    const cuDoubleComplex* __restrict__ pGamma12,
+    const cuDoubleComplex* __restrict__ pGamma13,
+    const DOUBLE* __restrict__ pGamma22,
+    const cuDoubleComplex* __restrict__ pGamma23,
+    DOUBLE fAlpha
+#else
     const Real* __restrict__ pGamma11,
     const CLGComplex* __restrict__ pGamma12,
     const CLGComplex* __restrict__ pGamma13,
     const Real* __restrict__ pGamma22,
     const CLGComplex* __restrict__ pGamma23,
-    Real fAlpha)
+    Real fAlpha
+#endif
+)
 {
     intokernalInt4;
 
@@ -197,8 +370,14 @@ _kernelCalculateG(
     else
     {
         deviceSU3 pA = deviceSU3::makeSU3TA(
+#if !_CLG_DOUBLEFLOAT
+            _cToFloat(pGamma12[uiSiteIndex]), _cToFloat(pGamma13[uiSiteIndex]), _cToFloat(pGamma23[uiSiteIndex]),
+            static_cast<Real>(pGamma11[uiSiteIndex]), static_cast<Real>(pGamma22[uiSiteIndex])
+#else
             pGamma12[uiSiteIndex], pGamma13[uiSiteIndex], pGamma23[uiSiteIndex],
-            pGamma11[uiSiteIndex], pGamma22[uiSiteIndex]);
+            pGamma11[uiSiteIndex], pGamma22[uiSiteIndex]
+#endif
+        );
         pG[uiSiteIndex] = (0 == _DC_ExpPrecision)
             ? pA.QuickExp(fAlpha)
             : pA.ExpReal(fAlpha, _DC_ExpPrecision);
@@ -249,14 +428,20 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateTrAGradientSq(
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* pDeviceRes,
+    const DOUBLE* __restrict__ pDeltaA11,
+    const cuDoubleComplex* __restrict__ pDeltaA12,
+    const cuDoubleComplex* __restrict__ pDeltaA13,
+    const DOUBLE* __restrict__ pDeltaA22,
+    const cuDoubleComplex* __restrict__ pDeltaA23
 #else
     Real* pDeviceRes,
-#endif
     const Real* __restrict__ pDeltaA11,
     const CLGComplex* __restrict__ pDeltaA12,
     const CLGComplex* __restrict__ pDeltaA13,
     const Real* __restrict__ pDeltaA22,
-    const CLGComplex* __restrict__ pDeltaA23)
+    const CLGComplex* __restrict__ pDeltaA23
+#endif
+)
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
@@ -271,13 +456,18 @@ _kernelCalculateTrAGradientSq(
         return;
     }
 
+
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fAbs1 = cuCabs(pDeltaA12[uiSiteIndex]);
+    DOUBLE fAbs2 = cuCabs(pDeltaA13[uiSiteIndex]);
+    DOUBLE fAbs3 = cuCabs(pDeltaA23[uiSiteIndex]);
+    DOUBLE fM1122 = pDeltaA11[uiSiteIndex] + pDeltaA22[uiSiteIndex];
+    pDeviceRes[uiSiteIndex] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#else
     Real fAbs1 = _cuCabsf(pDeltaA12[uiSiteIndex]);
     Real fAbs2 = _cuCabsf(pDeltaA13[uiSiteIndex]);
     Real fAbs3 = _cuCabsf(pDeltaA23[uiSiteIndex]);
     Real fM1122 = pDeltaA11[uiSiteIndex] + pDeltaA22[uiSiteIndex];
-#if !_CLG_DOUBLEFLOAT
-    pDeviceRes[uiSiteIndex] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-#else
     pDeviceRes[uiSiteIndex] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
 #endif
 }
@@ -288,11 +478,34 @@ _kernelCalculateTrAGradientSq(
 #pragma region FFT accelaration
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelBakeMomentumTable(Real* pP, UINT uiV)
+_kernelBakeMomentumTable(
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* pP,
+#else
+    Real* pP,
+#endif
+    UINT uiV)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fDenorm = static_cast<DOUBLE>(uiDir);
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        fDenorm -= cos(2.0 * PI * sSite4.m_byData4[dir] / static_cast<DOUBLE>(_constIntegers[ECI_Lx + dir]));
+    }
+
+    if (abs(fDenorm) < _CLG_FLT_EPSILON)
+    {
+        fDenorm = 0.5;
+    }
+
+    //when p^2=0, p^2=1, or p^2 = 2(Nd - sum cos)
+    //4 * 4 / 2(Nd - sum cos)
+    pP[uiSiteIndex] = 8.0 / (fDenorm * uiV);
+#else
     Real fDenorm = static_cast<Real>(uiDir);
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
@@ -307,8 +520,32 @@ _kernelBakeMomentumTable(Real* pP, UINT uiV)
     //when p^2=0, p^2=1, or p^2 = 2(Nd - sum cos)
     //4 * 4 / 2(Nd - sum cos)
     pP[uiSiteIndex] = F(8.0) / (fDenorm * uiV);
+#endif
 }
 
+#if !_CLG_DOUBLEFLOAT
+__global__ void _CLG_LAUNCH_BOUND
+_kernelFFTRtoC(const DOUBLE* __restrict__ realBuffer, cuDoubleComplex* complexBuffer)
+{
+    intokernal;
+    complexBuffer[uiSiteIndex] = make_cuDoubleComplex(realBuffer[uiSiteIndex], 0.0);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelFFTCtoR(const cuDoubleComplex* __restrict__ complexBuffer, DOUBLE* realBuffer)
+{
+    intokernal;
+    realBuffer[uiSiteIndex] = complexBuffer[uiSiteIndex].x;
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelFFTScale(const DOUBLE* __restrict__ pP, cuDoubleComplex* fftRes)
+{
+    intokernal;
+    fftRes[uiSiteIndex] = cuCmulf_cd(fftRes[uiSiteIndex], pP[uiSiteIndex]);
+}
+
+#else
 __global__ void _CLG_LAUNCH_BOUND
 _kernelFFTRtoC(const Real* __restrict__ realBuffer, CLGComplex* complexBuffer)
 {
@@ -317,7 +554,10 @@ _kernelFFTRtoC(const Real* __restrict__ realBuffer, CLGComplex* complexBuffer)
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelFFTCtoR(const CLGComplex* __restrict__ complexBuffer, Real* realBuffer)
+_kernelFFTCtoR(
+    const CLGComplex* __restrict__ complexBuffer, 
+    Real* realBuffer
+)
 {
     intokernal;
     realBuffer[uiSiteIndex] = complexBuffer[uiSiteIndex].x;
@@ -329,6 +569,7 @@ _kernelFFTScale(const Real* __restrict__ pP, CLGComplex* fftRes)
     intokernal;
     fftRes[uiSiteIndex] = cuCmulf_cr(fftRes[uiSiteIndex], pP[uiSiteIndex]);
 }
+#endif
 
 #pragma endregion
 
@@ -341,7 +582,11 @@ void CGaugeFixingLandauCornell::Initial(class CLatticeData* pOwner, const CParam
     m_pOwner = pOwner;
 
     //========== Initial Settings ==============
+#if !_CLG_DOUBLEFLOAT
+    if (!params.FetchValueDOUBLE(_T("Alpha"), m_fAlpha))
+#else
     if (!params.FetchValueReal(_T("Alpha"), m_fAlpha))
+#endif
     {
         appGeneral(_T("CGaugeFixingLandauCornell: Alpha not set, set to 0.08 by defualt."));
     }
@@ -349,6 +594,11 @@ void CGaugeFixingLandauCornell::Initial(class CLatticeData* pOwner, const CParam
     if (!params.FetchValueReal(_T("Accuracy"), m_fAccuracy))
     {
         appGeneral(_T("CGaugeFixingLandauCornell: Accuracy not set, set to 0.00000000001 by defualt."));
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small, set to be %2.18f\n"), m_fAccuracy);
+        }
     }
 
     INT iValue = static_cast<INT>(m_iMaxIterate);
@@ -373,6 +623,19 @@ void CGaugeFixingLandauCornell::Initial(class CLatticeData* pOwner, const CParam
     m_bFA = (0 != iValue);
 
     //========== Initial Buffers ==============
+#if !_CLG_DOUBLEFLOAT
+    checkCudaErrors(cudaMalloc((void**)&m_pA11, _HC_Volume * _HC_Dir * sizeof(DOUBLE)));
+    checkCudaErrors(cudaMalloc((void**)&m_pA12, _HC_Volume * _HC_Dir * sizeof(cuDoubleComplex)));
+    checkCudaErrors(cudaMalloc((void**)&m_pA13, _HC_Volume * _HC_Dir * sizeof(cuDoubleComplex)));
+    checkCudaErrors(cudaMalloc((void**)&m_pA22, _HC_Volume * _HC_Dir * sizeof(DOUBLE)));
+    checkCudaErrors(cudaMalloc((void**)&m_pA23, _HC_Volume * _HC_Dir * sizeof(cuDoubleComplex)));
+
+    checkCudaErrors(cudaMalloc((void**)&m_pGamma11, _HC_Volume * sizeof(DOUBLE)));
+    checkCudaErrors(cudaMalloc((void**)&m_pGamma12, _HC_Volume * sizeof(cuDoubleComplex)));
+    checkCudaErrors(cudaMalloc((void**)&m_pGamma13, _HC_Volume * sizeof(cuDoubleComplex)));
+    checkCudaErrors(cudaMalloc((void**)&m_pGamma22, _HC_Volume * sizeof(DOUBLE)));
+    checkCudaErrors(cudaMalloc((void**)&m_pGamma23, _HC_Volume * sizeof(cuDoubleComplex)));
+#else
     checkCudaErrors(cudaMalloc((void**)& m_pA11, _HC_Volume * _HC_Dir * sizeof(Real)));
     checkCudaErrors(cudaMalloc((void**)& m_pA12, _HC_Volume * _HC_Dir * sizeof(CLGComplex)));
     checkCudaErrors(cudaMalloc((void**)& m_pA13, _HC_Volume * _HC_Dir * sizeof(CLGComplex)));
@@ -384,12 +647,17 @@ void CGaugeFixingLandauCornell::Initial(class CLatticeData* pOwner, const CParam
     checkCudaErrors(cudaMalloc((void**)& m_pGamma13, _HC_Volume * sizeof(CLGComplex)));
     checkCudaErrors(cudaMalloc((void**)& m_pGamma22, _HC_Volume * sizeof(Real)));
     checkCudaErrors(cudaMalloc((void**)& m_pGamma23, _HC_Volume * sizeof(CLGComplex)));
-
+#endif
     checkCudaErrors(cudaMalloc((void**)& m_pG, _HC_Volume * sizeof(deviceSU3)));
     if (m_bFA)
     {
+#if !_CLG_DOUBLEFLOAT
+        checkCudaErrors(cudaMalloc((void**)&m_pMomentumTable, _HC_Volume * sizeof(DOUBLE)));
+        checkCudaErrors(cudaMalloc((void**)&m_pTempFFTBuffer, _HC_Volume * sizeof(cuDoubleComplex)));
+#else
         checkCudaErrors(cudaMalloc((void**)& m_pMomentumTable, _HC_Volume * sizeof(Real)));
         checkCudaErrors(cudaMalloc((void**)& m_pTempFFTBuffer, _HC_Volume * sizeof(CLGComplex)));
+#endif
 
         preparethread;
         _kernelBakeMomentumTable << <block, threads >> > (m_pMomentumTable, _HC_Volume);
@@ -408,7 +676,11 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
 
     preparethread;
     m_iIterate = 0;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fTheta = 0.0;
+#else
     Real fTheta = F(0.0);
+#endif
 
     while (m_iIterate < m_iMaxIterate)
     {
@@ -469,6 +741,33 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
         //======= 3. FFT                =========
         if (m_bFA)
         {
+#if !_CLG_DOUBLEFLOAT
+
+            CCLGFFTHelper::FFT4DDouble(m_pGamma12, TRUE);
+            _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pGamma12);
+            CCLGFFTHelper::FFT4DDouble(m_pGamma12, FALSE);
+
+            CCLGFFTHelper::FFT4DDouble(m_pGamma13, TRUE);
+            _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pGamma13);
+            CCLGFFTHelper::FFT4DDouble(m_pGamma13, FALSE);
+
+            CCLGFFTHelper::FFT4DDouble(m_pGamma23, TRUE);
+            _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pGamma23);
+            CCLGFFTHelper::FFT4DDouble(m_pGamma23, FALSE);
+
+            _kernelFFTRtoC << <block, threads >> > (m_pGamma11, m_pTempFFTBuffer);
+            CCLGFFTHelper::FFT4DDouble(m_pTempFFTBuffer, TRUE);
+            _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
+            CCLGFFTHelper::FFT4DDouble(m_pTempFFTBuffer, FALSE);
+            _kernelFFTCtoR << <block, threads >> > (m_pTempFFTBuffer, m_pGamma11);
+
+            _kernelFFTRtoC << <block, threads >> > (m_pGamma22, m_pTempFFTBuffer);
+            CCLGFFTHelper::FFT4DDouble(m_pTempFFTBuffer, TRUE);
+            _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
+            CCLGFFTHelper::FFT4DDouble(m_pTempFFTBuffer, FALSE);
+            _kernelFFTCtoR << <block, threads >> > (m_pTempFFTBuffer, m_pGamma22);
+
+#else
             CCLGFFTHelper::FFT4D(m_pGamma12, TRUE);
             _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pGamma12);
             CCLGFFTHelper::FFT4D(m_pGamma12, FALSE);
@@ -492,6 +791,7 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
             _kernelFFTScale << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
             CCLGFFTHelper::FFT4D(m_pTempFFTBuffer, FALSE);
             _kernelFFTCtoR << <block, threads >> > (m_pTempFFTBuffer, m_pGamma22);
+#endif
         }
 
         //======= 4. Gauge Transform    =========
@@ -513,12 +813,20 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
     appGeneral(_T("Gauge fixing failed with last error = %f\n"), fTheta);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
+#else
 Real CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
+#endif
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CGaugeFixingLandauCornell only implemented with gauge SU3!\n"));
+#if !_CLG_DOUBLEFLOAT
+        return 0.0;
+#else
         return F(0.0);
+#endif
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);

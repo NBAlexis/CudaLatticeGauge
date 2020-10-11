@@ -47,15 +47,26 @@ protected:
 
     Real* m_pDevicePropogators;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* m_pResPropogators;
+#else
     //This is 4 x (Lt - 1)
     Real* m_pResPropogators;
+#endif
 
 public:
 
+#if !_CLG_DOUBLEFLOAT
+    TArray<TArray<DOUBLE>> m_lstAverageResults;
+
+    //m_lstResults[conf][type][t]
+    TArray<TArray<TArray<DOUBLE>>> m_lstResults;
+#else
     TArray<TArray<Real>> m_lstAverageResults;
 
     //m_lstResults[conf][type][t]
     TArray<TArray<TArray<Real>>> m_lstResults;
+#endif
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
 };

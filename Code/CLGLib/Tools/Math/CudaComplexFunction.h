@@ -29,10 +29,17 @@ extern "C" {
     /**
     * |c|^2
     */
-    __device__ static __inline__ Real __cuCabsSqf(const CLGComplex& c)
+    __device__ __host__ static __inline__ Real __cuCabsSqf(const CLGComplex& c)
     {
         return c.x *c.x + c.y * c.y;
     }
+
+#if !_CLG_DOUBLEFLOAT
+    __device__ __host__ static __inline__ DOUBLE __cuCabsSqd(const cuDoubleComplex& c)
+    {
+        return c.x * c.x + c.y * c.y;
+    }
+#endif
 
     /**
     * c^p
@@ -95,6 +102,10 @@ extern "C" {
         return _make_cuComplex(__div(x.x, y), __div(x.y, y));
     }
 #if !_CLG_DOUBLEFLOAT
+    __host__ static __inline__ cuDoubleComplex cuCdivf_cd_host(const cuDoubleComplex& x, DOUBLE y)
+    {
+        return make_cuDoubleComplex(x.x / y, x.y / y);
+    }
     __device__ static __inline__ cuDoubleComplex cuCdivf_cd(const cuDoubleComplex& x, DOUBLE y)
     {
         return make_cuDoubleComplex(__div(x.x, y), __div(x.y, y));
@@ -110,6 +121,13 @@ extern "C" {
     {
         return _make_cuComplex(x.x * y, x.y * y);
     }
+#if !_CLG_DOUBLEFLOAT
+    __device__ __host__ static __inline__ cuDoubleComplex cuCmulf_cd(const cuDoubleComplex& x, DOUBLE y)
+    {
+        return make_cuDoubleComplex(x.x * y, x.y * y);
+    }
+#endif
+
     __device__ static __inline__ CLGComplex cuCmulf_rc(Real y, const CLGComplex& x)
     {
         return _make_cuComplex(x.x * y, x.y * y);

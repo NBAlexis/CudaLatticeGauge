@@ -36,7 +36,11 @@ public:
     void OnFinishTrajectory(UBOOL bAccepted) override;
     CCString GetInfos(const CCString &tab) const override;
 
+#if !_CLG_DOUBLEFLOAT
+    void SetBeta(DOUBLE fBeta);
+#else
     void SetBeta(Real fBeta);
+#endif
     //Real GetEnergyPerPlaqutte() const;
     UBOOL m_bCloverEnergy;
 
@@ -45,11 +49,12 @@ protected:
 #if !_CLG_DOUBLEFLOAT
     DOUBLE m_fLastEnergy;
     DOUBLE m_fNewEnergy;
+    DOUBLE m_fBetaOverN;
 #else
     Real m_fLastEnergy;
     Real m_fNewEnergy;
-#endif
     Real m_fBetaOverN;
+#endif
 
     //Not using it
     //UBOOL m_bUsing4PlaqutteEnergy;

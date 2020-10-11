@@ -34,6 +34,8 @@ __DEFINE_ENUM(EFieldFileType,
     EFFT_BridgePPBin,
     EFFT_CLGBin,
     EFFT_CLGBinCompressed,
+    EFFT_CLGBinFloat,
+    EFFT_CLGBinDouble,
     
     EFFT_ForceDWORD = 0x7fffffff,
     )

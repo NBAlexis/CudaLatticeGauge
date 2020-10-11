@@ -72,21 +72,31 @@ protected:
     CLGComplex* m_pDevicePropogators;
 #if !_CLG_DOUBLEFLOAT
     cuDoubleComplex* m_pDevicePropogatorsEveryTimeSlice;
+    cuDoubleComplex* m_pResPropogators;
 #else
     CLGComplex* m_pDevicePropogatorsEveryTimeSlice;
+    CLGComplex* m_pResPropogators;
 #endif
 
     //This is 20 x (Lt - 2)
-    CLGComplex* m_pResPropogators;
+    
 
     void InitialBuffers();
 
 public:
 
+#if !_CLG_DOUBLEFLOAT
+    TArray<TArray<DOUBLE>> m_lstAverageResults;
+
+    //m_lstResults[conf][type][t]
+    TArray<TArray<TArray<cuDoubleComplex>>> m_lstResults;
+#else
     TArray<TArray<Real>> m_lstAverageResults;
 
     //m_lstResults[conf][type][t]
     TArray<TArray<TArray<CLGComplex>>> m_lstResults;
+#endif
+
     UINT m_uiConfigurationCount;
     UBOOL m_bGaugeFixing;
     UBOOL m_bShowResult;

@@ -413,6 +413,11 @@ void CGaugeFixingLandauLosAlamos::Initial(class CLatticeData* pOwner, const CPar
     if (!params.FetchValueReal(_T("Accuracy"), m_fAccuracy))
     {
         appGeneral(_T("CGaugeFixingLandauCornell: Accuracy not set, set to 0.00000000001 by defualt."));
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small, set to be %2.18f\n"), m_fAccuracy);
+        }
     }
 
     INT iValue = static_cast<INT>(m_iMaxIterate);
@@ -438,12 +443,20 @@ void CGaugeFixingLandauLosAlamos::Initial(class CLatticeData* pOwner, const CPar
     checkCudaErrors(cudaMalloc((void**)& m_pA23, _HC_Volume * _HC_Dir * sizeof(CLGComplex)));
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CGaugeFixingLandauLosAlamos::CheckRes(const CFieldGauge* pGauge)
+#else
 Real CGaugeFixingLandauLosAlamos::CheckRes(const CFieldGauge* pGauge)
+#endif
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CGaugeFixingLandauCornell only implemented with gauge SU3!\n"));
+#if !_CLG_DOUBLEFLOAT
+        return 0.0;
+#else
         return F(0.0);
+#endif
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
@@ -496,7 +509,11 @@ void CGaugeFixingLandauLosAlamos::GaugeFixing(CFieldGauge* pResGauge)
 
     preparethread;
     m_iIterate = 0;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fTheta = 0.0;
+#else
     Real fTheta = F(0.0);
+#endif
 
     while (m_iIterate < m_iMaxIterate)
     {

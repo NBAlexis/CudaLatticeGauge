@@ -200,7 +200,11 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     }
 
     m_uiLt = _HC_Lt;
+#if !_CLG_DOUBLEFLOAT
+    m_f2OverVolumnSqrt = 2.0 / _hostsqrtd(static_cast<DOUBLE>(_HC_Volume));
+#else
     m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
+#endif
     m_uiResoultCount = 0;
 }
 
@@ -244,12 +248,20 @@ void CMeasureMesonCorrelator::Report()
         appGeneral(_T("\n log10(C(nt))=\n"));
         for (UINT j = 0; j < m_uiLt; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            appGeneral(_T("%8.12f, "), _hostlog10d(appAbs(m_lstResults[i][j])));
+#else
             appGeneral(_T("%8.12f, "), _hostlog10(appAbs(m_lstResults[i][j])));
+#endif
         }
         appGeneral(_T("\n log10(C(nt)/C(0))=\n"));
         for (UINT j = 1; j < m_uiLt; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            appGeneral(_T("%8.12f, "), _hostlog10d(appAbs(m_lstResults[i][j] / m_lstResults[i][0])));
+#else
             appGeneral(_T("%8.12f, "), _hostlog10(appAbs(m_lstResults[i][j] / m_lstResults[i][0])));
+#endif
         }
         appGeneral(_T("\n"));
     }
@@ -352,17 +364,29 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
         //}
 
         appParanoiac(_T("CMeasureMesonCorrelator for %s: "), __ENUM_TO_STRING(EGammaMatrix, m_lstGammas[i]).c_str());
+#if !_CLG_DOUBLEFLOAT
+        DOUBLE* sumSpatial = (DOUBLE*)appAlloca(sizeof(DOUBLE) * m_uiLt);
+#else
         Real* sumSpatial = (Real*)appAlloca(sizeof(Real) * m_uiLt);
+#endif
         for (UINT j = 0; j < m_uiLt; ++j)
         {
             sumSpatial[j] = m_f2OverVolumnSqrt * CCudaHelper::ReduceReal(_D_RealThreadBuffer + j * _HC_Volume_xyz, _HC_Volume_xyz);
+#if !_CLG_DOUBLEFLOAT
+            appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, \n"), j, sumSpatial[j], _hostlog10d(appAbs(sumSpatial[j])));
+#else
             appParanoiac(_T("C(nt=%d)=%f, log10(C(nt))=%f, \n"), j, sumSpatial[j], _hostlog10(appAbs(sumSpatial[j])));
+#endif
         }
         appParanoiac(_T("\n"));
         //anverage
         if (m_uiResoultCount == 0)
         {
+#if !_CLG_DOUBLEFLOAT
+            TArray<DOUBLE> thisGammaResult;
+#else
             TArray<Real> thisGammaResult;
+#endif
             for (UINT j = 0; j < m_uiLt; ++j)
             {
                 thisGammaResult.AddItem(sumSpatial[j]);

@@ -62,6 +62,44 @@ public:
 
     virtual void SetAutoCorrection(UBOOL bAutoCorrection) = 0;
 
+#if !_CLG_DOUBLEFLOAT
+
+    Real GetHDiff() const
+    {
+        if (0 == m_lstHDiff.Num())
+        {
+            return F(0.0);
+        }
+
+        if (1 == m_lstHDiff.Num())
+        {
+            return appAbs(static_cast<Real>(m_lstHDiff[0]));
+        }
+
+        Real fAdd = F(0.0);
+        for (INT i = 0; i < m_lstHDiff.Num(); ++i)
+        {
+            fAdd += static_cast<Real>(m_lstHDiff[i] * m_lstHDiff[i]);
+        }
+        return _hostsqrt(fAdd / (m_lstHDiff.Num() - 1));
+    }
+
+    Real GetHValue() const
+    {
+        if (0 == m_lstH.Num())
+        {
+            return F(0.0);
+        }
+
+        Real fAdd = F(0.0);
+        for (INT i = 0; i < m_lstH.Num(); ++i)
+        {
+            fAdd += static_cast<Real>(m_lstH[i]);
+        }
+        return fAdd / m_lstH.Num();
+    }
+
+#else
     Real GetHDiff() const
     {
         if (0 == m_lstHDiff.Num())
@@ -96,6 +134,7 @@ public:
         }
         return fAdd / m_lstH.Num();
     }
+#endif
 
     void SetSaveConfiguration(UBOOL bSave, const CCString& sPrefix)
     {
@@ -116,8 +155,13 @@ protected:
     Real m_fGrowStep;
     Real m_fReduceStep;
     CCString m_sConfigurationPrefix;
+#if !_CLG_DOUBLEFLOAT
+    TArray<DOUBLE> m_lstHDiff;
+    TArray<DOUBLE> m_lstH;
+#else
     TArray<Real> m_lstHDiff;
     TArray<Real> m_lstH;
+#endif
 };
 
 __END_NAMESPACE

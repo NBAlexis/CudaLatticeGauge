@@ -485,8 +485,8 @@ void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
                 static_cast<BYTE>(t), 
                 m_pDevicePropogatorsEveryTimeSlice);
 #if !_CLG_DOUBLEFLOAT
-            const CLGComplex sum = _cToFloat(appGetCudaHelper()->ReduceComplex(
-                m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz));
+            const cuDoubleComplex sum = appGetCudaHelper()->ReduceComplex(
+                m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz);
 #else
             const CLGComplex sum = appGetCudaHelper()->ReduceComplex(
                 m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz);
@@ -506,11 +506,12 @@ void CMeasureMesonCorrelatorStaggered::InitialBuffers()
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(CLGComplex) * _HC_Volume));
 #if !_CLG_DOUBLEFLOAT
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogatorsEveryTimeSlice, sizeof(cuDoubleComplex) * _HC_Volume_xyz));
+    m_pResPropogators = (cuDoubleComplex*)(malloc(sizeof(cuDoubleComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
 #else
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogatorsEveryTimeSlice, sizeof(CLGComplex) * _HC_Volume_xyz));
-#endif
-
     m_pResPropogators = (CLGComplex*)(malloc(sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
+#endif
+    
 }
 
 #pragma endregion
@@ -579,17 +580,29 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
     {
         appGeneral(_T("==================== correlators ===============\n"));
     }
+#if !_CLG_DOUBLEFLOAT
+    TArray<TArray<cuDoubleComplex>> thisConf;
+#else
     TArray<TArray<CLGComplex>> thisConf;
+#endif
     for (INT i = 0; i < _kMesonCorrelatorType; ++i)
     {
         if (m_bShowResult)
         {
             appGeneral(_T("Type%d:"), i);
         }
+#if !_CLG_DOUBLEFLOAT
+        TArray<cuDoubleComplex> thisType;
+#else
         TArray<CLGComplex> thisType;
+#endif
         for (INT j = 0; j < _HC_Lti - 1; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            const cuDoubleComplex& res = m_pResPropogators[i * (_HC_Lt - 1) + j];
+#else
             const CLGComplex& res = m_pResPropogators[i * (_HC_Lt - 1) + j];
+#endif
             if (m_bShowResult)
             {
                 LogGeneralComplex(res);
@@ -626,7 +639,11 @@ void CMeasureMesonCorrelatorStaggered::Report()
     for (INT ty = 0; ty < _kMesonCorrelatorType; ++ty)
     {
         appGeneral(_T("(* ======================= Type:%d=================*)\ntabres%d={\n"), ty, ty);
+#if !_CLG_DOUBLEFLOAT
+        TArray<DOUBLE> thisType;
+#else
         TArray<Real> thisType;
+#endif
         for (INT conf = 0; conf < m_lstResults.Num(); ++conf)
         {
             appGeneral(_T("{"));

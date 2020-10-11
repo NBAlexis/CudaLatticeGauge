@@ -15,13 +15,13 @@ UINT TestFileIO(CParameters& sParam)
     Real fExpected = F(0.625129946974942);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
-    const Real fPlaqutteEneregy = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume);
+    const Real fPlaqutteEneregy = static_cast<Real>(appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume));
 
     CFieldGaugeSU3* pStable = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     CFieldGaugeSU3* pForce = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
 
     appGetLattice()->m_pGaugeField->CalculateForceAndStaple(pForce, pStable, F(1.0) / F(3.0));
-    const Real fPlaqutteEneregy2 = appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume);
+    const Real fPlaqutteEneregy2 = static_cast<Real>(appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume));
 
     appGeneral(_T("Plaqutte Energy (expected:0.625129946974942)= %1.10f and %1.10f\n"), F(1.0) - fPlaqutteEneregy, F(1.0) - fPlaqutteEneregy2);
 

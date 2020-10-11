@@ -147,7 +147,11 @@ void CSLASolverGMRESMDR::QRFactorizationOfUk()
     //QR of AY
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
+#if !_CLG_DOUBLEFLOAT
+        const Real fLength = static_cast<Real>(_hostsqrtd(m_lstU[i]->Dot(m_lstU[i]).x));
+#else
         const Real fLength = _hostsqrt(m_lstU[i]->Dot(m_lstU[i]).x);
+#endif
         m_pHostTmpR[i * m_uiKDim + i] = _make_cuComplex(fLength, F(0.0));
         m_lstU[i]->ScalarMultply(F(1.0) / fLength);
         for (UINT j = i + 1; j < m_uiKDim; ++j)

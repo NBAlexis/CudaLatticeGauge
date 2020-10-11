@@ -73,11 +73,11 @@ UINT TestOperators(CParameters& )
     appGeneral(_T("DDagger f2.(D.f1) = (%f %f); (D+.f2).f1 = (%f %f);\n"),
         dot5.x, dot5.y, dot6.x, dot6.y);
 
-    if (appAbs(dot5.x - dot6.x) > 0.01f)
+    if (appAbs(dot5.x - dot6.x) > F(0.02))
     {
         ++uiErrors;
     }
-    if (appAbs(dot5.y - dot6.y)  > 0.01f)
+    if (appAbs(dot5.y - dot6.y)  > F(0.01))
     {
         ++uiErrors;
     }
@@ -262,7 +262,7 @@ UINT TestGaugeInvarience(CParameters&)
     TArray<Real> beforeGaugeTransform;
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL);
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL));
         beforeGaugeTransform.AddItem(fEnergy);
     }
 
@@ -285,7 +285,7 @@ UINT TestGaugeInvarience(CParameters&)
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL);
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL));
         appGeneral(_T("Action%d, Before:%2.20f, After:%2.20f\n"), i, beforeGaugeTransform[i], fEnergy);
         if (appAbs(beforeGaugeTransform[i] - fEnergy) > F(0.0000001))
         {

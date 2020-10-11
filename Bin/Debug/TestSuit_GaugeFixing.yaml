@@ -206,7 +206,9 @@ TestGaugeFixingCoulombCornellDR:
 
         Name : CGaugeFixingCoulombCornell
         Alpha : 0.08
-        MaxIterate : 100000
+        MaxIterate : 10000
+        ShowErrorStep : 5
+        Accuracy : 0.00001
         FFT : 1
 
     Solver:
@@ -217,7 +219,7 @@ TestGaugeFixingCoulombCornellDR:
         KDim : 5
         RecalculateR : 3
         DeflateSpace : EEDT_SVD
-        Accuracy : 0.0000001
+        Accuracy : 0.00001
 
         Restart : 100
         AbsoluteAccuracy : 1

@@ -146,12 +146,19 @@ void CIntegrator::FinishEvaluate() const
     m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
+#else
 Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
+#endif
 {
     m_pMomentumField->SetOneDirectionZero(m_byBindDir);
     m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
-
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE retv = m_pMomentumField->CalculateKinematicEnergy();
+#else
     Real retv = m_pMomentumField->CalculateKinematicEnergy();
+#endif
 
 #if _CLG_DEBUG
     CCString sLog = _T("");
@@ -162,7 +169,11 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
     {
         //this is accumulate
 #if _CLG_DEBUG
+#if !_CLG_DOUBLEFLOAT
+        DOUBLE fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
+#else
         Real fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
+#endif
         CCString sThisActionInfo = _T("");
         sThisActionInfo.Format(_T(" Action%d:%f, "), i + 1, fActionEnergy);
         sLog += sThisActionInfo;

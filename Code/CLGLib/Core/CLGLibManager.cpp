@@ -235,6 +235,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_MeasureListLength] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("UseLogADefinition"), 0);
+#if !_CLG_DOUBLEFLOAT
+    if (0 != iVaules)
+    {
+        appCrucial(_T("Single float does not support Log definition!\n"));
+    }
+#endif
     m_InitialCache.constIntegers[ECI_UseLogADefinition] = static_cast<UINT>(iVaules);
 
     const UINT iThreadConstraint = m_InitialCache.constIntegers[ECI_ThreadConstaint];
