@@ -48,7 +48,11 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 
     if (m_bDebugForce)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
         const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
         appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
     }
 
@@ -80,7 +84,11 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 
         if (m_bDebugForce)
         {
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
             const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
             appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
         }
 
@@ -115,7 +123,11 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
         }
         if (m_bDebugForce)
         {
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
             const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
             appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
         }
     }

@@ -182,9 +182,6 @@
     <ClInclude Include="Core\CLGFloat.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Action\CActionFermion.h">
-      <Filter>Data\Action</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Math\Vectors.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>

@@ -39,8 +39,11 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->FixBoundary();
     m_pSourceZero->InverseD(pGaugeField);
+#if !_CLG_DOUBLEFLOAT
+    const CLGComplex color1 = _cToFloat(m_pSourceZero->Dot(m_pSourceZero));
+#else
     const CLGComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
-
+#endif
     //sour.m_byColorIndex = 1;
     //m_pSourceZero->InitialAsSource(sour);
     //m_pSourceZero->InverseD(pGaugeField);

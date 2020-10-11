@@ -27,7 +27,12 @@ _kernelDotMeasureAllKS(
     const deviceSU3Vector* __restrict__ pMe,
     const deviceSU3Vector* __restrict__ pOther,
     CLGComplex* resultXYPlan,
-    CLGComplex* result)
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex* result
+#endif
+)
 {
     intokernalInt4;
 
@@ -70,10 +75,16 @@ _kernelDotMeasureAllKS(
     //default:
     //    break;
     //}
-
+    
+#if !_CLG_DOUBLEFLOAT
+    result[uiSiteIndex] = _cToDouble(pMe[uiSiteIndex].ConjugateDotC(right));
+    atomicAdd(&resultXYPlan[_ixy].x, static_cast<Real>(result[uiSiteIndex].x));
+    atomicAdd(&resultXYPlan[_ixy].y, static_cast<Real>(result[uiSiteIndex].y));
+#else
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(right);
     atomicAdd(&resultXYPlan[_ixy].x, result[uiSiteIndex].x);
     atomicAdd(&resultXYPlan[_ixy].y, result[uiSiteIndex].y);
+#endif
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -238,7 +249,11 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             m_pDeviceXYBuffer[i],
             _D_ComplexThreadBuffer
             );
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));
+#else
         const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+#endif
         m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
     }
 

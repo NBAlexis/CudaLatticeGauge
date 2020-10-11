@@ -201,11 +201,20 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelPickEveryTimeSlice(
     const CLGComplex* __restrict__ pAll,
     BYTE byT,
-    CLGComplex* res)
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* res
+#else
+    CLGComplex* res
+#endif
+)
 {
     const UINT uiVolumnIdx = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiSiteIndex = uiVolumnIdx * _DC_Lt + byT;
+#if !_CLG_DOUBLEFLOAT
+    res[uiVolumnIdx] = _cToDouble(pAll[uiSiteIndex]);
+#else
     res[uiVolumnIdx] = pAll[uiSiteIndex];
+#endif
 }
 
 #pragma endregion
@@ -475,8 +484,13 @@ void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
                 m_pDevicePropogators, 
                 static_cast<BYTE>(t), 
                 m_pDevicePropogatorsEveryTimeSlice);
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex sum = _cToFloat(appGetCudaHelper()->ReduceComplex(
+                m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz));
+#else
             const CLGComplex sum = appGetCudaHelper()->ReduceComplex(
                 m_pDevicePropogatorsEveryTimeSlice, _HC_Volume_xyz);
+#endif
             m_pResPropogators[i * (_HC_Lti - 1) + t - 1] = sum;
             //appParanoiac(_T("Type=%d t=%d, res = %2.18f + %2.18f\n"), i, t, sum.x, sum.y);
         }
@@ -490,7 +504,11 @@ void CMeasureMesonCorrelatorStaggered::InitialBuffers()
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceW1, sizeof(deviceSU3Vector*) * 24));
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceW2, sizeof(deviceSU3Vector*) * 24));
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(CLGComplex) * _HC_Volume));
+#if !_CLG_DOUBLEFLOAT
+    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogatorsEveryTimeSlice, sizeof(cuDoubleComplex) * _HC_Volume_xyz));
+#else
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogatorsEveryTimeSlice, sizeof(CLGComplex) * _HC_Volume_xyz));
+#endif
 
     m_pResPropogators = (CLGComplex*)(malloc(sizeof(CLGComplex) * _kMesonCorrelatorType * (_HC_Lt - 1)));
 }

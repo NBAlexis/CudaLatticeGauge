@@ -91,7 +91,11 @@ UBOOL CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, c
 /**
 * The implementation depends on the type of gauge field
 */
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionGaugePlaquette::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#else
 Real CActionGaugePlaquette::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#endif
 {
     if (bBeforeEvolution)
     {

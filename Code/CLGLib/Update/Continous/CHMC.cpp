@@ -78,8 +78,13 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
     ++m_uiUpdateCall;
     UBOOL bAccepted = FALSE;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fEnergy = 0.0;
+    DOUBLE fEnergyNew = 0.0;
+#else
     Real fEnergy = F(0.0);
     Real fEnergyNew = F(0.0);
+#endif
 
     for (UINT i = 0; i < iSteps; ++i)
     {
@@ -95,12 +100,21 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             fEnergyNew = m_pIntegrator->GetEnergy(FALSE);
         }
 
+#if !_CLG_DOUBLEFLOAT
+        DOUBLE diff_H = 1.0;
+        DOUBLE rand = 0.0;
+#else
         Real diff_H = F(1.0);
         Real rand = F(0.0);
+#endif
 
         if (m_bMetropolis || m_bTestHDiff)
         {
+#if !_CLG_DOUBLEFLOAT
+            DOUBLE fDiff = fEnergy - fEnergyNew;
+#else
             Real fDiff = fEnergy - fEnergyNew;
+#endif
             if (m_bTestHDiff)
             {
                 m_lstHDiff.AddItem(fDiff);

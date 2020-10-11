@@ -25,7 +25,11 @@ public:
     * bBeforeEvolution is set to be TRUE if call this just after an update (therefore the energy is already calculate for Metroplis of the last step),
     * and will return the last result.
     */
+#if !_CLG_DOUBLEFLOAT
+    virtual DOUBLE Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) = 0;
+#else
     virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) = 0;
+#endif
 
     /**
     * Obtain the pointer of the fields

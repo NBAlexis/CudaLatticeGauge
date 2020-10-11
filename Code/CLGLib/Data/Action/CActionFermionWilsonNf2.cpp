@@ -48,14 +48,22 @@ UBOOL CActionFermionWilsonNf2::CalculateForceOnGauge(const CFieldGauge* pGauge, 
     return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionFermionWilsonNf2::Energy(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
+#else
 Real CActionFermionWilsonNf2::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
+#endif
 {
     //(D^-1 phi)^2
     CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
     assert(NULL != pPooled);
     m_pFerimionField->CopyTo(pPooled);
     pPooled->InverseD(pGauge);
+#if !_CLG_DOUBLEFLOAT
+    const cuDoubleComplex res = pPooled->Dot(pPooled);
+#else
     const CLGComplex res = pPooled->Dot(pPooled);
+#endif
     //pPooled->InverseDDdagger(pGauge);
     //const CLGComplex res = m_pFerimionField->Dot(pPooled);
     appDetailed(_T("CActionFermionWilsonNf2 : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);

@@ -128,8 +128,14 @@ _kernelPlaqutteEnergySU3CacheIndex_D(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN,
+    DOUBLE* results
+#else
     Real betaOverN,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernal;
 
@@ -286,7 +292,13 @@ _kernelExpMultSU3Real_D(
 * Trace (P^2)
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData, Real* results)
+_kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
     const UINT uiDir = _DC_Dir;
@@ -463,7 +475,11 @@ void CFieldGaugeSU3D::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* 
         betaOverN);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3D::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
+#else
 Real CFieldGaugeSU3D::CalculatePlaqutteEnergy(Real betaOverN) const
+#endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
 
@@ -479,7 +495,11 @@ Real CFieldGaugeSU3D::CalculatePlaqutteEnergy(Real betaOverN) const
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3D::CalculateKinematicEnergy() const
+#else
 Real CFieldGaugeSU3D::CalculateKinematicEnergy() const
+#endif
 {
     preparethread;
     _kernelCalculateKinematicEnergySU3_D << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);

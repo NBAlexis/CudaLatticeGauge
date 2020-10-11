@@ -26,7 +26,11 @@ _CLG_LAUNCH_BOUND
 _kernelCalculateCorrelatorSU3(
     const deviceWilsonVectorSU3** __restrict__ sources,
     EGammaMatrix eGamma,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* correlatorRes
+#else
     Real* correlatorRes
+#endif
 )
 {
     intokernal;
@@ -35,7 +39,11 @@ _kernelCalculateCorrelatorSU3(
     * No comments.... see the detail.pdf for detail
     */
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE res = 0.0;
+#else
     Real res = F(0.0);
+#endif
     //Constract U_{ij}
     //Constract U_{p(i)p(j)}
     CLGComplex uijdagger[3];

@@ -64,6 +64,11 @@ void CSLASolverGCR::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        }
     }
 }
 
@@ -131,7 +136,11 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
             pAP[j]->ApplyOperator(uiM, pGaugeFeild);
             length_AP[j] = pAP[j]->Dot(pAP[j]).x;
             //appParanoiac(_T("length p = %f ap = %f r = %f\n"), pP[j]->Dot(pP[j]).x, length_AP[j], pR->Dot(pR).x);
+#if !_CLG_DOUBLEFLOAT
+            CLGComplex al = cuCdivf_cr_host(_cToFloat(pAP[j]->Dot(pR)), length_AP[j]);
+#else
             CLGComplex al = cuCdivf_cr_host(pAP[j]->Dot(pR), length_AP[j]);
+#endif
 
             pX->Axpy(al, pP[j]);
             pR->Axpy(_make_cuComplex(-al.x, -al.y), pAP[j]);
@@ -168,7 +177,11 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
                 {
                     if (k != nextPjIndex)
                     {
+#if !_CLG_DOUBLEFLOAT
+                        CLGComplex beta = cuCdivf_cr_host(_cToFloat(pAP[k]->Dot(pAAP)), -length_AP[j]);
+#else
                         CLGComplex beta = cuCdivf_cr_host(pAP[k]->Dot(pAAP), -length_AP[j]);
+#endif
                         pP[nextPjIndex]->Axpy(beta, pP[k]);
                     }
                 }

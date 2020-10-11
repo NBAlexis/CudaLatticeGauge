@@ -19,12 +19,22 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergy_Rectangular_Normal(
     const BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+    const DOUBLE betaOverNTimesCRect,
+    DOUBLE* results
+#else
     const Real betaOverNTimesCRect,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE res = 0.0;
+#else
     Real res = F(0.0);
+#endif
     for (BYTE byMu = 0; byMu < _DC_Dir; ++byMu)
     {
         for (BYTE byNu = byMu + 1; byNu < _DC_Dir; ++byNu)
@@ -49,12 +59,22 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergy_Rectangular_Clover(
     const BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+    const DOUBLE betaOverNTimesCRect,
+    DOUBLE* results
+#else
     const Real betaOverNTimesCRect,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE res = 0.0;
+#else
     Real res = F(0.0);
+#endif
     for (BYTE byMu = 0; byMu < _DC_Dir; ++byMu)
     {
         for (BYTE byNu = byMu + 1; byNu < _DC_Dir; ++byNu)
@@ -202,9 +222,17 @@ void CFieldGaugeSU3TreeImproved::CalculateForceAndStaple(CFieldGauge* pForce, CF
         pForceSU3->m_pDeviceData);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
+#else
 Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergy(Real betaOverN) const
+#endif
 {
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergy(betaOverN);
+#else
     Real fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergy(betaOverN);
+#endif
     preparethread;
     _kernelPlaqutteEnergy_Rectangular_Normal << <block, threads >> > (
         m_byFieldId,
@@ -217,9 +245,17 @@ Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergy(Real betaOverN) const
     return fPlaqTerm;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const
+#else
 Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
+#endif
 {
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(betaOverN);
+#else
     Real fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(betaOverN);
+#endif
 
     preparethread;
     _kernelPlaqutteEnergy_Rectangular_Clover << <block, threads >> > (
@@ -232,12 +268,20 @@ Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUseClover(Real betaOverN
     return fPlaqTerm;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const
+#else
 Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge* pStaple) const
+#endif
 {
     appGeneral(_T("Calculate energy using stable is not supported...\n"));
     //We don't known whether to use clover or not, so use normal
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(betaOverN, pStaple);
+#else
     Real fPlaqTerm = CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(betaOverN, pStaple);
+#endif
     preparethread;
     _kernelPlaqutteEnergy_Rectangular_Normal << <block, threads >> > (
         m_byFieldId,

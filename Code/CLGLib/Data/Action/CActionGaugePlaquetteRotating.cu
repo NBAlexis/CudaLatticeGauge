@@ -71,7 +71,12 @@ _kernelAdd4PlaqutteTermSU3(
     const SIndex* __restrict__ pCachedPlaqutte,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmegaSq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     //intokernalInt4;
     SSmallInt4 sSite4;
@@ -122,7 +127,11 @@ _kernelAdd4PlaqutteTermSU3(
         }
     }
 
+#if !_CLG_DOUBLEFLOAT
+    atomicAdd(&results[uiSiteIndex], static_cast<DOUBLE>(betaOverN * fOmegaSq * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3)));
+#else
     atomicAdd(&results[uiSiteIndex], betaOverN * fOmegaSq * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3));
+#endif
 
 }
 
@@ -210,7 +219,12 @@ _kernelAddChairTermSU3_Term12(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmega,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -242,7 +256,12 @@ _kernelAddChairTermSU3_Term34(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmega,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -274,7 +293,12 @@ _kernelAddChairTermSU3_Term5(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmegaSq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -785,7 +809,12 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmegaSq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -881,7 +910,12 @@ _kernelAddChairTermSU3_Term12_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmega,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -914,7 +948,12 @@ _kernelAddChairTermSU3_Term34_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmega,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -946,7 +985,12 @@ _kernelAddChairTermSU3_Term5_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     Real betaOverN, Real fOmegaSq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -1987,7 +2031,11 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
 /**
 * The implementation depends on the type of gauge field
 */
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#else
 Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#endif
 {
     if (bBeforeEvolution)
     {

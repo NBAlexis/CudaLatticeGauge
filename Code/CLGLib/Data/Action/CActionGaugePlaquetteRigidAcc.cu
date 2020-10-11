@@ -62,11 +62,20 @@ _kernelEnergy_RigidAcc_Simplified(
     const SIndex* __restrict__ pCachedIndex,
     BYTE plaqLength, BYTE plaqCount,
     Real betaOverN, Real fG,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE resThisThread = 0.0;
+#else
     Real resThisThread = F(0.0);
+#endif
     const UINT plaqCountAll = plaqCount * plaqLength;
     for (BYTE i = 0; i < plaqCount; ++i)
     {
@@ -337,7 +346,11 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGauge(const CFieldGauge * p
     return TRUE;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#else
 Real CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#endif
 {
     if (bBeforeEvolution)
     {

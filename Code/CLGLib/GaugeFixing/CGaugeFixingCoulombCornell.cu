@@ -307,7 +307,11 @@ _kernelGaugeTransform3DT(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateTrAGradientSq3D(
     SBYTE uiT,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* pDeviceRes,
+#else
     Real* pDeviceRes,
+#endif
     const Real* __restrict__ pDeltaA11,
     const CLGComplex* __restrict__ pDeltaA12,
     const CLGComplex* __restrict__ pDeltaA13,
@@ -319,14 +323,22 @@ _kernelCalculateTrAGradientSq3D(
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
     if (site.IsDirichlet())
     {
+#if !_CLG_DOUBLEFLOAT
+        pDeviceRes[uiSiteIndex3D] = 0.0;
+#else
         pDeviceRes[uiSiteIndex3D] = F(0.0);
+#endif
     }
 
     const Real fAbs1 = _cuCabsf(pDeltaA12[uiSiteIndex3D]);
     const Real fAbs2 = _cuCabsf(pDeltaA13[uiSiteIndex3D]);
     const Real fAbs3 = _cuCabsf(pDeltaA23[uiSiteIndex3D]);
     const Real fM1122 = pDeltaA11[uiSiteIndex3D] + pDeltaA22[uiSiteIndex3D];
+#if !_CLG_DOUBLEFLOAT
+    pDeviceRes[uiSiteIndex3D] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#else
     pDeviceRes[uiSiteIndex3D] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#endif
 }
 
 
@@ -604,7 +616,11 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
         return F(0.0);
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fRet = 2.0;
+#else
     Real fRet = F(0.0);
+#endif
 
     preparethread_S;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)

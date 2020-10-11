@@ -27,7 +27,7 @@ CSLASolverGMRES::CSLASolverGMRES()
 
 CSLASolverGMRES::~CSLASolverGMRES()
 {
-    ReleaseBuffers();
+    CSLASolverGMRES::ReleaseBuffers();
     appSafeDelete(m_pHelper);
 }
 
@@ -69,6 +69,11 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        }
     }
 
     //We do not need to initialize the entries of H matrix since they are never visited.
@@ -139,7 +144,11 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             pW->ApplyOperator(uiM, pGaugeFeild);
             for (UINT k = 0; k <= j; ++k)
             {
+#if !_CLG_DOUBLEFLOAT
+                const CLGComplex dotc = _cToFloat(m_lstVectors[k]->Dot(pW));
+#else
                 const CLGComplex dotc = m_lstVectors[k]->Dot(pW);
+#endif
                 m_h[HIndex(k, j)] = dotc;
                 //w -= h[k,j] v[k]
                 pW->Axpy(_make_cuComplex(-dotc.x, -dotc.y), m_lstVectors[k]);

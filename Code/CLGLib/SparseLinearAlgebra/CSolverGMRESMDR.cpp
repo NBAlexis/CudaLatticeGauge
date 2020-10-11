@@ -36,7 +36,11 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
             for (UINT j = 0; j < m_uiKDim; ++j)
             {
                 //Q^+ AQ
+#if !_CLG_DOUBLEFLOAT
+                m_pHostHmGm[i * m_uiKDim + j] = _cToFloat(m_lstU[i]->Dot(m_lstC[j]));
+#else
                 m_pHostHmGm[i * m_uiKDim + j] = m_lstU[i]->Dot(m_lstC[j]);
+#endif
             }
         }
 
@@ -51,12 +55,22 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
             for (UINT j = 0; j < m_uiKDim; ++j)
             {
                 //Q^+ A^+ Q
+#if !_CLG_DOUBLEFLOAT
+                m_pHostB[i * m_uiKDim + j] = _cToFloat(m_lstC[i]->Dot(m_lstU[j]));
+                if (j >= i)
+                {
+                    //Q^+A^+ AQ
+                    m_pHostHmGm[i * m_uiKDim + j] = _cToFloat(m_lstC[i]->Dot(m_lstC[j]));
+            }
+#else
                 m_pHostB[i * m_uiKDim + j] = m_lstC[i]->Dot(m_lstU[j]);
                 if (j >= i)
                 {
                     //Q^+A^+ AQ
                     m_pHostHmGm[i * m_uiKDim + j] = m_lstC[i]->Dot(m_lstC[j]);
                 }
+#endif
+
             }
         }
         for (UINT i = 0; i < m_uiKDim; ++i)
@@ -80,7 +94,11 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
             for (UINT j = i; j < m_uiKDim; ++j)
             {
                 //Q^+A^+ AQ
+#if !_CLG_DOUBLEFLOAT
+                m_pHostHmGm[i * m_uiKDim + j] = _cToFloat(m_lstC[i]->Dot(m_lstC[j]));
+#else
                 m_pHostHmGm[i * m_uiKDim + j] = m_lstC[i]->Dot(m_lstC[j]);
+#endif
             }
         }
         for (UINT i = 0; i < m_uiKDim; ++i)
@@ -105,7 +123,11 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
     pR->ApplyOperator(uiM, pGaugeField, EOCT_Minus); //r0 = -A x0
     pR->AxpyPlus(pFieldB); //r0 = b-Ax0
 
+#if !_CLG_DOUBLEFLOAT
+    m_cLastDiviation = _cToFloat(pR->Dot(pR));
+#else
     m_cLastDiviation = pR->Dot(pR);
+#endif
     m_fDiviation = _hostsqrt(__cuCabsSqf(m_cLastDiviation));
 }
 
@@ -130,7 +152,11 @@ void CSLASolverGMRESMDR::QRFactorizationOfUk()
         m_lstU[i]->ScalarMultply(F(1.0) / fLength);
         for (UINT j = i + 1; j < m_uiKDim; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            m_pHostTmpR[i * m_uiKDim + j] = _cToFloat(m_lstU[i]->Dot(m_lstU[j]));
+#else
             m_pHostTmpR[i * m_uiKDim + j] = m_lstU[i]->Dot(m_lstU[j]);
+#endif
             m_lstU[j]->Axpy(
                 _make_cuComplex(
                     -m_pHostTmpR[i * m_uiKDim + j].x,

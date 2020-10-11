@@ -21,11 +21,20 @@ _CLG_LAUNCH_BOUND
 _kernelTopoChargeClover(
     const deviceSU3* __restrict__ pDeviceBuffer,
     BYTE byFieldId,
-    Real* pResBuffer)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* pResBuffer
+#else
+    Real* pResBuffer
+#endif
+)
 {
     intokernalInt4;
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fRes = 0.0;
+#else
     Real fRes = F(0.0);
+#endif
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         fRes = _deviceTopologicalCharge(pDeviceBuffer, byFieldId, sSite4, uiN);
@@ -37,12 +46,21 @@ _kernelTopoChargeClover(
 __global__ void
 _CLG_LAUNCH_BOUND
 _kernelTopoChargeSumOverZT(
-    const Real* __restrict__ pChargeDensity, 
-    Real* densityXYPlane)
+#if !_CLG_DOUBLEFLOAT
+    const DOUBLE* __restrict__ pChargeDensity,
+#else
+    const Real* __restrict__ pChargeDensity,   
+#endif
+    Real* densityXYPlane
+)
 {
     intokernalInt4;
     const UINT uiXYIndex = sSite4.x * _DC_Ly + sSite4.y;
+#if !_CLG_DOUBLEFLOAT
+    atomicAdd(&densityXYPlane[uiXYIndex], static_cast<Real>(pChargeDensity[uiSiteIndex]));
+#else
     atomicAdd(&densityXYPlane[uiXYIndex], pChargeDensity[uiSiteIndex]);
+#endif
 }
 
 #pragma endregion

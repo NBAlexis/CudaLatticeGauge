@@ -25,7 +25,7 @@ CSLASolverBiCGStab::CSLASolverBiCGStab()
 
 CSLASolverBiCGStab::~CSLASolverBiCGStab()
 {
-    ReleaseBuffers();
+    CSLASolverBiCGStab::ReleaseBuffers();
 }
 
 void CSLASolverBiCGStab::Configurate(const CParameters& param)
@@ -51,6 +51,11 @@ void CSLASolverBiCGStab::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        }
     }
 }
 
@@ -79,7 +84,11 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
     {
+#if !_CLG_DOUBLEFLOAT
+        fBLength = cuCabs(pFieldB->Dot(pFieldB));
+#else
         fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
+#endif
     }
 
     appParanoiac(_T("-- CSLASolverBiCGStab::Solve start operator: %s--\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
@@ -116,10 +125,14 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
         {
             //==========
             //One step
+#if !_CLG_DOUBLEFLOAT
+            rho = _cToFloat(pRh->Dot(pR));
+#else
             rho = pRh->Dot(pR);//rho = rh dot r(i-1), if rho = 0, failed (assume will not)
+#endif
             if (__cuCabsSqf(rho) < _CLG_FLT_MIN)
             {
-                appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.18f, i: %d\n"), rho, i);
+                appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.18f, i: %d\n"), __cuCabsSqf(rho), i);
                 if (i < m_uiReTry - 1)
                 {
                     i = m_uiReTry - 1;
@@ -145,9 +158,11 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
             //v(i) = A p(i)
             pP->CopyTo(pV);
             pV->ApplyOperator(uiM, pGaugeFeild);
-
+#if !_CLG_DOUBLEFLOAT
+            alpha = _cuCdivf(rho, _cToFloat(pRh->Dot(pV)));//alpha = rho / (rh dot v(i))
+#else
             alpha = _cuCdivf(rho, pRh->Dot(pV));//alpha = rho / (rh dot v(i))
-
+#endif
             //s=r(i-1) - alpha v(i)
             pR->CopyTo(pS);
             pS->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pV);
@@ -177,8 +192,11 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
             //t=As
             pS->CopyTo(pT);
             pT->ApplyOperator(uiM, pGaugeFeild);
-
+#if !_CLG_DOUBLEFLOAT
+            omega = cuCdivf_cr_host(_cToFloat(pS->Dot(pT)), static_cast<Real>(pT->Dot(pT).x));//omega = ts / tt
+#else
             omega = cuCdivf_cr_host(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt
+#endif
 
             //r(i)=s-omega t
             pS->CopyTo(pR);
@@ -231,7 +249,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
     {
+#if !_CLG_DOUBLEFLOAT
+        fBLength = cuCabs(pFieldB->Dot(pFieldB));
+#else
         fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
+#endif
     }
 
     appParanoiac(_T("-- CSLASolverBiCGStab::Solve start operator: %s--\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
@@ -280,12 +302,16 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             if (0 == j)
             {
                 //for j > 0, rho is calculated at the end of this loop
+#if !_CLG_DOUBLEFLOAT
+                rho = _cToFloat(pRh->Dot(pR));
+#else
                 rho = pRh->Dot(pR);
+#endif
             }
             
             if (__cuCabsSqf(rho) < _CLG_FLT_MIN) //if rho = 0, failed (assume will not)    
             {
-                appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.28f\n"), rho);
+                appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.28f\n"), __cuCabsSqf(rho));
                 if (i < m_uiReTry - 1)
                 {
                     i = m_uiReTry - 1;
@@ -297,7 +323,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             //v(i) = A p(i)
             pP->CopyTo(pV);
             pV->ApplyOperator(uiM, pGaugeFeild);
+#if !_CLG_DOUBLEFLOAT
+            alpha = _cuCdivf(rho, _cToFloat(pRh->Dot(pV)));//alpha = rho / (rh dot v(i))
+#else
             alpha = _cuCdivf(rho, pRh->Dot(pV));//alpha = rho / (rh dot v(i))
+#endif
             
             //s=r(i-1) - alpha v(i)
             pR->CopyTo(pS);
@@ -330,13 +360,21 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pS->CopyTo(pT);
             pT->ApplyOperator(uiM, pGaugeFeild);
 
+#if !_CLG_DOUBLEFLOAT
+            omega = cuCdivf_cr_host(_cToFloat(pS->Dot(pT)), static_cast<Real>(pT->Dot(pT).x));//omega = ts / tt
+#else
             omega = cuCdivf_cr_host(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt
+#endif
 
             //r(i)=s-omega t
             pS->CopyTo(pR);
             pR->Axpy(_make_cuComplex(-omega.x, -omega.y), pT);
             beta = _cuCdivf(alpha, _cuCmulf(omega, rho));
+#if !_CLG_DOUBLEFLOAT
+            rho = _cToFloat(pRh->Dot(pR));
+#else
             rho = pRh->Dot(pR);
+#endif
             beta = _cuCmulf(beta, rho);
 
             //x(i)=x(i-1) + alpha p + omega s

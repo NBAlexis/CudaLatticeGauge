@@ -540,10 +540,20 @@ _kernelAxpyRealFermionKS(deviceSU3Vector* pMe, const deviceSU3Vector* __restrict
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelDotFermionKS(const deviceSU3Vector* __restrict__ pMe, const deviceSU3Vector* __restrict__ pOther, CLGComplex* result)
+_kernelDotFermionKS(const deviceSU3Vector* __restrict__ pMe, const deviceSU3Vector* __restrict__ pOther,
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex* result
+#endif
+)
 {
     intokernal;
+#if !_CLG_DOUBLEFLOAT
+    result[uiSiteIndex] = _cToDouble(pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]));
+#else
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
+#endif
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -1124,12 +1134,16 @@ void CFieldFermionKSSU3::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexFermionKS << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
+#if !_CLG_DOUBLEFLOAT
+cuDoubleComplex CFieldFermionKSSU3::Dot(const CField* x) const
+#else
 CLGComplex CFieldFermionKSSU3::Dot(const CField* x) const
+#endif
 {
     if (NULL == x || EFT_FermionStaggeredSU3 != x->GetFieldType())
     {
         appCrucial(_T("CFieldFermionKSSU3 can only copy to CFieldFermionKSSU3!"));
-        return _make_cuComplex(0, 0);
+        return make_cuDoubleComplex(0, 0);
     }
     const CFieldFermionKSSU3* pField = dynamic_cast<const CFieldFermionKSSU3*>(x);
     preparethread;

@@ -379,11 +379,20 @@ _kernelAxpyRealFermionWilsonSquareSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotFermionWilsonSquareSU3(
     const deviceWilsonVectorSU3 * __restrict__ pMe, 
-    const deviceWilsonVectorSU3 * __restrict__ pOther, 
-    CLGComplex * result)
+    const deviceWilsonVectorSU3 * __restrict__ pOther,
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex * result
+#endif
+)
 {
     intokernal;
+#if !_CLG_DOUBLEFLOAT
+    result[uiSiteIndex] = _cToDouble(pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]));
+#else
     result[uiSiteIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
+#endif
 }
 
 //__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
@@ -772,12 +781,16 @@ void CFieldFermionWilsonSquareSU3::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
+#if !_CLG_DOUBLEFLOAT
+cuDoubleComplex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
+#else
 CLGComplex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const
+#endif
 {
     if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
-        return _make_cuComplex(0,0);
+        return make_cuDoubleComplex(0,0);
     }
     const CFieldFermionWilsonSquareSU3 * pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
     preparethread;

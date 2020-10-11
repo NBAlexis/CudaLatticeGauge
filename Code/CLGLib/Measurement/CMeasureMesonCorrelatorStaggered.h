@@ -70,7 +70,11 @@ protected:
     BYTE* m_pDeviceSignTable;
     BYTE* m_pDeviceDeltaTable;
     CLGComplex* m_pDevicePropogators;
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* m_pDevicePropogatorsEveryTimeSlice;
+#else
     CLGComplex* m_pDevicePropogatorsEveryTimeSlice;
+#endif
 
     //This is 20 x (Lt - 2)
     CLGComplex* m_pResPropogators;

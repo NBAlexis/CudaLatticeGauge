@@ -99,7 +99,11 @@ public:
     virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
     virtual void Dagger() = 0;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE GetLength() const { return m_fLength; }
+#else
     Real GetLength() const { return m_fLength; }
+#endif
     //This is a * me
     virtual void ScalarMultply(const CLGComplex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
@@ -120,7 +124,19 @@ public:
     * Using pDeviceBuffer, we make sure Dot function is a constant function as it should be.
     * The final result of dot, should be sum of pDeviceBuffer
     */
+#if !_CLG_DOUBLEFLOAT
+    virtual cuDoubleComplex Dot(const CField* other) const = 0;
+    virtual CLGComplex DotReal(const CField* other) const
+    {
+        return _cToFloat(Dot(other));
+    }
+#else
     virtual CLGComplex Dot(const CField* other) const = 0;
+    virtual CLGComplex DotReal(const CField* other) const
+    {
+        return Dot(other);
+    }
+#endif
 
     virtual void CopyTo(CField* U) const
     {
@@ -142,7 +158,11 @@ public:
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE m_fLength;
+#else
     Real m_fLength;
+#endif
 
     void Return();
 

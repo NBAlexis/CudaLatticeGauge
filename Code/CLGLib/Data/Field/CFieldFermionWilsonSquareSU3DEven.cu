@@ -601,7 +601,12 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDotFermionWilsonSquareSU3_Even(
     const deviceWilsonVectorSU3* __restrict__ pMe,
     const deviceWilsonVectorSU3* __restrict__ pOther,
-    CLGComplex* result)
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex* result
+#endif
+)
 {
     const UINT uiEvenIndex = ((threadIdx.x + blockIdx.x * blockDim.x) * _DC_GridDimZT + (threadIdx.y + blockIdx.y * blockDim.y) * _DC_Lt + (threadIdx.z + blockIdx.z * blockDim.z));
     UINT uiSiteIndex = uiEvenIndex << 1; 
@@ -611,7 +616,11 @@ _kernelDotFermionWilsonSquareSU3_Even(
     }
     //SSmallInt4 sSite4 = __deviceSiteIndexToInt4(uiSiteIndex);
     //printf("uiEvenIndex = %d, idx = (%d, %d, %d, %d)\n", uiEvenIndex, sSite4.x, sSite4.y, sSite4.z, sSite4.w);
+#if !_CLG_DOUBLEFLOAT
+    result[uiEvenIndex] = _cToDouble(pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]));
+#else
     result[uiEvenIndex] = pMe[uiSiteIndex].ConjugateDotC(pOther[uiSiteIndex]);
+#endif
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -787,12 +796,16 @@ void CFieldFermionWilsonSU3DEven::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexFermionWilsonSquareSU3_Even << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
+#if !_CLG_DOUBLEFLOAT
+cuDoubleComplex CFieldFermionWilsonSU3DEven::Dot(const CField* x) const
+#else
 CLGComplex CFieldFermionWilsonSU3DEven::Dot(const CField* x) const
+#endif
 {
     if (NULL == x || EFT_FermionWilsonSquareSU3 != x->GetFieldType())
     {
         appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
-        return _make_cuComplex(0, 0);
+        return make_cuDoubleComplex(0, 0);
     }
     const CFieldFermionWilsonSquareSU3* pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(x);
 

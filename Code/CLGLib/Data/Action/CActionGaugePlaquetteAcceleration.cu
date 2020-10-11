@@ -26,7 +26,12 @@ _kernelAdd4PlaqutteTermSU3_Acc(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     Real betaOverN, Real fGsq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     //intokernalInt4;
     SSmallInt4 sSite4;
@@ -76,7 +81,11 @@ _kernelAdd4PlaqutteTermSU3_Acc(
     }
 
     //Note that Retr[U14] = Retr[U41], Retr[U24] = Retr[U42], so it is OK
+#if !_CLG_DOUBLEFLOAT
+    atomicAdd(&results[uiSiteIndex], static_cast<DOUBLE>(betaOverN * (F(3.0) - toAdd.ReTr()) * _deviceGnAcc(sSite4, fGsq)));
+#else
     atomicAdd(&results[uiSiteIndex], betaOverN * (F(3.0) - toAdd.ReTr()) * _deviceGnAcc(sSite4, fGsq));
+#endif
 
 }
 
@@ -89,7 +98,12 @@ _kernelAddChairTermSU3_Chair_Acc(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     Real betaOverN, Real fG,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -436,7 +450,11 @@ UBOOL CActionGaugePlaquetteAcceleration::CalculateForceOnGauge(const CFieldGauge
     return TRUE;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionGaugePlaquetteAcceleration::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#else
 Real CActionGaugePlaquetteAcceleration::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#endif
 {
     if (bBeforeEvolution)
     {

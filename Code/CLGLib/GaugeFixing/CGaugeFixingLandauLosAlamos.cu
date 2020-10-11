@@ -307,7 +307,11 @@ _kernelCalculateAAll(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateLandauDivation(
     BYTE byFieldId,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* pDeviceRes,
+#else
     Real* pDeviceRes,
+#endif
     const Real* __restrict__ pA11,
     const CLGComplex* __restrict__ pA12,
     const CLGComplex* __restrict__ pA13,
@@ -321,7 +325,11 @@ _kernelCalculateLandauDivation(
 
     if (site.IsDirichlet())
     {
+#if !_CLG_DOUBLEFLOAT
+        pDeviceRes[uiSiteIndex] = 0.0;
+#else
         pDeviceRes[uiSiteIndex] = F(0.0);
+#endif
         return;
     }
 
@@ -377,7 +385,11 @@ _kernelCalculateLandauDivation(
     const Real fAbs2 = _cuCabsf(g13);
     const Real fAbs3 = _cuCabsf(g23);
     const Real fM1122 = g11 + g22;
+#if !_CLG_DOUBLEFLOAT
+    pDeviceRes[uiSiteIndex] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#else
     pDeviceRes[uiSiteIndex] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#endif
 }
 
 

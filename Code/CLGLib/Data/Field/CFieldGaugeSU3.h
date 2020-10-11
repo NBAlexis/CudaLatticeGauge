@@ -47,10 +47,17 @@ public:
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
     void MakeRandomGenerator() override;
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
+    DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override;
+    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
+    DOUBLE CalculateKinematicEnergy() const override;
+#else
     Real CalculatePlaqutteEnergy(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
     Real CalculateKinematicEnergy() const override;
+#endif
 
 #pragma endregion
 
@@ -93,7 +100,11 @@ public:
     void ExpMult(Real a, CField* U) const override;
 
     void ElementNormalize() override;
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex Dot(const CField* other) const override;
+#else
     CLGComplex Dot(const CField* other) const override;
+#endif
     void SaveToFile(const CCString &fileName) const override;
     void SaveToCompressedFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;

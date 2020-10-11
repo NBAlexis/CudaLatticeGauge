@@ -95,6 +95,7 @@
 
 #define _D_ComplexThreadBuffer (appGetCudaHelper()->m_pComplexBufferThreadCount)
 #define _D_RealThreadBuffer (appGetCudaHelper()->m_pRealBufferThreadCount)
+
 //#define _D_IndexBuffer (appGetCudaHelper()->m_pIndexBuffer)
 
 

@@ -58,7 +58,7 @@ CSLASolverGCRODR::CSLASolverGCRODR()
 
 CSLASolverGCRODR::~CSLASolverGCRODR()
 {
-    ReleaseBuffers();
+    CSLASolverGCRODR::ReleaseBuffers();
     appSafeDelete(m_pHelper);
     appSafeDelete(m_pFieldMatrix);
 }
@@ -107,6 +107,11 @@ void CSLASolverGCRODR::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        }
     }
 
     CCString sDeflate = _T("EEDT_SVD");
@@ -271,7 +276,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             for (UINT k = 0; k < m_uiKDim; ++k)
             {
                 //B(k, j) = C(k)^dagger AV(j)
+#if !_CLG_DOUBLEFLOAT
+                const CLGComplex CkH_W = _cToFloat(m_lstC[k]->Dot(pW));
+#else
                 const CLGComplex CkH_W = m_lstC[k]->Dot(pW);
+#endif
                 m_pHostHmGm[k * m_uiMDim + j] = CkH_W;
                 //v(j+1) = (I - Ck CkH).A v(j)
                 vjp1->Axpy(_make_cuComplex(-CkH_W.x, -CkH_W.y), m_lstC[k]);
@@ -279,7 +288,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             for (UINT k = m_uiKDim; k <= j; ++k)
             {
                 CField* vk = GetW(k);
+#if !_CLG_DOUBLEFLOAT
+                const CLGComplex dotc = _cToFloat(vk->Dot(vjp1));
+#else
                 const CLGComplex dotc = vk->Dot(vjp1);
+#endif
                 m_pHostHmGm[k * m_uiMDim + j] = dotc;
                 //w -= h[k,j] v[k]
                 vjp1->Axpy(_make_cuComplex(-dotc.x, -dotc.y), vk);
@@ -322,7 +335,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             pX->CopyTo(pW);
             pW->ApplyOperator(uiM, pFieldGauge, EOCT_Minus); //x0 = -A x0
             pW->AxpyPlus(pFieldB); //x0 = b-Ax0
+#if !_CLG_DOUBLEFLOAT
+            m_cLastDiviation = _cToFloat(pW->Dot(pW));
+#else
             m_cLastDiviation = pW->Dot(pW);
+#endif
             m_fDiviation = _hostsqrt(m_cLastDiviation.x);
         }
         else
@@ -334,7 +351,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             {
                 pW->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
             }
+#if !_CLG_DOUBLEFLOAT
+            m_cLastDiviation = _cToFloat(pW->Dot(pW));
+#else
             m_cLastDiviation = pW->Dot(pW);
+#endif
             m_fDiviation = _hostsqrt(m_cLastDiviation.x);
         }
 
@@ -395,7 +416,11 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         for (UINT k = 0; k <= j; ++k)
         {
             CField* vk = GetW(k);
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex dotc = _cToFloat(vk->Dot(vjp1));
+#else
             const CLGComplex dotc = vk->Dot(vjp1);
+#endif
             m_pHostHmGm[k * m_uiMDim + j] = dotc;
             //w -= h[k,j] v[k]
             vjp1->Axpy(_make_cuComplex(-dotc.x, -dotc.y), vk);
@@ -431,7 +456,11 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         {
             pR->Axpy(_make_cuComplex(-m_pHostY[j].x, -m_pHostY[j].y), GetW(j));
         }
+#if !_CLG_DOUBLEFLOAT
+        m_cLastDiviation = _cToFloat(pR->Dot(pR));
+#else
         m_cLastDiviation = pR->Dot(pR);
+#endif
         m_fDiviation = _hostsqrt(m_cLastDiviation.x);
     }
     else
@@ -439,7 +468,11 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         pX->CopyTo(pR);
         pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
+#if !_CLG_DOUBLEFLOAT
+        m_cLastDiviation = _cToFloat(pR->Dot(pR));
+#else
         m_cLastDiviation = pR->Dot(pR);
+#endif
         m_fDiviation = _hostsqrt(m_cLastDiviation.x);
     }
 
@@ -468,7 +501,11 @@ void CSLASolverGCRODR::QRFactorAY(const CFieldGauge* pGaugeField, EFieldOperator
         m_lstC[i]->ScalarMultply(F(1.0) / fLength);
         for (UINT j = i + 1; j < m_uiKDim; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            m_pHostTmpR[i * m_uiKDim + j] = _cToFloat(m_lstC[i]->Dot(m_lstC[j]));
+#else
             m_pHostTmpR[i * m_uiKDim + j] = m_lstC[i]->Dot(m_lstC[j]);
+#endif
             m_lstC[j]->Axpy(
                 _make_cuComplex(
                     -m_pHostTmpR[i * m_uiKDim + j].x,
@@ -523,12 +560,20 @@ void CSLASolverGCRODR::FindPk2()
                 if (i < m_uiKDim && j < m_uiKDim)
                 {
                     //Ui dagger Cj
+#if !_CLG_DOUBLEFLOAT
+                    m_pHostALeft[i * (m_uiMDim + 1) + j] = _cToFloat(m_lstU[i]->Dot(m_lstC[j]));
+#else
                     m_pHostALeft[i * (m_uiMDim + 1) + j] = m_lstU[i]->Dot(m_lstC[j]);
+#endif
                 }
                 else if (i < m_uiKDim && j >= m_uiKDim)
                 {
                     //Ui dagger V[j + m_uiK]
+#if !_CLG_DOUBLEFLOAT
+                    m_pHostALeft[i * (m_uiMDim + 1) + j] = _cToFloat(m_lstU[i]->Dot(m_lstV[j - m_uiKDim]));
+#else
                     m_pHostALeft[i * (m_uiMDim + 1) + j] = m_lstU[i]->Dot(m_lstV[j - m_uiKDim]);
+#endif
                 }
                 else // i >= m_uiKDim
                 {
@@ -558,7 +603,11 @@ void CSLASolverGCRODR::FindPk2()
                     }
                     else
                     {
+#if !_CLG_DOUBLEFLOAT
+                        m_pHostB[i * m_uiMDim + j] = _cToFloat(m_lstU[i]->Dot(m_lstU[j]));
+#else
                         m_pHostB[i * m_uiMDim + j] = m_lstU[i]->Dot(m_lstU[j]);
+#endif
                     }
                 }
                 else if (i < m_uiKDim && j >= m_uiKDim)
@@ -602,13 +651,21 @@ void CSLASolverGCRODR::FindPk2()
             {
                 if (i < m_uiKDim && j < m_uiKDim)
                 {
+#if !_CLG_DOUBLEFLOAT
+                    m_pHostALeft[i * m_uiMDim + j] = _cToFloat(m_lstC[i]->Dot(m_lstU[j]));
+#else
                     //Ui dagger Cj
                     m_pHostALeft[i * m_uiMDim + j] = m_lstC[i]->Dot(m_lstU[j]);
+#endif
                 }
                 else if (i >= m_uiKDim && j < m_uiKDim)
                 {
+#if !_CLG_DOUBLEFLOAT
+                    m_pHostALeft[i * m_uiMDim + j] = _cToFloat(m_lstV[i - m_uiKDim]->Dot(m_lstU[j]));
+#else
                     //Ui dagger V[j + m_uiK]
                     m_pHostALeft[i * m_uiMDim + j] = m_lstV[i - m_uiKDim]->Dot(m_lstU[j]);
+#endif
                 }
                 else // j >= m_uiKDim
                 {
@@ -644,7 +701,11 @@ void CSLASolverGCRODR::FindPk2()
                     }
                     else
                     {
+#if !_CLG_DOUBLEFLOAT
+                        m_pHostB[i * m_uiMDim + j] = _cToFloat(m_lstU[i]->Dot(m_lstU[j]));
+#else
                         m_pHostB[i * m_uiMDim + j] = m_lstU[i]->Dot(m_lstU[j]);
+#endif
                     }
                 }
                 else  // i >= m_uiKDim || j >= m_uiKDim
@@ -746,8 +807,12 @@ void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField*
     pX->CopyTo(pR);
     pR->ApplyOperator(uiM, pGaugeField, EOCT_Minus); //r0 = -A x0
     pR->AxpyPlus(pFieldB); //r0 = b-Ax0
-    
+
+#if !_CLG_DOUBLEFLOAT
+    m_cLastDiviation = _cToFloat(pR->Dot(pR));
+#else
     m_cLastDiviation = pR->Dot(pR);
+#endif
     m_fDiviation = _hostsqrt(__cuCabsSqf(m_cLastDiviation));
 }
 
@@ -760,7 +825,11 @@ void CSLASolverGCRODR::NormUkAndSetD()
 
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex dotres = _cToFloat(m_lstU[i]->Dot(m_lstU[i]));
+#else
         const CLGComplex dotres = m_lstU[i]->Dot(m_lstU[i]);
+#endif
         const Real fLength = F(1.0) / _hostsqrt(dotres.x);
         m_pHostHmGm[i * m_uiMDim + i] = _make_cuComplex(fLength, F(0.0));
         m_lstU[i]->ScalarMultply(fLength);
@@ -772,7 +841,11 @@ void CSLASolverGCRODR::OrthognalXR(CField* pX, CField* pR, CField* pTmp)
     pR->CopyTo(pTmp);
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
+#if !_CLG_DOUBLEFLOAT
+        CLGComplex CkH_R0 = _cToFloat(m_lstC[i]->Dot(pTmp));
+#else
         CLGComplex CkH_R0 = m_lstC[i]->Dot(pTmp);
+#endif
         //x=x+Uk CkH r0
         pX->Axpy(CkH_R0, m_lstU[i]);
         //r=r-Ck CkH r0

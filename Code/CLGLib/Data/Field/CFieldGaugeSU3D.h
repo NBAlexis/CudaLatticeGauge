@@ -43,14 +43,21 @@ public:
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
 
     void MakeRandomGenerator() override;
-    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
-
-    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
+    DOUBLE CalculateKinematicEnergy() const override;
+    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override
     {
         return CalculatePlaqutteEnergy(betaOverN);
     }
-
+#else
+    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
     Real CalculateKinematicEnergy() const override;
+    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge* pStaple) const override
+    {
+        return CalculatePlaqutteEnergy(betaOverN);
+    }
+#endif
 
 #pragma endregion
 

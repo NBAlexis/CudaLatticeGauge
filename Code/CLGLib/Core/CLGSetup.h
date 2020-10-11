@@ -35,9 +35,9 @@
 //Note that single float is rarely the problem for accuracy, but much much faster
 #ifndef _CLG_DOUBLEFLOAT
 #if _CLG_DEBUG
-#define _CLG_DOUBLEFLOAT 1
+#define _CLG_DOUBLEFLOAT 0
 #else
-#define _CLG_DOUBLEFLOAT 1
+#define _CLG_DOUBLEFLOAT 0
 #endif
 #endif
 

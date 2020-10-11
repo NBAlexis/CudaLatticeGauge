@@ -97,6 +97,10 @@ public:
 
     _FetchFunction(Real)
 
+#if !_CLG_DOUBLEFLOAT
+    _FetchFunction(DOUBLE)
+#endif
+
     UBOOL FetchStringValue(const CCString& key, CCString& value) const
     {
         if (m_pStrings.Lookup(key, value))

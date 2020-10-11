@@ -31,11 +31,12 @@ UINT TestSU3Generator(CParameters& sParam)
     Real sigma = 0;
     //size_t freeMemory;
     //size_t totalMemory;
+    appSetLogDate(FALSE);
     for (INT i = 0; i < fieldSampleCount; ++i)
     {
         pGauge->InitialField(EFIT_RandomGenerator);
         pGauge2->InitialField(EFIT_SumGenerator);
-        average = _cuCaddf(average, pGauge2->Dot(pGauge));
+        average = _cuCaddf(average, pGauge2->DotReal(pGauge));
         sigma += pGauge->CalculateKinematicEnergy();
 
         if (0 == (i % 50))
@@ -47,6 +48,7 @@ UINT TestSU3Generator(CParameters& sParam)
             appGeneral(_T("="));
         }
     }
+    appSetLogDate(TRUE);
     average.x = average.x / (_HC_LinkCount * 8);
     average.y = average.y / (_HC_LinkCount * 8);
     sigma = sigma / (_HC_LinkCount * 8);

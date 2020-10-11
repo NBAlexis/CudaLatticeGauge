@@ -74,7 +74,13 @@ _kernelPickPropagatorsSimple(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPickEveryTimeSliceSimple(
     const Real* __restrict__ pAll,
-    BYTE byT, BYTE byType, Real* res)
+    BYTE byT, BYTE byType,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* res
+#else
+    Real* res
+#endif
+)
 {
     const UINT uiVolumnIdx = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiSiteIndex = uiVolumnIdx * _DC_Lt + byT;

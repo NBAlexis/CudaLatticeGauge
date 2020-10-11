@@ -51,6 +51,11 @@ void CSolverTFQMR::Configurate(const CParameters& param)
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
+        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        {
+            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        }
     }
 }
 
@@ -78,7 +83,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
     Real fBLength = F(1.0);
     if (!m_bAbsoluteAccuracy)
     {
+#if !_CLG_DOUBLEFLOAT
+        fBLength = _cuCabsf(_cToFloat(pFieldB->Dot(pFieldB)));
+#else
         fBLength = _cuCabsf(pFieldB->Dot(pFieldB));
+#endif
     }
 
     appParanoiac(_T("-- CSolverTFQMR::Solve start operator: %s--\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
@@ -113,8 +122,12 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
 
         Real thetaSq = F(0.0);
         Real tau = _sqrt(pU->Dot(pU).x);
-        
+
+#if !_CLG_DOUBLEFLOAT
+        CLGComplex rho = _cToFloat(pRh->Dot(pU));
+#else
         CLGComplex rho = pRh->Dot(pU);
+#endif
         CLGComplex alpha = _make_cuComplex(F(0.0), F(0.0));
         CLGComplex eta = _make_cuComplex(F(0.0), F(0.0));
 
@@ -135,7 +148,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
 
             if (0 == (j & 1)) //even
             {
+#if !_CLG_DOUBLEFLOAT
+                alpha = _cuCdivf(rho, _cToFloat(pRh->Dot(pV)));
+#else
                 alpha = _cuCdivf(rho, pRh->Dot(pV));
+#endif
             }
 
             pW->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pAU);
@@ -158,7 +175,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
 
             if (1 == (j & 1)) //odd
             {
+#if !_CLG_DOUBLEFLOAT
+                const CLGComplex newRho = _cToFloat(pRh->Dot(pW));
+#else
                 const CLGComplex newRho = pRh->Dot(pW);
+#endif
                 CLGComplex beta = _cuCdivf(newRho, rho);
                 rho = newRho;
                 pU->ScalarMultply(beta);
@@ -182,7 +203,11 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
 
             if (0 == (j + 1) % m_uiDevationCheck)
             {
+#if !_CLG_DOUBLEFLOAT
+                const Real fErrorV = _cuCabsf(_cToFloat(pRh->Dot(pV)));
+#else
                 const Real fErrorV = _cuCabsf(pRh->Dot(pV));
+#endif
                 appParanoiac(_T("CSolverTFQMR::r* x v = %8.18f\n"), fErrorV);
                 if (fErrorV < m_fAccuracy * fBLength)
                 {

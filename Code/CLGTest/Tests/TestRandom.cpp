@@ -22,7 +22,7 @@ UINT TestRandom(CParameters& sParam)
     appGeneral(_T("------- Host random result:%f\n"), hostRandom / hostSampleCount);
 
     UINT uiError = 0;
-    Real accuracy = F(0.001);
+    Real accuracy = F(0.02);
     TArray<UINT> decompPi;
     TArray<UINT> decompGaussian; 
 

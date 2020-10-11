@@ -326,7 +326,11 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateCoulombDivation_S(
     BYTE byFieldId,
     SBYTE uiT,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* pDeviceRes,
+#else
     Real* pDeviceRes,
+#endif
     const Real* __restrict__ pA11,
     const CLGComplex* __restrict__ pA12,
     const CLGComplex* __restrict__ pA13,
@@ -340,7 +344,11 @@ _kernelCalculateCoulombDivation_S(
 
     if (site.IsDirichlet())
     {
+#if !_CLG_DOUBLEFLOAT
+        pDeviceRes[uiSiteIndex3D] = 0.0;
+#else
         pDeviceRes[uiSiteIndex3D] = F(0.0);
+#endif
         return;
     }
 
@@ -396,7 +404,11 @@ _kernelCalculateCoulombDivation_S(
     const Real fAbs2 = _cuCabsf(g13);
     const Real fAbs3 = _cuCabsf(g23);
     const Real fM1122 = g11 + g22;
+#if !_CLG_DOUBLEFLOAT
+    pDeviceRes[uiSiteIndex3D] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#else
     pDeviceRes[uiSiteIndex3D] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
+#endif
 }
 
 

@@ -42,10 +42,15 @@ public:
 
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
+    DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override;
+    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
+#else
     Real CalculatePlaqutteEnergy(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
-
+#endif
     Real m_fRectOverPlaq;
 
 #pragma endregion

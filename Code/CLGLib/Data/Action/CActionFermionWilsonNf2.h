@@ -24,7 +24,11 @@ public:
     */
     CActionFermionWilsonNf2();
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+#else
     Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+#endif
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
     void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;

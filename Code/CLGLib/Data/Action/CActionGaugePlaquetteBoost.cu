@@ -26,7 +26,12 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     Real betaOverN, Real fGsq,
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     //intokernalInt4;
     SSmallInt4 sSite4;
@@ -76,8 +81,11 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     }
 
     //Note that Retr[U14] = Retr[U41], Retr[U24] = Retr[U42], so it is OK
+#if !_CLG_DOUBLEFLOAT
+    atomicAdd(&results[uiSiteIndex], static_cast<DOUBLE>(betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq));
+#else
     atomicAdd(&results[uiSiteIndex], betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq);
-
+#endif
 }
 
 
@@ -441,7 +449,11 @@ UBOOL CActionGaugePlaquetteBoost::CalculateForceOnGauge(const CFieldGauge * pGau
     return TRUE;
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionGaugePlaquetteBoost::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#else
 Real CActionGaugePlaquetteBoost::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+#endif
 {
     if (bBeforeEvolution)
     {

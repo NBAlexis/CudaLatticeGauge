@@ -133,10 +133,17 @@ public:
         return iRet;
     }
 
+#if !_CLG_DOUBLEFLOAT
+    static DOUBLE ReduceReal(DOUBLE* deviceBuffer, UINT uiLength);
+    DOUBLE ReduceRealWithThreadCount(DOUBLE* deviceBuffer);
+    static cuDoubleComplex ReduceComplex(cuDoubleComplex* deviceBuffer, UINT uiLength);
+    cuDoubleComplex ReduceComplexWithThreadCount(cuDoubleComplex* deviceBuffer);
+#else
     static Real ReduceReal(Real* deviceBuffer, UINT uiLength);
     Real ReduceRealWithThreadCount(Real* deviceBuffer);
     static CLGComplex ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength);
     CLGComplex ReduceComplexWithThreadCount(CLGComplex* deviceBuffer);
+#endif
 
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
@@ -151,7 +158,6 @@ public:
 
     /**ret[0] = max thread count, ret[1,2,3] = max thread for x,y,z per block*/
     static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
-
 
     UINT m_ConstIntegers[kContentLength];
     Real m_ConstFloats[kContentLength];
@@ -173,7 +179,7 @@ public:
 
         checkCudaErrors(cudaFree(m_pRealBufferThreadCount));
         checkCudaErrors(cudaFree(m_pComplexBufferThreadCount));
-        
+
         //checkCudaErrors(cudaFree(m_pIndexBuffer));
 
         for (UINT i = 0; i < kMaxFieldCount; ++i)
@@ -191,16 +197,32 @@ public:
         }
     }
 
+#if !_CLG_DOUBLEFLOAT
+    void ThreadBufferZero(cuDoubleComplex* pDeviceBuffer, cuDoubleComplex cInitial = make_cuDoubleComplex(0.0, 0.0)) const;
+    void ThreadBufferZero(DOUBLE* pDeviceBuffer, DOUBLE fInitial = 0.0) const;
+#else
     void ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial = _make_cuComplex(F(0.0),F(0.0))) const;
     void ThreadBufferZero(Real * pDeviceBuffer, Real fInitial = F(0.0)) const;
+#endif
 
     //m_uiThreadCount = Volumn, so this is in fact volumn sum
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex ThreadBufferSum(cuDoubleComplex* pDeviceBuffer);
+    DOUBLE ThreadBufferSum(DOUBLE* pDeviceBuffer);
+#else
     CLGComplex ThreadBufferSum(CLGComplex * pDeviceBuffer);
     Real ThreadBufferSum(Real * pDeviceBuffer);
+#endif
 
     //struct SIndex* m_pIndexBuffer;
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* m_pComplexBufferThreadCount;
+    DOUBLE* m_pRealBufferThreadCount;
+#else
     CLGComplex * m_pComplexBufferThreadCount;
     Real * m_pRealBufferThreadCount;
+#endif
+
     class CField * m_deviceFieldPointers[kMaxFieldCount];
     class CFieldBoundary * m_deviceBoundaryFieldPointers[kMaxFieldCount];
 

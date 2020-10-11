@@ -800,7 +800,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     m_pCudaHelper->SetFieldPointers();
     m_pLatticeData->FixAllFieldBoundary();
 
-    if (m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
+    if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
     {
         appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
     }

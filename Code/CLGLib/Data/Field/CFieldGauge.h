@@ -31,6 +31,15 @@ public:
 
     virtual void MakeRandomGenerator() = 0;
 
+#if !_CLG_DOUBLEFLOAT
+    virtual DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const = 0;
+
+    virtual DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const = 0;
+
+    virtual DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStable) const = 0;
+
+    virtual DOUBLE CalculateKinematicEnergy() const = 0;
+#else
     virtual Real CalculatePlaqutteEnergy(Real betaOverN) const = 0;
 
     /**
@@ -41,6 +50,7 @@ public:
     virtual Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const = 0;
 
     virtual Real CalculateKinematicEnergy() const = 0;
+#endif
 
     /**
     * U = exp(a this)U

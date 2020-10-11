@@ -293,8 +293,14 @@ _kernelPlaqutteEnergySU3CacheIndex(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN,
+    DOUBLE* results
+#else
     Real betaOverN,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernal;
 
@@ -341,8 +347,14 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergySU3_UseClover(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fBetaOverN,
+    DOUBLE* results
+#else
     Real fBetaOverN,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -363,62 +375,17 @@ _kernelPlaqutteEnergySU3_UseClover(
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelPlaqutteEnergySU3_TestSym(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    Real fBetaOverN,
-    Real* results)
-{
-    intokernalInt4;
-
-    Real fRes = F(0.0);
-    for (BYTE byDir1 = 0; byDir1 < _DC_Dir; ++byDir1)
-    {
-        for (BYTE byDir2 = 0; byDir2 < _DC_Dir; ++byDir2)
-        {
-            if (byDir1 != byDir2)
-            {
-                fRes += _device1PlaqutteTermPP(pDeviceData, byDir1, byDir2, __bi(sSite4), sSite4, byFieldId).ReTr();
-            }
-        }
-    }
-    fRes = F(36.0) - fRes;
-    results[uiSiteIndex] = fRes * fBetaOverN * F(0.5);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelPlaqutteEnergySU3_TestEdge(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    Real fBetaOverN,
-    Real* results)
-{
-    intokernalInt4;
-
-    Real fRes = F(0.0);
-    if (0 == sSite4.z && 0 == sSite4.w)
-    {
-        if (0 == sSite4.y)// && 0 != sSite4.y && sSite4.y != _DC_Ly - 1)
-        {
-            fRes = _device1PlaqutteTermMM(pDeviceData, 0, 1, __bi(sSite4), sSite4, byFieldId).ReTr();
-            fRes = F(3.0) - fRes;
-        }
-        if (_DC_Ly - 1 == sSite4.y)// && 0 != sSite4.y && sSite4.y != _DC_Ly - 1)
-        {
-            fRes = _device1PlaqutteTermPP(pDeviceData, 0, 1, __bi(sSite4), sSite4, byFieldId).ReTr();
-            fRes = F(3.0) - fRes;
-        }
-    }
-    
-    results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergyUsingStableSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     const deviceSU3 * __restrict__ pStableData,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN,
+    DOUBLE* results
+#else
     Real betaOverN,
-    Real* results)
+    Real* results
+#endif
+)
 {
     intokernaldir;
 
@@ -476,7 +443,13 @@ _kernelExpMultSU3Real(
 * Trace (P^2)
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, Real* results)
+_kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData, 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE* results
+#else
+    Real* results
+#endif
+)
 {
     intokernaldir;
 
@@ -507,10 +480,27 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDotSU3(
     const deviceSU3 * __restrict__ pMyDeviceData, 
     const deviceSU3 * __restrict__ pOtherDeviceData,
-    CLGComplex* result)
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex* result
+#endif
+)
 {
     intokernaldir;
 
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex resThisThread = make_cuDoubleComplex(0, 0);
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        resThisThread = cuCadd(resThisThread, 
+            _cToDouble(pMyDeviceData[linkIndex].DaggerMulC(pOtherDeviceData[linkIndex]).Tr())
+        );
+    }
+
+    result[uiSiteIndex] = resThisThread;
+#else
     CLGComplex resThisThread = _make_cuComplex(0,0);
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -519,6 +509,7 @@ _kernelDotSU3(
     }
 
     result[uiSiteIndex] = resThisThread;
+#endif
     //printf("res = %f %f\n", pOtherDeviceData[uiSiteIndex * 4].m_me[0].x, pMyDeviceData[uiSiteIndex * 4].m_me[0].x);
 }
 
@@ -1077,7 +1068,11 @@ void CFieldGaugeSU3::CalculateOnlyStaple(CFieldGauge* pStable) const
         pStableSU3->m_pDeviceData);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
+#else
 Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
+#endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
 
@@ -1088,33 +1083,17 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
-        _D_RealThreadBuffer);
-
-    //Real fRet = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-    //_kernelPlaqutteEnergySU3_TestEdge << <block, threads >> > (
-    //    m_byFieldId,
-    //    m_pDeviceData,
-    //    betaOverN,
-    //    _D_RealThreadBuffer);
-    //Real* testBuffer = (Real*)malloc(sizeof(Real) * _HC_Volume);
-
-    //checkCudaErrors(cudaMemcpy(testBuffer, _D_RealThreadBuffer, sizeof(Real) * _HC_Volume, cudaMemcpyDeviceToHost));
-
-    //for (UINT i = 0; i < _HC_Volume; ++i)
-    //{
-    //    SSmallInt4 site = __hostSiteIndexToInt4(i);
-    //    if (0 == site.z && 0 == site.w)
-    //    {
-    //        appGeneral(_T("%d %d: %2.20f\n"), site.x, site.y, testBuffer[i]);
-    //    }
-    //}
-
-    //appSafeFree(testBuffer);
+        _D_RealThreadBuffer
+        );
 
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const
+#else
 Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
+#endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
 
@@ -1128,7 +1107,11 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStable) const
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge *pStable) const
+#else
+Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge* pStable) const
+#endif
 {
     if (NULL == pStable || EFT_GaugeSU3 != pStable->GetFieldType())
     {
@@ -1147,10 +1130,15 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CF
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CFieldGaugeSU3::CalculateKinematicEnergy() const
+#else
 Real CFieldGaugeSU3::CalculateKinematicEnergy() const
+#endif
 {
     preparethread;
     _kernelCalculateKinematicEnergySU3 << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);
+
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
@@ -1233,12 +1221,16 @@ void CFieldGaugeSU3::ElementNormalize()
     _kernelNormalizeSU3 << < block, threads >> > (m_pDeviceData);
 }
 
+#if !_CLG_DOUBLEFLOAT
+cuDoubleComplex CFieldGaugeSU3::Dot(const CField* other) const
+#else
 CLGComplex CFieldGaugeSU3::Dot(const CField* other) const
+#endif
 {
     if (NULL == other || EFT_GaugeSU3 != other->GetFieldType())
     {
         appCrucial("CFieldGaugeSU3: U field is not SU3");
-        return _make_cuComplex(0,0);
+        return make_cuDoubleComplex(0,0);
     }
 
     const CFieldGaugeSU3* pUField = dynamic_cast<const CFieldGaugeSU3*>(other);

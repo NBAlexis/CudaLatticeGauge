@@ -12,7 +12,7 @@
 UINT TestMultiShiftSolver(CParameters& params)
 {
     UINT uiError = 0;
-    Real fMaxError = F(0.000001);
+    Real fMaxError = F(0.00001);
     params.FetchValueReal(_T("ExpectedErr"), fMaxError);
 
     CMultiShiftSolver* pSolver = appGetMultiShiftSolver(2);
@@ -48,7 +48,7 @@ UINT TestMultiShiftSolver(CParameters& params)
     for (INT i = 0; i < constants.Num(); ++i)
     {
         resultFields[i]->AxpyMinus(pFermion);
-        const Real fError1 = _cuCabsf(resultFields[i]->Dot(resultFields[i]));
+        const Real fError1 = _cuCabsf(resultFields[i]->DotReal(resultFields[i]));
         appGeneral(_T("| D D^-1 phi - phi |^2=%8.18f, |phi|^2=%8.18f\n"), fError1, fLengthOfPhi);
         if (appAbs(fError1) > fMaxError)
         {
@@ -70,7 +70,7 @@ UINT TestMultiShiftSolver(CParameters& params)
     for (INT i = 0; i < constants.Num(); ++i)
     {
         resultFields[i]->AxpyMinus(pFermion);
-        const Real fError1 = _cuCabsf(resultFields[i]->Dot(resultFields[i]));
+        const Real fError1 = _cuCabsf(resultFields[i]->DotReal(resultFields[i]));
         appGeneral(_T("| D+ D+^-1 phi - phi |^2=%8.18f, |phi|^2=%8.18f\n"), fError1, fLengthOfPhi);
         if (appAbs(fError1) > fMaxError)
         {
@@ -92,7 +92,7 @@ UINT TestMultiShiftSolver(CParameters& params)
     for (INT i = 0; i < constants.Num(); ++i)
     {
         resultFields[i]->AxpyMinus(pFermion);
-        const Real fError1 = _cuCabsf(resultFields[i]->Dot(resultFields[i]));
+        const Real fError1 = _cuCabsf(resultFields[i]->DotReal(resultFields[i]));
         appGeneral(_T("| DD+ (DD+)^-1 phi - phi |^2=%8.18f, |phi|^2=%8.18f\n"), fError1, fLengthOfPhi);
         if (appAbs(fError1) > fMaxError)
         {
@@ -121,7 +121,7 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     params.FetchValueArrayReal(_T("MinusOneOver2"), _oneOver2);
     params.FetchValueArrayReal(_T("OneOver4"), oneOver4);
     params.FetchValueArrayReal(_T("MinusOneOver4"), _oneOver4);
-    Real fMaxError = F(0.000001);
+    Real fMaxError = F(0.00001);
     params.FetchValueReal(_T("ExpectedErr"), fMaxError);
 
     CRatinalApproximation R1Over2(oneOver2);

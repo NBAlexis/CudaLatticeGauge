@@ -220,7 +220,11 @@ void CNestedIntegrator::UpdatePF(Real fStep, ESolverPhase ePhase)
 
     if (m_bDebugForce)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
         const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
         appGeneral(_T(" ------ Fermion Force= %f \n"), force.x);
     }
 }
@@ -241,7 +245,11 @@ void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
 
     if (m_bDebugForce)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
         const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
         appGeneral(_T(" ------ Gauge Force= %f \n"), force.x);
     }
 }
@@ -409,7 +417,11 @@ void CMultiLevelNestedIntegrator::NestedEvaluateLeapfrog(INT iLevel, Real fNeste
 
     if (m_bDebugForce)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
         const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
         appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
     }
 
@@ -441,7 +453,11 @@ void CMultiLevelNestedIntegrator::NestedEvaluateLeapfrog(INT iLevel, Real fNeste
 
         if (m_bDebugForce)
         {
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
             const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
             appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
         }
     }

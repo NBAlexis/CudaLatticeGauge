@@ -55,7 +55,11 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
 
     if (m_bDebugForce)
     {
+#if !_CLG_DOUBLEFLOAT
+        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
         const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
         appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
     }
 
@@ -100,7 +104,11 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
         UpdateP(f2Over3Estep, iLevel, ESP_InTrajectory, FALSE, TRUE);
         if (m_bDebugForce)
         {
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
             const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
             appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
         }
         //restore U
@@ -138,7 +146,11 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
         }
         if (m_bDebugForce)
         {
+#if !_CLG_DOUBLEFLOAT
+            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
+#else
             const CLGComplex force = m_pForceField->Dot(m_pForceField);
+#endif
             appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
         }
     }

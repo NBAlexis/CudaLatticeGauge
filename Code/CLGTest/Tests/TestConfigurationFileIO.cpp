@@ -60,9 +60,9 @@ UINT TestFileIOCLG(CParameters& sParam)
     CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
-    const CLGComplex res1 = cuCmulf_cr(pNewGauge->Dot(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
+    const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
-    const CLGComplex res2 = pNewFermion->Dot(pNewFermion);
+    const CLGComplex res2 = pNewFermion->DotReal(pNewFermion);
 
     appGeneral(_T("Gauge file test: expeted 3.0 + 0.0i, res = %f %s %f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
     appGeneral(_T("Fermion file test: expeted 0.0 + 0.0i, res = %f %s %f\n"), res2.x, res2.y > 0 ? _T("+") : _T(""), res2.y);
@@ -98,7 +98,7 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
 
     pNewGauge->AxpyMinus(appGetLattice()->m_pGaugeField);
 
-    const CLGComplex res1 = pNewGauge->Dot(pNewGauge);
+    const CLGComplex res1 = pNewGauge->DotReal(pNewGauge);
 
     appGeneral(_T("Gauge file test: expeted 0.0 + 0.0i, res = %2.16f %s %2.16f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
 

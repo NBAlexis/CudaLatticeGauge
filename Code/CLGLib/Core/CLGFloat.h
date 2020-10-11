@@ -181,6 +181,15 @@
 #define _11Stage_RhoP (F(-0.08442961950707149))
 #define _11Stage_ThetaP (F(0.3549000571574260))
 
+static __host__ __device__ __inline__ cuDoubleComplex _cToDouble(const cuComplex& c)
+{
+    return make_cuDoubleComplex(c.x, c.y);
+}
+static __host__ __device__ __inline__ cuComplex _cToFloat(const cuDoubleComplex& c)
+{
+    return make_cuComplex(static_cast<FLOAT>(c.x), static_cast<FLOAT>(c.y));
+}
+
 __BEGIN_NAMESPACE
 
 //NOTE, _Complex is already a keyword in GCC

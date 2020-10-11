@@ -48,7 +48,11 @@ UBOOL CActionFermionKS::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldG
     return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
 }
 
+#if !_CLG_DOUBLEFLOAT
+DOUBLE CActionFermionKS::Energy(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
+#else
 Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
+#endif
 {
     //[ (DD)^(-1/4) phi ]^2
     
@@ -61,7 +65,11 @@ Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGau
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
     m_pFerimionField->CopyTo(pPooled);
     pPooled->D_MD(pGauge);
+#if !_CLG_DOUBLEFLOAT
+    const cuDoubleComplex res = pPooled->Dot(m_pFerimionField);
+#else
     const CLGComplex res = pPooled->Dot(m_pFerimionField);
+#endif
 
     appDetailed(_T("CActionFermionKS : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);
 

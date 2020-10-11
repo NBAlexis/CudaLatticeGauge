@@ -52,7 +52,11 @@ public:
     void Axpy(const CLGComplex& a, const CField* x) override;
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex Dot(const CField* other) const override;
+#else
     CLGComplex Dot(const CField* other) const override;
+#endif
 
     //=================================
     //It is tested, although, the DEBUG Mode, this is faster
