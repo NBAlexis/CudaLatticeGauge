@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure
-RotationJob : ESR_Measure
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -13,6 +13,8 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 8
     BeforeEquvibStep : 100
     EquvibSkip : 100
     EquvibStep : 500
@@ -61,7 +63,7 @@ JobSimulate:
         IntegratorType : CIntegratorNestedOmelyan
         ## IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 20
+        IntegratorStep : 25
         NestedStep : 25
         Omelyan2Lambda : 0.38636665500756728
 
@@ -248,7 +250,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -264,7 +266,7 @@ JobSimulate:
         SolverForFieldId : 3
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -273,7 +275,7 @@ JobSimulate:
         SolverForFieldId : 4
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver4:
@@ -300,7 +302,7 @@ JobSimulate:
             MaxDim : 25
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.00000001
+            Accuracy : 0.000000001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5

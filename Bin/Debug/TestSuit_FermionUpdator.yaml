@@ -521,7 +521,7 @@ TestFermionUpdatorLargeScale:
     RandomType : ER_Schrage
     RandomSeedType : ERST_Timestamp
     RandomSeed : 1234567
-    ExponentialPrecision : 0
+    ExponentialPrecision : 8
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
@@ -543,6 +543,123 @@ TestFermionUpdatorLargeScale:
         IntegratorStepLength : 1
         IntegratorStep : 8
         NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionWilsonSquareSU3
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Hopping : 0.1355
+
+        FieldId : 2
+
+        PoolNumber : 17
+
+        Period : [1, 1, 1, -1]
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 12
+        Accuracy : 0.00001
+        Restart : 10
+        AbsoluteAccuracy : 1
+
+        ##SolverName : CSLASolverGMRESMDR
+        ##SolverForFieldId : 2
+        ##MDim : 10
+        ##KDim : 2
+        ##RecalculateR : 25
+        ##DeflateSpace : EEDT_SVD
+        ##Accuracy : 0.0001
+        ##Restart : 10
+        ##AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 2.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+
+TestFermionUpdatorLargeScaleFloat:
+    ## Should be about 1100 - 1350s
+
+    ## Single float
+    ## For 32x32x32x32 lattice
+    ## 5 Gauge Fields - gauge, force, staple, evaluating gauge, momentum. 2.5GB (about 512MB each)
+    ## Total 18 Fermion fields.
+    ## 2(one for Fermion, one for cached DDdaggerInverse) 
+    ## + (Pool 6 + MaxDim) of GMRES Fermion fields, 
+    ## About 2.4GB (about 128Mb each)
+    ## 4 Index Buffers
+    ## Gauge Plaqutte per site, 8 x 24 x site = (200 Mb)
+    ## Staples, 8 x 24 x link = (800 Mb)
+    ## Gauge and Fermion move cache, about 12Mb
+    ## Random Number = 16Mb
+    ## Total > 5GB(Maximum avialiab of this computer is 4.9GB...)
+    ## AllocateBuffer : 4.9
+
+    ## The H can be as large as 2E7, 
+    ## but the max error of substraction of Single Float point can be 1E-7 (1.192092896e-07F)
+    ## So we only check the accept rate and expect plaqutte
+    ## This parameters with [32, 32, 32, 16] and Double Float is tested (on GTX1080 32^4 and double is possible), 
+    ## When equilibrium, H_diff ~ 0.25, 
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [32, 32, 32, 32]
+    ##LatticeLength : [32, 32, 32, 32]
+    ##ThreadAutoDecompose : 0
+    ##ThreadDecompose : [8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeedType : ERST_Timestamp
+    RandomSeed : 1234567
+    ExponentialPrecision : 0
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    Updates : 5
+    ##For 8x8x8x8, this is 0.17
+    ExpectedRes : 0.17
+
+    ##CacheStaple : 0
+    ##CacheSolution : 0
+
+    Updator:
+        UpdatorType : CHMC
+
+        ## The H can be as large as 2E7, 
+        ## but the max error of substraction of Single Float point can be 1E-7
+        ## So we only check the expect plaqutte, and average H_diff / H
+        Metropolis : 0
+        IntegratorType : CIntegratorNestedForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 12
+        NestedStep : 8
+        InnerLeapfrog : 1
 
     Gauge:
     

@@ -151,6 +151,10 @@ public:
             {
                 //Maybe the first initial is not entered?
             }
+            if (CRUCIAL == level)
+            {
+                *m_pStdStream << _T("\033[31;1m");
+            }
             if (m_bLogDate)
             {
                 static TCHAR timeBuffer[256];
@@ -164,9 +168,12 @@ public:
                     }
                 }
             }
-
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
             *m_pStdStream << m_cBuff;
+            if (CRUCIAL == level)
+            {
+                *m_pStdStream << _T("\033[0m");
+            }
             if (NULL != m_pStream)
             {
                 *m_pStream << m_cBuff;

@@ -75,6 +75,15 @@ int main(int argc, char * argv[])
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
 
+#if !_CLG_DOUBLEFLOAT
+    TArray<DOUBLE> pionCorrelator;
+    TArray<DOUBLE> rhoCorrelator;
+
+    TArray<DOUBLE> rho0Correlator;
+    TArray<DOUBLE> rho1Correlator;
+    TArray<DOUBLE> rho2Correlator;
+    TArray<DOUBLE> rho3Correlator;
+#else
     TArray<Real> pionCorrelator;
     TArray<Real> rhoCorrelator;
 
@@ -82,7 +91,7 @@ int main(int argc, char * argv[])
     TArray<Real> rho1Correlator;
     TArray<Real> rho2Correlator;
     TArray<Real> rho3Correlator;
-
+#endif
     //TArray<Real> potentialR;
     //TArray<CLGComplex> potentialC;
 
@@ -155,11 +164,17 @@ int main(int argc, char * argv[])
                         rho2Correlator.AddItem(pMC->m_lstResultsLastConf[2][uiLt]);
                         rho3Correlator.AddItem(pMC->m_lstResultsLastConf[3][uiLt]);
 
+#if !_CLG_DOUBLEFLOAT
+                        rhoCorrelator.AddItem((
+                            pMC->m_lstResultsLastConf[1][uiLt]
+                            + pMC->m_lstResultsLastConf[2][uiLt]
+                            + pMC->m_lstResultsLastConf[3][uiLt]) / 3.0);
+#else
                         rhoCorrelator.AddItem((
                             pMC->m_lstResultsLastConf[1][uiLt]
                             + pMC->m_lstResultsLastConf[2][uiLt]
                             + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
-
+#endif
                         rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                     }
                 }
@@ -231,11 +246,17 @@ int main(int argc, char * argv[])
                     rho1Correlator.AddItem(pMC->m_lstResultsLastConf[1][uiLt]);
                     rho2Correlator.AddItem(pMC->m_lstResultsLastConf[2][uiLt]);
                     rho3Correlator.AddItem(pMC->m_lstResultsLastConf[3][uiLt]);
+#if !_CLG_DOUBLEFLOAT
+                    rhoCorrelator.AddItem((
+                        pMC->m_lstResultsLastConf[1][uiLt]
+                        + pMC->m_lstResultsLastConf[2][uiLt]
+                        + pMC->m_lstResultsLastConf[3][uiLt]) / 3.0);
+#else
                     rhoCorrelator.AddItem((
                         pMC->m_lstResultsLastConf[1][uiLt]
                       + pMC->m_lstResultsLastConf[2][uiLt]
                       + pMC->m_lstResultsLastConf[3][uiLt]) / F(3.0));
-
+#endif
                     rho0Correlator.AddItem(pMC->m_lstResultsLastConf[4][uiLt]);
                 }
             }

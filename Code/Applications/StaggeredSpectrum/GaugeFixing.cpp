@@ -53,8 +53,13 @@ INT StaggeredGaugeFixing(CParameters& params)
             sSaveFile.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiIndex);
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
 
+#if !_CLG_DOUBLEFLOAT
+            const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+            if (fRes >= 0.0 && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
+#else
             const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
             if (fRes >= F(0.0) && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
+#endif
             {
                 if (0 == (uiIndex % 20))
                 {

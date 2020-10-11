@@ -122,7 +122,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(20, FALSE);
     appGetLattice()->m_pUpdator->Update(50, TRUE);
 
-    const Real fRes = pMeasure->m_lstResults[0][0];
+    const DOUBLE fRes = pMeasure->m_lstResults[0][0];
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
     if (appAbs(fRes - fExpected) > F(0.005))
     {
@@ -191,6 +191,9 @@ UINT TestFermionUpdatorL(CParameters& sParam)
 
 #if !_CLG_DEBUG
 __REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale);
+#if !_CLG_DOUBLEFLOAT
+__REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScaleFloat);
+#endif
 #endif
 
 UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)

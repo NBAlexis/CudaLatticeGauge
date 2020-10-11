@@ -38,7 +38,7 @@
     <ProjectGuid>{392CE519-7F1F-4B37-860D-5EEC43F5F0B3}</ProjectGuid>
     <RootNamespace>CudaLatticeGauge</RootNamespace>
     <ProjectName>ConstAcc</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

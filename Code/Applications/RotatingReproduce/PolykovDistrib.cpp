@@ -472,8 +472,13 @@ INT MeasurePolyakovDist(CParameters& params)
                 {
                     if (bCheckGaugeFixing && NULL != appGetLattice()->m_pGaugeFixing)
                     {
+#if !_CLG_DOUBLEFLOAT
+                        DOUBLE fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                        if (appAbs(fError) > F(0.000001))
+#else
                         Real fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
                         if (appAbs(fError) > F(0.000000000001))
+#endif
                         {
                             appGeneral(_T("Bad Gauge Fixing\n"));
                         }

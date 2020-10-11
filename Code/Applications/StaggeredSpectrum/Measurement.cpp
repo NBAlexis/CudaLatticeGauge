@@ -230,6 +230,212 @@ void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray
     file.close();
 }
 
+#if !_CLG_DOUBLEFLOAT
+void WriteStringFileRealArray(const CCString& sFileName, const TArray<DOUBLE>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.Num(); ++i)
+    {
+        _gcvt_s(str, 50, lst[i], iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        file << _T(" ");
+        file << sReal;
+        if (i != lst.GetCount() - 1)
+        {
+            file << _T(",");
+        }
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<DOUBLE>& lst1, const TArray<cuDoubleComplex>& lst2, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR strleft[50];
+    TCHAR strreal[50];
+    TCHAR strimg[50];
+    for (INT i = 0; i < lst1.Num(); ++i)
+    {
+        _gcvt_s(strleft, 50, lst1[i], iDigital);
+        _gcvt_s(strreal, 50, lst2[i].x, iDigital);
+        _gcvt_s(strimg, 50, lst2[i].y, iDigital);
+        CCString s1 = CCString(strleft);
+        CCString s2 = CCString(strreal);
+        CCString s3 = CCString(strimg);
+        s1 = s1.Replace(_T("e"), _T("*^"));
+        s2 = s2.Replace(_T("e"), _T("*^"));
+        s3 = s3.Replace(_T("e"), _T("*^"));
+
+        file << s1;
+        file << _T(", ");
+        file << s2;
+
+        if (s3.Left(1) == _T("-"))
+        {
+            s3 = s3.Right(s3.GetLength() - 1);
+            file << _T(" - ");
+        }
+        else
+        {
+            file << _T(" + ");
+        }
+        file << s3;
+        file << _T(" I");
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<DOUBLE>>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            _gcvt_s(str, 50, lst[i][j], iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            file << _T(" ");
+            file << sReal;
+            if (j != lst[i].GetCount() - 1)
+            {
+                file << _T(",");
+            }
+        }
+        file << _T("\n");
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileComplexArray(const CCString& sFileName, const TArray<cuDoubleComplex>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+    TCHAR str[50];
+    for (INT i = 0; i < lst.Num(); ++i)
+    {
+        _gcvt_s(str, 50, lst[i].x, iDigital);
+        CCString sReal = CCString(str);
+        sReal = sReal.Replace(_T("e"), _T("*^"));
+        _gcvt_s(str, 50, lst[i].y, iDigital);
+        CCString sImg = CCString(str);
+        sImg = sImg.Replace(_T("e"), _T("*^"));
+        CCString sMid = _T(" + ");
+        if (sImg.Left(1) == _T("-"))
+        {
+            sImg = sImg.Right(sImg.GetLength() - 1);
+            sMid = _T(" - ");
+        }
+
+        file << _T(" ");
+        file << sReal;
+        file << sMid;
+        file << sImg;
+        if (i == lst.GetCount() - 1)
+        {
+            file << _T(" I");
+        }
+        else
+        {
+            file << _T(" I,");
+        }
+    }
+    file.flush();
+    file.close();
+}
+
+void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray<cuDoubleComplex>>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = static_cast<INT>(kExportDigital);
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+
+    TCHAR str[50];
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            _gcvt_s(str, 50, lst[i][j].x, iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+            _gcvt_s(str, 50, lst[i][j].y, iDigital);
+            CCString sImg = CCString(str);
+            sImg = sImg.Replace(_T("e"), _T("*^"));
+            CCString sMid = _T(" + ");
+            if (sImg.Left(1) == _T("-"))
+            {
+                sImg = sImg.Right(sImg.GetLength() - 1);
+                sMid = _T(" - ");
+            }
+            file << _T(" ");
+            file << sReal;
+            file << sMid;
+            file << sImg;
+            if (j == lst[i].GetCount() - 1)
+            {
+                file << _T(" I");
+            }
+            else
+            {
+                file << _T(" I,");
+            }
+        }
+        file << _T("\n");
+    }
+    file.flush();
+    file.close();
+}
+
+#endif
+
 void AppendStringFile(const CCString& sFileName, const CCString& sContent)
 {
     appGetFileSystem()->AppendAllText(sFileName, sContent);
@@ -388,10 +594,18 @@ INT Measurement(CParameters& params)
         {
             CCString sCSVFile;
             sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
+#if !_CLG_DOUBLEFLOAT
+            TArray<TArray<DOUBLE>> res;
+#else
             TArray<TArray<Real>> res;
+#endif
             for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
             {
+#if !_CLG_DOUBLEFLOAT
+                TArray<DOUBLE> oneConf;
+#else
                 TArray<Real> oneConf;
+#endif
                 for (INT t = 0; t < _HC_Lti - 1; ++t)
                 {
                     oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
@@ -408,10 +622,18 @@ INT Measurement(CParameters& params)
         {
             CCString sCSVFile;
             sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
+#if !_CLG_DOUBLEFLOAT
+            TArray<TArray<DOUBLE>> res;
+#else
             TArray<TArray<Real>> res;
+#endif
             for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
             {
+#if !_CLG_DOUBLEFLOAT
+                TArray<DOUBLE> oneConf;
+#else
                 TArray<Real> oneConf;
+#endif
                 for (INT t = 0; t < _HC_Lti - 1; ++t)
                 {
                     oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
