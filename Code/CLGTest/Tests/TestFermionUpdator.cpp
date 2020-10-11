@@ -102,7 +102,11 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     
     for (UINT i = 1; i < _HC_Lt; ++i)
     {
+#if _CLG_DOUBLEFLOAT
+        Real fRes = _hostlog10(pMeasure->m_lstResults[0][i] / pMeasure->m_lstResults[0][0]);
+#else
         Real fRes = static_cast<Real>(_hostlog10d(pMeasure->m_lstResults[0][i] / pMeasure->m_lstResults[0][0]));
+#endif
         appGeneral(_T("%f : %f, "), lstResExpected[i - 1], fRes);
         if (appAbs(fRes - lstResExpected[i - 1]) > F(0.2))
         {

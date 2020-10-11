@@ -21,8 +21,7 @@ struct STestSuits##paramName : public TestList \
         Link(_testSuits); \
     } \
 }; \
-static STestSuits##paramName registTest##paramName(functionname); 
-
+static STestSuits##paramName registTest##paramName(functionname);
 
 typedef UINT (*testfunction)(CParameters& sParamName);
 

@@ -923,6 +923,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         InitialWithByte(data);
         free(data);
     }
+    break;
 #if _CLG_DOUBLEFLOAT
     case EFFT_CLGBinFloat:
     {

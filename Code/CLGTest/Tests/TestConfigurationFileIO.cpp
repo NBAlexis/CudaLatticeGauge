@@ -61,6 +61,9 @@ UINT TestFileIOCLG(CParameters& sParam)
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
     const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
+    const CLGComplex res3 = pNewGauge->DotReal(pNewGauge);
+    //appGeneral(_T("dot res:%2.20f\n"), res3.x);
+    //appGeneral(_T("dot res:%2.20f\n"), res3.y);
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));
     const CLGComplex res2 = pNewFermion->DotReal(pNewFermion);
 
@@ -83,6 +86,42 @@ UINT TestFileIOCLG(CParameters& sParam)
     appSafeDelete(pNewFermion);
 
     return uiError;
+}
+
+UINT TestFileDOUBLE(CParameters&)
+{
+    const DOUBLE expectedres = 49152.00000000000000000000;
+    CCString sFile = _T("testGaugeDouble.con_");
+#if !_CLG_DEBUG
+    sFile = _T("../Debug/") + sFile;
+#endif
+    appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinDouble);
+    const DOUBLE res = appGetLattice()->m_pGaugeField->Dot(appGetLattice()->m_pGaugeField).x;
+
+    appGeneral(_T("load:%2.10f, expect:%2.10f, delta:%2.10f\n"), res, expectedres, appAbs(res - expectedres));
+    if (appAbs(res - expectedres) > F(0.000001))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+UINT TestFileFloat(CParameters&)
+{
+    const DOUBLE expectedres = 49152.00000000000000000000;
+    CCString sFile = _T("testGaugeSingle.con_");
+#if !_CLG_DEBUG
+    sFile = _T("../Debug/") + sFile;
+#endif
+    appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinFloat);
+    const DOUBLE res = appGetLattice()->m_pGaugeField->Dot(appGetLattice()->m_pGaugeField).x;
+
+    appGeneral(_T("load:%2.10f, expect:%2.10f, delta:%2.10f\n"), res, expectedres, appAbs(res - expectedres));
+    if (appAbs(res - expectedres) > F(0.000001))
+    {
+        return 1;
+    }
+    return 0;
 }
 
 UINT TestFileIOCLGCompressed(CParameters& sParam)
@@ -111,7 +150,14 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
 }
 
 __REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration);
+#if _CLG_DEBUG
+__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressedDebug);
+#else
 __REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed);
+#endif
+
+__REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble);
+__REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat);
 
 //=============================================================================
 // END OF FILE
