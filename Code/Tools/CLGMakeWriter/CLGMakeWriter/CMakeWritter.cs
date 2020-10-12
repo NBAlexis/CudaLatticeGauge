@@ -94,12 +94,13 @@ namespace CLGMakeWriter
             if (m_bDouble)
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+                sContent += "MESSAGE(\"Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
             }
             else
             {
                 sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
+                sContent += "MESSAGE(\"Note: double float is disabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
             }
-            sContent += "MESSAGE(\"Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
 
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";

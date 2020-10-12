@@ -24,7 +24,7 @@ JobSimulate:
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./500204/SR500204_
+    SavePrefix : SRF500204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -63,7 +63,7 @@ JobSimulate:
         IntegratorType : CIntegratorNestedOmelyan
         ## IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 25
+        IntegratorStep : 20
         NestedStep : 25
         Omelyan2Lambda : 0.38636665500756728
 
@@ -250,7 +250,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -266,7 +266,7 @@ JobSimulate:
         SolverForFieldId : 3
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -275,7 +275,7 @@ JobSimulate:
         SolverForFieldId : 4
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.00001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
 
     MSSolver4:
@@ -302,7 +302,7 @@ JobSimulate:
             MaxDim : 25
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.000000001
+            Accuracy : 0.00000001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5
