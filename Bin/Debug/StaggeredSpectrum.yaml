@@ -237,9 +237,10 @@ JobMeasure:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
+    LoadDouble : 1
 
     StartN : 201
-    EndN : 860
+    EndN : 1100
     # {ESSM_Polyakov, ESSM_Correlator, ESSM_CorrelatorSimple}
     MeasureType : ESSM_CorrelatorSimple
     SavePrefix : ./500205/500205_

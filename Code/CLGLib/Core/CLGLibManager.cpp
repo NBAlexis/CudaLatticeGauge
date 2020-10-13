@@ -211,6 +211,12 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     }
 
     __FetchIntWithDefault(_T("ExponentialPrecision"), 0);
+#if !_CLG_DOUBLEFLOAT
+    if (iVaules < 8)
+    {
+        appCrucial(_T("Single point float generally does not support quick exponential.\n You may need to set ExponentialPrecision : n with n >= 8\n"));
+    }
+#endif
     m_InitialCache.constIntegers[ECI_ExponentPrecision] = static_cast<UINT>(iVaules);
 
     __FetchIntWithDefault(_T("CacheStaple"), 1);

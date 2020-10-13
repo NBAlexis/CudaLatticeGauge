@@ -460,6 +460,7 @@ TestRotationKS:
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
+    ExponentialPrecision : 8
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 5
@@ -680,6 +681,7 @@ TestRotationProjectivePlane:
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
+    ExponentialPrecision : 8
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 5
@@ -700,7 +702,7 @@ TestRotationProjectivePlane:
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
         IntegratorStep : 20
-        NestedStep : 10
+        NestedStep : 20
 
     Gauge:
     

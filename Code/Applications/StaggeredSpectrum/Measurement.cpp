@@ -460,6 +460,10 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("DoSmearing"), iVaule);
     UBOOL bDoSmearing = (0 != iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("LoadDouble"), iVaule);
+    UBOOL bLoadDouble = (0 != iVaule);
+
     //iVaule = 1;
     //params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
     //UBOOL bCheckGaugeFixing = 0 != iVaule;
@@ -508,7 +512,7 @@ INT Measurement(CParameters& params)
     {
         CCString sFileName;
         sFileName.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiN);
-        appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+        appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, bLoadDouble ? EFFT_CLGBinDouble : EFFT_CLGBin);
 
         switch (eJob)
         {
