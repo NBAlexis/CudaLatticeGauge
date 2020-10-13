@@ -29,7 +29,11 @@ _kernelDFermionWilsonSquareSU3_DR(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -249,7 +253,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -329,7 +337,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -471,7 +483,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -606,7 +622,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -715,7 +735,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -1318,7 +1342,11 @@ _kernelDWilsonForceSU3_DR_X_Naive(
     deviceSU3* pForce,
     SSmallInt4 sCenter,
     Real fKai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -1381,7 +1409,11 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
     deviceSU3* pForce,
     SSmallInt4 sCenter,
     Real fKai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -1444,7 +1476,11 @@ _kernelDWilsonForceSU3_DR_X(
     deviceSU3* pForce,
     SSmallInt4 sCenter,
     Real fKai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -1509,7 +1545,11 @@ _kernelDWilsonForceSU3_DR_Y(
     deviceSU3* pForce,
     SSmallInt4 sCenter,
     Real fKai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -1574,7 +1614,11 @@ _kernelDWilsonForceSU3_DR_T(
     deviceSU3* pForce,
     SSmallInt4 sCenter,
     Real fKai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     BYTE byFieldId)
 {
     intokernalInt4;

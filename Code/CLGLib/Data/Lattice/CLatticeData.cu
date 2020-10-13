@@ -13,11 +13,12 @@ __BEGIN_NAMESPACE
 
 #if !_CLG_DOUBLEFLOAT
 DOUBLE CLGAPI CCommonData::m_fBeta = 0.0;
+DOUBLE CLGAPI CCommonData::m_fOmega = 0.0;
 #else
 Real CLGAPI CCommonData::m_fBeta = F(0.0);
+Real CLGAPI CCommonData::m_fOmega = F(0.0);
 #endif
 Real CLGAPI CCommonData::m_fKai = F(0.0);
-Real CLGAPI CCommonData::m_fOmega = F(0.0);
 Real CLGAPI CCommonData::m_fG = F(0.0);
 Real CLGAPI CCommonData::m_fShiftedMass = F(0.0);
 SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);

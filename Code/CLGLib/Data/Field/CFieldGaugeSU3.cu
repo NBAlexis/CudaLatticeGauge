@@ -196,7 +196,7 @@ _kernelStapleAtSiteSU3CacheIndex(
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
         //there are 6 staples, each is sum of two plaquttes
-        for (int i = 0; i < plaqCount; ++i)
+        for (INT i = 0; i < plaqCount; ++i)
         {
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
@@ -206,7 +206,7 @@ _kernelStapleAtSiteSU3CacheIndex(
                 toAdd.Dagger();
             }
 
-            for (int j = 1; j < plaqLengthm1; ++j)
+            for (INT j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
                 deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
@@ -258,7 +258,7 @@ _kernelCalculateOnlyStaple(
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
         //there are 6 staples, each is sum of two plaquttes
-        for (int i = 0; i < plaqCount; ++i)
+        for (INT i = 0; i < plaqCount; ++i)
         {
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
@@ -268,7 +268,7 @@ _kernelCalculateOnlyStaple(
                 toAdd.Dagger();
             }
 
-            for (int j = 1; j < plaqLengthm1; ++j)
+            for (INT j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
                 deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
@@ -304,7 +304,11 @@ _kernelPlaqutteEnergySU3CacheIndex(
 {
     intokernal;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE resThisThread = 0.0;
+#else
     Real resThisThread = F(0.0);
+#endif
     UINT plaqCountAll = plaqCount * plaqLength;
     for (BYTE i = 0; i < plaqCount; ++i)
     {
@@ -335,7 +339,12 @@ _kernelPlaqutteEnergySU3CacheIndex(
         assert(reTr > -F(1.50001));
         assert(reTr < F(3.00001));
 #endif
+
+#if !_CLG_DOUBLEFLOAT
+        resThisThread += (3.0 - toAdd.ReTr());
+#else
         resThisThread += (F(3.0) - toAdd.ReTr());
+#endif
     }
 
     results[uiSiteIndex] = resThisThread * betaOverN;
@@ -358,7 +367,11 @@ _kernelPlaqutteEnergySU3_UseClover(
 {
     intokernalInt4;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fRes = 0.0;
+#else
     Real fRes = F(0.0);
+#endif
     for (BYTE byDir1 = 0; byDir1 < _DC_Dir; ++byDir1)
     {
         for (BYTE byDir2 = byDir1 + 1; byDir2 < _DC_Dir; ++byDir2)
@@ -370,7 +383,11 @@ _kernelPlaqutteEnergySU3_UseClover(
             //}
         }
     }
+#if !_CLG_DOUBLEFLOAT
+    fRes = 18.0 - 0.25 * fRes;
+#else
     fRes = F(18.0) - F(0.25) * fRes;
+#endif
     results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
 }
 
@@ -389,15 +406,28 @@ _kernelPlaqutteEnergyUsingStableSU3(
 {
     intokernaldir;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE resThisThread = 0.0;
+#else
     Real resThisThread = F(0.0);
+#endif
+    
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         //For each link, there are 6 staples
+#if !_CLG_DOUBLEFLOAT
+        resThisThread += (18.0 - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
+#else
         resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
+#endif
     }
 
+#if !_CLG_DOUBLEFLOAT
+    results[uiSiteIndex] = resThisThread * betaOverN * 0.25;
+#else
     results[uiSiteIndex] = resThisThread * betaOverN * F(0.25);
+#endif
 
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
@@ -453,7 +483,11 @@ _kernelCalculateKinematicEnergySU3(const deviceSU3 * __restrict__ pDeviceData,
 {
     intokernaldir;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE resThisThread = 0.0;
+#else
     Real resThisThread = F(0.0);
+#endif
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);

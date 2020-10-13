@@ -265,7 +265,11 @@ _kernelDFermionKS_PR_XYTerm(
     deviceSU3Vector* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -347,7 +351,11 @@ _kernelDFermionKS_PR_XYTau_Term(
     deviceSU3Vector* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -436,7 +444,12 @@ _kernelDFermionKSForce_PR_XYTerm(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
-    Real fOmega, SSmallInt4 sCenter, BYTE byMu, INT iTau,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
+    Real fOmega,
+#endif
+    SSmallInt4 sCenter, BYTE byMu, INT iTau,
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
     BYTE byContribution)
@@ -602,7 +615,11 @@ _kernelDFermionKSForce_PR_XYTau_Term2(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     INT pathLdir1, INT pathLdir2, INT pathLdir3)
 {
     intokernalInt4;

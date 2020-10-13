@@ -22,7 +22,11 @@ __CLGIMPLEMENT_CLASS(CMeasureChiralCondensateKS)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotMeasureAllKS(
     BYTE byMeasureIndex,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     const deviceSU3Vector* __restrict__ pMe,
     const deviceSU3Vector* __restrict__ pOther,

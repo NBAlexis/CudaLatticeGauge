@@ -243,7 +243,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
         sourceSite,
         CCommonData::m_sCenter,
         CCommonData::m_fKai,
-        CCommonData::m_fOmega,
+        static_cast<Real>(CCommonData::m_fOmega),
         static_cast<BYTE>(sourceSite.x), //array idx
         m_byFieldId,
         //m_pMeasureFunctions,

@@ -33,16 +33,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
 #endif
 )
 {
-    //intokernalInt4;
-    SSmallInt4 sSite4;
-    UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
-    UINT _iz_idx = (threadIdx.y + blockIdx.y * blockDim.y);
-
-    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx);
-    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx);
-    sSite4.z = static_cast<SBYTE>(_iz_idx >> 1);
-    sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z);
-    UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
+    intokernalInt4;
 
     UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
     UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
@@ -54,7 +45,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     //  4: 24
     //  5: 34
     //0->2, 1->4
-    BYTE idx = ((_iz_idx & 1) + 1) * 2;
+    BYTE idx = 2;
 
     //Real resThisThread = F(0.0);
 
@@ -79,12 +70,37 @@ _kernelAdd4PlaqutteTermSU3_Boost(
             toAdd.Mul(toMul);
         }
     }
-
-    //Note that Retr[U14] = Retr[U41], Retr[U24] = Retr[U42], so it is OK
 #if !_CLG_DOUBLEFLOAT
-    atomicAdd(&results[uiSiteIndex], static_cast<DOUBLE>(betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq));
+    results[uiSiteIndex] = static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * fGsq);
 #else
-    atomicAdd(&results[uiSiteIndex], betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq);
+    results[uiSiteIndex] = betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq;
+#endif
+
+    idx = 4;
+    first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
+    toAdd = _deviceGetGaugeBCSU3(pDeviceData, first);
+    if (first.NeedToDagger())
+    {
+        toAdd.Dagger();
+    }
+    for (BYTE j = 1; j < plaqLength; ++j)
+    {
+        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        if (first.NeedToDagger())
+        {
+            toAdd.MulDagger(toMul);
+        }
+        else
+        {
+            toAdd.Mul(toMul);
+        }
+    }
+
+#if !_CLG_DOUBLEFLOAT
+    results[uiSiteIndex] += static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * fGsq);
+#else
+    results[uiSiteIndex] += betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq;
 #endif
 }
 
@@ -472,9 +488,7 @@ Real CActionGaugePlaquetteBoost::Energy(UBOOL bBeforeEvolution, const class CFie
 
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
-    dim3 block2 = block;
-    block2.y = block.y * 2;
-    _kernelAdd4PlaqutteTermSU3_Boost << <block2, threads >> > (
+    _kernelAdd4PlaqutteTermSU3_Boost << <block, threads >> > (
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
             m_fBetaOverN,

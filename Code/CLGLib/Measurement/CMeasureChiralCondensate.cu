@@ -37,7 +37,11 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelDotMeasureAll(
     BYTE byMeasureIndex,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     const deviceWilsonVectorSU3* __restrict__ pMe,
     const deviceWilsonVectorSU3* __restrict__ pOther, 

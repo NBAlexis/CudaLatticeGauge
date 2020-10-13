@@ -38,7 +38,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_Step1(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -156,7 +160,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_Step1(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -257,7 +265,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_Step1(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -348,7 +360,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step1(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -466,7 +482,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_Step2(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -592,7 +612,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_Step2(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -705,7 +729,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_Step2(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -807,7 +835,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step2(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -1074,7 +1106,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_WriteEven(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1192,7 +1228,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_WriteEven(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1298,7 +1338,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_WriteEven(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1392,7 +1436,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteEven(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1514,7 +1562,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X_WriteBack(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1640,7 +1692,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y_WriteBack(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1745,7 +1801,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z_WriteBack(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)
@@ -1840,7 +1900,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteBack(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fOmega,
+#else
     Real fOmega,
+#endif
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger)

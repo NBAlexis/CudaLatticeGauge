@@ -121,6 +121,7 @@ __DEFINE_ENUM(EFieldType,
     EFT_GaugeSU3,
     EFT_FermionWilsonSquareSU3,
     EFT_FermionStaggeredSU3,
+    EFT_GaugeU1,
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,
 
@@ -430,8 +431,10 @@ public:
 
 #if !_CLG_DOUBLEFLOAT
     static DOUBLE m_fBeta;
+    static DOUBLE m_fOmega;
 #else
     static Real m_fBeta;
+    static Real m_fOmega;
 #endif
     static Real m_fKai;
 
@@ -441,7 +444,7 @@ public:
 
     //Used in rotating frame. Since the fermion fields are copied,
     //it is convinient to set all parameters at one place
-    static Real m_fOmega;
+    
     static SSmallInt4 m_sCenter;
 
     //Use for acceleration, Since the fermion fields are copied,

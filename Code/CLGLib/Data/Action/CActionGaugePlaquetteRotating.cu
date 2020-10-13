@@ -70,69 +70,70 @@ _kernelAdd4PlaqutteTermSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmegaSq,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmegaSq,
     Real* results
 #endif
 )
 {
-    //intokernalInt4;
-    SSmallInt4 sSite4;
-    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
-    const UINT _iz_idx = (threadIdx.y + blockIdx.y * blockDim.y);
-
-    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Lx);
-    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Lx);
-    sSite4.z = static_cast<SBYTE>(_iz_idx / 3);
-    sSite4.w = static_cast<SBYTE>(threadIdx.z + blockIdx.z * blockDim.z);
-    const UINT uiSiteIndex = _ixy * _DC_GridDimZT + sSite4.z * _DC_Lt + sSite4.w;
-    const BYTE idx0 = _iz_idx % 3;
+    intokernalInt4;
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
     const UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
     const UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
-    
-    //i=0: 12
-    //  1: 13
-    //  2: 14
-    //  3: 23
-    //  4: 24
-    //  5: 34
-    //0->2, 1->4, 2->5
-    const BYTE idx = (2 == idx0) ? 5 : ((idx0 + 1) * 2);
-
-    //Real resThisThread = F(0.0);
-
-    //========================================
-    //find plaqutte 1-4, or 2-4, or 3-4
-    SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
-    if (first.NeedToDagger())
-    {
-        toAdd.Dagger();
-    }
-    for (BYTE j = 1; j < plaqLength; ++j)
-    {
-        first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
-        if (first.NeedToDagger())
-        {
-            toAdd.MulDagger(toMul);
-        }
-        else
-        {
-            toAdd.Mul(toMul);
-        }
-    }
 
 #if !_CLG_DOUBLEFLOAT
-    atomicAdd(&results[uiSiteIndex], static_cast<DOUBLE>(betaOverN * fOmegaSq * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3)));
+    DOUBLE res = 0.0;
 #else
-    atomicAdd(&results[uiSiteIndex], betaOverN * fOmegaSq * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3));
+    Real res = F(0.0);
 #endif
+    #pragma unroll
+    for (BYTE idx0 = 0; idx0 < 3; ++idx0)
+    {
+        //i=0: 12
+        //  1: 13
+        //  2: 14
+        //  3: 23
+        //  4: 24
+        //  5: 34
+        //0->2, 1->4, 2->5
+        const BYTE idx = (2 == idx0) ? 5 : ((idx0 + 1) * 2);
 
+        //Real resThisThread = F(0.0);
+
+        //========================================
+        //find plaqutte 1-4, or 2-4, or 3-4
+        SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        if (first.NeedToDagger())
+        {
+            toAdd.Dagger();
+        }
+        for (BYTE j = 1; j < plaqLength; ++j)
+        {
+            first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            if (first.NeedToDagger())
+            {
+                toAdd.MulDagger(toMul);
+            }
+            else
+            {
+                toAdd.Mul(toMul);
+            }
+        }
+
+#if !_CLG_DOUBLEFLOAT
+        res += static_cast<DOUBLE>(betaOverN * fOmegaSq * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3));
+#else
+        res += betaOverN * fOmegaSq * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, idx0, 3);
+#endif
+    }
+
+    results[uiSiteIndex] = res;
 }
 
 
@@ -145,7 +146,14 @@ _kernelAddForce4PlaqutteTermSU3_XYZ(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN,
+    DOUBLE fOmegaSq
+#else
+    Real betaOverN,
+    Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -178,7 +186,12 @@ _kernelAddForce4PlaqutteTermSU3_T(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -218,10 +231,11 @@ _kernelAddChairTermSU3_Term12(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmega,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmega,
     Real* results
 #endif
 )
@@ -255,10 +269,11 @@ _kernelAddChairTermSU3_Term34(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmega,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmega,
     Real* results
 #endif
 )
@@ -292,10 +307,11 @@ _kernelAddChairTermSU3_Term5(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmegaSq,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmegaSq,
     Real* results
 #endif
 )
@@ -334,7 +350,12 @@ _kernelAddForceChairTermSU3_Term1_1(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -365,7 +386,12 @@ _kernelAddForceChairTermSU3_Term1_2(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -396,7 +422,12 @@ _kernelAddForceChairTermSU3_Term1_3(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -427,7 +458,12 @@ _kernelAddForceChairTermSU3_Term2_1(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -458,7 +494,12 @@ _kernelAddForceChairTermSU3_Term2_2(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -489,7 +530,12 @@ _kernelAddForceChairTermSU3_Term2_3(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -520,7 +566,12 @@ _kernelAddForceChairTermSU3_Term3_1(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -552,7 +603,12 @@ _kernelAddForceChairTermSU3_Term3_2(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -583,7 +639,12 @@ _kernelAddForceChairTermSU3_Term3_3(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -615,7 +676,12 @@ _kernelAddForceChairTermSU3_Term4_1(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -647,7 +713,12 @@ _kernelAddForceChairTermSU3_Term4_2(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -679,7 +750,12 @@ _kernelAddForceChairTermSU3_Term4_3(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -711,7 +787,12 @@ _kernelAddForceChairTermSU3_Term5_1(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -741,7 +822,12 @@ _kernelAddForceChairTermSU3_Term5_2(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -772,7 +858,12 @@ _kernelAddForceChairTermSU3_Term5_3(
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -808,10 +899,11 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmegaSq,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmegaSq,
     Real* results
 #endif
 )
@@ -820,6 +912,23 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fXSq = (sSite4.x - sCenterSite.x + 0.5);
+    fXSq = fXSq * fXSq;
+    DOUBLE fYSq = (sSite4.y - sCenterSite.y + 0.5);
+    fYSq = fYSq * fYSq;
+
+    //======================================================
+    //4-plaqutte terms
+    //Omega^2 x^2 Retr[1 - U_1,4]
+    const DOUBLE fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 0, 3, uiBigIdx, sSite4, byFieldId);
+
+    //Omega^2 y^2 Retr[1 - U_2,4]
+    const DOUBLE fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 1, 3, uiBigIdx, sSite4, byFieldId);
+
+    //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
+    const DOUBLE fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx, sSite4, byFieldId);
+#else
     Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
     fXSq = fXSq * fXSq;
     Real fYSq = (sSite4.y - sCenterSite.y + F(0.5));
@@ -835,6 +944,7 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
 
     //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
     const Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx, sSite4, byFieldId);
+#endif
 
     results[uiSiteIndex] = (fU14 + fU24 + fU34) * betaOverN;
 }
@@ -845,7 +955,12 @@ _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -875,7 +990,12 @@ _kernelAddForce4PlaqutteTermSU3_T_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -909,10 +1029,11 @@ _kernelAddChairTermSU3_Term12_Shifted(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmega,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmega,
     Real* results
 #endif
 )
@@ -927,6 +1048,19 @@ _kernelAddChairTermSU3_Term12_Shifted(
     //    return;
     //}
 
+#if !_CLG_DOUBLEFLOAT
+    betaOverN = 0.125 * betaOverN;
+    const DOUBLE fXOmega = (sSite4.x - sCenterSite.x + 0.5) * fOmega;
+
+    //===============
+    //+x Omega V412
+    const DOUBLE fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+
+    //===============
+    //+x Omega V432
+    const DOUBLE fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+
+#else
     betaOverN = F(0.125) * betaOverN;
     const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5)) * fOmega;
 
@@ -937,6 +1071,7 @@ _kernelAddChairTermSU3_Term12_Shifted(
     //===============
     //+x Omega V432
     const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+#endif
 
     results[uiSiteIndex] = (fV412 + fV432) * betaOverN;
 }
@@ -947,10 +1082,11 @@ _kernelAddChairTermSU3_Term34_Shifted(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmega,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmega,
     Real* results
 #endif
 )
@@ -964,7 +1100,18 @@ _kernelAddChairTermSU3_Term34_Shifted(
     //    results[uiSiteIndex] = F(0.0);
     //    return;
     //}
+#if !_CLG_DOUBLEFLOAT
+    betaOverN = 0.125 * betaOverN;
+    const DOUBLE fYOmega = -(sSite4.y - sCenterSite.y + 0.5) * fOmega;
 
+    //===============
+    //-y Omega V421
+    const DOUBLE fV421 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+
+    //===============
+    //-y Omega V431
+    const DOUBLE fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+#else
     betaOverN = F(0.125) * betaOverN;
     const Real fYOmega = -(sSite4.y - sCenterSite.y + F(0.5)) * fOmega;
 
@@ -975,6 +1122,7 @@ _kernelAddChairTermSU3_Term34_Shifted(
     //===============
     //-y Omega V431
     const Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+#endif
 
     results[uiSiteIndex] = (fV421 + fV431) * betaOverN;
 }
@@ -984,10 +1132,11 @@ _kernelAddChairTermSU3_Term5_Shifted(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmegaSq,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
 #else
+    Real betaOverN, Real fOmegaSq,
     Real* results
 #endif
 )
@@ -1002,12 +1151,21 @@ _kernelAddChairTermSU3_Term5_Shifted(
     //    return;
     //}
 
+#if !_CLG_DOUBLEFLOAT
+    betaOverN = 0.125 * betaOverN;
+    const DOUBLE fXYOmega2 = (sSite4.x - sCenterSite.x + 0.5) * (sSite4.y - sCenterSite.y + F(0.5)) * fOmegaSq;
+
+    //===============
+    //+Omega^2 xy V142
+    const DOUBLE fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 3, 1, uiN);
+#else
     betaOverN = F(0.125) * betaOverN;
     const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5)) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
     const Real fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 3, 1, uiN);
+#endif
 
     results[uiSiteIndex] = fV142 * betaOverN;
 }
@@ -1022,7 +1180,12 @@ _kernelAddForceChairTermSU3_Term1_1_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1053,7 +1216,12 @@ _kernelAddForceChairTermSU3_Term1_2_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1084,7 +1252,12 @@ _kernelAddForceChairTermSU3_Term1_3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1115,7 +1288,12 @@ _kernelAddForceChairTermSU3_Term2_1_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1146,7 +1324,12 @@ _kernelAddForceChairTermSU3_Term2_2_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1177,7 +1360,12 @@ _kernelAddForceChairTermSU3_Term2_3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1209,7 +1397,12 @@ _kernelAddForceChairTermSU3_Term3_1_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1241,7 +1434,12 @@ _kernelAddForceChairTermSU3_Term3_2_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1272,7 +1470,12 @@ _kernelAddForceChairTermSU3_Term3_3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1304,7 +1507,12 @@ _kernelAddForceChairTermSU3_Term4_1_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1336,7 +1544,12 @@ _kernelAddForceChairTermSU3_Term4_2_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1368,7 +1581,12 @@ _kernelAddForceChairTermSU3_Term4_3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmega)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmega
+#else
+    Real betaOverN, Real fOmega
+#endif
+)
 {
     intokernalInt4;
 
@@ -1400,7 +1618,12 @@ _kernelAddForceChairTermSU3_Term5_1_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -1430,7 +1653,12 @@ _kernelAddForceChairTermSU3_Term5_2_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -1460,7 +1688,12 @@ _kernelAddForceChairTermSU3_Term5_3_Shifted(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
-    Real betaOverN, Real fOmegaSq)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq
+#else
+    Real betaOverN, Real fOmegaSq
+#endif
+)
 {
     intokernalInt4;
 
@@ -1890,19 +2123,31 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     m_bShiftHalfCoord = (0 != iShiftCoord);
 }
 
+#if !_CLG_DOUBLEFLOAT
+void CActionGaugePlaquetteRotating::SetBeta(DOUBLE fBeta)
+#else
 void CActionGaugePlaquetteRotating::SetBeta(Real fBeta)
+#endif
 {
     CCommonData::m_fBeta = fBeta;
     if (NULL != m_pOwner->m_pGaugeField && EFT_GaugeSU3 == m_pOwner->m_pGaugeField->GetFieldType())
     {
+#if !_CLG_DOUBLEFLOAT
+        fBeta = fBeta / 3.0;
+#else
         fBeta = fBeta / F(3.0);
+#endif
     }
     m_fBetaOverN = fBeta;
 }
 
 UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
+#if !_CLG_DOUBLEFLOAT
+    pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(m_fBetaOverN));
+#else
     pGauge->CalculateForceAndStaple(pForce, pStaple, m_fBetaOverN);
+#endif
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
@@ -2069,9 +2314,6 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     //    _D_RealThreadBuffer);
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
-    dim3 block2 = block;
-    block2.y = block.y * 3;
-
     if (m_bShiftHalfCoord)
     {
         _kernelAdd4PlaqutteTermSU3_Shifted << <block, threads >> > (
@@ -2116,7 +2358,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     }
     else
     {
-        _kernelAdd4PlaqutteTermSU3 << <block2, threads >> > (
+        _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
@@ -2167,8 +2409,11 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 //{
 //    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 //}
-
-void CActionGaugePlaquetteRotating::SetOmega(Real fOmega) 
+#if !_CLG_DOUBLEFLOAT
+void CActionGaugePlaquetteRotating::SetOmega(DOUBLE fOmega)
+#else
+void CActionGaugePlaquetteRotating::SetOmega(Real fOmega)
+#endif
 { 
     m_fOmega = fOmega; 
     CCommonData::m_fOmega = fOmega;

@@ -36,12 +36,21 @@ public:
     void OnFinishTrajectory(UBOOL bAccepted) override;
     CCString GetInfos(const CCString &tab) const override;
 
+#if !_CLG_DOUBLEFLOAT
+    void SetBeta(DOUBLE fBeta);
+    void SetOmega(DOUBLE fOmega);
+#else
     void SetBeta(Real fBeta);
     void SetOmega(Real fOmega);
+#endif
     void SetCenter(const SSmallInt4 &newCenter);
     //Real GetEnergyPerPlaqutte() const;
 
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE m_fOmega;
+#else
     Real m_fOmega;
+#endif
     UBOOL m_bCloverEnergy;
     UBOOL m_bShiftHalfCoord;
 
@@ -50,12 +59,13 @@ protected:
 #if !_CLG_DOUBLEFLOAT
     DOUBLE m_fLastEnergy;
     DOUBLE m_fNewEnergy;
+    DOUBLE m_fBetaOverN;
 #else
     Real m_fLastEnergy;
     Real m_fNewEnergy;
-#endif
-    
     Real m_fBetaOverN;
+#endif
+
     UINT m_uiPlaqutteCount;
 };
 
