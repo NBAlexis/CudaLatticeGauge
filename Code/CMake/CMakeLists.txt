@@ -27,8 +27,13 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow")
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
-add_definitions(-D_CLG_DOUBLEFLOAT=0)
-MESSAGE("Note: double float is disabled, arch is ${CUDA_CMP} and ${CUDA_SM}.")
+if (DEFINED CLGDOUBLE)
+  add_definitions(-D_CLG_DOUBLEFLOAT=1)
+  MESSAGE("Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.")
+else()
+  add_definitions(-D_CLG_DOUBLEFLOAT=0)
+  MESSAGE("Note: double float is disabled, arch is ${CUDA_CMP} and ${CUDA_SM}.")
+endif()
 MESSAGE("CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}")
 MESSAGE("CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}")
 
@@ -98,6 +103,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBerryPhase.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensateKS.h
@@ -187,6 +193,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBerryPhase.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu

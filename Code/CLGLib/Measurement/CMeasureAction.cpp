@@ -64,6 +64,15 @@ void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, co
 
 void CMeasureAction::Average(UINT )
 {
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fAdd = 0.0;
+    for (INT i = 0; i < m_lstData.Num(); ++i)
+    {
+        fAdd += m_lstData[i];
+    }
+    m_fLastRealResult = static_cast<Real>(fAdd / m_lstData.Num());
+    appParanoiac(_T(" === Action Averaged (%d measures) === energy = %f\n"), m_lstData.Num(), m_fLastRealResult);
+#else
     Real fAdd = F(0.0);
     for (INT i = 0; i < m_lstData.Num(); ++i)
     {
@@ -71,6 +80,7 @@ void CMeasureAction::Average(UINT )
     }
     m_fLastRealResult = fAdd / m_lstData.Num();
     appParanoiac(_T(" === Action Averaged (%d measures) === energy = %f\n"), m_lstData.Num(), m_fLastRealResult);
+#endif
 }
 
 void CMeasureAction::Report()

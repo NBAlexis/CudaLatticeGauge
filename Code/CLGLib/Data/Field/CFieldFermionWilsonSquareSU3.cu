@@ -513,6 +513,20 @@ _kernelMakePointSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite, B
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelMakePointSourceOne(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredSite)
+{
+    intokernal;
+    if (uiSiteIndex == uiDesiredSite)
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeOneWilsonVectorSU3();
+    }
+    else
+    {
+        pDeviceData[uiSiteIndex] = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelMakeWallSource(deviceWilsonVectorSU3* pDeviceData, UINT uiDesiredT, BYTE bySpin, BYTE byColor, BYTE byFieldID, UINT uiVolumn)
 {
     intokernalInt4;
@@ -1087,7 +1101,14 @@ void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceD
     case EFS_Point:
     {
         preparethread;
-        _kernelMakePointSource<<<block, threads >>>(m_pDeviceData, uiSiteIndex, sourceData.m_bySpinIndex, sourceData.m_byColorIndex);
+        if (sourceData.m_byColorIndex >= 3)
+        {
+            _kernelMakePointSourceOne << <block, threads >> > (m_pDeviceData, uiSiteIndex);
+        }
+        else
+        {
+            _kernelMakePointSource << <block, threads >> > (m_pDeviceData, uiSiteIndex, sourceData.m_bySpinIndex, sourceData.m_byColorIndex);
+        }
     }
     break;
     case EFS_Wall:

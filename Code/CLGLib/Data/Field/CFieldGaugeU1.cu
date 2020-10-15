@@ -88,7 +88,7 @@ _kernelAxpyU1A(CLGComplex*pDevicePtr, const CLGComplex* __restrict__ x, CLGCompl
 {
     gaugeSU3KernelFuncionStart
 
-    pDevicePtr[uiLinkIndex] = _cuCaddf(pDevicePtr[uiLinkIndex], cuCmulf(x[uiLinkIndex], a));
+    pDevicePtr[uiLinkIndex] = _cuCaddf(pDevicePtr[uiLinkIndex], _cuCmulf(x[uiLinkIndex], a));
 
     gaugeSU3KernelFuncionEnd
 }
@@ -1278,7 +1278,8 @@ void CFieldGaugeU1::DebugPrintMe() const
     //Since Debug Print Me is only used to debug, we do it slow but convinient
     CLGComplex* pToPrint = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
     checkCudaErrors(cudaMemcpy(pToPrint, m_pDeviceData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
-
+    UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
     for (UINT uiSite = 0; uiSite < m_uiLinkeCount / _HC_Dir; ++uiSite)
     {
         appGeneral(_T(" --- site: %d --- "), uiSite);
@@ -1291,8 +1292,9 @@ void CFieldGaugeU1::DebugPrintMe() const
                 appAbs(pToPrint[uiLink].y)
                 );
         }
+        appGeneral(_T("\n"));
     }
-
+    appSetLogDate(bLogDate);
     free(pToPrint);
 }
 
@@ -1320,11 +1322,8 @@ BYTE* CFieldGaugeU1::CopyDataOut(UINT &uiSize) const
     for (UINT i = 0; i < m_uiLinkeCount; ++i)
     {
         Real oneLink[2];
-        for (UINT j = 0; j < 9; ++j)
-        {
-            oneLink[2 * j] = static_cast<Real>(toSave[i].x);
-            oneLink[2 * j + 1] = static_cast<Real>(toSave[i].y);
-        }
+        oneLink[0] = static_cast<Real>(toSave[i].x);
+        oneLink[1] = static_cast<Real>(toSave[i].y);
         memcpy(byToSave + i * sizeof(Real) * 2, oneLink, sizeof(Real) * 2);
     }
     free(toSave);

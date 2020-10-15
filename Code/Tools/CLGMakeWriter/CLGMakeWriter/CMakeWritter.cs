@@ -91,16 +91,13 @@ namespace CLGMakeWriter
             sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
             sContent += "# to enable double float, add the following line:\n";
-            if (m_bDouble)
-            {
-                sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
-                sContent += "MESSAGE(\"Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
-            }
-            else
-            {
-                sContent += "add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
-                sContent += "MESSAGE(\"Note: double float is disabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
-            }
+            sContent += "if (DEFINED CLGDOUBLE)\n";
+            sContent += "  add_definitions(-D_CLG_DOUBLEFLOAT=1)\n";
+            sContent += "  MESSAGE(\"Note: double float is enabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
+            sContent += "else()\n";
+            sContent += "  add_definitions(-D_CLG_DOUBLEFLOAT=0)\n";
+            sContent += "  MESSAGE(\"Note: double float is disabled, arch is ${CUDA_CMP} and ${CUDA_SM}.\")\n";
+            sContent += "endif()\n";
 
             sContent += "MESSAGE(\"CMAKE_CUDA_FLAGS flag = ${CMAKE_CUDA_FLAGS}\")\n";
             sContent += "MESSAGE(\"CMAKE_CXX_FLAGS flag = ${CMAKE_CXX_FLAGS}\")\n\n";

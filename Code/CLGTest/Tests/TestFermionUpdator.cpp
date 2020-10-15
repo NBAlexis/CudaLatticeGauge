@@ -285,6 +285,55 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
 
 __REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, Updator, TestFermionUpdatorWithMesonCorrelatorStaggered);
 
+UINT TestBerryPhase(CParameters& sParam)
+{
+    Real fExpected = F(0.2064);
+    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+
+    CMeasureBerryPhase* pMeasure = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    if (NULL == pMeasure)
+    {
+        return 1;
+    }
+
+    //appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+    //pMeasure->m_bGuageFixing = FALSE;
+    //pMeasure->OnConfigurationAccepted(appGetLattice()->m_pGaugeField);
+
+#if 1
+
+#if _CLG_DEBUG
+    appGetLattice()->m_pUpdator->Update(10, FALSE);
+#else
+    appGetLattice()->m_pUpdator->Update(100, FALSE);
+#endif
+    appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
+    //Measure
+    pMeasure->Reset();
+    appGetLattice()->m_pUpdator->SetTestHdiff(FALSE);
+    appGetLattice()->m_pUpdator->SetConfigurationCount(0);
+    INT iAccepted = appGetLattice()->m_pUpdator->GetConfigurationCount();
+#if _CLG_DEBUG
+    while (iAccepted < 20)
+#else
+    while (iAccepted < 50)
+#endif
+    {
+        const INT newCount = appGetLattice()->m_pUpdator->Update(1, FALSE);
+        if (newCount != iAccepted)
+        {
+            pMeasure->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            iAccepted = newCount;
+        }
+    }
+
+    pMeasure->Report();
+#endif
+    return 0;
+}
+
+__REGIST_TEST(TestBerryPhase, Updator, TestBerryPhase);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

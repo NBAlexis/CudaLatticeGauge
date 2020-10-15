@@ -83,6 +83,7 @@
     <ClInclude Include="Measurement\CMeasureAction.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
+    <ClInclude Include="Measurement\CMeasureBerryPhase.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensateKS.h" />
@@ -182,6 +183,9 @@
     </CudaCompile>
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
+    <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp" />

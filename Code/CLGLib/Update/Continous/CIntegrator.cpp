@@ -160,7 +160,7 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
     Real retv = m_pMomentumField->CalculateKinematicEnergy();
 #endif
 
-#if _CLG_DEBUG
+#if 1
     CCString sLog = _T("");
     sLog.Format(_T("kin:%f, "), retv);
 #endif
@@ -168,7 +168,7 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-#if _CLG_DEBUG
+#if 1
 #if !_CLG_DOUBLEFLOAT
         DOUBLE fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
 #else
@@ -182,7 +182,7 @@ Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
         retv += m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
 #endif
     }
-#if _CLG_DEBUG
+#if 1
     appDetailed(_T("H (%s) = %s \n"), bBeforeEvolution ? "before" : "after" , sLog.c_str());
 #endif
     return retv;

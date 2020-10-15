@@ -702,7 +702,7 @@ TestRotationProjectivePlane:
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
         IntegratorStep : 20
-        NestedStep : 20
+        NestedStep : 25
 
     Gauge:
     

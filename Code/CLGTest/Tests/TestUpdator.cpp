@@ -121,27 +121,6 @@ UINT TestWilsonLoop(CParameters& sParam)
     }
     
     pMeasure->Report();
-    //const Real fRes = pMeasure->m_fLastRealResult;
-    //appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
-    //UINT uiError = 0;
-    //if (appAbs(fRes - fExpected) > F(0.005))
-    //{
-    //    ++uiError;
-    //}
-
-    //const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    //const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
-    //appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
-
-    //if (uiAccept < 45)
-    //{
-    //    ++uiError;
-    //}
-
-    //if (fHDiff > F(0.1))
-    //{
-    //    ++uiError;
-    //}
 
     return uiError;
 }

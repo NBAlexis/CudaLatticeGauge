@@ -752,10 +752,6 @@ void CSLASolverGCRODR::FindPk2()
         m_pHelper->GeneralizedEigenValueProblem(m_pDeviceA, m_pDeviceB, m_pDeviceEigenValue, m_pDevicePk, m_uiMDim, m_uiKDim);
     }
     m_pHelper->Transpose(m_pDevicePk, m_uiKDim, m_uiMDim);
-#if _CLG_DEBUG
-    //appParanoiac(_T("GCRO-DR: EigenValues:\n"));
-    //m_pHelper->PrintDeviceMatrix(m_pDeviceEigenValue, 1, m_uiKDim);
-#endif
     checkCudaErrors(cudaMemcpy(m_pHostPk, m_pDevicePk, sizeof(CLGComplex) * m_uiMDim * m_uiKDim, cudaMemcpyDeviceToHost));
 }
 

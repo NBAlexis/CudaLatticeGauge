@@ -437,6 +437,9 @@
     <ClInclude Include="Data\Field\CFieldGaugeU1.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasureBerryPhase.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -717,6 +720,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldGaugeU1.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
+      <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

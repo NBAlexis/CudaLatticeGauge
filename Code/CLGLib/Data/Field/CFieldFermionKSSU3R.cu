@@ -750,6 +750,7 @@ void CFieldFermionKSSU3R::DerivateD0(
 {
     CFieldFermionKSSU3::DerivateD0(pForce, pGaugeBuffer);
 
+#if 1
     preparethread;
     #pragma region X Y Term
 
@@ -897,6 +898,7 @@ void CFieldFermionKSSU3R::DerivateD0(
     }
     
     #pragma endregion
+#endif
 }
 
 #pragma endregion

@@ -221,6 +221,7 @@ int main(int argc, char * argv[])
                     timer.Start();
                     UINT uiError = 0;
                     UINT uiPassed = 0;
+                    TArray<CCString> unpassed;
                     for (INT j = 0; j < category[keys[i]]->Num(); ++j)
                     {
                         UINT uiThisError = RunTest(params, category[keys[i]]->GetAt(j));
@@ -231,12 +232,17 @@ int main(int argc, char * argv[])
                         else
                         {
                             uiError += uiThisError;
+                            unpassed.AddItem(category[keys[i]]->GetAt(j)->m_sParamName);
                         }
                     }
                     timer.Stop();
                     appGeneral(_T("Run all %s test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), 
                         keys[i].c_str(), uiPassed, category[keys[i]]->Num(),
                         uiError, timer.Elapsed() * 0.001f);
+                    for (INT unpassidx = 0; unpassidx < unpassed.Num(); ++unpassidx)
+                    {
+                        appGeneral(_T("Faield:%s\n"), unpassed[unpassidx].c_str());
+                    }
                     break;
                     //bExcuted = TRUE;
                 }

@@ -15,7 +15,7 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 8
-    BeforeEquvibStep : 100
+    BeforeEquvibStep : 0
     EquvibSkip : 100
     EquvibStep : 500
     SaveStartIndex : 0
@@ -24,7 +24,7 @@ JobSimulate:
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : SRF500204_
+    SavePrefix : SRF490204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -46,8 +46,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # Nt6FileName : ./535161/NC535161_Rotate_Nt6_O4_1713.con
-    # Nt6Polyakov : 0.315620733
+    Nt6FileName : SRF490204_R_Nt6_O0_81.con
+    Nt6Polyakov : 0.315620733
 
     Updator:
 
@@ -197,7 +197,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.0
+        Beta : 4.9
         Omega : 0.0
 
     Action2:
