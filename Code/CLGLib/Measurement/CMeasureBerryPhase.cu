@@ -180,7 +180,7 @@ _kernelBerryCurvatureU1(
         const INT iDir2 = ((dir + 2) % 3) + 1;
         const INT path[4] = { iDir1, iDir2, -iDir1, -iDir2 };
         const Real curve = _deviceLinkU1ArgSum(pU1Field, sSite4, 4, byGaugeFieldId, path);
-        fArgSum += curve * curve; // __cuCargf(pU1Field[_deviceGetSiteIndex(sSite4) * 4 + dir])* curve;
+        fArgSum += curve;// *curve; // __cuCargf(pU1Field[_deviceGetSiteIndex(sSite4) * 4 + dir])* curve;
     }
 
     pRes[uiSiteSpatial] = fArgSum;
@@ -429,6 +429,7 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
 
             m_lstData.AddItem(m_pResEachConfiguration[t]);
         }
+        appGeneral(_T("\n"));
         appSetLogDate(TRUE);
     }
     ++m_uiConfigurationCount;

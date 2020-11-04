@@ -16,11 +16,11 @@ JobSimulate:
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 8
     BeforeEquvibStep : 0
-    EquvibSkip : 100
+    EquvibSkip : 0
     EquvibStep : 500
-    SaveStartIndex : 0
+    SaveStartIndex : 139
     OmegaSep : 16
-    OmegaStart : 0
+    OmegaStart : 5
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
@@ -46,8 +46,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : SRF490204_R_Nt6_O0_81.con
-    Nt6Polyakov : 0.315620733
+    Nt6FileName : SRF490204_R_Nt6_O5_139.con
+    Nt6Polyakov : 0.055577110499
 
     Updator:
 
@@ -64,7 +64,7 @@ JobSimulate:
         ## IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
         IntegratorStep : 20
-        NestedStep : 25
+        NestedStep : 15
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -250,7 +250,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -266,7 +266,7 @@ JobSimulate:
         SolverForFieldId : 3
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -275,7 +275,7 @@ JobSimulate:
         SolverForFieldId : 4
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
 
     MSSolver4:
@@ -286,7 +286,7 @@ JobSimulate:
         # DiviationStep : 20
         DiviationStep : 50
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
         
         NestedSolver :
@@ -302,7 +302,7 @@ JobSimulate:
             MaxDim : 25
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.00000001
+            Accuracy : 0.0000000001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5

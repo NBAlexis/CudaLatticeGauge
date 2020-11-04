@@ -305,7 +305,7 @@ UINT TestBerryPhase(CParameters& sParam)
 #if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(10, FALSE);
 #else
-    appGetLattice()->m_pUpdator->Update(100, FALSE);
+    appGetLattice()->m_pUpdator->Update(20, FALSE);
 #endif
     appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
     //Measure

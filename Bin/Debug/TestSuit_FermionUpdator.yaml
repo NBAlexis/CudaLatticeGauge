@@ -890,14 +890,15 @@ TestBerryPhase:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [8, 8, 8, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
-    ActionListLength : 1
-    FermionFieldCount : 1
+    ActionListLength : 3
+    FermionFieldCount : 2
     MeasureListLength : 1
     ExpectedResR : 0.1561
 
@@ -909,10 +910,10 @@ TestBerryPhase:
         ## but the max error of substraction of Single Float point can be 1E-7
         ## So we only check the expect plaqutte, and average H_diff / H
         Metropolis : 0
-        # IntegratorType : CIntegratorNestedForceGradient
-        IntegratorType : CIntegratorForceGradient
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 15
         NestedStep : 6
 
     Gauge:
@@ -924,32 +925,40 @@ TestBerryPhase:
         FieldInitialType : EFIT_Random
         
     FermionField1:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionWilsonSquareSU3
 
-        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldName : CFieldFermionKSSU3EM
         FieldInitialType : EFIT_RandomGaussian
-
-        Hopping : 0.16
-
-        FieldId : 2
-
-        ## 2(phi_right,left) + 3(x,r,w of GMRES) + 1(Solving DDdagger, need one more) + MaxDim of GMRES
-        ## = 6 + MaxDim of GMRES
-        PoolNumber : 16
-
-        ## Still have problem here
-        Period : [1, 1, 1, -1]
-
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
-
         Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+        EachSiteEta : 1
 
-        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
-        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
-        # EN : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        Qa2Ez : 0.0
+        Qa2Bz : 2.0
+
+        Period : [1, 1, 1, -1]
+        # 1/8
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+        # -1/4
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+
+        FieldName : CFieldFermionKSSU3EM
+        FieldInitialType : EFIT_RandomGaussian
+        Mass : 0.5
+        FieldId : 3
+        PoolNumber : 15
+        EachSiteEta : 1
+
+        Qa2Ez : 0.0
+        Qa2Bz : -1.0
+
+        Period : [1, 1, 1, -1]
+        # 1/8
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+        # -1/4
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
 
     Solver:
 
@@ -963,15 +972,45 @@ TestBerryPhase:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 20
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+
+    MSSolver1:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 20
+        ## after MaxStep checks (DiviationStep x MaxStep steps) if the Accuracy is not reached, give up
+        MaxStep : 500
+        ## Can NOT be too small, otherwise, will never reached..
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 7.0
+        Beta : 6.0
+        CloverEnergy : 1
+        ShiftCoord : 1
 
     Action2:
 
-        ActionName : CActionFermionWilsonNf2
+        ActionName : CActionFermionKS
         FieldId : 2
+
+    Action3:
+
+        ActionName : CActionFermionKS
+        FieldId : 3
+
         ## MultiStep : 2
 
     GaugeFixing:
