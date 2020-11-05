@@ -29,8 +29,14 @@ _kernelAdd4PlaqutteTermSU3_Test(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
-    Real betaOverN, Real fOmegaSq, 
-    Real* results)
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE betaOverN, DOUBLE fOmegaSq,
+    DOUBLE* results
+#else
+    Real betaOverN, Real fOmegaSq,
+    Real* results
+#endif
+)
 {
     intokernalInt4;
 
@@ -49,13 +55,13 @@ _kernelAdd4PlaqutteTermSU3_Test(
 
     //======================================================
     //4-plaqutte terms
-    //Omega^2 x^2 Retr[1 - U_1,4]
+    //Omega^2 x^2 Retr[1 - U_2,3]
     const Real fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 y^2 Retr[1 - U_2,4]
+    //Omega^2 y^2 Retr[1 - U_1,3]
     const Real fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
+    //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
     const Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 
     results[uiSiteIndex] = (fU14 + fU24 + fU34) * betaOverN;
@@ -695,14 +701,14 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
 
     //======================================================
     //4-plaqutte terms
-    //Omega^2 x^2 Retr[1 - U_1,4]
-    const DOUBLE fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 0, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 x^2 Retr[1 - U_2,3]
+    const DOUBLE fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 y^2 Retr[1 - U_2,4]
-    const DOUBLE fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 1, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 y^2 Retr[1 - U_1,3]
+    const DOUBLE fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
-    const DOUBLE fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
+    const DOUBLE fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #else
     Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
     fXSq = fXSq * fXSq;
@@ -711,17 +717,17 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
 
     //======================================================
     //4-plaqutte terms
-    //Omega^2 x^2 Retr[1 - U_1,4]
-    const Real fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 0, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 x^2 Retr[1 - U_2,3]
+    const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 y^2 Retr[1 - U_2,4]
-    const Real fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 1, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 y^2 Retr[1 - U_1,3]
+    const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
-    //Omega^2 (x^2 + y^2) Retr[1 - U_3,4]
-    const Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 2, 3, uiBigIdx, sSite4, byFieldId);
+    //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
+    const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #endif
 
-    results[uiSiteIndex] = (fU14 + fU24 + fU34) * betaOverN;
+    results[uiSiteIndex] = (fU23 + fU13 + fU12) * betaOverN * fOmegaSq;
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -743,6 +749,8 @@ _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted(
 
     betaOverN = betaOverN * F(-0.5);
     //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
+    BYTE idx[6] = { 1, 0, 2, 0, 1, 2 };
+    BYTE byOtherDir[6] = { 2, 1, 2, 0, 0, 1 };
 
     #pragma unroll
     for (UINT idir = 0; idir < 3; ++idir)
@@ -750,49 +758,23 @@ _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         //mu = idir, nu = 4, i = mu
-        const deviceSU3 stap(_deviceStapleTerm123Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 3, idir));
+        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+            idir,
+            byOtherDir[2 * idir],
+            idx[2 * idir],
+            TRUE));
+        stap.Add(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+            idir,
+            byOtherDir[2 * idir + 1],
+            idx[2 * idir + 1],
+            TRUE));
+        
         deviceSU3 force(pDeviceData[linkIndex]);
         force.MulDagger(stap);
         force.Ta();
         force.MulReal(betaOverN);
         pForceData[linkIndex].Add(force);
     }
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForce4PlaqutteTermSU3_T_Shifted(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
-    deviceSU3* pForceData,
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE betaOverN, DOUBLE fOmegaSq
-#else
-    Real betaOverN, Real fOmegaSq
-#endif
-)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    //UINT uiDir = _DC_Dir;
-
-    betaOverN = betaOverN * F(-0.5);
-    //deviceSU3 plaqSum = deviceSU3::makeSU3Zero();
-
-    const BYTE idir = 3;
-    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-
-    //mu = idir, nu = i = sum _1-3
-    deviceSU3 stap = //deviceSU3::makeSU3Zero();
-        _deviceStapleTerm4Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 0);
-    stap.Add(_deviceStapleTerm4Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 1));
-    stap.Add(_deviceStapleTerm123Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, idir, 2, 2));
-    deviceSU3 force(pDeviceData[linkIndex]);
-    force.MulDagger(stap);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[linkIndex].Add(force);
 }
 
 #pragma endregion
@@ -824,7 +806,7 @@ _kernelAddChairTermSU3_Term12_Shifted(
     //}
 
 #if !_CLG_DOUBLEFLOAT
-    betaOverN = 0.125 * betaOverN;
+    betaOverN = -0.125 * betaOverN;
     const DOUBLE fXOmega = (sSite4.x - sCenterSite.x + 0.5) * fOmega;
 
     //===============
@@ -836,7 +818,7 @@ _kernelAddChairTermSU3_Term12_Shifted(
     const DOUBLE fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
 #else
-    betaOverN = F(0.125) * betaOverN;
+    betaOverN = -F(0.125) * betaOverN;
     const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5)) * fOmega;
 
     //===============
@@ -877,7 +859,7 @@ _kernelAddChairTermSU3_Term34_Shifted(
     //}
 #if !_CLG_DOUBLEFLOAT
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fYOmega = -(sSite4.y - sCenterSite.y + 0.5) * fOmega;
+    const DOUBLE fYOmega = (sSite4.y - sCenterSite.y + 0.5) * fOmega;
 
     //===============
     //-y Omega V421
@@ -888,7 +870,7 @@ _kernelAddChairTermSU3_Term34_Shifted(
     const DOUBLE fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 #else
     betaOverN = F(0.125) * betaOverN;
-    const Real fYOmega = -(sSite4.y - sCenterSite.y + F(0.5)) * fOmega;
+    const Real fYOmega = (sSite4.y - sCenterSite.y + F(0.5)) * fOmega;
 
     //===============
     //-y Omega V421
@@ -927,22 +909,22 @@ _kernelAddChairTermSU3_Term5_Shifted(
     //}
 
 #if !_CLG_DOUBLEFLOAT
-    betaOverN = 0.125 * betaOverN;
+    betaOverN = -0.125 * betaOverN;
     const DOUBLE fXYOmega2 = (sSite4.x - sCenterSite.x + 0.5) * (sSite4.y - sCenterSite.y + 0.5) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
-    const DOUBLE fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 3, 1, uiN);
+    const DOUBLE fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #else
-    betaOverN = F(0.125) * betaOverN;
+    betaOverN = -F(0.125) * betaOverN;
     const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5)) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
-    const Real fV142 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 3, 1, uiN);
+    const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #endif
 
-    results[uiSiteIndex] = fV142 * betaOverN;
+    results[uiSiteIndex] = fV132 * betaOverN;
 }
 
 #pragma endregion
@@ -966,7 +948,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+    betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
     //+x Omega V412
@@ -1035,7 +1017,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+    betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
     //+x Omega V432
@@ -1104,7 +1086,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    betaOverN = betaOverN * F(0.5) * fOmega * F(0.125);
+    betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
     //-y Omega V421
@@ -1114,7 +1096,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
     const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 1, 0, 1);
+        2, 1, 0, 1);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term3_4);
     force4.Ta();
@@ -1130,7 +1112,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
     const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        0, 1, 3, 1);
+        0, 1, 2, 1);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term3_1);
     force1.Ta();
@@ -1147,7 +1129,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
     const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 1, 0, 1);
+        2, 1, 0, 1);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term3_2);
     force2.Ta();
@@ -1781,9 +1763,10 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
         _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-        _kernelAddForce4PlaqutteTermSU3_T_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        //_kernelAddForce4PlaqutteTermSU3_T_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        //    pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
+        /*
         _kernelAddForceChairTermSU3_Term1_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
@@ -1798,6 +1781,7 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
 
         _kernelAddForceChairTermSU3_Term5_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        */
 
     }
 
@@ -1859,6 +1843,7 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
+        /*
         _kernelAddChairTermSU3_Term12_Shifted << <block, threads >> > (
             pGaugeSU3->m_byFieldId, 
             pGaugeSU3->m_pDeviceData, 
@@ -1885,9 +1870,18 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);
         m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+        */
     }
     else
     {
+        //_kernelAdd4PlaqutteTermSU3_Test << <block, threads >> > (
+        //    pGaugeSU3->m_byFieldId,
+        //    pGaugeSU3->m_pDeviceData,
+        //    CCommonData::m_sCenter,
+        //    m_fBetaOverN,
+        //    m_fOmega * m_fOmega,
+        //    _D_RealThreadBuffer);
+
         _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,

@@ -43,7 +43,9 @@ _kernelDotAndGatherXYAMomentumJL(
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
+#if _CLG_WIN
 #pragma region JL
+#endif
 
     //idir = mu
     #pragma unroll
@@ -182,7 +184,9 @@ _kernelDotAndGatherXYAMomentumJL(
         }
     }
 
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(jl);
 
@@ -215,7 +219,9 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
+#if _CLG_WIN
 #pragma region JL
+#endif
 
     //idir = mu
     #pragma unroll
@@ -322,7 +328,9 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         }
     }
 
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(gamma4.MulWilsonC(jl));
 
@@ -356,7 +364,9 @@ _kernelDotAndGatherXYAMomentumJPure(
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
 
+#if _CLG_WIN
 #pragma region JL
+#endif
 
     //idir = mu
     #pragma unroll
@@ -468,7 +478,9 @@ _kernelDotAndGatherXYAMomentumJPure(
         }
     }
 
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     //this part is Dmu phi
 
@@ -614,14 +626,18 @@ _kernelDotAndGatherXYAMomentumJS(
 
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
 
+#if _CLG_WIN
 #pragma region JS
+#endif
 
     const deviceWilsonVectorSU3 right_element(pRight[uiSiteIndex]);
     deviceWilsonVectorSU3 js(__chiralGamma[SIGMA12].MulWilsonC(right_element));
     js = __chiralGamma[GAMMA4].MulWilsonC(js);
     js.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
 
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(js);
 
@@ -654,7 +670,9 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
     const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
 
+#if _CLG_WIN
 #pragma region JS
+#endif
 
     //idir = mu
     //=========================
@@ -707,8 +725,10 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
 
     js.Sub(u_dagger_phi_x_m_m); //here was add which is wrong, see D operator this is Add, but the sin bring a sign
     js = sigma12.MulWilsonC(js);
-    
+
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(js);
 

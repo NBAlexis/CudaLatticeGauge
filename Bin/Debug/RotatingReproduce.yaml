@@ -13,16 +13,16 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 100
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 300
+    EquvibStep : 3000
     SaveStartIndex : 0
     OmegaSep : 20
-    OmegaStart : 0
+    OmegaStart : 2
     MaxOmega : 0.14
     MinNt : 3
     MaxNt : 3
-    SavePrefix : ./NC49916_
+    SavePrefix : ./NC48116_
     Additive : 0
     ExponentialPrecision : 8
 
@@ -56,8 +56,8 @@ JobThermal:
     # Nt6Polyakov : 0.232158563337
 
     # 55150
-    # Nt5FileName : NC537516_Rotate_Nt5_O2_749.con
-    # Nt5Polyakov : 0.4742444189672135
+    Nt3FileName : NC48116_Rotate_Nt3_O1_3000.con
+    Nt3Polyakov : 0.742901265621
 
     # 50217
     # Nt4FileName : N50217_Nt4.con
@@ -118,7 +118,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.99
+        Beta : 4.81
         Omega : 0.0
 
     Action2:
@@ -128,13 +128,13 @@ JobThermal:
     Solver:
         SolverForFieldId : 2
 
-        SolverName : CSLASolverBiCGStab
+        # SolverName : CSLASolverBiCGStab
         Accuracy : 0.000001
 
         DiviationStep : 50
         MaxStep : 1
 
-        # SolverName : CSLASolverGMRES
+        SolverName : CSLASolverGMRES
         MaxDim : 15
 
         # SolverName : CSLASolverGCRODR

@@ -27,6 +27,7 @@
 \contentsline {subsubsection}{\numberline {2.4.2}The RHMC with $N_f=2$}{25}{subsubsection.2.4.2}% 
 \contentsline {subsubsection}{\numberline {2.4.3}The RHMC with $N_f=2+1$}{29}{subsubsection.2.4.3}% 
 \contentsline {subsubsection}{\numberline {2.4.4}Multi field Optimization}{30}{subsubsection.2.4.4}% 
+\contentsline {subsubsection}{\numberline {2.4.5}Tip to implement higher orders staggered fermion}{30}{subsubsection.2.4.5}% 
 \contentsline {section}{\numberline {3}Sparse linear algebra solver}{31}{section.3}% 
 \contentsline {subsection}{\numberline {3.1}Krylov subspace}{31}{subsection.3.1}% 
 \contentsline {subsection}{\numberline {3.2}GMRES}{31}{subsection.3.2}% 
@@ -90,19 +91,19 @@
 \contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{93}{subsubsection.8.1.2}% 
 \contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{97}{subsubsection.8.1.3}% 
 \contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{99}{subsubsection.8.1.4}% 
-\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{100}{subsubsection.8.1.5}% 
-\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{105}{subsubsection.8.1.6}% 
-\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{106}{subsubsection.8.1.7}% 
-\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{114}{subsubsection.8.1.8}% 
-\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{114}{subsubsection.8.1.9}% 
-\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{115}{subsubsection.8.1.10}% 
-\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{115}{subsubsection.8.1.11}% 
-\contentsline {subsection}{\numberline {8.2}Sample Producer}{116}{subsection.8.2}% 
-\contentsline {subsection}{\numberline {8.3}Data Analyse}{116}{subsection.8.3}% 
-\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{116}{subsubsection.8.3.1}% 
-\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{117}{subsubsection.8.3.2}% 
-\contentsline {subsection}{\numberline {8.4}Constant Acceleration}{118}{subsection.8.4}% 
-\contentsline {subsubsection}{\numberline {8.4.1}Discretization}{118}{subsubsection.8.4.1}% 
-\contentsline {subsubsection}{\numberline {8.4.2}Force}{121}{subsubsection.8.4.2}% 
-\contentsline {subsubsection}{\numberline {8.4.3}Rigid Acceleration}{122}{subsubsection.8.4.3}% 
-\contentsline {subsubsection}{\numberline {8.4.4}Force Terms}{125}{subsubsection.8.4.4}% 
+\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{101}{subsubsection.8.1.5}% 
+\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{106}{subsubsection.8.1.6}% 
+\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{107}{subsubsection.8.1.7}% 
+\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{115}{subsubsection.8.1.8}% 
+\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{115}{subsubsection.8.1.9}% 
+\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{116}{subsubsection.8.1.10}% 
+\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{116}{subsubsection.8.1.11}% 
+\contentsline {subsection}{\numberline {8.2}Sample Producer}{117}{subsection.8.2}% 
+\contentsline {subsection}{\numberline {8.3}Data Analyse}{117}{subsection.8.3}% 
+\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{117}{subsubsection.8.3.1}% 
+\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{118}{subsubsection.8.3.2}% 
+\contentsline {subsection}{\numberline {8.4}Constant Acceleration}{119}{subsection.8.4}% 
+\contentsline {subsubsection}{\numberline {8.4.1}Discretization}{119}{subsubsection.8.4.1}% 
+\contentsline {subsubsection}{\numberline {8.4.2}Force}{122}{subsubsection.8.4.2}% 
+\contentsline {subsubsection}{\numberline {8.4.3}Rigid Acceleration}{123}{subsubsection.8.4.3}% 
+\contentsline {subsubsection}{\numberline {8.4.4}Force Terms}{126}{subsubsection.8.4.4}% 

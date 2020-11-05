@@ -21,6 +21,9 @@ __CLGIMPLEMENT_CLASS(CFieldFermionWilsonSquareSU3DR)
 
 #pragma region hamitonian
 
+/**
+ * This is only for no exponent D operator
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionWilsonSquareSU3_DR(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,

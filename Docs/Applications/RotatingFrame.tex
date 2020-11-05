@@ -49,11 +49,18 @@ For rotational frame, the metric and frame can be defined as
 
 \subsubsection{\label{sec:RotatingGaugeAction}The rotating gauge action}
 
+\textcolor[rgb]{1,0,0}{Note that $g^{\mu\nu}\neq g_{\mu\nu}$}. Using
+\begin{equation}
+\begin{split}
+&g^{\mu\nu}=\left(\begin{array}{cccc} 1 & y\Omega & -x\Omega & 0 \\ y\Omega & y^2\Omega^2 -1 & -xy\Omega^2 & 0 \\ -x\Omega & -xy\Omega^2 & x^2\Omega^2-1 & 0 \\ 0 & 0 & 0 & -1 \end{array}\right),\;\;\sqrt{-\det (g_{\mu\nu})}=1\\
+\end{split}
+\end{equation}
+
 Considering the case of pure gauge, the action can be written as
 \begin{equation}
 \begin{split}
 &\mathcal{L}_G=-\sqrt{\det (-g_{\alpha \beta})}\frac{1}{2g_{YM}^2}g^{\mu\nu}g^{\rho\sigma }{\rm tr}[F_{\mu\rho}F_{\nu\sigma}]\\
-&=-\frac{1}{2g_{YM}^2}\left(\sum _{ijkl=0}^3 h_{ij}h_{kl}{\rm tr}[F_{ik}F_{jl}]+2\Omega^2 {\rm tr}\left[(x F_{01}+y F_{02})^2+r^2 F_{03}^2\right]\right.\\
+&=-\frac{1}{2g_{YM}^2}\left(\sum _{ijkl=0}^3 \eta_{ij}\eta_{kl}{\rm tr}[F_{ik}F_{jl}]-2\Omega^2 {\rm tr}\left[(x F_{23}-y F_{13})^2+r^2 F_{12}^2\right]\right.\\
 &\left.-4\Omega\left(x {\rm tr}[F_{01}F_{12}]+y {\rm tr}[F_{02}F_{12}]+y {\rm tr}[F_{03}F_{13}]-x {\rm tr}[F_{03}F_{23}]\right)\right)
 \end{split}
 \end{equation}
@@ -62,10 +69,10 @@ Considering the case of pure gauge, the action can be written as
   \item Wick rotation of gauge action
 \end{itemize}
 
-The Wick rotation
+The Wick rotation ($F_{\mu\nu}=\partial _{\mu}A_{\nu}-\partial _{\nu}A_{\mu}+i[A_{\mu},A_{\nu}]$)
 \begin{equation}
 \begin{split}
-&t\to -i\tau,\;\;\Omega \to i\Omega ,\;\;A_{\mu}\to (iA_0,A_1,A_2,A_3),\;\;F_{0i}\to \textcolor[rgb]{1,0,0}{-}iF_{0i}\\
+&t\to -i\tau,\;\;\partial _t \to i\partial _t,\;\;\Omega \to i\Omega ,\;\;A_{\mu}\to (iA_0,A_1,A_2,A_3),\;\;F_{0i}\to \textcolor[rgb]{1,0,0}{+}iF_{0i}\\
 \end{split}
 \end{equation}
 and substitute $x=(t,x,y,z)\to x_E=(x,y,z,\tau)$. After Wick rotation, we are expecting
@@ -78,12 +85,12 @@ the result is
 \begin{equation}
 \begin{split}
 &-S_G=i\int d^4 x\mathcal{L}_G\\
-&S_G=\int d^4 x_E \frac{1}{2g_{YM}^2}\left(\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]+2\Omega^2 {\rm tr}\left[(x F_{14}+y F_{24})^2+r^2 F_{34}^2\right]\right.\\
-&\left.+4\Omega\left(x {\rm tr}[F_{14}F_{12}]+y {\rm tr}[F_{24}F_{12}]+y {\rm tr}[F_{34}F_{13}]-x {\rm tr}[F_{34}F_{23}]\right)\right)
+&S_G=\int d^4 x_E \frac{1}{2g_{YM}^2}\left(\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]+2\Omega^2 {\rm tr}\left[(x F_{23}-y F_{13})^2+r^2 F_{12}^2\right]\right.\\
+&\left.+4\Omega\left(x {\rm tr}[F_{41}F_{12}]+y {\rm tr}[F_{42}F_{12}]+y {\rm tr}[F_{43}F_{13}]-x {\rm tr}[F_{43}F_{23}]\right)\right)
 \end{split}
 \end{equation}
 
-Therefor $S_G$ is real. The $\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]$ is the gauge action in rest frame.
+Therefore $S_G$ is real. The $\sum _{ij=1}^4 {\rm tr}[F_{ij}F_{ij}]$ is the gauge action in rest frame. \textcolor[rgb]{1,0,0}{The sign of the terms propotional to $\Omega$ is different from Refs.}
 
 \begin{itemize}
   \item Discretization of gauge action
@@ -150,10 +157,10 @@ Similarly, we can use the average of chairs, and define
 The discretized and Wick rotated gauge action is
 \begin{equation}
 \begin{split}
-&S_G=\frac{2}{a^4g_{YM}^2}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
-&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{14}(n)]+y^2{\rm Retr}[1-\bar{U}_{24}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]+xy{\rm Retr}[V_{142}]\right)\\
-&=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
-&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{14}(n)]+y^2{\rm Retr}[1-\bar{U}_{24}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]+xy{\rm Retr}[V_{142}]\right)\\
+&S_G=\frac{2}{a^4g_{YM}^2}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]-\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{23}(n)]+y^2{\rm Retr}[1-\bar{U}_{13}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]-xy{\rm Retr}[V_{132}]\right)\\
+&=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]\textcolor[rgb]{1,0,0}{-}\Omega\left(x{\rm Retr}[V_{412}+V_{432}]-y{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\Omega^2(x^2{\rm Retr}[1-\bar{U}_{23}(n)]+y^2{\rm Retr}[1-\bar{U}_{13}(n)]+r^2{\rm Retr}[1-\bar{U}_{34}(n)]-xy{\rm Retr}[V_{132}]\right)\\
 \end{split}
 \end{equation}
 with $\frac{\beta}{N_c} \equiv \frac{2}{a^4g_{YM}^2}$.
@@ -172,14 +179,19 @@ with
 &w_{\mu ij}=g_{\alpha \beta}e_i^{\alpha}(\partial _{\mu}e_j^{\beta}+\Gamma ^{\beta}_{\mu\nu}e_j^{\nu})\\
 &\Gamma ^{\beta}_{\mu\nu}=\frac{1}{2}g^{\beta \alpha}\left(\frac{\partial g _{\alpha \mu}}{\partial x ^{\nu}}+\frac{\partial g _{\alpha \nu}}{\partial x ^{\mu}}-\frac{\partial g_{\mu\nu}}{\partial x^{\alpha}}\right)\\
 &\sigma ^{ij}=\frac{i}{2}[\gamma ^i,\gamma ^j]\\
+&e_0=(1,y\Omega,-x\Omega,0)\\
+&e_1=(0,1,0,0)\\
+&e_2=(0,0,1,0)\\
+&e_3=(0,0,0,1)\\
 \end{split}
 \end{equation}
 so
+\textcolor[rgb]{0,0,1}{
 \begin{equation}
 \begin{split}
 &\frac{i}{4}\sigma ^{ij}w_{\mu ij}=\left(\frac{i}{2}\Omega \sigma ^{12},0,0,0\right)\\
 \end{split}
-\end{equation}
+\end{equation}}
 and
 \begin{equation}
 \begin{split}
@@ -418,8 +430,8 @@ with
 \textcolor[rgb]{0,0,0.8}{
 \begin{equation}
 \begin{split}
-&S_G=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]+\hat{\Omega}\left(\hat{x}{\rm Retr}[V_{412}+V_{432}]-\hat{y}{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
-&\left.+\hat{\Omega}^2(\hat{x}^2{\rm Retr}[1-\bar{U}_{14}(n)]+\hat{y}^2{\rm Retr}[1-\bar{U}_{24}(n)]+(\hat{x}^2+\hat{y}^2){\rm Retr}[1-\bar{U}_{34}(n)]+\hat{x}\hat{y}{\rm Retr}[V_{142}]\right)\\
+&S_G=\frac{\beta}{N_c}\sum _{n}\left(\sum _{\mu >\nu}{\rm Retr}[1-U_{\mu\nu}(n)]-\hat{\Omega}\left(\hat{x}{\rm Retr}[V_{412}+V_{432}]-\hat{y}{\rm Retr}[V_{421}+V_{431}]\right)\right.\\
+&\left.+\hat{\Omega}^2(\hat{x}^2{\rm Retr}[1-\bar{U}_{23}(n)]+\hat{y}^2{\rm Retr}[1-\bar{U}_{13}(n)]+(\hat{x}^2+\hat{y}^2){\rm Retr}[1-\bar{U}_{12}(n)]-\hat{x}\hat{y}{\rm Retr}[V_{132}]\right)\\
 &U_{\mu, \nu}(n)\equiv U_{\mu}(n)U_{\nu}(n+a\hat{\mu})U^{-1}_{\mu}(n+a\hat{\nu})U^{-1}_{\nu}(n)\\
 &\bar{U}_{\mu, \nu}(n)\equiv \frac{1}{4}\left(U_{\mu, \nu}(n)+U_{-\mu ,\nu}(n)+U_{\mu, -\nu}(n)+U_{-\mu, -\nu}(n)\right)\\
 &V_{\mu\nu\sigma}(n)=\frac{1}{8}\left((U_{\mu,\nu}(n)-U_{-\mu,\nu}(n))(U_{\nu,\sigma}(n)-U_{\nu,-\sigma}(n))\right.\\
@@ -467,6 +479,20 @@ If using the exponential spin coupling term it is
 \end{equation}
 }
 
+For convenient, it is
+\textcolor[rgb]{0,0,0.8}{
+\begin{equation}
+\begin{split}
+&D(n|m)=\delta _{n,m}-\kappa M\\
+&M=\sum _{\mu = 1,2,3}=\left((1-\gamma _{\mu})U_{\mu}(n)\delta _{n+a\hat{\mu},m}+(1+\gamma _{\mu})U_{-\mu}(n)\delta _{n-a\hat{\mu},m}\right)\\
+&-\hat{y}\hat{\Omega} \gamma _4 U_{x}(n)\delta _{n+a\hat{x},m}+\hat{y}\hat{\Omega}\gamma _4 U_{-x}(n)\delta _{n-a\hat{x},m})\\
+&+\hat{x}\hat{\Omega} \gamma _4 U_{y}(n)\delta _{n+a\hat{y},m}-\hat{x}\gamma _4U_{-y}(n)\delta _{n-a\hat{y},m}\\
+&+\left(\cos\left(\frac{ia\Omega }{2}\right)+i\sin\left(\frac{ia\Omega }{2}\right)\sigma ^{12}\right)(1-\gamma _4)U_{\tau}(n)\delta _{n,n+t}\\
+&+\left(\cos\left(\frac{ia\Omega }{2}\right)-i\sin\left(\frac{ia\Omega }{2}\right)\sigma ^{12}\right)(1+\gamma _4) U_{-\tau}(n)\delta _{n-t,n}\\
+\end{split}
+\end{equation}
+}
+
 
 \subsubsection{\label{sec:ForceFromGaugeAction}The force from gauge action}
 
@@ -493,7 +519,7 @@ and
 &\sum _n f(n){\rm Retr}[1-\bar{U}_{\mu, \nu}(n)]=\sum _n\frac{f(n)+f(n+a\mu)+f(n+a\nu)+f(n+a\mu+a\nu)}{4}{\rm Retr}[1-U_{\mu\nu}(n)]\\
 \end{split}
 \end{equation}
-so (\textbf{Note, this is for infinite lattice size, the boundary condition should be considered})
+so (\textbf{Note, this is for finite lattice size, the boundary condition should be considered})
 \begin{equation}
 \begin{split}
 &\sum _n \hat{\Omega}^2\hat{x}^2{\rm Retr}[1-\bar{U}_{1, 4}(n)]=\sum _n\hat{\Omega}^2\frac{2\hat{x}^2+2\hat{x}+1}{2}{\rm Retr}[1-U_{1,4}(n)]\\

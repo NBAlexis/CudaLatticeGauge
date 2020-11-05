@@ -61,7 +61,7 @@ UINT TestFileIOCLG(CParameters& sParam)
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
     const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
-    const CLGComplex res3 = pNewGauge->DotReal(pNewGauge);
+    //const CLGComplex res3 = pNewGauge->DotReal(pNewGauge);
     //appGeneral(_T("dot res:%2.20f\n"), res3.x);
     //appGeneral(_T("dot res:%2.20f\n"), res3.y);
     pNewFermion->AxpyMinus(appGetLattice()->GetFieldById(2));

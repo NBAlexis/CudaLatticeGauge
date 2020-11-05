@@ -373,6 +373,70 @@ static __device__ __inline__ Real _deviceFi(
         + x4 * x4);
 }
 
+static __device__ __inline__ Real _deviceFiShifted(
+    BYTE byFieldId,
+    const SSmallInt4& sSite4,
+    const SSmallInt4& sCenter,
+    BYTE i, BYTE mu, BYTE nu)
+{
+    const SIndex& n__idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4)];
+    const SSmallInt4 site_N = __deviceSiteIndexToInt4(n__idx.m_uiSiteIndex);
+
+    const SSmallInt4 sN_p_mu = _deviceSmallInt4OffsetC(sSite4, mu + 1);
+    const SIndex& n_p_mu__idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sN_p_mu)];
+    const SSmallInt4 site_N_p_mu = __deviceSiteIndexToInt4(n_p_mu__idx.m_uiSiteIndex);
+
+    const SSmallInt4 sN_p_nu = _deviceSmallInt4OffsetC(sSite4, nu + 1);
+    const SIndex& n_p_nu__idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sN_p_nu)];
+    const SSmallInt4 site_N_p_nu = __deviceSiteIndexToInt4(n_p_nu__idx.m_uiSiteIndex);
+
+    const SSmallInt4 sN_p_numu = _deviceSmallInt4OffsetC(sN_p_mu, nu + 1);
+    const SIndex& n_p_numu__idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sN_p_numu)];
+    const SSmallInt4 site_N_p_munu = __deviceSiteIndexToInt4(n_p_numu__idx.m_uiSiteIndex);
+
+    //const UBOOL bN_surface = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet();
+    //const UBOOL bN_p_mu_surface = n_p_mu__idx.IsDirichlet();
+    //const UBOOL bN_p_nu_surface = n_p_nu__idx.IsDirichlet();
+    //const UBOOL bN_p_munu_surface = n_p_numu__idx.IsDirichlet();
+
+    const Real x1 = static_cast<Real>(site_N.x - sCenter.x + F(0.5));
+    const Real y1 = static_cast<Real>(site_N.y - sCenter.y + F(0.5));
+
+    const Real x2 = static_cast<Real>(site_N_p_mu.x - sCenter.x + F(0.5));
+    const Real y2 = static_cast<Real>(site_N_p_mu.y - sCenter.y + F(0.5));
+
+    const Real x3 = static_cast<Real>(site_N_p_nu.x - sCenter.x + F(0.5));
+    const Real y3 = static_cast<Real>(site_N_p_nu.y - sCenter.y + F(0.5));
+
+    const Real x4 = static_cast<Real>(site_N_p_munu.x - sCenter.x + F(0.5));
+    const Real y4 = static_cast<Real>(site_N_p_munu.y - sCenter.y + F(0.5));
+
+    if (0 == i)
+    {
+        //const UBOOL bCorner = (sSite4.x == site_N_p_munu.x) && (sSite4.y == site_N_p_munu.y);
+        //if (bCorner)
+        //{
+        //    return F(0.0);
+        //}
+        return F(0.25) * (x1 * x1 + y1 * y1
+            + x2 * x2 + y2 * y2
+            + x3 * x3 + y3 * y3
+            + x4 * x4 + y4 * y4);
+    }
+
+    if (1 == i)
+    {
+        return F(0.25) * (y1 * y1
+            + y2 * y2
+            + y3 * y3
+            + y4 * y4);
+    }
+    return F(0.25) * (x1 * x1
+        + x2 * x2
+        + x3 * x3
+        + x4 * x4);
+}
+
 /**
  * Staple for U_mu, from U_{mu,nu}
  */
@@ -380,7 +444,7 @@ static __device__ __inline__ deviceSU3 _deviceStapleTermGfactor(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, Real fOmegaSq,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE i, UBOOL bShifted = FALSE)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
@@ -409,9 +473,12 @@ static __device__ __inline__ deviceSU3 _deviceStapleTermGfactor(
             n_m_nu__nu_dag, n_m_nu__mu, n_p_mu_m_nu__nu
         ));
 
-
-    const Real fLFactor = _deviceFi(byFieldId, sSite, sCenter, uiBigIndex, i, mu, nu);
-    const Real fRFactor = _deviceFi(byFieldId, n_m_nu, sCenter, __bi(n_m_nu), i, mu, nu);
+    const Real fLFactor = bShifted
+        ? _deviceFiShifted(byFieldId, sSite, sCenter, i, mu, nu)
+        : _deviceFi(byFieldId, sSite, sCenter, uiBigIndex, i, mu, nu);
+    const Real fRFactor = bShifted
+        ? _deviceFiShifted(byFieldId, n_m_nu, sCenter, i, mu, nu)
+        : _deviceFi(byFieldId, n_m_nu, sCenter, __bi(n_m_nu), i, mu, nu);
     
     left.MulReal(fLFactor * fOmegaSq);
     right.MulReal(fRFactor * fOmegaSq);
@@ -959,135 +1026,6 @@ static __device__ __inline__ deviceSU3 _deviceStapleChairTerm2(
 #pragma endregion
 
 #pragma region Projective plane related
-
-#pragma region Clover
-
-static __device__ __inline__ Real _deviceGiShifted(
-    BYTE byFieldId,
-    const SSmallInt4& sCenter,
-    SSmallInt4 sSite,
-    SSmallInt4 sSiteOffset,
-    BYTE i,
-    Real fOmegaSq)
-{
-    if (0 == i)
-    {
-        sSite = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite)].m_uiSiteIndex);
-        sSiteOffset = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSiteOffset)].m_uiSiteIndex);
-        const Real fX = static_cast<Real>(sSite.x - sCenter.x + F(0.5));
-        const Real fXp1 = static_cast<Real>(sSiteOffset.x - sCenter.x + F(0.5));
-        return F(0.5) * fOmegaSq * (fX * fX + fXp1 * fXp1);
-    }
-    if (1 == i)
-    {
-        sSite = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite)].m_uiSiteIndex);
-        sSiteOffset = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSiteOffset)].m_uiSiteIndex);
-        const Real fY = static_cast<Real>(sSite.y - sCenter.y + F(0.5));
-        const Real fYp1 = static_cast<Real>(sSiteOffset.y - sCenter.y + F(0.5));
-        return F(0.5) * fOmegaSq * (fY * fY + fYp1 * fYp1);
-    }
-
-    //The shift is on z and t direction, so x and y is not changed
-    //sSite = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite)].m_uiSiteIndex);
-    const Real fX = static_cast<Real>(sSite.x - sCenter.x + F(0.5));
-    const Real fY = static_cast<Real>(sSite.y - sCenter.y + F(0.5));
-    return fOmegaSq * (fX * fX + fY * fY);
-}
-
-static __device__ __inline__ deviceSU3 _deviceStapleTerm4Shifted(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    const SSmallInt4& sCenter, const SSmallInt4& sSite, Real fOmegaSq,
-    UINT uiBigIndex, BYTE mu, BYTE nu)
-{
-    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
-    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
-    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
-    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
-
-    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
-    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
-    SIndex n_p_mu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
-    n_p_mu__nu_dag.m_byTag = n_p_mu__nu_dag.m_byTag ^ _kDaggerOrOpposite;
-
-    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
-    SIndex n_m_nu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
-    n_m_nu__nu_dag.m_byTag = n_m_nu__nu_dag.m_byTag ^ _kDaggerOrOpposite;
-    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
-    const SIndex& n_p_mu_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu_m_nu) + nu];
-
-    deviceSU3 left(
-        _deviceGetSTTerm(byFieldId, pDeviceData,
-            //pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
-            n__nu, n_p_nu__mu, n_p_mu__nu_dag
-        ));
-    deviceSU3 right(
-        _deviceGetSTTerm(byFieldId, pDeviceData,
-            n_m_nu__nu_dag, n_m_nu__mu, n_p_mu_m_nu__nu
-            //pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
-        ));
-
-    //nu = 0 or 1, for U14 and U24 and mu = 3 for t
-    //left is +nu term, right is -nu term
-    left.MulReal(_deviceGiShifted(byFieldId, sCenter, sSite, n_p_nu, nu, fOmegaSq));
-    right.MulReal(_deviceGiShifted(byFieldId, sCenter, sSite, n_m_nu, nu, fOmegaSq));
-    left.Add(right);
-
-    return left;
-}
-
-/**
-* Simplified: for mu = 0,1,2, gi(n)=gi(n-nu)
-*/
-static __device__ __inline__ deviceSU3 _deviceStapleTerm123Shifted(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    const SSmallInt4& sCenter, const SSmallInt4& sSite, Real fOmegaSq,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE i)
-{
-    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
-    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
-    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
-    const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
-
-    const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
-    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
-    SIndex n_p_mu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
-    n_p_mu__nu_dag.m_byTag = n_p_mu__nu_dag.m_byTag ^ _kDaggerOrOpposite;
-
-    const UINT n_m_nu_bi4 = __bi4(n_m_nu);
-    SIndex n_m_nu__nu_dag = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
-    n_m_nu__nu_dag.m_byTag = n_m_nu__nu_dag.m_byTag ^ _kDaggerOrOpposite;
-    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
-    const SIndex& n_p_mu_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu_m_nu) + nu];
-
-    deviceSU3 left(
-        _deviceGetSTTerm(byFieldId, pDeviceData,
-            //pDeviceData, uiBigIndex, uiN_p_nu, uiN_p_mu, nu, mu, nu, 0, 0, 1
-            n__nu, n_p_nu__mu, n_p_mu__nu_dag
-        ));
-    const deviceSU3 right(
-        _deviceGetSTTerm(byFieldId, pDeviceData,
-            //pDeviceData, uiN_m_nu, uiN_m_nu, uiN_p_mu_m_nu, nu, mu, nu, 1, 0, 0
-            n_m_nu__nu_dag, n_m_nu__mu, n_p_mu_m_nu__nu
-        ));
-
-    left.Add(right);
-    if (2 == i)
-    {
-        //simplified here, for z, site_offset is not needed
-        left.MulReal(_deviceGiShifted(byFieldId, sCenter, sSite, sSite, i, fOmegaSq));
-    }
-    else
-    {
-        const SSmallInt4 n_p_i = _deviceSmallInt4OffsetC(sSite, __fwd(i));
-        left.MulReal(_deviceGiShifted(byFieldId, sCenter, sSite, n_p_i, i, fOmegaSq));
-    }
-
-    return left;
-}
-
-#pragma endregion
 
 #pragma region Chair
 

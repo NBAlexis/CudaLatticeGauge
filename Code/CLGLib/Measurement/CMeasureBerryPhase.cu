@@ -443,7 +443,7 @@ void CMeasureBerryPhase::Average(UINT )
 void CMeasureBerryPhase::Report()
 {
     appSetLogDate(FALSE);
-    assert(_HC_Lt * static_cast<INT>(m_uiConfigurationCount) == m_lstData.Num());
+    assert(_HC_Lti * static_cast<INT>(m_uiConfigurationCount) == m_lstData.Num());
 #if !_CLG_DOUBLEFLOAT
     TArray<DOUBLE> average;
 #else

@@ -18,12 +18,12 @@ JobSimulate:
     BeforeEquvibStep : 0
     EquvibSkip : 0
     EquvibStep : 500
-    SaveStartIndex : 139
+    SaveStartIndex : 0
     OmegaSep : 16
-    OmegaStart : 5
+    OmegaStart : 10
     MaxOmega : 0.128
-    MinNt : 6
-    MaxNt : 6
+    MinNt : 3
+    MaxNt : 3
     SavePrefix : SRF490204_
     Additive : 0
 
@@ -32,13 +32,14 @@ JobSimulate:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 5
+    ActionListLength : 1
     FermionFieldCount : 4
     MeasureListLength : 1
     CacheStaple : 0
@@ -46,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : SRF490204_R_Nt6_O5_139.con
-    Nt6Polyakov : 0.055577110499
+    # Nt6FileName : SRF490204_R_Nt6_O5_139.con
+    # Nt6Polyakov : 0.055577110499
 
     Updator:
 
@@ -60,10 +61,10 @@ JobSimulate:
         InnerLeapfrog : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorNestedOmelyan
-        ## IntegratorType : CIntegratorOmelyan
+        ## IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 20
+        IntegratorStep : 100
         NestedStep : 15
         Omelyan2Lambda : 0.38636665500756728
 
