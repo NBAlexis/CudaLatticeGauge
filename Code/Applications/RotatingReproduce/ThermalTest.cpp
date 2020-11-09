@@ -125,7 +125,7 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
             Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
-            if (fError < F(1E-07))
+            if (fError < F(1E-05))
             {
                 appGeneral(_T("\n ================ Bake using old file =================\n"));
                 bNeedBake = FALSE;
@@ -207,7 +207,7 @@ INT TestThermal(CParameters& params)
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
                 pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
-                if (fError < F(1E-07))
+                if (fError < F(1E-05))
                 {
                     appGeneral(_T("\n ================ using old file start from %d =================\n"), iSaveStartIndex);
                 }

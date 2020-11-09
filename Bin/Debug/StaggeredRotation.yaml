@@ -14,7 +14,7 @@ JobSimulate:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
-    ExponentialPrecision : 8
+    ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
     EquvibStep : 500
@@ -22,8 +22,8 @@ JobSimulate:
     OmegaSep : 16
     OmegaStart : 10
     MaxOmega : 0.128
-    MinNt : 3
-    MaxNt : 3
+    MinNt : 6
+    MaxNt : 6
     SavePrefix : SRF490204_
     Additive : 0
 
@@ -32,14 +32,14 @@ JobSimulate:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 1
+    ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
     CacheStaple : 0
@@ -59,12 +59,14 @@ JobSimulate:
         MinMaxStep : [4, 50]
         GrowReduceThreshold : [-0.3, 0.02]
         InnerLeapfrog : 1
+        DebugForce : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        ## IntegratorType : CIntegratorNestedOmelyan
-        IntegratorType : CIntegratorOmelyan
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        IntegratorType : CIntegratorNested11Stage
+        ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 100
+        IntegratorStep : 25
         NestedStep : 15
         Omelyan2Lambda : 0.38636665500756728
 

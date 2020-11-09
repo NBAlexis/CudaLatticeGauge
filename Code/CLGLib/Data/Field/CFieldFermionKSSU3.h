@@ -95,13 +95,13 @@ public:
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
     CCString GetInfos(const CCString& tab) const override;
 
-    void SetMass(Real f2am);
-    Real GetMass() const { return m_f2am; }
+    void SetMass(Real fam);
+    Real GetMass() const { return m_fam; }
 
     //============================
     //Override these two functions for KS
     virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const;
-    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
+    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real fam,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
     //============================
 
@@ -111,7 +111,7 @@ public:
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
     {
-        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_fam, bDagger, eOCT, fRealCoeff, cCmpCoeff);
     }
 
     /**
@@ -138,7 +138,7 @@ protected:
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
     UBOOL m_bEachSiteEta;
 
-    Real m_f2am;
+    Real m_fam;
 
     // r(x) = x^{1/4} use to prepare for Nf=2
     // r(x) = x^{3/8} use as s quark for Nf=2+1

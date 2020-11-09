@@ -681,7 +681,7 @@ TestRotationProjectivePlane:
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
-    ExponentialPrecision : 8
+    ExponentialPrecision : 10
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 5
@@ -696,13 +696,15 @@ TestRotationProjectivePlane:
         UpdatorType : CHMC
         Metropolis : 1
         DebugForce : 1
+
+        # 
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 20
-        NestedStep : 25
+        IntegratorStep : 40
+        NestedStep : 30
 
     Gauge:
     
@@ -946,8 +948,8 @@ TestEMSimple:
         FieldId : 2
         PoolNumber : 15
 
-        Qa2Ez : 0.2
-        Qa2Bz : 0.2
+        Qa2Ez : 0.1
+        Qa2Bz : 0.1
 
         Period : [1, 1, 1, -1]
 

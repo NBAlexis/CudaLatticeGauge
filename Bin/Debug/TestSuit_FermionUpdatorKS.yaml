@@ -12,7 +12,7 @@ TestFermionUpdatorKS:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.427
+    ExpectedRes : 0.437
 
     Updator:
 
@@ -125,7 +125,7 @@ TestFermionUpdatorKSNestedForceGradient:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Mass : 0.1
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
 
@@ -250,11 +250,11 @@ TestFermionUpdatorKSNestedForceGradientNf2p1:
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{-1/4}
+        # a^2 delta M = 0.0096, this is (x+0.0096/x)^{-1/4}
         MC : [0.9999881240311078, -0.0005149551496446561, -0.0018810650349126727, 0.0014583220237758202, 0.0071163010669864175]
 
         # MD is to calculate force
-        # 4a^2 delta M = 0.0096, this is (x+0.0096/x)^{1/2}
+        # a^2 delta M = 0.0096, this is (x+0.0096/x)^{1/2}
         MD : [1.0000181158194439, 0.002645611557101056, 0.0021484403702662705, 0.00044249817227846476, 0.004650283535051439]
 
     Solver:

@@ -37,7 +37,7 @@ _kernelDFermionKS(
     const SIndex * __restrict__ pFermionMove,
     const BYTE * __restrict__ pEtaTable,
     deviceSU3Vector* pResultData,
-    Real f2am,
+    Real fam,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -53,7 +53,7 @@ _kernelDFermionKS(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
 
         //x, mu
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -93,7 +93,7 @@ _kernelDFermionKS(
         result.Add(u_phi_x_p_m);
     }
 
-    pResultData[uiSiteIndex].MulReal(f2am);
+    pResultData[uiSiteIndex].MulReal(fam);
     if (bDDagger)
     {
         pResultData[uiSiteIndex].Sub(result);
@@ -125,7 +125,7 @@ _kernelDFermionKSPlusEta(
     const SIndex* __restrict__ pFermionMove,
     const BYTE* __restrict__ pEtaTable,
     deviceSU3Vector* pResultData,
-    Real f2am,
+    Real fam,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -149,8 +149,8 @@ _kernelDFermionKSPlusEta(
         const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
         //This is in fact, -1 * eta(n + mu)
-        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
-        const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
+        const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
@@ -187,7 +187,7 @@ _kernelDFermionKSPlusEta(
         result.Add(u_phi_x_p_m);
     }
 
-    pResultData[uiSiteIndex].MulReal(f2am);
+    pResultData[uiSiteIndex].MulReal(fam);
     if (bDDagger)
     {
         pResultData[uiSiteIndex].Sub(result);
@@ -228,7 +228,7 @@ _kernelDFermionKSForce(
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         //Get Gamma mu
-        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
         //x, mu
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
@@ -264,7 +264,7 @@ _kernelDFermionKSForce(
 #pragma endregion
 
 void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
-    const void * pGaugeBuffer, Real f2am,
+    const void * pGaugeBuffer, Real fam,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -282,7 +282,7 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
-            f2am,
+            fam,
             m_byFieldId,
             bDagger,
             eOCT,
@@ -298,7 +298,7 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
-            f2am,
+            fam,
             m_byFieldId,
             bDagger,
             eOCT,
@@ -915,7 +915,7 @@ void CFieldFermionKSSU3::OneLinkForce(
 CFieldFermionKSSU3::CFieldFermionKSSU3()
     : CFieldFermion()
     , m_bEachSiteEta(FALSE)
-    , m_f2am(F(0.01))
+    , m_fam(F(0.01))
     , m_pRationalFieldPointers(NULL)
     , m_pMDNumerator(NULL)
 {
@@ -984,8 +984,8 @@ void CFieldFermionKSSU3::InitialWithByte(BYTE* byData)
 
 void CFieldFermionKSSU3::InitialOtherParameters(CParameters& params)
 {
-    params.FetchValueReal(_T("Mass"), m_f2am);
-    if (m_f2am < F(0.00000001))
+    params.FetchValueReal(_T("Mass"), m_fam);
+    if (m_fam < F(0.00000001))
     {
         appCrucial(_T("CFieldFermionKSSU3: Mass is nearly 0!\n"));
     }
@@ -1062,7 +1062,7 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
     CFieldFermionKSSU3* pField = dynamic_cast<CFieldFermionKSSU3*>(U);
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
     pField->m_byFieldId = m_byFieldId;
-    pField->m_f2am = m_f2am;
+    pField->m_fam = m_fam;
     pField->m_rMC = m_rMC;
     pField->m_rMD = m_rMD;
     pField->m_bEachSiteEta = m_bEachSiteEta;
@@ -1491,9 +1491,9 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
     }
 }
 
-void CFieldFermionKSSU3::SetMass(Real f2am)
+void CFieldFermionKSSU3::SetMass(Real fam)
 {
-    m_f2am = f2am;
+    m_fam = fam;
 }
 
 void CFieldFermionKSSU3::SaveToFile(const CCString& fileName) const
@@ -1562,7 +1562,7 @@ TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(const class 
 CCString CFieldFermionKSSU3::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("Mass (am) : ") + appFloatToString(m_fam) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     return sRet;

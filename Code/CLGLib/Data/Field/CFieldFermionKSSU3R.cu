@@ -328,7 +328,7 @@ _kernelDFermionKS_PR_XYTerm(
     {
         fOmega = -fOmega;
     }
-    result.MulReal(F(0.25) * fOmega);
+    result.MulReal(F(0.125) * fOmega);
 
     switch (eCoeff)
     {
@@ -404,11 +404,11 @@ _kernelDFermionKS_PR_XYTau_Term(
 
     if (bDDagger)
     {
-        result.MulReal(-F(0.125) * fOmega);
+        result.MulReal(-F(0.0625) * fOmega);
     }
     else
     {
-        result.MulReal(F(0.125) * fOmega);
+        result.MulReal(F(0.0625) * fOmega);
     }
 
     switch (eCoeff)
@@ -504,7 +504,7 @@ _kernelDFermionKSForce_PR_XYTerm(
         res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
         res.Ta();
         const Real eta_tau = (1 == ((pEtaTable[smiddle.m_uiSiteIndex] >> 3) & 1)) ? F(-1.0) : F(1.0);
-        res.MulReal(OneOver12 * fOmega * fNv * pNumerators[rfieldId] * eta_tau);
+        res.MulReal(OneOver24 * fOmega * fNv * pNumerators[rfieldId] * eta_tau);
 
         //For mu
         if (0 == byContribution || 2 == byContribution)
@@ -590,7 +590,7 @@ _kernelDFermionKSForce_PR_XYTau_Term(
         //However, eta124(n1) = -eta124(n2), so use Add directly.
         res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
         res.Ta();
-        res.MulReal(OneOver48 * fOmega * pNumerators[rfieldId] * eta124);
+        res.MulReal(OneOver96 * fOmega * pNumerators[rfieldId] * eta124);
 
         if (pathLdir1 > 0)
         {
@@ -681,7 +681,7 @@ _kernelDFermionKSForce_PR_XYTau_Term2(
             //However, eta124(n1) = -eta124(n2), so use Add directly.
             res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
             res.Ta();
-            res.MulReal(OneOver48 * fOmega * pNumerators[rfieldId] * eta124);
+            res.MulReal(OneOver96 * fOmega * pNumerators[rfieldId] * eta124);
 
             if (bHasLeft)
             {
@@ -706,11 +706,11 @@ _kernelDFermionKSForce_PR_XYTau_Term2(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, Real fam,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
-    CFieldFermionKSSU3::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    CFieldFermionKSSU3::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, fam, bDagger, eOCT, fRealCoeff, cCmpCoeff);
 
     deviceSU3Vector* pTarget = (deviceSU3Vector*)pTargetBuffer;
     const deviceSU3Vector* pSource = (const deviceSU3Vector*)pBuffer;
@@ -917,7 +917,7 @@ void CFieldFermionKSSU3R::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3R::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3R\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("Mass (am) : ") + appFloatToString(m_fam) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
