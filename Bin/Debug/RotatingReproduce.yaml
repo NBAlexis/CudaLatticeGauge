@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -18,7 +18,7 @@ JobThermal:
     EquvibStep : 3000
     SaveStartIndex : 0
     OmegaSep : 20
-    OmegaStart : 9
+    OmegaStart : 12
     MaxOmega : 0.14
     MinNt : 3
     MaxNt : 3
@@ -56,8 +56,8 @@ JobThermal:
     # Nt6Polyakov : 0.232158563337
 
     # 55150
-    Nt3FileName : NC48116_Rotate_Nt3_O8_3000.con
-    Nt3Polyakov : 0.759691655636
+    Nt3FileName : NC48116_Rotate_Nt3_O11_3000.con
+    Nt3Polyakov : 0.846399664879
 
     # 50217
     # Nt4FileName : N50217_Nt4.con
@@ -129,7 +129,7 @@ JobThermal:
         SolverForFieldId : 2
 
         # SolverName : CSLASolverBiCGStab
-        Accuracy : 0.000001
+        Accuracy : 0.00001
 
         DiviationStep : 50
         MaxStep : 1
@@ -168,12 +168,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.78
-    OmegaRange : 0.14
+    GaugeBate : 5.02
+    OmegaRange : 0.08775
     StartOmega : 0
-    EndOmega : 20
-    StartN : 101
-    EndN : 3000
+    EndOmega : 10
+    StartN : 201
+    EndN : 1000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
@@ -183,14 +183,14 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\configs\newresf\47816\Nt3
+    SubFolderPrefix : G:\configs\Extrapolation\502161Nt4\Nt4
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC47816_
-    CSVSavePrefix : G:\configs\newresf\47816\Polyakov\NC47816_
+    SavePrefix : NC502161_
+    CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
     ## CSVSavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/GFN49616_
 
@@ -201,7 +201,7 @@ JobPolyakovDist:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [18, 18, 8, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -225,7 +225,7 @@ JobPolyakovDist:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.161
         FieldId : 2
         PoolNumber : 5
         Period : [0, 0, 1, -1]

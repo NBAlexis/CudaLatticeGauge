@@ -29,7 +29,7 @@ _kernelDFermionKS_D(
     const SIndex* __restrict__ pFermionMove,
     const BYTE* __restrict__ pEtaTable,
     deviceSU3Vector* pResultData,
-    Real fam,
+    Real f2am,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -52,7 +52,7 @@ _kernelDFermionKS_D(
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
         //Get Gamma mu
-        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
         //x, mu
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
@@ -88,7 +88,7 @@ _kernelDFermionKS_D(
         result.Add(res);
     }
 
-    pResultData[uiSiteIndex].MulReal(fam);
+    pResultData[uiSiteIndex].MulReal(f2am);
     if (bDDagger)
     {
         pResultData[uiSiteIndex].Sub(result);
@@ -134,7 +134,7 @@ _kernelDFermionKSForce_D(
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
         //Get Gamma mu
-        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-0.5) : F(0.5);
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         //x, mu
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
@@ -176,7 +176,7 @@ _kernelDFermionKSForce_D(
 
 
 void CFieldFermionKSSU3D::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real fam,
+    const void* pGaugeBuffer, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -192,7 +192,7 @@ void CFieldFermionKSSU3D::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
-        fam,
+        f2am,
         m_byFieldId,
         bDagger,
         eOCT,
@@ -268,7 +268,7 @@ void CFieldFermionKSSU3D::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3D::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3D\n");
-    sRet = sRet + tab + _T("Mass (am) : ") + appFloatToString(m_fam) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     return sRet;

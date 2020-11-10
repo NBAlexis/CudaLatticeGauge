@@ -514,7 +514,9 @@ _kernelDotAndGatherXYAMomentumJJM(
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
 
+#if _CLG_WIN
 #pragma region JL
+#endif
 
     //idir = mu
     #pragma unroll
@@ -602,7 +604,9 @@ _kernelDotAndGatherXYAMomentumJJM(
         }
     }
 
+#if _CLG_WIN
 #pragma endregion
+#endif
 
     //this part is Dmu phi
 

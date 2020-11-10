@@ -696,21 +696,25 @@ TestRotationProjectivePlane:
         UpdatorType : CHMC
         Metropolis : 1
         DebugForce : 1
-
+        SaveConfiguration : 1
         # 
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 40
-        NestedStep : 30
+        IntegratorStep : 15
+        NestedStep : 20
 
     Gauge:
     
         FieldName : CFieldGaugeSU3
-        FieldInitialType : EFIT_Random
-        # FieldInitialType : EFIT_Identity
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_ReadFromFile
+        GaugeFileType : EFFT_CLGBin
+        GaugeFileName : ../Release/_testconfig3.con_
+
+        
         Period : [1, 1, 1, 1]
         
     GaugeBoundary:
@@ -797,19 +801,19 @@ TestRotationProjectivePlane:
         FieldInitialType : EFIT_RandomGaussian
 
         #2am
-        Mass : 0.1
+        Mass : 0.2
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
-        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
-        MC : [0.9988776027442932, -0.0006048425258523454, -0.007474052537327324, -0.050125636831114, 0.002915674710566969, 0.027921962272665187, 0.15288658498030255]
+        # a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
+        MC : [0.9915999894311766, -0.0021476095267560047, -0.048514047416973405, 0.007107730618195659, 0.10600139532889653]
 
         # MD is to calculate force
-        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{1/2}
-        MD : [1.0017043047437033, 0.018926025885869273, 0.03710444286611928, 0.0615256743746604, 0.0007928125852341372, 0.012883942266637766, 0.08873533812604463]
+        # a^2 delta M = 0.24, this is (x+0.24/x)^{1/2}
+        MD : [1.0132551014506765, 0.029386648240391496, 0.07784373678367397, 0.0016822160208431202, 0.04330792580841882]
 
     Solver:
 
@@ -826,7 +830,7 @@ TestRotationProjectivePlane:
         SolverForFieldId : 2
         DiviationStep : 10
         MaxStep : 500
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2
@@ -842,7 +846,7 @@ TestRotationProjectivePlane:
         SolverForFieldId : 3
         DiviationStep : 10
         MaxStep : 50
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver3:
@@ -851,17 +855,48 @@ TestRotationProjectivePlane:
         SolverForFieldId : 4
         DiviationStep : 10
         MaxStep : 50
-        Accuracy : 0.001
+        Accuracy : 0.00001
         AbsoluteAccuracy : 1
 
     MSSolver4:
 
-        SolverName : CMultiShiftBiCGStab
+        # SolverName : CMultiShiftBiCGStab
+        # SolverForFieldId : 5
+        # DiviationStep : 30
+        # MaxStep : 50
+        # Accuracy : 0.00001
+        # AbsoluteAccuracy : 1
+
+        # SolverName : CMultiShiftBiCGStab
+        SolverName : CMultiShiftNested
         SolverForFieldId : 5
-        DiviationStep : 30
-        MaxStep : 50
-        Accuracy : 0.001
+        # DiviationStep : 20
+        DiviationStep : 50
+        MaxStep : 500
+        Accuracy : 0.000001
         AbsoluteAccuracy : 1
+        
+        NestedSolver :
+            SolverForFieldId : 2
+
+            # SolverName : CSLASolverBiCGStab
+            # Accuracy : 0.00000001
+
+            DiviationStep : 50
+            MaxStep : 1
+
+            SolverName : CSLASolverGMRES
+            MaxDim : 25
+
+            # SolverName : CSLASolverGCRODR
+            Accuracy : 0.0000001
+            # MDim : 26
+            # KDim : 5
+            # RecalculateR : 5
+            # DeflateSpace : EEDT_SVD
+
+            Restart : 500
+            AbsoluteAccuracy : 1
 
     Action1:
    

@@ -95,8 +95,8 @@ public:
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
     CCString GetInfos(const CCString& tab) const override;
 
-    void SetMass(Real fam);
-    Real GetMass() const { return m_fam; }
+    void SetMass(Real f2am);
+    Real GetMass() const { return m_f2am; }
 
     //============================
     //Override these two functions for KS
@@ -111,7 +111,7 @@ public:
     void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
     {
-        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_fam, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
     }
 
     /**
@@ -123,7 +123,7 @@ public:
 
     #pragma region Help functions to implement higher orders
 
-    void OnlyMass(deviceSU3Vector* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
+    void OnlyMass(deviceSU3Vector* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
     void OneLink(const deviceSU3* pGuage, BYTE byGaugeFieldId, deviceSU3Vector* pTarget, Real fCoefficient, 
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
@@ -138,7 +138,7 @@ protected:
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
     UBOOL m_bEachSiteEta;
 
-    Real m_fam;
+    Real m_f2am;
 
     // r(x) = x^{1/4} use to prepare for Nf=2
     // r(x) = x^{3/8} use as s quark for Nf=2+1

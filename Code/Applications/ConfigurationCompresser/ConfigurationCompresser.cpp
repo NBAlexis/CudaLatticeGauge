@@ -72,6 +72,10 @@ int main(int argc, char * argv[])
         }
         appSetLogDate(TRUE);
     }
+    else if (EJT_Rotate == eJob)
+    {
+        
+    }
 
     appGeneral(_T("\n================= Done ===============\n"));
     appQuitCLG();

@@ -35,6 +35,11 @@ extern "C" {
     }
 
 #if !_CLG_DOUBLEFLOAT
+    __device__ __host__ static __inline__ DOUBLE __cuCabsSqfd(const cuDoubleComplex& c)
+    {
+        return c.x * c.x + c.y * c.y;
+    }
+
     __device__ __host__ static __inline__ DOUBLE __cuCabsSqd(const cuDoubleComplex& c)
     {
         return c.x * c.x + c.y * c.y;
@@ -121,7 +126,9 @@ extern "C" {
     {
         return _make_cuComplex(x.x * y, x.y * y);
     }
+
 #if !_CLG_DOUBLEFLOAT
+
     __device__ __host__ static __inline__ cuDoubleComplex cuCmulf_cd(const cuDoubleComplex& x, DOUBLE y)
     {
         return make_cuDoubleComplex(x.x * y, x.y * y);

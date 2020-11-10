@@ -62,10 +62,14 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     {
         m_uiReStart = static_cast<UINT>(iValue);
     }
+#if _CLG_DOUBLEFLOAT
     if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
     {
         m_bAbsoluteAccuracy = (0 != iValue);
     }
+#else
+    m_bAbsoluteAccuracy = FALSE;
+#endif
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
@@ -129,8 +133,11 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
     {
         pStart->CopyTo(pX);
     }
-
+#if !_CLG_DOUBLEFLOAT
+    DOUBLE fLastDiavation = 0.0;
+#else
     Real fLastDiavation = F(0.0);
+#endif
     for (UINT i = 0; i < m_uiReStart; ++i)
     {
         //r = b - A x0
@@ -140,7 +147,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
-        m_fBeta = static_cast<Real>(_sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x));
+        m_fBeta = _sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
 #else
         m_fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
 #endif
@@ -153,7 +160,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             for (UINT k = 0; k <= j; ++k)
             {
 #if !_CLG_DOUBLEFLOAT
-                const CLGComplex dotc = _cToFloat(m_lstVectors[k]->Dot(pW));
+                const cuDoubleComplex dotc = m_lstVectors[k]->Dot(pW);
 #else
                 const CLGComplex dotc = m_lstVectors[k]->Dot(pW);
 #endif
@@ -164,26 +171,45 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
 
             //h[j + 1, j] = ||w||
 #if !_CLG_DOUBLEFLOAT
-            const Real fWNorm = static_cast<Real>(_sqrtd(pW->Dot(pW).x));
+            const DOUBLE fWNorm = _sqrtd(pW->Dot(pW).x);
+            m_h[HIndex(j + 1, j)] = make_cuDoubleComplex(fWNorm, 0.0);
+
+            //v[j + 1] = w / ||w||
+            if (j < m_uiMaxDim - 1)
+            {
+                pW->ScalarMultply(static_cast<Real>(1.0 / fWNorm));
+                pW->CopyTo(m_lstVectors[j + 1]);
+            }
 #else
             const Real fWNorm = _sqrt(pW->Dot(pW).x);
-#endif
             m_h[HIndex(j + 1, j)] = _make_cuComplex(fWNorm, F(0.0));
+
             //v[j + 1] = w / ||w||
             if (j < m_uiMaxDim - 1)
             {
                 pW->ScalarMultply(F(1.0) / fWNorm);
                 pW->CopyTo(m_lstVectors[j + 1]);
             }
+#endif
+            
+
         }
         //RotateH(m_uiMaxDim);
         RotateH();
+#if !_CLG_DOUBLEFLOAT
+        fLastDiavation = __cuCabsSqfd(m_g[m_uiMaxDim]);
+#else
         fLastDiavation = __cuCabsSqf(m_g[m_uiMaxDim]);
+#endif
         //SolveY(m_uiMaxDim);
         SolveY();
         for (UINT j = 0; j < m_uiMaxDim; ++j)
         {
+#if !_CLG_DOUBLEFLOAT
+            pX->Axpy(_cToFloat(m_y[j]), m_lstVectors[j]);
+#else
             pX->Axpy(m_y[j], m_lstVectors[j]);
+#endif
         }
         
         if (fLastDiavation < m_fAccuracy * fBLength)
@@ -218,6 +244,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
 
 void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
 {
+#if _CLG_DOUBLEFLOAT
     if (NULL != m_pHelper)
     {
         m_pHelper->InitialZeroHost(m_g, m_uiMaxDim + 1, 1);
@@ -225,6 +252,7 @@ void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
         m_pHelper->RotateHenssenbergHost(m_h, m_g, m_uiMaxDim);
         return;
     }
+
     //======================= reset g ==================
     m_g[0] = _make_cuComplex(m_fBeta, F(0.0));
     for (UINT i = 0; i < m_uiMaxDim; ++i)
@@ -251,10 +279,39 @@ void CSLASolverGMRES::RotateH(/*UINT uiHeisenbergDim*/)
         m_g[i] = _cuCmulf(cs_h, m_g[i]);
         m_g[i + 1] = _cuCmulf(sn, minus_gi);
     }
+#else
+    //======================= reset g ==================
+    m_g[0] = make_cuDoubleComplex(m_fBeta, 0.0);
+    for (UINT i = 0; i < m_uiMaxDim; ++i)
+    {
+        const UINT ii = HIndex(i, i);
+        const UINT i1i = HIndex(i + 1, i);
+        const DOUBLE denomi = 1.0 / sqrt(__cuCabsSqfd(m_h[ii]) + __cuCabsSqfd(m_h[i1i]));
+        const cuDoubleComplex cs = cuCmulf_cd(m_h[ii], denomi);
+        const cuDoubleComplex sn = cuCmulf_cd(m_h[i1i], denomi);
+        const cuDoubleComplex cs_h = cuConj(cs);
+        const cuDoubleComplex sn_h = cuConj(sn);
+
+        for (UINT j = i; j < m_uiMaxDim; ++j)
+        {
+            const UINT ij = HIndex(i, j);
+            const UINT i1j = HIndex(i + 1, j);
+
+            const cuDoubleComplex hij = m_h[ij];
+            m_h[ij] = cuCadd(cuCmul(cs_h, hij), cuCmul(sn_h, m_h[i1j]));
+            m_h[i1j] = cuCsub(cuCmul(cs, m_h[i1j]), cuCmul(sn, hij));
+        }
+
+        const cuDoubleComplex minus_gi = make_cuDoubleComplex(-m_g[i].x, -m_g[i].y);
+        m_g[i] = cuCmul(cs_h, m_g[i]);
+        m_g[i + 1] = cuCmul(sn, minus_gi);
+    }
+#endif
 }
 
 void CSLASolverGMRES::SolveY(/*UINT uiHeisenbergDim*/)
 {
+#if _CLG_DOUBLEFLOAT
     if (NULL != m_pHelper)
     {
         memcpy(m_y, m_g, sizeof(CLGComplex) * m_uiMaxDim);
@@ -270,6 +327,17 @@ void CSLASolverGMRES::SolveY(/*UINT uiHeisenbergDim*/)
         }
         m_y[i] = _cuCdivf(m_g[i], m_h[HIndex(i,i)]);
     }
+#else
+    const INT iHeisenbergDim = static_cast<INT>(m_uiMaxDim);
+    for (INT i = m_uiMaxDim - 1; i > -1; --i)
+    {
+        for (INT j = i + 1; j < iHeisenbergDim; ++j)
+        {
+            m_g[i] = cuCsub(m_g[i], cuCmul(m_h[HIndex(i, j)], m_y[j]));
+        }
+        m_y[i] = cuCdiv(m_g[i], m_h[HIndex(i, i)]);
+    }
+#endif
 }
 
 

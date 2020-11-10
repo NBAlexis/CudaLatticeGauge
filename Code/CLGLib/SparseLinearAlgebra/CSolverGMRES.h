@@ -41,12 +41,22 @@ protected:
     UINT m_uiReStart;
     UINT m_uiMaxDim;
     Real m_fAccuracy;
+#if _CLG_DOUBLEFLOAT
     Real m_fBeta;
+#else
+    DOUBLE m_fBeta;
+#endif
     UBOOL m_bUseCudaForSmallMatrix;
 
+#if _CLG_DOUBLEFLOAT
     CLGComplex m_h[(_kMaxStep + 1) * _kMaxStep];
     CLGComplex m_y[_kMaxStep];
     CLGComplex m_g[_kMaxStep];
+#else
+    cuDoubleComplex m_h[(_kMaxStep + 1) * _kMaxStep];
+    cuDoubleComplex m_y[_kMaxStep];
+    cuDoubleComplex m_g[_kMaxStep];
+#endif
 
     TArray<class CField*> m_lstVectors;
 
