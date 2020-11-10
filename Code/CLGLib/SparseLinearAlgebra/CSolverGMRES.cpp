@@ -52,6 +52,9 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     {
         m_bUseCudaForSmallMatrix = (0 != iValue);
     }
+#if !_CLG_DOUBLEFLOAT
+    m_bUseCudaForSmallMatrix = FALSE;
+#endif
 
     if (m_bUseCudaForSmallMatrix && m_uiMaxDim < CLinearAlgebraHelper::_kMaxSmallDim)
     {
@@ -62,14 +65,12 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     {
         m_uiReStart = static_cast<UINT>(iValue);
     }
-#if _CLG_DOUBLEFLOAT
+
     if (param.FetchValueINT(_T("AbsoluteAccuracy"), iValue))
     {
         m_bAbsoluteAccuracy = (0 != iValue);
     }
-#else
-    m_bAbsoluteAccuracy = FALSE;
-#endif
+
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
@@ -148,10 +149,12 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
         m_fBeta = _sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
+        m_lstVectors[0]->ScalarMultply(static_cast<Real>(1.0 / m_fBeta));  //v[0] = (b - A x0).normalize
 #else
         m_fBeta = _sqrt(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
-#endif
         m_lstVectors[0]->ScalarMultply(F(1.0) / m_fBeta);  //v[0] = (b - A x0).normalize
+#endif
+        
         for (UINT j = 0; j < m_uiMaxDim; ++j)
         {
             //w = A v[j]

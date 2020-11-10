@@ -69,6 +69,7 @@ void CSLASolverBiCGStab::ReleaseBuffers()
 
 }
 
+#if 0
 UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart) const
 {
 #if !_CLG_DOUBLEFLOAT
@@ -363,6 +364,7 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
     return FALSE;
 #endif
 }
+#endif
 
 //It is tested this is better, the main difference is to let p0 = r0, and rho = r0^* by Yousef Saad.
 UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)

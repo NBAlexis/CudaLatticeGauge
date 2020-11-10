@@ -377,7 +377,7 @@ _kernelDFermionKS_P4_C12(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real fam,
+    const void* pGaugeBuffer, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -402,7 +402,7 @@ void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         1,
         fUFactor,
         fFatFactor,
-        fam,
+        f2am * F(0.5),
         bDagger,
         eOCT,
         fRealCoeff,
@@ -558,7 +558,7 @@ void CFieldFermionKSSU3P4::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3P4::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3R\n");
-    sRet = sRet + tab + _T("Mass (am) : ") + appFloatToString(m_fam) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     sRet = sRet + tab + _T("omega : ") + appFloatToString(m_fomega) + _T("\n");

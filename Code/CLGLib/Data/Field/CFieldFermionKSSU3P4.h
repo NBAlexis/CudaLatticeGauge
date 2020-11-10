@@ -24,7 +24,7 @@ public:
     CFieldFermionKSSU3P4();
     ~CFieldFermionKSSU3P4();
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
-    void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real fam,
+    void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
 
     void InitialOtherParameters(CParameters& params) override;

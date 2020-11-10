@@ -25,7 +25,7 @@ class CLGAPI CFieldFermionKSSU3DR : public CFieldFermionKSSU3D
 public:
 
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
-    void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real fam,
+    void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
 
     CCString GetInfos(const CCString& tab) const override;

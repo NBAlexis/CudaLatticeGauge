@@ -31,8 +31,8 @@ public:
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
     //Old version, for compare
-    UBOOL Solve1(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild,
-        EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) const;
+    //UBOOL Solve1(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild,
+    //    EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) const;
 
 protected:
    

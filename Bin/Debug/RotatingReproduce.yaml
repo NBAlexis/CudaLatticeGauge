@@ -15,11 +15,11 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 3000
-    SaveStartIndex : 0
-    OmegaSep : 20
+    EquvibStep : 1205
+    SaveStartIndex : 1795
+    OmegaSep : 12
     OmegaStart : 12
-    MaxOmega : 0.14
+    MaxOmega : 0.084
     MinNt : 3
     MaxNt : 3
     SavePrefix : ./NC48116_
@@ -56,7 +56,7 @@ JobThermal:
     # Nt6Polyakov : 0.232158563337
 
     # 55150
-    Nt3FileName : NC48116_Rotate_Nt3_O11_3000.con
+    Nt3FileName : NC48116_Rotate_Nt3_O12_1795.con
     Nt3Polyakov : 0.846399664879
 
     # 50217
