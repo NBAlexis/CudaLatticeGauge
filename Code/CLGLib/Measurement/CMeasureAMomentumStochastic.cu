@@ -635,7 +635,7 @@ _kernelDotAndGatherXYAMomentumJS(
 #endif
 
     const deviceWilsonVectorSU3 right_element(pRight[uiSiteIndex]);
-    deviceWilsonVectorSU3 js(__chiralGamma[SIGMA12].MulWilsonC(right_element));
+    deviceWilsonVectorSU3 js(__chiralGamma[SIGMA12E].MulWilsonC(right_element));
     js = __chiralGamma[GAMMA4].MulWilsonC(js);
     js.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
 
@@ -672,7 +672,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
 
 #if _CLG_WIN
 #pragma region JS

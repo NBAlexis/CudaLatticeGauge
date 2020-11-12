@@ -60,7 +60,7 @@ _kernelDFermionWilsonSquareSU3_DR(
 
     deviceWilsonVectorSU3 right_element = bDDagger ? gamma5.MulWilsonC(pDeviceData[uiSiteIndex]) : pDeviceData[uiSiteIndex];
 
-    deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12].MulWilsonC(right_element));
+    deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12E].MulWilsonC(right_element));
     term3 = gamma4.MulWilsonC(term3);
     term3.MulComp(_make_cuComplex(F(0.0), -fOmega * kai));
 
@@ -762,7 +762,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
 
     const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
     const Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -1233,7 +1233,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
     Real fhalfOmega = fOmega * F(0.5);
     BYTE idir = 3;
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
@@ -1628,7 +1628,7 @@ _kernelDWilsonForceSU3_DR_T(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12];
+    const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
 
     //x, mu
     const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);

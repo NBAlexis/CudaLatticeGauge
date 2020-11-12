@@ -60,6 +60,11 @@ _kernelDebugFunction()
     //printf("testres %d\n", ((SIndex*)&test[2])->m_uiSiteIndex);
     //printf("testres %lld\n", ((SIndex*)&test[2])->m_ullData);
     //__idx->DebugPrintWalkingTable();
+    for (UINT i = 0; i < EGM_MAX; ++i)
+    {
+        printf("gammamatrix is %d\n", i);
+        __chiralGamma[i].Print();
+    }
 }
 
 __global__ void
@@ -68,6 +73,11 @@ _kernelDebugFunctionForSites()
 {
     //intokernal;
     //printf("%d\n", uiSiteIndex);
+    //for (UINT i = 0; i < EGM_MAX; ++i)
+    //{
+    //    printf("gammamatrix is %d\n", i);
+    //    __chiralGamma[i].Print();
+    //}
 }
 
 #if !_CLG_DOUBLEFLOAT
@@ -460,6 +470,8 @@ void CCudaHelper::DebugFunction()
 
     preparethread;
     _kernelDebugFunctionForSites << <block, threads >> > ();
+
+    
 }
 
 void CCudaHelper::CopyConstants() const

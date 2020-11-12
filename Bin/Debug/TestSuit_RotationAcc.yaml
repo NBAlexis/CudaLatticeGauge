@@ -688,7 +688,7 @@ TestRotationProjectivePlane:
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
-    ExpectedRes : 0.487
+    ExpectedRes : 0.416
     CacheStaple : 0
 
     Updator:
@@ -696,7 +696,7 @@ TestRotationProjectivePlane:
         UpdatorType : CHMC
         Metropolis : 1
         DebugForce : 1
-        SaveConfiguration : 1
+        SaveConfiguration : 0
         # 
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient

@@ -380,7 +380,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step1(
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
     Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -858,7 +858,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_Step2(
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
     Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -1456,7 +1456,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteEven(
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
     Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -1920,7 +1920,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T_WriteBack(
 
     gammaMatrix gamma5 = __chiralGamma[GAMMA5];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
     Real fhalfOmega = fOmega * F(0.5);
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 

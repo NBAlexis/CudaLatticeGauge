@@ -361,10 +361,10 @@ UINT TestRotationKS(CParameters& sParam)
 {
     Real fExpected = F(0.65);
 
-    INT iVaule = 2;
+    INT iVaule = 3;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     const UINT iBeforeEquib = static_cast<UINT>(iVaule);
-    iVaule = 10;
+    iVaule = 15;
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
     const UINT iAfterEquib = static_cast<UINT>(iVaule);
 #if _CLG_DEBUG
@@ -412,13 +412,13 @@ UINT TestRotationKS(CParameters& sParam)
 #if _CLG_DEBUG
     appGeneral(_T("accept (%d/5) : expected >= 4. HDiff = %f : expected < 1\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 #else
-    appGeneral(_T("accept (%d/25) : expected >= 23. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
+    appGeneral(_T("accept (%d/18) : expected >= 15. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
 #endif
 
 #if _CLG_DEBUG
     if (uiAccept < 4)
 #else
-    if (uiAccept < 23)
+    if (uiAccept < 15)
 #endif
     {
         ++uiError;

@@ -46,7 +46,7 @@ __device__ void _deviceMeasure4(const SSmallInt4& site, const SSmallInt4& sCente
 */
 __device__ void _deviceMeasure5(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
-    element = __chiralGamma[SIGMA12].MulWilsonC(element);
+    element = __chiralGamma[SIGMA12E].MulWilsonC(element);
     element = __chiralGamma[GAMMA4].MulWilsonC(element);
     element.MulComp(_make_cuComplex(F(0.0), -fKappa));
 }

@@ -220,7 +220,7 @@ _kernel_FS(
     }
 
     const deviceWilsonVectorSU3 right_element(pSources[uiCS][uiSiteIndex]);
-    deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12].MulWilsonC(right_element));
+    deviceWilsonVectorSU3 term3(__chiralGamma[SIGMA12E].MulWilsonC(right_element));
     term3 = __chiralGamma[GAMMA4].MulWilsonC(term3);
     term3.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
 
@@ -256,7 +256,7 @@ _kernel_FS_Exponential(
     }
 
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    gammaMatrix sigma12 = __chiralGamma[SIGMA12];
+    gammaMatrix sigma12 = __chiralGamma[SIGMA12E];
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 

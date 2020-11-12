@@ -491,6 +491,10 @@ public:
         gmarray[SIGMA23] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA2]);
         gmarray[SIGMA31] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA3]);
 
+        gmarray[SIGMA12E] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA2]);
+        gmarray[SIGMA23E] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA3]);
+        gmarray[SIGMA31E] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA1]);
+
         gmarray[SIGMA41] = gmarray[GAMMA1]._mult_i(gmarray[GAMMA4]);
         gmarray[SIGMA42] = gmarray[GAMMA2]._mult_i(gmarray[GAMMA4]);
         gmarray[SIGMA43] = gmarray[GAMMA3]._mult_i(gmarray[GAMMA4]);

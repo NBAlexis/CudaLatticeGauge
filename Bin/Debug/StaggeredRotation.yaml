@@ -15,16 +15,16 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 10
-    BeforeEquvibStep : 0
+    BeforeEquvibStep : 100
     EquvibSkip : 0
     EquvibStep : 500
     SaveStartIndex : 0
     OmegaSep : 16
-    OmegaStart : 10
+    OmegaStart : 1
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : SRF490204_
+    SavePrefix : SRF510204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # Nt6FileName : SRF490204_R_Nt6_O5_139.con
-    # Nt6Polyakov : 0.055577110499
+    Nt6FileName : SRF510204_R_Nt6_O0_700.con
+    Nt6Polyakov : 0.160479158163
 
     Updator:
 
@@ -59,15 +59,15 @@ JobSimulate:
         MinMaxStep : [4, 50]
         GrowReduceThreshold : [-0.3, 0.02]
         InnerLeapfrog : 1
-        DebugForce : 1
+        DebugForce : 0
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        IntegratorType : CIntegratorNested11Stage
+        IntegratorType : CIntegratorNestedOmelyan
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 25
-        NestedStep : 15
+        IntegratorStep : 15
+        NestedStep : 20
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 4.9
+        Beta : 5.1
         Omega : 0.0
 
     Action2:
@@ -293,7 +293,7 @@ JobSimulate:
         AbsoluteAccuracy : 1
         
         NestedSolver :
-            SolverForFieldId : 2
+            SolverForFieldId : 5
 
             # SolverName : CSLASolverBiCGStab
             # Accuracy : 0.00000001
@@ -302,10 +302,10 @@ JobSimulate:
             MaxStep : 1
 
             SolverName : CSLASolverGMRES
-            MaxDim : 25
+            MaxDim : 15
 
             # SolverName : CSLASolverGCRODR
-            Accuracy : 0.0000000001
+            Accuracy : 0.0000001
             # MDim : 26
             # KDim : 5
             # RecalculateR : 5
