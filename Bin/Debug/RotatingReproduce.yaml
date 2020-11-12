@@ -168,7 +168,7 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.78
+    GaugeBate : 4.84
     OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
@@ -184,14 +184,14 @@ JobPolyakovDist:
     UseLogADefinition : 0
     SubFolder : 1
     # SubFolderPrefix : G:\configs\Extrapolation\502161Nt4\Nt4
-    SubFolderPrefix : G:\configs\newresf\47816\Nt3
+    SubFolderPrefix : G:\configs\newresf\48416\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC47816_
-    CSVSavePrefix : G:\configs\newresf\47816\Polyakov\NC47816_
+    SavePrefix : NC48416_
+    CSVSavePrefix : G:\configs\newresf\48416\Polyakov\NC48416_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
