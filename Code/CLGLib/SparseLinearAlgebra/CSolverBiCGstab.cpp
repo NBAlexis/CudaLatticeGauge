@@ -48,14 +48,21 @@ void CSLASolverBiCGStab::Configurate(const CParameters& param)
     {
         m_bAbsoluteAccuracy = (0 != iValue);
     }
+#if _CLG_DOUBLEFLOAT
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
-        if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
-        {
-            m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
-            appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
-        }
+#else
+    DOUBLE dValue = 0.0;
+    if (param.FetchValueDOUBLE(_T("Accuracy"), dValue))
+    {
+        m_fAccuracy = dValue;
+#endif
+        //if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        //{
+        //    m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+        //    appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        //}
     }
 }
 

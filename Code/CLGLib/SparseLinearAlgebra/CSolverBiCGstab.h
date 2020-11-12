@@ -39,7 +39,11 @@ protected:
     UINT m_uiReTry;
     UINT m_uiDevationCheck;
     UINT m_uiStepCount;
+#if _CLG_DOUBLEFLOAT
+    DOUBLE m_fAccuracy;
+#else
     Real m_fAccuracy;
+#endif
 };
 
 __END_NAMESPACE

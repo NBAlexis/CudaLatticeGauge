@@ -40,7 +40,11 @@ protected:
 
     UINT m_uiReStart;
     UINT m_uiMaxDim;
+#if _CLG_DOUBLEFLOAT
+    DOUBLE m_fAccuracy;
+#else
     Real m_fAccuracy;
+#endif
 #if _CLG_DOUBLEFLOAT
     Real m_fBeta;
 #else

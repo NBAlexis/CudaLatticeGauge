@@ -101,7 +101,7 @@ public:
     //============================
     //Override these two functions for KS
     virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const;
-    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real fam,
+    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const;
     //============================
 

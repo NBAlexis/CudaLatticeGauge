@@ -380,7 +380,7 @@ _kernelDFermionKS_PR_XYTau_Term(
         //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
         
-        const deviceSU3Vector right = _deviceVXYTOptimized(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
+        const deviceSU3Vector right = _deviceVXYT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
         .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
 
@@ -557,7 +557,7 @@ _kernelDFermionKSForce_PR_XYTau_Term(
     const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten2)];
 
     //Why use sn2? shouldn't it be sn1?
-    const Real eta124 = _deviceEta124(__deviceSiteIndexToInt4(sn2.m_uiSiteIndex));
+    const Real eta124 = _deviceEta124(__deviceSiteIndexToInt4(sn1.m_uiSiteIndex));
     //=================================
     // 2. Find V(n,n1), V(n,n2)
     const deviceSU3 vnn1 = _deviceLink(pGauge, sSite4, Llength, 1, Ldirs);
@@ -592,16 +592,18 @@ _kernelDFermionKSForce_PR_XYTau_Term(
         res.Ta();
         res.MulReal(OneOver48 * fOmega * pNumerators[rfieldId] * eta124);
 
+        //Use eta124 of n2 so Add left Sub right
+        //Change to use eta124 of n1, Sub left and Add right
         if (pathLdir1 > 0)
         {
             const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLdir1 - 1);
-            pForce[linkIndex].Add(res);
+            pForce[linkIndex].Sub(res);
         }
 
         if (pathRdir1 > 0)
         {
             const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRdir1 - 1);
-            pForce[linkIndex].Sub(res);
+            pForce[linkIndex].Add(res);
         }
     }
 
@@ -716,6 +718,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
     const deviceSU3Vector* pSource = (const deviceSU3Vector*)pBuffer;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
 
+
     preparethread;
     _kernelDFermionKS_PR_XYTerm << <block, threads >> > (
         pSource,
@@ -730,7 +733,9 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         eOCT,
         fRealCoeff,
         cCmpCoeff);
-   
+
+#if 1
+
     _kernelDFermionKS_PR_XYTau_Term << <block, threads >> > (
         pSource,
         pGauge,
@@ -742,6 +747,8 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         eOCT,
         fRealCoeff,
         cCmpCoeff);
+
+#endif
 }
 
 void CFieldFermionKSSU3R::DerivateD0(
@@ -750,7 +757,7 @@ void CFieldFermionKSSU3R::DerivateD0(
 {
     CFieldFermionKSSU3::DerivateD0(pForce, pGaugeBuffer);
 
-#if 1
+
     preparethread;
     #pragma region X Y Term
 
@@ -820,6 +827,8 @@ void CFieldFermionKSSU3R::DerivateD0(
 
     #pragma endregion
 
+#if 1
+
     #pragma region Polarization term
 
     //===========================
@@ -855,6 +864,7 @@ void CFieldFermionKSSU3R::DerivateD0(
         for (INT isixtype = 0; isixtype < 6; ++isixtype)
         {
             //bearly no change of time, because force calculation is not frequent
+            /*
             _kernelDFermionKSForce_PR_XYTau_Term2 << <block, threads >> > (
                 (const deviceSU3*)pGaugeBuffer,
                 (deviceSU3*)pForce,
@@ -865,7 +875,8 @@ void CFieldFermionKSSU3R::DerivateD0(
                 CCommonData::m_fOmega,
                 sixlinks[isixtype][0], sixlinks[isixtype][1], sixlinks[isixtype][2]
                 );
-            /*
+            */
+
             for (INT iSeperation = 0; iSeperation < 4; ++iSeperation)
             {
                 INT L[3] = { 0, 0, 0 };
@@ -893,7 +904,6 @@ void CFieldFermionKSSU3R::DerivateD0(
                         );
                 }
             }
-            */
         }
     }
     
