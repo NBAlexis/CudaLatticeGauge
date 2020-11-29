@@ -113,6 +113,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
@@ -214,6 +215,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu

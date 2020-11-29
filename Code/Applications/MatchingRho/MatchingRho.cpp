@@ -56,6 +56,10 @@ int main(int argc, char * argv[])
     const UBOOL bMeasureCondensation = 0 != iVaule;
 
     iVaule = 0;
+    params.FetchValueINT(_T("DoMeasureTrace"), iVaule);
+    const UBOOL bMeasureTrace = 0 != iVaule;
+
+    iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
     const UBOOL bZ4 = 0 != iVaule;
 
@@ -74,6 +78,10 @@ int main(int argc, char * argv[])
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
+
+    CCString sCSVPrefix;
+    params.FetchStringValue(_T("CSVPrefix"), sCSVPrefix);
+    appGeneral(_T("CSV prefix: %s\n"), sCSVPrefix.c_str());
 
 #if !_CLG_DOUBLEFLOAT
     TArray<DOUBLE> pionCorrelator;
@@ -106,6 +114,9 @@ int main(int argc, char * argv[])
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureMesonCorrelator* pMC = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+
+    CMeasurePandChiralTalor* pTalor = dynamic_cast<CMeasurePandChiralTalor*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+
     CFieldGaugeSU3* pStaple = NULL;
     if (bDoSmearing)
     {
@@ -149,6 +160,7 @@ int main(int argc, char * argv[])
         UINT uiAccepCountBeforeE2 = uiAccepCountAfterE;
         if (!bOnlyMeasure)
         {
+            //If do some simulation
             uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, TRUE);
             if (uiAccepCountAfterE != uiAccepCountBeforeE2)
             {
@@ -218,6 +230,7 @@ int main(int argc, char * argv[])
         }
         else
         {
+            //only load configuration and measure
             ++uiAccepCountAfterE;
             sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE + iSaveIndexStart);
             sFileName = sSavePrefix + sFileName;
@@ -300,7 +313,43 @@ int main(int argc, char * argv[])
             }
             else
             {
-                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                if (NULL != pPL && !bMeasureTrace)
+                {
+                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                
+                if (bMeasureTrace && NULL != pTalor)
+                {
+                    pTalor->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
+                    const UINT iFieldCount = pTalor->GetFieldCount();
+                    for (UINT i = 0; i < iFieldCount; ++i)
+                    {
+                        if (bZ4)
+                        {
+                            pF1->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1->InitialField(EFIT_RandomGaussian);
+                        }
+                        //pF1->FixBoundary();
+                        pF1->CopyTo(pF2);
+                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        //pF1->FixBoundary();
+
+                        pTalor->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2,
+                            pF1,
+                            0 == i,
+                            iFieldCount == i + 1);
+                    }
+                    pF1->Return();
+                    pF2->Return();
+                }
             }
 
             appSetLogDate(FALSE);
@@ -314,7 +363,7 @@ int main(int argc, char * argv[])
     }
     else
     {
-        if (!bMeasureFermion)
+        if (!bMeasureFermion && !bMeasureTrace)
         {
             pPL->Report();
 
@@ -372,7 +421,7 @@ int main(int argc, char * argv[])
         appSetLogDate(TRUE);
     }
 
-    if ((bOnlyMeasure && bMeasureCondensation) && NULL != pCC)
+    if (bOnlyMeasure && bMeasureCondensation && NULL != pCC)
     {
         appSetLogDate(FALSE);
 
@@ -395,6 +444,34 @@ int main(int argc, char * argv[])
         appGeneral(_T("}\n")); 
 
         appSetLogDate(TRUE);
+    }
+
+    if (bOnlyMeasure && bMeasureTrace && NULL != pTalor)
+    {
+        CCString sCSVFileName;
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("D"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_D]);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("MD"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_MD]);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("DMD"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_DMD]);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("MDMD"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_MDMD]);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("DMDMD"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_DMDMD]);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("PL"));
+        WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstPolyakov);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("GO"));
+        WriteStringFileRealArray(sCSVFileName, pTalor->m_lstPolyakovSOmega);
+
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("GOS"));
+        WriteStringFileRealArray(sCSVFileName, pTalor->m_lstPolyakovSOmegaSq);
     }
 
     if (bDoSmearing)

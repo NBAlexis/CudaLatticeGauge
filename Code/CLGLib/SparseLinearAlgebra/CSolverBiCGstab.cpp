@@ -31,7 +31,7 @@ CSLASolverBiCGStab::~CSLASolverBiCGStab()
 void CSLASolverBiCGStab::Configurate(const CParameters& param)
 {
     INT iValue;
-    Real fValue;
+    //Real fValue;
     if (param.FetchValueINT(_T("DiviationStep"), iValue))
     {
         m_uiDevationCheck = static_cast<UINT>(iValue);
@@ -484,7 +484,11 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             
             //s=r(i-1) - alpha v(i)
             pR->CopyTo(pS);
+#if !_CLG_DOUBLEFLOAT
+            pS->Axpy(_make_cuComplex(-static_cast<Real>(alpha.x), -static_cast<Real>(alpha.y)), pV);
+#else
             pS->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pV);
+#endif
 
             if (0 == (j + 1) % m_uiDevationCheck)
             {
@@ -521,8 +525,9 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
 
             //r(i)=s-omega t
             pS->CopyTo(pR);
-            pR->Axpy(_make_cuComplex(-omega.x, -omega.y), pT);
+            
 #if !_CLG_DOUBLEFLOAT
+            pR->Axpy(_make_cuComplex(-static_cast<Real>(omega.x), -static_cast<Real>(omega.y)), pT);
             beta = cuCdiv(alpha, cuCmul(omega, rho));
             rho = pRh->Dot(pR);
             beta = cuCmul(beta, rho);
@@ -537,6 +542,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             pP->ScalarMultply(_cToFloat(beta));
             pP->AxpyPlus(pR);
 #else
+            pR->Axpy(_make_cuComplex(-omega.x, -omega.y), pT);
             beta = _cuCdivf(alpha, _cuCmulf(omega, rho));
             rho = pRh->Dot(pR);
             beta = _cuCmulf(beta, rho);

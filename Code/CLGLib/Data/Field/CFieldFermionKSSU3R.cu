@@ -540,7 +540,11 @@ _kernelDFermionKSForce_PR_XYTau_Term(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
-    Real fOmega, 
+#if _CLG_DOUBLEFLOAT
+    Real fOmega,
+#else
+    DOUBLE fOmega,
+#endif
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength)
 {
@@ -590,7 +594,7 @@ _kernelDFermionKSForce_PR_XYTau_Term(
         //However, eta124(n1) = -eta124(n2), so use Add directly.
         res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
         res.Ta();
-        res.MulReal(OneOver48 * fOmega * pNumerators[rfieldId] * eta124);
+        res.MulReal(OneOver48 * static_cast<Real>(fOmega) * pNumerators[rfieldId] * eta124);
 
         //Use eta124 of n2 so Add left Sub right
         //Change to use eta124 of n1, Sub left and Add right

@@ -34,7 +34,7 @@ CSLASolverGMRES::~CSLASolverGMRES()
 void CSLASolverGMRES::Configurate(const CParameters& param)
 {
     INT iValue;
-    Real fValue;
+    //Real fValue;
 
     if (param.FetchValueINT(_T("MaxDim"), iValue))
     {
@@ -171,12 +171,15 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
             {
 #if !_CLG_DOUBLEFLOAT
                 const cuDoubleComplex dotc = m_lstVectors[k]->Dot(pW);
+                m_h[HIndex(k, j)] = dotc;
+                //w -= h[k,j] v[k]
+                pW->Axpy(_make_cuComplex(-static_cast<Real>(dotc.x), -static_cast<Real>(dotc.y)), m_lstVectors[k]);
 #else
                 const CLGComplex dotc = m_lstVectors[k]->Dot(pW);
-#endif
                 m_h[HIndex(k, j)] = dotc;
                 //w -= h[k,j] v[k]
                 pW->Axpy(_make_cuComplex(-dotc.x, -dotc.y), m_lstVectors[k]);
+#endif
             }
 
             //h[j + 1, j] = ||w||
