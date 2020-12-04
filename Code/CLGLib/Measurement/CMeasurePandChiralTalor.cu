@@ -16,6 +16,9 @@ __CLGIMPLEMENT_CLASS(CMeasurePandChiralTalor)
 
 #pragma region kernels
 
+/**
+ * This is (-y g4 Dx + x g4 Dy - (i/2) g4 sigma12)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTraceApplyM(
     const deviceWilsonVectorSU3* __restrict__ pRight,

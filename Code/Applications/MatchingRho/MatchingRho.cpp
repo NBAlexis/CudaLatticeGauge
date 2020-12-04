@@ -449,28 +449,28 @@ int main(int argc, char * argv[])
     if (bOnlyMeasure && bMeasureTrace && NULL != pTalor)
     {
         CCString sCSVFileName;
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("D"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("D"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_D]);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("MD"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("MD"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_MD]);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("DMD"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("DMD"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_DMD]);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("MDMD"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("MDMD"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_MDMD]);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("DMDMD"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("DMDMD"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstTraceRes[ECPCTTT_DMDMD]);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("PL"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("PL"));
         WriteStringFileComplexArray(sCSVFileName, pTalor->m_lstPolyakov);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("GO"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("GO"));
         WriteStringFileRealArray(sCSVFileName, pTalor->m_lstPolyakovSOmega);
 
-        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix, _T("GOS"));
+        sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), _T("GOS"));
         WriteStringFileRealArray(sCSVFileName, pTalor->m_lstPolyakovSOmegaSq);
     }
 
