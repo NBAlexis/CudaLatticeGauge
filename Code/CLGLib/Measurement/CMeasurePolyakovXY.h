@@ -86,9 +86,10 @@ protected:
     UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
     UBOOL m_bShowResult;
-    UBOOL m_bMeasureLoopZ;
 
 public:
+
+    UBOOL m_bMeasureLoopZ;
 
     TArray<CLGComplex> m_lstLoop;
     TArray<CLGComplex> m_lstLoopInner;

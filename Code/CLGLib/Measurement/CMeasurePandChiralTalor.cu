@@ -17,13 +17,14 @@ __CLGIMPLEMENT_CLASS(CMeasurePandChiralTalor)
 #pragma region kernels
 
 /**
- * This is (-y g4 Dx + x g4 Dy - (i/2) g4 sigma12)
+ * This is kappa * (-y g4 Dx + x g4 Dy - i g4 sigma12)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTraceApplyM(
     const deviceWilsonVectorSU3* __restrict__ pRight,
     deviceWilsonVectorSU3* pRes,
     SSmallInt4 sCenter,
+    const DOUBLE fKappa,
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
@@ -36,8 +37,8 @@ _kernelTraceApplyM(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>((sSite4.y - sCenter.y) * fKappa);
+    const Real fmX = -static_cast<Real>((sSite4.x - sCenter.x) * fKappa);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -147,10 +148,10 @@ _kernelTraceApplyM(
     }
 
     //=========================================
-    //-i/2 * gamma_4 sigma_12
+    //-i * gamma_4 sigma_12
     pRes[uiSiteIndex] = sigma12.MulWilsonC(pRight[uiSiteIndex]);
     pRes[uiSiteIndex] = gamma4.MulWilsonC(pRes[uiSiteIndex]);
-    pRes[uiSiteIndex].MulComp(_make_cuComplex(F(0.0), F(-0.5)));
+    pRes[uiSiteIndex].MulComp(_make_cuComplex(F(0.0), static_cast<Real>(-fKappa)));
 
     pRes[uiSiteIndex].Sub(jl);
 }
@@ -165,7 +166,7 @@ _kernelPolyakovLoopOfSiteTalor(
 #endif
 )
 {
-    UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lt + (threadIdx.y + blockIdx.y * blockDim.y);
+    UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     deviceSU3 beforeTrace;
 #if _CLG_DOUBLEFLOAT
     sumCount[uiXYZ] = F(0.0);
@@ -210,6 +211,9 @@ _kernelPolyakovLoopOfSiteTalor(
 #endif
 }
 
+/**
+ * x (V412 + V432) - y (V421 + V431)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelActionTalorOmega(
     BYTE byFieldId,
@@ -233,7 +237,7 @@ _kernelActionTalorOmega(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    const Real fXOmega = -(sSite4.x - sCenterSite.x);
+    const Real fXOmega = (sSite4.x - sCenterSite.x);
 
     //===============
     //+x Omega V412
@@ -244,7 +248,7 @@ _kernelActionTalorOmega(
     const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
 
-    const Real fYOmega = (sSite4.y - sCenterSite.y);
+    const Real fYOmega = -(sSite4.y - sCenterSite.y);
 
     //===============
     //-y Omega V421
@@ -257,6 +261,9 @@ _kernelActionTalorOmega(
     results[uiSiteIndex] = (fV412 + fV432 + fV421 + fV431) * betaOverN;
 }
 
+/**
+ * -(x^2 U23 + y^2 U13 + r^2 U12 - xy V132)
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelActionTalorOmegaSq(
     BYTE byFieldId,
@@ -323,6 +330,10 @@ _kernelActionTalorOmegaSq(
         const BYTE mushift = (idx0 / 2);
         //y z z
         const BYTE nushift = ((idx0 + 1) / 2) + 1;
+
+        //the Fi function is: 0 : x^2 + y^2, 1 : y^2, 2 : x^2
+        //r^2 (1-U_{xy}) + y^2 U_{xz} + x^2 U_{yz}
+
 #if !_CLG_DOUBLEFLOAT
         res += static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, mushift, nushift));
 #else
@@ -341,7 +352,7 @@ _kernelActionTalorOmegaSq(
         res += fV132 * F(0.125) * betaOverN;
     }
 
-    results[uiSiteIndex] = res;
+    results[uiSiteIndex] = -res;
 }
 
 #pragma endregion
@@ -403,6 +414,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
         CCommonData::m_sCenter,
+        CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
@@ -434,6 +446,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
         CCommonData::m_sCenter,
+        CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],

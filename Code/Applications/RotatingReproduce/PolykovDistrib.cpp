@@ -379,6 +379,8 @@ INT MeasurePolyakovDist(CParameters& params)
     TArray<Real> lstR;
     TArray<TArray<CLGComplex>> lstPolyIn;
     TArray<TArray<CLGComplex>> lstPolyOut;
+    TArray<TArray<CLGComplex>> lstPolyInZ;
+    TArray<TArray<CLGComplex>> lstPolyOutZ;
 
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
@@ -614,6 +616,30 @@ INT MeasurePolyakovDist(CParameters& params)
                 lstPolyIn.AddItem(polyIn);
                 lstPolyOut.AddItem(polyOut);
                 WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
+
+                if (pPL->m_bMeasureLoopZ)
+                {
+                    CCString sFileNameWrite3;
+                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                    polyakovOmgR.RemoveAll();
+                    polyIn.RemoveAll();
+                    polyOut.RemoveAll();
+
+                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                    {
+                        TArray<CLGComplex> thisConfiguration;
+                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                        {
+                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
+                        }
+                        polyakovOmgR.AddItem(thisConfiguration);
+                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
+                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
+                    }
+                    lstPolyInZ.AddItem(polyIn);
+                    lstPolyOutZ.AddItem(polyOut);
+                    WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgR);
+                }
             }
             break;
             case EDJ_Chiral:
@@ -740,6 +766,16 @@ INT MeasurePolyakovDist(CParameters& params)
             sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
             WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
             WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
+
+            if (NULL != pPL && pPL->m_bMeasureLoopZ)
+            {
+                CCString sFileNameWrite3;
+                CCString sFileNameWrite4;
+                sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+                sFileNameWrite4.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+                WriteStringFileComplexArray2(sFileNameWrite3, lstPolyInZ);
+                WriteStringFileComplexArray2(sFileNameWrite4, lstPolyOutZ);
+            }
         }
         break;
         case EDJ_Chiral:
