@@ -72,6 +72,7 @@ void CSLASolverGMRES::Configurate(const CParameters& param)
     }
 
 #if _CLG_DOUBLEFLOAT
+    Real fValue = F(0.0);
     if (param.FetchValueReal(_T("Accuracy"), fValue))
     {
         m_fAccuracy = fValue;
