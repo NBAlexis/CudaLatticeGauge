@@ -11,7 +11,7 @@
 //             It is -2 kappa { 0.5 i sigma12 [(1 - gamma4) T+ - (1 + gamma4) T-] }
 //
 // JLPure : Chen decomposition orbit angular momentum, (1/i) psidagger r x Dpure psi
-// JLJM :   Jaffe¨CManohar decomposition orbit angular momentum, (1/i) psidagger r x partial psi, not gauge inv.
+// JLJM :   Jaffe-Manohar decomposition orbit angular momentum, (1/i) psidagger r x partial psi, not gauge inv.
 //          at Coulomb gauge, JLJM = JLPure
 // JPot :   Wak decomposition, Lpot g x (psidagger r x Aphys psi), Note in our definition, g A -> A.
 //

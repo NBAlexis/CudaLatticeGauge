@@ -62,11 +62,11 @@ public:
     * CURNAD_RNG_PSEUDO_MT19937 supports only HOST API and can be used only on architecture sm_35 or higher. 
     * CURAND_RNG_PHILOX4_32_10 is a member of Philox family, which is one of the three non-cryptographic Counter Based Random Number Generators presented on SC11 conference by D E Shaw Research. 
     *
-    *  There are 4 variants of the basic SOBOL¡¯ quasi random number generator. All of the variants generate sequences in up to 20,000 dimensions. CURAND_RNG_QUASI_SOBOL32, CURAND_RNG_QUASI_SCRAMBLED_SOBOL32, CURAND_RNG_QUASI_SOBOL64, and CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 are quasirandom number generator types. 
-    * CURAND_RNG_QUASI_SOBOL32 is a Sobol¡¯ generator of 32-bit sequences. 
-    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL32 is a scrambled Sobol¡¯ generator of 32-bit sequences. 
-    * CURAND_RNG_QUASI_SOBOL64 is a Sobol¡¯ generator of 64-bit sequences. 
-    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 is a scrambled Sobol¡¯ generator of 64-bit sequences.
+    *  There are 4 variants of the basic SOBOL quasi random number generator. All of the variants generate sequences in up to 20,000 dimensions. CURAND_RNG_QUASI_SOBOL32, CURAND_RNG_QUASI_SCRAMBLED_SOBOL32, CURAND_RNG_QUASI_SOBOL64, and CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 are quasirandom number generator types. 
+    * CURAND_RNG_QUASI_SOBOL32 is a Sobol generator of 32-bit sequences. 
+    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL32 is a scrambled Sobol generator of 32-bit sequences. 
+    * CURAND_RNG_QUASI_SOBOL64 is a Sobol generator of 64-bit sequences. 
+    * CURAND_RNG_QUASI_SCRAMBLED_SOBOL64 is a scrambled Sobol generator of 64-bit sequences.
     */
     CRandom(UINT uiSeed, ERandom er) 
         : m_eRandomType(er)

@@ -491,7 +491,7 @@ _kernelDotAndGatherXYAMomentumJPure(
 }
 
 /**
- * Jaffe¨CManohar
+ * Jaffe-Manohar
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJJM(
