@@ -438,12 +438,20 @@ int main(int argc, char * argv[])
                     appAbs(pCC->m_lstCond[iType][iConf].y),
                     ((iType + 1) == CMeasureChiralCondensate::_kCondMeasureCount) ? _T("") : _T(",")
                     );
+
             }
             appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(",")); 
         } 
         appGeneral(_T("}\n")); 
 
         appSetLogDate(TRUE);
+
+        for (UINT iType = 0; iType < CMeasureChiralCondensate::_kCondMeasureCount; ++iType)
+        {
+            CCString sCSVFileName;
+            sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), __ENUM_TO_STRING(ECondList, (ECondList)iType).c_str());
+            WriteStringFileComplexArray(sCSVFileName, pCC->m_lstCond[iType]);
+        }
     }
 
     if (bOnlyMeasure && bMeasureTrace && NULL != pTalor)

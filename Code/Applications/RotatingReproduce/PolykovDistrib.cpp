@@ -384,6 +384,10 @@ INT MeasurePolyakovDist(CParameters& params)
 
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
+    if (uiNewLine < 1)
+    {
+        uiNewLine = 1;
+    }
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));

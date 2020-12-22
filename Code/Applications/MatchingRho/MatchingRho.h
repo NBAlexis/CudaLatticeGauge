@@ -12,6 +12,19 @@
 
 enum { kExportDigital = 20, };
 
+__DEFINE_ENUM(ECondList,
+    Chiral,
+    Gamma1,
+    Gamma2,
+    Gamma3,
+    Gamma4,
+    Gamma5,
+    Gamma45,
+    GammaX,
+    GammaY,
+    );
+
+
 #if !_CLG_WIN
 
 void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
