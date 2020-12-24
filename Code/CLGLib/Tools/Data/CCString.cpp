@@ -563,6 +563,8 @@ void CCString::FormatV(const TCHAR* lpszFormat, va_list argList)
 
     GetBuffer(nMaxLen);
     appGeneral(_T("nMaxLength=%d\n"), nMaxLen);
+    appGeneral(_T("Format: %s\n"), lpszFormat);
+    appGeneral(lpszFormat, argListSave);
     appVsprintf(m_pchData, GetAllocLength(), lpszFormat, argListSave);
     ReleaseBuffer();
 
