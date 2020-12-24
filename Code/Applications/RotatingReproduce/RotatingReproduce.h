@@ -70,10 +70,12 @@ enum ECondList
 #define _CLG_EXPORT_CHIRAL(measureName, lstName) \
 CCString sFileNameWrite##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##lstName##All = _T("%s_condensate"); \
-appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
 sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
 sFileNameWrite##lstName##All = sFileNameWrite##lstName##All + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
 appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
+appGeneral(_T("header: %s\n"), sCSVSavePrefix.c_str()); \
+appGeneral(_T("_HC_Lt: %d\n"), _HC_Lt); \
+appGeneral(_T("uiOmega: %d\n"), uiOmega); \
 sFileNameWrite##lstName.Format(sFileNameWrite##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 sFileNameWrite##lstName##All.Format(sFileNameWrite##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
