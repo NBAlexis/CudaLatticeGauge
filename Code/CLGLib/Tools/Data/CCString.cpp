@@ -368,12 +368,17 @@ void __cdecl CCString::Format(const TCHAR* lpszFormat, ...)
     FormatV(lpszFormat, argList);
     va_end(argList);
 #else
+    va_list argList;
+    va_start(argList, lpszFormat);
+
     static TCHAR tmpBuffer[4096];
-    appVsnprintf(tmpBuffer, 4095, format, arg);
+    appVsnprintf(tmpBuffer, 4095, lpszFormat, argList);
     INT nLen = appStrlen(tmpBuffer);
     GetBuffer(nMaxLen);
     appStrcpy(m_pchData, GetAllocLength(), tmpBuffer);
     ReleaseBuffer();
+
+    va_end(argList);
 #endif
 }
 
