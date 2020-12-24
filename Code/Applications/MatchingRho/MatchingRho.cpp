@@ -72,6 +72,10 @@ int main(int argc, char * argv[])
     const UBOOL bDoSmearing = 0 != iVaule;
 
     iVaule = 0;
+    params.FetchValueINT(_T("TestZero"), iVaule);
+    const UBOOL bTestZero = 0 != iVaule;
+
+    iVaule = 0;
     params.FetchValueINT(_T("SaveIndexStart"), iVaule);
     const UINT iSaveIndexStart = static_cast<UINT>(iVaule);
 
@@ -152,6 +156,7 @@ int main(int argc, char * argv[])
 
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     appGetLattice()->m_pMeasurements->Reset();
+    appGeneral(_T("Omega:%f\n"), CCommonData::m_fOmega);
     while (
         (bOnlyMeasure && uiAccepCountAfterE < iEquib)
      || (!bOnlyMeasure && appGetLattice()->m_pUpdator->GetConfigurationCount() < iEquib)
@@ -277,6 +282,11 @@ int main(int argc, char * argv[])
             {
                 if (NULL != pCC)
                 {
+                    if (bTestZero)
+                    {
+                        appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+                    }
+
                     CFieldFermionWilsonSquareSU3*  pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     CFieldFermionWilsonSquareSU3*  pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     const UINT iFieldCount = pCC->GetFieldCount();
@@ -450,7 +460,7 @@ int main(int argc, char * argv[])
         {
             CCString sCSVFileName;
             sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), __ENUM_TO_STRING(ECondList, (ECondList)iType).c_str());
-            WriteStringFileComplexArray(sCSVFileName, pCC->m_lstCond[iType]);
+            WriteStringFileComplexArray(sCSVFileName, pCC->m_lstCondAll[iType]);
         }
     }
 

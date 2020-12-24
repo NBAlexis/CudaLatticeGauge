@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure
-RotationJob : ESR_Simulate
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,14 +328,14 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.84
-    OmegaRange : 0.14
-    StartOmega : 19
-    EndOmega : 20
+    GaugeBate : 5.1
+    OmegaRange : 0.128
+    StartOmega : 0
+    EndOmega : 16
     StartN : 101
-    EndN : 500
+    EndN : 400
     ## EDJKS_Polyakov, EDJKS_Chiral
-    DistributionJob : EDJKS_Chiral
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -343,17 +343,17 @@ JobMeasure:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : F:\CppWorkingFolder\CudaLatticeGauge\Bin\Release\48416
+    SubFolderPrefix : G:\SRFloat\510204\Nt6
 
-    SavePrefix : N48416_
-    CSVSavePrefix : F:\CppWorkingFolder\CudaLatticeGauge\Bin\Release\48416\N48416_
+    SavePrefix : SRF510204_
+    CSVSavePrefix : G:\SRFloat\510204\Polyakov\SRF510204_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -366,7 +366,7 @@ JobMeasure:
         FieldName : CFieldGaugeSU3D
         FieldInitialType : EFIT_Random
 
-        Period : [0, 0, 1, 1]
+        Period : [1, 1, 1, 1]
 
     GaugeBoundary:
 
@@ -385,7 +385,7 @@ JobMeasure:
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
-        Period : [0, 0, 1, -1]
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/16}
@@ -412,11 +412,11 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.05
+        Mass : 0.04
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
-        Period : [0, 0, 1, -1]
+        Period : [1, 1, 1, -1]
 
         # MC is to prepare
         # This is x^{1/16}
@@ -439,7 +439,7 @@ JobMeasure:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 0
         ShiftCoord : 0
-        Beta : 4.84
+        Beta : 4.9
         Omega : 0.0
 
     Solver:

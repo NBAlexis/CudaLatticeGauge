@@ -10,13 +10,14 @@ DoSmearing : 0
 DoMeasureFermion : 0
 DoMeasureCondensation : 1
 DoMeasureTrace : 0
+TestZero : 0
 UseZ4 : 0
 ExponentialPrecision : 10
 # If Only Measure, for SaveIndexStart + 1 to SaveIndexStart + EquvibStep
 # If running, save start from SaveIndexStart + 1
 SaveIndexStart : 0
-SavePrefix : ./502161/502161_
-CSVPrefix : ./502161/Chiral502161_
+SavePrefix : G:\configs\502161\502161_
+CSVPrefix : G:\configs\502161\Chiral0_502161_
 # SavePrefix : D:\NotUsingCLGCon\Nx14_49016\25153Nt3\Matching\25153_
 
 Dim : 4
@@ -148,7 +149,7 @@ Measure3:
     FieldId : 2
     FieldCount : 25
     ShowResult : 0
-    MeasureDist : 0
+    MeasureDist : 1
 
 Measure4:
 

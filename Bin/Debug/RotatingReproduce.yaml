@@ -22,7 +22,7 @@ JobThermal:
     MaxOmega : 0.14
     MinNt : 3
     MaxNt : 3
-    SavePrefix : ./50216/NC50216_
+    SavePrefix : ./48416/NC48416_
     Additive : 1
     ExponentialPrecision : 0
 
@@ -33,7 +33,7 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [1.0414751806027008384,1.0512387648702708358,1.0932499695649909581,1.0730088069853137494,1.039999686047257099,1.0581215958769381427,1.126797795032261808,1.079625281761403675,1.0925634565813843724,1.093841765744083572,1.1396261836107953053,1.117358082435979031,1.1725473617345026191,1.135828197546616248,1.1710986761819270912,1.2007678417251211015,1.2067493305975950749,1.152217382744722419,1.239004047298030913,1.239320002823738496,1.246804101425231541]
+    Polyakovs : [0.7578178802644820994,0.6978537638129379131,0.7149090974479801439,0.8139783600406373431,0.7688093238034712478,0.7739352731576715464,0.7427007966771463635,0.7918140812609005569,0.7969504789622993943,0.8469133334220434752,0.8341341980844266206,0.8503379260444807362,0.8461001079893429396,0.9304285976670972983,0.9692888170850763281,0.9949980571050330918,0.9499767093526193173,1.005261945980231987,0.9901163844498961119,1.039484462363271165,1.030230324309320321]
 
     Dim : 4
     Dir : 4
@@ -56,8 +56,8 @@ JobThermal:
     # Nt6Polyakov : 0.232158563337
 
     # 55150
-    # Nt3FileName : ./49616/NC49616_Rotate_Nt3_O5_6481.con
-    # Nt3Polyakov : 0.973698496819
+    # Nt6FileName : ./NC535161_Rotate_Nt6_O1_2501.con
+    # Nt6Polyakov : 0.179406819728
 
     # 50217
     # Nt4FileName : N50217_Nt4.con
@@ -118,7 +118,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.02
+        Beta : 4.84
         Omega : 0.0
 
     Action2:
@@ -168,12 +168,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.81
+    GaugeBate : 5.05
     OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
     StartN : 101
-    EndN : 8000
+    EndN : 2000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
@@ -183,15 +183,15 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\configs\newresf\48116\Nt3
+    SubFolderPrefix : G:\configs\newresf\50516\Nt3
     # SubFolderPrefix : G:\configs\newresf\49916\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC48116_
-    CSVSavePrefix : G:\configs\newresf\48116\Polyakov\NC48116_
+    SavePrefix : NC50516_
+    CSVSavePrefix : G:\configs\newresf\50516\Polyakov\NC50516_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
@@ -251,7 +251,7 @@ JobPolyakovDist:
 
         # SolverName : CSLASolverGMRES
         # double
-        Accuracy : 0.00000001
+        Accuracy : 0.0000001
         # float
         # Accuracy : 0.000001
         # MaxDim = 15 for 5.0(or 5.02) and 0.17
@@ -328,25 +328,25 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    Nt : 5
-    OmegaStart : 0
-    OmegaEnd : 10
-    IndexStart : 2801
-    IndexEnd : 3200
+    Nt : 6
+    OmegaStart : 1
+    OmegaEnd : 1
+    IndexStart : 2501
+    IndexEnd : 2503
 
-    SubFolder : 1
-    SubFolderPrefix : G:\configs\Extrapolation\5283161Nt5\Nt5
-    LoadPrefix : NC5283161_
-    CheckSubFolder : 1
-    CheckSubFolderPrefix : G:\configs\Extrapolation\5283161Nt5\GF
-    SavePrefix : GFN5283161_
+    SubFolder : 0
+    SubFolderPrefix : ./NC535161_
+    LoadPrefix : NC535161_
+    CheckSubFolder : 0
+    CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
+    SavePrefix : GFN535161_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
 
     Dim : 4
     Dir : 4
-    LatticeLength : [22, 22, 10, 5]
+    LatticeLength : [26, 26, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
