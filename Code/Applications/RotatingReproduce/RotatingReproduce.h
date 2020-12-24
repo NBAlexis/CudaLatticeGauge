@@ -72,13 +72,8 @@ CCString sFileNameWrite##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##lstName##All = _T("%s_condensate"); \
 sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
 sFileNameWrite##lstName##All = sFileNameWrite##lstName##All + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
-appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
-appGeneral(_T("header: %s\n"), sCSVSavePrefix.c_str()); \
-appGeneral(_T("_HC_Lt: %d\n"), _HC_Lt); \
-appGeneral(_T("uiOmega: %d\n"), uiOmega); \
 sFileNameWrite##lstName.Format(sFileNameWrite##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 sFileNameWrite##lstName##All.Format(sFileNameWrite##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
-appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
 TArray<TArray<CLGComplex>> lstName##OverR; \
 TArray<CLGComplex> lstName##All; \
 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
@@ -91,7 +86,6 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##OverR.AddItem(thisConfiguration); \
     lstName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
 } \
-appGeneral(_T("Saving to %s and %s\n"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
 WriteStringFileComplexArray2(sFileNameWrite##lstName, lstName##OverR); \
 WriteStringFileComplexArray(sFileNameWrite##lstName##All, lstName##All); 
 
