@@ -86,7 +86,7 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     lstName##OverR.AddItem(thisConfiguration); \
     lstName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
 } \
-appGeneral(_T("Saving to %s and %s"), sFileNameWrite##lstName, sFileNameWrite##lstName##All); \
+appGeneral(_T("Saving to %s and %s"), sFileNameWrite##lstName.c_str(), sFileNameWrite##lstName##All.c_str()); \
 WriteStringFileComplexArray2(sFileNameWrite##lstName, lstName##OverR); \
 WriteStringFileComplexArray(sFileNameWrite##lstName##All, lstName##All); 
 
