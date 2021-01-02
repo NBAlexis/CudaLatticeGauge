@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing}
-RotatingJob : ERJ_Thermal
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -15,15 +15,15 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 2000
-    SaveStartIndex : 6001
-    OmegaSep : 20
-    OmegaStart : 0
-    MaxOmega : 0.14
+    EquvibStep : 21
+    SaveStartIndex : 2239
+    OmegaSep : 3
+    OmegaStart : 3
+    MaxOmega : 0.021
     MinNt : 3
     MaxNt : 3
-    SavePrefix : ./48416/NC48416_
-    Additive : 1
+    SavePrefix : ./50516/NC50516_
+    Additive : 0
     ExponentialPrecision : 0
 
     # 53551575Nt4 Omega60 
@@ -33,7 +33,7 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [0.7578178802644820994,0.6978537638129379131,0.7149090974479801439,0.8139783600406373431,0.7688093238034712478,0.7739352731576715464,0.7427007966771463635,0.7918140812609005569,0.7969504789622993943,0.8469133334220434752,0.8341341980844266206,0.8503379260444807362,0.8461001079893429396,0.9304285976670972983,0.9692888170850763281,0.9949980571050330918,0.9499767093526193173,1.005261945980231987,0.9901163844498961119,1.039484462363271165,1.030230324309320321]
+    Polyakovs : [1.1144278951547659088,1.161090074077501647,1.1499962256538063214,1.1337112115710824730,1.138396250143989914,1.206112086100691661,1.139145150294474003,1.098765356165412494,1.189953003585512307,1.209822233646109264,1.207321536890375900,1.210460626540395313,1.156238273277303828,1.285008462274228413,1.2178567362449411956,1.2324889570435339162,1.2871675640065986223,1.2436614082119905607,1.184665366809605187,1.2312059968864824123,1.257874004417391259]
 
     Dim : 4
     Dir : 4
@@ -52,8 +52,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    # Nt6FileName : ./535161/NC535161_Rotate_Nt6_O2_1869.con
-    # Nt6Polyakov : 0.232158563337
+    Nt3FileName : ./50516/NC50516_Rotate_Nt3_O3_2239.con
+    Nt3Polyakov : 1.138975024223
 
     # 55150
     # Nt6FileName : ./NC535161_Rotate_Nt6_O1_2501.con
@@ -118,7 +118,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.84
+        Beta : 5.05
         Omega : 0.0
 
     Action2:
@@ -173,7 +173,7 @@ JobPolyakovDist:
     StartOmega : 0
     EndOmega : 20
     StartN : 101
-    EndN : 2000
+    EndN : 6000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
@@ -183,7 +183,7 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\configs\newresf\50516\Nt3
+    SubFolderPrefix : H:\configs\newresf\50516\Nt3
     # SubFolderPrefix : G:\configs\newresf\49916\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
@@ -191,7 +191,7 @@ JobPolyakovDist:
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
     SavePrefix : NC50516_
-    CSVSavePrefix : G:\configs\newresf\50516\Polyakov\NC50516_
+    CSVSavePrefix : H:\configs\newresf\50516\Polyakov\NC50516_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_

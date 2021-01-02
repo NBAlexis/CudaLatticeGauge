@@ -451,12 +451,24 @@ int main(int argc, char * argv[])
 
             }
             appGeneral(_T("}%s\n"), (iConf == uiAccepCountAfterE - 1) ? _T("") : _T(",")); 
+        }
+        appGeneral(_T("}\n"));
+
+        for (INT i = 0; i < 6; ++i)
+        {
+            TArray<CLGComplex> thisConfiguration; 
+            for (UINT j = 0; j < uiAccepCountAfterE; ++j)
+            { 
+                thisConfiguration.AddItem(pCC->m_lstCond[0][j * pCC->m_lstR.Num() + i]); 
+            }
+            CCString sCSVFileName;
+            sCSVFileName.Format(_T("%s_Chiral_r%d.csv"), sCSVPrefix.c_str(), i);
+            WriteStringFileComplexArray(sCSVFileName, thisConfiguration);
         } 
-        appGeneral(_T("}\n")); 
 
         appSetLogDate(TRUE);
 
-        for (UINT iType = 0; iType < CMeasureChiralCondensate::_kCondMeasureCount; ++iType)
+        for (UINT iType = 0; iType < 1/*CMeasureChiralCondensate::_kCondMeasureCount*/; ++iType)
         {
             CCString sCSVFileName;
             sCSVFileName.Format(_T("%s_%s.csv"), sCSVPrefix.c_str(), __ENUM_TO_STRING(ECondList, (ECondList)iType).c_str());

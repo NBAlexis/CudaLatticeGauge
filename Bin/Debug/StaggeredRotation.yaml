@@ -328,12 +328,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.1
+    GaugeBate : 5.0
     OmegaRange : 0.128
     StartOmega : 0
-    EndOmega : 16
+    EndOmega : 8
     StartN : 101
-    EndN : 400
+    EndN : 500
     ## EDJKS_Polyakov, EDJKS_Chiral
     DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
@@ -343,10 +343,10 @@ JobMeasure:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\510204\Nt6
+    SubFolderPrefix : G:\SRFloat\500204\Nt6
 
-    SavePrefix : SRF510204_
-    CSVSavePrefix : G:\SRFloat\510204\Polyakov\SRF510204_
+    SavePrefix : SRF500204_
+    CSVSavePrefix : G:\SRFloat\500204\Polyakov\SRF500204_
 
     Dim : 4
     Dir : 4
@@ -439,7 +439,7 @@ JobMeasure:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 0
         ShiftCoord : 0
-        Beta : 4.9
+        Beta : 5.0
         Omega : 0.0
 
     Solver:
