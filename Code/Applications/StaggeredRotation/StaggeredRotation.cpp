@@ -39,6 +39,12 @@ int main(int argc, char * argv[])
         res = Measurement(workingParam1);
     }
     break;
+    case ESR_GaugeFixing:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobGaugeFixing"));
+        res = GaugeFixing(workingParam1);
+    }
+    break;
     default:
     break;
     }

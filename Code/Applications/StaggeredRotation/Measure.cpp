@@ -311,8 +311,9 @@ INT Measurement(CParameters& params)
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+
     CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
@@ -347,10 +348,12 @@ INT Measurement(CParameters& params)
         pPL->Reset();
         pCCLight->Reset();
         pCCHeavy->Reset();
-        pCCSLight->Reset();
-        pCCSHeavy->Reset();
+        pFALight->Reset();
+        pFAHeavy->Reset();
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
+        pFALight->SetFieldCount(iFieldCount);
+        pFAHeavy->SetFieldCount(iFieldCount);
 
 #pragma region Measure
 
@@ -423,8 +426,6 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
                     }
 
-                    pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                    pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
                 case EDJKS_AngularMomentum:
@@ -434,7 +435,66 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_ChiralAndFermionMomentum:
                 {
+                    for (UINT i = 0; i < iFieldCount; ++i)
+                    {
+                        if (bZ4)
+                        {
+                            pF1Light->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1Light->InitialField(EFIT_RandomGaussian);
+                        }
+                        pF1Light->FixBoundary();
+                        pF1Light->CopyTo(pF2Light);
+                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Light->FixBoundary();
 
+                        pCCLight->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Light,
+                            pF1Light,
+                            0 == i,
+                            iFieldCount == i + 1);
+
+                        pFALight->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Light,
+                            pF1Light,
+                            0 == i,
+                            iFieldCount == i + 1);
+
+                        if (bZ4)
+                        {
+                            pF1Heavy->InitialField(EFIT_RandomZ4);
+                        }
+                        else
+                        {
+                            pF1Heavy->InitialField(EFIT_RandomGaussian);
+                        }
+                        pF1Heavy->FixBoundary();
+                        pF1Heavy->CopyTo(pF2Heavy);
+                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Heavy->FixBoundary();
+
+                        pCCHeavy->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Heavy,
+                            pF1Heavy,
+                            0 == i,
+                            iFieldCount == i + 1);
+
+                        pFAHeavy->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Light,
+                            pF1Light,
+                            0 == i,
+                            iFieldCount == i + 1);
+                    }
                 }
                 break;
                 case EDJKS_PlaqutteEnergy:
@@ -504,7 +564,9 @@ INT Measurement(CParameters& params)
             case EDJKS_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
 
                 if (uiOmega == iStartOmega)
                 {
@@ -517,20 +579,6 @@ INT Measurement(CParameters& params)
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
-
-                TArray<Real> connectSuspLight;
-                TArray<Real> connectSuspHeavy;
-                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                {
-                    connectSuspLight.AddItem(pCCSLight->m_lstResults[j].x);
-                    connectSuspHeavy.AddItem(pCCSHeavy->m_lstResults[j].x);
-                }
-                CCString sFileNameSuspLight;
-                CCString sFileNameSuspHeavy;
-                sFileNameSuspLight.Format(_T("%s_coonectsuspLight_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                sFileNameSuspHeavy.Format(_T("%s_coonectsuspHeavy_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                WriteStringFileRealArray(sFileNameSuspLight, connectSuspLight);
-                WriteStringFileRealArray(sFileNameSuspHeavy, connectSuspHeavy);
             }
             break;
             case EDJKS_AngularMomentum:
@@ -540,7 +588,28 @@ INT Measurement(CParameters& params)
             break;
             case EDJKS_ChiralAndFermionMomentum:
             {
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS);
+                _CLG_EXPORT_CHIRAL(pFALight, SpinKS);
+                _CLG_EXPORT_CHIRAL(pFALight, PotentialKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS);
 
+                if (uiOmega == iStartOmega)
+                {
+                    TArray<Real> lstRadius;
+                    for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
+                    {
+                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
+                    }
+                    CCString sRadiousFile;
+                    sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
+                    WriteStringFileRealArray(sRadiousFile, lstRadius);
+                }
             }
             break;
             case EDJKS_PlaqutteEnergy:

@@ -33,6 +33,7 @@ public:
     , m_pA13(NULL)
     , m_pA22(NULL)
     , m_pA23(NULL)
+    , m_bMixed(FALSE)
     {
     }
 
@@ -71,6 +72,8 @@ public:
     CLGComplex* m_pA13;
     Real* m_pA22;
     CLGComplex* m_pA23;
+
+    UBOOL m_bMixed;
 
     TArray<INT> m_lstDims;
 };

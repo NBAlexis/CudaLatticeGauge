@@ -15,15 +15,15 @@ JobThermal:
     ShowParameterContent : 0
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 21
-    SaveStartIndex : 2239
-    OmegaSep : 3
-    OmegaStart : 3
-    MaxOmega : 0.021
+    EquvibStep : 3000
+    SaveStartIndex : 5001
+    OmegaSep : 20
+    OmegaStart : 0
+    MaxOmega : 0.14
     MinNt : 3
     MaxNt : 3
-    SavePrefix : ./50516/NC50516_
-    Additive : 0
+    SavePrefix : ./47516/NC47516_
+    Additive : 1
     ExponentialPrecision : 0
 
     # 53551575Nt4 Omega60 
@@ -33,7 +33,7 @@ JobThermal:
     # Polyakovs : [0.4805665256631027, 0.4672786529512087, 0.4768947670332304, 0.4310357856276174, 0.3688309832207927, 0.4649521795124337, 0.5286123393687702, 0.5199754488640354, 0.5033608001722806, 0.5669160329078488, 0.49400603496712786, 0.5005412323360551, 0.6425276182892847, 0.6639336872716378, 0.6287471222097016, 0.6880276446756204, 0.6213186189485207, 0.6312015358186215, 0.6417133671773977, 0.7531024748189957, 0.7585210347862668, 0.6333679089802862, 0.6425621412728557, 0.7493119862532313]
 
     # 53551575Nt5 Omega60 
-    Polyakovs : [1.1144278951547659088,1.161090074077501647,1.1499962256538063214,1.1337112115710824730,1.138396250143989914,1.206112086100691661,1.139145150294474003,1.098765356165412494,1.189953003585512307,1.209822233646109264,1.207321536890375900,1.210460626540395313,1.156238273277303828,1.285008462274228413,1.2178567362449411956,1.2324889570435339162,1.2871675640065986223,1.2436614082119905607,1.184665366809605187,1.2312059968864824123,1.257874004417391259]
+    Polyakovs : [0.5773995326719144840,0.6531509761394140016,0.6180293049597433951,0.6780932932780046936,0.6430770520874591062,0.6759648815137088459,0.6997411217533554359,0.6584174478756571670,0.6720113090774414458,0.6850932246112091821,0.7262372611396352871,0.6998974186088073115,0.7759468020800089386,0.8273849002161828061,0.8380854643635194559,0.8586104903613913461,0.8691556466566406847,0.9112178332560106586,0.9070690187184175780,0.9460917588013998333,1.0090811413325764557]
 
     Dim : 4
     Dir : 4
@@ -52,8 +52,8 @@ JobThermal:
     ## Initial files
     ## ============================================================
     # 5016
-    Nt3FileName : ./50516/NC50516_Rotate_Nt3_O3_2239.con
-    Nt3Polyakov : 1.138975024223
+    # Nt3FileName : ./48416/NC48416_Rotate_Nt3_O1_8841.con
+    # Nt3Polyakov : 0.819180846214
 
     # 55150
     # Nt6FileName : ./NC535161_Rotate_Nt6_O1_2501.con
@@ -118,7 +118,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 5.05
+        Beta : 4.75
         Omega : 0.0
 
     Action2:
@@ -168,12 +168,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.05
+    GaugeBate : 4.90
     OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
     StartN : 101
-    EndN : 6000
+    EndN : 8000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
@@ -183,15 +183,15 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\configs\newresf\50516\Nt3
+    SubFolderPrefix : H:\configs\newresf\49016\Nt3
     # SubFolderPrefix : G:\configs\newresf\49916\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC50516_
-    CSVSavePrefix : H:\configs\newresf\50516\Polyakov\NC50516_
+    SavePrefix : NC49016_
+    CSVSavePrefix : H:\configs\newresf\49016\Polyakov\NC49016_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
@@ -343,6 +343,10 @@ JobGaugeFixing:
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
+
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    SaveType : EFFT_CLGBin
+    LoadType : EFFT_CLGBin
 
     Dim : 4
     Dir : 4

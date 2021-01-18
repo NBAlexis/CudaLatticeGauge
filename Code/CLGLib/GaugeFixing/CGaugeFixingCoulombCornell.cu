@@ -154,15 +154,16 @@ _kernelCalculateAGradient3D(
             pGamma23[uiSiteIndex3D] = cuCsub(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex3D]);
         }
 
-        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
-        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
-        const UINT uiLinkIndex2_3D = (p_m_mu_dir.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + dir;
+        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, __bck(dir));
+        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(p_m_mu_site) + dir];
+        const UINT uiLinkIndex2_3D = (p_m_mu_dir.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + p_m_mu_dir.m_byDir;
 
         //if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
         if (!p_m_mu_dir.IsDirichlet())
         {
             if (p_m_mu_dir.NeedToDagger())
             {
+                //dagger means A -> -A
                 pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] - pA11[uiLinkIndex2_3D];
                 pGamma12[uiSiteIndex3D] = cuCsub(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
                 pGamma13[uiSiteIndex3D] = cuCsub(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
@@ -206,7 +207,7 @@ _kernelCalculateG3D(
     }
     else
     {
-        deviceSU3 pA = deviceSU3::makeSU3TA(
+        const deviceSU3 pA = deviceSU3::makeSU3TA(
             _cToFloat(pGamma12[uiSiteIndex3D]), _cToFloat(pGamma13[uiSiteIndex3D]), _cToFloat(pGamma23[uiSiteIndex3D]),
             static_cast<Real>(pGamma11[uiSiteIndex3D]), static_cast<Real>(pGamma22[uiSiteIndex3D]));
         pG[uiSiteIndex3D] = (0 == _DC_ExpPrecision)
@@ -441,8 +442,8 @@ _kernelGaugeTransform3D(
             const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
 
-            const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
-            const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_p_mu_site)];
+            const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, __fwd(dir));
+            const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(p_p_mu_site)];
 
             if (!site_p_mu.IsDirichlet())
             {
@@ -491,7 +492,9 @@ _kernelGaugeTransform3DT(
         const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
         if (site_m_t.NeedToDagger())
         {
-            pGauge[uiLinkIndex2].Mul(pGx[uiSiteIndex3D]);
+            //never here
+            printf("ever here???\n");
+            pGauge[uiLinkIndex2] = pGx[uiSiteIndex3D].MulC(pGauge[uiLinkIndex2]);
         }
         else
         {

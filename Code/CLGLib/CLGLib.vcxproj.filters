@@ -443,6 +443,9 @@
     <ClInclude Include="Measurement\CMeasurePandChiralTalor.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -728,6 +731,9 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>

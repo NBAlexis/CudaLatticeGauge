@@ -1440,14 +1440,6 @@ void CFieldGaugeSU3::DebugPrintMe() const
     free(pToPrint);
 }
 
-void CFieldGaugeSU3::SaveToFile(const CCString &fileName) const
-{
-    UINT uiSize = 0;
-    BYTE* byToSave = CopyDataOut(uiSize);
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-    free(byToSave);
-}
-
 void CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
 {
     CFieldGaugeSU3* pPooledGauge = dynamic_cast<CFieldGaugeSU3*>(GetCopy());
@@ -1506,6 +1498,51 @@ BYTE* CFieldGaugeSU3::CopyDataOut(UINT &uiSize) const
 
     return byToSave;
 }
+
+BYTE* CFieldGaugeSU3::CopyDataOutFloat(UINT& uiSize) const
+{
+    deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    //fuck ofstream
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiLinkeCount * 18);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        FLOAT oneLink[18];
+        for (UINT j = 0; j < 9; ++j)
+        {
+            oneLink[2 * j] = static_cast<FLOAT>(toSave[i].m_me[j].x);
+            oneLink[2 * j + 1] = static_cast<FLOAT>(toSave[i].m_me[j].y);
+        }
+        memcpy(byToSave + i * sizeof(FLOAT) * 18, oneLink, sizeof(FLOAT) * 18);
+    }
+    free(toSave);
+
+    return byToSave;
+}
+
+BYTE* CFieldGaugeSU3::CopyDataOutDouble(UINT& uiSize) const
+{
+    deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    //fuck ofstream
+    uiSize = static_cast<UINT>(sizeof(DOUBLE) * m_uiLinkeCount * 18);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        DOUBLE oneLink[18];
+        for (UINT j = 0; j < 9; ++j)
+        {
+            oneLink[2 * j] = static_cast<DOUBLE>(toSave[i].m_me[j].x);
+            oneLink[2 * j + 1] = static_cast<DOUBLE>(toSave[i].m_me[j].y);
+        }
+        memcpy(byToSave + i * sizeof(DOUBLE) * 18, oneLink, sizeof(DOUBLE) * 18);
+    }
+    free(toSave);
+
+    return byToSave;
+}
+
 
 CCString CFieldGaugeSU3::GetInfos(const CCString &tab) const
 {

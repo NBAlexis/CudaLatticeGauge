@@ -168,6 +168,177 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
     return uiError;
 }
 
+//test the action of rotation (both gauge and KS) are gauge invarient in the case of projective plane
+//test the chiral and angular momentum measurement is gauge invarient in the case of projective plane
+UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
+{
+    UINT uiError = 0;
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    CFieldFermionKSSU3R* pFermion = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(2));
+    pFermion->PrepareForHMCOnlyRandomize();
+
+    CFieldFermionKSSU3R* pFermion2 = dynamic_cast<CFieldFermionKSSU3R*>(pFermion->GetCopy());
+    CFieldFermionKSSU3R* pF1W = dynamic_cast<CFieldFermionKSSU3R*>(pFermion->GetCopy());
+    pF1W->InitialField(EFIT_RandomZ4);
+    CFieldFermionKSSU3R* pF2W = dynamic_cast<CFieldFermionKSSU3R*>(pF1W->GetCopy());
+    pF2W->InverseD(pGauge);
+    pFermion->PrepareForHMCNotRandomize(pGauge);
+
+    CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
+    CActionFermionKS* pAction2 = dynamic_cast<CActionFermionKS*>(appGetLattice()->GetActionById(2));
+
+    CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasureChiralCondensateKS* pCC = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+    CMeasureAngularMomentumKS* pAM = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    pAction2->m_pFerimionField = pFermion;
+    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+
+    pPL->OnConfigurationAccepted(pGauge, NULL);
+    const Real fPolyakov1 = _cuCabsf(pPL->m_lstLoop[0]);
+    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    const Real fChiralCond1 = _cuCabsf(pCC->m_lstCondAll[0][0]);
+    const Real fConectSusp1 = _cuCabsf(pCC->m_lstCondAll[1][0]);
+    pAM->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    const Real fOrbital1 = _cuCabsf(pAM->m_lstCondAll[0][0]);
+    const Real fSpin1 = _cuCabsf(pAM->m_lstCondAll[1][0]);
+    const Real fPotential1 = _cuCabsf(pAM->m_lstCondAll[2][0]);
+
+    appGeneral(_T("PL: %d, CC: %d, %d, AM: %d, %d, %d\n"),
+        pPL->m_lstLoop.GetCount(),
+        pCC->m_lstCondAll[0].GetCount(),
+        pCC->m_lstCondAll[1].GetCount(),
+        pAM->m_lstCondAll[0].GetCount(),
+        pAM->m_lstCondAll[1].GetCount(),
+        pAM->m_lstCondAll[2].GetCount()
+        );
+
+    //appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
+    CGaugeFixingRandom* pRandom = new CGaugeFixingRandom();
+    pRandom->Initial(appGetLattice(), CParameters());
+
+    for (INT i = 0; i < 10; ++i)
+    {
+        pRandom->GaugeFixing(pGauge);
+        pRandom->AlsoFixingFermion(pFermion2);
+        pRandom->AlsoFixingFermion(pF1W);
+    }
+
+    pF1W->CopyTo(pF2W);
+    pF2W->InverseD(pGauge);
+
+    pFermion2->PrepareForHMCNotRandomize(pGauge);
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    pAction2->m_pFerimionField = pFermion2;
+    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+
+
+    pPL->OnConfigurationAccepted(pGauge, NULL);
+    const Real fPolyakov2 = _cuCabsf(pPL->m_lstLoop[0]);
+    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    const Real fChiralCond2 = _cuCabsf(pCC->m_lstCondAll[0][0]);
+    const Real fConectSusp2 = _cuCabsf(pCC->m_lstCondAll[1][0]);
+    pAM->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    const Real fOrbital2 = _cuCabsf(pAM->m_lstCondAll[0][0]);
+    const Real fSpin2 = _cuCabsf(pAM->m_lstCondAll[1][0]);
+    const Real fPotential2 = _cuCabsf(pAM->m_lstCondAll[2][0]);
+
+    appGeneral(_T("PL: %d, CC: %d, %d, AM: %d, %d, %d\n"),
+        pPL->m_lstLoop.GetCount(),
+        pCC->m_lstCondAll[0].GetCount(),
+        pCC->m_lstCondAll[1].GetCount(),
+        pAM->m_lstCondAll[0].GetCount(),
+        pAM->m_lstCondAll[1].GetCount(),
+        pAM->m_lstCondAll[2].GetCount()
+    );
+
+    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
+    {
+        ++uiError;
+    }
+    if (appAbs(fEnergy2 - fEnergy4) > F(0.001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fPolyakov1 - fPolyakov2) > F(0.001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fChiralCond1 - fChiralCond2) > F(0.001))
+    {
+        ++uiError;
+    }
+    if (appAbs(fConectSusp1 - fConectSusp2) > F(0.001))
+    {
+        ++uiError;
+    }
+
+    if (appAbs(fOrbital1 - fOrbital2) > F(0.001))
+    {
+        ++uiError;
+    }
+    if (appAbs(fSpin1 - fSpin2) > F(0.001))
+    {
+        ++uiError;
+    }
+    if (appAbs(fPotential1 - fPotential2) > F(0.001))
+    {
+        ++uiError;
+    }
+
+    //appGeneral(_T("Gauge Divation = %2.12f\n"), fError);
+    appGeneral(_T("Gauge Energy before = %f, after = %f\n"), fEnergy1, fEnergy3);
+    appGeneral(_T("Fermion Energy before = %f, after = %f\n"), fEnergy2, fEnergy4);
+
+    appGeneral(_T("Polyakov loop before = %f, after = %f\n"), fPolyakov1, fPolyakov2);
+    appGeneral(_T("Chiral Condensation before = %f, after = %f\n"), fChiralCond1, fChiralCond2);
+    appGeneral(_T("Connect Susp before = %f, after = %f\n"), fConectSusp1, fConectSusp2);
+    appGeneral(_T("Fermion Orbital before = %f, after = %f\n"), fOrbital1, fOrbital2);
+    appGeneral(_T("Fermion Spin before = %f, after = %f\n"), fSpin1, fSpin2);
+    appGeneral(_T("Fermion Potential before = %f, after = %f\n"), fPotential1, fPotential2);
+
+    appSafeDelete(pGauge);
+    appSafeDelete(pFermion2);
+    appSafeDelete(pRandom);
+
+    return uiError;
+}
+
+//test the coulomb gauge fixing works for projective plane
+UINT TestGaugeFixingCoulombPorjectivePlane2(CParameters&)
+{
+    UINT uiError = 0;
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
+
+    CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
+
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+
+    appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
+    const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
+
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+
+    if (fError > F(0.0001))
+    {
+        ++uiError;
+    }
+    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("Gauge Divation = %2.12f\n"), fError);
+    appGeneral(_T("Gauge Energy before = %f, after = %f\n"), fEnergy1, fEnergy3);
+
+    appSafeDelete(pGauge);
+
+    return uiError;
+}
+
 __REGIST_TEST(TestFFT, Misc, TestFFT);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauCornell);
@@ -185,6 +356,10 @@ __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR);
 
 __REGIST_TEST(TestGaugeFixingCoulombDRChiral, Misc, TestGaugeFixingCoulombDRChiral);
+
+__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, Misc, TestGaugeFixingRotationKS);
+
+__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane2, Misc, TestGaugeFixingRotationKS2);
 
 
 //=============================================================================

@@ -103,6 +103,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBerryPhase.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
@@ -191,6 +192,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.cu
@@ -375,6 +377,7 @@ target_link_libraries(StaggeredSpectrum CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation)
 add_executable(StaggeredRotation 
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.h
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate.cpp

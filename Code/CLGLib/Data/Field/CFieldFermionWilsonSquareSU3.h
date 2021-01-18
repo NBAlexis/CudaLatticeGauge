@@ -96,8 +96,9 @@ public:
 
     UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
     void InitialAsSource(const SFermionSource& sourceData) override;
-    void SaveToFile(const CCString &fileName) const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
+    BYTE* CopyDataOutFloat(UINT& uiSize) const override;
+    BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
     CCString GetInfos(const CCString &tab) const override;
 

@@ -26,6 +26,44 @@ void CField::Return()
     m_pPool->Return(this);
 }
 
+void CField::SaveToFile(const CCString& fileName, EFieldFileType eType) const
+{
+    switch (eType)
+    {
+    case EFFT_CLGBin:
+        {
+            UINT uiSize = 0;
+            BYTE* byToSave = CopyDataOut(uiSize);
+            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            free(byToSave);
+        }
+        return;
+    case EFFT_CLGBinCompressed:
+        {
+            SaveToCompressedFile(fileName);
+        }
+        return;
+    case EFFT_CLGBinFloat:
+        {
+            UINT uiSize = 0;
+            BYTE* byToSave = CopyDataOutFloat(uiSize);
+            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            free(byToSave);
+        }
+        return;
+    case EFFT_CLGBinDouble:
+        {
+            UINT uiSize = 0;
+            BYTE* byToSave = CopyDataOutDouble(uiSize);
+            appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            free(byToSave);
+        }
+        return;
+    }
+
+    appCrucial(_T("Save for this type not implemented: CFieldGaugeSU3 : %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
+}
+
 CFieldFermion::CFieldFermion()
 : CField()
 , m_byEvenFieldId(-1)

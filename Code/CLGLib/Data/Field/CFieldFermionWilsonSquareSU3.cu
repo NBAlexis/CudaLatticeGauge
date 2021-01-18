@@ -1135,14 +1135,6 @@ void CFieldFermionWilsonSquareSU3::SetKai(Real fKai)
     CCommonData::m_fKai = fKai;
 }
 
-void CFieldFermionWilsonSquareSU3::SaveToFile(const CCString &fileName) const
-{
-    UINT uiSize = 0;
-    BYTE* saveData = CopyDataOut(uiSize);
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
-    free(saveData);
-}
-
 BYTE* CFieldFermionWilsonSquareSU3::CopyDataOut(UINT &uiSize) const
 {
     deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
@@ -1163,6 +1155,58 @@ BYTE* CFieldFermionWilsonSquareSU3::CopyDataOut(UINT &uiSize) const
         memcpy(saveData + sizeof(Real) * i * 24, oneSite, sizeof(Real) * 24);
     }
     
+    //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    //free(saveData);
+    free(toSave);
+    return saveData;
+}
+
+BYTE* CFieldFermionWilsonSquareSU3::CopyDataOutFloat(UINT& uiSize) const
+{
+    deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 24);
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        FLOAT oneSite[24];
+        for (UINT j = 0; j < 4; ++j)
+        {
+            for (UINT k = 0; k < 3; ++k)
+            {
+                oneSite[2 * (j * 3 + k)] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].x);
+                oneSite[2 * (j * 3 + k) + 1] = static_cast<FLOAT>(toSave[i].m_d[j].m_ve[k].y);
+            }
+        }
+        memcpy(saveData + sizeof(FLOAT) * i * 24, oneSite, sizeof(FLOAT) * 24);
+    }
+
+    //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    //free(saveData);
+    free(toSave);
+    return saveData;
+}
+
+BYTE* CFieldFermionWilsonSquareSU3::CopyDataOutDouble(UINT& uiSize) const
+{
+    deviceWilsonVectorSU3* toSave = (deviceWilsonVectorSU3*)malloc(sizeof(deviceWilsonVectorSU3) * m_uiSiteCount);
+    uiSize = static_cast<UINT>(sizeof(DOUBLE) * m_uiSiteCount * 24);
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        DOUBLE oneSite[24];
+        for (UINT j = 0; j < 4; ++j)
+        {
+            for (UINT k = 0; k < 3; ++k)
+            {
+                oneSite[2 * (j * 3 + k)] = static_cast<DOUBLE>(toSave[i].m_d[j].m_ve[k].x);
+                oneSite[2 * (j * 3 + k) + 1] = static_cast<DOUBLE>(toSave[i].m_d[j].m_ve[k].y);
+            }
+        }
+        memcpy(saveData + sizeof(DOUBLE) * i * 24, oneSite, sizeof(DOUBLE) * 24);
+    }
+
     //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
     //free(saveData);
     free(toSave);

@@ -1298,14 +1298,6 @@ void CFieldGaugeU1::DebugPrintMe() const
     free(pToPrint);
 }
 
-void CFieldGaugeU1::SaveToFile(const CCString &fileName) const
-{
-    UINT uiSize = 0;
-    BYTE* byToSave = CopyDataOut(uiSize);
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
-    free(byToSave);
-}
-
 void CFieldGaugeU1::SaveToCompressedFile(const CCString& fileName) const
 {
     appCrucial(_T("U1 SaveToCompressedFile Not supported!\n"));
@@ -1325,6 +1317,44 @@ BYTE* CFieldGaugeU1::CopyDataOut(UINT &uiSize) const
         oneLink[0] = static_cast<Real>(toSave[i].x);
         oneLink[1] = static_cast<Real>(toSave[i].y);
         memcpy(byToSave + i * sizeof(Real) * 2, oneLink, sizeof(Real) * 2);
+    }
+    free(toSave);
+
+    return byToSave;
+}
+
+BYTE* CFieldGaugeU1::CopyDataOutFloat(UINT& uiSize) const
+{
+    CLGComplex* toSave = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    //fuck ofstream
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiLinkeCount * 2);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        FLOAT oneLink[2];
+        oneLink[0] = static_cast<FLOAT>(toSave[i].x);
+        oneLink[1] = static_cast<FLOAT>(toSave[i].y);
+        memcpy(byToSave + i * sizeof(FLOAT) * 2, oneLink, sizeof(FLOAT) * 2);
+    }
+    free(toSave);
+
+    return byToSave;
+}
+
+BYTE* CFieldGaugeU1::CopyDataOutDouble(UINT& uiSize) const
+{
+    CLGComplex* toSave = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    //fuck ofstream
+    uiSize = static_cast<UINT>(sizeof(DOUBLE) * m_uiLinkeCount * 2);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        DOUBLE oneLink[2];
+        oneLink[0] = static_cast<DOUBLE>(toSave[i].x);
+        oneLink[1] = static_cast<DOUBLE>(toSave[i].y);
+        memcpy(byToSave + i * sizeof(DOUBLE) * 2, oneLink, sizeof(DOUBLE) * 2);
     }
     free(toSave);
 

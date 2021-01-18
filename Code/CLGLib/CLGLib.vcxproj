@@ -83,6 +83,7 @@
     <ClInclude Include="Measurement\CMeasureAction.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
+    <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h" />
     <ClInclude Include="Measurement\CMeasureBerryPhase.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
@@ -173,6 +174,7 @@
     <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingRandom.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu" />
+    <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu" />
     <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu">
       <FileType>Document</FileType>
     </CudaCompile>

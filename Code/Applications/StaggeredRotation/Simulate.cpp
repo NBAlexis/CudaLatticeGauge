@@ -128,7 +128,11 @@ INT SimulateStaggeredRotation(CParameters& params)
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
             Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
+#if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
+#else
+            if (fError < F(1E-05))
+#endif
             {
                 appGeneral(_T("\n ================ Bake using old file =================\n"));
                 bNeedBake = FALSE;
@@ -205,7 +209,11 @@ INT SimulateStaggeredRotation(CParameters& params)
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
                 pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+#if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))
+#else
+                if (fError < F(1E-05))
+#endif
                 {
                     appGeneral(_T("\n ================ using old file start from %d =================\n"), iSaveStartIndex);
                 }

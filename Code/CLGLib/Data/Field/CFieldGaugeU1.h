@@ -93,9 +93,10 @@ public:
 #else
     CLGComplex Dot(const CField* other) const override;
 #endif
-    void SaveToFile(const CCString &fileName) const override;
     void SaveToCompressedFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
+    BYTE* CopyDataOutFloat(UINT& uiSize) const override;
+    BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     CCString GetInfos(const CCString &tab) const override;
 
     CLGComplex* m_pDeviceData;

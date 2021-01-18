@@ -1,34 +1,35 @@
 //=============================================================================
-// FILENAME : CMeasureChiralCondensateKS.h
+// FILENAME : CMeasureAngularMomentumKS.h
 // 
 // DESCRIPTION:
 // NOTE: 
 //
 // REVISION:
-//  [10/01/2020 nbale]
+//  [01/17/2021 nbale]
 //=============================================================================
 
-#ifndef _CMEASURECHIRALCONDENSATEKS_H_
-#define _CMEASURECHIRALCONDENSATEKS_H_
+#ifndef _CMEASUREANGULARMOMENTUMKS_H_
+#define _CMEASUREANGULARMOMENTUMKS_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CMeasureChiralCondensateKS)
+__CLG_REGISTER_HELPER_HEADER(CMeasureAngularMomentumKS)
 
-enum EChiralMeasureTypeKS
+enum EAngularMeasureTypeKS
 {
-    ChiralKS = 0,
-    ConnectSusp = 1,
+    OrbitalKS = 0,
+    SpinKS = 1,
+    PotentialKS = 2,
 
-    ChiralKSMax,
+    EAngularMeasureMax,
 };
 
-class CLGAPI CMeasureChiralCondensateKS : public CMeasureStochastic
+class CLGAPI CMeasureAngularMomentumKS : public CMeasureStochastic
 {
-    __CLGDECLARE_CLASS(CMeasureChiralCondensateKS)
+    __CLGDECLARE_CLASS(CMeasureAngularMomentumKS)
 public:
 
-    CMeasureChiralCondensateKS()
+    CMeasureAngularMomentumKS()
         : CMeasureStochastic()
         , m_uiConfigurationCount(0)
         , m_pHostXYBuffer(NULL)
@@ -45,7 +46,7 @@ public:
         
     }
 
-    ~CMeasureChiralCondensateKS();
+    ~CMeasureAngularMomentumKS();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
@@ -58,29 +59,17 @@ public:
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
 
-    static void KSTraceEndZ4(
-        UINT uiMaxR, 
-        BYTE byFieldId,
-        UINT uiFieldCount,
-        UINT uiMeasureCount,
-        UINT uiCurrentMeasureCount,
-        const CLGComplex* const * pXYBuffers, 
-        UINT* pCountBuffer, 
-        CLGComplex* pValueBuffer,
-        UINT* pHostCountBuffer,
-        CLGComplex* pHostValueBuffer,
-        TArray<UINT>& lstR,
-        TArray<CLGComplex>* lstValues,
-        UBOOL bLogResult);
-    
-
 protected:
+
+    void ApplyOrbitalMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const;
+    void ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const;
+    void ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const;
     
     UINT m_uiConfigurationCount;
 
-    CLGComplex* m_pDeviceXYBuffer[ChiralKSMax];
+    CLGComplex* m_pDeviceXYBuffer[EAngularMeasureMax];
     CLGComplex* m_pHostXYBuffer;
-    CLGComplex m_cTmpSum[ChiralKSMax];
+    CLGComplex m_cTmpSum[EAngularMeasureMax];
 
     UINT* m_pDistributionR;
     CLGComplex* m_pDistribution;
@@ -93,8 +82,8 @@ protected:
 public:
 
     TArray<UINT> m_lstR;
-    TArray<CLGComplex> m_lstCondAll[ChiralKSMax];
-    TArray<CLGComplex> m_lstCond[ChiralKSMax];
+    TArray<CLGComplex> m_lstCondAll[EAngularMeasureMax];
+    TArray<CLGComplex> m_lstCond[EAngularMeasureMax];
 };
 
 __END_NAMESPACE

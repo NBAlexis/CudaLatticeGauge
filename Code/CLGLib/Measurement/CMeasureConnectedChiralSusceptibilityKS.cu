@@ -39,22 +39,37 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->FixBoundary();
     m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(pGaugeField);
 #if !_CLG_DOUBLEFLOAT
-    const CLGComplex color1 = _cToFloat(m_pSourceZero->Dot(m_pSourceZero));
+    const cuDoubleComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
 #else
     const CLGComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
 #endif
-    //sour.m_byColorIndex = 1;
-    //m_pSourceZero->InitialAsSource(sour);
-    //m_pSourceZero->InverseD(pGaugeField);
-    //const CLGComplex color2 = m_pSourceZero->Dot(m_pSourceZero);
+    sour.m_byColorIndex = 1;
+    m_pSourceZero->InitialAsSource(sour);
+    m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(pGaugeField);
+#if !_CLG_DOUBLEFLOAT
+    const cuDoubleComplex color2 = m_pSourceZero->Dot(m_pSourceZero);
+#else
+    const CLGComplex color2 = m_pSourceZero->Dot(m_pSourceZero);
+#endif
 
-    //sour.m_byColorIndex = 2;
-    //m_pSourceZero->InitialAsSource(sour);
-    //m_pSourceZero->InverseD(pGaugeField);
-    //const CLGComplex color3 = m_pSourceZero->Dot(m_pSourceZero);
-    //m_lstResults.AddItem(_cuCaddf(_cuCaddf(color1, color2), color3));
-    m_lstResults.AddItem(color1);
+    sour.m_byColorIndex = 2;
+    m_pSourceZero->InitialAsSource(sour);
+    m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(pGaugeField);
+#if !_CLG_DOUBLEFLOAT
+    const cuDoubleComplex color3 = m_pSourceZero->Dot(m_pSourceZero);
+#else
+    const CLGComplex color3 = m_pSourceZero->Dot(m_pSourceZero);
+#endif
+
+#if !_CLG_DOUBLEFLOAT
+    m_lstResults.AddItem(_cToFloat(cuCadd(cuCadd(color1, color2), color3)));
+#else
+    m_lstResults.AddItem(_cuCaddf(_cuCaddf(color1, color2), color3));
+#endif
 
     if (m_bShowResult)
     {

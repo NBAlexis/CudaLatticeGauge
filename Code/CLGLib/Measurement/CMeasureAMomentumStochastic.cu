@@ -43,7 +43,7 @@ _kernelDotAndGatherXYAMomentumJL(
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JL
 #endif
 
@@ -184,7 +184,7 @@ _kernelDotAndGatherXYAMomentumJL(
         }
     }
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 
@@ -219,7 +219,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JL
 #endif
 
@@ -328,7 +328,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         }
     }
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 
@@ -364,7 +364,7 @@ _kernelDotAndGatherXYAMomentumJPure(
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JL
 #endif
 
@@ -478,7 +478,7 @@ _kernelDotAndGatherXYAMomentumJPure(
         }
     }
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 
@@ -514,7 +514,7 @@ _kernelDotAndGatherXYAMomentumJJM(
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JL
 #endif
 
@@ -604,7 +604,7 @@ _kernelDotAndGatherXYAMomentumJJM(
         }
     }
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 
@@ -630,7 +630,7 @@ _kernelDotAndGatherXYAMomentumJS(
 
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JS
 #endif
 
@@ -639,7 +639,7 @@ _kernelDotAndGatherXYAMomentumJS(
     js = __chiralGamma[GAMMA4].MulWilsonC(js);
     js.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 
@@ -674,7 +674,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
     const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma region JS
 #endif
 
@@ -730,7 +730,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     js.Sub(u_dagger_phi_x_m_m); //here was add which is wrong, see D operator this is Add, but the sin bring a sign
     js = sigma12.MulWilsonC(js);
 
-#if _CLG_WIN
+#if _CLG_WIN && !defined(__CUDACC__)
 #pragma endregion
 #endif
 

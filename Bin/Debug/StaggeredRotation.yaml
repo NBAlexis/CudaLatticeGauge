@@ -363,7 +363,7 @@ JobMeasure:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3D
+        FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
 
         Period : [1, 1, 1, 1]
@@ -375,7 +375,7 @@ JobMeasure:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -406,7 +406,7 @@ JobMeasure:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3R
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -437,8 +437,8 @@ JobMeasure:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 0
-        ShiftCoord : 0
+        CloverEnergy : 1
+        ShiftCoord : 1
         Beta : 5.0
         Omega : 0.0
 
@@ -536,14 +536,16 @@ JobMeasure:
 
     Measure4:
 
-        MeasureName : CMeasureConnectedSusceptibilityKS
+        MeasureName : CMeasureAngularMomentumKS
         FieldId : 2
+        MeasureDist : 1
         ShowResult : 0
 
     Measure5:
 
-        MeasureName : CMeasureConnectedSusceptibilityKS
+        MeasureName : CMeasureAngularMomentumKS
         FieldId : 3
+        MeasureDist : 1
         ShowResult : 0
 
     Measure6:
@@ -551,3 +553,62 @@ JobMeasure:
         MeasureName : CMeasureAction
         FieldId : 1
         ShowResult : 0
+
+
+JobGaugeFixing:
+
+    # VerboseLevel : DETAILED
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 1
+
+    Nt : 6
+    OmegaStart : 0
+    OmegaEnd : 8
+    IndexStart : 101
+    IndexEnd : 1000
+
+    SubFolder : 0
+    SubFolderPrefix : ./SRF490204_
+    LoadPrefix : SRF490204_
+    CheckSubFolder : 0
+    CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
+    SavePrefix : GFN535161_
+    UseLogADefinition : 0
+    OnlyCheck : 0
+    CheckAndFix : 0
+
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    SaveType : EFFT_CLGBin
+    LoadType : EFFT_CLGBin
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 0
+    CacheStaple : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    GaugeFixing:
+
+        Name : CGaugeFixingCoulombLosAlamos
+        Omega : 1.5
+        CheckErrorStep : 200
+        MaxIterate : 20000
+        Mixed : 1

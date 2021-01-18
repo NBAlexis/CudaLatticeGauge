@@ -1,13 +1,13 @@
 //=============================================================================
-// FILENAME : Thermal.cpp
+// FILENAME : GaugeFixing.cpp
 // 
 // DESCRIPTION:
 //
 // REVISION:
-//  [06/12/2019 nbale]
+//  [01/17/2021 nbale]
 //=============================================================================
 
-#include "RotatingReproduce.h"
+#include "StaggeredRotation.h"
 
 INT GaugeFixing(CParameters& params)
 {
@@ -78,7 +78,7 @@ INT GaugeFixing(CParameters& params)
         eSaveType = __STRING_TO_ENUM(EFieldFileType, sSaveType);
     }
     appGeneral(_T("save type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eSaveType).c_str());
-
+    
     CCString sLoadType = _T("EFFT_CLGBin");
     EFieldFileType eLoadType = EFFT_CLGBin;
     if (params.FetchStringValue(_T("LoadType"), sLoadType))
@@ -98,11 +98,11 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 if (!bCheckSubFolder)
                 {
-                    sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sSaveFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 }
                 else
                 {
-                    sSaveFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sSaveFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 }
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, eLoadType);
 #if !_CLG_DOUBLEFLOAT
@@ -139,11 +139,11 @@ INT GaugeFixing(CParameters& params)
                         CCString sLoadFile;
                         if (bSubFolder)
                         {
-                            sLoadFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                            sLoadFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
                         }
                         else
                         {
-                            sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                            sLoadFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
                         }
                         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                         appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
@@ -168,13 +168,13 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 if (bSubFolder)
                 {
-                    sLoadFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                    sLoadFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
                 }
                 else
                 {
-                    sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sLoadFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
                 }
-                sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                sSaveFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 appGeneral(_T("Fixing O%d : %d \n"), uiOmega, uiIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                 appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);

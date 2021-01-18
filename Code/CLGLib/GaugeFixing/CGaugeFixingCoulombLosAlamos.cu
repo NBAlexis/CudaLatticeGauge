@@ -19,6 +19,7 @@ _kernelCalculateGOdd_S(
     SBYTE uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
+    UBOOL bMixed,
     deviceSU3* pG)
 {
     intokernalInt4_S;
@@ -31,6 +32,10 @@ _kernelCalculateGOdd_S(
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || !sSite4.IsOdd())
     {
+        if (bMixed)
+        {
+            pG[uiSiteIndex3D] = su3Id;
+        }
         return;
     }
 
@@ -44,7 +49,14 @@ _kernelCalculateGOdd_S(
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        if (site_m_mu.NeedToDagger())
+        {
+            pG[uiSiteIndex3D].Add(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        }
+        else
+        {
+            pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        }
     }
 
     pG[uiSiteIndex3D].MulReal(fOmega);
@@ -58,6 +70,7 @@ _kernelCalculateGEven_S(
     SBYTE uiT,
     const deviceSU3* __restrict__ pU,
     Real fOmega,
+    UBOOL bMixed,
     deviceSU3* pG)
 {
     intokernalInt4_S;
@@ -70,6 +83,10 @@ _kernelCalculateGEven_S(
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || sSite4.IsOdd())
     {
+        if (bMixed)
+        {
+            pG[uiSiteIndex3D] = su3Id;
+        }
         return;
     }
 
@@ -83,7 +100,14 @@ _kernelCalculateGEven_S(
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
         pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
-        pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        if (site_m_mu.NeedToDagger())
+        {
+            pG[uiSiteIndex3D].Add(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        }
+        else
+        {
+            pG[uiSiteIndex3D].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
+        }
     }
 
     pG[uiSiteIndex3D].MulReal(fOmega);
@@ -273,6 +297,90 @@ _kernelGaugeTransform3DTEven(
     }
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelGaugeTransform3Dcpy(
+    BYTE byFieldId,
+    SBYTE uiT,
+    const deviceSU3* __restrict__ pGx,
+    deviceSU3* pGauge)
+{
+    intokernalInt4_S;
+
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir2 = uiDir * 2;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    const deviceSU3 left(pGx[uiSiteIndex3D]);
+
+    for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+    {
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        {
+            const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
+            deviceSU3 res(pGauge[uiLinkDir]);
+
+            const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, __fwd(dir));
+            const SIndex& site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(p_p_mu_site)];
+
+            if (!site_p_mu.IsDirichlet())
+            {
+                res.MulDagger(pGx[(site_p_mu.m_uiSiteIndex / _DC_Lt)]);
+            }
+
+            pGauge[uiLinkDir] = left.MulC(res);
+        }
+    }
+}
+
+/**
+ * g(n) U_t(n)
+ * U_t(n -t) g(n)^dagger
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelGaugeTransform3DTcpy(
+    BYTE byFieldId,
+    SBYTE uiT,
+    const deviceSU3* __restrict__ pGx,
+    deviceSU3* pGauge)
+{
+    intokernalInt4_S;
+
+    //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir2 = uiDir * 2;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    {
+        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+        if (!site.IsDirichlet())
+        {
+            const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
+            pGauge[uiLinkIndex] = pGx[uiSiteIndex3D].MulC(pGauge[uiLinkIndex]);
+        }
+    }
+
+    const SSmallInt4 p_m_t_site = _deviceSmallInt4OffsetC(sSite4, -4);
+    const UINT p_m_t_bi = __idx->_deviceGetBigIndex(p_m_t_site);
+    const SIndex& site_m_t_point = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][p_m_t_bi];
+    const SIndex& site_m_t = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][p_m_t_bi * _DC_Dir + 3];
+
+    if (!site_m_t.IsDirichlet() && !site_m_t_point.IsDirichlet())
+    {
+        const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_t.m_uiSiteIndex, 3);
+        if (site_m_t.NeedToDagger())
+        {
+            //never here
+            printf("ever here???\n");
+            pGauge[uiLinkIndex2] = pGx[uiSiteIndex3D].MulC(pGauge[uiLinkIndex2]);
+        }
+        else
+        {
+            pGauge[uiLinkIndex2].MulDagger(pGx[uiSiteIndex3D]);
+        }
+    }
+}
+
 #pragma region Commen
 
 /**
@@ -381,10 +489,10 @@ _kernelCalculateCoulombDivation_S(
         {
             if (site_m_mu.NeedToDagger())
             {
-                g11 = g11 + pA11[uiLinkIndex2_3D];
+                g11 = g11 - pA11[uiLinkIndex2_3D];
                 g12 = _cuCsubf(g12, pA12[uiLinkIndex2_3D]);
                 g13 = _cuCsubf(g13, pA13[uiLinkIndex2_3D]);
-                g22 = g22 + pA22[uiLinkIndex2_3D];
+                g22 = g22 - pA22[uiLinkIndex2_3D];
                 g23 = _cuCsubf(g23, pA23[uiLinkIndex2_3D]);
             }
             else
@@ -471,6 +579,12 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
         appGeneral(_T("CGaugeFixingCoulombLosAlamos: CheckErrorStep not set, set to 1000 by defualt."));
     }
     m_iCheckErrorStep = static_cast<UINT>(iValue);
+
+    INT iMixed = 0;
+    if (params.FetchValueINT(_T("Mixed"), iMixed))
+    {
+        m_bMixed = (0 != iMixed);
+    }
 
     //========== Initial Buffers ==============
     checkCudaErrors(cudaMalloc((void**)& m_pG, _HC_Volume_xyz * sizeof(deviceSU3)));
@@ -607,13 +721,32 @@ void CGaugeFixingCoulombLosAlamos::GaugeFixingForT(deviceSU3* pDeviceBufferPoint
             }
         }
 
-        _kernelCalculateGOdd_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformOdd_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-        _kernelGaugeTransform3DTOdd << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        _kernelCalculateGOdd_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
 
-        _kernelCalculateGEven_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_pG);
-        _kernelGaugeTransformEven_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
-        _kernelGaugeTransform3DTEven << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        if (m_bMixed)
+        {
+            _kernelGaugeTransform3Dcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _kernelGaugeTransform3DTcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        }
+        else
+        {
+            _kernelGaugeTransformOdd_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _kernelGaugeTransform3DTOdd << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        }
+
+
+        _kernelCalculateGEven_S << <block, threads >> > (byFieldId, uiT, pDeviceBufferPointer, m_fOmega, m_bMixed, m_pG);
+        if (m_bMixed)
+        {
+            _kernelGaugeTransform3Dcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _kernelGaugeTransform3DTcpy << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        }
+        else
+        {
+            _kernelGaugeTransformEven_S << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+            _kernelGaugeTransform3DTEven << <block, threads >> > (byFieldId, uiT, m_pG, pDeviceBufferPointer);
+        }
+
 
         ++m_iIterate;
     }

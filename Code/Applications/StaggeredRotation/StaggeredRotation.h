@@ -18,6 +18,7 @@ __DEFINE_ENUM(EStaggeredRotationJob,
 
 extern INT SimulateStaggeredRotation(CParameters& params);
 extern INT Measurement(CParameters& params);
+extern INT GaugeFixing(CParameters& params);
 
 //=============================================================================
 // END OF FILE

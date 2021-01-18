@@ -73,6 +73,7 @@ public:
     UBOOL InverseDdagger(const CField* pGauge) override;
     UBOOL InverseDDdagger(const CField* pGauge) override;
     void ApplyGamma(EGammaMatrix eGamma) override;
+    virtual void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma);
 
     //================= test anti-hermitian =========
     UINT TestAntiHermitian(const CFieldGauge* pGauge) const;
@@ -89,9 +90,14 @@ public:
     void PrepareForHMC(const CFieldGauge* pGauge) override;
     UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
 
+    //For test only
+    void PrepareForHMCOnlyRandomize();
+    void PrepareForHMCNotRandomize(const CFieldGauge* pGauge);
+
     void InitialAsSource(const SFermionSource& sourceData) override;
-    void SaveToFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT& uiSize) const override;
+    BYTE* CopyDataOutFloat(UINT& uiSize) const override;
+    BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
     CCString GetInfos(const CCString& tab) const override;
 

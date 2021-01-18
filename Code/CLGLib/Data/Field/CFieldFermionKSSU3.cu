@@ -630,6 +630,101 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData,
     }
 }
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelKSApplyGamma(
+    deviceSU3Vector* pMe, 
+    const deviceSU3Vector* __restrict__ pOther,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    BYTE byDir)
+{
+    intokernal;
+    const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1)) ? F(-1.0) : F(1.0);
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
+
+    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        pMe[uiSiteIndex].MulReal(F(-1.0));
+    }
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    else
+    {
+        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    pMe[uiSiteIndex].MulReal(F(0.5) * eta_mu);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelKSApplyGammaEta(
+    deviceSU3Vector* pMe,
+    const deviceSU3Vector* __restrict__ pOther,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    BYTE byDir)
+{
+    intokernal;
+
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
+    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> byDir) & 1));
+
+    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
+
+    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu = eta_mu + 1;
+    }
+
+    if (eta_mu & 1)
+    {
+        pMe[uiSiteIndex].MulReal(F(-1.0));
+    }
+
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu2 = eta_mu2 + 1;
+    }
+    if (eta_mu2 & 1)
+    {
+        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    else
+    {
+        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    pMe[uiSiteIndex].MulReal(F(0.5));
+}
+
+
 #pragma endregion
 
 
@@ -1169,6 +1264,79 @@ void CFieldFermionKSSU3::ApplyGamma(EGammaMatrix eGamma)
     appCrucial(_T("Not implemented yet...\n"));
 }
 
+void CFieldFermionKSSU3::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+{
+    INT iDir = -1;
+    switch (eGamma)
+    {
+    case UNITY:
+        {
+            return;
+        }
+    case GAMMA1:
+        {
+            iDir = 0;
+        }
+        break;
+    case GAMMA2:
+        {
+            iDir = 1;
+        }
+        break;
+    case GAMMA3:
+        {
+            iDir = 2;
+        }
+        break;
+    case GAMMA4:
+        {
+            iDir = 4;
+        }
+        break;
+    }
+
+    if (iDir >= 0)
+    {
+        if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+        {
+            appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+            return;
+        }
+        const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+        CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+        preparethread;
+        if (m_bEachSiteEta)
+        {
+            _kernelKSApplyGammaEta << <block, threads >> > (
+                m_pDeviceData,
+                pPooled->m_pDeviceData,
+                pFieldSU3->m_pDeviceData,
+                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pEtaMu,
+                static_cast<BYTE>(iDir));
+        }
+        else
+        {
+            _kernelKSApplyGamma << <block, threads >> > (
+                m_pDeviceData,
+                pPooled->m_pDeviceData,
+                pFieldSU3->m_pDeviceData,
+                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pEtaMu,
+                static_cast<BYTE>(iDir));
+        }
+
+        pPooled->Return();
+        return;
+    }
+
+    appCrucial(_T("Not implemented yet...\n"));
+
+}
+
 
 //Kai should be part of D operator
 void CFieldFermionKSSU3::D(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
@@ -1496,14 +1664,6 @@ void CFieldFermionKSSU3::SetMass(Real f2am)
     m_f2am = f2am;
 }
 
-void CFieldFermionKSSU3::SaveToFile(const CCString& fileName) const
-{
-    UINT uiSize = 0;
-    BYTE* saveData = CopyDataOut(uiSize);
-    appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
-    free(saveData);
-}
-
 BYTE* CFieldFermionKSSU3::CopyDataOut(UINT& uiSize) const
 {
     deviceSU3Vector* toSave = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
@@ -1519,6 +1679,52 @@ BYTE* CFieldFermionKSSU3::CopyDataOut(UINT& uiSize) const
             oneSite[2 * k + 1] = static_cast<Real>(toSave[i].m_ve[k].y);
         }
         memcpy(saveData + sizeof(Real) * i * 6, oneSite, sizeof(Real) * 6);
+    }
+
+    //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    //free(saveData);
+    free(toSave);
+    return saveData;
+}
+
+BYTE* CFieldFermionKSSU3::CopyDataOutFloat(UINT& uiSize) const
+{
+    deviceSU3Vector* toSave = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * 6);
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        FLOAT oneSite[6];
+        for (UINT k = 0; k < 3; ++k)
+        {
+            oneSite[2 * k] = static_cast<FLOAT>(toSave[i].m_ve[k].x);
+            oneSite[2 * k + 1] = static_cast<FLOAT>(toSave[i].m_ve[k].y);
+        }
+        memcpy(saveData + sizeof(FLOAT) * i * 6, oneSite, sizeof(FLOAT) * 6);
+    }
+
+    //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
+    //free(saveData);
+    free(toSave);
+    return saveData;
+}
+
+BYTE* CFieldFermionKSSU3::CopyDataOutDouble(UINT& uiSize) const
+{
+    deviceSU3Vector* toSave = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
+    uiSize = static_cast<UINT>(sizeof(DOUBLE) * m_uiSiteCount * 6);
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < m_uiSiteCount; ++i)
+    {
+        DOUBLE oneSite[6];
+        for (UINT k = 0; k < 3; ++k)
+        {
+            oneSite[2 * k] = static_cast<DOUBLE>(toSave[i].m_ve[k].x);
+            oneSite[2 * k + 1] = static_cast<DOUBLE>(toSave[i].m_ve[k].y);
+        }
+        memcpy(saveData + sizeof(DOUBLE) * i * 6, oneSite, sizeof(DOUBLE) * 6);
     }
 
     //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
@@ -1568,7 +1774,19 @@ CCString CFieldFermionKSSU3::GetInfos(const CCString& tab) const
     return sRet;
 }
 
+void CFieldFermionKSSU3::PrepareForHMCOnlyRandomize()
+{
+    preparethread;
+    _kernelInitialFermionKS << <block, threads >> > (
+        m_pDeviceData,
+        m_byFieldId,
+        EFIT_RandomGaussian);
+}
 
+void CFieldFermionKSSU3::PrepareForHMCNotRandomize(const CFieldGauge* pGauge)
+{
+    D_MC(pGauge);
+}
 
 __END_NAMESPACE
 
