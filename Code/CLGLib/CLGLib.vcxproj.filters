@@ -446,6 +446,9 @@
     <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Data\CLGMD5.h">
+      <Filter>Tools\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">

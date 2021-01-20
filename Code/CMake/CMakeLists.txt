@@ -141,6 +141,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/CYAMLParser.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CBitFlag.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CCString.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CLGMD5.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/CLinkedList.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/STDStringFunctions.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Data/TArray.h

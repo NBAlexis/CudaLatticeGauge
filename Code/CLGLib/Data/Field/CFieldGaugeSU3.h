@@ -105,7 +105,7 @@ public:
 #else
     CLGComplex Dot(const CField* other) const override;
 #endif
-    void SaveToCompressedFile(const CCString& fileName) const override;
+    CCString SaveToCompressedFile(const CCString& fileName) const override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;

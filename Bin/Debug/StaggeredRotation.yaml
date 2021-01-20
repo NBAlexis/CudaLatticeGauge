@@ -1,5 +1,5 @@
-# ESR_Simulate, ESR_Measure
-RotationJob : ESR_Measure
+# ESR_Simulate, ESR_Measure, ESR_GaugeFixing
+RotationJob : ESR_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -15,13 +15,13 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 10
-    BeforeEquvibStep : 100
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 500
-    SaveStartIndex : 0
-    OmegaSep : 16
-    OmegaStart : 1
-    MaxOmega : 0.128
+    EquvibStep : 100
+    SaveStartIndex : 390
+    OmegaSep : 4
+    OmegaStart : 4
+    MaxOmega : 0.064
     MinNt : 6
     MaxNt : 6
     SavePrefix : SRF510204_
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : SRF510204_R_Nt6_O0_700.con
-    Nt6Polyakov : 0.160479158163
+    Nt6FileName : ./5060204/SRF510204_R_Nt6_O4_390.con
+    Nt6Polyakov : 0.232008457184
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.1
+        Beta : 5.06
         Omega : 0.0
 
     Action2:
@@ -328,12 +328,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.0
+    GaugeBate : 5.1
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
     StartN : 101
-    EndN : 500
+    EndN : 400
     ## EDJKS_Polyakov, EDJKS_Chiral
     DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
@@ -343,10 +343,10 @@ JobMeasure:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\500204\Nt6
+    SubFolderPrefix : G:\SRFloat\5100204\Nt6
 
-    SavePrefix : SRF500204_
-    CSVSavePrefix : G:\SRFloat\500204\Polyakov\SRF500204_
+    SavePrefix : SRF510204_
+    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
 
     Dim : 4
     Dir : 4
@@ -439,7 +439,7 @@ JobMeasure:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.0
+        Beta : 5.1
         Omega : 0.0
 
     Solver:
@@ -554,7 +554,6 @@ JobMeasure:
         FieldId : 1
         ShowResult : 0
 
-
 JobGaugeFixing:
 
     # VerboseLevel : DETAILED
@@ -569,19 +568,19 @@ JobGaugeFixing:
     IndexStart : 101
     IndexEnd : 1000
 
-    SubFolder : 0
-    SubFolderPrefix : ./SRF490204_
-    LoadPrefix : SRF490204_
+    SubFolder : 1
+    SubFolderPrefix : ./5060204/Nt6
+    LoadPrefix : SRF510204_
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : GFN535161_
+    SavePrefix : ./5060204/GF/GFSRF5060204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
 
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
-    SaveType : EFFT_CLGBin
-    LoadType : EFFT_CLGBin
+    SaveType : EFFT_CLGBinFloat
+    LoadType : EFFT_CLGBinFloat
 
     Dim : 4
     Dir : 4

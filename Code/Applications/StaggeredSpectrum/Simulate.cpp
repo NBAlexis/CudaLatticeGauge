@@ -77,27 +77,30 @@ INT SimulateStaggered(CParameters& params)
             //save configurations
             sFileName.Format(_T("Matching_%d"), uiAccepCountAfterE + iSaveIndexStart);
             sFileName = sSavePrefix + sFileName;
+
+            //=================================
+            //Save config
+            CCString sMD5;
+            if (bCompressedFile)
+            {
+                sMD5 = appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileName + _T(".cco"));
+            }
+            else
+            {
+                sMD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+            }
+
             //=================================
             //Save info
             appGetTimeNow(buff1, 256);
             appGetTimeUtc(buff2, 256);
-            sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
+            sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s"),
                 appGetTimeStamp(),
                 buff1,
-                buff2);
+                buff2,
+                sMD5.c_str());
             sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
             appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
-
-            //=================================
-            //Save config
-            if (bCompressedFile)
-            {
-                appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileName + _T(".cco"));
-            }
-            else
-            {
-                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
-            }
 
             appGeneral(_T("%s saved\n"), (sFileName + _T(".con")).c_str());
         }

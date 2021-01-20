@@ -232,20 +232,22 @@ INT TestThermal(CParameters& params)
                 {
                     sFileName.Format(_T("Rotate_Nt%d_O%d_%d"), uiNt, uiOmega, uiAcce + iSaveStartIndex);
                     sFileName = sSavePrefix + sFileName;
+
+                    //=================================
+                    //Save config
+                    const CCString MD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+
                     //=================================
                     //Save info
                     appGetTimeNow(buff1, 256);
                     appGetTimeUtc(buff2, 256);
-                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\n"),
+                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s\n"),
                         appGetTimeStamp(),
                         buff1,
-                        buff2);
+                        buff2,
+                        MD5.c_str());
                     sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
                     appGetFileSystem()->WriteAllText(sFileName + _T(".txt"), sInfo);
-
-                    //=================================
-                    //Save config
-                    appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
 
                     iConfigNumberNow = uiAcce;
                 }

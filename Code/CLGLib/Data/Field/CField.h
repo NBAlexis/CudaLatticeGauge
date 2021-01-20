@@ -109,8 +109,8 @@ public:
     //This is a * me
     virtual void ScalarMultply(const CLGComplex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
-    virtual void SaveToFile(const CCString &fileName, EFieldFileType eType = EFFT_CLGBin) const;
-    virtual void SaveToCompressedFile(const CCString& ) const { appCrucial(_T("Not supported compressed file format for this field!\n")); }
+    virtual CCString SaveToFile(const CCString &fileName, EFieldFileType eType = EFFT_CLGBin) const;
+    virtual CCString SaveToCompressedFile(const CCString&) const { appCrucial(_T("Not supported compressed file format for this field!\n")); return _T("Not Supported"); }
     //Why we need this? because the data structure are aligned.
     //Remember to free the buffer
     virtual BYTE* CopyDataOut(UINT &uiSize) const = 0;

@@ -52,8 +52,8 @@ UINT TestFileIOWithUpdate(CParameters& sParam)
 UINT TestFileIOCLG(CParameters& sParam)
 {
     UINT uiError = 0;
-    appGetLattice()->m_pGaugeField->SaveToFile(_T("testGauge.con"));
-    appGetLattice()->GetFieldById(2)->SaveToFile(_T("testFermion.con"));
+    const CCString MD51 = appGetLattice()->m_pGaugeField->SaveToFile(_T("testGauge.con"));
+    const CCString MD52 = appGetLattice()->GetFieldById(2)->SaveToFile(_T("testFermion.con"));
 
     CFieldGaugeSU3* pNewGauge = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     pNewGauge->InitialFieldWithFile(_T("testGauge.con"), EFFT_CLGBin);
@@ -69,6 +69,9 @@ UINT TestFileIOCLG(CParameters& sParam)
 
     appGeneral(_T("Gauge file test: expeted 3.0 + 0.0i, res = %f %s %f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
     appGeneral(_T("Fermion file test: expeted 0.0 + 0.0i, res = %f %s %f\n"), res2.x, res2.y > 0 ? _T("+") : _T(""), res2.y);
+
+    appGeneral(_T("Gauge file MD5: %s\n"), MD51.c_str());
+    appGeneral(_T("Fermion file MD5: %s\n"), MD52.c_str());
 
     if (appAbs(res1.x - F(3.0)) > F(0.000001)
      || appAbs(res1.y) > F(0.000001))

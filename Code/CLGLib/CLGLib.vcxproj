@@ -121,6 +121,7 @@
     <ClInclude Include="Tools\CYAMLParser.h" />
     <ClInclude Include="Tools\Data\CBitFlag.h" />
     <ClInclude Include="Tools\Data\CCString.h" />
+    <ClInclude Include="Tools\Data\CLGMD5.h" />
     <ClInclude Include="Tools\Data\CLinkedList.h" />
     <ClInclude Include="Tools\Data\STDStringFunctions.h" />
     <ClInclude Include="Tools\Data\TArray.h" />

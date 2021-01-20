@@ -26,7 +26,7 @@ void CField::Return()
     m_pPool->Return(this);
 }
 
-void CField::SaveToFile(const CCString& fileName, EFieldFileType eType) const
+CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) const
 {
     switch (eType)
     {
@@ -35,33 +35,36 @@ void CField::SaveToFile(const CCString& fileName, EFieldFileType eType) const
             UINT uiSize = 0;
             BYTE* byToSave = CopyDataOut(uiSize);
             appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
             free(byToSave);
+            return MD5;
         }
-        return;
     case EFFT_CLGBinCompressed:
         {
-            SaveToCompressedFile(fileName);
+            return SaveToCompressedFile(fileName);
         }
-        return;
     case EFFT_CLGBinFloat:
         {
             UINT uiSize = 0;
             BYTE* byToSave = CopyDataOutFloat(uiSize);
             appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
             free(byToSave);
+            return MD5;
         }
-        return;
     case EFFT_CLGBinDouble:
         {
             UINT uiSize = 0;
             BYTE* byToSave = CopyDataOutDouble(uiSize);
             appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+            CCString MD5 = CLGMD5Hash(byToSave, uiSize);
             free(byToSave);
+            return MD5;
         }
-        return;
     }
 
     appCrucial(_T("Save for this type not implemented: CFieldGaugeSU3 : %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
+    return _T("Not supported");
 }
 
 CFieldFermion::CFieldFermion()

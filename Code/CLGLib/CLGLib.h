@@ -56,6 +56,7 @@
 //using these class to avoid warnings by STL...
 #include "Tools/Data/TArray.h"
 #include "Tools/Data/CCString.h"
+#include "Tools/Data/CLGMD5.h"
 #include "Tools/Data/THashMap.h"
 #include "Tools/EnumGather.h"
 

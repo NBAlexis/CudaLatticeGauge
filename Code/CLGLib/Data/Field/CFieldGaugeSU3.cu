@@ -1440,7 +1440,7 @@ void CFieldGaugeSU3::DebugPrintMe() const
     free(pToPrint);
 }
 
-void CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
+CCString CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
 {
     CFieldGaugeSU3* pPooledGauge = dynamic_cast<CFieldGaugeSU3*>(GetCopy());
 
@@ -1473,8 +1473,10 @@ void CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
     appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
     //pPooledGauge->DebugPrintMe();
     free(toSave);
+    CCString MD5 = CLGMD5Hash(byToSave, uiSize);
     free(byToSave);
     appSafeDelete(pPooledGauge);
+    return MD5;
 }
 
 BYTE* CFieldGaugeSU3::CopyDataOut(UINT &uiSize) const

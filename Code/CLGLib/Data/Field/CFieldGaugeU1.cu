@@ -1298,12 +1298,6 @@ void CFieldGaugeU1::DebugPrintMe() const
     free(pToPrint);
 }
 
-void CFieldGaugeU1::SaveToCompressedFile(const CCString& fileName) const
-{
-    appCrucial(_T("U1 SaveToCompressedFile Not supported!\n"));
-    _FAIL_EXIT;
-}
-
 BYTE* CFieldGaugeU1::CopyDataOut(UINT &uiSize) const
 {
     CLGComplex* toSave = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
