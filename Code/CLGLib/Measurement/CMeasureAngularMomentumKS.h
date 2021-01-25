@@ -40,7 +40,7 @@ public:
         , m_pHostDistribution(NULL)
 
         , m_uiMaxR(1)
-        , m_bMeasureDistribution(FALSE)
+        , m_bShiftCenter(FALSE)
         , m_bShowResult(FALSE)
     {
         
@@ -76,7 +76,7 @@ protected:
     UINT* m_pHostDistributionR;
     CLGComplex* m_pHostDistribution;
     UINT m_uiMaxR;
-    UBOOL m_bMeasureDistribution;
+    UBOOL m_bShiftCenter;
     UBOOL m_bShowResult;
 
 public:

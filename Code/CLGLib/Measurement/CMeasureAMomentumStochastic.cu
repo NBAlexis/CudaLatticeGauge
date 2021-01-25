@@ -1048,9 +1048,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         //2.0 is for the flavour
         const Real fDivider = -F(2.0) * CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
 
-        XYDataToRdistri_R(m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, m_byFieldId);
-        XYDataToRdistri_R(m_pDeviceXYBufferJS, m_pDistributionR, m_pDistributionJS, m_uiMaxR, FALSE, m_byFieldId);
-        XYDataToRdistri_R(m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, m_byFieldId);
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, m_byFieldId);
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJS, m_pDistributionR, m_pDistributionJS, m_uiMaxR, FALSE, m_byFieldId);
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, m_byFieldId);
 
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJL, m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));        
@@ -1061,8 +1061,8 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
         if (m_bMeasureJLPure)
         {
-            XYDataToRdistri_R(m_pDeviceXYBufferJLPure, m_pDistributionR, m_pDistributionJLPure, m_uiMaxR, FALSE, m_byFieldId);
-            XYDataToRdistri_R(m_pDeviceXYBufferJLJM, m_pDistributionR, m_pDistributionJLJM, m_uiMaxR, FALSE, m_byFieldId);
+            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLPure, m_pDistributionR, m_pDistributionJLPure, m_uiMaxR, FALSE, m_byFieldId);
+            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLJM, m_pDistributionR, m_pDistributionJLJM, m_uiMaxR, FALSE, m_byFieldId);
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLPure, m_pDistributionJLPure, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLJM, m_pDistributionJLJM, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());

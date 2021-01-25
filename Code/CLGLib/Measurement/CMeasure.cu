@@ -4,6 +4,7 @@
 // DESCRIPTION:
 // Some common functions
 //
+//
 // REVISION:
 //  [09/26/2019 nbale]
 //=============================================================================
@@ -48,7 +49,6 @@ _kernelAverageOverZT_XYPlaneC(CLGComplex* pBuffer)
     pBuffer[_ixy].y = pBuffer[_ixy].y / (_DC_Lz * _DC_Lt);
 }
 
-
 __global__ void _CLG_LAUNCH_BOUND
 _kernelXY_To_R_C(
     const CLGComplex* __restrict__ jgsXY,
@@ -56,19 +56,32 @@ _kernelXY_To_R_C(
     UINT uiMax, 
     BYTE byFieldId,
     CLGComplex* result,
-    UINT* pCount)
+    UINT* pCount,
+    UBOOL bShiftCenter)
 {
-    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    SBYTE uiX = static_cast<SBYTE>(uiXY / _DC_Ly);
-    SBYTE uiY = static_cast<SBYTE>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-             + (sCenter.y - uiY) * (sCenter.y - uiY);
+    const UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+    const UINT uiX = static_cast<UINT>(uiXY / _DC_Ly);
+    const UINT uiY = static_cast<UINT>(uiXY % _DC_Ly);
+    UINT uiC;
+    const UINT uiCenterX = static_cast<UINT>(sCenter.x);
+    const UINT uiCenterY = static_cast<UINT>(sCenter.y);
+    if (bShiftCenter)
+    {
+        uiC = (((uiCenterX - uiX) << 1) - 1) * (((uiCenterX - uiX) << 1) - 1)
+            + (((uiCenterY - uiY) << 1) - 1) * (((uiCenterY - uiY) << 1) - 1);
+    }
+    else
+    {
+        uiC = (uiCenterX - uiX) * (uiCenterX - uiX)
+            + (uiCenterY - uiY) * (uiCenterY - uiY);
+    }
 
+    //In the following, sSite is only used for Dirichlet check
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;
     sSite4.w = sCenter.w;
-    sSite4.x = uiX;
-    sSite4.y = uiY;
+    sSite4.x = static_cast<SBYTE>(uiX);
+    sSite4.y = static_cast<SBYTE>(uiY);
     if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
     {
         if (NULL != pCount)
@@ -98,13 +111,25 @@ _kernelXY_To_R_R(
     UINT uiMax,
     BYTE byFieldId,
     Real* result,
-    UINT* pCount)
+    UINT* pCount,
+    UBOOL bShiftCenter)
 {
-    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
-    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-             + (sCenter.y - uiY) * (sCenter.y - uiY);
+    const UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+    const UINT uiX = static_cast<UINT>(uiXY / _DC_Ly);
+    const UINT uiY = static_cast<UINT>(uiXY % _DC_Ly);
+    UINT uiC;
+    const UINT uiCenterX = static_cast<UINT>(sCenter.x);
+    const UINT uiCenterY = static_cast<UINT>(sCenter.y);
+    if (bShiftCenter)
+    {
+        uiC = (((uiCenterX - uiX) << 1) - 1) * (((uiCenterX - uiX) << 1) - 1)
+            + (((uiCenterY - uiY) << 1) - 1) * (((uiCenterY - uiY) << 1) - 1);
+    }
+    else
+    {
+        uiC = (uiCenterX - uiX) * (uiCenterX - uiX)
+            + (uiCenterY - uiY) * (uiCenterY - uiY);
+    }
 
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;
@@ -152,7 +177,7 @@ _kernelInitialDist(UINT* pCount, Real* pValue, CLGComplex* pValueC)
 
 void CMeasure::FillDataWithR_R(
     TArray<Real>& arrData,
-    TArray<Real>& arrInner,
+    TArray<Real>* arrInner,
     TArray<Real>& arrFull,
     TArray<UINT>& arrR,
     Real* hostData,
@@ -160,12 +185,14 @@ void CMeasure::FillDataWithR_R(
     UINT uiConfig,
     UINT uiMaxR,
     UINT uiEdgeR,
+    Real fDivider,
     UBOOL bFillR)
 {
     Real fAverageJGInner = F(0.0);
     Real fAverageJGAll = F(0.0);
     UINT uiInnerPointsAll = 0;
     UINT uiInnerPointsInner = 0;
+
     if (0 == uiConfig)
     {
         assert(!bFillR || 0 == arrR.Num());
@@ -180,14 +207,14 @@ void CMeasure::FillDataWithR_R(
                     arrR.AddItem(uiL);
                 }
                 
-                arrData.AddItem(hostData[uiL]);
+                arrData.AddItem(hostData[uiL] * fDivider);
 
                 uiInnerPointsAll += hostR[uiL];
-                fAverageJGAll += hostR[uiL] * hostData[uiL];
-                if (uiL < uiEdgeR)
+                fAverageJGAll += hostR[uiL] * hostData[uiL] * fDivider;
+                if (NULL != arrInner && uiL < uiEdgeR)
                 {
                     uiInnerPointsInner += hostR[uiL];
-                    fAverageJGInner += hostR[uiL] * hostData[uiL];
+                    fAverageJGInner += hostR[uiL] * hostData[uiL] * fDivider;
                 }
             }
         }
@@ -197,14 +224,14 @@ void CMeasure::FillDataWithR_R(
         for (INT i = 0; i < arrR.Num(); ++i)
         {
             assert(hostR[arrR[i]] > 0);
-            arrData.AddItem(hostData[arrR[i]]);
+            arrData.AddItem(hostData[arrR[i]] * fDivider);
 
             uiInnerPointsAll += hostR[arrR[i]];
-            fAverageJGAll += hostR[arrR[i]] * hostData[arrR[i]];
-            if (arrR[i] < uiEdgeR)
+            fAverageJGAll += hostR[arrR[i]] * hostData[arrR[i]] * fDivider;
+            if (NULL != arrInner && arrR[i] < uiEdgeR)
             {
                 uiInnerPointsInner += hostR[arrR[i]];
-                fAverageJGInner += hostR[arrR[i]] * hostData[arrR[i]];
+                fAverageJGInner += hostR[arrR[i]] * hostData[arrR[i]] * fDivider;
             }
         }
     }
@@ -213,17 +240,20 @@ void CMeasure::FillDataWithR_R(
     {
         fAverageJGAll = fAverageJGAll / uiInnerPointsAll;
     }
-    if (uiInnerPointsInner > 0)
+    if (NULL != arrInner && uiInnerPointsInner > 0)
     {
         fAverageJGInner = fAverageJGInner / uiInnerPointsInner;
     }
     arrFull.AddItem(fAverageJGAll);
-    arrInner.AddItem(fAverageJGInner);
+    if (NULL != arrInner)
+    {
+        arrInner->AddItem(fAverageJGInner);
+    }
 }
 
 void CMeasure::FillDataWithR_C(
     TArray<CLGComplex>& arrData,
-    TArray<CLGComplex>& arrInner,
+    TArray<CLGComplex>* arrInner,
     TArray<CLGComplex>& arrFull,
     TArray<UINT>& arrR,
     CLGComplex* hostData,
@@ -231,12 +261,14 @@ void CMeasure::FillDataWithR_C(
     UINT uiConfig,
     UINT uiMaxR,
     UINT uiEdgeR,
+    Real fDivider,
     UBOOL bFillR)
 {
     CLGComplex cAverageJGInner = _zeroc;
     CLGComplex cAverageJGAll = _zeroc;
     UINT uiInnerPointsAll = 0;
     UINT uiInnerPointsInner = 0;
+
     if (0 == uiConfig)
     {
         assert(!bFillR || 0 == arrR.Num());
@@ -251,16 +283,16 @@ void CMeasure::FillDataWithR_C(
                     arrR.AddItem(uiL);
                 }
 
-                arrData.AddItem(hostData[uiL]);
+                arrData.AddItem(cuCmulf_cr(hostData[uiL], fDivider));
 
                 uiInnerPointsAll += hostR[uiL];
-                cAverageJGAll.x += hostR[uiL] * hostData[uiL].x;
-                cAverageJGAll.y += hostR[uiL] * hostData[uiL].y;
-                if (uiL < uiEdgeR)
+                cAverageJGAll.x += hostR[uiL] * hostData[uiL].x * fDivider;
+                cAverageJGAll.y += hostR[uiL] * hostData[uiL].y * fDivider;
+                if (NULL != arrInner && uiL < uiEdgeR)
                 {
                     uiInnerPointsInner += hostR[uiL];
-                    cAverageJGInner.x += hostR[uiL] * hostData[uiL].x;
-                    cAverageJGInner.y += hostR[uiL] * hostData[uiL].y;
+                    cAverageJGInner.x += hostR[uiL] * hostData[uiL].x * fDivider;
+                    cAverageJGInner.y += hostR[uiL] * hostData[uiL].y * fDivider;
                 }
             }
         }
@@ -270,16 +302,16 @@ void CMeasure::FillDataWithR_C(
         for (INT i = 0; i < arrR.Num(); ++i)
         {
             assert(hostR[arrR[i]] > 0);
-            arrData.AddItem(hostData[arrR[i]]);
+            arrData.AddItem(cuCmulf_cr(hostData[arrR[i]], fDivider));
 
             uiInnerPointsAll += hostR[arrR[i]];
-            cAverageJGAll.x += hostR[arrR[i]] * hostData[arrR[i]].x;
-            cAverageJGAll.y += hostR[arrR[i]] * hostData[arrR[i]].y;
-            if (arrR[i] < uiEdgeR)
+            cAverageJGAll.x += hostR[arrR[i]] * hostData[arrR[i]].x * fDivider;
+            cAverageJGAll.y += hostR[arrR[i]] * hostData[arrR[i]].y * fDivider;
+            if (NULL != arrInner && arrR[i] < uiEdgeR)
             {
                 uiInnerPointsInner += hostR[arrR[i]];
-                cAverageJGInner.x += hostR[arrR[i]] * hostData[arrR[i]].x;
-                cAverageJGInner.y += hostR[arrR[i]] * hostData[arrR[i]].y;
+                cAverageJGInner.x += hostR[arrR[i]] * hostData[arrR[i]].x * fDivider;
+                cAverageJGInner.y += hostR[arrR[i]] * hostData[arrR[i]].y * fDivider;
             }
         }
     }
@@ -289,13 +321,16 @@ void CMeasure::FillDataWithR_C(
         cAverageJGAll.x = cAverageJGAll.x / uiInnerPointsAll;
         cAverageJGAll.y = cAverageJGAll.y / uiInnerPointsAll;
     }
-    if (uiInnerPointsInner > 0)
+    if (NULL != arrInner && uiInnerPointsInner > 0)
     {
         cAverageJGInner.x = cAverageJGInner.x / uiInnerPointsInner;
         cAverageJGInner.y = cAverageJGInner.y / uiInnerPointsInner;
     }
     arrFull.AddItem(cAverageJGAll);
-    arrInner.AddItem(cAverageJGInner);
+    if (NULL != arrInner)
+    {
+        arrInner->AddItem(cAverageJGInner);
+    }
 }
 
 
@@ -477,6 +512,7 @@ void CMeasure::_ZeroXYPlaneC(CLGComplex* pDeviceRes)
 }
 
 void CMeasure::XYDataToRdistri_R(
+    UBOOL bShiftCenter,
     const Real* __restrict__ source,
     UINT* count,
     Real* result,
@@ -501,13 +537,15 @@ void CMeasure::XYDataToRdistri_R(
         uiMaxR,
         byFieldId,
         result,
-        bCalculateCounter ? count : NULL
+        bCalculateCounter ? count : NULL,
+        bShiftCenter
         );
 
     _kernelXY_To_RAverage_R << <block3, threads3 >> > (count, result);
 }
 
 void CMeasure::XYDataToRdistri_C(
+    UBOOL bShiftCenter,
     const CLGComplex* __restrict__ source,
     UINT* count,
     CLGComplex* result,
@@ -532,10 +570,99 @@ void CMeasure::XYDataToRdistri_C(
         uiMaxR,
         byFieldId,
         result,
-        bCalculateCounter ? count : NULL
+        bCalculateCounter ? count : NULL,
+        bShiftCenter
         );
 
     _kernelXY_To_RAverage_C << <block3, threads3 >> > (count, result);
+}
+
+void CMeasure::TransformFromXYDataToRData_C(
+    UBOOL bShiftCenter,
+    UINT uiMaxR,
+    UINT uiEdgeR,
+    BYTE byFieldId,
+    UINT uiFieldCount,
+    UINT uiMeasureCount,
+    UINT uiConfig,
+    const CLGComplex* const* pXYBuffers,
+    UINT* pCountBuffer,
+    CLGComplex* pValueBuffer,
+    UINT* pHostCountBuffer,
+    CLGComplex* pHostValueBuffer,
+    TArray<UINT>& lstR,
+    TArray<CLGComplex>* lstValues,
+    TArray<CLGComplex>* lstAll,
+    TArray<CLGComplex>* lstInner)
+{
+    for (UINT i = 0; i < uiMeasureCount; ++i)
+    {
+        XYDataToRdistri_C(bShiftCenter, pXYBuffers[i], pCountBuffer, pValueBuffer, uiMaxR, 0 == i, byFieldId);
+        if (0 == i)
+        {
+            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+        }
+
+        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(CLGComplex) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        FillDataWithR_C(
+            lstValues[i],
+            NULL == lstInner ? NULL : lstInner + i,
+            lstAll[i],
+            lstR,
+            pHostValueBuffer,
+            pHostCountBuffer,
+            uiConfig,
+            uiMaxR,
+            uiEdgeR,
+            F(1.0) / static_cast<Real>(uiFieldCount * _HC_Lz * _HC_Lt), 
+            0 == i
+        );
+    }
+}
+
+void CMeasure::TransformFromXYDataToRData_R(
+    UBOOL bShiftCenter,
+    UINT uiMaxR,
+    UINT uiEdgeR,
+    BYTE byFieldId,
+    UINT uiFieldCount,
+    UINT uiMeasureCount,
+    UINT uiConfig,
+    const Real* const* pXYBuffers,
+    UINT* pCountBuffer,
+    Real* pValueBuffer,
+    UINT* pHostCountBuffer,
+    Real* pHostValueBuffer,
+    TArray<UINT>& lstR,
+    TArray<Real>* lstValues,
+    TArray<Real>* lstAll,
+    TArray<Real>* lstInner)
+{
+    for (UINT i = 0; i < uiMeasureCount; ++i)
+    {
+        XYDataToRdistri_R(bShiftCenter, pXYBuffers[i], pCountBuffer, pValueBuffer, uiMaxR, 0 == i, byFieldId);
+        if (0 == i)
+        {
+            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+        }
+
+        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(Real) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        FillDataWithR_R(
+            lstValues[i],
+            NULL == lstInner ? NULL : lstInner + i,
+            lstAll[i],
+            lstR,
+            pHostValueBuffer,
+            pHostCountBuffer,
+            uiConfig,
+            uiMaxR,
+            uiEdgeR,
+            F(1.0) / static_cast<Real>(uiFieldCount * _HC_Lz * _HC_Lt),
+            0 == i
+        );
+    }
 }
 
 __END_NAMESPACE

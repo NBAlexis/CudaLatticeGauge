@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing
-RotationJob : ESR_GaugeFixing
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,25 +328,25 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.1
+    GaugeBate : 5.06
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
     StartN : 101
-    EndN : 400
-    ## EDJKS_Polyakov, EDJKS_Chiral
-    DistributionJob : EDJKS_Polyakov
+    EndN : 1000
+    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
     CheckGaugeFixing : 0
-    UseZ4 : 0
+    UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5100204\Nt6
+    SubFolderPrefix : ../Release/5060204/GF
 
-    SavePrefix : SRF510204_
-    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
+    SavePrefix : GFSRF5060204_
+    CSVSavePrefix : ../Release/5060204/Chiral/SRF5060204_
 
     Dim : 4
     Dir : 4
@@ -358,7 +358,7 @@ JobMeasure:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 6
+    MeasureListLength : 5
     CacheStaple : 0
 
     Gauge:
@@ -433,14 +433,6 @@ JobMeasure:
         # MD is to calculate force
         # This is x^{-1/4}
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
-
-    Action1:
-   
-        ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 1
-        ShiftCoord : 1
-        Beta : 5.1
-        Omega : 0.0
 
     Solver:
 
@@ -519,6 +511,8 @@ JobMeasure:
         FieldId : 1
         ShowResult : 0
         MeasureDist : 1
+        MeasureZ : 1
+        ShiftCenter : 1
 
     Measure2:
 
@@ -526,6 +520,7 @@ JobMeasure:
         FieldId : 2
         MeasureDist : 1
         ShowResult : 0
+        ShiftCenter : 1
 
     Measure3:
 
@@ -533,6 +528,7 @@ JobMeasure:
         FieldId : 3
         MeasureDist : 1
         ShowResult : 0
+        ShiftCenter : 1
 
     Measure4:
 
@@ -540,6 +536,7 @@ JobMeasure:
         FieldId : 2
         MeasureDist : 1
         ShowResult : 0
+        ShiftCenter : 1
 
     Measure5:
 
@@ -547,12 +544,8 @@ JobMeasure:
         FieldId : 3
         MeasureDist : 1
         ShowResult : 0
+        ShiftCenter : 1
 
-    Measure6:
-
-        MeasureName : CMeasureAction
-        FieldId : 1
-        ShowResult : 0
 
 JobGaugeFixing:
 

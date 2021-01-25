@@ -31,6 +31,12 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##OverR); \
 WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All);
 
+#if !_CLG_WIN
+void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
+{
+    strcpy(buffer, strerror(error));
+}
+#endif
 
 __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_Polyakov,
@@ -71,6 +77,14 @@ void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst
     {
         file.open(sFileName.c_str(), std::ios::app | std::ios::out);
     }
+
+    if (file.fail())
+    {
+        static TCHAR errorMsg[256];
+        strerror_s(errorMsg, 256, errno);
+        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
+    }
+
     TCHAR str[50];
     for (INT i = 0; i < lst.Num(); ++i)
     {
@@ -100,6 +114,14 @@ void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Re
     {
         file.open(sFileName.c_str(), std::ios::app | std::ios::out);
     }
+
+    if (file.fail())
+    {
+        static TCHAR errorMsg[256];
+        strerror_s(errorMsg, 256, errno);
+        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
+    }
+
     TCHAR str[50];
     for (INT i = 0; i < lst.GetCount(); ++i)
     {
@@ -133,6 +155,14 @@ void WriteStringFileComplexArray(const CCString& sFileName, const TArray<CLGComp
     {
         file.open(sFileName.c_str(), std::ios::app | std::ios::out);
     }
+
+    if (file.fail())
+    {
+        static TCHAR errorMsg[256];
+        strerror_s(errorMsg, 256, errno);
+        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
+    }
+
     TCHAR str[50];
     for (INT i = 0; i < lst.Num(); ++i)
     {
@@ -177,6 +207,13 @@ void WriteStringFileComplexArray2(const CCString& sFileName, const TArray<TArray
     else
     {
         file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+
+    if (file.fail())
+    {
+        static TCHAR errorMsg[256];
+        strerror_s(errorMsg, 256, errno);
+        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
     }
     
     TCHAR str[50];
@@ -305,6 +342,8 @@ INT Measurement(CParameters& params)
     TArray<Real> lstR;
     TArray<TArray<CLGComplex>> lstPolyIn;
     TArray<TArray<CLGComplex>> lstPolyOut;
+    TArray<TArray<CLGComplex>> lstPolyInZ;
+    TArray<TArray<CLGComplex>> lstPolyOutZ;
 
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
@@ -404,6 +443,14 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
+                        pFALight->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Light,
+                            pF1Light,
+                            0 == i,
+                            iFieldCount == i + 1);
+
                         if (bZ4)
                         {
                             pF1Heavy->InitialField(EFIT_RandomZ4);
@@ -418,6 +465,14 @@ INT Measurement(CParameters& params)
                         pF1Heavy->FixBoundary();
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
+                            appGetLattice()->m_pGaugeField,
+                            NULL,
+                            pF2Heavy,
+                            pF1Heavy,
+                            0 == i,
+                            iFieldCount == i + 1);
+
+                        pFAHeavy->OnConfigurationAcceptedZ4(
                             appGetLattice()->m_pGaugeField,
                             NULL,
                             pF2Heavy,
@@ -536,7 +591,7 @@ INT Measurement(CParameters& params)
                 {
                     for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                     {
-                        lstR.AddItem(_hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
+                        lstR.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
                     }
                     WriteStringFileRealArray(sFileNameWrite1, lstR);
                 }
@@ -559,6 +614,30 @@ INT Measurement(CParameters& params)
                 lstPolyIn.AddItem(polyIn);
                 lstPolyOut.AddItem(polyOut);
                 WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
+
+                if (pPL->m_bMeasureLoopZ)
+                {
+                    CCString sFileNameWrite3;
+                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                    polyakovOmgR.RemoveAll();
+                    polyIn.RemoveAll();
+                    polyOut.RemoveAll();
+
+                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                    {
+                        TArray<CLGComplex> thisConfiguration;
+                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                        {
+                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
+                        }
+                        polyakovOmgR.AddItem(thisConfiguration);
+                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
+                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
+                    }
+                    lstPolyInZ.AddItem(polyIn);
+                    lstPolyOutZ.AddItem(polyOut);
+                    WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgR);
+                }
             }
             break;
             case EDJKS_Chiral:
@@ -573,7 +652,7 @@ INT Measurement(CParameters& params)
                     TArray<Real> lstRadius;
                     for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
                     {
-                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
+                        lstRadius.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
@@ -604,7 +683,7 @@ INT Measurement(CParameters& params)
                     TArray<Real> lstRadius;
                     for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
                     {
-                        lstRadius.AddItem(_hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
+                        lstRadius.AddItem(F(0.5) * _hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
@@ -636,6 +715,11 @@ INT Measurement(CParameters& params)
             sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
             WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
             WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
+
+            sFileNameWrite1.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            sFileNameWrite2.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            WriteStringFileComplexArray2(sFileNameWrite1, lstPolyInZ);
+            WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
         }
         break;
         case EDJKS_Chiral:

@@ -39,7 +39,7 @@ public:
         , m_pHostDistribution(NULL)
 
         , m_uiMaxR(1)
-        , m_bMeasureDistribution(FALSE)
+        , m_bShiftCenter(FALSE)
         , m_bShowResult(FALSE)
     {
         
@@ -56,23 +56,7 @@ public:
     void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
-    UBOOL IsZ4Source() const override { return TRUE; }
-
-    static void KSTraceEndZ4(
-        UINT uiMaxR, 
-        BYTE byFieldId,
-        UINT uiFieldCount,
-        UINT uiMeasureCount,
-        UINT uiCurrentMeasureCount,
-        const CLGComplex* const * pXYBuffers, 
-        UINT* pCountBuffer, 
-        CLGComplex* pValueBuffer,
-        UINT* pHostCountBuffer,
-        CLGComplex* pHostValueBuffer,
-        TArray<UINT>& lstR,
-        TArray<CLGComplex>* lstValues,
-        UBOOL bLogResult);
-    
+    UBOOL IsZ4Source() const override { return TRUE; }    
 
 protected:
     
@@ -87,7 +71,7 @@ protected:
     UINT* m_pHostDistributionR;
     CLGComplex* m_pHostDistribution;
     UINT m_uiMaxR;
-    UBOOL m_bMeasureDistribution;
+    UBOOL m_bShiftCenter;
     UBOOL m_bShowResult;
 
 public:

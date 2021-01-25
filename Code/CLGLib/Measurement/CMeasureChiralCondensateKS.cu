@@ -44,156 +44,8 @@ _kernelDotMeasureAllKS(
 #endif
 }
 
-__global__ void _CLG_LAUNCH_BOUND
-_kernelChiralCondensateInitialDistRKS(UINT* pCount)
-{
-    pCount[threadIdx.x] = 0;
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelChiralCondensateInitialDistCondKS(CLGComplex* pCond)
-{
-    pCond[threadIdx.x] = _zeroc;
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelChiralCondensateMeasureDistKS(
-    const CLGComplex* __restrict__ CondXY,
-    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId, UBOOL bCalcR,
-    UINT* counter, 
-    CLGComplex* CondR
-)
-{
-    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
-    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-        + (sCenter.y - uiY) * (sCenter.y - uiY);
-
-    SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
-    sSite4.x = static_cast<SBYTE>(uiX);
-    sSite4.y = static_cast<SBYTE>(uiY);
-    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
-    {
-        if (bCalcR)
-        {
-            atomicAdd(&counter[uiC], 1);
-        }
-        
-        atomicAdd(&CondR[uiC].x, CondXY[uiXY].x);
-        atomicAdd(&CondR[uiC].y, CondXY[uiXY].y);
-    }
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelChiralAverageDistKS(UINT* pCount, CLGComplex* pCond)
-{
-    const UINT uiIdx = threadIdx.x;
-    if (pCount[uiIdx] > 0)
-    {
-        pCond[uiIdx].x = pCond[uiIdx].x / static_cast<Real>(pCount[uiIdx]);
-        pCond[uiIdx].y = pCond[uiIdx].y / static_cast<Real>(pCount[uiIdx]);
-    }
-}
-
 #pragma endregion
 
-void CMeasureChiralCondensateKS::KSTraceEndZ4(
-    UINT uiMaxR,
-    BYTE byFieldId,
-    UINT uiFieldCount,
-    UINT uiMeasureCount,
-    UINT uiCurrentMeasureCount,
-    const CLGComplex* const* pXYBuffers,
-    UINT* pCountBuffer,
-    CLGComplex* pValueBuffer,
-    UINT* pHostCountBuffer,
-    CLGComplex* pHostValueBuffer,
-    TArray<UINT>& lstR,
-    TArray<CLGComplex>* lstValues,
-    UBOOL bLogResult)
-{
-    dim3 block2(_HC_DecompX, 1, 1);
-    dim3 threads2(_HC_DecompLx, 1, 1);
-    dim3 block3(1, 1, 1);
-    dim3 threads3(uiMaxR + 1, 1, 1);
-
-    const Real fDivider = F(1.0) / (uiFieldCount * _HC_Lz * _HC_Lt);
-    _kernelChiralCondensateInitialDistRKS << <block3, threads3 >> > (pCountBuffer);
-    for (UINT i = 0; i < uiMeasureCount; ++i)
-    {
-        _kernelChiralCondensateInitialDistCondKS << <block3, threads3 >> > (pValueBuffer);
-
-        _kernelChiralCondensateMeasureDistKS << <block2, threads2 >> > (
-            pXYBuffers[i],
-            CCommonData::m_sCenter,
-            uiMaxR,
-            byFieldId,
-            0 == i,
-            pCountBuffer,
-            pValueBuffer
-            );
-
-        _kernelChiralAverageDistKS << <block3, threads3 >> > (pCountBuffer, pValueBuffer);
-
-        if (0 == i)
-        {
-            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
-        }
-
-        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(CLGComplex) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
-
-        if (0 == uiCurrentMeasureCount)
-        {
-            if (0 == i)
-            {
-                assert(0 == lstR.Num());
-            }
-            assert(0 == lstValues[i].Num());
-            for (UINT uiL = 0; uiL <= uiMaxR; ++uiL)
-            {
-                if (pHostCountBuffer[uiL] > 0)
-                {
-                    if (0 == i)
-                    {
-                        lstR.AddItem(uiL);
-                    }
-                    lstValues[i].AddItem(cuCmulf_cr(pHostValueBuffer[uiL], fDivider));
-
-                    if (bLogResult)
-                    {
-                        appDetailed(_T("Cond %d (r = %f)= %f + %f i\n"),
-                            i,
-                            _hostsqrt(static_cast<Real>(uiL)),
-                            pHostValueBuffer[uiL].x,
-                            pHostValueBuffer[uiL].y
-                        );
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (INT j = 0; j < lstR.Num(); ++j)
-            {
-                assert(pHostCountBuffer[lstR[j]] > 0);
-                lstValues[i].AddItem(cuCmulf_cr(pHostValueBuffer[lstR[j]], fDivider));
-
-                if (bLogResult)
-                {
-                    appDetailed(_T("Cond %d (r = %f)=%f + %f i\n"),
-                        i,
-                        _hostsqrt(static_cast<Real>(lstR[j])),
-                        pHostValueBuffer[lstR[j]].x,
-                        pHostValueBuffer[lstR[j]].y
-                    );
-                }
-            }
-        }
-    }
-}
 
 CMeasureChiralCondensateKS::~CMeasureChiralCondensateKS()
 {
@@ -247,22 +99,18 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
 
-    iValue = 1;
-    param.FetchValueINT(_T("MeasureDist"), iValue);
-    m_bMeasureDistribution = iValue != 0;
+    iValue = 0;
+    param.FetchValueINT(_T("ShiftCenter"), iValue);
+    m_bShiftCenter = iValue != 0;
 
-    if (m_bMeasureDistribution)
-    {
-        //assuming the center is really at center
-        m_uiMaxR = ((_HC_Lx + 1) / 2 ) * ((_HC_Lx + 1) / 2 )
-            + ((_HC_Ly + 1) / 2 ) * ((_HC_Ly + 1) / 2 );
+    //assuming the center is really at center
+    SetMaxAndEdge(&m_uiMaxR, NULL, m_bShiftCenter);
 
-        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-        checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
-        m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
-        m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
-    }
+    m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
+    m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
 }
 
 void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
@@ -310,7 +158,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 
         _kernelDotMeasureAllKS << <block, threads >> > (
             pF1W->m_pDeviceData,
-            pF2W->m_pDeviceData,
+            pAfterApplied->m_pDeviceData,
             m_pDeviceXYBuffer[i],
             _D_ComplexThreadBuffer
             );
@@ -328,31 +176,24 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 
     if (bEnd)
     {
-        if (m_bMeasureDistribution)
-        {
-            KSTraceEndZ4(
-                m_uiMaxR,
-                m_byFieldId,
-                m_uiFieldCount,
-                ChiralKSMax,
-                m_uiConfigurationCount,
-                m_pDeviceXYBuffer,
-                m_pDistributionR,
-                m_pDistribution,
-                m_pHostDistributionR,
-                m_pHostDistribution,
-                m_lstR,
-                m_lstCond,
-                m_bShowResult);
-        }
-
-        const Real fDiv2 = F(1.0) / m_uiFieldCount;
-        for (UINT i = 0; i < ChiralKSMax; ++i)
-        {
-            m_cTmpSum[i] = cuCmulf_cr(m_cTmpSum[i], fDiv2);
-            appDetailed(_T("\n Condensate %d = %2.12f + %2.12f\n"), i, m_cTmpSum[i].x, m_cTmpSum[i].y);
-            m_lstCondAll[i].AddItem(m_cTmpSum[i]);
-        }
+        TransformFromXYDataToRData_C(
+            m_bShiftCenter,
+            m_uiMaxR,
+            0,
+            m_byFieldId,
+            m_uiFieldCount,
+            ChiralKSMax,
+            m_uiConfigurationCount,
+            m_pDeviceXYBuffer,
+            m_pDistributionR,
+            m_pDistribution,
+            m_pHostDistributionR,
+            m_pHostDistribution,
+            m_lstR,
+            m_lstCond,
+            m_lstCondAll,
+            NULL
+        );
 
         ++m_uiConfigurationCount;
     }

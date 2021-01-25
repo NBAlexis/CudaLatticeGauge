@@ -279,22 +279,16 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
 
-    iValue = 1;
-    param.FetchValueINT(_T("MeasureDist"), iValue);
-    m_bMeasureDistribution = iValue != 0;
+    iValue = 0;
+    param.FetchValueINT(_T("ShiftCenter"), iValue);
+    m_bShiftCenter = iValue != 0;
 
-    if (m_bMeasureDistribution)
-    {
-        //assuming the center is really at center
-        m_uiMaxR = ((_HC_Lx + 1) / 2 ) * ((_HC_Lx + 1) / 2 )
-            + ((_HC_Ly + 1) / 2 ) * ((_HC_Ly + 1) / 2 );
+    SetMaxAndEdge(&m_uiMaxR, NULL, m_bShiftCenter);
+    checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
+    checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
-        checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
-        checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
-
-        m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
-        m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
-    }
+    m_pHostDistributionR = (UINT*)malloc(sizeof(UINT) * (m_uiMaxR + 1));
+    m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
 }
 
 void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
@@ -421,31 +415,24 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
 
     if (bEnd)
     {
-        if (m_bMeasureDistribution)
-        {
-            CMeasureChiralCondensateKS::KSTraceEndZ4(
-                m_uiMaxR,
-                m_byFieldId,
-                m_uiFieldCount,
-                EAngularMeasureMax,
-                m_uiConfigurationCount,
-                m_pDeviceXYBuffer,
-                m_pDistributionR,
-                m_pDistribution,
-                m_pHostDistributionR,
-                m_pHostDistribution,
-                m_lstR,
-                m_lstCond,
-                m_bShowResult);
-        }
-
-        const Real fDiv2 = F(1.0) / m_uiFieldCount;
-        for (UINT i = 0; i < EAngularMeasureMax; ++i)
-        {
-            m_cTmpSum[i] = cuCmulf_cr(m_cTmpSum[i], fDiv2);
-            appDetailed(_T("\n AngularMomentum %d = %2.12f + %2.12f\n"), i, m_cTmpSum[i].x, m_cTmpSum[i].y);
-            m_lstCondAll[i].AddItem(m_cTmpSum[i]);
-        }
+        TransformFromXYDataToRData_C(
+            m_bShiftCenter,
+            m_uiMaxR,
+            0,
+            m_byFieldId,
+            m_uiFieldCount,
+            EAngularMeasureMax,
+            m_uiConfigurationCount,
+            m_pDeviceXYBuffer,
+            m_pDistributionR,
+            m_pDistribution,
+            m_pHostDistributionR,
+            m_pHostDistribution,
+            m_lstR,
+            m_lstCond,
+            m_lstCondAll,
+            NULL
+        );
 
         ++m_uiConfigurationCount;
     }

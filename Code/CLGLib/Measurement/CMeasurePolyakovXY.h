@@ -49,6 +49,7 @@ public:
           , m_bMeasureDistribution(FALSE)
           , m_bShowResult(TRUE)
           , m_bMeasureLoopZ(FALSE)
+          , m_bShiftCenter(FALSE)
           , m_cAverageLoop()
     {
     }
@@ -90,13 +91,22 @@ protected:
 public:
 
     UBOOL m_bMeasureLoopZ;
+    UBOOL m_bShiftCenter;
 
+    //all
     TArray<CLGComplex> m_lstLoop;
+    //inner
     TArray<CLGComplex> m_lstLoopInner;
+
+    //not using
     TArray<CLGComplex> m_lstLoopDensity;
 
+    //all
     TArray<CLGComplex> m_lstLoopZ;
+    //inner
     TArray<CLGComplex> m_lstLoopZInner;
+
+    //not using
     TArray<CLGComplex> m_lstLoopZDensity;
 
     CLGComplex m_cAverageLoop;

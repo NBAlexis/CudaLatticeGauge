@@ -94,9 +94,11 @@ public:
             bHasComma ? _T(",   ") : _T(" "));
     }
 
+#pragma region Distribution Common functions
+
     static void FillDataWithR_R(
         TArray<Real>& arrData,
-        TArray<Real>& arrInner,
+        TArray<Real>* arrInner,
         TArray<Real>& arrFull,
         TArray<UINT>& arrR,
         Real* hostData,
@@ -104,11 +106,12 @@ public:
         UINT uiConfig,
         UINT uiMaxR,
         UINT uiEdgeR,
+        Real fDivider,
         UBOOL bFillR);
 
     static void FillDataWithR_C(
         TArray<CLGComplex>& arrData,
-        TArray<CLGComplex>& arrInner,
+        TArray<CLGComplex>* arrInner,
         TArray<CLGComplex>& arrFull,
         TArray<UINT>& arrR,
         CLGComplex* hostData,
@@ -116,6 +119,7 @@ public:
         UINT uiConfig,
         UINT uiMaxR,
         UINT uiEdgeR,
+        Real fDivider,
         UBOOL bFillR);
 
     
@@ -131,6 +135,7 @@ public:
     static void _AverageXYPlaneC(CLGComplex* pDeviceRes);
 
     static void XYDataToRdistri_R(
+        UBOOL bShiftCenter,
         const Real* __restrict__ source,
         UINT* count,
         Real* result,
@@ -139,6 +144,7 @@ public:
         BYTE byFieldId);
 
     static void XYDataToRdistri_C(
+        UBOOL bShiftCenter,
         const CLGComplex* __restrict__ source,
         UINT* count,
         CLGComplex* result,
@@ -147,6 +153,183 @@ public:
         BYTE byFieldId);
 
     static void ReportDistributeWithR_R(UINT uiConf, UINT uiR, const TArray<Real>& arrayData);
+
+    /**
+     * TransformFromXYDataToRDataOnce_C and TransformFromXYDataToRDataOnce_R
+     * is for gauge measurement
+     */
+    static void TransformFromXYDataToRDataOnce_C(
+        UBOOL bShiftCenter,
+        const CLGComplex* __restrict__ pXYData,
+        UINT* pCountBuffer,
+        CLGComplex* pValueBuffer,
+        UINT* pHostCountBuffer,
+        CLGComplex* pHostValueBuffer,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        UBOOL bCalculateCounter,
+        BYTE byFieldId,
+        TArray<CLGComplex>& arrData,
+        TArray<CLGComplex>* arrInner,
+        TArray<CLGComplex>& arrFull,
+        TArray<UINT>& arrR,
+        UINT uiConfig,
+        Real fDivider)
+    {
+        XYDataToRdistri_C(
+            bShiftCenter,
+            pXYData,
+            pCountBuffer,
+            pValueBuffer,
+            uiMaxR,
+            bCalculateCounter,
+            byFieldId);
+
+        if (bCalculateCounter)
+        {
+            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+        }
+        
+        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(CLGComplex) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        //Here we have already divide by all XYZ points
+        FillDataWithR_C(
+            arrData,
+            arrInner,
+            arrFull,
+            arrR,
+            pHostValueBuffer,
+            pHostCountBuffer,
+            uiConfig,
+            uiMaxR,
+            uiEdgeR,
+            fDivider,
+            bCalculateCounter
+        );
+    }
+
+    static void TransformFromXYDataToRDataOnce_R(
+        UBOOL bShiftCenter,
+        const Real* __restrict__ pXYData,
+        UINT* pCountBuffer,
+        Real* pValueBuffer,
+        UINT* pHostCountBuffer,
+        Real* pHostValueBuffer,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        UBOOL bCalculateCounter,
+        BYTE byFieldId,
+        TArray<Real>& arrData,
+        TArray<Real>* arrInner,
+        TArray<Real>& arrFull,
+        TArray<UINT>& arrR,
+        UINT uiConfig,
+        Real fDivider)
+    {
+        XYDataToRdistri_R(
+            bShiftCenter,
+            pXYData,
+            pCountBuffer,
+            pValueBuffer,
+            uiMaxR,
+            bCalculateCounter,
+            byFieldId);
+
+        if (bCalculateCounter)
+        {
+            checkCudaErrors(cudaMemcpy(pHostCountBuffer, pCountBuffer, sizeof(UINT) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+        }
+        checkCudaErrors(cudaMemcpy(pHostValueBuffer, pValueBuffer, sizeof(Real) * (uiMaxR + 1), cudaMemcpyDeviceToHost));
+
+        //Here we have already divide by all XYZ points
+        FillDataWithR_R(
+            arrData,
+            arrInner,
+            arrFull,
+            arrR,
+            pHostValueBuffer,
+            pHostCountBuffer,
+            uiConfig,
+            uiMaxR,
+            uiEdgeR,
+            fDivider,
+            bCalculateCounter
+        );
+    }
+
+    /**
+     * TransformFromXYDataToRData_C and TransformFromXYDataToRData_R
+     * is for Stochastic measurements
+     */
+    static void TransformFromXYDataToRData_C(
+        UBOOL bShiftCenter,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        BYTE byFieldId,
+        UINT uiFieldCount,
+        UINT uiMeasureCount,
+        UINT uiConfig,
+        const CLGComplex* const* pXYBuffers,
+        UINT* pCountBuffer,
+        CLGComplex* pValueBuffer,
+        UINT* pHostCountBuffer,
+        CLGComplex* pHostValueBuffer,
+        TArray<UINT>& lstR,
+        TArray<CLGComplex>* lstValues,
+        TArray<CLGComplex>* lstAll,
+        TArray<CLGComplex>* lstInner);
+
+    static void TransformFromXYDataToRData_R(
+        UBOOL bShiftCenter,
+        UINT uiMaxR,
+        UINT uiEdgeR,
+        BYTE byFieldId,
+        UINT uiFieldCount,
+        UINT uiMeasureCount,
+        UINT uiConfig,
+        const Real* const* pXYBuffers,
+        UINT* pCountBuffer,
+        Real* pValueBuffer,
+        UINT* pHostCountBuffer,
+        Real* pHostValueBuffer,
+        TArray<UINT>& lstR,
+        TArray<Real>* lstValues,
+        TArray<Real>* lstAll,
+        TArray<Real>* lstInner);
+
+    /**
+     * Many measurements measure the XY distributions, needs to calculate max R and edge
+     */
+    static void SetMaxAndEdge(UINT* maxXY, UINT* edgeXY, UBOOL bShiftCenter)
+    {
+        if (bShiftCenter)
+        {
+            if (NULL != maxXY)
+            {
+                *maxXY = (_HC_Lx - 1) * (_HC_Lx - 1) + (_HC_Ly - 1) * (_HC_Ly - 1);
+            }
+            
+            if (NULL != edgeXY)
+            {
+                *edgeXY = _HC_Lx - 1;
+            }
+        }
+        else
+        {
+            if (NULL != maxXY)
+            {
+                *maxXY = ((_HC_Lx + 1) / 2) * ((_HC_Lx + 1) / 2)
+                       + ((_HC_Ly + 1) / 2) * ((_HC_Ly + 1) / 2);
+            }
+
+            if (NULL != edgeXY)
+            {
+                *edgeXY = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+            }
+        }
+    }
+
+#pragma endregion
 
 protected:
 
