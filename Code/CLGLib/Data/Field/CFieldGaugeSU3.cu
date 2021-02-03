@@ -309,10 +309,10 @@ _kernelPlaqutteEnergySU3CacheIndex(
 #else
     Real resThisThread = F(0.0);
 #endif
-    UINT plaqCountAll = plaqCount * plaqLength;
+    const UINT indexSkip = plaqCount * plaqLength * uiSiteIndex;
     for (BYTE i = 0; i < plaqCount; ++i)
     {
-        SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
+        SIndex first = pCachedIndex[i * plaqLength + indexSkip];
         deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
 
         if (first.NeedToDagger())
@@ -322,7 +322,7 @@ _kernelPlaqutteEnergySU3CacheIndex(
 
         for (BYTE j = 1; j < plaqLength; ++j)
         {
-            first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
+            first = pCachedIndex[i * plaqLength + j + indexSkip];
             deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
             if (first.NeedToDagger())
             {

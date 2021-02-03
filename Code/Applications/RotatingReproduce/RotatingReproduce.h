@@ -15,6 +15,7 @@ __DEFINE_ENUM(ERotatingJob,
     ERJ_Thermal,
     ERJ_PolyakovDist,
     ERJ_GaugeFixing,
+    ERJ_RotationTest,
     )
 
 
@@ -22,6 +23,7 @@ extern INT TestAngularMomentum(CParameters& params);
 extern INT TestThermal(CParameters& params);
 extern INT MeasurePolyakovDist(CParameters& params);
 extern INT GaugeFixing(CParameters& params);
+extern INT RotationTest(CParameters& params);
 
 
 #define _CLG_EXPORT_ANGULAR(measureName, lstName) \

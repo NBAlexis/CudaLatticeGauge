@@ -467,7 +467,7 @@ TestRotationKS:
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
-    ExpectedRes : 0.487
+    ExpectedRes : 0.526069
     CacheStaple : 0
 
     Updator:
@@ -688,7 +688,7 @@ TestRotationProjectivePlane:
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
-    ExpectedRes : 0.416
+    ExpectedRes : 0.526069
     CacheStaple : 0
 
     Updator:

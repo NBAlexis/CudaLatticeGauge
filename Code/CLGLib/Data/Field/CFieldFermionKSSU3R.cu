@@ -46,6 +46,7 @@ _kernelDFermionKS_PR_XYTerm(
     intokernalInt4;
 
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
+    const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
 
     #pragma unroll
     for (UINT idx = 0; idx < 8; ++idx)
@@ -63,31 +64,36 @@ _kernelDFermionKS_PR_XYTerm(
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sTargetSite)];
         const SIndex& sMiddleBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sMidSite)];
         sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
-        
-        INT eta_tau = (pEtaTable[sMiddleBigIndex.m_uiSiteIndex] >> 3) & 1;
-        eta_tau = eta_tau + bXorY;       
+
+        //note that bYorX = 1, it is x partial_y term, therefore is '-'
+        INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+                         + bYorX;
+
         if (sTargetBigIndex.NeedToOpposite())
-        {
-            eta_tau = eta_tau + 1;
+        {            
+            this_eta_tau = this_eta_tau + 1;
         }
 
         deviceSU3Vector right = _deviceVXXTauOptimized(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
             pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
-        right.MulReal(sCenter.m_byData4[bXorY] - sMidSite.m_byData4[bXorY] - F(0.5));
+        //when bXorY = 1, it is y partial _x, so is [1]
+        //when bXorY = 0, it is x partial _y, so is [0]
+        right.MulReal(sMidSite.m_byData4[bXorY] - sCenter.m_byData4[bXorY] + F(0.5));
 
-        if (bPlusMu)
+        if (!bPlusMu)
         {
-            eta_tau = eta_tau + 1;
+            //for -2x, -2y terms, there is another minus sign
+            this_eta_tau = this_eta_tau + 1;
         }
 
-        if (eta_tau & 1)
+        if (this_eta_tau & 1)
         {
-            result.Add(right);
+            result.Sub(right);
         }
         else
         {
-            result.Sub(right);
+            result.Add(right);
         }
     }
 
@@ -153,7 +159,8 @@ _kernelDFermionKS_PR_XYTau_Term(
 
         //eta124 of site is almost always -target, so use left or right is same
         //The only exception is on the boundary
-        INT eta124 = bPlusT ? (sSite4.y + sSite4.z): (site_target.y + site_target.z + 1);
+        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+
         if (sTargetBigIndex.NeedToOpposite())
         {
             eta124 = eta124 + 1;
@@ -201,6 +208,8 @@ _kernelDFermionKS_PR_XYTau_Term(
  * 2. we need phi(n1), phi(n2), phid(n1), phid(n2)
  *
  * byContribution: 0 for mu, 1 for tau, 2 for both mu and tau
+ *
+ * iTau = 1 for +t, -1 for -t
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKSForce_PR_XYTerm( 
@@ -238,7 +247,7 @@ _kernelDFermionKSForce_PR_XYTerm(
     
     site_n1 = __deviceSiteIndexToInt4(smiddle.m_uiSiteIndex);
     //y Dx and -x Dy
-    Real fNv = (0 == byMu)
+    const Real fNv = (0 == byMu)
         ? static_cast<Real>(site_n1.y - sCenter.y + F(0.5))
         : static_cast<Real>(sCenter.x - site_n1.x - F(0.5));
 
@@ -270,7 +279,10 @@ _kernelDFermionKSForce_PR_XYTerm(
         deviceSU3 res = deviceSU3::makeSU3ContractV(phi1, phi2);
         res.Add(deviceSU3::makeSU3ContractV(phi4, phi3));
         res.Ta();
-        const Real eta_tau = (1 == ((pEtaTable[smiddle.m_uiSiteIndex] >> 3) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_tau = (iTau > 0 ? 
+            ((pEtaTable[sn1.m_uiSiteIndex] >> 3) & 1) 
+            : ((pEtaTable[sn2.m_uiSiteIndex] >> 3) & 1) )
+            ? F(-1.0) : F(1.0);
         res.MulReal(OneOver12 * fOmega * fNv * pNumerators[rfieldId] * eta_tau);
 
         //For mu
@@ -380,8 +392,9 @@ _kernelDFermionKSForce_PR_XYTau_Term(
 
 }
 
+/*
 __global__ void _CLG_LAUNCH_BOUND
-_kernelDFermionKSForce_PR_XYTau_Term2(
+_giveupkernelDFermionKSForce_PR_XYTau_Term2(
     const deviceSU3* __restrict__ pGauge,
     deviceSU3* pForce,
     const deviceSU3Vector* const* __restrict__ pFermionPointers,
@@ -470,6 +483,8 @@ _kernelDFermionKSForce_PR_XYTau_Term2(
         }
     }
 }
+
+*/
 
 #pragma endregion
 
@@ -636,7 +651,7 @@ void CFieldFermionKSSU3R::DerivateD0(
         {
             //bearly no change of time, because force calculation is not frequent
             /*
-            _kernelDFermionKSForce_PR_XYTau_Term2 << <block, threads >> > (
+            _giveupkernelDFermionKSForce_PR_XYTau_Term2 << <block, threads >> > (
                 (const deviceSU3*)pGaugeBuffer,
                 (deviceSU3*)pForce,
                 m_pRationalFieldPointers,

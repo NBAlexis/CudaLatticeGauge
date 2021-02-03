@@ -29,6 +29,7 @@ _kernelDFermionKS_PR_XYTermCopy(
     intokernalInt4;
 
     pResultData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+    const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
 
     #pragma unroll
     for (UINT idx = 0; idx < 8; ++idx)
@@ -47,30 +48,35 @@ _kernelDFermionKS_PR_XYTermCopy(
         const SIndex& sMiddleBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sMidSite)];
         sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
 
-        INT eta_tau = (pEtaTable[sMiddleBigIndex.m_uiSiteIndex] >> 3) & 1;
-        eta_tau = eta_tau + bXorY;
+        //note that bYorX = 1, it is x partial_y term, therefore is '-'
+        INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+            + bYorX;
+
         if (sTargetBigIndex.NeedToOpposite())
         {
-            eta_tau = eta_tau + 1;
+            this_eta_tau = this_eta_tau + 1;
         }
 
         deviceSU3Vector right = _deviceVXXTauOptimized(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
             pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
-        right.MulReal(sCenter.m_byData4[bXorY] - sMidSite.m_byData4[bXorY] - F(0.5));
+        //when bXorY = 1, it is y partial _x, so is [1]
+        //when bXorY = 0, it is x partial _y, so is [0]
+        right.MulReal(sMidSite.m_byData4[bXorY] - sCenter.m_byData4[bXorY] + F(0.5));
 
-        if (bPlusMu)
+        if (!bPlusMu)
         {
-            eta_tau = eta_tau + 1;
+            //for -2x, -2y terms, there is another minus sign
+            this_eta_tau = this_eta_tau + 1;
         }
 
-        if (eta_tau & 1)
+        if (this_eta_tau & 1)
         {
-            pResultData[uiSiteIndex].Add(right);
+            pResultData[uiSiteIndex].Sub(right);
         }
         else
         {
-            pResultData[uiSiteIndex].Sub(right);
+            pResultData[uiSiteIndex].Add(right);
         }
     }
 
@@ -149,7 +155,7 @@ _kernelKSApplyGammaEtaCopy(
     const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
-    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> byDir) & 1));
+    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
 
     const deviceSU3& x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];

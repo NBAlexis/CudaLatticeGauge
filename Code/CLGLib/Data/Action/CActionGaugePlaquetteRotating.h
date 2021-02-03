@@ -54,6 +54,10 @@ public:
     UBOOL m_bCloverEnergy;
     UBOOL m_bShiftHalfCoord;
 
+    //===== test functions ======
+    DOUBLE XYTerm1(const class CFieldGauge* pGauge);
+    DOUBLE XYTerm2(const class CFieldGauge* pGauge);
+
 protected:
 
 #if !_CLG_DOUBLEFLOAT
@@ -1037,6 +1041,7 @@ static __device__ __inline__ Real _deviceSiteCoeff(
 {
     if (0 == byType)
     {
+        //x
         const UBOOL bOpposite = sSite4.x >= static_cast<SBYTE>(_DC_Lx) || sSite4.x < 0;
         sSite4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4)].m_uiSiteIndex);
         if (bOpposite)
@@ -1047,6 +1052,7 @@ static __device__ __inline__ Real _deviceSiteCoeff(
     }
     if (1 == byType)
     {
+        //y
         const UBOOL bOpposite = sSite4.y >= static_cast<SBYTE>(_DC_Ly) || sSite4.y < 0;
         sSite4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4)].m_uiSiteIndex);
         if (bOpposite)
@@ -1057,10 +1063,12 @@ static __device__ __inline__ Real _deviceSiteCoeff(
     }
     if (3 == byType)
     {
+        //There should be NO byType = 3?
         sSite4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4)].m_uiSiteIndex);
         return -sSite4.y + sCenterSite.y - F(0.5);
     }
 
+    //byType = 2 and this is XY
     const BYTE bOppositeX = (sSite4.x >= static_cast<SBYTE>(_DC_Lx) || sSite4.x < 0) ? 1 : 0;
     const BYTE bOppositeY = (sSite4.y >= static_cast<SBYTE>(_DC_Ly) || sSite4.y < 0) ? 1 : 0;
     sSite4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4)].m_uiSiteIndex);

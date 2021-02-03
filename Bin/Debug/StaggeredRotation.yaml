@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing
-RotationJob : ESR_Measure
+RotationJob : ESR_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,14 +328,14 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.06
+    GaugeBate : 5.02
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
     StartN : 101
     EndN : 1000
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -343,10 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : ../Release/5060204/GF
+    SubFolderPrefix : G:\SRFloat\5020204\Nt6
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF5060204_
-    CSVSavePrefix : ../Release/5060204/Chiral/SRF5060204_
+    SavePrefix : SRF5020204_
+    CSVSavePrefix : G:\SRFloat\5020204\Polyakov\SRF5020204_
 
     Dim : 4
     Dir : 4
@@ -562,11 +564,11 @@ JobGaugeFixing:
     IndexEnd : 1000
 
     SubFolder : 1
-    SubFolderPrefix : ./5060204/Nt6
-    LoadPrefix : SRF510204_
+    SubFolderPrefix : G:\SRFloat\5020204\Nt6
+    LoadPrefix : SRF5020204_
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : ./5060204/GF/GFSRF5060204_
+    SavePrefix : ./5020204/GF/GFSRF5020204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0

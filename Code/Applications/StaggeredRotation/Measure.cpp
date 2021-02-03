@@ -323,6 +323,14 @@ INT Measurement(CParameters& params)
     params.FetchValueReal(_T("OmegaRange"), fOmega);
     fOmega = fOmega / iEndOmega;
 
+    CCString sLoadType = _T("EFFT_CLGBin");
+    EFieldFileType eLoadType = EFFT_CLGBin;
+    if (params.FetchStringValue(_T("LoadType"), sLoadType))
+    {
+        eLoadType = __STRING_TO_ENUM(EFieldFileType, sLoadType);
+    }
+    appGeneral(_T("load type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eLoadType).c_str());
+
     if (!appInitialCLG(params))
     {
         appCrucial(_T("Initial Failed!\n"));
@@ -409,7 +417,7 @@ INT Measurement(CParameters& params)
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             }
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
             
             switch (eJob)
             {
@@ -545,8 +553,8 @@ INT Measurement(CParameters& params)
                         pFAHeavy->OnConfigurationAcceptedZ4(
                             appGetLattice()->m_pGaugeField,
                             NULL,
-                            pF2Light,
-                            pF1Light,
+                            pF2Heavy,
+                            pF1Heavy,
                             0 == i,
                             iFieldCount == i + 1);
                     }

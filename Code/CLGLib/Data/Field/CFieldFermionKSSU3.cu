@@ -150,7 +150,7 @@ _kernelDFermionKSPlusEta(
 
         //This is in fact, -1 * eta(n + mu)
         const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
-        const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
@@ -689,7 +689,7 @@ _kernelKSApplyGammaEta(
     const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
     BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
-    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Gauge.m_uiSiteIndex] >> byDir) & 1));
+    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
 
     const deviceSU3& x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];

@@ -50,6 +50,12 @@ int main(int argc, char * argv[])
                 res = GaugeFixing(workingParam4);
             }
         break;
+        case ERJ_RotationTest:
+            {
+                CParameters workingParam4 = params.GetParameter(_T("JobRotationTest"));
+                res = RotationTest(workingParam4);
+            }
+        break;
     }
 
     return res;
