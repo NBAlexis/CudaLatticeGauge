@@ -99,9 +99,12 @@ _kernelDFermionKS_PR_XYTerm(
 
     if (bDDagger)
     {
-        fOmega = -fOmega;
+        result.MulReal(F(-0.25) * fOmega);
     }
-    result.MulReal(F(0.25) * fOmega);
+    else
+    {
+        result.MulReal(F(0.25) * fOmega);
+    }
 
     switch (eCoeff)
     {
@@ -168,11 +171,11 @@ _kernelDFermionKS_PR_XYTau_Term(
 
         if (eta124 & 1)
         {
-            result.Add(right);
+            result.Sub(right);
         }
         else
         {
-            result.Sub(right);
+            result.Add(right);
         }
     }
 
@@ -380,13 +383,13 @@ _kernelDFermionKSForce_PR_XYTau_Term(
         if (pathLdir1 > 0)
         {
             const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLdir1 - 1);
-            pForce[linkIndex].Sub(res);
+            pForce[linkIndex].Add(res);
         }
 
         if (pathRdir1 > 0)
         {
             const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRdir1 - 1);
-            pForce[linkIndex].Add(res);
+            pForce[linkIndex].Sub(res);
         }
     }
 

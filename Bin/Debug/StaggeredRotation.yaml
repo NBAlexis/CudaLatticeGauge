@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing
-RotationJob : ESR_GaugeFixing
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,14 +17,14 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 100
-    SaveStartIndex : 390
-    OmegaSep : 4
-    OmegaStart : 4
-    MaxOmega : 0.064
+    EquvibStep : 1000
+    SaveStartIndex : 0
+    OmegaSep : 8
+    OmegaStart : 1
+    MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : SRF510204_
+    SavePrefix : ./4980204/SRF4980204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./5060204/SRF510204_R_Nt6_O4_390.con
-    Nt6Polyakov : 0.232008457184
+    Nt6FileName : ./4980204/SRF4980204_R_Nt6_O0_1000.con
+    Nt6Polyakov : 0.009915229864
 
     Updator:
 
@@ -66,7 +66,7 @@ JobSimulate:
         IntegratorType : CIntegratorNestedOmelyan
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 15
+        IntegratorStep : 8
         NestedStep : 20
         Omelyan2Lambda : 0.38636665500756728
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.06
+        Beta : 4.98
         Omega : 0.0
 
     Action2:

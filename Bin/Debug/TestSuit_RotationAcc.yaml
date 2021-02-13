@@ -688,7 +688,7 @@ TestRotationProjectivePlane:
     FermionFieldCount : 4
     MeasureListLength : 1
     ExpectedResDebug : 0.413
-    ExpectedRes : 0.526069
+    ExpectedRes : 0.433
     CacheStaple : 0
 
     Updator:

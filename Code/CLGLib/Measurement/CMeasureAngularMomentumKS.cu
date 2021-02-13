@@ -124,11 +124,11 @@ _kernelDFermionKS_PR_XYTau_TermCopy(
 
         if (eta124 & 1)
         {
-            pResultData[uiSiteIndex].Add(right);
+            pResultData[uiSiteIndex].Sub(right);
         }
         else
         {
-            pResultData[uiSiteIndex].Sub(right);
+            pResultData[uiSiteIndex].Add(right);
         }
     }
 

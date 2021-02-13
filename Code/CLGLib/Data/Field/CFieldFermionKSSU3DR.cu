@@ -95,6 +95,7 @@ _kernelDFermionKS_R_XYTerm(
                 eta_tau = F(-1.0);
             }
             //sTargetSite no longer use
+            //Why to use target set?????
             sTargetSite = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
             if (bXorY)
             {
@@ -198,11 +199,11 @@ _kernelDFermionKS_R_XYTau_Term(
 
         if (sTargetBigIndex.NeedToOpposite())
         {
-            result.Add(right);
+            result.Sub(right);
         }
         else
         {
-            result.Sub(right);
+            result.Add(right);
         }
     }
 
@@ -411,7 +412,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, pathLdir1 - 1))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLdir1 - 1);
-                pForce[linkIndex].Add(res);
+                pForce[linkIndex].Sub(res);
             }
         }
 
@@ -420,7 +421,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
             if (!__idx->_deviceIsBondOnSurface(uiBigIdx, pathRdir1 - 1))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRdir1 - 1);
-                pForce[linkIndex].Sub(res);
+                pForce[linkIndex].Add(res);
             }
         }
     }

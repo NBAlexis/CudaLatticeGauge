@@ -247,7 +247,7 @@ INT SimulateStaggeredRotation(CParameters& params)
                     //Save info
                     appGetTimeNow(buff1, 256);
                     appGetTimeUtc(buff2, 256);
-                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s"),
+                    sInfo.Format(_T("TimeStamp : %d\nTime : %s\nTimeUTC : %s\nMD5 : %s\n"),
                         appGetTimeStamp(),
                         buff1,
                         buff2,
