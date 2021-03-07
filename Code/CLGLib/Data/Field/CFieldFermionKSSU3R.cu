@@ -46,13 +46,15 @@ _kernelDFermionKS_PR_XYTerm(
     intokernalInt4;
 
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
-    const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    //const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    const INT eta_tau = pEtaTable[uiSiteIndex] >> 3;
 
     #pragma unroll
     for (UINT idx = 0; idx < 8; ++idx)
     {
         const UBOOL bPlusMu  = idx & 2;
         const UBOOL bPlusTau = idx & 4;
+        //x or y, and y or x is the derivate, not coefficient
         const UINT bXorY = idx & 1;
         const UINT bYorX = 1 - bXorY;
         SSmallInt4 sTargetSite = sSite4;
@@ -66,7 +68,8 @@ _kernelDFermionKS_PR_XYTerm(
         sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
 
         //note that bYorX = 1, it is x partial_y term, therefore is '-'
-        INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+        //INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+        INT this_eta_tau = (bPlusTau ? eta_tau : (pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3))
                          + bYorX;
 
         if (sTargetBigIndex.NeedToOpposite())

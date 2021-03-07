@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing, ERJ_RotationTest}
-RotatingJob : ERJ_RotationTest
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -168,12 +168,12 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.75
+    GaugeBate : 4.81
     OmegaRange : 0.14
     StartOmega : 0
     EndOmega : 20
     StartN : 101
-    EndN : 8000
+    EndN : 10000
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
     DistributionJob : EDJ_Polyakov
     FermionMomentum : 0
@@ -183,15 +183,15 @@ JobPolyakovDist:
     UseZ4 : 0
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\configs\newresf\47516\Nt3
+    SubFolderPrefix : H:\configs\newresf\48116\Nt3
     # SubFolderPrefix : G:\configs\newresf\49916\Nt3
 
     # SavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Nt3/NC38161_
     # CSVSavePrefix : D:/NotUsingCLGCon/Nx14_49016/38161Nt3/Polyakov/NC38161_
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
-    SavePrefix : NC47516_
-    CSVSavePrefix : H:\configs\newresf\47516\Polyakov\NC47516_
+    SavePrefix : NC48116_
+    CSVSavePrefix : H:\configs\newresf\48116\Polyakov\NC48116_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_

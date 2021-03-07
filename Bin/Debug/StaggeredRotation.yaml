@@ -20,11 +20,11 @@ JobSimulate:
     EquvibStep : 1000
     SaveStartIndex : 0
     OmegaSep : 8
-    OmegaStart : 1
+    OmegaStart : 5
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./4980204/SRF4980204_
+    SavePrefix : ./5220204/SRF5220204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./4980204/SRF4980204_R_Nt6_O0_1000.con
-    Nt6Polyakov : 0.009915229864
+    Nt6FileName : ./5220204/SRF5220204_R_Nt6_O4_2000.con
+    Nt6Polyakov : 0.259081929922
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 4.98
+        Beta : 5.22
         Omega : 0.0
 
     Action2:
@@ -328,12 +328,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.02
-    OmegaRange : 0.128
+    GaugeBate : 5.1
+    OmegaRange : 0.64
     StartOmega : 0
-    EndOmega : 8
+    EndOmega : 4
     StartN : 101
-    EndN : 1000
+    EndN : 800
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum
     DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5020204\Nt6
+    SubFolderPrefix : G:\SRFloat\5100204\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF5020204_
-    CSVSavePrefix : G:\SRFloat\5020204\Polyakov\SRF5020204_
+    SavePrefix : SRF5100204_
+    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
 
     Dim : 4
     Dir : 4
