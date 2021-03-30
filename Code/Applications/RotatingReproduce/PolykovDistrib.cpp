@@ -15,6 +15,7 @@ __DEFINE_ENUM(EDistributionJob,
     EDJ_AngularMomentum,
     EDJ_ChiralAndFermionMomentum,
     EDJ_PlaqutteEnergy,
+    EDJ_CheckMD5,
     )
 
 
@@ -437,7 +438,13 @@ INT MeasurePolyakovDist(CParameters& params)
             {
                 sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             }
-            
+
+            if (EDJ_CheckMD5 == eJob)
+            {
+
+                break;
+            }
+
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             
             switch (eJob)

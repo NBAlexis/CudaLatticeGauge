@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing
-RotationJob : ESR_Simulate
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -20,7 +20,7 @@ JobSimulate:
     EquvibStep : 1000
     SaveStartIndex : 0
     OmegaSep : 8
-    OmegaStart : 5
+    OmegaStart : 6
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./5220204/SRF5220204_R_Nt6_O4_2000.con
-    Nt6Polyakov : 0.259081929922
+    Nt6FileName : ./5220204/SRF5220204_R_Nt6_O5_934.con
+    Nt6Polyakov : 0.295527398586
 
     Updator:
 
@@ -328,14 +328,14 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.1
-    OmegaRange : 0.64
+    GaugeBate : 5.06
+    OmegaRange : 0.128
     StartOmega : 0
-    EndOmega : 4
-    StartN : 101
-    EndN : 800
-    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum
-    DistributionJob : EDJKS_Polyakov
+    EndOmega : 3
+    StartN : 1
+    EndN : 2200
+    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
+    DistributionJob : EDJKS_CheckMD5
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5100204\Nt6
+    SubFolderPrefix : G:\SRFloat\5060204\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF5100204_
-    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
+    SavePrefix : SRF5060204_
+    CSVSavePrefix : G:\SRFloat\5220204\Polyakov\SRF5220204_
 
     Dim : 4
     Dir : 4
@@ -362,6 +362,7 @@ JobMeasure:
     FermionFieldCount : 2
     MeasureListLength : 5
     CacheStaple : 0
+    AlsoCheckMD5 : 1
 
     Gauge:
 

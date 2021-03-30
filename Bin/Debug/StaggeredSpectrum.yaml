@@ -13,11 +13,11 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 0
-    EquvibStep : 300
+    BeforeEquvibStep : 200
+    EquvibStep : 2000
     SaveStartIndex : 0
 
-    SavePrefix : ./500205/500205_
+    SavePrefix : ./5100204_
 
     Dim : 4
     Dir : 4
@@ -256,7 +256,7 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 5.0
+        Beta : 5.1
 
     Action2:
 

@@ -44,6 +44,7 @@ __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_AngularMomentum,
     EDJKS_ChiralAndFermionMomentum,
     EDJKS_PlaqutteEnergy,
+    EDJKS_CheckMD5,
     )
 
 
@@ -288,6 +289,10 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
     UINT iFieldCount = static_cast<UINT>(iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("AlsoCheckMD5"), iVaule);
+    UBOOL bCheckMd5 = (0 != iVaule);
+
     //iVaule = 1;
     //params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
     //UBOOL bCheckGaugeFixing = 0 != iVaule;
@@ -408,13 +413,59 @@ INT Measurement(CParameters& params)
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
         {
             CCString sFileName;
+            CCString sTxtFileName;
             if (bSubFolder)
             {
                 sFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sTxtFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.txt"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             }
             else
             {
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sTxtFileName.Format(_T("%sR_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+            }
+            //appGeneral(_T("checking %s ..."), sFileName);
+            if (EDJKS_CheckMD5 == eJob || bCheckMd5)
+            {
+                UINT uiSize = 0;
+                BYTE* fileContent = appGetFileSystem()->ReadAllBytes(sFileName, uiSize);
+                CCString sMD5 = "MD5 : " + CLGMD5Hash(fileContent, uiSize);
+                CCString sMD5old = "MD5 : " + CLGMD5Hash_OLD(fileContent, uiSize);
+                CCString sFileContent = appGetFileSystem()->ReadAllText(sTxtFileName);
+                if (sFileContent.Find(sMD5) >= 0)
+                {
+                    if (EDJKS_CheckMD5 == eJob)
+                    {
+                        appGeneral(_T("MD5 Found and good %s \n"), sFileName);
+                    }                    
+                }
+                else if (sFileContent.Find(sMD5old) >= 0)
+                {
+                    if (EDJKS_CheckMD5 == eJob)
+                    {
+                        appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName);
+                        sFileContent = sFileContent.Replace(sMD5old, sMD5);
+                        appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
+                    }
+                }
+                else if (sFileContent.Find("MD5 : ") >= 0)
+                {
+                    appCrucial(_T("MD5 Found and NOT good %s \n"), sFileName);
+                }
+                else
+                {
+                    if (EDJKS_CheckMD5 == eJob)
+                    {
+                        appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName);
+                        sFileContent = sFileContent + "\n" + sMD5 + "\n";
+                        appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
+                    }
+                }
+
+                if (EDJKS_CheckMD5 == eJob)
+                {
+                    continue;
+                }
             }
             
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
@@ -581,6 +632,11 @@ INT Measurement(CParameters& params)
         }
         appGeneral(_T("\n*)\n"));
 
+        if (EDJKS_CheckMD5 == eJob)
+        {
+            continue;
+        }
+
 #pragma endregion
 
         switch (eJob)
@@ -711,6 +767,20 @@ INT Measurement(CParameters& params)
         }
 
         appGeneral(_T("\n"));
+    }
+
+    if (EDJKS_CheckMD5 == eJob)
+    {
+        if (NULL != pF1Light)
+        {
+            pF1Light->Return();
+            pF2Light->Return();
+            pF1Heavy->Return();
+            pF2Heavy->Return();
+        }
+
+        appQuitCLG();
+        return 0;
     }
 
     switch (eJob)
