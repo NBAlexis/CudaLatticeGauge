@@ -18,6 +18,9 @@
 //
 //  Both JGChenApprox and JGChenApprox2 are not gauge inv.
 //
+// For Projective plane:
+//
+//
 // REVISION:
 //  [05/21/2019 nbale]
 //=============================================================================
@@ -68,6 +71,7 @@ public:
         , m_pE(NULL)
         , m_pDpureA(NULL)
         , m_bMeasureApprox(FALSE)
+        , m_bProjectivePlane(FALSE)
     {
     }
 
@@ -116,6 +120,7 @@ protected:
 public:
 
     UBOOL m_bMeasureApprox;
+    UBOOL m_bProjectivePlane;
     TArray<Real> m_lstJGAll;
     TArray<Real> m_lstJGInner;
 

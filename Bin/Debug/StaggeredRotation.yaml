@@ -17,14 +17,14 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 1000
-    SaveStartIndex : 0
-    OmegaSep : 8
-    OmegaStart : 6
-    MaxOmega : 0.128
+    EquvibStep : 150
+    SaveStartIndex : 1950
+    OmegaSep : 4
+    OmegaStart : 4
+    MaxOmega : 0.064
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./5220204/SRF5220204_
+    SavePrefix : ./5060204/SRF5060204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./5220204/SRF5220204_R_Nt6_O5_934.con
-    Nt6Polyakov : 0.295527398586
+    Nt6FileName : ./5060204/SRF5060204_R_Nt6_O4_1950.con
+    Nt6Polyakov : 0.216607317328
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.22
+        Beta : 5.06
         Omega : 0.0
 
     Action2:
@@ -328,14 +328,14 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.06
+    GaugeBate : 5.1
     OmegaRange : 0.128
     StartOmega : 0
-    EndOmega : 3
-    StartN : 1
-    EndN : 2200
+    EndOmega : 8
+    StartN : 201
+    EndN : 2700
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
-    DistributionJob : EDJKS_CheckMD5
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5060204\Nt6
+    SubFolderPrefix : G:\SRFloat\5100204\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF5060204_
-    CSVSavePrefix : G:\SRFloat\5220204\Polyakov\SRF5220204_
+    SavePrefix : SRF5100204_
+    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
 
     Dim : 4
     Dir : 4
@@ -362,7 +362,7 @@ JobMeasure:
     FermionFieldCount : 2
     MeasureListLength : 5
     CacheStaple : 0
-    AlsoCheckMD5 : 1
+    AlsoCheckMD5 : 0
 
     Gauge:
 

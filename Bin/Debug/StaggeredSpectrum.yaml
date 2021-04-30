@@ -1,5 +1,5 @@
 # ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing
-StaggeredSpectrumJob : ESSJ_Simulate
+StaggeredSpectrumJob : ESSJ_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -13,11 +13,11 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 200
-    EquvibStep : 2000
-    SaveStartIndex : 0
+    BeforeEquvibStep : 0
+    EquvibStep : 148
+    SaveStartIndex : 1852
 
-    SavePrefix : ./5100204_
+    SavePrefix : ./5180204_
 
     Dim : 4
     Dir : 4
@@ -51,10 +51,10 @@ JobSimulate:
     Gauge:
 
         FieldName : CFieldGaugeSU3
-        FieldInitialType : EFIT_Random
-        # FieldInitialType : EFIT_ReadFromFile
-        # GaugeFileType : EFFT_CLGBin
-        # GaugeFileName : ./5005002/5005002_Matching_97.con
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_ReadFromFile
+        GaugeFileType : EFFT_CLGBin
+        GaugeFileName : ./5180204_Matching_1852.con
 
         Period : [1, 1, 1, 1]
 
@@ -256,7 +256,7 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 5.1
+        Beta : 5.18
 
     Action2:
 
@@ -626,11 +626,11 @@ JobGaugeFixing:
     ShowDeviceInformation : 0
     ShowParameterContent : 1
 
-    IndexStart : 771
-    IndexEnd : 860
+    IndexStart : 1501
+    IndexEnd : 2000
 
-    LoadPrefix : ./500205/500205_
-    SavePrefix : ./500205/GF500205_
+    LoadPrefix : G:\SRMatching\5060204\Matching\5060204_
+    SavePrefix : ./5060204/GF/GF5060204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0

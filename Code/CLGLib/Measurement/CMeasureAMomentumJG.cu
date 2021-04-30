@@ -65,6 +65,58 @@ _kernelCalculateAngularMomentumJG(
     atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
 }
 
+/**
+ * In _deviceChairTerm, the projective plane is already considered
+ * So we need only to check the x and y
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateAngularMomentumJGProjectivePlane(
+    const deviceSU3* __restrict__ pDeviceData,
+    Real* pBuffer,
+    SSmallInt4 sCenter,
+    Real betaOverN,
+    BYTE byFieldId)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    Real fRes = F(0.0);
+    if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
+    {
+
+        //======================================================
+        //4-chair terms except for the last one
+        betaOverN = F(0.125) * betaOverN;
+
+        const Real fX = (sSite4.x - sCenter.x + F(0.5));
+
+        //===============
+        //+x Omega V412
+        const Real fV412 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
+
+        //===============
+        //+x Omega V432
+        const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
+
+        const Real fY = -(sSite4.y - sCenter.y + F(0.5));
+
+        //===============
+        //-y Omega V421
+        const Real fV421 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
+
+        //===============
+        //-y Omega V431
+        const Real fV431 = fY * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
+
+        fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
+    }
+
+    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
+}
+
+/**
+ * To calculate spin, there is no site out of lattice
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGaugeSpin(
     const deviceSU3* __restrict__ pE, 
@@ -158,6 +210,78 @@ _kernelCalculateJGSurf(
 }
 
 /**
+ * Already use m_pDeviceIndexLinkToSIndex
+ * So we just concerntrate on the X and Y
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateJGSurfProjectivePlane(
+    SSmallInt4 sCenter,
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pGauge,
+    const deviceSU3* __restrict__ pE,
+    const deviceSU3* __restrict__ pAphys,
+    Real* pBuffer,
+    Real fBetaOverN)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+
+    if (!site.IsDirichlet())
+    {
+        //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+        //const BYTE uiDir2 = uiDir * 2;
+        const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
+        const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+
+        Real fRes = F(0.0);
+        for (BYTE dir = 0; dir < 3; ++dir)
+        {
+            //p_i A_j = U_i(n) A_j(n+i) U_i^+(n) - U_i^+(n-i) A_j(n-i) U_i(n-i)
+            const SSmallInt4 x_p_i_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
+            const UINT x_p_i_bi = __idx->_deviceGetBigIndex(x_p_i_site);
+            const SIndex& x_p_i_x_idx = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_i_bi * 4 + 0];
+            const SIndex& x_p_i_y_idx = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_i_bi * 4 + 1];
+
+            //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
+            //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
+            //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
+            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, dir));
+            deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
+            a.MulDagger(u);
+            u.Mul(a);
+            //E_i (x p_i A_y  - y p_i A_x)
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            fRes += u.ReTr();
+
+            //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
+            //- y p_i A_x : -U_i^+(n-i) A_x(n-i) U_i(n-i)
+            /*
+            u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_i_Gauge, dir);
+            a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 1);
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 0).MulRealC(fY));
+            a.Mul(u);
+            u.DaggerMul(a);
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            fRes -= u.ReTr();
+            */
+            a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
+            a.MulReal(fX);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(a);
+            fRes -= u.ReTr();
+        }
+
+        //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN);
+    }
+}
+
+/**
  * This is (nabla . E) r x A
  * In z-dir this is (nabla . E) (x Ay - y Ax)
  */
@@ -179,6 +303,39 @@ _kernelCalculateJGPot(
     {
         const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
         const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+
+        deviceSU3 nablaE(pE[uiNablaE]);
+        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
+        a.MulReal(fX);
+        a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
+        nablaE.Mul(a);
+
+        //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -nablaE.ReTr() * fBetaOverN);
+    }
+}
+
+/**
+ *
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateJGPotProjectivePlane(
+    SSmallInt4 sCenter,
+    BYTE byFieldId,
+    const deviceSU3* __restrict__ pE,
+    const deviceSU3* __restrict__ pAphys,
+    Real* pBuffer,
+    Real fBetaOverN)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
+    const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
+    if (!site.IsDirichlet())
+    {
+        const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
+        const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
 
         deviceSU3 nablaE(pE[uiNablaE]);
         deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
@@ -333,8 +490,81 @@ _kernelMomentumJGChenDpureA(
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         pXcrossDpureA[uiLinkIndex] = deviceSU3::makeSU3Zero();
 
-        const SIndex& x_p_x_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_x_bi4 + idir + 1];
-        const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir + 1];
+        //should not be idir + 1!
+        const SIndex& x_p_x_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_x_bi4 + idir];
+        const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
+
+        //U_x(n) A_dir(n+x)U_x^+(n)
+        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 0));
+        deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
+        a.MulDagger(u);
+        u.Mul(a);
+        u.MulReal(fmY);
+        pXcrossDpureA[uiLinkIndex].Add(u);
+
+        //U_x^+(n-x) A_dir(n-x) U_x(n-x)
+        //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_x_Gauge, 0);
+        //a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_x_Gauge, idir);
+        //a.Mul(u);
+        //u.DaggerMul(a);
+        //u.MulReal(fmY);
+        //pXcrossDpureA[uiLinkIndex].Sub(u);
+        a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir);
+        a.MulReal(fmY - fmX);
+        pXcrossDpureA[uiLinkIndex].Sub(a);
+
+        //U_y(n) A_dir(n+y)U_y^+(n)
+        u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
+        a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
+        a.MulDagger(u);
+        u.Mul(a);
+        u.MulReal(fmX);
+        pXcrossDpureA[uiLinkIndex].Sub(u);
+
+        //U_y^+(n-y) A_dir(n-y) U_y(n-y)
+        //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_y_Gauge, 1);
+        //a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_y_Gauge, idir);
+        //a.Mul(u);
+        //u.DaggerMul(a);
+        //u.MulReal(fmX);
+        //pXcrossDpureA[uiLinkIndex].Add(u);
+    }
+}
+
+/**
+ *
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMomentumJGChenDpureAProjectivePlane(
+    deviceSU3* pXcrossDpureA,
+    const deviceSU3* __restrict__ pGauge,
+    const deviceSU3* __restrict__ pAphys,
+    SSmallInt4 sCenter,
+    BYTE byFieldId)
+{
+    intokernalInt4;
+
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir2 = uiDir * 2;
+    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
+    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+
+
+    const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
+    const SSmallInt4 x_p_y_site = _deviceSmallInt4OffsetC(sSite4, 2);
+    const UINT x_p_x_bi4 = __idx->_deviceGetBigIndex(x_p_x_site) * _DC_Dir;
+    const UINT x_p_y_bi4 = __idx->_deviceGetBigIndex(x_p_y_site) * _DC_Dir;
+
+    //idir = mu
+    for (UINT idir = 0; idir < uiDir - 1; ++idir)
+    {
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        pXcrossDpureA[uiLinkIndex] = deviceSU3::makeSU3Zero();
+
+        //Link to SIndex should not have 1!
+        const SIndex& x_p_x_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_x_bi4 + idir];
+        const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
 
         //U_x(n) A_dir(n+x)U_x^+(n)
         deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 0));
@@ -438,6 +668,10 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     param.FetchValueINT(_T("MeasureApprox"), iValue);
     m_bMeasureApprox = iValue != 0;
 
+    iValue = 0;
+    param.FetchValueINT(_T("ProjectivePlane"), iValue);
+    m_bProjectivePlane = iValue != 0;
+
     if (m_bMeasureSpin)
     {
         m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(m_byFieldId)->GetCopy());
@@ -447,10 +681,11 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     if (m_bMeasureDistribution)
     {
         //assuming the center is really at center
-        m_uiMaxR = ((_HC_Lx + 1) / 2) * ((_HC_Lx + 1) / 2)
-                 + ((_HC_Ly + 1) / 2) * ((_HC_Ly + 1) / 2);
+        //m_uiMaxR = ((_HC_Lx + 1) / 2) * ((_HC_Lx + 1) / 2)
+        //         + ((_HC_Ly + 1) / 2) * ((_HC_Ly + 1) / 2);
 
-        m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+        //m_uiEdgeR = ((_HC_Lx + 1) / 2 - 1) * ((_HC_Lx + 1) / 2 - 1);
+        SetMaxAndEdge(&m_uiMaxR, &m_uiEdgeR, m_bProjectivePlane);
 
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
         checkCudaErrors(cudaMalloc((void**)&m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1)));
@@ -479,12 +714,24 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     preparethread;
 
-    _kernelCalculateAngularMomentumJG << <block, threads >> > (
-        pGaugeSU3->m_pDeviceData, 
-        m_pDeviceDataBuffer,
-        CCommonData::m_sCenter,
-        fBetaOverN,
-        m_byFieldId);
+    if (m_bProjectivePlane)
+    {
+        _kernelCalculateAngularMomentumJGProjectivePlane << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pDeviceDataBuffer,
+            CCommonData::m_sCenter,
+            fBetaOverN,
+            m_byFieldId);
+    }
+    else
+    {
+        _kernelCalculateAngularMomentumJG << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pDeviceDataBuffer,
+            CCommonData::m_sCenter,
+            fBetaOverN,
+            m_byFieldId);
+    }
 
     _AverageXYPlane(m_pDeviceDataBuffer);
 
@@ -492,7 +739,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     if (m_bMeasureDistribution)
     {
-        XYDataToRdistri_R(FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+        XYDataToRdistri_R(m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
             m_uiMaxR, TRUE, m_byFieldId);
 
         checkCudaErrors(cudaGetLastError());
@@ -544,6 +791,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     if (m_bMeasureSpin)
     {
         _ZeroXYPlane(m_pDeviceDataBuffer);
+
+        //projective plane has been considered
         pGaugeSU3->CalculateE_Using_U(m_pE);
         const CFieldGaugeSU3* pESU3 = dynamic_cast<const CFieldGaugeSU3*>(m_pE);
         const CFieldGaugeSU3* pAphysSU3 = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
@@ -577,7 +826,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bMeasureDistribution)
             {
                 XYDataToRdistri_R(
-                    FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, m_byFieldId);
                 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -593,14 +842,29 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 #pragma region Surf
 
             _ZeroXYPlane(m_pDeviceDataBuffer);
-            _kernelCalculateJGSurf << <block, threads >> > (
-                CCommonData::m_sCenter,
-                m_byFieldId,
-                pGaugeSU3->m_pDeviceData,
-                pESU3->m_pDeviceData,
-                pAphysSU3->m_pDeviceData,
-                m_pDeviceDataBuffer,
-                fBetaOverN);
+            if (m_bProjectivePlane)
+            {
+                _kernelCalculateJGSurf << <block, threads >> > (
+                    CCommonData::m_sCenter,
+                    m_byFieldId,
+                    pGaugeSU3->m_pDeviceData,
+                    pESU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN);
+            }
+            else
+            {
+                _kernelCalculateJGSurf << <block, threads >> > (
+                    CCommonData::m_sCenter,
+                    m_byFieldId,
+                    pGaugeSU3->m_pDeviceData,
+                    pESU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN);
+            }
+
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
@@ -616,7 +880,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bMeasureDistribution)
             {
                 XYDataToRdistri_R(
-                    FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, m_byFieldId);
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -633,13 +897,27 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
             _ZeroXYPlane(m_pDeviceDataBuffer);
 
-            _kernelMomentumJGChenDpureA << <block, threads >> > (
-                pDpureA->m_pDeviceData,
-                pGaugeSU3->m_pDeviceData,
-                pAphysSU3->m_pDeviceData,
-                CCommonData::m_sCenter,
-                pAphysSU3->m_byFieldId
-                );
+            if (m_bProjectivePlane)
+            {
+                _kernelMomentumJGChenDpureAProjectivePlane << <block, threads >> > (
+                    pDpureA->m_pDeviceData,
+                    pGaugeSU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    CCommonData::m_sCenter,
+                    pAphysSU3->m_byFieldId
+                    );
+            }
+            else
+            {
+                _kernelMomentumJGChenDpureA << <block, threads >> > (
+                    pDpureA->m_pDeviceData,
+                    pGaugeSU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    CCommonData::m_sCenter,
+                    pAphysSU3->m_byFieldId
+                    );
+            }
+
             _kernelMomemtumJGChen << <block, threads >> > (
                 pESU3->m_pDeviceData,
                 pDpureA->m_pDeviceData,
@@ -661,7 +939,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bMeasureDistribution)
             {
                 XYDataToRdistri_R(
-                    FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, m_byFieldId);
 
                 //extract res
@@ -683,13 +961,27 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             pGaugeSU3->CalculateNablaE_Using_U(m_pE);
             //checkCudaErrors(cudaGetLastError());
             _ZeroXYPlane(m_pDeviceDataBuffer);
-            _kernelCalculateJGPot << <block, threads >> > (
-                CCommonData::m_sCenter,
-                m_byFieldId,
-                pESU3->m_pDeviceData,
-                pAphysSU3->m_pDeviceData,
-                m_pDeviceDataBuffer,
-                fBetaOverN);
+            if (m_bProjectivePlane)
+            {
+                _kernelCalculateJGPotProjectivePlane << <block, threads >> > (
+                    CCommonData::m_sCenter,
+                    m_byFieldId,
+                    pESU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN);
+            }
+            else
+            {
+                _kernelCalculateJGPot << <block, threads >> > (
+                    CCommonData::m_sCenter,
+                    m_byFieldId,
+                    pESU3->m_pDeviceData,
+                    pAphysSU3->m_pDeviceData,
+                    m_pDeviceDataBuffer,
+                    fBetaOverN);
+            }
+
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
@@ -705,7 +997,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bMeasureDistribution)
             {
                 XYDataToRdistri_R(
-                    FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+                    m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
                     m_uiMaxR, FALSE, m_byFieldId);
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -720,6 +1012,11 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
             if (m_bMeasureApprox)
             {
+                if (m_bProjectivePlane)
+                {
+                    appGeneral(_T("NOTE!!!: Projective plane does not support Approx"));
+                }
+
                 pGaugeSU3->CopyTo(pDpureA);
                 pDpureA->TransformToIA();
                 //[A, Aphys] = [Apure, Aphys], so we do not need to minus Aphys

@@ -437,16 +437,24 @@ INT Measurement(CParameters& params)
                     if (EDJKS_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Found and good %s \n"), sFileName);
-                    }                    
+                    }
+                    else
+                    {
+                        appGeneral(_T("-"));
+                    }
                 }
                 else if (sFileContent.Find(sMD5old) >= 0)
                 {
                     if (EDJKS_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName);
-                        sFileContent = sFileContent.Replace(sMD5old, sMD5);
-                        appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
                     }
+                    else
+                    {
+                        appGeneral(_T("-"));
+                    }
+                    sFileContent = sFileContent.Replace(sMD5old, sMD5);
+                    appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
                 }
                 else if (sFileContent.Find("MD5 : ") >= 0)
                 {
@@ -457,9 +465,13 @@ INT Measurement(CParameters& params)
                     if (EDJKS_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName);
-                        sFileContent = sFileContent + "\n" + sMD5 + "\n";
-                        appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
                     }
+                    else
+                    {
+                        appGeneral(_T("+"));
+                    }
+                    sFileContent = sFileContent + "\n" + sMD5 + "\n";
+                    appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
                 }
 
                 if (EDJKS_CheckMD5 == eJob)

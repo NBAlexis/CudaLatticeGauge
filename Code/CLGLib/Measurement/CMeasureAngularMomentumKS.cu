@@ -190,8 +190,8 @@ _kernelKSApplyGammaEtaCopy(
     pMe[uiSiteIndex].MulReal(F(0.5));
 
     //Here it is gamma _4 psi, we still need r x Aphys times it
-    const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
+    const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
     deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);

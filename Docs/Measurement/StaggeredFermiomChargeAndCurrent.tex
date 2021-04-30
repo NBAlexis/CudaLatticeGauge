@@ -1,0 +1,83 @@
+\subsection{\label{StaggeredFermionSpectrumChargeAndCurrent}Staggered Fermion Charge And Current}
+
+\subsubsection{\label{StaggeredFermionGammaMatrix}Staggered Fermion Gamma matrix}
+
+The observables in this sub-sub-section we want to measure are $\langle \bar{\psi} \gamma ^{\mu} \psi$, and we consider only the taste singlet, so that we care about $\langle \bar{\psi} \gamma ^{\mu}\otimes I \psi$.
+
+It has been shown that
+\textcolor[rgb]{0,0.5,0}{
+\begin{equation}
+\begin{split}
+&\sum _{\alpha_1,\alpha _2,a} \bar{q}_{\alpha_1,a}(2h)(\gamma _{\mu})_{\alpha_1,\alpha_2} q_{\alpha _2,a}(2h) = \frac{1}{16} \eta _{\mu}(s)\sum _{t} \left(\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\sum _{\alpha_1,\alpha _2,a_1,a_2} \bar{q}_{\alpha_1,a_1}(2h)(\gamma _5)_{\alpha_1,\alpha_2} (\gamma _5^*\gamma _{\mu}^*)_{a_1,a_2}q_{\alpha _2,a_2}(2h) \\
+&= \frac{1}{16} \eta _{\mu}(s)\sum _{t} \left(\textcolor[rgb]{1,0,0}{-}\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}}
+
+Therefore
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes I q(2h) = \frac{1}{16} \eta _{\mu}(s)\sum _{t} \left(\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h+2\mu) - \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h+2\mu)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)\\
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h-2\mu) + \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h-2\mu)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\\
+\end{split}
+\end{equation}}
+
+Therefore
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h+2\mu) - \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h+2\mu)\\
+&+\bar{q}(2h)\gamma _{\mu}\otimes \mathbb{I}_{\tau} q(2h-2\mu) + \bar{q}(2h)\gamma _5\otimes \tau _5^*\tau _{\mu}^* q(2h-2\mu)\\
+&+4\bar{q}(2h)\gamma _{\mu}\otimes I q(2h)-2\bar{q}(2h)\gamma _{\mu}\otimes I q(2h)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)\\
+&+\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\\
+&+\frac{1}{8} \eta _{\mu}(s)\sum _{t} \left(\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}
+which is
+\begin{equation}
+\begin{split}
+&4\bar{q}(2h)\gamma _{\mu}\otimes I q(2h)+\mathcal{O}(a^4+a^2)\\
+&=\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+\mu)\chi (2h+t+2\mu)\\
+&+\eta _{\mu}(s)\frac{1}{8}\sum _{t} \bar{\chi}(2h+t+2\mu)\chi (2h+t+\mu)\\
+&+\frac{1}{8} \eta _{\mu}(s)\sum _{t} \left(\bar{\chi}(2h+t+\mu)\chi (2h+t) +  \bar{\chi}(2h+t)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&4\sum _{2h}\bar{q}(2h)\gamma _{\mu}\otimes I q(2h)=\eta _{\mu}(n_{left})\frac{1}{8}\sum _{n} \left(\bar{\chi}(n+\mu)\chi (n)+\bar{\chi}(n)\chi (n+\mu)\right)\\
+&2^4\sum _{2h}\bar{q}(2h)\gamma _{\mu}\otimes I q(2h)=\eta _{\mu}(n_{left})\frac{1}{2}\sum _{n} \left(\bar{\chi}(n+\mu)\chi (n)+\bar{\chi}(n)\chi (n+\mu)\right)\\
+\end{split}
+\end{equation}
+
+
+\textbf{\textcolor[rgb]{1,0,0}{Note that they are not gauge invariant,} we need to add links to connect them.}
+
+\subsubsection{\label{StaggeredFermionGamma5}Staggered Fermion Gamma5}
+
+We can start from
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _5\otimes I q(2h) = \frac{1}{16} \eta _1(s)\eta _2(s)\eta _3(s)\eta _4(s)\sum _{n} \left(\bar{\chi}(2h)\chi (2h+n) +  \bar{\chi}(2h+2-n)\chi (2h+t+\mu)\right)
+\end{split}
+\end{equation}
+where $n$ runs over $16$ corners, and the link is for the diagonal corners.
+}
+
+\subsubsection{\label{StaggeredFermionTwoGamma}Multiplication of Gamma matrix}
+

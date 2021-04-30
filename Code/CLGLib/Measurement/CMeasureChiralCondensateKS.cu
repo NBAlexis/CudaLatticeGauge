@@ -148,6 +148,36 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
                 pF2W->CopyTo(pAfterApplied);
             }
             break;
+        case CMTKSGamma3:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA3);
+            }
+            break;
+        case CMTKSGamma4:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA4);
+            }
+            break;
+        //case CMTKSGamma5:
+        //    {
+        //        pF2W->CopyTo(pAfterApplied);
+        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA5);
+        //    }
+        //    break;
+        //case CMTKSGamma35:
+        //    {
+        //        pF2W->CopyTo(pAfterApplied);
+        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA35);
+        //    }
+        //    break;
+        //case CMTKSGamma45:
+        //    {
+        //        pF2W->CopyTo(pAfterApplied);
+        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA45);
+        //    }
+        //    break;
         case ConnectSusp:
             {
                 pF2W->CopyTo(pAfterApplied);

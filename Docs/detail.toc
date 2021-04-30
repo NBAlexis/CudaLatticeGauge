@@ -78,32 +78,36 @@
 \contentsline {subsubsection}{\numberline {5.5.6}Implementation Of Sink Operator}{80}{subsubsection.5.5.6}% 
 \contentsline {subsubsection}{\numberline {5.5.7}Fit of staggered correlator}{80}{subsubsection.5.5.7}% 
 \contentsline {subsubsection}{\numberline {5.5.8}Summary of Staggered Spectrum}{80}{subsubsection.5.5.8}% 
-\contentsline {section}{\numberline {6}Programming}{83}{section.6}% 
-\contentsline {subsection}{\numberline {6.1}cuda}{83}{subsection.6.1}% 
-\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{83}{subsubsection.6.1.1}% 
-\contentsline {subsubsection}{\numberline {6.1.2}device member function}{83}{subsubsection.6.1.2}% 
-\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{86}{subsubsection.6.1.3}% 
-\contentsline {section}{\numberline {7}Testing}{89}{section.7}% 
-\contentsline {subsection}{\numberline {7.1}random number}{89}{subsection.7.1}% 
-\contentsline {section}{\numberline {8}Applications}{90}{section.8}% 
-\contentsline {subsection}{\numberline {8.1}Rotating Frame}{90}{subsection.8.1}% 
-\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{91}{subsubsection.8.1.1}% 
-\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{93}{subsubsection.8.1.2}% 
-\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{97}{subsubsection.8.1.3}% 
-\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{99}{subsubsection.8.1.4}% 
-\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{101}{subsubsection.8.1.5}% 
-\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{106}{subsubsection.8.1.6}% 
-\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{107}{subsubsection.8.1.7}% 
-\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{115}{subsubsection.8.1.8}% 
-\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{115}{subsubsection.8.1.9}% 
-\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{116}{subsubsection.8.1.10}% 
-\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{116}{subsubsection.8.1.11}% 
-\contentsline {subsection}{\numberline {8.2}Sample Producer}{117}{subsection.8.2}% 
-\contentsline {subsection}{\numberline {8.3}Data Analyse}{117}{subsection.8.3}% 
-\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{117}{subsubsection.8.3.1}% 
-\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{118}{subsubsection.8.3.2}% 
-\contentsline {subsection}{\numberline {8.4}Constant Acceleration}{119}{subsection.8.4}% 
-\contentsline {subsubsection}{\numberline {8.4.1}Discretization}{119}{subsubsection.8.4.1}% 
-\contentsline {subsubsection}{\numberline {8.4.2}Force}{122}{subsubsection.8.4.2}% 
-\contentsline {subsubsection}{\numberline {8.4.3}Rigid Acceleration}{123}{subsubsection.8.4.3}% 
-\contentsline {subsubsection}{\numberline {8.4.4}Force Terms}{126}{subsubsection.8.4.4}% 
+\contentsline {subsection}{\numberline {5.6}Staggered Fermion Charge And Current}{83}{subsection.5.6}% 
+\contentsline {subsubsection}{\numberline {5.6.1}Staggered Fermion Gamma matrix}{83}{subsubsection.5.6.1}% 
+\contentsline {subsubsection}{\numberline {5.6.2}Staggered Fermion Gamma5}{84}{subsubsection.5.6.2}% 
+\contentsline {subsubsection}{\numberline {5.6.3}Multiplication of Gamma matrix}{84}{subsubsection.5.6.3}% 
+\contentsline {section}{\numberline {6}Programming}{85}{section.6}% 
+\contentsline {subsection}{\numberline {6.1}cuda}{85}{subsection.6.1}% 
+\contentsline {subsubsection}{\numberline {6.1.1}blocks and threads}{85}{subsubsection.6.1.1}% 
+\contentsline {subsubsection}{\numberline {6.1.2}device member function}{85}{subsubsection.6.1.2}% 
+\contentsline {subsubsection}{\numberline {6.1.3}device virtual member function}{88}{subsubsection.6.1.3}% 
+\contentsline {section}{\numberline {7}Testing}{91}{section.7}% 
+\contentsline {subsection}{\numberline {7.1}random number}{91}{subsection.7.1}% 
+\contentsline {section}{\numberline {8}Applications}{92}{section.8}% 
+\contentsline {subsection}{\numberline {8.1}Rotating Frame}{92}{subsection.8.1}% 
+\contentsline {subsubsection}{\numberline {8.1.1}The rotating gauge action}{93}{subsubsection.8.1.1}% 
+\contentsline {subsubsection}{\numberline {8.1.2}Rotating Fermion action}{95}{subsubsection.8.1.2}% 
+\contentsline {subsubsection}{\numberline {8.1.3}The exponential chemical potential}{99}{subsubsection.8.1.3}% 
+\contentsline {subsubsection}{\numberline {8.1.4}The final action of rotation}{101}{subsubsection.8.1.4}% 
+\contentsline {subsubsection}{\numberline {8.1.5}The force from gauge action}{103}{subsubsection.8.1.5}% 
+\contentsline {subsubsection}{\numberline {8.1.6}The force from fermion action}{108}{subsubsection.8.1.6}% 
+\contentsline {subsubsection}{\numberline {8.1.7}The angular momentum}{109}{subsubsection.8.1.7}% 
+\contentsline {subsubsection}{\numberline {8.1.8}The Current density and Charge density}{117}{subsubsection.8.1.8}% 
+\contentsline {subsubsection}{\numberline {8.1.9}The Topological Density}{117}{subsubsection.8.1.9}% 
+\contentsline {subsubsection}{\numberline {8.1.10}The Polyakov loop}{118}{subsubsection.8.1.10}% 
+\contentsline {subsubsection}{\numberline {8.1.11}The Chiral Condensate}{118}{subsubsection.8.1.11}% 
+\contentsline {subsection}{\numberline {8.2}Sample Producer}{119}{subsection.8.2}% 
+\contentsline {subsection}{\numberline {8.3}Data Analyse}{119}{subsection.8.3}% 
+\contentsline {subsubsection}{\numberline {8.3.1}What is autocorrelation}{119}{subsubsection.8.3.1}% 
+\contentsline {subsubsection}{\numberline {8.3.2}How to calculate autocorrelation, and how to use it to obtain the interval}{120}{subsubsection.8.3.2}% 
+\contentsline {subsection}{\numberline {8.4}Constant Acceleration}{121}{subsection.8.4}% 
+\contentsline {subsubsection}{\numberline {8.4.1}Discretization}{121}{subsubsection.8.4.1}% 
+\contentsline {subsubsection}{\numberline {8.4.2}Force}{124}{subsubsection.8.4.2}% 
+\contentsline {subsubsection}{\numberline {8.4.3}Rigid Acceleration}{125}{subsubsection.8.4.3}% 
+\contentsline {subsubsection}{\numberline {8.4.4}Force Terms}{128}{subsubsection.8.4.4}% 

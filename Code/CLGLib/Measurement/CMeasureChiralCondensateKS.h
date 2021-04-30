@@ -20,6 +20,12 @@ enum EChiralMeasureTypeKS
     ChiralKS = 0,
     ConnectSusp = 1,
 
+    CMTKSGamma3 = 2,
+    CMTKSGamma4 = 3,
+    //CMTKSGamma5 = 4,
+    //CMTKSGamma35 = 5,
+    //CMTKSGamma45 = 6,
+
     ChiralKSMax,
 };
 
