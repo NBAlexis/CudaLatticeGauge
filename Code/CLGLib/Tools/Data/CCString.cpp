@@ -362,7 +362,7 @@ void CCString::TrimLeft()
 */
 void __cdecl CCString::Format(const TCHAR* lpszFormat, ...)
 {
-#if _CLG_WIN
+#if 0
     va_list argList;
     va_start(argList, lpszFormat);
     FormatV(lpszFormat, argList);
@@ -373,7 +373,7 @@ void __cdecl CCString::Format(const TCHAR* lpszFormat, ...)
 
     static TCHAR tmpBuffer[4096];
     appVsnprintf(tmpBuffer, 4095, lpszFormat, argList);
-    INT nLen = appStrlen(tmpBuffer);
+    const INT nLen = appStrlen(tmpBuffer) + 1;
     GetBuffer(nLen);
     appStrcpy(m_pchData, GetAllocLength(), tmpBuffer);
     ReleaseBuffer();

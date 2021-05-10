@@ -1290,7 +1290,7 @@ void CFieldFermionKSSU3::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eG
         break;
     case GAMMA4:
         {
-            iDir = 4;
+            iDir = 3;
         }
         break;
     }

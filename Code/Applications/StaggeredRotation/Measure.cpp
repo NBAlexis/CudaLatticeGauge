@@ -31,6 +31,36 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##OverR); \
 WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All);
 
+
+#define _CLG_EXPORT_ANGULAR(measureName, lstName) \
+CCString sFileNameWrite##lstName = _T("%s_angular"); \
+CCString sFileNameWrite##lstName##In = _T("%s_angular"); \
+CCString sFileNameWrite##lstName##All = _T("%s_angular"); \
+sFileNameWrite##lstName = sFileNameWrite##lstName + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
+sFileNameWrite##lstName##In = sFileNameWrite##lstName##In + _T(#lstName) + _T("_Nt%d_In_O%d.csv"); \
+sFileNameWrite##lstName##All = sFileNameWrite##lstName##All + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
+sFileNameWrite##lstName.Format(sFileNameWrite##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+sFileNameWrite##lstName##In.Format(sFileNameWrite##lstName##In, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+sFileNameWrite##lstName##All.Format(sFileNameWrite##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+TArray<TArray<Real>> lstName##OverR; \
+TArray<Real> lstName##In; \
+TArray<Real> lstName##All; \
+for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
+{ \
+    TArray<Real> thisConfiguration; \
+    for (INT i = 0; i < measureName->m_lstR.Num(); ++i) \
+    { \
+        thisConfiguration.AddItem(measureName->m_lst##lstName[j * measureName->m_lstR.Num() + i]); \
+    } \
+    lstName##OverR.AddItem(thisConfiguration); \
+    lstName##In.AddItem(measureName->m_lst##lstName##Inner[j]); \
+    lstName##All.AddItem(measureName->m_lst##lstName##All[j]); \
+} \
+WriteStringFileRealArray2(sFileNameWrite##lstName, lstName##OverR); \
+WriteStringFileRealArray(sFileNameWrite##lstName##In, lstName##In); \
+WriteStringFileRealArray(sFileNameWrite##lstName##All, lstName##All);
+
+
 #if !_CLG_WIN
 void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
 {
@@ -365,8 +395,9 @@ INT Measurement(CParameters& params)
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
 
-    CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+    //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
@@ -398,6 +429,7 @@ INT Measurement(CParameters& params)
         }
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();
+        pJG->Reset();
         pCCLight->Reset();
         pCCHeavy->Reset();
         pFALight->Reset();
@@ -556,11 +588,14 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_AngularMomentum:
                 {
-
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
                 case EDJKS_ChiralAndFermionMomentum:
                 {
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (bZ4)
@@ -625,7 +660,7 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_PlaqutteEnergy:
                 {
-                    pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    //pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
             }
@@ -738,11 +773,21 @@ INT Measurement(CParameters& params)
             break;
             case EDJKS_AngularMomentum:
             {
-
+                _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS);
+                _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGSurf);
+                _CLG_EXPORT_ANGULAR(pJG, JGPot);
             }
             break;
             case EDJKS_ChiralAndFermionMomentum:
             {
+                _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS);
+                _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGSurf);
+                _CLG_EXPORT_ANGULAR(pJG, JGPot);
+
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
                 _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
@@ -769,9 +814,9 @@ INT Measurement(CParameters& params)
             break;
             case EDJKS_PlaqutteEnergy:
             {
-                CCString sFileName;
-                sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
-                WriteStringFileRealArray(sFileName, pPE->m_lstData);
+                //CCString sFileName;
+                //sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
+                //WriteStringFileRealArray(sFileName, pPE->m_lstData);
             }
             break;
             default:

@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing
-RotationJob : ESR_Measure
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,14 +17,14 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 150
-    SaveStartIndex : 1950
-    OmegaSep : 4
-    OmegaStart : 4
-    MaxOmega : 0.064
+    EquvibStep : 300
+    SaveStartIndex : 3200
+    OmegaSep : 1
+    OmegaStart : 0
+    MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./5060204/SRF5060204_
+    SavePrefix : ./SRF5100204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./5060204/SRF5060204_R_Nt6_O4_1950.con
-    Nt6Polyakov : 0.216607317328
+    Nt6FileName : ./SRF5100204_R_Nt6_O0_3200.con
+    Nt6Polyakov : 0.130295261741
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.06
+        Beta : 5.1
         Omega : 0.0
 
     Action2:
@@ -332,10 +332,10 @@ JobMeasure:
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
-    StartN : 201
-    EndN : 2700
+    StartN : 1001
+    EndN : 1005
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
-    DistributionJob : EDJKS_Polyakov
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5100204\Nt6
+    SubFolderPrefix : G:\SRFloat\5100204\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF5100204_
-    CSVSavePrefix : G:\SRFloat\5100204\Polyakov\SRF5100204_
+    SavePrefix : GFSRF5100204_
+    CSVSavePrefix : G:\SRFloat\5100204\Chiral\SRF5100204_
 
     Dim : 4
     Dir : 4
@@ -360,7 +360,7 @@ JobMeasure:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 5
+    MeasureListLength : 6
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -548,6 +548,16 @@ JobMeasure:
         MeasureDist : 1
         ShowResult : 0
         ShiftCenter : 1
+
+    Measure6:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 0
+        ProjectivePlane : 1
 
 
 JobGaugeFixing:
