@@ -60,36 +60,36 @@ _kernelXY_To_R_C(
     UBOOL bShiftCenter)
 {
     const UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    const UINT uiX = static_cast<UINT>(uiXY / _DC_Ly);
-    const UINT uiY = static_cast<UINT>(uiXY % _DC_Ly);
-    UINT uiC;
-    const UINT uiCenterX = static_cast<UINT>(sCenter.x);
-    const UINT uiCenterY = static_cast<UINT>(sCenter.y);
+    const INT iX = static_cast<INT>(uiXY / _DC_Ly);
+    const INT iY = static_cast<INT>(uiXY % _DC_Ly);
+    INT iC;
+    const INT iCenterX = static_cast<INT>(sCenter.x);
+    const INT iCenterY = static_cast<INT>(sCenter.y);
     if (bShiftCenter)
     {
-        uiC = (((uiCenterX - uiX) << 1) - 1) * (((uiCenterX - uiX) << 1) - 1)
-            + (((uiCenterY - uiY) << 1) - 1) * (((uiCenterY - uiY) << 1) - 1);
+        iC = (((iCenterX - iX) * 2) - 1) * (((iCenterX - iX) * 2) - 1)
+           + (((iCenterY - iY) * 2) - 1) * (((iCenterY - iY) * 2) - 1);
     }
     else
     {
-        uiC = (uiCenterX - uiX) * (uiCenterX - uiX)
-            + (uiCenterY - uiY) * (uiCenterY - uiY);
+        iC = (iCenterX - iX) * (iCenterX - iX)
+           + (iCenterY - iY) * (iCenterY - iY);
     }
 
     //In the following, sSite is only used for Dirichlet check
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;
     sSite4.w = sCenter.w;
-    sSite4.x = static_cast<SBYTE>(uiX);
-    sSite4.y = static_cast<SBYTE>(uiY);
-    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    sSite4.x = static_cast<SBYTE>(iX);
+    sSite4.y = static_cast<SBYTE>(iY);
+    if (iC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
     {
         if (NULL != pCount)
         {
-            atomicAdd(&pCount[uiC], 1);
+            atomicAdd(&pCount[iC], 1);
         }
-        atomicAdd(&result[uiC].x, jgsXY[uiXY].x);
-        atomicAdd(&result[uiC].y, jgsXY[uiXY].y);
+        atomicAdd(&result[iC].x, jgsXY[uiXY].x);
+        atomicAdd(&result[iC].y, jgsXY[uiXY].y);
     }
 }
 
@@ -115,34 +115,34 @@ _kernelXY_To_R_R(
     UBOOL bShiftCenter)
 {
     const UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    const UINT uiX = static_cast<UINT>(uiXY / _DC_Ly);
-    const UINT uiY = static_cast<UINT>(uiXY % _DC_Ly);
-    UINT uiC;
-    const UINT uiCenterX = static_cast<UINT>(sCenter.x);
-    const UINT uiCenterY = static_cast<UINT>(sCenter.y);
+    const INT iX = static_cast<INT>(uiXY / _DC_Ly);
+    const INT iY = static_cast<INT>(uiXY % _DC_Ly);
+    INT iC;
+    const INT iCenterX = static_cast<INT>(sCenter.x);
+    const INT iCenterY = static_cast<INT>(sCenter.y);
     if (bShiftCenter)
     {
-        uiC = (((uiCenterX - uiX) << 1) - 1) * (((uiCenterX - uiX) << 1) - 1)
-            + (((uiCenterY - uiY) << 1) - 1) * (((uiCenterY - uiY) << 1) - 1);
+        iC = (((iCenterX - iX) * 2) - 1) * (((iCenterX - iX) * 2) - 1)
+           + (((iCenterY - iY) * 2) - 1) * (((iCenterY - iY) * 2) - 1);
     }
     else
     {
-        uiC = (uiCenterX - uiX) * (uiCenterX - uiX)
-            + (uiCenterY - uiY) * (uiCenterY - uiY);
+        iC = (iCenterX - iX) * (iCenterX - iX)
+           + (iCenterY - iY) * (iCenterY - iY);
     }
 
     SSmallInt4 sSite4;
     sSite4.z = sCenter.z;
     sSite4.w = sCenter.w;
-    sSite4.x = static_cast<SBYTE>(uiX);
-    sSite4.y = static_cast<SBYTE>(uiY);
-    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+    sSite4.x = static_cast<SBYTE>(iX);
+    sSite4.y = static_cast<SBYTE>(iY);
+    if (iC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
     {
         if (NULL != pCount)
         {
-            atomicAdd(&pCount[uiC], 1);
+            atomicAdd(&pCount[iC], 1);
         }
-        atomicAdd(&result[uiC], jgsXY[uiXY]);
+        atomicAdd(&result[iC], jgsXY[uiXY]);
     }
 }
 

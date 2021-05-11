@@ -124,92 +124,92 @@ _kernelPolyakovZTraceOfSiteXY(
     atomicAdd(&resXY[uiXY].y, trres.y);
 }
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovZeroXYPlane(
-    CLGComplex* resXY,
-    CLGComplex* total)
-{
-    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
-    resXY[uiXY] = _make_cuComplex(F(0.0), F(0.0));
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovZeroXYPlane(
+//    CLGComplex* resXY,
+//    CLGComplex* total)
+//{
+//    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
+//    resXY[uiXY] = _make_cuComplex(F(0.0), F(0.0));
+//
+//    if (0 == threadIdx.x && 0 == blockIdx.x && NULL != total)
+//    {
+//        total[0] = _make_cuComplex(F(0.0), F(0.0));
+//    }
+//}
 
-    if (0 == threadIdx.x && 0 == blockIdx.x && NULL != total)
-    {
-        total[0] = _make_cuComplex(F(0.0), F(0.0));
-    }
-}
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovAverageOverZAndSum(
+//    CLGComplex* resXY,
+//    CLGComplex* total)
+//{
+//    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
+//    atomicAdd(&total[0].x, resXY[uiXY].x);
+//    atomicAdd(&total[0].y, resXY[uiXY].y);
+//    resXY[uiXY] = cuCdivf_cr(resXY[uiXY], _DC_Lz);
+//}
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovAverageOverZAndSum(
-    CLGComplex* resXY,
-    CLGComplex* total)
-{
-    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
-    atomicAdd(&total[0].x, resXY[uiXY].x);
-    atomicAdd(&total[0].y, resXY[uiXY].y);
-    resXY[uiXY] = cuCdivf_cr(resXY[uiXY], _DC_Lz);
-}
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovAverageOverTAndSum(
+//    CLGComplex* resXY,
+//    CLGComplex* total)
+//{
+//    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
+//    atomicAdd(&total[0].x, resXY[uiXY].x);
+//    atomicAdd(&total[0].y, resXY[uiXY].y);
+//    resXY[uiXY] = cuCdivf_cr(resXY[uiXY], _DC_Lt);
+//}
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovAverageOverTAndSum(
-    CLGComplex* resXY,
-    CLGComplex* total)
-{
-    UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
-    atomicAdd(&total[0].x, resXY[uiXY].x);
-    atomicAdd(&total[0].y, resXY[uiXY].y);
-    resXY[uiXY] = cuCdivf_cr(resXY[uiXY], _DC_Lt);
-}
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovInitialDist(UINT* pCount, CLGComplex* pValue)
+//{
+//    pCount[threadIdx.x] = 0;
+//    pValue[threadIdx.x] = _make_cuComplex(F(0.0), F(0.0));
+//}
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovInitialDist(UINT* pCount, CLGComplex* pValue)
-{
-    pCount[threadIdx.x] = 0;
-    pValue[threadIdx.x] = _make_cuComplex(F(0.0), F(0.0));
-}
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovMeasureDist(
+//    const CLGComplex* __restrict__ traceXY,
+//    const SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
+//    UINT* counter, CLGComplex* correlator)
+//{
+//    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
+//    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
+//    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
+//    UINT uiC = (static_cast<INT>(sCenter.x) - uiX) * (static_cast<INT>(sCenter.x) - uiX)
+//             + (static_cast<INT>(sCenter.y) - uiY) * (static_cast<INT>(sCenter.y) - uiY);
+//
+//    SSmallInt4 sSite4;
+//    sSite4.z = sCenter.z;
+//    sSite4.w = sCenter.w;
+//    sSite4.x = uiX;
+//    sSite4.y = uiY;
+//    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
+//    {
+//        atomicAdd(&counter[uiC], 1);
+//        atomicAdd(&correlator[uiC].x, traceXY[uiXY].x);
+//        atomicAdd(&correlator[uiC].y, traceXY[uiXY].y);
+//    }
+//}
 
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovMeasureDist(
-    const CLGComplex* __restrict__ traceXY,
-    const SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId,
-    UINT* counter, CLGComplex* correlator)
-{
-    UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
-    INT uiX = static_cast<INT>(uiXY / _DC_Ly);
-    INT uiY = static_cast<INT>(uiXY % _DC_Ly);
-    UINT uiC = (static_cast<INT>(sCenter.x) - uiX) * (static_cast<INT>(sCenter.x) - uiX)
-             + (static_cast<INT>(sCenter.y) - uiY) * (static_cast<INT>(sCenter.y) - uiY);
-
-    SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
-    sSite4.x = uiX;
-    sSite4.y = uiY;
-    if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
-    {
-        atomicAdd(&counter[uiC], 1);
-        atomicAdd(&correlator[uiC].x, traceXY[uiXY].x);
-        atomicAdd(&correlator[uiC].y, traceXY[uiXY].y);
-    }
-}
-
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelPolyakovAverageDist(UINT* pCount, CLGComplex* pValue)
-{
-    const UINT uiIdx = threadIdx.x;
-    if (pCount[uiIdx] > 0)
-    {
-        pValue[uiIdx].x =
-            pValue[uiIdx].x / static_cast<Real>(pCount[uiIdx]);
-        pValue[uiIdx].y =
-            pValue[uiIdx].y / static_cast<Real>(pCount[uiIdx]);
-    }
-}
+//__global__ void
+//_CLG_LAUNCH_BOUND
+//_kernelPolyakovAverageDist(UINT* pCount, CLGComplex* pValue)
+//{
+//    const UINT uiIdx = threadIdx.x;
+//    if (pCount[uiIdx] > 0)
+//    {
+//        pValue[uiIdx].x =
+//            pValue[uiIdx].x / static_cast<Real>(pCount[uiIdx]);
+//        pValue[uiIdx].y =
+//            pValue[uiIdx].y / static_cast<Real>(pCount[uiIdx]);
+//    }
+//}
 
 #pragma endregion
 

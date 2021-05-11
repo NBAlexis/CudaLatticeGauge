@@ -100,6 +100,7 @@
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
     <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoop.h" />
+    <ClInclude Include="Measurement\CMeasureWilsonLoopWithPath.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearing.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.h" />
     <ClInclude Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.h" />
@@ -251,6 +252,7 @@
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu" />
+    <CudaCompile Include="Measurement\CMeasureWilsonLoopWithPath.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEProj.cu" />
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearingAPEStout.cu" />
@@ -315,7 +317,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.0.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.2.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -514,7 +516,7 @@
       <FastMath>true</FastMath>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <AdditionalOptions>-Xcompiler /wd4819 -Xcompiler /wd4505 -Xcompiler /wd4100 %(AdditionalOptions)</AdditionalOptions>
-      <PtxAsOptionV>false</PtxAsOptionV>
+      <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
       <KeepDir>$(IntDir)Cuda\</KeepDir>
       <Include>./</Include>
@@ -522,6 +524,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.0.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.2.targets" />
   </ImportGroup>
 </Project>

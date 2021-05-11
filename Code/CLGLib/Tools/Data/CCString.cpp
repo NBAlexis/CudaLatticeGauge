@@ -373,7 +373,7 @@ void __cdecl CCString::Format(const TCHAR* lpszFormat, ...)
 
     static TCHAR tmpBuffer[4096];
     appVsnprintf(tmpBuffer, 4095, lpszFormat, argList);
-    const INT nLen = appStrlen(tmpBuffer) + 1;
+    const INT nLen = static_cast<INT>(appStrlen(tmpBuffer) + 1);
     GetBuffer(nLen);
     appStrcpy(m_pchData, GetAllocLength(), tmpBuffer);
     ReleaseBuffer();

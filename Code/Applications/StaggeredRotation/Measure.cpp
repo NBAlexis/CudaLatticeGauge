@@ -468,7 +468,7 @@ INT Measurement(CParameters& params)
                 {
                     if (EDJKS_CheckMD5 == eJob)
                     {
-                        appGeneral(_T("MD5 Found and good %s \n"), sFileName);
+                        appGeneral(_T("MD5 Found and good %s \n"), sFileName.c_str());
                     }
                     else
                     {
@@ -479,7 +479,7 @@ INT Measurement(CParameters& params)
                 {
                     if (EDJKS_CheckMD5 == eJob)
                     {
-                        appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName);
+                        appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName.c_str());
                     }
                     else
                     {
@@ -490,13 +490,13 @@ INT Measurement(CParameters& params)
                 }
                 else if (sFileContent.Find("MD5 : ") >= 0)
                 {
-                    appCrucial(_T("MD5 Found and NOT good %s \n"), sFileName);
+                    appCrucial(_T("MD5 Found and NOT good %s \n"), sFileName.c_str());
                 }
                 else
                 {
                     if (EDJKS_CheckMD5 == eJob)
                     {
-                        appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName);
+                        appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName.c_str());
                     }
                     else
                     {
@@ -755,8 +755,12 @@ INT Measurement(CParameters& params)
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
                 _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
 
                 if (uiOmega == iStartOmega)
                 {
@@ -790,8 +794,13 @@ INT Measurement(CParameters& params)
 
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
                 _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+
                 _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS);
                 _CLG_EXPORT_CHIRAL(pFALight, SpinKS);
                 _CLG_EXPORT_CHIRAL(pFALight, PotentialKS);

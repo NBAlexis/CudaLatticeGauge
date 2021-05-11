@@ -151,6 +151,31 @@ extern "C" {
 
 #if defined(__cplusplus)
 }
+
+__host__ __device__ __inline__
+UBOOL operator==(const cuComplex& c1, const cuComplex& c2)
+{
+    return c1.x == c2.x && c1.y == c2.y;
+}
+
+__host__ __device__ __inline__
+UBOOL operator==(const cuDoubleComplex& c1, const cuDoubleComplex& c2)
+{
+    return c1.x == c2.x && c1.y == c2.y;
+}
+
+__host__ __device__ __inline__
+UBOOL operator!=(const cuComplex& c1, const cuComplex& c2)
+{
+    return !(c1 == c2);
+}
+
+__host__ __device__ __inline__
+UBOOL operator!=(const cuDoubleComplex& c1, const cuDoubleComplex& c2)
+{
+    return !(c1 == c2);
+}
+
 #endif /* __cplusplus */
 
 __END_NAMESPACE

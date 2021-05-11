@@ -120,6 +120,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoop.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoopWithPath.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearing.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.h
@@ -223,6 +224,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoop.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoopWithPath.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearing.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEProj.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/GaugeSmearing/CGaugeSmearingAPEStout.cu

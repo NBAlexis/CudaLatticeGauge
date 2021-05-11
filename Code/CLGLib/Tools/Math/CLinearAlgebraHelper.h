@@ -251,6 +251,16 @@ protected:
         {
             m_pOwner->ReleaseTmpMatrix(m_uiIndex);
         }
+
+        inline UBOOL operator==(const STmpMatrix& ) const
+        {
+            return FALSE;
+        }
+
+        inline UBOOL operator!=(const STmpMatrix& ) const
+        {
+            return TRUE;
+        }
     };
 
     STmpMatrix GetTmpMatrix()
@@ -296,6 +306,8 @@ protected:
     CLGComplex* m_pDeviceComplexBuffer2;
     CLGComplex* m_pOneDeviceC;
 };
+
+
 
 __END_NAMESPACE
 

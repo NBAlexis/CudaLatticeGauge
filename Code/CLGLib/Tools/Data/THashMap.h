@@ -182,7 +182,7 @@ public:
         rValue = pAssoc->m_Value;
         return TRUE;
     }
-    const THashMap *PLookup(ARG_KEY key) const
+    const TAssoc*PLookup(ARG_KEY key) const
     {
         UINT nHashBucket, nHashValue;
         TAssoc* pAssoc = GetAssocAt(key, nHashBucket, nHashValue);
