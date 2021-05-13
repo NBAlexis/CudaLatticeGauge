@@ -45,6 +45,7 @@ public:
         , m_pHostDistribution(NULL)
 
         , m_uiMaxR(1)
+        , m_uiEdge(1)
         , m_bShiftCenter(FALSE)
         , m_bShowResult(FALSE)
     {
@@ -77,6 +78,7 @@ protected:
     UINT* m_pHostDistributionR;
     CLGComplex* m_pHostDistribution;
     UINT m_uiMaxR;
+    UINT m_uiEdge;
     UBOOL m_bShiftCenter;
     UBOOL m_bShowResult;
 
@@ -84,6 +86,7 @@ public:
 
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstCondAll[ChiralKSMax];
+    TArray<CLGComplex> m_lstCondIn[ChiralKSMax];
     TArray<CLGComplex> m_lstCond[ChiralKSMax];
 };
 

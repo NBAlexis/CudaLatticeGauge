@@ -289,7 +289,7 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     param.FetchValueINT(_T("ShiftCenter"), iValue);
     m_bShiftCenter = iValue != 0;
 
-    SetMaxAndEdge(&m_uiMaxR, NULL, m_bShiftCenter);
+    SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
 
@@ -424,7 +424,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
         TransformFromXYDataToRData_C(
             m_bShiftCenter,
             m_uiMaxR,
-            0,
+            m_uiEdge,
             m_byFieldId,
             m_uiFieldCount,
             EAngularMeasureMax,
@@ -437,7 +437,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             m_lstR,
             m_lstCond,
             m_lstCondAll,
-            NULL
+            m_lstCondIn
         );
 
         ++m_uiConfigurationCount;

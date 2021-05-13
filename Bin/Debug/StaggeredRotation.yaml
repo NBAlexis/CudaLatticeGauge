@@ -17,8 +17,8 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 2000
-    SaveStartIndex : 575
+    EquvibStep : 1034
+    SaveStartIndex : 1466
     OmegaSep : 1
     OmegaStart : 1
     MaxOmega : 0.016
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./6000204/SRF6000204_R_Nt6_O1_575.con
-    Nt6Polyakov : 0.606207728386
+    Nt6FileName : ./6000204/SRF6000204_R_Nt6_O1_1466.con
+    Nt6Polyakov : 0.605417311192
 
     Updator:
 

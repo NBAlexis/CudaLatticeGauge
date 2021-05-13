@@ -104,7 +104,7 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     m_bShiftCenter = iValue != 0;
 
     //assuming the center is really at center
-    SetMaxAndEdge(&m_uiMaxR, NULL, m_bShiftCenter);
+    SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
 
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
     checkCudaErrors(cudaMalloc((void**)&m_pDistribution, sizeof(CLGComplex) * (m_uiMaxR + 1)));
@@ -209,7 +209,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         TransformFromXYDataToRData_C(
             m_bShiftCenter,
             m_uiMaxR,
-            0,
+            m_uiEdge,
             m_byFieldId,
             m_uiFieldCount,
             ChiralKSMax,
@@ -222,7 +222,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             m_lstR,
             m_lstCond,
             m_lstCondAll,
-            NULL
+            m_lstCondIn
         );
 
         ++m_uiConfigurationCount;
@@ -288,6 +288,7 @@ void CMeasureChiralCondensateKS::Reset()
     for (UINT i = 0; i < ChiralKSMax; ++i)
     {
         m_lstCondAll[i].RemoveAll();
+        m_lstCondIn[i].RemoveAll();
         m_lstCond[i].RemoveAll();
     }
     m_lstR.RemoveAll();

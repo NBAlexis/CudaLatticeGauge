@@ -12,12 +12,16 @@
 #define _CLG_EXPORT_CHIRAL(measureName, lstName) \
 CCString sFileNameWrite##measureName##lstName = _T("%s_condensate"); \
 CCString sFileNameWrite##measureName##lstName##All = _T("%s_condensate"); \
+CCString sFileNameWrite##measureName##lstName##In = _T("%s_condensate"); \
 sFileNameWrite##measureName##lstName = sFileNameWrite##measureName##lstName + _T(#measureName) + _T(#lstName) + _T("_Nt%d_O%d.csv"); \
 sFileNameWrite##measureName##lstName##All = sFileNameWrite##measureName##lstName##All + _T(#measureName) + _T(#lstName) + _T("_Nt%d_All_O%d.csv"); \
+sFileNameWrite##measureName##lstName##In = sFileNameWrite##measureName##lstName##In + _T(#measureName) + _T(#lstName) + _T("_Nt%d_In_O%d.csv"); \
 sFileNameWrite##measureName##lstName.Format(sFileNameWrite##measureName##lstName, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 sFileNameWrite##measureName##lstName##All.Format(sFileNameWrite##measureName##lstName##All, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
+sFileNameWrite##measureName##lstName##In.Format(sFileNameWrite##measureName##lstName##In, sCSVSavePrefix.c_str(), _HC_Lt, uiOmega); \
 TArray<TArray<CLGComplex>> lstName##measureName##OverR; \
 TArray<CLGComplex> lstName##measureName##All; \
+TArray<CLGComplex> lstName##measureName##In; \
 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 { \
     TArray<CLGComplex> thisConfiguration; \
@@ -27,9 +31,11 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     } \
     lstName##measureName##OverR.AddItem(thisConfiguration); \
     lstName##measureName##All.AddItem(measureName->m_lstCondAll[lstName][j]); \
+    lstName##measureName##In.AddItem(measureName->m_lstCondIn[lstName][j]); \
 } \
 WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##OverR); \
-WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All);
+WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##All, lstName##measureName##All); \
+WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##In, lstName##measureName##In); 
 
 
 #define _CLG_EXPORT_ANGULAR(measureName, lstName) \
