@@ -607,7 +607,7 @@ void CMeasure::TransformFromXYDataToRData_C(
 
         FillDataWithR_C(
             lstValues[i],
-            NULL == lstInner ? NULL : lstInner + i,
+            NULL == lstInner ? NULL : &(lstInner[i]),
             lstAll[i],
             lstR,
             pHostValueBuffer,
@@ -651,7 +651,7 @@ void CMeasure::TransformFromXYDataToRData_R(
 
         FillDataWithR_R(
             lstValues[i],
-            NULL == lstInner ? NULL : lstInner + i,
+            NULL == lstInner ? NULL : &(lstInner[i]),
             lstAll[i],
             lstR,
             pHostValueBuffer,

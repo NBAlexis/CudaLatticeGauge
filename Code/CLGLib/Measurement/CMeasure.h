@@ -353,6 +353,7 @@ public:
     CMeasureStochastic()
         : CMeasure()
         , m_uiFieldCount(25)
+        , m_bDebugDivation(FALSE)
     {
     }
 
@@ -362,6 +363,10 @@ public:
         INT iValue = 25;
         param.FetchValueINT(_T("FieldCount"), iValue);
         m_uiFieldCount = static_cast<UINT>(iValue);
+
+        iValue = 0;
+        param.FetchValueINT(_T("DebugDivation"), iValue);
+        m_bDebugDivation = 0 != iValue;
     }
 
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override
@@ -386,6 +391,7 @@ public:
 protected:
 
     UINT m_uiFieldCount;
+    UBOOL m_bDebugDivation;
 
 };
 

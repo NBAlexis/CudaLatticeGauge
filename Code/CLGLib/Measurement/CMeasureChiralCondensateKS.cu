@@ -138,6 +138,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 #pragma region Dot
 
     // The results are Atomic Add to m_pDeviceXYBuffer
+    TArray<CLGComplex> debugData[(INT)ChiralKSMax];
     preparethread;
     for (BYTE i = 0; i < ChiralKSMax; ++i)
     {
@@ -199,8 +200,25 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 #endif
         m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
+        if (m_bDebugDivation)
+        {
+            debugData[i].AddItem(cuCmulf_cr(thisSum, oneOuiVolume));
+        }
     }
     pAfterApplied->Return();
+    if (m_bDebugDivation)
+    {
+        appGeneral(_T("Debug data:\n"));
+        for (BYTE i = 0; i < ChiralKSMax; ++i)
+        {
+            appGeneral(_T("{"));
+            for (INT j = 0; j < debugData[i].Num(); ++j)
+            {
+                LogGeneralComplex(debugData[i][j]);
+            }
+            appGeneral(_T("}\n"));
+        }
+    }
 
 #pragma endregion
 
