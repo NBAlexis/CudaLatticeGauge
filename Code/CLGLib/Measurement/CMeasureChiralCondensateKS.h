@@ -88,6 +88,7 @@ public:
     TArray<CLGComplex> m_lstCondAll[ChiralKSMax];
     TArray<CLGComplex> m_lstCondIn[ChiralKSMax];
     TArray<CLGComplex> m_lstCond[ChiralKSMax];
+    TArray<CLGComplex> m_lstDebugData[ChiralKSMax];
 };
 
 __END_NAMESPACE
