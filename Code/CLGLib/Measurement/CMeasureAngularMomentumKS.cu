@@ -503,6 +503,7 @@ void CMeasureAngularMomentumKS::Reset()
     for (UINT i = 0; i < EAngularMeasureMax; ++i)
     {
         m_lstCondAll[i].RemoveAll();
+        m_lstCondIn[i].RemoveAll();
         m_lstCond[i].RemoveAll();
     }
     m_lstR.RemoveAll();

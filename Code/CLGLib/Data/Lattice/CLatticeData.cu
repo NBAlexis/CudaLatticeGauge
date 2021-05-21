@@ -170,6 +170,14 @@ CField* CLatticeData::GetPooledFieldById(BYTE byId)
     return m_pFieldPoolMap[byId]->GetOne();
 }
 
+void CLatticeData::ReCopyPooled() const
+{
+    for (INT i = 0; i < m_pFieldPools.Num(); ++i)
+    {
+        m_pFieldPools[i]->ReCopyAll();
+    }
+}
+
 void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple) const
 {
     //accept gauge already copy to m_pGaugeField in Updator, maybe change this behavour in the furture.

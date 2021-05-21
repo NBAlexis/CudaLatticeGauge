@@ -213,6 +213,23 @@ public:
         m_pPool.PushBack(pField);
     }
 
+    void ClearAll()
+    {
+        for (INT i = 0; i < m_pPool.Num(); ++i)
+        {
+            appSafeDelete(m_pPool[i]);
+        }
+        m_pPool.RemoveAll();
+    }
+
+    void ReCopyAll() const
+    {
+        for (INT i = 0; i < m_pPool.Num(); ++i)
+        {
+            m_pOrignal->CopyTo(m_pPool[i]);
+        }
+    }
+
     CField* m_pOrignal;
     TArray<CField*> m_pPool;
 

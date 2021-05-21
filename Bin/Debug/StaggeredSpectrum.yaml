@@ -14,10 +14,10 @@ JobSimulate:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 0
-    EquvibStep : 1787
-    SaveStartIndex : 213
+    EquvibStep : 1699
+    SaveStartIndex : 301
 
-    SavePrefix : ./5260204_
+    SavePrefix : ./5220204_
 
     Dim : 4
     Dir : 4
@@ -54,7 +54,7 @@ JobSimulate:
         # FieldInitialType : EFIT_Random
         FieldInitialType : EFIT_ReadFromFile
         GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./5260204_Matching_213.con
+        GaugeFileName : ./5220204_Matching_301.con
 
         Period : [1, 1, 1, 1]
 
@@ -256,7 +256,7 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 5.26
+        Beta : 5.22
 
     Action2:
 

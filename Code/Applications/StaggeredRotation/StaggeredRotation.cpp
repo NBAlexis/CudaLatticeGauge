@@ -33,6 +33,12 @@ int main(int argc, char * argv[])
         res = SimulateStaggeredRotation(workingParam1);
     }
     break;
+    case ESR_SimulateEM:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateEM"));
+        res = SimulateStaggeredEM(workingParam1);
+    }
+    break;
     case ESR_Measure:
     {
         CParameters workingParam1 = params.GetParameter(_T("JobMeasure"));

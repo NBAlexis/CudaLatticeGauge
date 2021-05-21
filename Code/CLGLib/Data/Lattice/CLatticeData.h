@@ -92,6 +92,7 @@ public:
     class CFieldBoundary* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.Exist(byId) ? m_pActionMap.GetAt(byId) : NULL; }
     class CField* GetPooledFieldById(BYTE byId);
+    void ReCopyPooled() const;
 };
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);
