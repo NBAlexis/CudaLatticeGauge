@@ -41,8 +41,10 @@ protected:
     UINT m_uiStepCount;
 #if _CLG_DOUBLEFLOAT
     Real m_fAccuracy;
+    Real m_fSmallRho;
 #else
     DOUBLE m_fAccuracy;
+    DOUBLE m_fSmallRho;
 #endif
 };
 

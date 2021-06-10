@@ -45,6 +45,12 @@ int main(int argc, char * argv[])
         res = Measurement(workingParam1);
     }
     break;
+    case ESR_MeasureEM:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobMeasureEM"));
+        res = MeasurementEM(workingParam1);
+    }
+    break;
     case ESR_GaugeFixing:
     {
         CParameters workingParam1 = params.GetParameter(_T("JobGaugeFixing"));

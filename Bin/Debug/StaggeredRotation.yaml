@@ -1,5 +1,5 @@
-# ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM
-RotationJob : ESR_SimulateEM
+# ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM, ESR_MeasureEM
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,14 +17,14 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 867
-    SaveStartIndex : 1633
-    OmegaSep : 2
-    OmegaStart : 2
-    MaxOmega : 0.032
+    EquvibStep : 700
+    SaveStartIndex : 800
+    OmegaSep : 7
+    OmegaStart : 7
+    MaxOmega : 0.112
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./6000204/SRF6000204_
+    SavePrefix : ./4980204/SRF4980204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./6000204/SRF6000204_R_Nt6_O2_1633.con
-    Nt6Polyakov : 0.597179651260
+    Nt6FileName : ./4980204/SRF4980204_R_Nt6_O7_800.con
+    Nt6Polyakov : 0.216671645641
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 6.0
+        Beta : 4.98
         Omega : 0.0
 
     Action2:
@@ -328,27 +328,27 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.06
+    GaugeBate : 4.98
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
-    StartN : 201
-    EndN : 220
+    StartN : 101
+    EndN : 110
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
     DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
-    StochasticFieldCount : 10
+    StochasticFieldCount : 5
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5060204\GF
+    SubFolderPrefix : G:\SRFloat\4980204\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF5060204_
-    CSVSavePrefix : G:\SRFloat\5060204\Chiral2\SRF5060204_
+    SavePrefix : GFSRF4980204_
+    CSVSavePrefix : G:\SRFloat\4980204\Chiral\SRF4980204_
 
     Dim : 4
     Dir : 4
@@ -360,9 +360,10 @@ JobMeasure:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 6
+    MeasureListLength : 8
     CacheStaple : 0
     AlsoCheckMD5 : 0
+    MeasureCCS : 1
 
     Gauge:
 
@@ -467,7 +468,7 @@ JobMeasure:
         # SolverName : CSLASolverBiCGStab
         # Accuracy : 0.00000001
 
-        DiviationStep : 50
+        DiviationStep : 10
         MaxStep : 1
 
         SolverName : CSLASolverGMRES
@@ -524,7 +525,7 @@ JobMeasure:
         MeasureDist : 1
         ShowResult : 0
         ShiftCenter : 1
-        DebugDivation : 1
+        DebugDivation : 0
 
     Measure3:
 
@@ -533,7 +534,7 @@ JobMeasure:
         MeasureDist : 1
         ShowResult : 0
         ShiftCenter : 1
-        DebugDivation : 1
+        DebugDivation : 0
 
     Measure4:
 
@@ -561,6 +562,18 @@ JobMeasure:
         MeasureApprox : 0
         ProjectivePlane : 1
 
+    Measure7:
+
+        MeasureName : CMeasureConnectedSusceptibilityKS
+        FieldId : 2
+        ShowResult : 0
+
+    Measure8:
+
+        MeasureName : CMeasureConnectedSusceptibilityKS
+        FieldId : 3
+        ShowResult : 0
+
 
 JobGaugeFixing:
 
@@ -571,17 +584,17 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 6
-    OmegaStart : 0
+    OmegaStart : 7
     OmegaEnd : 8
-    IndexStart : 101
-    IndexEnd : 2500
+    IndexStart : 1001
+    IndexEnd : 1500
 
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\5340204\Nt6
-    LoadPrefix : SRF5340204_
+    SubFolderPrefix : G:\SRFloat\4980204\Nt6
+    LoadPrefix : SRF4980204_
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : ./5340204/GFSRF5340204_
+    SavePrefix : ./4980204/GF/GFSRF4980204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
@@ -634,13 +647,13 @@ JobSimulateEM:
     ExponentialPrecision : 0
     BeforeEquvibStep : 150
     EquvibSkip : 0
-    EquvibStep : 300
+    EquvibStep : 500
     SaveStartIndex : 0
     EMStart : 0
     EMEnd : 4
     ElectricList : [0, 0, 0, 0]
     MagneticList : [0, 0.3, 0.6, 0.9]
-    SavePrefix : ./SRF580_04EM_
+    SavePrefix : ./SRF600_04EM_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -680,8 +693,8 @@ JobSimulateEM:
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        # IntegratorType : CIntegratorNestedOmelyan
-        IntegratorType : CIntegratorOmelyan 
+        IntegratorType : CIntegratorNestedOmelyan
+        # IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
         IntegratorStep : 8
         NestedStep : 20
@@ -745,7 +758,7 @@ JobSimulateEM:
         ActionName : CActionGaugePlaquette
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.8
+        Beta : 6.0
         # Omega : 0.0
 
     Action2:
@@ -820,3 +833,231 @@ JobSimulateEM:
         ShowResult : 1
         ShiftCenter : 0
         DebugDivation : 0
+
+JobMeasureEM:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    GaugeBate : 5.0
+    EMStart : 0
+    EMEnd : 4
+    ElectricList : [0, 0, 0, 0]
+    MagneticList : [0, 0.3, 0.6, 0.9]
+    StartN : 101
+    EndN : 500
+    ## EDJKSEM_Polyakov, EDJKSEM_Chiral
+    DistributionJob : EDJKSEM_Chiral
+    FermionMomentum : 0
+    StochasticFieldCount : 1
+    StochasticGaussian : 1
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    UseLogADefinition : 0
+    SubFolder : 0
+    SubFolderPrefix : ./EMTest
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : ./EMTest/SRF500_04EM_
+    CSVSavePrefix : ./EMTest/Chiral/SRF500_04EM_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 2
+    MeasureListLength : 6
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3EM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.4
+        FieldId : 2
+        PoolNumber : 15
+        EachSiteEta : 0
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField2:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3EM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.4
+        FieldId : 3
+        PoolNumber : 15
+        EachSiteEta : 0
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Solver2:
+
+        SolverForFieldId : 3
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
+
+    MSSolver2:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 3
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 1
+        ShiftCenter : 0
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+
+    Measure3:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 3
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+
+    Measure4:
+
+        MeasureName : CMeasureAngularMomentumKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 1
+
+    Measure5:
+
+        MeasureName : CMeasureAngularMomentumKS
+        FieldId : 3
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 1
+
+    Measure6:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 0
+        ProjectivePlane : 1
+

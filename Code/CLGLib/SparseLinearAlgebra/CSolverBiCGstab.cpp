@@ -15,10 +15,11 @@ __CLGIMPLEMENT_CLASS(CSLASolverBiCGStab)
 
 CSLASolverBiCGStab::CSLASolverBiCGStab() 
     : CSLASolver()
-    , m_uiReTry(1)
+    , m_uiReTry(3)
     , m_uiDevationCheck(10)
     , m_uiStepCount(20)
     , m_fAccuracy(F(0.000001))
+    , m_fSmallRho(F(0.00000001))
 {
 
 }
@@ -65,6 +66,29 @@ void CSLASolverBiCGStab::Configurate(const CParameters& param)
         //    appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
         //}
     }
+
+#if _CLG_DOUBLEFLOAT
+    fValue = F(0.0);
+    if (param.FetchValueReal(_T("SmallRho"), fValue))
+    {
+        m_fSmallRho = fValue;
+#else
+    dValue = 0.0;
+    if (param.FetchValueDOUBLE(_T("SmallRho"), dValue))
+    {
+        m_fSmallRho = dValue;
+#endif
+        //if (m_fAccuracy < _CLG_FLT_EPSILON * F(2.0))
+        //{
+        //    m_fAccuracy = _CLG_FLT_EPSILON * F(2.0);
+        //    appGeneral(_T("Solver accuracy too small (%2.18f), set to be %2.18f\n"), fValue, m_fAccuracy);
+        //}
+    }
+
+    //if (m_uiReTry < 2)
+    //{
+    //    m_fSmallRho = _CLG_FLT_MIN_;
+    //}
 }
 
 void CSLASolverBiCGStab::AllocateBuffers(const CField* )
@@ -456,20 +480,17 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
                 //for j > 0, rho is calculated at the end of this loop
                 rho = pRh->Dot(pR);
             }
-
+            
 #if _CLG_DOUBLEFLOAT
-            if (__cuCabsSqf(rho) < _CLG_FLT_MIN) //if rho = 0, failed (assume will not)    
+            if (__cuCabsSqf(rho) < ((m_uiReTry == i + 1) ? _CLG_FLT_MIN : m_fSmallRho)) //if rho = 0, restart will be better  
             {
                 appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.28f\n"), __cuCabsSqf(rho));
 #else
-            if (__cuCabsSqfd(rho) < _CLG_FLT_MIN)
+            if (__cuCabsSqfd(rho) < ((m_uiReTry == i + 1) ? _CLG_FLT_MIN : m_fSmallRho))
             {
                 appParanoiac(_T("CSLASolverBiCGStab::rho too small:%0.28f\n"), __cuCabsSqfd(rho));
 #endif
-                if (i < m_uiReTry - 1)
-                {
-                    i = m_uiReTry - 1;
-                }
+                i = i + 1;
                 break;
             }
 

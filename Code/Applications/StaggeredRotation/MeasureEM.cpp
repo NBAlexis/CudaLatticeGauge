@@ -9,19 +9,16 @@
 
 #include "StaggeredRotation.h"
 
-__DEFINE_ENUM(EDistributionJobKS,
-    EDJKS_Polyakov,
-    EDJKS_Chiral,
-    EDJKS_AngularMomentum,
-    EDJKS_ChiralAndFermionMomentum,
-    EDJKS_PlaqutteEnergy,
-    EDJKS_CheckMD5,
+
+
+__DEFINE_ENUM(EDistributionJobKSEM,
+    EDJKSEM_Polyakov,
+    EDJKSEM_Chiral,
+
     )
 
 
-
-
-INT Measurement(CParameters& params)
+INT MeasurementEM(CParameters& params)
 {
 
 #pragma region read parameters
@@ -29,20 +26,16 @@ INT Measurement(CParameters& params)
     appSetupLog(params);
 
     INT iVaule = 0;
-    params.FetchValueINT(_T("StartOmega"), iVaule);
-    UINT iStartOmega = static_cast<UINT>(iVaule);
+    params.FetchValueINT(_T("StartEM"), iVaule);
+    UINT iStartEM = static_cast<UINT>(iVaule);
 
     iVaule = 10;
-    params.FetchValueINT(_T("EndOmega"), iVaule);
-    UINT iEndOmega = static_cast<UINT>(iVaule);
+    params.FetchValueINT(_T("EndEM"), iVaule);
+    UINT iEMEnd = static_cast<UINT>(iVaule);
 
     iVaule = 1;
     params.FetchValueINT(_T("StartN"), iVaule);
     UINT iStartN = static_cast<UINT>(iVaule);
-
-    iVaule = 1;
-    params.FetchValueINT(_T("FermionMomentum"), iVaule);
-    UBOOL bJF = 0 != iVaule;
 
     iVaule = 200;
     params.FetchValueINT(_T("EndN"), iVaule);
@@ -53,18 +46,6 @@ INT Measurement(CParameters& params)
     UINT iFieldCount = static_cast<UINT>(iVaule);
 
     iVaule = 0;
-    params.FetchValueINT(_T("AlsoCheckMD5"), iVaule);
-    UBOOL bCheckMd5 = (0 != iVaule);
-
-    iVaule = 0;
-    params.FetchValueINT(_T("MeasureCCS"), iVaule);
-    UBOOL bMeasureCCS = (0 != iVaule);
-
-    //iVaule = 1;
-    //params.FetchValueINT(_T("CheckGaugeFixing"), iVaule);
-    //UBOOL bCheckGaugeFixing = 0 != iVaule;
-
-    iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
     UBOOL bZ4 = 0 != iVaule;
 
@@ -72,9 +53,9 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
 
-    CCString sValue = _T("EDJ_Polyakov");
+    CCString sValue = _T("EDJKSEM_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
-    EDistributionJobKS eJob = __STRING_TO_ENUM(EDistributionJobKS, sValue);
+    EDistributionJobKSEM eJob = __STRING_TO_ENUM(EDistributionJobKSEM, sValue);
 
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
@@ -91,9 +72,38 @@ INT Measurement(CParameters& params)
     Real fBeta = F(0.0);
     params.FetchValueReal(_T("GaugeBate"), fBeta);
 
-    Real fOmega = F(0.1);
-    params.FetchValueReal(_T("OmegaRange"), fOmega);
-    fOmega = fOmega / iEndOmega;
+    TArray<Real> lstE;
+    params.FetchValueArrayReal(_T("ElectricList"), lstE);
+
+    TArray<Real> lstM;
+    params.FetchValueArrayReal(_T("MagneticList"), lstM);
+
+    if (0 == lstE.Num() && 0 != lstM.Num())
+    {
+        for (INT i = 0; i < lstM.Num(); ++i)
+        {
+            lstE.AddItem(F(0.0));
+        }
+    }
+
+    if (0 == lstM.Num() && 0 != lstE.Num())
+    {
+        for (INT i = 0; i < lstE.Num(); ++i)
+        {
+            lstM.AddItem(F(0.0));
+        }
+    }
+
+    if ((0 == lstE.Num() && 0 == lstM.Num()) || lstE.Num() != lstM.Num())
+    {
+        appCrucial(_T("The length of the list ElectricList or MagneticList is wrong!\n"));
+        return 1;
+    }
+
+    if (iEMEnd < static_cast<UINT>(lstE.Num()))
+    {
+        iEMEnd = static_cast<UINT>(lstE.Num());
+    }
 
     CCString sLoadType = _T("EFFT_CLGBin");
     EFieldFileType eLoadType = EFFT_CLGBin;
@@ -114,7 +124,7 @@ INT Measurement(CParameters& params)
     UINT uiMaxL = (_HC_Lx + 1) / 2 - 1;
     uiMaxL = uiMaxL * uiMaxL;
     TArray<TArray<CCString>> r_omega_idx;
-    for (UINT i = 0; i < iEndOmega * iEndOmega * uiMaxL; ++i)
+    for (UINT i = 0; i < iEMEnd * iEMEnd * uiMaxL; ++i)
     {
         TArray<CCString> newlst;
         r_omega_idx.AddItem(newlst);
@@ -133,22 +143,18 @@ INT Measurement(CParameters& params)
     CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
-    CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
-    CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
+    //CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
     CFieldFermionKSSU3* pF1Light = NULL;
     CFieldFermionKSSU3* pF2Light = NULL;
     CFieldFermionKSSU3* pF1Heavy = NULL;
     CFieldFermionKSSU3* pF2Heavy = NULL;
 
-    if (EDJKS_ChiralAndFermionMomentum == eJob
-        || (EDJKS_AngularMomentum == eJob && bJF)
-        || EDJKS_Chiral == eJob)
+    if (EDJKSEM_Chiral == eJob)
     {
         pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
         pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -159,27 +165,27 @@ INT Measurement(CParameters& params)
     appSetLogDate(FALSE);
 
 
-    for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
+    for (UINT uiEM = iStartEM; uiEM < iEMEnd; ++uiEM)
     {
-        CCommonData::m_fOmega = fOmega * uiOmega;
-        if (NULL != pAG)
-        {
-            pAG->SetOmega(CCommonData::m_fOmega);
-        }
-        appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
+        appGeneral(_T("(* ==== Electric(%f) Magnetic(%f) ========= *)\n"), lstE[uiEM], lstM[uiEM]);
         pPL->Reset();
         pJG->Reset();
         pCCLight->Reset();
         pCCHeavy->Reset();
         pFALight->Reset();
         pFAHeavy->Reset();
-        pCCSLight->Reset();
-        pCCSHeavy->Reset();
-
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
         pFALight->SetFieldCount(iFieldCount);
         pFAHeavy->SetFieldCount(iFieldCount);
+
+        CFieldFermionKSSU3EM* pFermionField1 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(2));
+        pFermionField1->m_fa2Bz = lstM[uiEM];
+        pFermionField1->m_fa2Ez = lstE[uiEM];
+        CFieldFermionKSSU3EM* pFermionField2 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(3));
+        pFermionField2->m_fa2Bz = F(-0.5) * lstM[uiEM];
+        pFermionField2->m_fa2Ez = F(-0.5) * lstE[uiEM];
+        appGetLattice()->ReCopyPooled();
 
 #pragma region Measure
 
@@ -190,80 +196,25 @@ INT Measurement(CParameters& params)
             CCString sTxtFileName;
             if (bSubFolder)
             {
-                sFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
-                sTxtFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.txt"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sFileName.Format(_T("%s/EM%d/%sR_Nt%d_EM%d_%d.con"), sSubFolderPrefix.c_str(), uiEM, sSavePrefix.c_str(), _HC_Lt, uiEM, uiN);
+                sTxtFileName.Format(_T("%s/EM%d/%sR_Nt%d_EM%d_%d.txt"), sSubFolderPrefix.c_str(), uiEM, sSavePrefix.c_str(), _HC_Lt, uiEM, uiN);
             }
             else
             {
-                sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
-                sTxtFileName.Format(_T("%sR_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sFileName.Format(_T("%sR_Nt%d_EM%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiEM, uiN);
+                sTxtFileName.Format(_T("%sR_Nt%d_EM%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiEM, uiN);
             }
-            //appGeneral(_T("checking %s ..."), sFileName);
-            if (EDJKS_CheckMD5 == eJob || bCheckMd5)
-            {
-                UINT uiSize = 0;
-                BYTE* fileContent = appGetFileSystem()->ReadAllBytes(sFileName, uiSize);
-                CCString sMD5 = "MD5 : " + CLGMD5Hash(fileContent, uiSize);
-                CCString sMD5old = "MD5 : " + CLGMD5Hash_OLD(fileContent, uiSize);
-                CCString sFileContent = appGetFileSystem()->ReadAllText(sTxtFileName);
-                if (sFileContent.Find(sMD5) >= 0)
-                {
-                    if (EDJKS_CheckMD5 == eJob)
-                    {
-                        appGeneral(_T("MD5 Found and good %s \n"), sFileName.c_str());
-                    }
-                    else
-                    {
-                        appGeneral(_T("-"));
-                    }
-                }
-                else if (sFileContent.Find(sMD5old) >= 0)
-                {
-                    if (EDJKS_CheckMD5 == eJob)
-                    {
-                        appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName.c_str());
-                    }
-                    else
-                    {
-                        appGeneral(_T("-"));
-                    }
-                    sFileContent = sFileContent.Replace(sMD5old, sMD5);
-                    appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
-                }
-                else if (sFileContent.Find("MD5 : ") >= 0)
-                {
-                    appCrucial(_T("MD5 Found and NOT good %s \n"), sFileName.c_str());
-                }
-                else
-                {
-                    if (EDJKS_CheckMD5 == eJob)
-                    {
-                        appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName.c_str());
-                    }
-                    else
-                    {
-                        appGeneral(_T("+"));
-                    }
-                    sFileContent = sFileContent + "\n" + sMD5 + "\n";
-                    appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
-                }
-
-                if (EDJKS_CheckMD5 == eJob)
-                {
-                    continue;
-                }
-            }
-            
+            //appGeneral(_T("checking %s ..."), sFileName);            
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
             
             switch (eJob)
             {
-                case EDJKS_Polyakov:
+                case EDJKSEM_Polyakov:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
-                case EDJKS_Chiral:
+                case EDJKSEM_Chiral:
                 {
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
@@ -326,13 +277,9 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
                     }
 
-                    if (bMeasureCCS)
-                    {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                    }
                 }
                 break;
+#if NotYet
                 case EDJKS_AngularMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
@@ -403,12 +350,6 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
                     }
-
-                    if (bMeasureCCS)
-                    {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                    }
                 }
                 break;
                 case EDJKS_PlaqutteEnergy:
@@ -416,6 +357,9 @@ INT Measurement(CParameters& params)
                     //pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
+#endif
+                default:
+                    break;
             }
 
             if ((iEndN - uiN + 1) % uiNewLine == 0)
@@ -432,26 +376,21 @@ INT Measurement(CParameters& params)
         }
         appGeneral(_T("\n*)\n"));
 
-        if (EDJKS_CheckMD5 == eJob)
-        {
-            continue;
-        }
-
 #pragma endregion
 
         switch (eJob)
         {
-            case EDJKS_Polyakov:
+            case EDJKSEM_Polyakov:
             {
                 CCString sFileNameWrite1;
                 CCString sFileNameWrite2;
                 sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
                 
                 //extract result
                 assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
                 
-                if (uiOmega == iStartOmega)
+                if (uiEM == iStartEM)
                 {
                     for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
                     {
@@ -482,7 +421,7 @@ INT Measurement(CParameters& params)
                 if (pPL->m_bMeasureLoopZ)
                 {
                     CCString sFileNameWrite3;
-                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                    sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
                     polyakovOmgR.RemoveAll();
                     polyIn.RemoveAll();
                     polyOut.RemoveAll();
@@ -504,18 +443,18 @@ INT Measurement(CParameters& params)
                 }
             }
             break;
-            case EDJKS_Chiral:
+            case EDJKSEM_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiEM, EM);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiEM, EM);
 
-                if (uiOmega == iStartOmega)
+                if (uiEM == iStartEM)
                 {
                     TArray<Real> lstRadius;
                     for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
@@ -526,49 +465,41 @@ INT Measurement(CParameters& params)
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
-
-                if (bMeasureCCS)
-                {
-                    CCString sFileNameWriteCCS;
-                    sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
-                    sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
-                }
             }
             break;
+#if NotYet
             case EDJKS_AngularMomentum:
             {
-                _CLG_EXPORT_ANGULAR(pJG, JG, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGS, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGChen, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGPot, uiOmega, O);
+                _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS);
+                _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGSurf);
+                _CLG_EXPORT_ANGULAR(pJG, JGPot);
             }
             break;
             case EDJKS_ChiralAndFermionMomentum:
             {
-                _CLG_EXPORT_ANGULAR(pJG, JG, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGS, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGChen, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiOmega, O);
-                _CLG_EXPORT_ANGULAR(pJG, JGPot, uiOmega, O);
+                _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS);
+                _CLG_EXPORT_ANGULAR(pJG, JGChen);
+                _CLG_EXPORT_ANGULAR(pJG, JGSurf);
+                _CLG_EXPORT_ANGULAR(pJG, JGPot);
 
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
 
-                _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFALight, SpinKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFALight, PotentialKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS, uiOmega, O);
+                _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS);
+                _CLG_EXPORT_CHIRAL(pFALight, SpinKS);
+                _CLG_EXPORT_CHIRAL(pFALight, PotentialKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS);
+                _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS);
 
                 if (uiOmega == iStartOmega)
                 {
@@ -581,15 +512,6 @@ INT Measurement(CParameters& params)
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
-
-                if (bMeasureCCS)
-                {
-                    CCString sFileNameWriteCCS;
-                    sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
-                    sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
-                }
             }
             break;
             case EDJKS_PlaqutteEnergy:
@@ -599,6 +521,7 @@ INT Measurement(CParameters& params)
                 //WriteStringFileRealArray(sFileName, pPE->m_lstData);
             }
             break;
+#endif
             default:
                 break;
         }
@@ -606,23 +529,9 @@ INT Measurement(CParameters& params)
         appGeneral(_T("\n"));
     }
 
-    if (EDJKS_CheckMD5 == eJob)
-    {
-        if (NULL != pF1Light)
-        {
-            pF1Light->Return();
-            pF2Light->Return();
-            pF1Heavy->Return();
-            pF2Heavy->Return();
-        }
-
-        appQuitCLG();
-        return 0;
-    }
-
     switch (eJob)
     {
-        case EDJKS_Polyakov:
+        case EDJKSEM_Polyakov:
         {
             CCString sFileNameWrite1;
             CCString sFileNameWrite2;
@@ -637,11 +546,12 @@ INT Measurement(CParameters& params)
             WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
         }
         break;
-        case EDJKS_Chiral:
+        case EDJKSEM_Chiral:
         {
             //nothing to do
         }
         break;
+#if NotYet
         case EDJKS_AngularMomentum:
         {
             //nothing to do
@@ -652,6 +562,7 @@ INT Measurement(CParameters& params)
             //nothing to do
         }
         break;
+#endif
         default:
             break;
     }

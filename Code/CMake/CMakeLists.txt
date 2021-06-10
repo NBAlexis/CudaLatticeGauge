@@ -383,6 +383,7 @@ add_executable(StaggeredRotation
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.h
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateBeta.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.cpp

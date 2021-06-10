@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="GaugeFixingJob.cpp" />
     <ClCompile Include="Measure.cpp" />
+    <ClCompile Include="MeasureEM.cpp" />
     <ClCompile Include="SimulateBeta.cpp" />
     <ClCompile Include="SimulateEM.cpp" />
     <ClCompile Include="StaggeredRotation.cpp">
