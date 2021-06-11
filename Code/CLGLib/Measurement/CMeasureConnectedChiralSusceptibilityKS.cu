@@ -31,6 +31,7 @@ void CMeasureConnectedSusceptibilityKS::Initial(CMeasurementManager* pOwner, CLa
 void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
     m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     SFermionSource sour;
     sour.m_byColorIndex = 0;
     sour.m_eSourceType = EFS_Point;
@@ -38,31 +39,34 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
     //appGeneral(_T("point1 %d, point2 %d\n"), _hostGetSiteIndex(sour.m_sSourcePoint), _hostGetSiteIndex(CCommonData::m_sCenter));
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->FixBoundary();
+    m_pSourceZero->CopyTo(pSourceZeroCopy);
     m_pSourceZero->InverseD(pGaugeField);
     m_pSourceZero->InverseD(pGaugeField);
 #if !_CLG_DOUBLEFLOAT
-    const cuDoubleComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
+    const cuDoubleComplex color1 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
-    const CLGComplex color1 = m_pSourceZero->Dot(m_pSourceZero);
+    const CLGComplex color1 = pSourceZeroCopy->Dot(m_pSourceZero);
 #endif
     sour.m_byColorIndex = 1;
     m_pSourceZero->InitialAsSource(sour);
+    m_pSourceZero->CopyTo(pSourceZeroCopy);
     m_pSourceZero->InverseD(pGaugeField);
     m_pSourceZero->InverseD(pGaugeField);
 #if !_CLG_DOUBLEFLOAT
-    const cuDoubleComplex color2 = m_pSourceZero->Dot(m_pSourceZero);
+    const cuDoubleComplex color2 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
-    const CLGComplex color2 = m_pSourceZero->Dot(m_pSourceZero);
+    const CLGComplex color2 = pSourceZeroCopy->Dot(m_pSourceZero);
 #endif
 
     sour.m_byColorIndex = 2;
     m_pSourceZero->InitialAsSource(sour);
+    m_pSourceZero->CopyTo(pSourceZeroCopy);
     m_pSourceZero->InverseD(pGaugeField);
     m_pSourceZero->InverseD(pGaugeField);
 #if !_CLG_DOUBLEFLOAT
-    const cuDoubleComplex color3 = m_pSourceZero->Dot(m_pSourceZero);
+    const cuDoubleComplex color3 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
-    const CLGComplex color3 = m_pSourceZero->Dot(m_pSourceZero);
+    const CLGComplex color3 = pSourceZeroCopy->Dot(m_pSourceZero);
 #endif
 
 #if !_CLG_DOUBLEFLOAT
@@ -70,6 +74,7 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
 #else
     m_lstResults.AddItem(_cuCaddf(_cuCaddf(color1, color2), color3));
 #endif
+    pSourceZeroCopy->Return();
 
     if (m_bShowResult)
     {

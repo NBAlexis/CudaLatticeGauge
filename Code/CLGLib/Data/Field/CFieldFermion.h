@@ -55,6 +55,9 @@ public:
         case EFO_F_Ddagger:
             Ddagger(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
+        case EFO_F_DD:
+            DD(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+            return TRUE;
         case EFO_F_DDdagger:
             DDdagger(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
@@ -73,6 +76,13 @@ public:
             }
             return InverseDdagger(otherfield);
         case EFO_F_InverseDDdagger:
+            if (EOCT_None != eCoeffType)
+            {
+                appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
+                return FALSE;
+            }
+            return InverseDDdagger(otherfield);
+        case EFO_F_InverseDD:
             if (EOCT_None != eCoeffType)
             {
                 appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
@@ -115,6 +125,19 @@ public:
                 }
             }
             return TRUE;
+        case EFO_F_DD_WithMass:
+            {
+                Real* fMass = (Real*)pOtherParameters;
+                if (NULL == fMass)
+                {
+                    DDWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+                else
+                {
+                    DDWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                }
+            }
+            return TRUE;
         case EFO_F_DDdagger_WithMass:
             {
                 Real* fMass = (Real*)pOtherParameters;
@@ -139,12 +162,15 @@ public:
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void DDWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     virtual void DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
 
     virtual UBOOL InverseD(const CField* pGauge) = 0;
     virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
+    virtual UBOOL InverseDD(const CField* pGauge) = 0;
     virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
     virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const = 0;

@@ -13,11 +13,11 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 200
-    EquvibStep : 2000
-    SaveStartIndex : 0
+    BeforeEquvibStep : 0
+    EquvibStep : 1920
+    SaveStartIndex : 80
 
-    SavePrefix : ./6200204_
+    SavePrefix : ./4940204_
 
     Dim : 4
     Dir : 4
@@ -51,10 +51,10 @@ JobSimulate:
     Gauge:
 
         FieldName : CFieldGaugeSU3
-        FieldInitialType : EFIT_Random
-        # FieldInitialType : EFIT_ReadFromFile
-        # GaugeFileType : EFFT_CLGBin
-        # GaugeFileName : ./5220204_Matching_301.con
+        # FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_ReadFromFile
+        GaugeFileType : EFFT_CLGBin
+        GaugeFileName : ./4940204_Matching_80.con
 
         Period : [1, 1, 1, 1]
 
@@ -256,7 +256,7 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        Beta : 6.2
+        Beta : 4.94
 
     Action2:
 

@@ -584,17 +584,17 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 6
-    OmegaStart : 7
+    OmegaStart : 0
     OmegaEnd : 8
-    IndexStart : 1001
+    IndexStart : 101
     IndexEnd : 1500
 
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4980204\Nt6
-    LoadPrefix : SRF4980204_
+    SubFolderPrefix : G:\SRFloat\4900204\Nt6
+    LoadPrefix : SRF490204_
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : ./4980204/GF/GFSRF4980204_
+    SavePrefix : ./4900204/GF/GFSRF4900204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0

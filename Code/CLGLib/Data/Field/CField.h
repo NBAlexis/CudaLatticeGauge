@@ -44,15 +44,18 @@ __DEFINE_ENUM(EFieldOperator,
 
     EFO_F_D,
     EFO_F_Ddagger,
+    EFO_F_DD,
     EFO_F_DDdagger,
     EFO_F_InverseD,
     EFO_F_InverseDdagger,
+    EFO_F_InverseDD,
     EFO_F_InverseDDdagger,
 
     EFO_F_RationalD,
 
     EFO_F_D_WithMass,
     EFO_F_Ddagger_WithMass,
+    EFO_F_DD_WithMass,
     EFO_F_DDdagger_WithMass,
 
     EFO_ForceDWORD = 0x7fffffff,

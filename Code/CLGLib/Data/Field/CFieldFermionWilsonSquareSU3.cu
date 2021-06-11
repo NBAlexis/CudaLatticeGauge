@@ -956,6 +956,33 @@ void CFieldFermionWilsonSquareSU3::DDdagger(const CField* pGauge, EOperatorCoeff
     pPooled->Return();
 }
 
+void CFieldFermionWilsonSquareSU3::DD(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+{
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    Real fRealCoeff = fCoeffReal;
+    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
+    if (EOCT_Minus == eCoeffType)
+    {
+        eCoeffType = EOCT_Real;
+        fRealCoeff = F(-1.0);
+    }
+    CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+
+    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData,
+        FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
+    //why only apply coeff in the next step?
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+        FALSE, eCoeffType, fRealCoeff, cCompCoeff);
+
+    pPooled->Return();
+}
+
 UBOOL CFieldFermionWilsonSquareSU3::InverseD(const CField* pGauge)
 {
     if (m_byEvenFieldId > 0)
@@ -1008,6 +1035,24 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger(const CField* pGauge)
 
     //Find a solver to solve me.
     return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
+}
+
+UBOOL CFieldFermionWilsonSquareSU3::InverseDD(const CField* pGauge)
+{
+    if (m_byEvenFieldId > 0)
+    {
+        return InverseDDdagger_eo(pGauge);
+    }
+
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        return FALSE;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    //Find a solver to solve me.
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DD);
 }
 
 UBOOL CFieldFermionWilsonSquareSU3::CalculateForce(
