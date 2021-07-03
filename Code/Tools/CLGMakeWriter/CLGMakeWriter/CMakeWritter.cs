@@ -88,7 +88,7 @@ namespace CLGMakeWriter
 
             sContent += "# Flags\n";
             sContent += "set(CMAKE_CUDA_FLAGS \"${CMAKE_CUDA_FLAGS} -O3\")\n";
-            sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow\")\n";
+            sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
             sContent += "# to enable double float, add the following line:\n";
             sContent += "if (DEFINED CLGDOUBLE)\n";

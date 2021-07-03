@@ -78,7 +78,7 @@ WriteStringFileRealArray(sFileNameWrite##lstName##All, lstName##All);
 
 
 #if !_CLG_WIN
-    void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
+inline void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
 {
     strcpy(buffer, strerror(error));
 }
@@ -88,7 +88,7 @@ enum { kExportDigital = 20, };
 
 #if !_CLG_WIN
 
-void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
+inline void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
 {
     static TCHAR tmpBuff[10];
     appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);

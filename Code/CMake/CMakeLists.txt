@@ -24,7 +24,7 @@ set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 # Flags
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess")
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
 if (DEFINED CLGDOUBLE)
