@@ -122,6 +122,7 @@ __DEFINE_ENUM(EFieldType,
     EFT_FermionWilsonSquareSU3,
     EFT_FermionStaggeredSU3,
     EFT_GaugeU1,
+    EFT_GaugeReal,
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,
 

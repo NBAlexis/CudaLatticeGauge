@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : Measure.cpp
+// FILENAME : MeasureEM.cpp
 // 
 // DESCRIPTION:
 //
@@ -14,6 +14,7 @@
 __DEFINE_ENUM(EDistributionJobKSEM,
     EDJKSEM_Polyakov,
     EDJKSEM_Chiral,
+    EDJKSEM_BerryPhase,
 
     )
 
@@ -143,7 +144,7 @@ INT MeasurementEM(CParameters& params)
     CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-
+    CMeasureBerryPhase* pBP = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
@@ -174,6 +175,7 @@ INT MeasurementEM(CParameters& params)
         pCCHeavy->Reset();
         pFALight->Reset();
         pFAHeavy->Reset();
+        pBP->Reset();
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
         pFALight->SetFieldCount(iFieldCount);
@@ -277,6 +279,11 @@ INT MeasurementEM(CParameters& params)
                             iFieldCount == i + 1);
                     }
 
+                }
+                break;
+                case EDJKSEM_BerryPhase:
+                {
+                    pBP->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
 #if NotYet
@@ -467,6 +474,13 @@ INT MeasurementEM(CParameters& params)
                 }
             }
             break;
+            case EDJKSEM_BerryPhase:
+            {
+                CCString sFileNameWriteBP;
+                sFileNameWriteBP.Format(_T("%s_BerryPhase_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray(sFileNameWriteBP, pBP->m_lstData);
+            }
+            break;
 #if NotYet
             case EDJKS_AngularMomentum:
             {
@@ -547,6 +561,11 @@ INT MeasurementEM(CParameters& params)
         }
         break;
         case EDJKSEM_Chiral:
+        {
+            //nothing to do
+        }
+        break;
+        case EDJKSEM_BerryPhase:
         {
             //nothing to do
         }

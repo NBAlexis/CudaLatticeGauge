@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM, ESR_MeasureEM
-RotationJob : ESR_Measure
+RotationJob : ESR_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,14 +328,14 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.98
+    GaugeBate : 4.82
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
-    StartN : 101
-    EndN : 110
+    StartN : 201
+    EndN : 1500
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 5
     StochasticGaussian : 1
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4980204\GF
+    SubFolderPrefix : G:\SRFloat\4820204\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF4980204_
-    CSVSavePrefix : G:\SRFloat\4980204\Chiral\SRF4980204_
+    SavePrefix : SRF4820204_
+    CSVSavePrefix : G:\SRFloat\4820204\Polyakov\SRF4820204_
 
     Dim : 4
     Dir : 4
@@ -584,17 +584,17 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 6
-    OmegaStart : 0
+    OmegaStart : 8
     OmegaEnd : 8
     IndexStart : 101
     IndexEnd : 1500
 
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4900204\Nt6
-    LoadPrefix : SRF490204_
+    SubFolderPrefix : G:\SRFloat\7000204\Nt6
+    LoadPrefix : SRF7000204_
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : ./4900204/GF/GFSRF4900204_
+    SavePrefix : ./7000204/GF/GFSRF7000204_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
@@ -876,7 +876,7 @@ JobMeasureEM:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 6
+    MeasureListLength : 7
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -1060,4 +1060,13 @@ JobMeasureEM:
         MeasureSpin : 1
         MeasureApprox : 0
         ProjectivePlane : 1
+
+    Measure7:
+
+        MeasureName : CMeasureBerryPhase
+        FieldId : 1
+        ShowResult : 0
+        WilsonDirac : 0
+        DoGaugeFixing : 0
+        
 

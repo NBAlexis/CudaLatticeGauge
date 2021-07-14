@@ -25,6 +25,9 @@ __DEFINE_ENUM(EFieldInitialType,
 
     EFIT_ReadFromFile,
 
+    EFIT_U1Ez,
+    EFIT_U1Bz,
+
     EFIT_ForceDWORD = 0x7fffffff,
     )
 

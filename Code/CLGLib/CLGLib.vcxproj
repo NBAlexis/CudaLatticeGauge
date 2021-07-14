@@ -62,6 +62,7 @@
     <ClInclude Include="Data\Field\CFieldGaugeSU3D.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h" />
     <ClInclude Include="Data\Field\CFieldGaugeU1.h" />
+    <ClInclude Include="Data\Field\CFieldGaugeU1Real.h" />
     <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h" />
@@ -171,6 +172,7 @@
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeSU3TreeImproved.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeU1.cu" />
+    <CudaCompile Include="Data\Field\CFieldGaugeU1Real.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombCornell.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingCoulombLosAlamos.cu" />
     <CudaCompile Include="GaugeFixing\CGaugeFixingLandauLosAlamos.cu" />

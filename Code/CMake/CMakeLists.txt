@@ -82,6 +82,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3TreeImproved.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1Real.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3.h
@@ -189,6 +190,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3TreeImproved.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1Real.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingCoulombLosAlamos.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauLosAlamos.cu
