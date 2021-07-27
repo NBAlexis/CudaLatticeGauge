@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM, ESR_MeasureEM
-RotationJob : ESR_GaugeFixing
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,12 +328,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.82
+    GaugeBate : 4.98
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
     StartN : 201
-    EndN : 1500
+    EndN : 2000
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
     DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
@@ -343,12 +343,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4820204\Nt6
+    SubFolderPrefix : G:\SRFloat\4980204\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF4820204_
-    CSVSavePrefix : G:\SRFloat\4820204\Polyakov\SRF4820204_
+    SavePrefix : SRF4980204_
+    CSVSavePrefix : G:\SRFloat\4980204\Polyakov\SRF4980204_
 
     Dim : 4
     Dir : 4

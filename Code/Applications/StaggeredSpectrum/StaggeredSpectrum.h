@@ -20,6 +20,8 @@ __DEFINE_ENUM(EStaggeredSpectrumMeasure,
     ESSM_Polyakov,
     ESSM_Correlator,
     ESSM_CorrelatorSimple,
+    ESSM_Chiral,
+    ESSM_All,
 )
 
 extern INT SimulateStaggered(CParameters& params);
