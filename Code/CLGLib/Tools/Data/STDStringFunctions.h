@@ -53,7 +53,7 @@ inline INT vsnprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, 
 
 inline TCHAR* strcpy_s(TCHAR* dest, size_t length, const TCHAR* source)
 {
-    size_t lengthOfdest = static_cast<size_t>(appStrlen(dest));
+    size_t lengthOfdest = static_cast<size_t>(sizeof(dest) / sizeof(TCHAR));
     if (lengthOfdest < length)
         length = lengthOfdest;
     return std::strncpy(dest, source, length);
