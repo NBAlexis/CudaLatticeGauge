@@ -416,6 +416,8 @@ INT Measurement(CParameters& params)
                     //pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
+                default:
+                    break;
             }
 
             if ((iEndN - uiN + 1) % uiNewLine == 0)

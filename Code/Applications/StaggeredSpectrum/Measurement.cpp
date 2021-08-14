@@ -544,6 +544,8 @@ INT Measurement(CParameters& params)
     pMCSimple->Reset();
     pCCLight->Reset();
     pCCHeavy->Reset();
+    pCCLight->SetFieldCount(iFieldCount);
+    pCCHeavy->SetFieldCount(iFieldCount);
 
 #pragma region Measure
 

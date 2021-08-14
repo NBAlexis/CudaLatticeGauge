@@ -7,7 +7,7 @@
 // REVISION:
 //  [09/24/2020 nbale]
 //=============================================================================
-
+#pragma once
 #include "CLGLib.h"
 
 __DEFINE_ENUM(EStaggeredRotationJob,
@@ -102,7 +102,8 @@ inline void WriteStringFile(const CCString& sFileName, const CCString& sContent)
     appGetFileSystem()->WriteAllText(sFileName, sContent);
 }
 
-inline void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst, UBOOL bAppend = FALSE)
+template <class T>
+void WriteStringFileRealArray(const CCString& sFileName, const TArray<T>& lst, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     std::ofstream file;
@@ -125,7 +126,7 @@ inline void WriteStringFileRealArray(const CCString& sFileName, const TArray<Rea
     TCHAR str[50];
     for (INT i = 0; i < lst.Num(); ++i)
     {
-        _gcvt_s(str, 50, lst[i], iDigital);
+        _gcvt_s(str, 50, static_cast<DOUBLE>(lst[i]), iDigital);
         CCString sReal = CCString(str);
         sReal = sReal.Replace(_T("e"), _T("*^"));
         file << _T(" ");

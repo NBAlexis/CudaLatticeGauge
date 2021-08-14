@@ -61,6 +61,8 @@ CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) cons
             free(byToSave);
             return MD5;
         }
+    default:
+        break;
     }
 
     appCrucial(_T("Save for this type not implemented: CFieldGaugeSU3 : %s\n"), __ENUM_TO_STRING(EFieldFileType, eType).c_str());
