@@ -94,6 +94,7 @@ _kernelPickPropagators(
         return;
     }
 
+    //this is because sum over 2n only even sites
     if (0 != (sSite4.x & 1)
      || 0 != (sSite4.y & 1)
      || 0 != (sSite4.z & 1))
@@ -125,6 +126,9 @@ _kernelPickPropagators(
             const SBYTE byA2v_p_delta = (byA2 ^ byDelta) * 3;
             CLGComplex respropagator = _zeroc;
 
+            //D(A) = +- A1, +- A2, +- A3
+            //So, we have D(A), D(A+delta) for MA
+            //we have D(B), D(B+delta) for MB
             #pragma unroll
             for (SBYTE byShift = 0; byShift < 8; ++byShift)
             {
@@ -143,11 +147,11 @@ _kernelPickPropagators(
 
                 //Discard the terms outside of the unit cube
                 //So we also do not need to consider the sites outside the lattice
-                if (shifta1x < 0 || shifta1y < 0 || shifta1z < 0
-                 || shifta1pdx < 0 || shifta1pdy < 0 || shifta1pdz < 0)
-                {
-                    continue;
-                }
+                //if (shifta1x < 0 || shifta1y < 0 || shifta1z < 0
+                // || shifta1pdx < 0 || shifta1pdy < 0 || shifta1pdz < 0)
+                //{
+                //    continue;
+                //}
                 //real shift
                 SSmallInt4 shifted_A1 = sSite4;
                 shifted_A1.x = shifted_A1.x + shifta1x;
@@ -158,10 +162,10 @@ _kernelPickPropagators(
                 shifted_A1_p_delta.y = shifted_A1_p_delta.y + shifta1pdy;
                 shifted_A1_p_delta.z = shifted_A1_p_delta.z + shifta1pdz;
 
-                //const UINT uiSiteShiftedA1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1)].m_uiSiteIndex;
-                //const UINT uiSiteShiftedA1_p_delta = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1_p_delta)].m_uiSiteIndex;;
-                const UINT uiSiteShiftedA1 = _deviceGetSiteIndex(shifted_A1);
-                const UINT uiSiteShiftedA1_p_delta = _deviceGetSiteIndex(shifted_A1_p_delta);
+                const UINT uiSiteShiftedA1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1)].m_uiSiteIndex;
+                const UINT uiSiteShiftedA1_p_delta = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(shifted_A1_p_delta)].m_uiSiteIndex;;
+                //const UINT uiSiteShiftedA1 = _deviceGetSiteIndex(shifted_A1);
+                //const UINT uiSiteShiftedA1_p_delta = _deviceGetSiteIndex(shifted_A1_p_delta);
 
                 #pragma unroll
                 for (BYTE c = 0; c < 9; ++c)
@@ -183,13 +187,14 @@ _kernelPickPropagators(
             }
 
             const BYTE sign = signTable[byType * 8 + byA1] + signTable[byType * 8 + byA2];
+            //Even is +1, Odd is -1
             if (sign & 1)
             {
-                thisSiteSum = _cuCaddf(thisSiteSum, respropagator);
+                thisSiteSum = _cuCsubf(thisSiteSum, respropagator);
             }
             else
             {
-                thisSiteSum = _cuCsubf(thisSiteSum, respropagator);
+                thisSiteSum = _cuCaddf(thisSiteSum, respropagator);
             }
         }
     }
@@ -223,6 +228,9 @@ __CLGIMPLEMENT_CLASS(CMeasureMesonCorrelatorStaggered)
 
 #pragma region Help functions
 
+/**
+ * Even: 1, Odd: -1
+ */
 static inline INT __eta(INT x, INT y, INT z, INT i)
 {
     switch (i)
@@ -265,12 +273,15 @@ void CMeasureMesonCorrelatorStaggered::InitialSignTable()
     {
         for (INT j = 0; j < 8; ++j)
         {
+            //x,y,z should be as same as in _kernelPickPropagators
             const INT x = j & 1;
             const INT y = (j >> 1) & 1;
             const INT z = (j >> 2) & 1;
             const INT idx = i * 8 + j;
             //eta_1=xi_3=xi_4=0
-
+            //eta_4=epsi
+            //for simplicity, always use k=x, l=y
+            
             switch (i)
             {
             case 0:
@@ -290,7 +301,7 @@ void CMeasureMesonCorrelatorStaggered::InitialSignTable()
                 m_pSignTable[idx] = (__xi(x, y, z, 1)) & 1;
                 break;
             case 4:
-                //1
+                //1?? should be etak
                 m_pSignTable[idx] = 0;
                 break;
             case 5:
@@ -497,6 +508,74 @@ void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
     }
 }
 
+void CMeasureMesonCorrelatorStaggered::SimplerVersion()
+{
+    CFieldFermionKSSU3* sinks[24];
+    for (BYTE i = 0; i < 24; ++i)
+    {
+        sinks[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    }
+
+    for (INT i = 0; i < _kMesonCorrelatorType; ++i)
+    {
+        for (INT t = 1; t < _HC_Lti; ++t)
+        {
+            for (BYTE shift = 0; shift < 8; ++shift)
+            {
+                for (BYTE c = 0; c < 3; ++c)
+                {
+                    const INT idx = shift * 3 + c;
+                    SFermionSource source;
+                    source.m_bySpinIndex = shift;
+                    source.m_byColorIndex = c;
+                    source.m_eSourceType = EFS_Wall;
+                    source.m_sSourcePoint = SSmallInt4(0, 0, 0, static_cast<SBYTE>(t));
+                    sinks[idx]->InitialAsSource(source);
+                }
+            }
+
+            cuDoubleComplex sum = make_cuDoubleComplex(0, 0);
+            for (BYTE a1 = 0; a1 < 8; ++a1)
+            {
+                const BYTE a1_p_delta = a1 ^ m_pDeltaTable[i];
+                for (BYTE a2 = 0; a2 < 8; ++a2)
+                {
+                    const BYTE sa1a2 = m_pSignTable[i * 8 + a1] + m_pSignTable[i * 8 + a2];
+                    const BYTE a2_p_delta = a2 ^ m_pDeltaTable[i];
+                    cuDoubleComplex colorsum = make_cuDoubleComplex(0, 0);
+                    for (BYTE c1 = 0; c1 < 3; ++c1)
+                    {
+                        for (BYTE c2 = 0; c2 < 3; ++c2)
+                        {
+                            colorsum = cuCadd(colorsum,
+                                cuCmul(sinks[a1_p_delta * 3 + c1]->Dot(m_pW1[a2_p_delta * 3 + c2]),
+                                    cuConj(sinks[a1 * 3 + c1]->Dot(m_pW2[a2 * 3 + c2]))
+                                )
+                            );
+                        }
+                    }
+
+                    if (0 == (sa1a2 & 1))
+                    {
+                        sum = cuCadd(sum, colorsum);
+                    }
+                    else
+                    {
+                        sum = cuCsub(sum, colorsum);
+                    }
+                }
+            }
+
+            m_pResPropogators[i * (_HC_Lti - 1) + t - 1] = sum;
+        }
+    }
+
+    for (BYTE i = 0; i < 24; ++i)
+    {
+        sinks[i]->Return();
+    }
+}
+
 void CMeasureMesonCorrelatorStaggered::InitialBuffers()
 {
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceSignTable, sizeof(BYTE) * _kMesonCorrelatorType * 8));
@@ -540,6 +619,10 @@ void CMeasureMesonCorrelatorStaggered::Initial(CMeasurementManager* pOwner, CLat
     param.FetchValueINT(_T("GaugeFixing"), iValue);
     m_bGaugeFixing = iValue != 0;
 
+    iValue = 1;
+    param.FetchValueINT(_T("SimpleVersion"), iValue);
+    m_bSimpleVersion = iValue != 0;
+
     InitialBuffers();
     InitialSignTable();
 }
@@ -567,12 +650,26 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
             appGetLattice()->m_pGaugeFixing->GaugeFixing(m_pGaugeFixing);
         }
         CalculateSources(m_pGaugeFixing);
-        CalculatePropogators();
+        if (m_bSimpleVersion)
+        {
+            SimplerVersion();
+        }
+        else
+        {
+            CalculatePropogators();
+        }
     }
     else
     {
         CalculateSources(pGaugeField);
-        CalculatePropogators();
+        if (m_bSimpleVersion)
+        {
+            SimplerVersion();
+        }
+        else
+        {
+            CalculatePropogators();
+        }
     }
 
     //========== extract result ===========

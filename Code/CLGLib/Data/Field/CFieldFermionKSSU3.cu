@@ -608,15 +608,17 @@ _kernelMakePointSourceKSOne(deviceSU3Vector* pDeviceData, UINT uiDesiredSite)
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, 
-    UINT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
+    INT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
 {
     intokernalInt4;
 
-    pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+    //pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
+    //We shall not set zero here!
+
     if ( (0 == (sSite4.x & 1))
       && (0 == (sSite4.y & 1))
       && (0 == (sSite4.z & 1))
-      && uiDesiredT == sSite4.w)
+      && (uiDesiredT < 0 || uiDesiredT == sSite4.w))
     {
         //sSite4 is no longer used
         sSite4.x = sSite4.x + static_cast<SBYTE>(uiShift & 1);
@@ -1711,9 +1713,10 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
     case EFS_Wall:
     {
         preparethread;
+        _kernelInitialFermionKS << <block, threads >> > (m_pDeviceData, m_byFieldId,EFIT_Zero);
         _kernelMakeWallSourceKS << <block, threads >> > (
             m_pDeviceData,
-            sourceData.m_sSourcePoint.w,
+            static_cast<INT>(sourceData.m_sSourcePoint.w),
             sourceData.m_bySpinIndex,
             sourceData.m_byColorIndex,
             m_byFieldId);

@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM, ESR_MeasureEM
-RotationJob : ESR_Measure
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,22 +17,22 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 700
-    SaveStartIndex : 800
-    OmegaSep : 7
-    OmegaStart : 7
-    MaxOmega : 0.112
-    MinNt : 6
-    MaxNt : 6
-    SavePrefix : ./4980204/SRF4980204_
-    Additive : 0
+    EquvibStep : 1000
+    SaveStartIndex : 1000
+    OmegaSep : 6
+    OmegaStart : 0
+    MaxOmega : 0.12
+    MinNt : 8
+    MaxNt : 8
+    SavePrefix : ./5300204/RWSRF5300204_
+    Additive : 1
 
     # 53551575Nt4 Omega60 
-    # Polyakovs : [0.2548793495166105009, 0.2674676527142243465, 0.28727804358433550130, 0.36891834544115924644, 0.3714890358030488316, 0.4434429554952389631, 0.5203437138701659326, 0.6383689173717348941, 0.7112141902124326872, 0.8122419471662560913, 0.9025054366091994723]
+    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 4.98
+        Beta : 5.3
         Omega : 0.0
 
     Action2:

@@ -283,7 +283,7 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, Updator, TestFermionUpdatorWithMesonCorrelatorStaggered);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, UpdatorKS, TestFermionUpdatorWithMesonCorrelatorStaggered);
 
 UINT TestBerryPhase(CParameters& sParam)
 {

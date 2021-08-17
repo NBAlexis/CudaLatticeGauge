@@ -69,14 +69,14 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 #endif
 }
 
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKS);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradient);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradientNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSNested11StageNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, Updator, TestFermionUpdatorKSP4);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKS);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradient);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4);
 
 
 

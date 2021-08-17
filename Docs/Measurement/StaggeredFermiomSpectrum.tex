@@ -225,7 +225,7 @@ idx & $S({\bf x})$ & ${\bf \delta}$ & $M$ & $J^{PC}_R$ & $\gamma _S\otimes \tau 
 The $\eta,\xi,\epsilon$ in Table~\ref{tab:staggeredMeson} are
 \begin{equation}
 \begin{split}
-&\eta_{\mu}(n)=(-1)^{\sum _{i<\mu} n_i},\;\;\xi _{\mu}(n)=(-1)^{\sum _{i\geq \mu}^4 n_i},\;\;\eta _{\mu}(\nu)=\xi _{\nu}(\mu),\\
+&\eta_{\mu}(n)=(-1)^{\sum _{i<\mu} n_i},\;\;\xi _{\mu}(n)=(-1)^{\sum _{i> \mu}^4 n_i},\;\;\eta _{\mu}(\nu)=\xi _{\nu}(\mu),\\
 &\epsilon (n) = (-1)^{\sum _{i=1}^4 n_i}=\eta _5,
 \end{split}
 \end{equation}
@@ -240,7 +240,7 @@ For staggered fermion, to simplify the calculation, one uses the wall source, wh
 &\tilde{M}(t) = \sum _{\bf A} S({\bf A})\tilde{M}_{{\bf A},{\bf A}+\delta}
 \end{split}
 \end{equation}
-\textbf{\textcolor[rgb]{0,0,1}{$\tilde{M}(t)$ carries same quantum number as $M(t)$~\cite{staggeredMeson}.}}
+\textbf{\textcolor[rgb]{0,0,1}{$\tilde{M}(t)$ carries same quantum number as $M(t)$~\cite{staggeredMeson}. This is only a function of $\delta$ and $t$}}
 
 Since it is a \index{wall source}wall source, to make sure \textbf{gauge invariance}, this correlator should be measured in \textcolor[rgb]{0,0,1}{\textbf{Coulomb gauge}}. How to fix the gauge is introduced in Sec.~\ref{sec:CoulombGauge}.
 
@@ -250,6 +250,48 @@ The expression of the sources are
 &s_{\bf A,c}({\bf n}, t) = \sum _{{\bf x}} \delta _{c,c'}\delta _{2{\bf x}+{\bf A},{\bf n}}\delta _{t,n_4}\\
 \end{split}
 \end{equation}
+
+\subsubsection{\label{ModifiedOperator}Modified operator}
+
+The correlation function is defined as overlap between sources.
+
+Then
+\begin{equation}
+\begin{split}
+&C(\delta,t)=\langle \tilde{M}_{\delta}(t) \overline{\tilde{M} _{\delta}(0)}\rangle \\
+&= \sum _{c_1,c_2,\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\langle \sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1 + {\bf A}_1,t)\sum _{\bf y _1}\chi_{c_1}(2{\bf x}_1+{\bf A}_1+\delta,t)\\
+& \sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0) \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\rangle\\
+&=\sum _{c_1,c_2,\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\\
+&\times \langle \sum _{\bf y _1}\chi_{c_1}(2{\bf x}_1+{\bf A}_1+\delta,t)  \sum _{\bf x _2} \chi_{c_2}(2{\bf x}_2+{\bf A}_2,0)\sum _{\bf y_2}\bar{\chi} _{c_2} (2{\bf y}_2+{\bf A}_2+\delta,0)\sum _{\bf x _1}\bar{\chi}_{c_1}(2{\bf x}_1 + {\bf A}_1,t)\rangle\\
+\end{split}
+\end{equation}
+Then use
+\begin{equation}
+\begin{split}
+&\langle \psi _1\psi_2 \bar{\psi} _3 \bar{\psi}_4\rangle = \left(M^{-1}\right)_{1,3}\left((M^{\dagger})^{-1}\right)_{4,2}^*- \left(M^{-1}\right)_{1,4}\left((M^{\dagger})^{-1}\right)_{3,2}^*.\\
+\end{split}
+\end{equation}
+\textcolor[rgb]{1,0,0}{\textbf{The second term is the `disconnected pieces' (propagator within same time slice) which is expansive to calculate because one need inverses of sources at different time}, the first term is the `connected pieces' (propagator connecting different time slices). Connected pieces are cheaper because we only need inverses of sources at $t=0$.} I don't known why but we drop the disconnected pieces, so that
+\begin{equation}
+\begin{split}
+&\langle \psi _1\psi_2 \bar{\psi} _3 \bar{\psi}_4\rangle = \left(M^{-1}\right)_{1,3}\left((M^{\dagger})^{-1}\right)_{4,2}^*= \left(M^{-1}\right)_{1,3}\left(M^{-1}\right)_{2,4}.\\
+\end{split}
+\end{equation}
+So
+\begin{equation}
+\begin{split}
+&C(\delta,t)=\sum _{c_1,c_2,\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2)\\
+&\times \sum _{{\bf x}_1,{\bf y}_1,{\bf x}_2,{\bf y}_2}\left(M^{-1}\right)_{2{\bf x}_1+{\bf A}_1+\delta,t,c_1;2{\bf y}_2+{\bf A}_2+\delta,0,c_2}\left({M^{\dagger}}^{-1}\right)^*_{2{\bf x}_1 + {\bf A}_1,t,c_1;2{\bf x}_2+{\bf A}_2,0,c_2}\\
+\end{split}
+\end{equation}
+Which is
+\begin{equation}
+\begin{split}
+&C(\delta,t)=\sum _{c_1,c_2,\bf A _1 A_2}S({\bf A}_1)S({\bf A}_2) \phi ({\bf A}_1+\delta,c_1,t) D^{-1} \phi({\bf A}_2+\delta,c_2,0) \left(\phi ({\bf A}_1,c_1,t) {D^{\dagger}}^{-1} \phi({\bf A}_2,c_2,0)\right)^*\\
+\end{split}
+\end{equation}
+
+It seems we have compute $24$ inverses rather than $8$.
 
 \subsubsection{\label{ThePropagatorsOfStaggeredMeson}The propagators of staggered meson}
 

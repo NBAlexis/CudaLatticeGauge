@@ -392,7 +392,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             break;
         case PotentialKS:
             {
-                ApplySpinMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                ApplyPotentialMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
             }
             break;
         }

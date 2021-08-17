@@ -1154,6 +1154,7 @@ TestFermionUpdatorWithMesonCorrelatorStaggered:
         MeasureName : CMeasureMesonCorrelatorStaggered
         ShowResult : 1
         GaugeFixing : 1
+        # SimpleVersion : 1
         FieldId : 2
 
     Measure2:

@@ -195,6 +195,7 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     pAction2->m_pFerimionField = pFermion;
     const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
 
+    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
     pPL->OnConfigurationAccepted(pGauge, NULL);
     const Real fPolyakov1 = _cuCabsf(pPL->m_lstLoop[0]);
     pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);

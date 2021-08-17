@@ -23,6 +23,7 @@ public:
     enum { _kMesonCorrelatorType = 20 };
 
     CMeasureMesonCorrelatorStaggered() : CMeasure()
+        , m_bSimpleVersion(FALSE)
         , m_pDeviceW1(NULL)
         , m_pDeviceW2(NULL)
         , m_pGaugeFixing(NULL)
@@ -51,6 +52,7 @@ public:
 
 protected:
 
+    UBOOL m_bSimpleVersion;
     //This is a 20 x 8 table
     BYTE m_pSignTable[_kMesonCorrelatorType * 8];
     //This is a 20 x 1 table
@@ -66,6 +68,7 @@ protected:
     //uiSite
     CFieldGauge* m_pGaugeFixing;
     void CalculatePropogators();
+    void SimplerVersion();
 
     BYTE* m_pDeviceSignTable;
     BYTE* m_pDeviceDeltaTable;
