@@ -23,26 +23,32 @@ __CLGIMPLEMENT_CLASS(CMeasureWilsonLoop)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelWilsonLoopCalculateP(
-    const deviceSU3* __restrict__ pDeviceData, deviceSU3* res)
+    const deviceSU3* __restrict__ pDeviceData, deviceSU3* res, 
+    const BYTE byFieldId, const BYTE tstart)
 {
     const UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiXYZ_Lt = uiXYZ * _DC_Lt;
+    SSmallInt4 startSite = __deviceSiteIndexToInt4(uiXYZ_Lt + tstart);
+    UINT uiSaveSiteIndex = 0;
     for (UINT t = 0; t < _DC_Lt; ++t)
     {
         if (0 == t)
         {
-            const UINT uiSiteIndex = uiXYZ_Lt + t;
+            const UINT uiSiteIndex = uiXYZ_Lt + tstart;
+            uiSaveSiteIndex = uiXYZ_Lt;
             const UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
-            res[uiSiteIndex] = pDeviceData[uiLinkIdx];
+            res[uiSaveSiteIndex] = pDeviceData[uiLinkIdx];
         }
         else
         {
-            const UINT uiSiteIndex2 = uiXYZ_Lt + t;
-            const UINT uiSiteIndex1 = uiSiteIndex2 - 1;
-            const UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex2, 3);
+            startSite.w = startSite.w + 1;
+            const UINT uiSiteIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(startSite)].m_uiSiteIndex;
+            const UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+            res[uiSaveSiteIndex + 1] = res[uiSaveSiteIndex];
+            res[uiSaveSiteIndex + 1].Mul(pDeviceData[uiLinkIdx]);
 
-            res[uiSiteIndex2] = res[uiSiteIndex1];
-            res[uiSiteIndex2].Mul(pDeviceData[uiLinkIdx]);
+            startSite = __deviceSiteIndexToInt4(uiSiteIndex);
+            uiSaveSiteIndex = uiSaveSiteIndex + 1;
         }
     }
 }
@@ -65,7 +71,7 @@ _kernelWilsonLoops(
     const deviceSU3* __restrict__ pP,
     const SSmallInt4 shift, const INT product, const INT linkLength, const UINT shiftLength,
     const INT link1, const INT link2, const INT link3, const INT link4, const INT link5,
-    const UINT maxLength, UINT* counter, CLGComplex* correlator)
+    const UINT maxLength, const BYTE tstart, UINT* counter, CLGComplex* correlator)
 {
     intokernalInt4;
     if (0 == sSite4.w || sSite4.w > (_DC_Lt / 2))
@@ -82,8 +88,14 @@ _kernelWilsonLoops(
         sSite4.x,
         sSite4.y,
         sSite4.z,
-        0);
+        tstart);
     SSmallInt4 point2 = sSite4;
+    for (BYTE i = 0; i < tstart; ++i)
+    {
+        point2.w = point2.w + 1;
+        point2 = __deviceSiteIndexToInt4(
+            __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(point2)].m_uiSiteIndex);
+    }
 
     INT links[5] = { link1, link2, link3, link4, link5 };
     for (INT prod = 1; prod <= product; ++prod)
@@ -104,7 +116,9 @@ _kernelWilsonLoops(
         //(n0,t) to (n',t)
         loop.Mul(w2);
         //(n',t) to (n',0)
-        loop.MulDagger(pP[_deviceGetSiteIndex(point2) - 1]);
+        SSmallInt4 point3 = point2;
+        point3.w = sSite4.w - 1;
+        loop.MulDagger(pP[_deviceGetSiteIndex(point3)]);
         //(n',0) to (n0,0)
         loop.MulDagger(w1);
         CLGComplex res = loop.Tr();
@@ -236,11 +250,6 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
     preparethread;
-    //_HC_DecompX * _HC_DecompLx =  Lx * Ly
-    //_HC_DecompY * _HC_DecompLy = Lz
-    dim3 block1(_HC_DecompX, _HC_DecompY, 1);
-    dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
-    _kernelWilsonLoopCalculateP << <block1, threads1 >> > (pGaugeSU3->m_pDeviceData, m_pTmpLoop);
     const UINT halfT = _HC_Lt / 2;
     dim3 block2(halfT, 1, 1);
     dim3 threads2(m_uiMaxLengthSq, 1, 1);
@@ -327,26 +336,37 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
         {3, 1, 2, 3, 1}
     };
 
-    for (INT i = 0; i < 19; ++i)
+    for (INT t = 0; t < _HC_Lti; ++t)
     {
-        UINT uiShiftLength = static_cast<UINT>(
-              static_cast<INT>(sOffsets[i].x) * static_cast<INT>(sOffsets[i].x)
-            + static_cast<INT>(sOffsets[i].y) * static_cast<INT>(sOffsets[i].y)
-            + static_cast<INT>(sOffsets[i].z) * static_cast<INT>(sOffsets[i].z)
-            );
-        _kernelWilsonLoops << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            m_pTmpLoop,
-            sOffsets[i],
-            products[i],
-            iPathLengths[i],
-            uiShiftLength,
-            iPaths[i][0], iPaths[i][1], iPaths[i][2], iPaths[i][3], iPaths[i][4],
-            m_uiMaxLengthSq,
-            m_pCorrelatorCounter,
-            m_pCorrelator
-            );
+        //_HC_DecompX * _HC_DecompLx =  Lx * Ly
+        //_HC_DecompY * _HC_DecompLy = Lz
+        dim3 block1(_HC_DecompX, _HC_DecompY, 1);
+        dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
+        _kernelWilsonLoopCalculateP << <block1, threads1 >> > (
+            pGaugeSU3->m_pDeviceData, m_pTmpLoop, pGaugeSU3->m_byFieldId, t);
+
+        for (INT i = 0; i < 19; ++i)
+        {
+            UINT uiShiftLength = static_cast<UINT>(
+                static_cast<INT>(sOffsets[i].x)* static_cast<INT>(sOffsets[i].x)
+                + static_cast<INT>(sOffsets[i].y)* static_cast<INT>(sOffsets[i].y)
+                + static_cast<INT>(sOffsets[i].z)* static_cast<INT>(sOffsets[i].z)
+                );
+            _kernelWilsonLoops << <block, threads >> > (
+                pGaugeSU3->m_byFieldId,
+                pGaugeSU3->m_pDeviceData,
+                m_pTmpLoop,
+                sOffsets[i],
+                products[i],
+                iPathLengths[i],
+                uiShiftLength,
+                iPaths[i][0], iPaths[i][1], iPaths[i][2], iPaths[i][3], iPaths[i][4],
+                m_uiMaxLengthSq,
+                t,
+                m_pCorrelatorCounter,
+                m_pCorrelator
+                );
+        }
     }
 
     _kernelAverageWilsonLoop << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);

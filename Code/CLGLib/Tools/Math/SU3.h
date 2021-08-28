@@ -1175,6 +1175,7 @@ extern "C" {
          * u3 = m3.cmproj().u2
          * ...
          * retr(u3.m)>retr(u2.m)>retr(u1.m), where u1,u2,u3 are su3, m is random matrix
+         * finally, u = dagger(u3) so that retr(u3^+ . m) or retr(u3.m^+) is maximized
          */
         __device__ __inline__ void CabbiboMarinariProj(/*BYTE ite = 1*/)
         {

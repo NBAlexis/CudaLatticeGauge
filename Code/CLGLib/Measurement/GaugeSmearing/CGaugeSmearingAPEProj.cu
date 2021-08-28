@@ -71,6 +71,7 @@ _kernelAPEProjSU3CM(
             //when it=2, this is u3.u2.u1
             gauge[uiLinkIndex] = u.MulC(gauge[uiLinkIndex]);
         }
+        gauge[uiLinkIndex].Dagger();
     }
 }
 

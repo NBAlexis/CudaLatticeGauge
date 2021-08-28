@@ -1,5 +1,5 @@
 # ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing
-StaggeredSpectrumJob : ESSJ_GaugeFixing
+StaggeredSpectrumJob : ESSJ_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -14,17 +14,17 @@ JobSimulate:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     BeforeEquvibStep : 0
-    EquvibStep : 3
-    SaveStartIndex : 1337
+    EquvibStep : 1500
+    SaveStartIndex : 500
 
-    SavePrefix : ./5100204_
+    SavePrefix : ./4860204_
 
     Dim : 4
     Dir : 4
     LatticeLength : [12, 12, 12, 24]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -55,7 +55,7 @@ JobSimulate:
         # FieldInitialType : EFIT_Random
         FieldInitialType : EFIT_ReadFromFile
         GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./5100204_Matching_1337.con
+        GaugeFileName : ./4860204_Matching_500.con
 
         Period : [1, 1, 1, 1]
 
@@ -75,7 +75,7 @@ JobSimulate:
         Mass : 0.2
         FieldId : 2
         PoolNumber : 15
-        # EachSiteEta : 1
+        EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -106,7 +106,7 @@ JobSimulate:
         Mass : 0.2
         FieldId : 3
         PoolNumber : 15
-        # EachSiteEta : 1
+        EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -137,7 +137,7 @@ JobSimulate:
         Mass : 0.2
         FieldId : 4
         PoolNumber : 15
-        # EachSiteEta : 1
+        EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -168,7 +168,7 @@ JobSimulate:
         Mass : 0.04
         FieldId : 5
         PoolNumber : 15
-        # EachSiteEta : 1
+        EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -257,8 +257,8 @@ JobSimulate:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        # CloverEnergy : 1
-        Beta : 5.1
+        CloverEnergy : 1
+        Beta : 4.86
 
     Action2:
 
@@ -298,11 +298,11 @@ JobMeasure:
 
     StartN : 1
     EndN : 500
-    # {ESSM_Polyakov, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
-    MeasureType : ESSM_Chiral
-    SavePrefix : G:\SRMatching\Projective\6200204\Matching\P6200204_
-    # Chiral, Meson, MesonSimple, Polyakov
-    CSVSavePrefix : G:\SRMatching\Projective\6200204\Chiral\P6200204_
+    # {ESSM_Polyakov, ESSM_Wilson, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
+    MeasureType : ESSM_Wilson
+    SavePrefix : G:\SRMatching\Projective\4980204\Matching\P4980204_
+    # Chiral, Meson, MesonSimple, Polyakov, Wilson
+    CSVSavePrefix : G:\SRMatching\Projective\4980204\Wilson\P4980204_
     UseZ4 : 1
     StochasticFieldCount : 4
 
@@ -317,9 +317,9 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 5
     FermionFieldCount : 4
-    MeasureListLength : 5
-    CacheStaple : 0
-    DoSmearing : 0
+    MeasureListLength : 6
+    CacheStaple : 1
+    DoSmearing : 1
 
     Updator:
 
@@ -593,7 +593,7 @@ JobMeasure:
    
         ActionName : CActionGaugePlaquette
         CloverEnergy : 1
-        Beta : 6.2
+        Beta : 4.90
 
     Action2:
 
@@ -650,21 +650,30 @@ JobMeasure:
         ShiftCenter : 0
         DebugDivation : 0
 
+    Measure6:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 0
+        MeasureZ : 0
+        ShiftCenter : 0
+
     GaugeSmearing:
 
-        # SmearingName : CGaugeSmearingAPEProj
-        # AlphaLeft : 2.3
-        # AlphaRight : 1.0
-        # Iterate : 50
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 2.3
+        AlphaRight : 1
+        Iterate : 26
         # Cabibbo-Marinani projection is not correctly implemented
-        # Cabibbo : 0
-        # ProjIterate : 8
-        # HasT : 0
-
-        SmearingName : CGaugeSmearingAPEStout
-        Rho : 0.1
+        Cabibbo : 1
+        ProjIterate : 15
         HasT : 0
-        Iterate : 50
+
+        # SmearingName : CGaugeSmearingAPEStout
+        # Rho : 0.1
+        # HasT : 0
+        # Iterate : 50
 
 
 JobGaugeFixing:

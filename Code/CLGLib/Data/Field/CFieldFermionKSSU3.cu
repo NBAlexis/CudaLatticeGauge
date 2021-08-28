@@ -610,7 +610,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData, 
     INT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
 {
-    intokernalInt4;
+    intokernalOnlyInt4;
 
     //pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
     //We shall not set zero here!

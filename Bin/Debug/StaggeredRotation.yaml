@@ -17,22 +17,22 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 1000
-    SaveStartIndex : 1000
-    OmegaSep : 6
+    EquvibStep : 1295
+    SaveStartIndex : 205
+    OmegaSep : 1
     OmegaStart : 0
-    MaxOmega : 0.12
-    MinNt : 8
-    MaxNt : 8
-    SavePrefix : ./5300204/RWSRF5300204_
-    Additive : 1
+    MaxOmega : 0.016
+    MinNt : 6
+    MaxNt : 6
+    SavePrefix : ./5800204/SRF5800204_
+    Additive : 0
 
     # 53551575Nt4 Omega60 
     Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
@@ -47,8 +47,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./4980204/SRF4980204_R_Nt6_O7_800.con
-    Nt6Polyakov : 0.216671645641
+    Nt6FileName : ./5800204/SRF5800204_R_Nt6_O0_205.con
+    Nt6Polyakov : 0.550824880600
 
     Updator:
 
@@ -200,7 +200,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.3
+        Beta : 5.8
         Omega : 0.0
 
     Action2:

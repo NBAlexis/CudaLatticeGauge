@@ -18,6 +18,7 @@ __DEFINE_ENUM(EStaggeredSpectrumJob,
 
 __DEFINE_ENUM(EStaggeredSpectrumMeasure,
     ESSM_Polyakov,
+    ESSM_Wilson,
     ESSM_Correlator,
     ESSM_CorrelatorSimple,
     ESSM_Chiral,

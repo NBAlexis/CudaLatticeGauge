@@ -25,7 +25,7 @@ _kernelStapleWithoutT(
     const UINT plaqLengthm1 = plaqLength - 1;     //3
     UINT plaqCountAll = plaqCount * plaqLengthm1; //18
 
-#pragma unroll
+    #pragma unroll
     for (UINT idir = 0; idir < 3; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);

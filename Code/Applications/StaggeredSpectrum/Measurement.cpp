@@ -535,11 +535,13 @@ INT Measurement(CParameters& params)
     const UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
     CMeasureWilsonLoop* pPL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasurePolyakovXY* pPXY = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureMesonCorrelatorStaggeredSimple* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     pPL->Reset();
+    pPXY->Reset();
     pMC->Reset();
     pMCSimple->Reset();
     pCCLight->Reset();
@@ -573,6 +575,11 @@ INT Measurement(CParameters& params)
         switch (eJob)
         {
         case ESSM_Polyakov:
+        {
+            pPXY->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+        }
+        break;
+        case ESSM_Wilson:
         {
             if (bDoSmearing)
             {
@@ -754,6 +761,19 @@ INT Measurement(CParameters& params)
     switch (eJob)
     {
     case ESSM_Polyakov:
+    {
+        //Write result to file
+        CCString sCSVFile;
+        sCSVFile.Format(_T("%s_polya.csv"), sCSVSavePrefix.c_str());
+        TArray<CLGComplex> polyas;
+        for (INT j = 0; j < pPXY->m_lstLoop.Num(); ++j)
+        {
+            polyas.AddItem(pPXY->m_lstLoop[j]);
+        }
+        WriteStringFileComplexArray(sCSVFile, polyas);
+    }
+    break;
+    case ESSM_Wilson:
     {
         //Write result to file
         CCString sCSVFile;
