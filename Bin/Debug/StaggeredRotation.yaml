@@ -1,5 +1,5 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, ESR_SimulateEM, ESR_MeasureEM
-RotationJob : ESR_Simulate
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -328,31 +328,34 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.98
-    OmegaRange : 0.128
+    GaugeBate : 5.2
+    OmegaRange : 0.16
     StartOmega : 0
     EndOmega : 8
-    StartN : 201
+    StartN : 101
     EndN : 2000
-    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5
+    SaveFermionFile : 0
+    FermionFileIndexStart : 1
+    FermionFileHead : G:\SRFloat\4900204\ChiralFNew\F4900204
+    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5, EDJKS_AngularMomentum
     DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
-    StochasticFieldCount : 5
+    StochasticFieldCount : 10
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4980204\Nt6
+    SubFolderPrefix : G:\RW\5200204\Nt8
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF4980204_
-    CSVSavePrefix : G:\SRFloat\4980204\Polyakov\SRF4980204_
+    SavePrefix : RWSRF5200204_
+    CSVSavePrefix : G:\RW\5200204\Polyakov\RWSRF5200204_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -363,7 +366,7 @@ JobMeasure:
     MeasureListLength : 8
     CacheStaple : 0
     AlsoCheckMD5 : 0
-    MeasureCCS : 1
+    MeasureCCS : 0
 
     Gauge:
 
@@ -561,6 +564,7 @@ JobMeasure:
         MeasureSpin : 1
         MeasureApprox : 0
         ProjectivePlane : 1
+        NaiveNabla : 0
 
     Measure7:
 

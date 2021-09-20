@@ -93,7 +93,7 @@ public:
 
     void CalculateE_Using_U(CFieldGauge* pResoult) const override;
 
-    void CalculateNablaE_Using_U(CFieldGauge* pResoult) const override;
+    void CalculateNablaE_Using_U(CFieldGauge* pResoult, UBOOL bNaive = FALSE) const override;
 
 #pragma endregion
 

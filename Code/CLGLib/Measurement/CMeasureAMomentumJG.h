@@ -68,6 +68,7 @@ public:
         , m_bShowResult(TRUE)
 
         , m_bMeasureSpin(FALSE)
+        , m_bNaiveNabla(FALSE)
         , m_pE(NULL)
         , m_pDpureA(NULL)
         , m_bMeasureApprox(FALSE)
@@ -114,6 +115,7 @@ protected:
     TArray<Real> m_lstResJGPot;
 
     UBOOL m_bMeasureSpin;
+    UBOOL m_bNaiveNabla;
     CFieldGauge* m_pE;
     CFieldGauge* m_pDpureA;
 

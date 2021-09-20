@@ -91,7 +91,7 @@ public:
     /**
      * X_0(n) = nabla E
      */
-    virtual void CalculateNablaE_Using_U(CFieldGauge* pResoult) const = 0;
+    virtual void CalculateNablaE_Using_U(CFieldGauge* pResoult, UBOOL bNaive = FALSE) const = 0;
 
 #pragma endregion
 

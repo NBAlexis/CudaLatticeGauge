@@ -631,14 +631,34 @@ _kernelTransformToE(
         if (dir < uiDir - 1)
         {
             //find clover F
-            //res = _deviceClover(pDeviceData, uiBigIdx, 3, dir);
+            //res = _deviceClover(pDeviceData, sSite4, uiBigIdx, 3, dir, byFieldId);
             //test not using clover
             res = _device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx, sSite4, byFieldId);
             //res.iIm2();
             //not using clover not multiply 0.25
             //res.MulReal(F(0.125));
 
+            //test clover
+            //INT dirs[4];
+            //dirs[0] = 4;
+            //dirs[1] = dir + 1;
+            //dirs[2] = -4;
+            //dirs[3] = -static_cast<INT>(dir) - 1;
+            //SSmallInt4 sSite4_m_mu = sSite4;
+            //sSite4_m_mu.m_byData4[dir] = sSite4_m_mu.m_byData4[dir] - 1;
+            //SSmallInt4 sSite4_m_mu_m_t = sSite4_m_mu;
+            //sSite4_m_mu_m_t.m_byData4[3] = sSite4_m_mu_m_t.m_byData4[3] - 1;
+            //SSmallInt4 sSite4_m_t = sSite4;
+            //sSite4_m_t.m_byData4[3] = sSite4_m_t.m_byData4[3] - 1;
+
+            //res = _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs);
+            //res.Add(_deviceLink(pDeviceData, sSite4_m_mu, 4, byFieldId, dirs));
+            //res.Add(_deviceLink(pDeviceData, sSite4_m_mu_m_t, 4, byFieldId, dirs));
+            //res.Add(_deviceLink(pDeviceData, sSite4_m_t, 4, byFieldId, dirs));
+            //res.MulReal(0.25);
+
             res.Ta();
+            res.MulReal(F(-1.0));
             //res.MulReal(F(0.25));
         }
 
@@ -679,11 +699,10 @@ _kernelCalculateNablaE(
 
         INT dirs[4];
         //deviceSU3 toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
-        dirs[0] = dir + 1;
-        dirs[1] = 4;
-        dirs[2] = dir;
-        dirs[2] = -dirs[2] - 1;
-        dirs[3] = -4;
+        dirs[0] = 4;
+        dirs[1] = dir + 1;
+        dirs[2] = -4;
+        dirs[3] = -static_cast<INT>(dir) - 1;
         deviceSU3 toMul(
             //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
             _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
@@ -691,17 +710,97 @@ _kernelCalculateNablaE(
 
         //
         dirs[0] = 4;
-        dirs[1] = dir;
-        dirs[1] = -dirs[1] - 1;
+        dirs[1] = -static_cast<INT>(dir) - 1;
         dirs[2] = -4;
         dirs[3] = dir + 1;
-        toMul.MulDagger(
+
+        toMul.Mul(
             _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
         );
-        pRes[uiResLinkIdx].Add(toMul);
+        //toMul.Ta();
+        pRes[uiResLinkIdx].Sub(toMul);
     }
+    pRes[uiResLinkIdx].Ta();
+    //pRes[uiResLinkIdx].SubReal(F(3.0));
+}
 
-    pRes[uiResLinkIdx].SubReal(F(3.0));
+/**
+ * Larger than the above
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateNablaENaive(
+    const deviceSU3* __restrict__ pDeviceData,
+    BYTE byFieldId, deviceSU3* pRes)
+{
+    intokernalInt4;
+    //const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+
+    //i=0: 12
+    //  1: 13
+    //  2: 14
+    //  3: 23
+    //  4: 24
+    //  5: 34  
+
+    UINT uiResLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+
+    pRes[uiResLinkIdx] = deviceSU3::makeSU3Zero();
+    #pragma unroll
+    for (BYTE dir = 0; dir < 3; ++dir)
+    {
+        //we need 2, 4 and 5
+        //BYTE byPlaqIdx = (dir + 1) << 1;
+        //if (byPlaqIdx > 5) byPlaqIdx = 5;
+
+        INT dirs[4];
+        //deviceSU3 toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+        dirs[0] = 4;
+        dirs[1] = dir + 1;
+        dirs[2] = -4;
+        dirs[3] = -static_cast<INT>(dir) - 1;
+        //SSmallInt4 sSite4_m_mu = sSite4;
+        //sSite4_m_mu.m_byData4[dir] = sSite4_m_mu.m_byData4[dir] - 1;
+        //SSmallInt4 sSite4_m_mu_m_t = sSite4_m_mu;
+        //sSite4_m_mu_m_t.m_byData4[3] = sSite4_m_mu_m_t.m_byData4[3] - 1;
+        //SSmallInt4 sSite4_m_t = sSite4;
+        //sSite4_m_t.m_byData4[3] = sSite4_m_t.m_byData4[3] - 1;
+
+        deviceSU3 a(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
+            //_deviceClover(pDeviceData, sSite4, __bi(sSite4), 3, dir, byFieldId)
+        );
+        //a.Add(_deviceLink(pDeviceData, sSite4_m_mu, 4, byFieldId, dirs));
+        //a.Add(_deviceLink(pDeviceData, sSite4_m_mu_m_t, 4, byFieldId, dirs));
+        //a.Add(_deviceLink(pDeviceData, sSite4_m_t, 4, byFieldId, dirs));
+        //a.Ta();
+        
+        //SSmallInt4 sSite4_m_2mu = sSite4_m_mu;
+        //sSite4_m_2mu.m_byData4[dir] = sSite4_m_2mu.m_byData4[dir] - 1;
+        //SSmallInt4 sSite4_m_2mu_m_t = sSite4_m_2mu;
+        //sSite4_m_2mu_m_t.m_byData4[3] = sSite4_m_2mu_m_t.m_byData4[3] - 1;
+        dirs[0] = -static_cast<INT>(dir) - 1;
+        dirs[1] = 4;
+        dirs[2] = dir + 1;
+        dirs[3] = -4;
+
+        deviceSU3 b(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLink(pDeviceData, sSite4, 4, byFieldId, dirs)
+            //_deviceClover(pDeviceData, sSite4_m_mu, __bi(sSite4_m_mu), 3, dir, byFieldId)
+        );
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_mu_m_t, 4, byFieldId, dirs));
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_2mu, 4, byFieldId, dirs));
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_2mu_m_t, 4, byFieldId, dirs));
+
+        //b.Ta();
+        a.Sub(b);
+        //a.Ta();
+        //a.MulReal(F(0.25));
+        pRes[uiResLinkIdx].Sub(a);
+    }
 }
 
 /**
@@ -954,6 +1053,10 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
     {
         UINT uiSize = static_cast<UINT>(sizeof(Real) * 18 * m_uiLinkeCount);
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        if (uiSize != sizeof(Real) * 18 * _HC_LinkCount)
+        {
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(Real) * 18 * _HC_LinkCount);
+        }
         InitialWithByte(data);
         free(data);
     }
@@ -965,6 +1068,10 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         BYTE* data = (BYTE*)malloc(uiSize);
         Real* rdata = (Real*)data;
         FLOAT* fdata = (FLOAT*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        if (uiSize != sizeof(FLOAT) * 18 * _HC_LinkCount)
+        {
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(FLOAT) * 18 * _HC_LinkCount);
+        }
         for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
         {
             rdata[i] = static_cast<Real>(fdata[i]);
@@ -981,6 +1088,10 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         BYTE* data = (BYTE*)malloc(uiSize);
         Real* rdata = (Real*)data;
         DOUBLE* ddata = (DOUBLE*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+        if (uiSize != sizeof(DOUBLE) * 18 * _HC_LinkCount)
+        {
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(DOUBLE) * 18 * _HC_LinkCount);
+        }
         for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
         {
             rdata[i] = static_cast<Real>(ddata[i]);
@@ -1368,7 +1479,7 @@ void CFieldGaugeSU3::CalculateE_Using_U(CFieldGauge* pResoult) const
     _kernelTransformToE << <block, threads >> > (pUField->m_byFieldId, m_pDeviceData, pUField->m_pDeviceData);
 }
 
-void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult) const
+void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult, UBOOL bNaive) const
 {
     if (NULL == pResoult || EFT_GaugeSU3 != pResoult->GetFieldType())
     {
@@ -1379,10 +1490,20 @@ void CFieldGaugeSU3::CalculateNablaE_Using_U(CFieldGauge* pResoult) const
     CFieldGaugeSU3* pUField = dynamic_cast<CFieldGaugeSU3*>(pResoult);
 
     preparethread;
-    _kernelCalculateNablaE << <block, threads >> > (
-        m_pDeviceData,
-        m_byFieldId,
-        pUField->m_pDeviceData);
+    if (bNaive)
+    {
+        _kernelCalculateNablaENaive << <block, threads >> > (
+            m_pDeviceData,
+            m_byFieldId,
+            pUField->m_pDeviceData);
+    }
+    else
+    {
+        _kernelCalculateNablaE << <block, threads >> > (
+            m_pDeviceData,
+            m_byFieldId,
+            pUField->m_pDeviceData);
+    }
 }
 
 void CFieldGaugeSU3::DebugPrintMe() const

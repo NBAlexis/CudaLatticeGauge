@@ -1151,7 +1151,7 @@ void CFieldGaugeU1Real::CalculateE_Using_U(CFieldGauge* pResoult) const
     //_kernelTransformToE << <block, threads >> > (pUField->m_byFieldId, m_pDeviceData, pUField->m_pDeviceData);
 }
 
-void CFieldGaugeU1Real::CalculateNablaE_Using_U(CFieldGauge* pResoult) const
+void CFieldGaugeU1Real::CalculateNablaE_Using_U(CFieldGauge* pResoult, UBOOL bNaive) const
 {
     appCrucial(_T("U1Real CalculateNablaE_Using_U Not supported!\n"));
     _FAIL_EXIT;

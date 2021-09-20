@@ -62,7 +62,7 @@ _kernelCalculateAngularMomentumJG(
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }
 
-    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
+    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes);
 }
 
 /**
@@ -111,7 +111,7 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
         fRes = (fV412 + fV432 + fV421 + fV431) * betaOverN;
     }
 
-    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
+    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes);
 }
 
 /**
@@ -188,7 +188,7 @@ _kernelCalculateJGSurf(
             //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
             //- y p_i A_x : -U_i^+(n-i) A_x(n-i) U_i(n-i)
             /*
-            u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_i_Gauge, dir);
+            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, x_m_i_Gauge, dir));
             a = _deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 1);
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, x_m_i_Gauge, 0).MulRealC(fY));
@@ -205,7 +205,7 @@ _kernelCalculateJGSurf(
         }
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
-        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes * fBetaOverN);
     }
 }
 
@@ -236,6 +236,7 @@ _kernelCalculateJGSurfProjectivePlane(
         const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
 
         Real fRes = F(0.0);
+        #pragma unroll
         for (BYTE dir = 0; dir < 3; ++dir)
         {
             //p_i A_j = U_i(n) A_j(n+i) U_i^+(n) - U_i^+(n-i) A_j(n-i) U_i(n-i)
@@ -277,7 +278,7 @@ _kernelCalculateJGSurfProjectivePlane(
         }
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
-        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes * fBetaOverN);
     }
 }
 
@@ -437,7 +438,7 @@ _kernelMomemtumJGChen(
 {
     intokernalInt4;
     
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
 
@@ -445,7 +446,8 @@ _kernelMomemtumJGChen(
     if (!site.IsDirichlet())
     {
         //only calculate x,y,z
-        for (BYTE dir = 0; dir < uiDir - 1; ++dir)
+        #pragma unroll
+        for (BYTE dir = 0; dir < 3; ++dir)
         {
             deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir);
             beforeTrace.Mul(pXcrossDpureA[_deviceGetLinkIndex(uiSiteIndex, dir)]);
@@ -455,7 +457,7 @@ _kernelMomemtumJGChen(
         //res = cuCmulf_cr(res, fBetaOverN * F(0.5));
         //res = cuCmulf_cr(res, fBetaOverN);
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res.x);
-        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], res * fBetaOverN);
+        atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -res * fBetaOverN);
     }
 }
 
@@ -545,7 +547,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
     const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
@@ -557,7 +559,8 @@ _kernelMomentumJGChenDpureAProjectivePlane(
     const UINT x_p_y_bi4 = __idx->_deviceGetBigIndex(x_p_y_site) * _DC_Dir;
 
     //idir = mu
-    for (UINT idir = 0; idir < uiDir - 1; ++idir)
+    #pragma unroll
+    for (UINT idir = 0; idir < 3; ++idir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         pXcrossDpureA[uiLinkIndex] = deviceSU3::makeSU3Zero();
@@ -572,7 +575,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmY);
-        pXcrossDpureA[uiLinkIndex].Add(u);
+        pXcrossDpureA[uiLinkIndex].Add(u); //this is -y U_x A_j(n+x) U_x+
 
         //U_x^+(n-x) A_dir(n-x) U_x(n-x)
         //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_x_Gauge, 0);
@@ -583,7 +586,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         //pXcrossDpureA[uiLinkIndex].Sub(u);
         a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir);
         a.MulReal(fmY - fmX);
-        pXcrossDpureA[uiLinkIndex].Sub(a);
+        pXcrossDpureA[uiLinkIndex].Sub(a); //this is (y-x)A_j
 
         //U_y(n) A_dir(n+y)U_y^+(n)
         u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
@@ -591,7 +594,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         a.MulDagger(u);
         u.Mul(a);
         u.MulReal(fmX);
-        pXcrossDpureA[uiLinkIndex].Sub(u);
+        pXcrossDpureA[uiLinkIndex].Sub(u); //this is +x U_y A_j(n+y) U_y+
 
         //U_y^+(n-y) A_dir(n-y) U_y(n-y)
         //u = _deviceGetGaugeBCSU3DirOne(pGauge, x_m_y_Gauge, 1);
@@ -671,6 +674,10 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     iValue = 0;
     param.FetchValueINT(_T("ProjectivePlane"), iValue);
     m_bProjectivePlane = iValue != 0;
+
+    iValue = 0;
+    param.FetchValueINT(_T("NaiveNabla"), iValue);
+    m_bNaiveNabla = iValue != 0;
 
     if (m_bMeasureSpin)
     {
@@ -958,7 +965,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 #pragma region JGPot
 
             //checkCudaErrors(cudaGetLastError());
-            pGaugeSU3->CalculateNablaE_Using_U(m_pE);
+            pGaugeSU3->CalculateNablaE_Using_U(m_pE, m_bNaiveNabla);
             //checkCudaErrors(cudaGetLastError());
             _ZeroXYPlane(m_pDeviceDataBuffer);
             if (m_bProjectivePlane)

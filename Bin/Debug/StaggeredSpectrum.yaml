@@ -13,15 +13,15 @@ JobSimulate:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 0
-    EquvibStep : 1500
-    SaveStartIndex : 500
+    BeforeEquvibStep : 28
+    EquvibStep : 1000
+    SaveStartIndex : 150
 
-    SavePrefix : ./4860204_
+    SavePrefix : ./P4980204_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 24]
+    LatticeLength : [12, 12, 12, 48]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -55,7 +55,7 @@ JobSimulate:
         # FieldInitialType : EFIT_Random
         FieldInitialType : EFIT_ReadFromFile
         GaugeFileType : EFFT_CLGBin
-        GaugeFileName : ./4860204_Matching_500.con
+        GaugeFileName : ./P4980204_Matching_122.con
 
         Period : [1, 1, 1, 1]
 
@@ -258,7 +258,7 @@ JobSimulate:
    
         ActionName : CActionGaugePlaquette
         CloverEnergy : 1
-        Beta : 4.86
+        Beta : 4.98
 
     Action2:
 
@@ -296,13 +296,13 @@ JobMeasure:
     ShowParameterContent : 0
     LoadDouble : 1
 
-    StartN : 1
-    EndN : 500
+    StartN : 201
+    EndN : 800
     # {ESSM_Polyakov, ESSM_Wilson, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
     MeasureType : ESSM_Wilson
-    SavePrefix : G:\SRMatching\Projective\4980204\Matching\P4980204_
+    SavePrefix : G:\SRMatching\Projective\482325065\Matching\P482325065_
     # Chiral, Meson, MesonSimple, Polyakov, Wilson
-    CSVSavePrefix : G:\SRMatching\Projective\4980204\Wilson\P4980204_
+    CSVSavePrefix : G:\SRMatching\Projective\482325065\Wilson\P482325065_
     UseZ4 : 1
     StochasticFieldCount : 4
 
@@ -593,7 +593,7 @@ JobMeasure:
    
         ActionName : CActionGaugePlaquette
         CloverEnergy : 1
-        Beta : 4.90
+        Beta : 4.82
 
     Action2:
 

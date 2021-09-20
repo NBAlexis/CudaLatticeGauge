@@ -311,7 +311,7 @@ public:
             
             if (NULL != edgeXY)
             {
-                *edgeXY = _HC_Lx - 1;
+                *edgeXY = (_HC_Lx - 1) * (_HC_Lx - 1);
             }
         }
         else
