@@ -16,6 +16,7 @@ __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_ChiralAndFermionMomentum,
     EDJKS_PlaqutteEnergy,
     EDJKS_CheckMD5,
+    EDJKS_VR,
     )
 
 
@@ -152,6 +153,7 @@ INT Measurement(CParameters& params)
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
     CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
+    CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
@@ -174,7 +176,11 @@ INT Measurement(CParameters& params)
     }
 
     appSetLogDate(FALSE);
-
+    CFieldGaugeSU3* pStaple = NULL;
+    if (EDJKS_VR == eJob)
+    {
+        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+    }
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
@@ -192,6 +198,7 @@ INT Measurement(CParameters& params)
         pFAHeavy->Reset();
         pCCSLight->Reset();
         pCCSHeavy->Reset();
+        pWilson->Reset();
 
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
@@ -272,7 +279,7 @@ INT Measurement(CParameters& params)
             }
             
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            
+
             switch (eJob)
             {
                 case EDJKS_Polyakov:
@@ -513,6 +520,24 @@ INT Measurement(CParameters& params)
                     //pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
+                case EDJKS_VR:
+                    {
+                        appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
+                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+                        pWilson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        if (uiN == iStartN)
+                        {
+                            TArray<Real> lstRadius;
+                            for (INT i = 0; i < pWilson->m_lstR.Num(); ++i)
+                            {
+                                lstRadius.AddItem(_hostsqrt(static_cast<Real>(pWilson->m_lstR[i])));
+                            }
+                            CCString sRadiousFile;
+                            sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
+                            WriteStringFileRealArray(sRadiousFile, lstRadius);
+                        }
+                    }
+                break;
                 default:
                     break;
             }
@@ -698,11 +723,36 @@ INT Measurement(CParameters& params)
                 //WriteStringFileRealArray(sFileName, pPE->m_lstData);
             }
             break;
+            case EDJKS_VR:
+                {
+                    CCString sCSVFile;
+                    sCSVFile.Format(_T("%s_VR_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                    TArray<TArray<CLGComplex>> vrs;
+                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                    {
+                        TArray<CLGComplex> thisConfiguration;
+                        for (INT i = 0; i < pWilson->m_lstR.Num(); ++i)
+                        {
+                            for (UINT t = 0; t < (_HC_Lt - 1); ++t)
+                            {
+                                thisConfiguration.AddItem(pWilson->m_lstC[j][i][t]);
+                            }
+                        }
+                        vrs.AddItem(thisConfiguration);
+                    }
+                    WriteStringFileComplexArray2(sCSVFile, vrs);
+                }
+            break;
             default:
                 break;
         }
 
         appGeneral(_T("\n"));
+    }
+
+    if (NULL != pStaple)
+    {
+        appSafeDelete(pStaple);
     }
 
     if (EDJKS_CheckMD5 == eJob)
@@ -734,21 +784,6 @@ INT Measurement(CParameters& params)
             sFileNameWrite2.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
             WriteStringFileComplexArray2(sFileNameWrite1, lstPolyInZ);
             WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
-        }
-        break;
-        case EDJKS_Chiral:
-        {
-            //nothing to do
-        }
-        break;
-        case EDJKS_AngularMomentum:
-        {
-            //nothing to do
-        }
-        break;
-        case EDJKS_ChiralAndFermionMomentum:
-        {
-            //nothing to do
         }
         break;
         default:

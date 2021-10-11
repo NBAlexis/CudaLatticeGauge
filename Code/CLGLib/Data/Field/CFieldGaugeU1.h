@@ -235,6 +235,159 @@ static __device__ __inline__ Real _deviceLinkU1ArgSum(
     return sRet;
 }
 
+
+static __device__ __inline__ CLGComplex _deviceGetGaugeBCU1DirSIndex(
+    const CLGComplex* __restrict__ pBuffer,
+    const SIndex& idx,
+    BYTE byFieldId)
+{
+    CLGComplex ret = idx.IsDirichlet() ?
+        ((CFieldBoundaryGaugeU1*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+        ]
+        : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
+    if (idx.NeedToDagger())
+    {
+        ret = _cuConjf(ret);
+    }
+    return ret;
+}
+
+
+
+
+/**
+* big index is the index of walking table.
+* The plaqutte index may not be cached because n may out of boundary, so we calculate every one
+* n, n+mu, n+nu, n
+*
+*   <----- ^
+*   |      |
+*   |      |
+*   V      |
+* O ------->
+*/
+static __device__ __inline__ CLGComplex _device1PlaqutteTermPPU1(
+    const CLGComplex* __restrict__ pDeviceData,
+    BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
+{
+    //For any boundary condition it is always, site->mu, site_p_mu->nu, site_p_nu->mu+, site->nu+
+    const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite4, byMu + 1);
+    const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite4, byNu + 1);
+    const UINT uiB4 = uiBigIdx * _DC_Dir;
+    const SIndex& s_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiB4 + byMu];
+    const SIndex& s_p_mu_nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_p_mu) * _DC_Dir + byNu];
+    const SIndex& s_p_nu_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_p_nu) * _DC_Dir + byMu];
+    const SIndex& s_nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiB4 + byNu];
+
+    CLGComplex u = _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_mu, byFieldId);
+    u = _cuCmulf(u, _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_p_mu_nu, byFieldId));
+    u = _cuCmulf(u, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, s_p_nu_mu, byFieldId)));
+    u = _cuCmulf(u, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, s_nu, byFieldId)));
+
+    return u;
+}
+
+/**
+* U(-mu,nu) = U^+_{mu}(N-mu) U_{nu}(N-mu) U_{mu}(N-mu+nu) U^+_{nu}(N)
+*
+*    ------->
+*    ^      |
+*    |      |
+*    |      V
+*    <------- O
+*/
+static __device__ __inline__ CLGComplex _device1PlaqutteTermMPU1(
+    const CLGComplex* __restrict__ pDeviceData,
+    BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
+{
+    const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1);
+    const SSmallInt4 n_m_mu_p_nu = _deviceSmallInt4OffsetC(n_m_mu, byNu + 1);
+    const UINT uin_m_mub4 = __idx->_deviceGetBigIndex(n_m_mu) * _DC_Dir;
+    const SIndex& s_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_mub4 + byMu];
+    const SIndex& s_m_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_mub4 + byNu];
+    const SIndex& s_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_mu_p_nu) * _DC_Dir + byMu];
+    const SIndex& s__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIdx * _DC_Dir + byNu];
+
+    CLGComplex u = _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_mu__mu, byFieldId);
+    u = _cuCmulf(_cuConjf(u), _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_mu__nu, byFieldId));
+    u = _cuCmulf(u, _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_mu_p_nu__mu, byFieldId));
+    u = _cuCmulf(u, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, s__nu, byFieldId)));
+
+    return u;
+}
+
+/**
+* U(mu,-nu) = U(N) U^+(N+mu-nu) U^+(N-nu) U(N-nu)
+*
+* O  ------->
+*    ^      |
+*    |      |
+*    |      V
+*    <-------
+*/
+static __device__ __inline__ CLGComplex _device1PlaqutteTermPMU1(
+    const CLGComplex* __restrict__ pDeviceData,
+    BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
+{
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byNu) - 1);
+    const SSmallInt4 n_m_nu_p_mu = _deviceSmallInt4OffsetC(n_m_nu, byMu + 1);
+    const UINT uin_m_nub4 = __idx->_deviceGetBigIndex(n_m_nu) * _DC_Dir;
+    const SIndex& s_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_nub4 + byMu];
+    const SIndex& s_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_nub4 + byNu];
+    const SIndex& s_m_nu_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_nu_p_mu) * _DC_Dir + byNu];
+    const SIndex& s__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIdx * _DC_Dir + byMu];
+
+    CLGComplex u = _deviceGetGaugeBCU1DirSIndex(pDeviceData, s__mu, byFieldId);
+    u = _cuCmulf(u, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu_p_mu__nu, byFieldId)));
+    u = _cuCmulf(u, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu__mu, byFieldId)));
+    u = _cuCmulf(u, _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu__nu, byFieldId));
+
+    return u;
+}
+
+/**
+* U(-mu,-nu) = U^+(N-mu) U^+(N-mu-nu) U(N-mu-nu) U(N-nu)
+*
+* <----- ^ O
+* |      |
+* |      |
+* V      |
+* ------->
+*/
+static __device__ __inline__ CLGComplex _device1PlaqutteTermMMU1(
+    const CLGComplex* __restrict__ pDeviceData,
+    BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
+{
+    const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1);
+    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byNu) - 1);
+    const SSmallInt4 n_m_nu_m_mu = _deviceSmallInt4OffsetC(n_m_nu, -static_cast<INT>(byMu) - 1);
+    const UINT uin_m_nu_m_mub4 = __idx->_deviceGetBigIndex(n_m_nu_m_mu) * _DC_Dir;
+
+    const SIndex& s_m_nu_m_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_nu_m_mub4 + byNu];
+    const SIndex& s_m_nu_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uin_m_nu_m_mub4 + byMu];
+    const SIndex& s_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_mu) * _DC_Dir + byMu];
+    const SIndex& s_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_nu) * _DC_Dir + byNu];
+
+    //u1^+ u2^+ u3 u4
+    //= (u2 u1)^+ u3 u4
+    CLGComplex u = _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu_m_mu__nu, byFieldId);
+    u = _cuCmulf(u, _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_mu__mu, byFieldId));
+    u = _cuCmulf(_cuConjf(u), _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu_m_mu__mu, byFieldId));
+    u = _cuCmulf(u, _deviceGetGaugeBCU1DirSIndex(pDeviceData, s_m_nu__nu, byFieldId));
+
+    return u;
+}
+
+
+static __device__ __inline__ Real _deviceCloverRetrU1(const CLGComplex* __restrict__ pGaugeField, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE byFieldId)
+{
+    return _device1PlaqutteTermPPU1(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId).x
+        + _device1PlaqutteTermMMU1(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId).x
+        + _device1PlaqutteTermPMU1(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId).x
+        + _device1PlaqutteTermMPU1(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId).x;
+}
+
 #pragma endregion
 
 __END_NAMESPACE

@@ -1055,7 +1055,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         if (uiSize != sizeof(Real) * 18 * _HC_LinkCount)
         {
-            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(Real) * 18 * _HC_LinkCount);
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, static_cast<INT>(sizeof(Real) * 18 * _HC_LinkCount));
         }
         InitialWithByte(data);
         free(data);
@@ -1090,7 +1090,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         DOUBLE* ddata = (DOUBLE*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         if (uiSize != sizeof(DOUBLE) * 18 * _HC_LinkCount)
         {
-            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(DOUBLE) * 18 * _HC_LinkCount);
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, static_cast<INT>(sizeof(DOUBLE) * 18 * _HC_LinkCount));
         }
         for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
         {

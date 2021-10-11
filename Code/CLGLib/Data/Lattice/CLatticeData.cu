@@ -282,6 +282,8 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("SUN : %d\n"), _HC_SUN);
+    sRet = sRet + sTab + sInfos;
 
     for (INT i = 0; i < kMaxFieldCount; ++i)
     {

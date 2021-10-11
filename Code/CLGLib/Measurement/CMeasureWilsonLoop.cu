@@ -343,7 +343,7 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
         dim3 block1(_HC_DecompX, _HC_DecompY, 1);
         dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
         _kernelWilsonLoopCalculateP << <block1, threads1 >> > (
-            pGaugeSU3->m_pDeviceData, m_pTmpLoop, pGaugeSU3->m_byFieldId, t);
+            pGaugeSU3->m_pDeviceData, m_pTmpLoop, pGaugeSU3->m_byFieldId, static_cast<BYTE>(t));
 
         for (INT i = 0; i < 19; ++i)
         {
@@ -362,7 +362,7 @@ void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAccep
                 uiShiftLength,
                 iPaths[i][0], iPaths[i][1], iPaths[i][2], iPaths[i][3], iPaths[i][4],
                 m_uiMaxLengthSq,
-                t,
+                static_cast<BYTE>(t),
                 m_pCorrelatorCounter,
                 m_pCorrelator
                 );

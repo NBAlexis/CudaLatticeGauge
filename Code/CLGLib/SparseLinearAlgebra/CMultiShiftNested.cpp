@@ -95,13 +95,13 @@ UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex
     {
         pFieldX[i]->InitialField(EFIT_Zero);
 
-        if (EFT_FermionStaggeredSU3 != pFieldX[i]->GetFieldType())
+        if (NULL == dynamic_cast<CFieldFermionKS*>(pFieldX[i]))
         {
             appCrucial(_T("CMultiShiftNested only support Staggered fermion\n"));
             continue;
         }
 
-        CFieldFermionKSSU3* pFieldKS = dynamic_cast<CFieldFermionKSSU3*>(pFieldX[i]);
+        CFieldFermionKS* pFieldKS = dynamic_cast<CFieldFermionKS*>(pFieldX[i]);
 
         if (NULL == pFieldKS)
         {

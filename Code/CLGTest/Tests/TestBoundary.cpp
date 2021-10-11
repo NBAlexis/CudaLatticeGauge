@@ -136,11 +136,54 @@ UINT TestBoundaryMapping(CParameters& sParam)
     return uiError;
 }
 
+UINT TestEtaShift(CParameters& sParam)
+{
+    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pF1->GetCopy());
+    CFieldFermionKSU1* pF3 = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetFieldById(3));
+    CFieldFermionKSU1* pF4 = dynamic_cast<CFieldFermionKSU1*>(pF3->GetCopy());
+    CFieldGaugeSU3* pSU3 = new CFieldGaugeSU3();
+    pSU3->InitialField(EFIT_Random);
+    CFieldGaugeU1* pU1 = new CFieldGaugeU1();
+    pU1->InitialField(EFIT_Random);
+    pF1->TestSetEtaShift(TRUE);
+    pF2->TestSetEtaShift(FALSE);
+    pF3->TestSetEtaShift(TRUE);
+    pF4->TestSetEtaShift(FALSE);
+    UINT uiError = 0;
+    pF1->D(pSU3);
+    pF2->D(pSU3);
+    pF1->AxpyMinus(pF2);
+    const DOUBLE fDiff1 = cuCabs(pF1->Dot(pF1));
+    appGeneral(_T("Diff1 = %2.12f\n"), fDiff1);
+    if (fDiff1 > F(0.000001))
+    {
+        ++uiError;
+    }
+    pF3->D(pU1);
+    pF4->D(pU1);
+    pF3->AxpyMinus(pF4);
+    const DOUBLE fDiff2 = cuCabs(pF3->Dot(pF3));
+    appGeneral(_T("Diff2 = %2.12f\n"), fDiff2);
+    if (fDiff2 > F(0.000001))
+    {
+        ++uiError;
+    }
+    appSafeDelete(pF2);
+    appSafeDelete(pF4);
+    appSafeDelete(pSU3);
+    appSafeDelete(pU1);
+
+    return uiError;
+}
+
 __REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
 
 __REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary);
 
 __REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping);
+
+__REGIST_TEST(TestEtaShift, Misc, TestEtaShift);
 
 
 //=============================================================================

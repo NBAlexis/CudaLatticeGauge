@@ -22,8 +22,10 @@
     <ClCompile Include="GaugeFixingJob.cpp" />
     <ClCompile Include="Measure.cpp" />
     <ClCompile Include="MeasureEM.cpp" />
+    <ClCompile Include="MeasureU1.cpp" />
     <ClCompile Include="SimulateBeta.cpp" />
     <ClCompile Include="SimulateEM.cpp" />
+    <ClCompile Include="SimulateU1.cpp" />
     <ClCompile Include="StaggeredRotation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -13,8 +13,10 @@
 __DEFINE_ENUM(EStaggeredRotationJob,
     ESR_Simulate,
     ESR_SimulateEM,
+    ESR_SimulateU1,
     ESR_Measure,
     ESR_MeasureEM,
+    ESR_MeasureU1,
     ESR_GaugeFixing,
     )
 
@@ -299,8 +301,10 @@ inline void AppendStringFile(const CCString& sFileName, const CCString& sContent
 extern INT SimulateStaggeredBeta(CParameters& params);
 extern INT SimulateStaggeredRotation(CParameters& params);
 extern INT SimulateStaggeredEM(CParameters& params);
+extern INT SimulateStaggeredRotationU1(CParameters& params);
 extern INT Measurement(CParameters& params);
 extern INT MeasurementEM(CParameters& params);
+extern INT MeasurementU1(CParameters& params);
 extern INT GaugeFixing(CParameters& params);
 
 //=============================================================================

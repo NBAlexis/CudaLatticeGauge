@@ -39,6 +39,12 @@ int main(int argc, char * argv[])
         res = SimulateStaggeredEM(workingParam1);
     }
     break;
+    case ESR_SimulateU1:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateU1"));
+        res = SimulateStaggeredRotationU1(workingParam1);
+    }
+    break;
     case ESR_Measure:
     {
         CParameters workingParam1 = params.GetParameter(_T("JobMeasure"));
@@ -49,6 +55,12 @@ int main(int argc, char * argv[])
     {
         CParameters workingParam1 = params.GetParameter(_T("JobMeasureEM"));
         res = MeasurementEM(workingParam1);
+    }
+    break;
+    case ESR_MeasureU1:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobMeasureU1"));
+        res = MeasurementU1(workingParam1);
     }
     break;
     case ESR_GaugeFixing:

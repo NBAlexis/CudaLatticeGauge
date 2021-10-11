@@ -217,6 +217,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 
 #include "Data/Field/CFieldGauge.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h"
 #include "Data/Field/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldGaugeSU3D.h"
 #include "Data/Field/CFieldGaugeU1.h"
@@ -229,6 +230,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 //#include "Data/Field/CFieldSpin.h"
 
 #include "Data/Field/CFieldFermion.h"
+#include "Data/Field/CFieldFermionKS.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3.h"
 #include "Data/Field/CFieldFermionWilsonSquareSU3D.h"
@@ -244,6 +246,8 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/CFieldFermionKSSU3DR.h"
 #include "Data/Field/CFieldFermionKSSU3EM.h"
 #include "Data/Field/CFieldFermionKSSU3P4.h"
+#include "Data/Field/CFieldFermionKSU1.h"
+#include "Data/Field/CFieldFermionKSU1R.h"
 
 //=====================================================
 
@@ -255,6 +259,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Action/CActionGaugePlaquetteAcceleration.h"
 #include "Data/Action/CActionGaugePlaquetteBoost.h"
 #include "Data/Action/CActionGaugePlaquetteRigidAcc.h"
+#include "Data/Action/CActionGaugePlaquetteRotatingu1.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
@@ -280,6 +285,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasurePolyakovXY.h"
 #include "Measurement/CMeasurePolyakov.h"
 #include "Measurement/CMeasureWilsonLoop.h"
+#include "Measurement/CMeasureWilsonLoopXY.h"
 #include "Measurement/CMeasureChiralCondensate.h"
 #include "Measurement/CMeasureAMomentumStochastic.h"
 #include "Measurement/CMeasureMesonCorrelatorStaggered.h"

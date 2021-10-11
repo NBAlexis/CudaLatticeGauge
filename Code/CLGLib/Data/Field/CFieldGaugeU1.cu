@@ -61,7 +61,7 @@ _kernelInitialU1Field(CLGComplex *pDevicePtr, EFieldInitialType eInitialType)
         case EFIT_RandomGenerator:
         {
             const Real r1 = _deviceRandomGaussFSqrt2(_deviceGetFatIndex(uiSiteIndex, idir + 1)) * PI2;
-            pDevicePtr[uiLinkIndex] = _make_cuComplex(_cos(r1), -_sin(r1));
+            pDevicePtr[uiLinkIndex] = _make_cuComplex(F(0.0), r1);
         }
         break;
         //case EFIT_U1Ez:
@@ -174,7 +174,7 @@ _kernelStapleAtSiteU1CacheIndex(
         for (INT i = 0; i < plaqCount; ++i)
         {
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            CLGComplex toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            CLGComplex toAdd = pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)];
 
             if (first.NeedToDagger())
             {
@@ -184,7 +184,7 @@ _kernelStapleAtSiteU1CacheIndex(
             for (INT j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                CLGComplex toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                CLGComplex toMul = pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)];
 
                 if (nextlink.NeedToDagger())
                 {
@@ -203,7 +203,7 @@ _kernelStapleAtSiteU1CacheIndex(
         }
 
         //staple calculated
-        CLGComplex force(pDeviceData[linkIndex]);
+        CLGComplex force = pDeviceData[linkIndex];
         //force = _cuCmulf(_make_cuComplex(res.x, -res.y));
         //force.Ta();
         //force.MulReal(betaOverN);
@@ -211,7 +211,7 @@ _kernelStapleAtSiteU1CacheIndex(
         
 
         //force is additive
-        pForceData[linkIndex] = _cuCaddf(pForceData[linkIndex], force);
+        pForceData[linkIndex].y = pForceData[linkIndex].y + force.y;
     }
 }
 
@@ -237,7 +237,7 @@ _kernelCalculateOnlyStapleU1(
         for (INT i = 0; i < plaqCount; ++i)
         {
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            CLGComplex toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            CLGComplex toAdd = pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)];
 
             if (first.NeedToDagger())
             {
@@ -247,7 +247,7 @@ _kernelCalculateOnlyStapleU1(
             for (INT j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                CLGComplex toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                CLGComplex toMul = pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)];
 
                 if (nextlink.NeedToDagger())
                 {
@@ -341,11 +341,11 @@ _kernelPlaqutteEnergyU1CacheIndex(
     //printf("  ---- energy: thread=%d, res=%f\n", __thread_id, results[__thread_id]);
 }
 
-/*
+
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergyU1_UseClover(
     BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
+    const CLGComplex* __restrict__ pDeviceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fBetaOverN,
     DOUBLE* results
@@ -365,14 +365,14 @@ _kernelPlaqutteEnergyU1_UseClover(
             //For any strange boundary condition, U_{mu,nu}=U_{nu,mu}^+ should be TRUE!
             //if (byDir1 != byDir2)
             //{
-                fRes += _deviceCloverRetr(pDeviceData, sSite4, __bi(sSite4), byDir1, byDir2, byFieldId);
+                fRes += _deviceCloverRetrU1(pDeviceData, sSite4, __bi(sSite4), byDir1, byDir2, byFieldId);
             //}
         }
     }
-    fRes = F(18.0) - F(0.25) * fRes;
+    fRes = F(6.0) - F(0.25) * fRes;
     results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
 }
-*/
+
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergyUsingStableU1(
@@ -424,7 +424,8 @@ _kernelExpMultU1Real(
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        pU[linkIndex] = _cuCmulf(__cuCexpf(cuCmulf_cr(pMyDeviceData[linkIndex], a)), pU[linkIndex]);
+        //pU[linkIndex] = _cuCmulf(__cuCexpf(cuCmulf_cr(pMyDeviceData[linkIndex], a)), pU[linkIndex]);
+        pU[linkIndex] = _cuCmulf(__cuCexpf(_make_cuComplex(F(0.0), a * pMyDeviceData[linkIndex].y)), pU[linkIndex]);
     }
 }
 
@@ -1000,12 +1001,12 @@ void CFieldGaugeU1::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pS
 {
     if (NULL == pForce || EFT_GaugeU1 != pForce->GetFieldType())
     {
-        appCrucial("CFieldGaugeSU3: force field is not SU3");
+        appCrucial("CFieldGaugeU1: force field is not U1");
         return;
     }
     if (NULL != pStable && EFT_GaugeU1 != pStable->GetFieldType())
     {
-        appCrucial("CFieldGaugeSU3: stape field is not SU3");
+        appCrucial("CFieldGaugeU1: stape field is not U1");
         return;
     }
 
@@ -1071,18 +1072,16 @@ DOUBLE CFieldGaugeU1::CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const
 Real CFieldGaugeU1::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
 #endif
 {
-    appCrucial(_T("U1 CalculatePlaqutteEnergyUseClover Not supported!\n"));
-    _FAIL_EXIT;
-    //assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
 
-    //preparethread;
-    //_kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
-    //    m_byFieldId,
-    //    m_pDeviceData,
-    //    betaOverN,
-    //    _D_RealThreadBuffer);
+    preparethread;
+    _kernelPlaqutteEnergyU1_UseClover << <block, threads >> > (
+        m_byFieldId,
+        m_pDeviceData,
+        betaOverN,
+        _D_RealThreadBuffer);
 
-    //return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
 #if !_CLG_DOUBLEFLOAT
@@ -1183,6 +1182,8 @@ void CFieldGaugeU1::ExpMult(Real a, CField* U) const
 
     preparethread;
     _kernelExpMultU1Real << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+
+    pUField->ElementNormalize();
     
 }
 
@@ -1215,7 +1216,7 @@ void CFieldGaugeU1::CopyTo(CField* pTarget) const
 {
     if (NULL == pTarget || EFT_GaugeU1 != pTarget->GetFieldType())
     {
-        appCrucial("CFieldGaugeSU3: target field is not SU3");
+        appCrucial("CFieldGaugeU1: target field is not U1");
         return;
     }
 

@@ -90,12 +90,13 @@ CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
 
 UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGauge, const class CRatinalApproximation* pRational)
 {
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    if (NULL == pGauge)
     {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge !"));
         return FALSE;
     }
-    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    const CFieldGauge* pFieldGauge = dynamic_cast<const CFieldGauge*>(pGauge);
     if (NULL == pRational)
     {
         return FALSE;
@@ -118,7 +119,7 @@ UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGau
         shifts.AddItem(_make_cuComplex(pRational->m_lstB[i], F(0.0)));
     }
 
-    solver->Solve(solutions, shifts, this, pFieldSU3, op);
+    solver->Solve(solutions, shifts, this, pFieldGauge, op);
 
     ScalarMultply(pRational->m_fC);
 
@@ -128,6 +129,42 @@ UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGau
         solutions[i]->Return();
     }
     return TRUE;
+}
+
+void CFieldFermionKS::InitialOtherParameters(CParameters& params)
+{
+    params.FetchValueReal(_T("Mass"), m_f2am);
+    if (m_f2am < F(0.00000001))
+    {
+        appCrucial(_T("CFieldFermionKS: Mass is nearly 0!\n"));
+    }
+
+    INT iEachEta = 0;
+    params.FetchValueINT(_T("EachSiteEta"), iEachEta);
+    m_bEachSiteEta = (0 != iEachEta);
+
+    TArray<Real> coeffs;
+    params.FetchValueArrayReal(_T("MD"), coeffs);
+    m_rMD.Initial(coeffs);
+
+    params.FetchValueArrayReal(_T("MC"), coeffs);
+    m_rMC.Initial(coeffs);
+
+    //params.FetchValueArrayReal(_T("EN"), coeffs);
+    //m_rEN.Initial(coeffs);
+
+    if (NULL != m_pMDNumerator)
+    {
+        checkCudaErrors(cudaFree(m_pMDNumerator));
+    }
+    checkCudaErrors(cudaMalloc((void**)&m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
+    Real* hostNumerator = (Real*)appAlloca(sizeof(Real) * m_rMD.m_uiDegree);
+    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
+    {
+        hostNumerator[i] = m_rMD.m_lstA[i];
+    }
+    checkCudaErrors(cudaMemcpy(m_pMDNumerator, hostNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyHostToDevice));
+
 }
 
 __END_NAMESPACE

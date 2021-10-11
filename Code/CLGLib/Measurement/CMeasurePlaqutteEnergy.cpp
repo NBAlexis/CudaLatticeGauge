@@ -44,6 +44,7 @@ void CMeasurePlaqutteEnergy::OnConfigurationAccepted(const CFieldGauge* pAcceptG
     const Real plaqEnergy = F(1.0) - plaqutteEneregy;
 #endif
     m_lstData.AddItem(plaqEnergy);
+    m_fLastRealResult = plaqEnergy;
     appParanoiac(_T(" === Plaqutte Energy Measured === energy = %f\n"), plaqEnergy);
 }
 

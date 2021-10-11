@@ -455,6 +455,24 @@
     <ClInclude Include="Data\Field\CFieldGaugeU1Real.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Measurement\CMeasureWilsonLoopXY.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSU1.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSU1R.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKS.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -749,6 +767,21 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldGaugeU1Real.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureWilsonLoopXY.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSU1.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSU1R.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

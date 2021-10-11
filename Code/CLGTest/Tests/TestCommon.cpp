@@ -232,8 +232,8 @@ UINT TestAnitiHermiticity(CParameters&)
 {
     //test Ddagger
     appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
-    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
-    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+    CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
+    CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2));
     UINT uiErrors = pF1->TestAntiHermitian(pGauge);
     //CCudaHelper::DebugFunction();
     pF1->Return();

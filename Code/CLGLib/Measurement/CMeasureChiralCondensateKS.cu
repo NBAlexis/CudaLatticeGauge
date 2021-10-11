@@ -44,6 +44,31 @@ _kernelDotMeasureAllKS(
 #endif
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotMeasureAllKSU1(
+    const CLGComplex* __restrict__ pZ4,
+    const CLGComplex* __restrict__ pApplied,
+    CLGComplex* resultXYPlan,
+#if !_CLG_DOUBLEFLOAT
+    cuDoubleComplex* result
+#else
+    CLGComplex* result
+#endif
+)
+{
+    intokernalInt4;
+
+#if !_CLG_DOUBLEFLOAT
+    result[uiSiteIndex] = _cToDouble(_cuCmulf(_cuConjf(pZ4[uiSiteIndex]), pApplied[uiSiteIndex]));
+    atomicAdd(&resultXYPlan[_ixy].x, static_cast<Real>(result[uiSiteIndex].x));
+    atomicAdd(&resultXYPlan[_ixy].y, static_cast<Real>(result[uiSiteIndex].y));
+#else
+    result[uiSiteIndex] = _cuCmulf(_cuConjf(pZ4[uiSiteIndex]), pApplied[uiSiteIndex]);
+    atomicAdd(&resultXYPlan[_ixy].x, result[uiSiteIndex].x);
+    atomicAdd(&resultXYPlan[_ixy].y, result[uiSiteIndex].y);
+#endif
+}
+
 #pragma endregion
 
 
@@ -135,9 +160,9 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
     }
 
     const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
-    const CFieldFermionKSSU3 * pF1W = dynamic_cast<const CFieldFermionKSSU3*>(pZ4);
-    const CFieldFermionKSSU3* pF2W = dynamic_cast<const CFieldFermionKSSU3*>(pInverseZ4);
-    CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    const CFieldFermionKS * pF1W = dynamic_cast<const CFieldFermionKS*>(pZ4);
+    const CFieldFermionKS* pF2W = dynamic_cast<const CFieldFermionKS*>(pInverseZ4);
+    CFieldFermionKS* pAfterApplied = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
 #pragma region Dot
 
@@ -191,12 +216,39 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             break;
         }
 
-        _kernelDotMeasureAllKS << <block, threads >> > (
-            pF1W->m_pDeviceData,
-            pAfterApplied->m_pDeviceData,
-            m_pDeviceXYBuffer[i],
-            _D_ComplexThreadBuffer
-            );
+        switch (pF1W->GetFieldType())
+        {
+        case EFT_FermionStaggeredSU3:
+            {
+                const CFieldFermionKSSU3* pF1WSU3 = dynamic_cast<const CFieldFermionKSSU3*>(pF1W);
+                const CFieldFermionKSSU3* pAfterSU3 = dynamic_cast<const CFieldFermionKSSU3*>(pAfterApplied);
+                _kernelDotMeasureAllKS << <block, threads >> > (
+                    pF1WSU3->m_pDeviceData,
+                    pAfterSU3->m_pDeviceData,
+                    m_pDeviceXYBuffer[i],
+                    _D_ComplexThreadBuffer
+                    );
+            }
+            break;
+        case EFT_FermionStaggeredU1:
+            {
+                const CFieldFermionKSU1* pF1WU1 = dynamic_cast<const CFieldFermionKSU1*>(pF1W);
+                const CFieldFermionKSU1* pAfterU1 = dynamic_cast<const CFieldFermionKSU1*>(pAfterApplied);
+                _kernelDotMeasureAllKSU1 << <block, threads >> > (
+                    pF1WU1->m_pDeviceData,
+                    pAfterU1->m_pDeviceData,
+                    m_pDeviceXYBuffer[i],
+                    _D_ComplexThreadBuffer
+                    );
+            }
+            break;
+        default:
+            {
+                appCrucial(_T("CMeasureChiralCondensateKS unsupported field type!\n"));
+            }
+            break;
+        }
+
 
 #if !_CLG_DOUBLEFLOAT
         const CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));

@@ -59,15 +59,7 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
     param.FetchValueReal(_T("Beta"), fBeta);
 #endif
     CCommonData::m_fBeta = fBeta;
-    if (NULL != pOwner->m_pGaugeField && EFT_GaugeSU3 == pOwner->m_pGaugeField->GetFieldType())
-    {
-#if !_CLG_DOUBLEFLOAT
-        fBeta = fBeta / 3.0;
-#else
-        fBeta = fBeta / F(3.0);
-#endif
-    }
-    m_fBetaOverN = fBeta;
+    m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     INT iUsing4Plaq = 0;
@@ -86,15 +78,7 @@ void CActionGaugePlaquette::SetBeta(Real fBeta)
 #endif
 {
     CCommonData::m_fBeta = fBeta;
-    if (NULL != m_pOwner->m_pGaugeField && EFT_GaugeSU3 == m_pOwner->m_pGaugeField->GetFieldType())
-    {
-#if !_CLG_DOUBLEFLOAT
-        fBeta = fBeta / 3.0;
-#else
-        fBeta = fBeta / F(3.0);
-#endif
-    }
-    m_fBetaOverN = fBeta;
+    m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
 }
 
 UBOOL CActionGaugePlaquette::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const

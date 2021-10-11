@@ -406,9 +406,9 @@ TestAnitiHermiticity:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -436,7 +436,8 @@ TestAnitiHermiticity:
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        # FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeU1
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -445,14 +446,16 @@ TestAnitiHermiticity:
         
     GaugeBoundary:
 
-        FieldName : CFieldBoundaryGaugeSU3
+        # FieldName : CFieldBoundaryGaugeSU3
+        FieldName : CFieldBoundaryGaugeU1
 
     FermionField1:
 
         # FieldName : CFieldFermionKSSU3P4
         # FieldName : CFieldFermionKSSU3
         # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3EM
+        # FieldName : CFieldFermionKSSU3EM
+        FieldName : CFieldFermionKSU1
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian

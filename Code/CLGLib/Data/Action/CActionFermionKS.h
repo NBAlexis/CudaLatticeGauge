@@ -37,7 +37,7 @@ public:
     void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
     UBOOL IsFermion() const override { return TRUE; }
-    class CFieldFermionKSSU3* m_pFerimionField;
+    class CFieldFermionKS* m_pFerimionField;
 };
 
 __END_NAMESPACE

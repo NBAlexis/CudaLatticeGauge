@@ -263,7 +263,13 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
             CCString sFieldName;
             gauge.FetchStringValue(_T("FieldName"), sFieldName);
             if (sFieldName == _T("CFieldGaugeSU3")
-             || sFieldName == _T("CFieldGaugeSU3D"))
+             || sFieldName == _T("CFieldGaugeSU3D")
+             || sFieldName == _T("CFieldGaugeSU3TreeImproved"))
+            {
+                m_InitialCache.constIntegers[ECI_SUN] = 3;
+            }
+
+            if (sFieldName.Find(_T("SU3")) >= 0)
             {
                 m_InitialCache.constIntegers[ECI_SUN] = 3;
             }
@@ -668,7 +674,7 @@ void CCLGLibManager::InitialIndexBuffer() const
             if (NULL != m_pLatticeData->GetFieldById(i))
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
-                if (EFT_FermionStaggeredSU3 == m_pLatticeData->GetFieldById(i)->GetFieldType())
+                if (NULL != dynamic_cast<CFieldFermionKS*>(m_pLatticeData->GetFieldById(i)))
                 {
                     bHasStaggeredFermion = TRUE;
                 }

@@ -307,12 +307,6 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
     }
 }
 
-void CFieldFermionKSSU3::DerivateDOperator(void* pForce, const void * pDphi, const void * pDDphi, const void * pGaugeBuffer) const
-{
-    appCrucial(_T("Do not call KS DerivateDOperator!"));
-    _FAIL_EXIT;
-}
-
 /**
  * partial D_{st0} / partial omega
  * Make sure m_pMDNumerator and m_pRationalFieldPointers are filled
@@ -934,12 +928,12 @@ _kernelDFermionKS_OnlyMass(
 }
 
 
-void CFieldFermionKSSU3::OnlyMass(deviceSU3Vector* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+void CFieldFermionKSSU3::OnlyMass(void* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
 {
     preparethread;
     _kernelDFermionKS_OnlyMass << <block, threads >> > (
         m_pDeviceData,
-        pTarget,
+        (deviceSU3Vector*)pTarget,
         fm,
         eOCT,
         fRealCoeff,
@@ -948,9 +942,9 @@ void CFieldFermionKSSU3::OnlyMass(deviceSU3Vector* pTarget, Real fm, EOperatorCo
 }
 
 void CFieldFermionKSSU3::OneLink(
-    const deviceSU3* pGuage, 
+    const void* pGuage, 
     BYTE byGaugeFieldId, 
-    deviceSU3Vector* pTarget, 
+    void* pTarget,
     Real fCoefficient, 
     const INT* pDevicePath, 
     BYTE pathLength,
@@ -964,9 +958,9 @@ void CFieldFermionKSSU3::OneLink(
     preparethread;
     _kernelDFermionKS_OneLink << <block, threads >> > (
         m_pDeviceData,
-        pGuage,
+        (const deviceSU3*)pGuage,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
-        pTarget,
+        (deviceSU3Vector*)pTarget,
         m_byFieldId,
         byGaugeFieldId,
         fCoefficient,
@@ -981,9 +975,9 @@ void CFieldFermionKSSU3::OneLink(
 }
 
 void CFieldFermionKSSU3::OneLinkForce(
-    const deviceSU3* pGuage, 
+    const void* pGuage, 
     BYTE byGaugeFieldId, 
-    deviceSU3* pForce, 
+    void* pForce,
     Real fCoefficient,
     const INT* pDevicePath, 
     BYTE pathLength, 
@@ -992,9 +986,9 @@ void CFieldFermionKSSU3::OneLinkForce(
     assert(pathLength <= _kKSLinkLength);
     preparethread;
     _kernelDFermionKSForce_WithLink << <block, threads >> > (
-        pGuage,
+        (const deviceSU3*)pGuage,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
-        pForce,
+        (deviceSU3*)pForce,
         m_pRationalFieldPointers,
         m_pMDNumerator,
         m_rMD.m_uiDegree,
@@ -1010,11 +1004,8 @@ void CFieldFermionKSSU3::OneLinkForce(
 #pragma endregion
 
 CFieldFermionKSSU3::CFieldFermionKSSU3()
-    : CFieldFermion()
-    , m_bEachSiteEta(FALSE)
-    , m_f2am(F(0.01))
+    : CFieldFermionKS()
     , m_pRationalFieldPointers(NULL)
-    , m_pMDNumerator(NULL)
 {
     checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount));
 }
@@ -1066,8 +1057,8 @@ void CFieldFermionKSSU3::InitialWithByte(BYTE* byData)
     deviceSU3Vector* readData = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
     for (UINT i = 0; i < m_uiSiteCount; ++i)
     {
-        Real thisSite[24];
-        memcpy(thisSite, byData + i * sizeof(Real) * 24, sizeof(Real) * 24);
+        Real thisSite[6];
+        memcpy(thisSite, byData + i * sizeof(Real) * 6, sizeof(Real) * 6);
         for (UINT k = 0; k < 3; ++k)
         {
             readData[i].m_ve[k] = _make_cuComplex(
@@ -1081,43 +1072,13 @@ void CFieldFermionKSSU3::InitialWithByte(BYTE* byData)
 
 void CFieldFermionKSSU3::InitialOtherParameters(CParameters& params)
 {
-    params.FetchValueReal(_T("Mass"), m_f2am);
-    if (m_f2am < F(0.00000001))
-    {
-        appCrucial(_T("CFieldFermionKSSU3: Mass is nearly 0!\n"));
-    }
-
-    INT iEachEta = 0;
-    params.FetchValueINT(_T("EachSiteEta"), iEachEta);
-    m_bEachSiteEta = (0 != iEachEta);
-
-    TArray<Real> coeffs;
-    params.FetchValueArrayReal(_T("MD"), coeffs);
-    m_rMD.Initial(coeffs);
-
-    params.FetchValueArrayReal(_T("MC"), coeffs);
-    m_rMC.Initial(coeffs);
-
-    //params.FetchValueArrayReal(_T("EN"), coeffs);
-    //m_rEN.Initial(coeffs);
+    CFieldFermionKS::InitialOtherParameters(params);
 
     if (NULL != m_pRationalFieldPointers)
     {
         checkCudaErrors(cudaFree(m_pRationalFieldPointers));
     }
-    if (NULL != m_pMDNumerator)
-    {
-        checkCudaErrors(cudaFree(m_pMDNumerator));
-    }
     checkCudaErrors(cudaMalloc((void**)&m_pRationalFieldPointers, sizeof(deviceSU3Vector*) * 2 * m_rMD.m_uiDegree));
-    checkCudaErrors(cudaMalloc((void**)&m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
-    Real* hostNumerator = (Real*)appAlloca(sizeof(Real) * m_rMD.m_uiDegree);
-    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-    {
-        hostNumerator[i] = m_rMD.m_lstA[i];
-    }
-    checkCudaErrors(cudaMemcpy(m_pMDNumerator, hostNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyHostToDevice));
-
 }
 
 void CFieldFermionKSSU3::DebugPrintMe() const
@@ -1154,16 +1115,10 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
         return;
     }
 
-    CField::CopyTo(U);
+    CFieldFermionKS::CopyTo(U);
 
     CFieldFermionKSSU3* pField = dynamic_cast<CFieldFermionKSSU3*>(U);
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
-    pField->m_byFieldId = m_byFieldId;
-    pField->m_f2am = m_f2am;
-    pField->m_rMC = m_rMC;
-    pField->m_rMD = m_rMD;
-    pField->m_bEachSiteEta = m_bEachSiteEta;
-    //pField->m_rEN = m_rEN;
 
     if (NULL != pField->m_pMDNumerator)
     {
@@ -1726,11 +1681,6 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
         appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
         break;
     }
-}
-
-void CFieldFermionKSSU3::SetMass(Real f2am)
-{
-    m_f2am = f2am;
 }
 
 BYTE* CFieldFermionKSSU3::CopyDataOut(UINT& uiSize) const
