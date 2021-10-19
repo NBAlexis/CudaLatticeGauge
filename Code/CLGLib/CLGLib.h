@@ -259,7 +259,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Action/CActionGaugePlaquetteAcceleration.h"
 #include "Data/Action/CActionGaugePlaquetteBoost.h"
 #include "Data/Action/CActionGaugePlaquetteRigidAcc.h"
-#include "Data/Action/CActionGaugePlaquetteRotatingu1.h"
+#include "Data/Action/CActionGaugePlaquetteRotatingU1.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
