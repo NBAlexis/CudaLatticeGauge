@@ -657,20 +657,6 @@ void CFieldFermionKSU1R::DerivateD0(
 
         for (INT isixtype = 0; isixtype < 6; ++isixtype)
         {
-            //bearly no change of time, because force calculation is not frequent
-            /*
-            _giveupkernelDFermionKSForce_PR_XYTau_Term2 << <block, threads >> > (
-                (const deviceSU3*)pGaugeBuffer,
-                (deviceSU3*)pForce,
-                m_pRationalFieldPointers,
-                m_pMDNumerator,
-                m_rMD.m_uiDegree,
-                m_byFieldId,
-                CCommonData::m_fOmega,
-                sixlinks[isixtype][0], sixlinks[isixtype][1], sixlinks[isixtype][2]
-                );
-            */
-
             for (INT iSeperation = 0; iSeperation < 4; ++iSeperation)
             {
                 INT L[3] = { 0, 0, 0 };

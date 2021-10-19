@@ -47,7 +47,7 @@ _kernelDFermionKSU1(
     intokernaldir;
 
     CLGComplex result = _zeroc;
-    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
+    //pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -98,8 +98,8 @@ _kernelDFermionKSU1(
         result.y += u_phi_x_p_m.y;
     }
 
-    pResultData[uiSiteIndex].x *= f2am;
-    pResultData[uiSiteIndex].y *= f2am;
+    pResultData[uiSiteIndex].x = pDeviceData[uiSiteIndex].x * f2am;
+    pResultData[uiSiteIndex].y = pDeviceData[uiSiteIndex].y * f2am;
     if (bDDagger)
     {
         pResultData[uiSiteIndex].x -= result.x;
@@ -290,6 +290,7 @@ void CFieldFermionKSU1::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
     CLGComplex* pTarget = (CLGComplex*)pTargetBuffer;
     const CLGComplex* pSource = (const CLGComplex*)pBuffer;
     const CLGComplex* pGauge = (const CLGComplex*)pGaugeBuffer;
+    //appGeneral(_T("Shift: %d, am: %f\n"), m_bEachSiteEta, f2am);
 
     preparethread;
     if (m_bEachSiteEta)

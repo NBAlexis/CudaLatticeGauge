@@ -1,6 +1,6 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
-RotationJob : ESR_SimulateU1
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -329,17 +329,19 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.82
-    OmegaRange : 0.128
+    GaugeBate : 5.1
+    OmegaRange : 0.096
     StartOmega : 0
-    EndOmega : 8
+    EndOmega : 0
     StartN : 101
-    EndN : 1500
+    EndN : 978
     SaveFermionFile : 0
     FermionFileIndexStart : 1
-    FermionFileHead : G:\SRFloat\4820204\Force\F4820204
-    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
-    DistributionJob : EDJKS_VR
+    FermionFileHead : G:\SRFloat\486295059\Force\F4820204
+    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
+    ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
+    ## EDJKS_DoubleToFloat
+    DistributionJob : EDJKS_DoubleToFloat
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -347,12 +349,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\4820204\GF
+    SubFolderPrefix : G:\SRFloat\510110022\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
-    LoadType : EFFT_CLGBinFloat
+    LoadType : EFFT_CLGBinDouble
 
-    SavePrefix : GFSRF4820204_
-    CSVSavePrefix : G:\SRFloat\4820204\Force\SRF4820204_
+    SavePrefix : SRF510110022_
+    CSVSavePrefix : G:\SRFloat\510110022\Nt6
 
     Dim : 4
     Dir : 4
@@ -389,7 +391,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.325
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -420,7 +422,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.04
+        Mass : 0.065
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -1102,17 +1104,17 @@ JobSimulateU1:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
-    ExponentialPrecision : 10
-    BeforeEquvibStep : 150
+    ExponentialPrecision : 15
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 500
+    EquvibStep : 300
     SaveStartIndex : 0
-    OmegaSep : 8
+    OmegaSep : 1
     OmegaStart : 0
     MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./482325065/SRFU115Quench_
+    SavePrefix : ./482325065/SRFU11502_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -1127,7 +1129,7 @@ JobSimulateU1:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 1
+    ActionListLength : 2
     FermionFieldCount : 4
     MeasureListLength : 1
     CacheStaple : 0
@@ -1147,15 +1149,16 @@ JobSimulateU1:
         MinMaxStep : [4, 50]
         GrowReduceThreshold : [-0.3, 0.02]
         InnerLeapfrog : 1
-        DebugForce : 0
+        DebugForce : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        ## IIntegratorType : CIntegratorNestedOmelyan
-        IntegratorType : CIntegratorOmelyan 
+        ## IntegratorType : CIntegratorNestedOmelyan
+        ## IntegratorType : CIntegratorOmelyan 
+        IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 30
-        NestedStep : 10
+        IntegratorStep : 35
+        NestedStep : 4
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -1305,7 +1308,7 @@ JobSimulateU1:
         ActionName : CActionGaugePlaquetteRotatingU1
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 1.2
+        Beta : 1.5
         Omega : 0.0
 
     Action2:
@@ -1409,15 +1412,15 @@ JobMeasureU1:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 1.2
+    GaugeBate : 1.5
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 1
     StartN : 21
-    EndN : 200
+    EndN : 300
     SaveFermionFile : 0
     FermionFileIndexStart : 1
-    FermionFileHead : ./482325065/Fermion/FU11205
+    FermionFileHead : ./482325065/Fermion/FU11201
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     EDistributionJobKSU1 : EDJKSU1_Chiral
     FermionMomentum : 0
@@ -1427,12 +1430,12 @@ JobMeasureU1:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 0
-    SubFolderPrefix : ./482325065/1205/SRFU11205_
+    SubFolderPrefix : ./482325065/1501/SRFU11501_
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
-    LoadType : EFFT_CLGBinFloat
+    LoadType : EFFT_CLGBinDouble
 
-    SavePrefix : ./482325065/1205/SRFU11205_
-    CSVSavePrefix : ./482325065/Chiral/SRFU11205_
+    SavePrefix : ./482325065/1501/SRFU11502_
+    CSVSavePrefix : ./482325065/Chiral/SRFU11501_
 
     Dim : 4
     Dir : 4

@@ -17,6 +17,7 @@ __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_PlaqutteEnergy,
     EDJKS_CheckMD5,
     EDJKS_VR,
+    EDJKS_DoubleToFloat,
     )
 
 
@@ -538,6 +539,13 @@ INT Measurement(CParameters& params)
                         }
                     }
                 break;
+                case EDJKS_DoubleToFloat:
+                    {
+                        CCString sSaveFileName;
+                        sSaveFileName.Format(_T("%s/%sR_Nt%d_O%d_%d.con"), sCSVSavePrefix.c_str(), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                        appGeneral(appGetLattice()->m_pGaugeField->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
+                    }
+                    break;
                 default:
                     break;
             }
@@ -743,6 +751,11 @@ INT Measurement(CParameters& params)
                     WriteStringFileComplexArray2(sCSVFile, vrs);
                 }
             break;
+            case EDJKS_DoubleToFloat:
+                {
+                    //do nothing
+                }
+                break;
             default:
                 break;
         }
