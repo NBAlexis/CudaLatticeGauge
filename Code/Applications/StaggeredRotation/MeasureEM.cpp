@@ -218,6 +218,7 @@ INT MeasurementEM(CParameters& params)
                 break;
                 case EDJKSEM_Chiral:
                 {
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (bZ4)
