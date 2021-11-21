@@ -109,6 +109,14 @@ INT Measurement(CParameters& params)
     params.FetchStringValue(_T("FermionFileHead"), sFermionHead);
     appGeneral(_T("FermionFileHead: %s\n"), sFermionHead.c_str());
 
+    iVaule = 0;
+    params.FetchValueINT(_T("LoadFermion"), iVaule);
+    const UINT uiLoadFermion = iVaule;
+
+    CCString sLoadFermionHead;
+    params.FetchStringValue(_T("LoadFermionHead"), sLoadFermionHead);
+    appGeneral(_T("Load Fermion File Head: %s\n"), sLoadFermionHead.c_str());
+
     CCString sLoadType = _T("EFFT_CLGBin");
     EFieldFileType eLoadType = EFFT_CLGBin;
     if (params.FetchStringValue(_T("LoadType"), sLoadType))
@@ -410,37 +418,51 @@ INT Measurement(CParameters& params)
                     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
-                        if (bZ4)
+                        if (0 == (1 & uiLoadFermion))
                         {
-                            pF1Light->InitialField(EFIT_RandomZ4);
-                        }
-                        else
-                        {
-                            pF1Light->InitialField(EFIT_RandomGaussian);
-                        }
-                        pF1Light->FixBoundary();
-                        pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Light->FixBoundary();
-                        if (bSaveFermion)
-                        {
-                            CCString sFermionFile = "";
-                            sFermionFile.Format(_T("%s_Light_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
-                            CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
-                            CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
-                            CCString sFileContent = "";
-                            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
                             if (bZ4)
                             {
-                                sFileContent = sFileContent + _T("\nZ4\n");
+                                pF1Light->InitialField(EFIT_RandomZ4);
                             }
                             else
                             {
-                                sFileContent = sFileContent + _T("\nGaussian\n");
+                                pF1Light->InitialField(EFIT_RandomGaussian);
                             }
-                            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            pF1Light->FixBoundary();
+                            pF1Light->CopyTo(pF2Light);
+                            pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Light->FixBoundary();
+                            if (bSaveFermion)
+                            {
+                                CCString sFermionFile = "";
+                                sFermionFile.Format(_T("%s_Light_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
+                                CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
+                                CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
+                                CCString sFileContent = "";
+                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                                if (bZ4)
+                                {
+                                    sFileContent = sFileContent + _T("\nZ4\n");
+                                }
+                                else
+                                {
+                                    sFileContent = sFileContent + _T("\nGaussian\n");
+                                }
+                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            }
+                        }
+                        else
+                        {
+                            CCString sF1FileName = "";
+                            CCString sF2FileName = "";
+                            sF1FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F1.con"),
+                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                            sF2FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F2.con"),
+                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                            pF1Light->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                            pF2Light->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
@@ -459,37 +481,51 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
-                        if (bZ4)
+                        if (0 == (2 & uiLoadFermion))
                         {
-                            pF1Heavy->InitialField(EFIT_RandomZ4);
-                        }
-                        else
-                        {
-                            pF1Heavy->InitialField(EFIT_RandomGaussian);
-                        }
-                        pF1Heavy->FixBoundary();
-                        pF1Heavy->CopyTo(pF2Heavy);
-                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Heavy->FixBoundary();
-                        if (bSaveFermion)
-                        {
-                            CCString sFermionFile = "";
-                            sFermionFile.Format(_T("%s_Heavy_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
-                            CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
-                            CCString sMD52 = pF1Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
-                            CCString sFileContent = "";
-                            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
                             if (bZ4)
                             {
-                                sFileContent = sFileContent + _T("\nZ4\n");
+                                pF1Heavy->InitialField(EFIT_RandomZ4);
                             }
                             else
                             {
-                                sFileContent = sFileContent + _T("\nGaussian\n");
+                                pF1Heavy->InitialField(EFIT_RandomGaussian);
                             }
-                            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            pF1Heavy->FixBoundary();
+                            pF1Heavy->CopyTo(pF2Heavy);
+                            pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Heavy->FixBoundary();
+                            if (bSaveFermion)
+                            {
+                                CCString sFermionFile = "";
+                                sFermionFile.Format(_T("%s_Heavy_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
+                                CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
+                                CCString sMD52 = pF2Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
+                                CCString sFileContent = "";
+                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                                if (bZ4)
+                                {
+                                    sFileContent = sFileContent + _T("\nZ4\n");
+                                }
+                                else
+                                {
+                                    sFileContent = sFileContent + _T("\nGaussian\n");
+                                }
+                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            }
+                        }
+                        else
+                        {
+                            CCString sF1FileName = "";
+                            CCString sF2FileName = "";
+                            sF1FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F1.con"),
+                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                            sF2FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F2.con"),
+                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                            pF1Heavy->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                            pF2Heavy->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(

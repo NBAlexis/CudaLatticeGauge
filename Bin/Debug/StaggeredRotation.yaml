@@ -1,6 +1,6 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
-RotationJob : ESR_Simulate
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -18,11 +18,11 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 430
-    SaveStartIndex : 1070
-    OmegaSep : 3
-    OmegaStart : 3
-    MaxOmega : 0.048
+    EquvibStep : 1179
+    SaveStartIndex : 321
+    OmegaSep : 8
+    OmegaStart : 8
+    MaxOmega : 0.128
     MinNt : 6
     MaxNt : 6
     SavePrefix : ./SRF506130026_
@@ -48,8 +48,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./SRF506130026_R_Nt6_O3_1070.con
-    Nt6Polyakov : 0.237500980496
+    Nt6FileName : ./SRF506130026_R_Nt6_O8_321.con
+    Nt6Polyakov : 0.286030173302
 
     Updator:
 
@@ -330,18 +330,25 @@ JobMeasure:
     ShowParameterContent : 0
 
     GaugeBate : 4.86
-    OmegaRange : 0.128
+    OmegaRange : 0.016
     StartOmega : 0
-    EndOmega : 8
+    EndOmega : 1
     StartN : 101
-    EndN : 1500
-    SaveFermionFile : 0
+    EndN : 105
+    SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : G:\SRFloat\486295059\Force\F4820204
+    FermionFileHead : ./F486295059_
+    # Load Fermion Not tested
+    # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
+    # LoadFermion = 1, load light, 2, load heavy, 3 both 
+    LoadFermion : 1
+    LoadFermionFile : F486295059_
+    LoadFermionHead : G:\SRFloat\486295059\Fermion
+
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_Polyakov
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -349,12 +356,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\486295059\Nt6
+    SubFolderPrefix : G:\SRFloat\486295059\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF486295059_
-    CSVSavePrefix : G:\SRFloat\486295059\Polyakov\SRF486295059_
+    SavePrefix : GFSRF486295059_
+    CSVSavePrefix : ./SRF486295059_
 
     Dim : 4
     Dir : 4
@@ -391,7 +398,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.325
+        Mass : 0.295
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -422,7 +429,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.065
+        Mass : 0.059
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
