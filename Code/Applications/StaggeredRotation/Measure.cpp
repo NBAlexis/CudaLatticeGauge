@@ -113,6 +113,10 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("LoadFermion"), iVaule);
     const UINT uiLoadFermion = iVaule;
 
+    CCString sLoadFermionFile;
+    params.FetchStringValue(_T("LoadFermionFile"), sLoadFermionFile);
+    appGeneral(_T("Load Fermion File Name: %s\n"), sLoadFermionFile.c_str());
+
     CCString sLoadFermionHead;
     params.FetchStringValue(_T("LoadFermionHead"), sLoadFermionHead);
     appGeneral(_T("Load Fermion File Head: %s\n"), sLoadFermionHead.c_str());
@@ -458,9 +462,9 @@ INT Measurement(CParameters& params)
                             CCString sF1FileName = "";
                             CCString sF2FileName = "";
                             sF1FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F1.con"),
-                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                                sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
                             sF2FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F2.con"),
-                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                                sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
                             pF1Light->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
                             pF2Light->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
@@ -521,9 +525,9 @@ INT Measurement(CParameters& params)
                             CCString sF1FileName = "";
                             CCString sF2FileName = "";
                             sF1FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F1.con"),
-                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                                sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
                             sF2FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F2.con"),
-                                sLoadFermionHead.c_str(), uiOmega, sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                                sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
                             pF1Heavy->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
                             pF2Heavy->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
