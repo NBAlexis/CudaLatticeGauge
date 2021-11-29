@@ -21,6 +21,15 @@ __CLGIMPLEMENT_CLASS(CFieldFermionKSSU3EM)
 
 /**
  * very very strange, the eta_mu is not modified for projective plane
+ * What do you mean eta_mu is not modified???
+ *
+ * Not support shift center
+ *
+ * Explain:
+ * qBz: u_y = exp(i qBz x), u_x(L_x) = exp(-i qBz Lx y)
+ *
+ * qEz: u_t = exp(- i qEz z), u_z(L_z) = exp(i qEz Lz t)
+ * 
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKSEM_Simple(
@@ -33,7 +42,6 @@ _kernelDFermionKSEM_Simple(
     Real fam,
     Real fqEz,
     Real fqBz,
-    UBOOL bShiftCenter,
     SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
@@ -46,26 +54,22 @@ _kernelDFermionKSEM_Simple(
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
 
-    Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
-    Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
-    Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
-    //SSmallInt4 site_shift = sSite4;
-    //site_shift.x = site_shift.x - 1;
-    //site_shift = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_shift)].m_uiSiteIndex);
-    //Real fXm = static_cast<Real>(sSite4.x - sCenter.x);
-    //site_shift = sSite4;
-    //site_shift.y = site_shift.y - 1;
-    //site_shift = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_shift)].m_uiSiteIndex);
-    //Real fYm = static_cast<Real>(sSite4.y - sCenter.y);
-    //site_shift = sSite4;
-    //site_shift.z = site_shift.z - 1;
-    //site_shift = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_shift)].m_uiSiteIndex);
-    //Real fZm = static_cast<Real>(sSite4.z - sCenter.z);
+    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
+    const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
+    const Real fT1 = static_cast<Real>(sSite4.w - sCenter.w);
 
-    if (bShiftCenter)
+    Real u1pX = F(0.0);
+    const Real u1pY = fX1 * fqBz;
+    Real u1pZ = F(0.0);
+    const Real u1pT = -fZ1 * fqEz;
+    if (sSite4.x == _DC_Lx - 1)
     {
-        fX1 += F(0.5);
-        fY1 += F(0.5);
+        u1pX = -fY1 * _DC_Lx * fqBz;
+    }
+    if (sSite4.z == _DC_Lz - 1)
+    {
+        u1pZ = fT1 * _DC_Lz * fqEz;
     }
 
     //idir = mu
@@ -78,67 +82,65 @@ _kernelDFermionKSEM_Simple(
 
         const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
         const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
-        //const SSmallInt4 x_p_site = __deviceSiteIndexToInt4(x_p_mu_Fermion.m_uiSiteIndex);
         const SSmallInt4 x_m_site = __deviceSiteIndexToInt4(x_m_mu_Fermion.m_uiSiteIndex);
 
         //Get Gamma mu
         const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
-        //Real fX2 = static_cast<Real>(x_p_site.x - sCenter.x);
-        //Real fY2 = static_cast<Real>(x_p_site.y - sCenter.y);
-        //Real fZ2 = static_cast<Real>(x_p_site.z - sCenter.z);
-        Real fX3 = static_cast<Real>(x_m_site.x - sCenter.x);
-        Real fY3 = static_cast<Real>(x_m_site.y - sCenter.y);
-        Real fZ3 = static_cast<Real>(x_m_site.z - sCenter.z);
-        if (bShiftCenter)
-        {
-            //fX2 += F(0.5);
-            //fY2 += F(0.5);
-            fX3 += F(0.5);
-            fY3 += F(0.5);
-        }
+        const Real fX2 = static_cast<Real>(x_m_site.x - sCenter.x);
+        const Real fY2 = static_cast<Real>(x_m_site.y - sCenter.y);
+        const Real fZ2 = static_cast<Real>(x_m_site.z - sCenter.z);
+        const Real fT2 = static_cast<Real>(x_m_site.w - sCenter.w);
 
-        //Real fXp = F(-0.5) * (fX1 + fX2) * fqBz;
-        //Real fYp = F(0.5) * (fY1 + fY2) * fqBz;
-        //Real fZp = F(0.5) * (fZ1 + fZ2) * fqEz;
-        //Real fXm = F(-0.5) * (fX1 + fX3) * fqBz;
-        //Real fYm = F(0.5) * (fY1 + fY3) * fqBz;
-        //Real fZm = F(0.5) * (fZ1 + fZ3) * fqEz;
-        const Real fXp = -fX1 * fqBz;
-        const Real fYp = fY1 * fqBz;
-        const Real fZp = fZ1 * fqEz;
-        const Real fXm = bShiftCenter ? (-fX3 * fqBz) : fXp;
-        const Real fYm = bShiftCenter ? (fY3 * fqBz) : fYp;
-        const Real fZm = bShiftCenter ? (fZ3 * fqEz) : fZp;
+        Real u1mX = F(0.0);
+        const Real u1mY = fX2 * fqBz;
+        Real u1mZ = F(0.0);
+        const Real u1mT = - fZ2 * fqEz;
+        if (x_m_site.x == _DC_Lx - 1)
+        {
+            u1mX = -fY2 * _DC_Lx * fqBz;
+        }
+        if (x_m_site.z == _DC_Lz - 1)
+        {
+            u1mZ = fT2 * _DC_Lz * fqEz;
+        }
 
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
         if (0 == idir)
         {
-            x_Gauge_element.MulComp(_make_cuComplex(_cos(fYp), _sin(fYp)));
+            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
         }
         else if (1 == idir)
         {
-            x_Gauge_element.MulComp(_make_cuComplex(_cos(fXp), _sin(fXp)));
+            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
+        }
+        else if (2 == idir)
+        {
+            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pZ), _sin(u1pZ)));
         }
         else if (3 == idir)
         {
-            x_Gauge_element.MulComp(_make_cuComplex(_cos(fZp), _sin(fZp)));
+            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pT), _sin(u1pT)));
         }
         deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
         if (0 == idir)
         {
-            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(fYm), _sin(fYm)));
+            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mX), _sin(u1mX)));
         }
         else if (1 == idir)
         {
-            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(fXm), _sin(fXm)));
+            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mY), _sin(u1mY)));
+        }
+        else if (2 == idir)
+        {
+            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mZ), _sin(u1mZ)));
         }
         else if (3 == idir)
         {
-            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(fZm), _sin(fZm)));
+            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mT), _sin(u1mT)));
         }
         if (x_m_mu_Gauge.NeedToDagger())
         {
@@ -197,6 +199,13 @@ _kernelDFermionKSEM_Simple(
 
 #pragma region Derivate
 
+/**
+ * Explain:
+ * qBz: u_y = exp(i qBz x), u_x(L_x) = exp(-i qBz Lx y)
+ *
+ * qEz: u_t = exp(- i qEz z), u_z(L_z) = exp(i qEz Lz t)
+ *
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKSForceEM_Simple(
     const deviceSU3* __restrict__ pGauge,
@@ -208,23 +217,28 @@ _kernelDFermionKSForceEM_Simple(
     UINT uiRational,
     Real fqEz,
     Real fqBz,
-    UBOOL bShiftCenter,
     SSmallInt4 sCenter,
     BYTE byFieldId)
 {
     intokernalInt4;
 
-    Real fX = static_cast<Real>(sSite4.x - sCenter.x);
-    Real fY = static_cast<Real>(sSite4.y - sCenter.y);
-    Real fZ = static_cast<Real>(sSite4.z - sCenter.z);
-    if (bShiftCenter)
+    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
+    const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
+    const Real fT1 = static_cast<Real>(sSite4.w - sCenter.w);
+
+    Real u1pX = F(0.0);
+    const Real u1pY = fX1 * fqBz;
+    Real u1pZ = F(0.0);
+    const Real u1pT = -fZ1 * fqEz;
+    if (sSite4.x == _DC_Lx - 1)
     {
-        fX += F(0.5);
-        fY += F(0.5);
+        u1pX = -fY1 * _DC_Lx * fqBz;
     }
-    fX = -fX * fqBz;
-    fY = fY * fqBz;
-    fZ = fZ * fqEz;
+    if (sSite4.z == _DC_Lz - 1)
+    {
+        u1pZ = fT1 * _DC_Lz * fqEz;
+    }
 
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
@@ -235,19 +249,6 @@ _kernelDFermionKSForceEM_Simple(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-        //const SSmallInt4 x_p_site = __deviceSiteIndexToInt4(x_p_mu_Fermion.m_uiSiteIndex);
-        //Real fX2 = static_cast<Real>(x_p_site.x - sCenter.x);
-        //Real fY2 = static_cast<Real>(x_p_site.y - sCenter.y);
-        //Real fZ2 = static_cast<Real>(x_p_site.z - sCenter.z);
-        //if (bShiftCenter)
-        //{
-        //    fX2 += F(0.5);
-        //    fY2 += F(0.5);
-        //}
-
-        //Real fX = F(-0.5) * (fX1 + fX2) * fqBz;
-        //Real fY = F(0.5) * (fY1 + fY2) * fqBz;
-        //Real fZ = F(0.5) * (fZ1 + fZ2) * fqEz;
 
         for (UINT uiR = 0; uiR < uiRational; ++uiR)
         {
@@ -257,30 +258,38 @@ _kernelDFermionKSForceEM_Simple(
             deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
             if (0 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fY), _sin(fY)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
             }
             else if (1 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fX), _sin(fX)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
+            }
+            else if (2 == idir)
+            {
+                toContract.MulComp(_make_cuComplex(_cos(u1pZ), _sin(u1pZ)));
             }
             else if (3 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fZ), _sin(fZ)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pT), _sin(u1pT)));
             }
             deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_id[uiSiteIndex], toContract);
 
             toContract = pGauge[linkIndex].MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
             if (0 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fY), _sin(fY)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
             }
             else if (1 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fX), _sin(fX)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
+            }
+            else if (2 == idir)
+            {
+                toContract.MulComp(_make_cuComplex(_cos(u1pZ), _sin(u1pZ)));
             }
             else if (3 == idir)
             {
-                toContract.MulComp(_make_cuComplex(_cos(fZ), _sin(fZ)));
+                toContract.MulComp(_make_cuComplex(_cos(u1pT), _sin(u1pT)));
             }
             thisTerm.Add(deviceSU3::makeSU3ContractV(toContract, phi_i[uiSiteIndex]));
 
@@ -326,9 +335,8 @@ void CFieldFermionKSSU3EM::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         f2am,
-        m_fa2Ez,
-        m_fa2Bz,
-        m_bEachSiteEta,
+        CCommonData::m_fEz * m_fQ,
+        CCommonData::m_fBz * m_fQ,
         CCommonData::m_sCenter,
         m_byFieldId,
         bDagger,
@@ -350,9 +358,8 @@ void CFieldFermionKSSU3EM::DerivateD0(
         m_pRationalFieldPointers,
         m_pMDNumerator,
         m_rMD.m_uiDegree,
-        m_fa2Ez,
-        m_fa2Bz,
-        m_bEachSiteEta,
+        CCommonData::m_fEz * m_fQ,
+        CCommonData::m_fBz * m_fQ,
         CCommonData::m_sCenter,
         m_byFieldId);
 }
@@ -362,9 +369,17 @@ void CFieldFermionKSSU3EM::DerivateD0(
 void CFieldFermionKSSU3EM::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionKSSU3::InitialOtherParameters(params);
-    params.FetchValueReal(_T("Qa2Ez"), m_fa2Ez);
-    params.FetchValueReal(_T("Qa2Bz"), m_fa2Bz);
-    //m_bEachSiteEta = TRUE;
+    Real fa2Ez = F(0.0);
+    Real fa2Bz = F(0.0);
+    if (params.FetchValueReal(_T("Qa2Ez"), fa2Ez))
+    {
+        CCommonData::m_fEz = fa2Ez;
+    }
+    if (params.FetchValueReal(_T("Qa2Bz"), fa2Bz))
+    {
+        CCommonData::m_fBz = fa2Bz;
+    }
+    params.FetchValueReal(_T("EMChange"), m_fQ);
 }
 
 void CFieldFermionKSSU3EM::CopyTo(CField* U) const
@@ -373,8 +388,7 @@ void CFieldFermionKSSU3EM::CopyTo(CField* U) const
     CFieldFermionKSSU3EM* target = dynamic_cast<CFieldFermionKSSU3EM*>(U);
     if (NULL != target)
     {
-        target->m_fa2Ez = m_fa2Ez;
-        target->m_fa2Bz = m_fa2Bz;
+        target->m_fQ = m_fQ;
     }
 }
 
@@ -384,8 +398,8 @@ CCString CFieldFermionKSSU3EM::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("Q x a^2Ez : ") + appFloatToString(m_fa2Ez) + _T("\n");
-    sRet = sRet + tab + _T("Q x a^2Bz : ") + appFloatToString(m_fa2Bz) + _T("\n");
+    sRet = sRet + tab + _T("Q x a^2Ez : ") + appFloatToString(m_fQ * CCommonData::m_fEz) + _T("\n");
+    sRet = sRet + tab + _T("Q x a^2Bz : ") + appFloatToString(m_fQ * CCommonData::m_fBz) + _T("\n");
     return sRet;
 }
 

@@ -1,6 +1,6 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
-RotationJob : ESR_Measure
+RotationJob : ESR_MeasureEM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -329,26 +329,26 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.86
-    OmegaRange : 0.016
+    GaugeBate : 4.90
+    OmegaRange : 0.128
     StartOmega : 0
-    EndOmega : 1
+    EndOmega : 8
     StartN : 101
-    EndN : 105
+    EndN : 1500
     SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : ./F486295059_
+    FermionFileHead : ./510/Fermions/F510110022_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
-    LoadFermion : 1
+    LoadFermion : 0
     LoadFermionFile : F486295059_
     LoadFermionHead : G:\SRFloat\486295059\Fermion
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -356,12 +356,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\486295059\GF
+    SubFolderPrefix : G:\SRFloat\490270054/Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF486295059_
-    CSVSavePrefix : ./SRF486295059_
+    SavePrefix : SRF490270054_
+    CSVSavePrefix : G:\SRFloat\490270054\Polyakov/SRF490270054_
 
     Dim : 4
     Dir : 4
@@ -398,7 +398,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.295
+        Mass : 0.11
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -429,7 +429,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.059
+        Mass : 0.022
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -675,15 +675,15 @@ JobSimulateEM:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 150
+    BeforeEquvibStep : 5
     EquvibSkip : 0
-    EquvibStep : 500
+    EquvibStep : 10
     SaveStartIndex : 0
     EMStart : 0
     EMEnd : 4
-    ElectricList : [0, 0, 0, 0]
-    MagneticList : [0, 0.3, 0.6, 0.9]
-    SavePrefix : ./SRF600_04EM_
+    ElectricList : [0, 0.3, 0.6, 0.9]
+    MagneticList : [0, 0, 0, 0]
+    SavePrefix : ./SRF550_02EM_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -746,11 +746,12 @@ JobSimulateEM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 0
         Period : [1, 1, 1, -1]
+        EMChange : 0.66666666666666666667
 
         # MC is to prepare
         # This is x^{1/8}
@@ -769,11 +770,12 @@ JobSimulateEM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 0
         Period : [1, 1, 1, -1]
+        EMChange : -0.33333333333333333333
 
         # MC is to prepare
         # This is x^{1/8}
@@ -786,10 +788,9 @@ JobSimulateEM:
     Action1:
    
         ActionName : CActionGaugePlaquette
-        CloverEnergy : 1
-        ShiftCoord : 1
-        Beta : 6.0
-        # Omega : 0.0
+        CloverEnergy : 0
+        ShiftCoord : 0
+        Beta : 5.5
 
     Action2:
 
@@ -855,15 +856,6 @@ JobSimulateEM:
         FieldId : 1
         ShowResult : 1
 
-    Measure2:
-
-        MeasureName : CMeasureChiralCondensateKS
-        FieldId : 2
-        MeasureDist : 1
-        ShowResult : 1
-        ShiftCenter : 0
-        DebugDivation : 0
-
 JobMeasureEM:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
@@ -872,13 +864,13 @@ JobMeasureEM:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.0
+    GaugeBate : 5.5
     EMStart : 0
     EMEnd : 4
-    ElectricList : [0, 0, 0, 0]
-    MagneticList : [0, 0.3, 0.6, 0.9]
-    StartN : 101
-    EndN : 500
+    ElectricList : [0, 0.3, 0.6, 0.9]
+    MagneticList : [0, 0, 0, 0]
+    StartN : 1
+    EndN : 10
     ## EDJKSEM_Polyakov, EDJKSEM_Chiral
     DistributionJob : EDJKSEM_Chiral
     FermionMomentum : 0
@@ -892,8 +884,8 @@ JobMeasureEM:
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./EMTest/SRF500_04EM_
-    CSVSavePrefix : ./EMTest/Chiral/SRF500_04EM_
+    SavePrefix : ./SRF550_02EM_
+    CSVSavePrefix : ./SRF550_02EM_
 
     Dim : 4
     Dir : 4
@@ -930,11 +922,12 @@ JobMeasureEM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 0
         Period : [1, 1, 1, -1]
+        EMChange : 0.66666666666666666667
 
         # MC is to prepare
         # This is x^{1/8}
@@ -953,11 +946,12 @@ JobMeasureEM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.4
+        Mass : 0.2
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 0
         Period : [1, 1, 1, -1]
+        EMChange : -0.333333333333333333333
 
         # MC is to prepare
         # This is x^{1/8}

@@ -181,13 +181,8 @@ INT MeasurementEM(CParameters& params)
         pFALight->SetFieldCount(iFieldCount);
         pFAHeavy->SetFieldCount(iFieldCount);
 
-        CFieldFermionKSSU3EM* pFermionField1 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(2));
-        pFermionField1->m_fa2Bz = lstM[uiEM];
-        pFermionField1->m_fa2Ez = lstE[uiEM];
-        CFieldFermionKSSU3EM* pFermionField2 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(3));
-        pFermionField2->m_fa2Bz = F(-0.5) * lstM[uiEM];
-        pFermionField2->m_fa2Ez = F(-0.5) * lstE[uiEM];
-        appGetLattice()->ReCopyPooled();
+        CCommonData::m_fBz = lstM[uiEM];
+        CCommonData::m_fEz = lstE[uiEM];
 
 #pragma region Measure
 

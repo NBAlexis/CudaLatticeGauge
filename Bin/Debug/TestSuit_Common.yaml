@@ -436,8 +436,8 @@ TestAnitiHermiticity:
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        # FieldName : CFieldGaugeSU3
-        FieldName : CFieldGaugeU1
+        FieldName : CFieldGaugeSU3
+        # FieldName : CFieldGaugeU1
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -446,16 +446,16 @@ TestAnitiHermiticity:
         
     GaugeBoundary:
 
-        # FieldName : CFieldBoundaryGaugeSU3
-        FieldName : CFieldBoundaryGaugeU1
+        FieldName : CFieldBoundaryGaugeSU3
+        # FieldName : CFieldBoundaryGaugeU1
 
     FermionField1:
 
         # FieldName : CFieldFermionKSSU3P4
         # FieldName : CFieldFermionKSSU3
         # FieldName : CFieldFermionKSSU3R
-        # FieldName : CFieldFermionKSSU3EM
-        FieldName : CFieldFermionKSU1
+        FieldName : CFieldFermionKSSU3EM
+        # FieldName : CFieldFermionKSU1
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -469,6 +469,7 @@ TestAnitiHermiticity:
 
         Qa2Ez : 0.1
         Qa2Bz : 0.1
+        EMChange : -0.33333333333
 
         Period : [1, 1, 1, -1]
 

@@ -27,6 +27,9 @@ UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 UBOOL CLGAPI CCommonData::m_bStochasticGaussian = FALSE;
 UINT CLGAPI CCommonData::m_uiMaxThreadPerBlock = 0;
 
+Real CLGAPI CCommonData::m_fBz = F(0.0);
+Real CLGAPI CCommonData::m_fEz = F(0.0);
+
 /**
 * m_uiLatticeDecompose[0,1,2] is the blocks
 * m_uiLatticeDecompose[3,4,5] is the threads in blocks

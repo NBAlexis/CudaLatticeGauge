@@ -24,8 +24,7 @@ class CLGAPI CFieldFermionKSSU3EM : public CFieldFermionKSSU3
 public:
 
     CFieldFermionKSSU3EM() : CFieldFermionKSSU3()
-        , m_fa2Ez(F(0.0))
-        , m_fa2Bz(F(0.0))
+        , m_fQ(F(0.0))
     {
         
     }
@@ -37,8 +36,9 @@ public:
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;
 
-    Real m_fa2Ez;
-    Real m_fa2Bz;
+protected:
+
+    Real m_fQ;
 };
 
 __END_NAMESPACE

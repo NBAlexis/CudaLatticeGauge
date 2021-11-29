@@ -157,13 +157,8 @@ INT SimulateStaggeredEM(CParameters& params)
     if (bNeedBake && iBeforeEquib > 0)
     {
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-        CFieldFermionKSSU3EM* pFermionField1 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(2));
-        pFermionField1->m_fa2Bz = F(0.0);
-        pFermionField1->m_fa2Ez = F(0.0);
-        CFieldFermionKSSU3EM* pFermionField2 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(3));
-        pFermionField2->m_fa2Bz = F(0.0);
-        pFermionField2->m_fa2Ez = F(0.0);
-        appGetLattice()->ReCopyPooled();
+        CCommonData::m_fBz = F(0.0);
+        CCommonData::m_fEz = F(0.0);
 
         appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
@@ -200,14 +195,8 @@ INT SimulateStaggeredEM(CParameters& params)
         sHeader.Format(_T("Nt%dEM%d"), _HC_Lt, uiEM);
         appSetLogHeader(sHeader);
         appGeneral(_T("\n========= E=%f M=%f ==========\n"), lstE[uiEM], lstM[uiEM]);
-
-        CFieldFermionKSSU3EM* pFermionField1 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(2));
-        pFermionField1->m_fa2Bz = lstM[uiEM];
-        pFermionField1->m_fa2Ez = lstE[uiEM];
-        CFieldFermionKSSU3EM* pFermionField2 = dynamic_cast<CFieldFermionKSSU3EM*>(appGetLattice()->GetFieldById(3));
-        pFermionField2->m_fa2Bz = F(-0.5) * lstM[uiEM];
-        pFermionField2->m_fa2Ez = F(-0.5) * lstE[uiEM];
-        appGetLattice()->ReCopyPooled();
+        CCommonData::m_fBz = lstM[uiEM];
+        CCommonData::m_fEz = lstE[uiEM];
 
         if (bAdditive)
         {

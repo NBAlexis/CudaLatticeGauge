@@ -457,6 +457,10 @@ public:
 
     //No room for other paramters in solvers, so put it here, maybe move to somewhere else later
     static Real m_fShiftedMass;
+
+    //External Electric - Magnetic field
+    static Real m_fBz;
+    static Real m_fEz;
 };
 
 __END_NAMESPACE
