@@ -14,9 +14,11 @@ __DEFINE_ENUM(EStaggeredRotationJob,
     ESR_Simulate,
     ESR_SimulateEM,
     ESR_SimulateU1,
+    ESR_SimulateREM,
     ESR_Measure,
     ESR_MeasureEM,
     ESR_MeasureU1,
+    ESR_MeasureREM,
     ESR_GaugeFixing,
     )
 
@@ -302,9 +304,11 @@ extern INT SimulateStaggeredBeta(CParameters& params);
 extern INT SimulateStaggeredRotation(CParameters& params);
 extern INT SimulateStaggeredEM(CParameters& params);
 extern INT SimulateStaggeredRotationU1(CParameters& params);
+extern INT SimulateStaggeredRotationEM(CParameters& params);
 extern INT Measurement(CParameters& params);
 extern INT MeasurementEM(CParameters& params);
 extern INT MeasurementU1(CParameters& params);
+extern INT MeasurementREM(CParameters& params);
 extern INT GaugeFixing(CParameters& params);
 
 //=============================================================================

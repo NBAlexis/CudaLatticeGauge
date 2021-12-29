@@ -55,6 +55,7 @@
     <ClInclude Include="Data\Field\CFieldFermionKSSU3EM.h" />
     <ClInclude Include="Data\Field\CFieldFermionKSSU3P4.h" />
     <ClInclude Include="Data\Field\CFieldFermionKSSU3R.h" />
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3REM.h" />
     <ClInclude Include="Data\Field\CFieldFermionKSU1.h" />
     <ClInclude Include="Data\Field\CFieldFermionKSU1R.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.h" />
@@ -173,6 +174,7 @@
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3EM.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3P4.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3R.cu" />
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3REM.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSU1.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSU1R.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.cu" />

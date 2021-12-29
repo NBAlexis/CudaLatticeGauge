@@ -345,12 +345,120 @@ static __device__ __inline__ deviceSU3 _deviceLink(
             }
         }
 
-        if (pDir[i] > 0) //Move
+        if (pDir[i] > 0 && i < (byLength - 1)) //Move
         {
             _deviceSmallInt4Offset(sStartSite, pDir[i]);
         }
     }
 
+    return sRet;
+}
+
+/**
+ * Same as _deviceLink, but with fixed electric-magnetic field
+ * The electric-magnetic field is parameterized as Bz
+ * For magnetic field between n1 and n2 is:
+ * Ax(Lx) = - q B ny
+ * Ay(n) = q B nx
+ */
+static __device__ __inline__ deviceSU3 _deviceLinkMP(
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sStartSite, const SSmallInt4& sCenterSite,
+    BYTE byLength, BYTE byFieldId, Real fQBz,
+    const INT* __restrict__ pDir)
+{
+    //length can be 0
+    deviceSU3 sRet = deviceSU3::makeSU3Id();
+    Real fPhase = F(0.0);
+    
+    for (BYTE i = 0; i < byLength; ++i)
+    {
+        if (0 == pDir[i])
+        {
+            continue;
+        }
+        UBOOL bDagger = FALSE;
+        const BYTE byDir = pDir[i] > 0 ?
+            static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
+
+        if (pDir[i] < 0) //Move-back
+        {
+            bDagger = TRUE;
+            _deviceSmallInt4Offset(sStartSite, pDir[i]);
+        }
+        const UINT uiBi4StartSite = __bi4(sStartSite);
+        const SIndex& newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBi4StartSite + byDir];
+        const UBOOL bDaggerFinal = 
+               (newLink.NeedToDagger() && !bDagger)
+            || (!newLink.NeedToDagger() && bDagger);
+        if (!newLink.IsDirichlet())
+        {
+            if (1 == newLink.m_byDir) //y-dir move
+            {
+                const SSmallInt4 newSite = __deviceSiteIndexToInt4(newLink.m_uiSiteIndex);
+                const Real fXCoord = static_cast<Real>(newSite.x - sCenterSite.x + F(0.5));
+                if (bDaggerFinal)
+                {
+                    fPhase = fPhase - fXCoord;
+                }
+                else
+                {
+                    fPhase = fPhase + fXCoord;
+                }
+            }
+            else if (0 == newLink.m_byDir) //x-dir move
+            {
+                const SSmallInt4 newSite = __deviceSiteIndexToInt4(newLink.m_uiSiteIndex);
+                if (newSite.x == static_cast<INT>(_DC_Lx) - 1)
+                {
+                    const Real fYCoord = static_cast<Real>(newSite.y - sCenterSite.y + F(0.5));
+                    if (bDaggerFinal)
+                    {
+                        fPhase = fPhase + fYCoord;
+                    }
+                    else
+                    {
+                        fPhase = fPhase - fYCoord;
+                    }
+                }
+            }
+        }
+
+        if (0 == i)
+        {
+            if (!newLink.IsDirichlet())
+            {
+                sRet = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
+                if (bDaggerFinal)
+                {
+                    sRet.Dagger();
+                }
+            }
+        }
+        else
+        {
+            if (!newLink.IsDirichlet())
+            {
+                if (bDaggerFinal)
+                {
+                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+                else
+                {
+                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+            }
+        }
+
+        if (pDir[i] > 0 && i < (byLength - 1)) //Move
+        {
+            _deviceSmallInt4Offset(sStartSite, pDir[i]);
+        }
+    }
+
+    fPhase = fPhase * fQBz;
+    const CLGComplex cmpPhase = _make_cuComplex(_cos(fPhase), _sin(fPhase));
+    sRet.MulComp(cmpPhase);
     return sRet;
 }
 

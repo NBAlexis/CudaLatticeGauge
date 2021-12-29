@@ -251,6 +251,20 @@ This is called \index{mass precondition}`mass precondition', the force from the 
 \end{equation}
 All the other steps are same as $N_f=2$.
 
+Possible choices are listed in Table.~\ref{table:nf2p1staggered}
+\begin{table}[ht]
+\begin{tabular}{ c || c c | c c | c c| c c}
+  schemes & MC & MD & MC & MD & MC & MD & MC & MD \\
+  \hline
+  $N_f=2+1$ & $x^{\frac{1}{4}}$  & $x^{-\frac{1}{2}}$ & $x^{\frac{1}{8}}$ & $x^{-\frac{1}{4}}$ & & & & \\
+  $N_f=2+1$ & $\left(\frac{x+4a^2\delta m^2}{x}\right)^{-\frac{1}{4}}$  & $\left(\frac{x+4a^2\delta m^2}{x}\right)^{\frac{1}{2}}$ & $x^{\frac{3}{8}}$ & $x^{-\frac{3}{4}}$ & & & & \\
+  $N_f=2+1$ & $\left(\frac{x+4a^2\delta m^2}{x}\right)^{-\frac{1}{4}}$  & $\left(\frac{x+4a^2\delta m^2}{x}\right)^{\frac{1}{2}}$ & $x^{\frac{1}{8}}$ & $x^{-\frac{1}{4}}$ & $x^{\frac{1}{8}}$ & $x^{-\frac{1}{4}}$ & $x^{\frac{1}{8}}$ & $x^{-\frac{1}{4}}$ \\
+  \hline
+\end{tabular}
+\caption{The Fermions for $N_f=2+1$.}
+\label{table:nf2p1staggered}
+\end{table}
+
 \subsubsection{\label{sec:multifieldOptimization}Multi field Optimization}
 
 The multi-level nested integrator is useless compared with multi field optimization. Instead of evaluating $\bar{\psi} A \psi$, one use $\sum _i^{\alpha} \bar{\psi _i} A^{\frac{1}{\alpha}} \psi _i$. Typically, the force from the $s$ quark is much larger than the mass preconditioned $u,d$ quarks, so we can use $\sum _{i=1,2,3} \bar{\psi _i} A^{-\frac{1}{4}} \psi _i$ instead of $\bar{\psi} A^{-\frac{3}{4}} \psi$. And then use a nested integrator.
@@ -265,4 +279,4 @@ As required by anti-Hermiticity and gauge invarience, for higher orders, we alwa
 &\bar{\chi}(n_1)U(n_1,n_2)\chi (n_2) - \bar{\chi}(n_2)U^{\dagger}(n_1,n_2)\chi (n_1)\\
 \end{split}
 \end{equation}
-Let $U(n_1,n_2)=U(n_1,n_3)U_{\mu}(n_3)$
+Let $U(n_1,n_2)=U(n_1,n_3)U_{\mu}(n_3)$ 

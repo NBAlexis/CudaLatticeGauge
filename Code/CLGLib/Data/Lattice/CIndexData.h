@@ -202,6 +202,8 @@ public:
     SIndex* m_pIndexLinkToSIndex[kMaxFieldCount];
 
     //used for device function
+    //map big-index to sindex, the site outside lattice can have a big-index out of lattice,
+    //however, after this mapping, it maps to a site inside lattice based on boundary condition
     SIndex** m_pDeviceIndexPositionToSIndex;
     //similar as m_pDeviceIndexPositionToSIndex, but with link
     SIndex** m_pDeviceIndexLinkToSIndex;

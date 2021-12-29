@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.8.14)  17 AUG 2021 19:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.8.14)  29 NOV 2021 23:18
 entering extended mode
 **./detail.tex
 (detail.tex
@@ -1285,12 +1285,13 @@ Overfull \hbox (2.62384pt too wide) detected at line 174
 []
  []
 
-[28] [29]) [30] (SparseLinearAlgebra/solver.tex) (SparseLinearAlgebra/gmres.tex
-[31
+[28] [29]<<c1937.cmap>>) [30] (SparseLinearAlgebra/solver.tex)
+(SparseLinearAlgebra/gmres.tex [31
 
-] [32] [33] [34]) (SparseLinearAlgebra/gcr.tex [35] [36]) [37]
-(SparseLinearAlgebra/gcro-dr.tex [38] [39] [40] [41] [42] [43] [44] [45]
-[46] [47] [48] [49] [50]) (SparseLinearAlgebra/evenodd.tex [51]
+] [32] [33] [34])
+(SparseLinearAlgebra/gcr.tex [35] [36]) [37] (SparseLinearAlgebra/gcro-dr.tex
+[38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] [50])
+(SparseLinearAlgebra/evenodd.tex [51]
 Overfull \hbox (1.25745pt too wide) detected at line 24
 []
  []
@@ -1310,9 +1311,8 @@ Overfull \hbox (57.54651pt too wide) in paragraph at lines 226--227
 [62]) [63] (Measurement/PlatqutteEnergy.tex) (Measurement/MesonCorrelator.tex
 [64
 
-] [65] [66] [67] [68]<<c1937.cmap>> [69])
-(Measurement/ChiralCondensateOfWilsonFermion.tex [70])
-(Measurement/Stochastic.tex [71] [72])
+] [65] [66] [67] [68] [69]) (Measurement/ChiralCondensateOfWilsonFermion.tex [7
+0]) (Measurement/Stochastic.tex [71] [72])
 (Measurement/StaggeredFermiomSpectrum.tex [73]
 Overfull \hbox (22.29858pt too wide) detected at line 54
 []
@@ -1525,10 +1525,10 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 201.
  ) 
 Here is how much of TeX's memory you used:
- 30351 strings out of 494838
- 512878 string characters out of 3178224
- 975248 words of memory out of 3000000
- 32489 multiletter control sequences out of 15000+200000
+ 30353 strings out of 494838
+ 512912 string characters out of 3178224
+ 975301 words of memory out of 3000000
+ 32490 multiletter control sequences out of 15000+200000
  555332 words of font info for 112 fonts, out of 3000000 for 9000
  17 hyphenation exceptions out of 8191
  44i,33n,63p,979b,1888s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1563,9 +1563,9 @@ ype1/public/amsfonts/euler/eufm10.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/
 public/amsfonts/symbols/msam7.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/publ
 ic/amsfonts/symbols/msbm10.pfb><D:/Program Files/MiKTeX 2.9/fonts/type1/public/
 amsfonts/symbols/msbm7.pfb>
-Output written on detail.pdf (136 pages, 1008164 bytes).
+Output written on detail.pdf (136 pages, 1009520 bytes).
 PDF statistics:
- 2478 PDF objects out of 2487 (max. 8388607)
- 954 named destinations out of 1000 (max. 500000)
+ 2481 PDF objects out of 2487 (max. 8388607)
+ 955 named destinations out of 1000 (max. 500000)
  949 words of extra memory for PDF output out of 10000 (max. 10000000)
 

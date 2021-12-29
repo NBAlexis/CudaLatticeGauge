@@ -473,6 +473,9 @@
     <ClInclude Include="Data\Field\CFieldFermionKS.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3REM.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -782,6 +785,9 @@
       <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSU1R.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3REM.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

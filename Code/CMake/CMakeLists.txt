@@ -75,6 +75,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.h
@@ -191,6 +192,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.cu
@@ -397,9 +399,11 @@ add_executable(StaggeredRotation
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureEM.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureU1.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateBeta.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateEM.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateU1.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate.cpp
