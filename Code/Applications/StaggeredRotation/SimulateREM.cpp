@@ -275,23 +275,23 @@ INT SimulateStaggeredRotationEM(CParameters& params)
     assert(polykov.Num() == uiRealRuned);
 
     appGeneral(_T("|Polyakov|={\n"));
-    for (UINT i = 0; i <= uiRealRuned; ++i)
+    for (INT i = 0; i <= uiRealRuned; ++i)
     {
         appGeneral(i == uiRealRuned ? _T("%2.10f\n ") : _T("%2.10f,\n"),
             _cuCabsf(polykov[i]));
     }
     appGeneral(_T("}\n\narg(Polyakov)={\n"));
 
-    for (UINT i = 0; i <= uiRealRuned; ++i)
+    for (INT i = 0; i <= uiRealRuned; ++i)
     {
         appGeneral(i == uiRealRuned ? _T("%2.10f\n ") : _T("%2.10f,\n"),
             polykovphase[i]);
     }
 
-    for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
+    for (INT x = 0; x < static_cast<INT>(CCommonData::m_sCenter.x); ++x)
     {
         appGeneral(_T("Polyakov[x=%d]={\n"), x);
-        for (UINT i = 0; i <= uiRealRuned; ++i)
+        for (INT i = 0; i <= uiRealRuned; ++i)
         {
             appGeneral(i == uiRealRuned ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
                 polykovX_nx[x][i].x,
