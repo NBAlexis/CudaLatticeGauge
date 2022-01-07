@@ -590,7 +590,7 @@ INT Measurement(CParameters& params)
                     break;
             }
 
-            if ((iEndN - uiN + 1) % uiNewLine == 0)
+            if (uiNewLine > 0 && ((iEndN - uiN + 1) % uiNewLine == 0))
             {
                 appSetLogDate(TRUE);
                 appGeneral(_T("\n="));

@@ -78,16 +78,16 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         return 1;
     }
 
-    const CCString sOldFileName;
+    CCString sOldFileName;
     Real fOldFilePolyakov = F(0.0);
     CCString sFileKeyName;
     CCString sPolyaKeyName;
     sFileKeyName.Format(_T("Nt%dFileName"), _HC_Lt);
     sPolyaKeyName.Format(_T("Nt%dPolyakov"), _HC_Lt);
-    params.FetchStringValue(sFileKeyName, sFileName);
+    params.FetchStringValue(sFileKeyName, sOldFileName);
     params.FetchValueReal(sPolyaKeyName, fOldFilePolyakov);
 
-    appGeneral(_T("file: %s, |p| : %f\n"), sFileName.c_str(), fOldFilePolyakov);
+    appGeneral(_T("file: %s, |p| : %f\n"), sOldFileName.c_str(), fOldFilePolyakov);
 
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     TArray<TArray<CLGComplex>> polykovX_nx;

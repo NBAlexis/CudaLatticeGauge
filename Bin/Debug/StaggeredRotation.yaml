@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_SimulateREM
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -19,14 +19,14 @@ JobSimulate:
     ExponentialPrecision : 10
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 1179
-    SaveStartIndex : 321
-    OmegaSep : 8
-    OmegaStart : 8
-    MaxOmega : 0.128
+    EquvibStep : 1
+    SaveStartIndex : 1015
+    OmegaSep : 1
+    OmegaStart : 1
+    MaxOmega : 0.008
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./SRF506130026_
+    SavePrefix : ./SRF4980204_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -49,8 +49,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./SRF506130026_R_Nt6_O8_321.con
-    Nt6Polyakov : 0.286030173302
+    Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    Nt6Polyakov : 0.022946210578
 
     Updator:
 
@@ -88,7 +88,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.13
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -119,7 +119,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.13
+        Mass : 0.2
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -150,7 +150,7 @@ JobSimulate:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.13
+        Mass : 0.2
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
@@ -182,7 +182,7 @@ JobSimulate:
 
         # 2am
         # Mass : 0.4
-        Mass : 0.026
+        Mass : 0.04
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
@@ -190,11 +190,11 @@ JobSimulate:
 
         # MC is to prepare
         # This is (x+0.0384/x)^{-1/4}
-        MC : [0.9958279922556589, -0.003471614578288403, 0.006510435326467733]
+        MC : [0.988087846183097, -0.0070337572362839966, 0.012149695891461821]
 
         # MD is to calculate force
         # This is (x+0.0384/x)^{1/2}
-        MD : [1.00669842363854, 0.007233287122377849, 0.0017901266639188112]
+        MD : [1.0192839071626443, 0.015390840632470528, 0.0028328749479887365]
 
 
     Action1:
@@ -202,7 +202,7 @@ JobSimulate:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.06
+        Beta : 4.98
         Omega : 0.0
 
     Action2:
@@ -330,21 +330,21 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.98
-    OmegaRange : 0.024
+    GaugeBate : 5.06
+    OmegaRange : 0.008
     StartOmega : 1
     EndOmega : 1
     StartN : 101
-    EndN : 2000
-    SaveFermionFile : 0
+    EndN : 1500
+    SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : ./510/Fermions/F510110022_
+    FermionFileHead : ./F4980204_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
     LoadFermion : 0
-    LoadFermionFile : F486295059_
-    LoadFermionHead : G:\SRFloat\486295059\Fermion
+    LoadFermionFile : F4980204_
+    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
@@ -357,12 +357,12 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 0
-    SubFolderPrefix : G:\SRFloat\4980204\Nt6\A40
+    SubFolderPrefix : G:\SRFloat\4980204\Nt6\A08
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : G:\SRFloat\4980204\Nt6\A40\SRF4980204_40_
-    CSVSavePrefix : ./SRF4980204_40_
+    SavePrefix : G:\SRFloat\506130026\GF\A08\GFSRF506130026_08_
+    CSVSavePrefix : ./SRF506130026_08_
 
     Dim : 4
     Dir : 4
@@ -399,7 +399,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.11
+        Mass : 0.2
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -430,7 +430,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.022
+        Mass : 0.04
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -1890,10 +1890,12 @@ JobMeasureREM:
 
     GaugeBate : 4.98
     OmegaRange : 0.024
-    StartOmega : 1
-    EndOmega : 1
+    ListStart : 1
+    ListEnd : 1
     StartN : 101
     EndN : 2000
+    OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
+    MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./510/Fermions/F510110022_

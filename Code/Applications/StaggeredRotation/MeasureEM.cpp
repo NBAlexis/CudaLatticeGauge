@@ -27,11 +27,11 @@ INT MeasurementEM(CParameters& params)
     appSetupLog(params);
 
     INT iVaule = 0;
-    params.FetchValueINT(_T("StartEM"), iVaule);
+    params.FetchValueINT(_T("EMStart"), iVaule);
     UINT iStartEM = static_cast<UINT>(iVaule);
 
     iVaule = 10;
-    params.FetchValueINT(_T("EndEM"), iVaule);
+    params.FetchValueINT(_T("EMEnd"), iVaule);
     UINT iEMEnd = static_cast<UINT>(iVaule);
 
     iVaule = 1;
