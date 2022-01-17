@@ -330,8 +330,8 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.06
-    OmegaRange : 0.008
+    GaugeBate : 5.02
+    OmegaRange : 0.040
     StartOmega : 1
     EndOmega : 1
     StartN : 101
@@ -361,8 +361,8 @@ JobMeasure:
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : G:\SRFloat\506130026\GF\A08\GFSRF506130026_08_
-    CSVSavePrefix : ./SRF506130026_08_
+    SavePrefix : H:\SRFloat\502165033\Nt6\A40\SRF502165033_40_
+    CSVSavePrefix : ./SRF502165033_40_
 
     Dim : 4
     Dir : 4
@@ -399,7 +399,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.165
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -430,7 +430,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.04
+        Mass : 0.033
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1

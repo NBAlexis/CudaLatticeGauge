@@ -673,11 +673,19 @@ INT MeasurementREM(CParameters& params)
             case EDJKS_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
+                if (pCCLight->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
+                if (pCCHeavy->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiListIdx, REM);
 
@@ -721,11 +729,19 @@ INT MeasurementREM(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiListIdx, REM);
 
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
+                if (pCCLight->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
+                if (pCCHeavy->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiListIdx, REM);
 

@@ -128,6 +128,10 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     param.FetchValueINT(_T("ShiftCenter"), iValue);
     m_bShiftCenter = iValue != 0;
 
+    iValue = 0;
+    param.FetchValueINT(_T("MeasureConnect"), iValue);
+    m_bMeasureConnect = iValue != 0;
+
     //assuming the center is really at center
     SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
 
@@ -211,7 +215,10 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         case ConnectSusp:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->InverseD(pAcceptGauge);
+                if (m_bMeasureConnect)
+                {
+                    pAfterApplied->InverseD(pAcceptGauge);
+                }
             }
             break;
         }

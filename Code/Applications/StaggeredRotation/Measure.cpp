@@ -679,11 +679,19 @@ INT Measurement(CParameters& params)
             case EDJKS_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                if (pCCLight->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+                if (pCCHeavy->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
 
@@ -727,11 +735,20 @@ INT Measurement(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiOmega, O);
 
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                if (pCCLight->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiOmega, O);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+
+                if (pCCHeavy->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiOmega, O);
+                }
+
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
 

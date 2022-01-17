@@ -449,11 +449,19 @@ INT MeasurementEM(CParameters& params)
             case EDJKSEM_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiEM, EM);
-                _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiEM, EM);
+                if (pCCLight->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiEM, EM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiEM, EM);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiEM, EM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiEM, EM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiEM, EM);
+                if (pCCHeavy->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiEM, EM);
+                }
+                
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiEM, EM);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiEM, EM);
 

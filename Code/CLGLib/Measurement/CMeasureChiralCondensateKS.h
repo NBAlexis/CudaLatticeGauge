@@ -47,7 +47,9 @@ public:
         , m_uiMaxR(1)
         , m_uiEdge(1)
         , m_bShiftCenter(FALSE)
+        
         , m_bShowResult(FALSE)
+        , m_bMeasureConnect(FALSE)
     {
         
     }
@@ -84,6 +86,7 @@ protected:
 
 public:
 
+    UBOOL m_bMeasureConnect;
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstCondAll[ChiralKSMax];
     TArray<CLGComplex> m_lstCondIn[ChiralKSMax];
