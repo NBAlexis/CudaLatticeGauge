@@ -109,13 +109,13 @@ public:
     void TestSetEtaShift(UBOOL bShift) { m_bEachSiteEta = bShift; }
     UBOOL TestIsEtaShift() const { return m_bEachSiteEta; }
 
-protected:
-
     //For some strange boundary condition
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
     UBOOL m_bEachSiteEta;
 
     Real m_f2am;
+
+protected:
 
     // r(x) = x^{1/4} use to prepare for Nf=2
     // r(x) = x^{3/8} use as s quark for Nf=2+1
