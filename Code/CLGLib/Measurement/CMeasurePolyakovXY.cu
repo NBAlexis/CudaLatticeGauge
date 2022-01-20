@@ -102,13 +102,27 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelPolyakovTraceOfSiteXY(
     const deviceSU3* __restrict__ resXYZ,
-    CLGComplex* resXY)
+    CLGComplex* resXY,
+    CLGComplex* resZ)
 {
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
-    UINT uiXYZ = uiXY * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
+    UINT uiZ = threadIdx.y + blockIdx.y * blockDim.y;
+    UINT uiXYZ = uiXY * _DC_Lz + uiZ;
     CLGComplex trres = resXYZ[uiXYZ].Tr();
     atomicAdd(&resXY[uiXY].x, trres.x);
     atomicAdd(&resXY[uiXY].y, trres.y);
+    if (NULL != resZ)
+    {
+        atomicAdd(&resZ[uiZ].x, trres.x);
+        atomicAdd(&resZ[uiZ].y, trres.y);
+    }
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelInitialZSlice(CLGComplex* resZ)
+{
+    resZ[threadIdx.x + blockIdx.x * blockDim.x] = _zeroc;
 }
 
 __global__ void
@@ -269,6 +283,16 @@ CMeasurePolyakovXY::~CMeasurePolyakovXY()
     {
         free(m_pHostDistributionP);
     }
+
+    if (NULL != m_pZDeviceLoopDensity)
+    {
+        checkCudaErrors(cudaFree(m_pZDeviceLoopDensity));
+    }
+
+    if (NULL != m_pZHostLoopDensity)
+    {
+        free(m_pZHostLoopDensity);
+    }
 }
 
 void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -292,6 +316,15 @@ void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
     iValue = 0;
     param.FetchValueINT(_T("MeasureZ"), iValue);
     m_bMeasureLoopZ = iValue != 0;
+
+    iValue = 0;
+    param.FetchValueINT(_T("ZSlice"), iValue);
+    m_bMeasureZSlice = iValue != 0;
+    if (m_bMeasureZSlice)
+    {
+        checkCudaErrors(cudaMalloc((void**)&m_pZDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lz));
+        m_pZHostLoopDensity = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lz);
+    }
 
     m_bMeasureDistribution = TRUE;
 
@@ -329,8 +362,23 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
         _kernelPolyakovLoopOfSite << <block1, threads1 >> > (pGaugeSU3->m_pDeviceData, uiT, m_pTmpLoop);
     }
     _ZeroXYPlaneC(m_pXYDeviceLoopDensity);
-    _kernelPolyakovTraceOfSiteXY << <block1, threads1 >> > (m_pTmpLoop, m_pXYDeviceLoopDensity);
+    if (m_bMeasureZSlice)
+    {
+        dim3 blockz(_HC_DecompY, 1, 1);
+        dim3 threadz(_HC_DecompLy, 1, 1);
+        _kernelInitialZSlice << <blockz , threadz >> > (m_pZDeviceLoopDensity);
+    }
+    _kernelPolyakovTraceOfSiteXY << <block1, threads1 >> > (m_pTmpLoop, m_pXYDeviceLoopDensity, m_pZDeviceLoopDensity);
     checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensity, m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+    if (m_bMeasureZSlice)
+    {
+        const Real fFactor = F(1.0) / static_cast<Real>(_HC_Lx * _HC_Ly);
+        checkCudaErrors(cudaMemcpy(m_pZHostLoopDensity, m_pZDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lz, cudaMemcpyDeviceToHost));
+        for (UINT i = 0; i < _HC_Lz; ++i)
+        {
+            m_lstPZSlice.AddItem(cuCmulf_cr(m_pZHostLoopDensity[i], fFactor));
+        }
+    }
     for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
     {
         m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[
@@ -531,6 +579,7 @@ void CMeasurePolyakovXY::Reset()
     m_lstR.RemoveAll();
     m_lstP.RemoveAll();
     m_lstPZ.RemoveAll();
+    m_lstPZSlice.RemoveAll();
 }
 
 __END_NAMESPACE

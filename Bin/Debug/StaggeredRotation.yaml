@@ -330,39 +330,39 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.02
-    OmegaRange : 0.040
-    StartOmega : 1
-    EndOmega : 1
+    GaugeBate : 4.94
+    OmegaRange : 0.128
+    StartOmega : 0
+    EndOmega : 8
     StartN : 101
-    EndN : 1500
+    EndN : 110
     SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : ./F4980204_
+    FermionFileHead : ./F494235047_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
-    LoadFermion : 0
-    LoadFermionFile : F4980204_
-    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
+    LoadFermion : 1
+    LoadFermionFile : F494235047_
+    LoadFermionHead : H:\SRFloat\494235047\Fermion
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_Polyakov
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 0
-    SubFolderPrefix : G:\SRFloat\4980204\Nt6\A08
+    SubFolder : 1
+    SubFolderPrefix : H:\SRFloat\494235047\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : H:\SRFloat\502165033\Nt6\A40\SRF502165033_40_
-    CSVSavePrefix : ./SRF502165033_40_
+    SavePrefix : GFSRF494235047_
+    CSVSavePrefix : ./SRF494235047_
 
     Dim : 4
     Dir : 4
@@ -399,7 +399,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.165
+        Mass : 0.235
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -430,7 +430,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.033
+        Mass : 0.047
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -681,9 +681,9 @@ JobSimulateEM:
     EquvibStep : 10
     SaveStartIndex : 0
     EMStart : 0
-    EMEnd : 4
-    ElectricList : [0, 0.3, 0.6, 0.9]
-    MagneticList : [0, 0, 0, 0]
+    EMEnd : 13
+    ElectricList : [0., 0.2617993877991494, 0.5235987755982988, 0.7853981633974483, 1.0471975511965976, 1.3089969389957472, 1.5707963267948966, 1.8325957145940461, 2.0943951023931953, 2.356194490192345, 2.6179938779914944, 2.8797932657906435, 3.141592653589793]
+    MagneticList : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     SavePrefix : ./SRF550_02EM_
     Additive : 0
 
@@ -865,13 +865,19 @@ JobMeasureEM:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.5
+    GaugeBate : 5.3
     EMStart : 0
-    EMEnd : 4
-    ElectricList : [0, 0.3, 0.6, 0.9]
-    MagneticList : [0, 0, 0, 0]
-    StartN : 1
-    EndN : 10
+    EMEnd : 13
+    ElectricList : [0., 0.2617993877991494, 0.5235987755982988, 0.7853981633974483, 1.0471975511965976, 1.3089969389957472, 1.5707963267948966, 1.8325957145940461, 2.0943951023931953, 2.356194490192345, 2.6179938779914944, 2.8797932657906435, 3.141592653589793]
+    MagneticList : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    StartN : 101
+    EndN : 120
+    SaveFermionFile : 1
+    FermionFileIndexStart : 1
+    FermionFileHead : ./F530_02EM_
+    LoadFermion : 0
+    LoadFermionFile : F4980204_
+    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EDJKSEM_Polyakov, EDJKSEM_Chiral
     DistributionJob : EDJKSEM_Chiral
     FermionMomentum : 0
@@ -880,17 +886,17 @@ JobMeasureEM:
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 0
-    SubFolderPrefix : ./EMTest
+    SubFolder : 1
+    SubFolderPrefix : I:\EW\53002\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./SRF550_02EM_
-    CSVSavePrefix : ./SRF550_02EM_
+    SavePrefix : ./SRF530_02EM_
+    CSVSavePrefix : ./SRF530_02EM_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 6, 4]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -1041,6 +1047,7 @@ JobMeasureEM:
         MeasureDist : 1
         MeasureZ : 1
         ShiftCenter : 0
+        ZSlice : 1
 
     Measure2:
 
@@ -1050,6 +1057,7 @@ JobMeasureEM:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
+        ZSlice : 1
 
     Measure3:
 
@@ -1059,6 +1067,7 @@ JobMeasureEM:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
+        ZSlice : 1
 
     Measure4:
 

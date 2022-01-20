@@ -79,6 +79,30 @@ INT MeasurementEM(CParameters& params)
     TArray<Real> lstM;
     params.FetchValueArrayReal(_T("MagneticList"), lstM);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("SaveFermionFile"), iVaule);
+    UBOOL bSaveFermion = 0 != iVaule;
+
+    iVaule = 1;
+    params.FetchValueINT(_T("FermionFileIndexStart"), iVaule);
+    UINT uiSaveFermionStart = static_cast<UINT>(iVaule);
+
+    CCString sFermionHead;
+    params.FetchStringValue(_T("FermionFileHead"), sFermionHead);
+    appGeneral(_T("FermionFileHead: %s\n"), sFermionHead.c_str());
+
+    iVaule = 0;
+    params.FetchValueINT(_T("LoadFermion"), iVaule);
+    const UINT uiLoadFermion = iVaule;
+
+    CCString sLoadFermionFile;
+    params.FetchStringValue(_T("LoadFermionFile"), sLoadFermionFile);
+    appGeneral(_T("Load Fermion File Name: %s\n"), sLoadFermionFile.c_str());
+
+    CCString sLoadFermionHead;
+    params.FetchStringValue(_T("LoadFermionHead"), sLoadFermionHead);
+    appGeneral(_T("Load Fermion File Head: %s\n"), sLoadFermionHead.c_str());
+
     if (0 == lstE.Num() && 0 != lstM.Num())
     {
         for (INT i = 0; i < lstM.Num(); ++i)
@@ -216,18 +240,59 @@ INT MeasurementEM(CParameters& params)
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
-                        if (bZ4)
+                        if (0 == (1 & uiLoadFermion))
                         {
-                            pF1Light->InitialField(EFIT_RandomZ4);
+                            if (bZ4)
+                            {
+                                pF1Light->InitialField(EFIT_RandomZ4);
+                            }
+                            else
+                            {
+                                pF1Light->InitialField(EFIT_RandomGaussian);
+                            }
+                            pF1Light->FixBoundary();
+                            pF1Light->CopyTo(pF2Light);
+                            pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Light->FixBoundary();
+
+                            if (bSaveFermion)
+                            {
+                                CCString sFermionFile = "";
+                                sFermionFile.Format(_T("%s_Light_Nt%d_EM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiEM, uiN, uiSaveFermionStart + i);
+                                CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
+                                CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
+                                CCString sFileContent = "";
+                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                                if (bZ4)
+                                {
+                                    sFileContent = sFileContent + _T("\nZ4\n");
+                                }
+                                else
+                                {
+                                    sFileContent = sFileContent + _T("\nGaussian\n");
+                                }
+                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Electric: ") + appFloatToString(CCommonData::m_fEz) + _T("\n");
+                                sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(CCommonData::m_fBz) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Light->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Chage: ") + appFloatToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Light)->GetQ()) + _T("\n");
+                                sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            }
                         }
                         else
                         {
-                            pF1Light->InitialField(EFIT_RandomGaussian);
+                            CCString sF1FileName = "";
+                            CCString sF2FileName = "";
+                            sF1FileName.Format(_T("%s/EM%d/Light/%s_Light_Nt%d_EM%d_%d_F%d_F1.con"),
+                                sLoadFermionHead.c_str(), uiEM, sLoadFermionFile.c_str(), _HC_Lt, uiEM, uiN, i + 1);
+                            sF2FileName.Format(_T("%s/EM%d/Light/%s_Light_Nt%d_EM%d_%d_F%d_F2.con"),
+                                sLoadFermionHead.c_str(), uiEM, sLoadFermionFile.c_str(), _HC_Lt, uiEM, uiN, i + 1);
+                            pF1Light->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                            pF2Light->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
-                        pF1Light->FixBoundary();
-                        pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Light->FixBoundary();
 
                         pCCLight->OnConfigurationAcceptedZ4(
                             appGetLattice()->m_pGaugeField,
@@ -245,18 +310,59 @@ INT MeasurementEM(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
-                        if (bZ4)
+                        if (0 == (2 & uiLoadFermion))
                         {
-                            pF1Heavy->InitialField(EFIT_RandomZ4);
+                            if (bZ4)
+                            {
+                                pF1Heavy->InitialField(EFIT_RandomZ4);
+                            }
+                            else
+                            {
+                                pF1Heavy->InitialField(EFIT_RandomGaussian);
+                            }
+                            pF1Heavy->FixBoundary();
+                            pF1Heavy->CopyTo(pF2Heavy);
+                            pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Heavy->FixBoundary();
+
+                            if (bSaveFermion)
+                            {
+                                CCString sFermionFile = "";
+                                sFermionFile.Format(_T("%s_Heavy_Nt%d_EM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiEM, uiN, uiSaveFermionStart + i);
+                                CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
+                                CCString sMD52 = pF2Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
+                                CCString sFileContent = "";
+                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                                if (bZ4)
+                                {
+                                    sFileContent = sFileContent + _T("\nZ4\n");
+                                }
+                                else
+                                {
+                                    sFileContent = sFileContent + _T("\nGaussian\n");
+                                }
+                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Electric: ") + appFloatToString(CCommonData::m_fEz) + _T("\n");
+                                sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(CCommonData::m_fBz) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Heavy->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Chage: ") + appFloatToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Heavy)->GetQ()) + _T("\n");
+                                sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                            }
                         }
                         else
                         {
-                            pF1Heavy->InitialField(EFIT_RandomGaussian);
+                            CCString sF1FileName = "";
+                            CCString sF2FileName = "";
+                            sF1FileName.Format(_T("%s/EM%d/Heavy/%s_Heavy_Nt%d_EM%d_%d_F%d_F1.con"),
+                                sLoadFermionHead.c_str(), uiEM, sLoadFermionFile.c_str(), _HC_Lt, uiEM, uiN, i + 1);
+                            sF2FileName.Format(_T("%s/EM%d/Heavy/%s_Heavy_Nt%d_EM%d_%d_F%d_F2.con"),
+                                sLoadFermionHead.c_str(), uiEM, sLoadFermionFile.c_str(), _HC_Lt, uiEM, uiN, i + 1);
+                            pF1Heavy->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                            pF2Heavy->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
                         }
-                        pF1Heavy->FixBoundary();
-                        pF1Heavy->CopyTo(pF2Heavy);
-                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Heavy->FixBoundary();
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
                             appGetLattice()->m_pGaugeField,
@@ -403,6 +509,7 @@ INT MeasurementEM(CParameters& params)
                 }
 
                 TArray<TArray<CLGComplex>> polyakovOmgR;
+                TArray<TArray<CLGComplex>> polyakovOmgZSlice;
                 TArray<CLGComplex> polyIn;
                 TArray<CLGComplex> polyOut;
 
@@ -413,6 +520,15 @@ INT MeasurementEM(CParameters& params)
                     {
                         thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
                     }
+                    if (pPL->m_bMeasureZSlice)
+                    {
+                        TArray<CLGComplex> thisConfigurationZSlice;
+                        for (UINT i = 0; i < _HC_Lz; ++i)
+                        {
+                            thisConfigurationZSlice.AddItem(pPL->m_lstPZSlice[j * _HC_Lz + i]);
+                        }
+                        polyakovOmgZSlice.AddItem(thisConfigurationZSlice);
+                    }
                     polyakovOmgR.AddItem(thisConfiguration);
                     polyIn.AddItem(pPL->m_lstLoopInner[j]);
                     polyOut.AddItem(pPL->m_lstLoop[j]);
@@ -420,6 +536,12 @@ INT MeasurementEM(CParameters& params)
                 lstPolyIn.AddItem(polyIn);
                 lstPolyOut.AddItem(polyOut);
                 WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
+                if (pPL->m_bMeasureZSlice)
+                {
+                    CCString sFileNameWrite3;
+                    sFileNameWrite3.Format(_T("%s_polyakovZSlice_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                    WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgZSlice);
+                }
 
                 if (pPL->m_bMeasureLoopZ)
                 {
@@ -475,6 +597,20 @@ INT MeasurementEM(CParameters& params)
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFileRealArray(sRadiousFile, lstRadius);
+                }
+
+                if (pCCLight->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, ChiralKS, uiEM, EM);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma3, uiEM, EM);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma4, uiEM, EM);
+                }
+
+                if (pCCHeavy->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, ChiralKS, uiEM, EM);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma3, uiEM, EM);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma4, uiEM, EM);
                 }
             }
             break;

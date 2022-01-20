@@ -39,6 +39,10 @@ public:
 protected:
 
     Real m_fQ;
+
+public:
+
+    Real GetQ() const { return m_fQ; }
 };
 
 __END_NAMESPACE

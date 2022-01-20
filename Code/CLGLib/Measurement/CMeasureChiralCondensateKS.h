@@ -38,6 +38,7 @@ public:
         : CMeasureStochastic()
         , m_uiConfigurationCount(0)
         , m_pHostXYBuffer(NULL)
+        , m_pHostZBuffer(NULL)
 
         , m_pDistributionR(NULL)
         , m_pDistribution(NULL)
@@ -50,6 +51,7 @@ public:
         
         , m_bShowResult(FALSE)
         , m_bMeasureConnect(FALSE)
+        , m_bMeasureZSlice(FALSE)
     {
         
     }
@@ -72,7 +74,9 @@ protected:
     UINT m_uiConfigurationCount;
 
     CLGComplex* m_pDeviceXYBuffer[ChiralKSMax];
+    CLGComplex* m_pDeviceZBuffer[ChiralKSMax];
     CLGComplex* m_pHostXYBuffer;
+    CLGComplex* m_pHostZBuffer;
     CLGComplex m_cTmpSum[ChiralKSMax];
 
     UINT* m_pDistributionR;
@@ -87,10 +91,12 @@ protected:
 public:
 
     UBOOL m_bMeasureConnect;
+    UBOOL m_bMeasureZSlice;
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstCondAll[ChiralKSMax];
     TArray<CLGComplex> m_lstCondIn[ChiralKSMax];
     TArray<CLGComplex> m_lstCond[ChiralKSMax];
+    TArray<CLGComplex> m_lstCondZSlice[ChiralKSMax];
     TArray<CLGComplex> m_lstDebugData[ChiralKSMax];
 };
 

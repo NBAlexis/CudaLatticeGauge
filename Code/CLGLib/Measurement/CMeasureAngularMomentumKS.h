@@ -33,6 +33,7 @@ public:
         : CMeasureStochastic()
         , m_uiConfigurationCount(0)
         , m_pHostXYBuffer(NULL)
+        , m_pHostZBuffer(NULL)
 
         , m_pDistributionR(NULL)
         , m_pDistribution(NULL)
@@ -43,6 +44,7 @@ public:
         , m_uiEdge(1)
         , m_bShiftCenter(FALSE)
         , m_bShowResult(FALSE)
+        , m_bMeasureZSlice(FALSE)
     {
         
     }
@@ -69,7 +71,9 @@ protected:
     UINT m_uiConfigurationCount;
 
     CLGComplex* m_pDeviceXYBuffer[EAngularMeasureMax];
+    CLGComplex* m_pDeviceZBuffer[EAngularMeasureMax];
     CLGComplex* m_pHostXYBuffer;
+    CLGComplex* m_pHostZBuffer;
     CLGComplex m_cTmpSum[EAngularMeasureMax];
 
     UINT* m_pDistributionR;
@@ -83,10 +87,12 @@ protected:
 
 public:
 
+    UBOOL m_bMeasureZSlice;
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstCondAll[EAngularMeasureMax];
     TArray<CLGComplex> m_lstCondIn[EAngularMeasureMax];
     TArray<CLGComplex> m_lstCond[EAngularMeasureMax];
+    TArray<CLGComplex> m_lstCondZSlice[EAngularMeasureMax];
 };
 
 __END_NAMESPACE

@@ -24,6 +24,7 @@ _kernelDotMeasureAllKS(
     const deviceSU3Vector* __restrict__ pZ4,
     const deviceSU3Vector* __restrict__ pApplied,
     CLGComplex* resultXYPlan,
+    CLGComplex* resZ,
 #if !_CLG_DOUBLEFLOAT
     cuDoubleComplex* result
 #else
@@ -37,10 +38,20 @@ _kernelDotMeasureAllKS(
     result[uiSiteIndex] = _cToDouble(pZ4[uiSiteIndex].ConjugateDotC(pApplied[uiSiteIndex]));
     atomicAdd(&resultXYPlan[_ixy].x, static_cast<Real>(result[uiSiteIndex].x));
     atomicAdd(&resultXYPlan[_ixy].y, static_cast<Real>(result[uiSiteIndex].y));
+    if (NULL != resZ)
+    {
+        atomicAdd(&resZ[sSite4.z].x, static_cast<Real>(result[uiSiteIndex].x));
+        atomicAdd(&resZ[sSite4.z].y, static_cast<Real>(result[uiSiteIndex].y));
+    }
 #else
     result[uiSiteIndex] = pZ4[uiSiteIndex].ConjugateDotC(pApplied[uiSiteIndex]);
     atomicAdd(&resultXYPlan[_ixy].x, result[uiSiteIndex].x);
     atomicAdd(&resultXYPlan[_ixy].y, result[uiSiteIndex].y);
+    if (NULL != resZ)
+    {
+        atomicAdd(&resZ[sSite4.z].x, result[uiSiteIndex].x);
+        atomicAdd(&resZ[sSite4.z].y, result[uiSiteIndex].y);
+    }
 #endif
 }
 
@@ -69,6 +80,26 @@ _kernelDotMeasureAllKSU1(
 #endif
 }
 
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelFillZSlice(
+    const CLGComplex* __restrict__ res,
+    CLGComplex** resZ)
+{
+    UINT uiXY= (threadIdx.x + blockIdx.x * blockDim.x);
+    UINT uiT = (threadIdx.z + blockIdx.z * blockDim.z);
+    UINT uiZ = threadIdx.y + blockIdx.y * blockDim.y;
+    resZ[uiZ][uiXY * _DC_Lt + uiT]
+    = res[uiXY * _DC_GridDimZT + uiZ * _DC_Lt + uiT];
+}
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelInitialZSliceChiralKS(CLGComplex* resZ)
+{
+    resZ[threadIdx.x + blockIdx.x * blockDim.x] = _zeroc;
+}
+
 #pragma endregion
 
 
@@ -82,9 +113,22 @@ CMeasureChiralCondensateKS::~CMeasureChiralCondensateKS()
         }
     }
 
+    if (NULL != m_pDeviceZBuffer[0])
+    {
+        for (UINT i = 0; i < ChiralKSMax; ++i)
+        {
+            checkCudaErrors(cudaFree(m_pDeviceZBuffer[i]));
+        }
+    }
+
     if (NULL != m_pHostXYBuffer)
     {
         free(m_pHostXYBuffer);
+    }
+
+    if (NULL != m_pHostZBuffer)
+    {
+        free(m_pHostZBuffer);
     }
 
     if (NULL != m_pDistributionR)
@@ -132,6 +176,25 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     param.FetchValueINT(_T("MeasureConnect"), iValue);
     m_bMeasureConnect = iValue != 0;
 
+    iValue = 0;
+    param.FetchValueINT(_T("ZSlice"), iValue);
+    m_bMeasureZSlice = iValue != 0;
+    if (m_bMeasureZSlice)
+    {
+        for (UINT i = 0; i < ChiralKSMax; ++i)
+        {
+            checkCudaErrors(cudaMalloc((void**)&m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz));
+        }
+        m_pHostZBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lz);
+    }
+    else
+    {
+        for (UINT i = 0; i < ChiralKSMax; ++i)
+        {
+            m_pDeviceZBuffer[i] = NULL;
+        }
+    }
+
     //assuming the center is really at center
     SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
 
@@ -152,6 +215,8 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 {
     if (bStart)
     {
+        dim3 blockz(_HC_DecompY, 1, 1);
+        dim3 threadz(_HC_DecompLy, 1, 1);
         for (UINT i = 0; i < ChiralKSMax; ++i)
         {
             _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
@@ -159,6 +224,11 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             if (m_bDebugDivation)
             {
                 m_lstDebugData[i].RemoveAll();
+            }
+
+            if (m_bMeasureZSlice)
+            {
+                _kernelInitialZSliceChiralKS << <blockz, threadz >> > (m_pDeviceZBuffer[i]);
             }
         }
     }
@@ -233,6 +303,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
                     pF1WSU3->m_pDeviceData,
                     pAfterSU3->m_pDeviceData,
                     m_pDeviceXYBuffer[i],
+                    m_bMeasureZSlice ? m_pDeviceZBuffer[i] : NULL,
                     _D_ComplexThreadBuffer
                     );
             }
@@ -307,6 +378,19 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             m_lstCondIn
         );
 
+        if (m_bMeasureZSlice)
+        {
+            const Real fDemon = F(1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
+            for (INT i = 0; i < static_cast<INT>(ChiralKSMax); ++i)
+            {
+                checkCudaErrors(cudaMemcpy(m_pHostZBuffer, m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz, cudaMemcpyDeviceToHost));
+                for (UINT j = 0; j < _HC_Lz; ++j)
+                {
+                    m_lstCondZSlice[i].AddItem(cuCmulf_cr(m_pHostZBuffer[j], fDemon));
+                }
+            }
+        }
+
         ++m_uiConfigurationCount;
     }
 }
@@ -372,6 +456,7 @@ void CMeasureChiralCondensateKS::Reset()
         m_lstCondAll[i].RemoveAll();
         m_lstCondIn[i].RemoveAll();
         m_lstCond[i].RemoveAll();
+        m_lstCondZSlice[i].RemoveAll();
     }
     m_lstR.RemoveAll();
 }

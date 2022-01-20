@@ -750,6 +750,13 @@ INT Measurement(CParameters& params)
                 
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiOmega, O);
+                if (pCCLight->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, ChiralKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma3, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCLight, CMTKSGamma4, uiOmega, O);
+                }
+
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiOmega, O);
 
                 if (pCCHeavy->m_bMeasureConnect)
@@ -759,13 +766,32 @@ INT Measurement(CParameters& params)
 
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                if (pCCHeavy->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, ChiralKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma3, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pCCHeavy, CMTKSGamma4, uiOmega, O);
+                }
 
                 _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pFALight, SpinKS, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pFALight, PotentialKS, uiOmega, O);
+                if (pFALight->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pFALight, OrbitalKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pFALight, SpinKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pFALight, PotentialKS, uiOmega, O);
+                }
+
                 _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS, uiOmega, O);
                 _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS, uiOmega, O);
+                if (pFAHeavy->m_bMeasureZSlice)
+                {
+                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, OrbitalKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, SpinKS, uiOmega, O);
+                    _CLG_EXPORT_CHIRALZSLICE(pFAHeavy, PotentialKS, uiOmega, O);
+                }
 
                 if (uiOmega == iStartOmega)
                 {

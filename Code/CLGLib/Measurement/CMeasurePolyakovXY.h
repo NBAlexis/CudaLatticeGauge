@@ -32,8 +32,10 @@ public:
     CMeasurePolyakovXY()
         : CMeasure()
           , m_pXYHostLoopDensity(NULL)
+          , m_pZHostLoopDensity(NULL)
           , m_pTmpDeviceSum(NULL)
           , m_pXYDeviceLoopDensity(NULL)
+          , m_pZDeviceLoopDensity(NULL)
           , m_pTmpLoop(NULL)
 
           , m_pTmpLoopZ(NULL)
@@ -49,6 +51,7 @@ public:
           , m_bMeasureDistribution(FALSE)
           , m_bShowResult(TRUE)
           , m_bMeasureLoopZ(FALSE)
+          , m_bMeasureZSlice(FALSE)
           , m_bShiftCenter(FALSE)
           , m_cAverageLoop()
     {
@@ -69,8 +72,10 @@ public:
 protected:
 
     CLGComplex* m_pXYHostLoopDensity;
+    CLGComplex* m_pZHostLoopDensity;
     CLGComplex* m_pTmpDeviceSum;
     CLGComplex* m_pXYDeviceLoopDensity;
+    CLGComplex* m_pZDeviceLoopDensity;
     deviceSU3* m_pTmpLoop;
     deviceSU3* m_pTmpLoopZ;
 
@@ -91,6 +96,7 @@ protected:
 public:
 
     UBOOL m_bMeasureLoopZ;
+    UBOOL m_bMeasureZSlice;
     UBOOL m_bShiftCenter;
 
     //all
@@ -115,6 +121,7 @@ public:
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstP;
     TArray<CLGComplex> m_lstPZ;
+    TArray<CLGComplex> m_lstPZSlice;
 };
 
 __END_NAMESPACE

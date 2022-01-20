@@ -211,6 +211,7 @@ _kernelMeasureDotAndDist(
     const deviceSU3Vector* __restrict__ pZ4,
     const deviceSU3Vector* __restrict__ pApplied,
     CLGComplex* resultXYPlan,
+    CLGComplex* resultZ,
 #if !_CLG_DOUBLEFLOAT
     cuDoubleComplex* result
 #else
@@ -224,11 +225,29 @@ _kernelMeasureDotAndDist(
     result[uiSiteIndex] = _cToDouble(pZ4[uiSiteIndex].ConjugateDotC(pApplied[uiSiteIndex]));
     atomicAdd(&resultXYPlan[_ixy].x, static_cast<Real>(result[uiSiteIndex].x));
     atomicAdd(&resultXYPlan[_ixy].y, static_cast<Real>(result[uiSiteIndex].y));
+    if (NULL != resultZ)
+    {
+        atomicAdd(&resultZ[sSite4.z].x, static_cast<Real>(result[uiSiteIndex].x));
+        atomicAdd(&resultZ[sSite4.z].y, static_cast<Real>(result[uiSiteIndex].y));
+    }
 #else
     result[uiSiteIndex] = pZ4[uiSiteIndex].ConjugateDotC(pApplied[uiSiteIndex]);
     atomicAdd(&resultXYPlan[_ixy].x, result[uiSiteIndex].x);
     atomicAdd(&resultXYPlan[_ixy].y, result[uiSiteIndex].y);
+    if (NULL != resultZ)
+    {
+        atomicAdd(&resultZ[sSite4.z].x, result[uiSiteIndex].x);
+        atomicAdd(&resultZ[sSite4.z].y, result[uiSiteIndex].y);
+    }
 #endif
+}
+
+
+__global__ void
+_CLG_LAUNCH_BOUND
+_kernelInitialZSliceAMomentumKS(CLGComplex* resZ)
+{
+    resZ[threadIdx.x + blockIdx.x * blockDim.x] = _zeroc;
 }
 
 #pragma endregion
@@ -243,9 +262,22 @@ CMeasureAngularMomentumKS::~CMeasureAngularMomentumKS()
         }
     }
 
+    if (NULL != m_pDeviceZBuffer[0])
+    {
+        for (UINT i = 0; i < ChiralKSMax; ++i)
+        {
+            checkCudaErrors(cudaFree(m_pDeviceZBuffer[i]));
+        }
+    }
+
     if (NULL != m_pHostXYBuffer)
     {
         free(m_pHostXYBuffer);
+    }
+
+    if (NULL != m_pHostZBuffer)
+    {
+        free(m_pHostZBuffer);
     }
 
     if (NULL != m_pDistributionR)
@@ -288,6 +320,25 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     iValue = 0;
     param.FetchValueINT(_T("ShiftCenter"), iValue);
     m_bShiftCenter = iValue != 0;
+
+    iValue = 0;
+    param.FetchValueINT(_T("ZSlice"), iValue);
+    m_bMeasureZSlice = iValue != 0;
+    if (m_bMeasureZSlice)
+    {
+        for (UINT i = 0; i < EAngularMeasureMax; ++i)
+        {
+            checkCudaErrors(cudaMalloc((void**)&m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz));
+        }
+        m_pHostZBuffer = (CLGComplex*)malloc(sizeof(CLGComplex) * _HC_Lz);
+    }
+    else
+    {
+        for (UINT i = 0; i < ChiralKSMax; ++i)
+        {
+            m_pDeviceZBuffer[i] = NULL;
+        }
+    }
 
     SetMaxAndEdge(&m_uiMaxR, &m_uiEdge, m_bShiftCenter);
     checkCudaErrors(cudaMalloc((void**)&m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1)));
@@ -360,10 +411,17 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
 {
     if (bStart)
     {
+        dim3 blockz(_HC_DecompY, 1, 1);
+        dim3 threadz(_HC_DecompLy, 1, 1);
         for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
             _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
             m_cTmpSum[i] = _zeroc;
+
+            if (m_bMeasureZSlice)
+            {
+                _kernelInitialZSliceAMomentumKS << <blockz, threadz >> > (m_pDeviceZBuffer[i]);
+            }
         }
     }
 
@@ -404,6 +462,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             pF1W->m_pDeviceData,
             pAfterApplied->m_pDeviceData,
             m_pDeviceXYBuffer[i],
+            m_bMeasureZSlice ? m_pDeviceZBuffer[i] : NULL,
             _D_ComplexThreadBuffer
             );
 
@@ -439,6 +498,19 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             m_lstCondAll,
             m_lstCondIn
         );
+
+        if (m_bMeasureZSlice)
+        {
+            const Real fDemon = F(1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
+            for (INT i = 0; i < static_cast<INT>(EAngularMeasureMax); ++i)
+            {
+                checkCudaErrors(cudaMemcpy(m_pHostZBuffer, m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz, cudaMemcpyDeviceToHost));
+                for (UINT j = 0; j < _HC_Lz; ++j)
+                {
+                    m_lstCondZSlice[i].AddItem(cuCmulf_cr(m_pHostZBuffer[j], fDemon));
+                }
+            }
+        }
 
         ++m_uiConfigurationCount;
     }
@@ -505,6 +577,7 @@ void CMeasureAngularMomentumKS::Reset()
         m_lstCondAll[i].RemoveAll();
         m_lstCondIn[i].RemoveAll();
         m_lstCond[i].RemoveAll();
+        m_lstCondZSlice[i].RemoveAll();
     }
     m_lstR.RemoveAll();
 }
