@@ -334,7 +334,7 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
     }
     else
     {
-        for (UINT i = 0; i < ChiralKSMax; ++i)
+        for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
             m_pDeviceZBuffer[i] = NULL;
         }
