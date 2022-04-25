@@ -615,47 +615,53 @@ INT Measurement(CParameters& params)
         {
             for (UINT i = 0; i < iFieldCount; ++i)
             {
-                if (bZ4)
+                if (NULL != pF1Light)
                 {
-                    pF1Light->InitialField(EFIT_RandomZ4);
-                }
-                else
-                {
-                    pF1Light->InitialField(EFIT_RandomGaussian);
-                }
-                pF1Light->FixBoundary();
-                pF1Light->CopyTo(pF2Light);
-                pF1Light->InverseD(appGetLattice()->m_pGaugeField);
-                pF1Light->FixBoundary();
+                    if (bZ4)
+                    {
+                        pF1Light->InitialField(EFIT_RandomZ4);
+                    }
+                    else
+                    {
+                        pF1Light->InitialField(EFIT_RandomGaussian);
+                    }
+                    pF1Light->FixBoundary();
+                    pF1Light->CopyTo(pF2Light);
+                    pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                    pF1Light->FixBoundary();
 
-                pCCLight->OnConfigurationAcceptedZ4(
-                    appGetLattice()->m_pGaugeField,
-                    NULL,
-                    pF2Light,
-                    pF1Light,
-                    0 == i,
-                    iFieldCount == i + 1);
-
-                if (bZ4)
-                {
-                    pF1Heavy->InitialField(EFIT_RandomZ4);
+                    pCCLight->OnConfigurationAcceptedZ4(
+                        appGetLattice()->m_pGaugeField,
+                        NULL,
+                        pF2Light,
+                        pF1Light,
+                        0 == i,
+                        iFieldCount == i + 1);
                 }
-                else
-                {
-                    pF1Heavy->InitialField(EFIT_RandomGaussian);
-                }
-                pF1Heavy->FixBoundary();
-                pF1Heavy->CopyTo(pF2Heavy);
-                pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
-                pF1Heavy->FixBoundary();
 
-                pCCHeavy->OnConfigurationAcceptedZ4(
-                    appGetLattice()->m_pGaugeField,
-                    NULL,
-                    pF2Heavy,
-                    pF1Heavy,
-                    0 == i,
-                    iFieldCount == i + 1);
+                if (NULL != pF1Heavy)
+                {
+                    if (bZ4)
+                    {
+                        pF1Heavy->InitialField(EFIT_RandomZ4);
+                    }
+                    else
+                    {
+                        pF1Heavy->InitialField(EFIT_RandomGaussian);
+                    }
+                    pF1Heavy->FixBoundary();
+                    pF1Heavy->CopyTo(pF2Heavy);
+                    pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                    pF1Heavy->FixBoundary();
+
+                    pCCHeavy->OnConfigurationAcceptedZ4(
+                        appGetLattice()->m_pGaugeField,
+                        NULL,
+                        pF2Heavy,
+                        pF1Heavy,
+                        0 == i,
+                        iFieldCount == i + 1);
+                }
             }
         }
         break;
@@ -750,10 +756,16 @@ INT Measurement(CParameters& params)
 
     if (ESSM_All == eJob || ESSM_Chiral == eJob)
     {
-        pF1Light->Return();
-        pF2Light->Return();
-        pF1Heavy->Return();
-        pF2Heavy->Return();
+        if (NULL != pF1Light)
+        {
+            pF1Light->Return();
+            pF2Light->Return();
+        }
+        if (NULL != pF1Heavy)
+        {
+            pF1Heavy->Return();
+            pF2Heavy->Return();
+        }
     }
 
 #pragma endregion
@@ -852,14 +864,20 @@ INT Measurement(CParameters& params)
     break;
     case ESSM_Chiral:
     {
-        _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
-        _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
-        _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-        _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
-        _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+		if (NULL != pF1Light)
+		{
+            _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+            _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+		}
+        if (NULL != pF1Heavy)
+        {
+            _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+        }
     }
     break;
     case ESSM_All:

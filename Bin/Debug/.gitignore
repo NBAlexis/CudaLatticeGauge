@@ -2,6 +2,7 @@
 *.log
 *.con
 *.txt
+*.csv
 
 /*.exp
 /*.ilk

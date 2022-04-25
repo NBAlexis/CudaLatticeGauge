@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_Measure
+RotationJob : ESR_MeasureEM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -865,21 +865,21 @@ JobMeasureEM:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.3
+    GaugeBate : 5.9
     EMStart : 0
     EMEnd : 13
     ElectricList : [0., 0.2617993877991494, 0.5235987755982988, 0.7853981633974483, 1.0471975511965976, 1.3089969389957472, 1.5707963267948966, 1.8325957145940461, 2.0943951023931953, 2.356194490192345, 2.6179938779914944, 2.8797932657906435, 3.141592653589793]
     MagneticList : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     StartN : 101
-    EndN : 120
-    SaveFermionFile : 1
+    EndN : 3000
+    SaveFermionFile : 0
     FermionFileIndexStart : 1
-    FermionFileHead : ./F530_02EM_
+    FermionFileHead : ./F520_02EM_
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EDJKSEM_Polyakov, EDJKSEM_Chiral
-    DistributionJob : EDJKSEM_Chiral
+    DistributionJob : EDJKSEM_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
@@ -887,12 +887,12 @@ JobMeasureEM:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : I:\EW\53002\Nt6
+    SubFolderPrefix : G:\EW\53802\Nt6
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./SRF530_02EM_
-    CSVSavePrefix : ./SRF530_02EM_
+    SavePrefix : SRF538_02EM_
+    CSVSavePrefix : G:\EW\53802\Polyakov\SRF538_02EM_
 
     Dim : 4
     Dir : 4

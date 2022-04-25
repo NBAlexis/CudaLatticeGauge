@@ -2,6 +2,7 @@
 *.log
 *.con
 *.txt
+*.csv
 
 /SampleProducer
 /curand64_10.dll

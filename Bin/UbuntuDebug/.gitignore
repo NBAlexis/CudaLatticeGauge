@@ -2,6 +2,7 @@
 *.log
 *.con
 *.txt
+*.csv
 
 /*.con_
 /CLGTest

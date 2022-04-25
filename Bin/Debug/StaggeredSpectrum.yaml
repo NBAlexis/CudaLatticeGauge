@@ -297,12 +297,12 @@ JobMeasure:
     LoadDouble : 1
 
     StartN : 201
-    EndN : 800
+    EndN : 205
     # {ESSM_Polyakov, ESSM_Wilson, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
-    MeasureType : ESSM_Wilson
+    MeasureType : ESSM_Chiral
     SavePrefix : G:\SRMatching\Projective\482325065\Matching\P482325065_
     # Chiral, Meson, MesonSimple, Polyakov, Wilson
-    CSVSavePrefix : G:\SRMatching\Projective\482325065\Wilson\P482325065_
+    CSVSavePrefix : ./P482325065_
     UseZ4 : 1
     StochasticFieldCount : 4
 
@@ -315,8 +315,8 @@ JobMeasure:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 5
-    FermionFieldCount : 4
+    ActionListLength : 2
+    FermionFieldCount : 1
     MeasureListLength : 6
     CacheStaple : 1
     DoSmearing : 1
