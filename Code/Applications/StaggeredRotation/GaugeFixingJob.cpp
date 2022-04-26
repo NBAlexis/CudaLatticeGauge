@@ -58,6 +58,9 @@ INT GaugeFixing(CParameters& params)
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
 
+    CCString sMiddle = _T("O");
+    params.FetchStringValue(_T("Middle"), sMiddle);
+    appGeneral(_T("Middle: %s\n"), sMiddle.c_str());
 
     CCString sLoadPrefix;
     params.FetchStringValue(_T("LoadPrefix"), sLoadPrefix);
@@ -91,18 +94,18 @@ INT GaugeFixing(CParameters& params)
     {
         for (UINT uiOmega = iOmegaStart; uiOmega <= iOmegaEnd; ++uiOmega)
         {
-            appGeneral(_T("====== Start O%d : %d to %d ======\n"), uiOmega, iIndexStart, iIndexEnd);
+            appGeneral(_T("====== Start %s%d : %d to %d ======\n"), sMiddle.c_str(), uiOmega, iIndexStart, iIndexEnd);
             appSetLogDate(FALSE);
             for (UINT uiIndex = iIndexStart; uiIndex <= iIndexEnd; ++uiIndex)
             {
                 CCString sSaveFile;
                 if (!bCheckSubFolder)
                 {
-                    sSaveFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sSaveFile.Format(_T("%sR_Nt%d_%s%d_%d.con"), sSavePrefix.c_str(), uiNt, sMiddle.c_str(), uiOmega, uiIndex);
                 }
                 else
                 {
-                    sSaveFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sSaveFile.Format(_T("%s%d/%sR_Nt%d_%s%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, sMiddle.c_str(), uiOmega, uiIndex);
                 }
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, eLoadType);
 #if !_CLG_DOUBLEFLOAT
@@ -129,21 +132,21 @@ INT GaugeFixing(CParameters& params)
                 {
                     if (fRes >= F(0.0) && fRes < F(0.01))
                     {
-                        appGeneral(_T("\nNot good enough O%d : %d \n"), uiOmega, uiIndex);
+                        appGeneral(_T("\nNot good enough %s%d : %d \n"), sMiddle.c_str(), uiOmega, uiIndex);
                         appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
                         appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
                     }
                     else
                     {
-                        appGeneral(_T("\nBad O%d : %d \n"), uiOmega, uiIndex);
+                        appGeneral(_T("\nBad %s%d : %d \n"), sMiddle.c_str(), uiOmega, uiIndex);
                         CCString sLoadFile;
                         if (bSubFolder)
                         {
-                            sLoadFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                            sLoadFile.Format(_T("%s%d/%sR_Nt%d_%s%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiOmega, uiIndex);
                         }
                         else
                         {
-                            sLoadFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                            sLoadFile.Format(_T("%sR_Nt%d_%s%d_%d.con"), sLoadPrefix.c_str(), uiNt, sMiddle.c_str(), uiOmega, uiIndex);
                         }
                         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                         appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
@@ -152,7 +155,7 @@ INT GaugeFixing(CParameters& params)
                 }
                 else
                 {
-                    appGeneral(_T("\nBad O%d : %d, is %2.20f\n"), uiOmega, uiIndex, fRes);
+                    appGeneral(_T("\nBad %s%d : %d, is %2.20f\n"), sMiddle.c_str(), uiOmega, uiIndex, fRes);
                 }
             }
             appSetLogDate(TRUE);
@@ -168,14 +171,14 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 if (bSubFolder)
                 {
-                    sLoadFile.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, uiOmega, uiIndex);
+                    sLoadFile.Format(_T("%s%d/%sR_Nt%d_%s%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sLoadPrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiOmega, uiIndex);
                 }
                 else
                 {
-                    sLoadFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
+                    sLoadFile.Format(_T("%sR_Nt%d_%s%d_%d.con"), sLoadPrefix.c_str(), uiNt, sMiddle.c_str(), uiOmega, uiIndex);
                 }
-                sSaveFile.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
-                appGeneral(_T("Fixing O%d : %d \n"), uiOmega, uiIndex);
+                sSaveFile.Format(_T("%sR_Nt%d_%s%d_%d.con"), sSavePrefix.c_str(), uiNt, sMiddle.c_str(), uiOmega, uiIndex);
+                appGeneral(_T("Fixing %s%d : %d \n"), sMiddle.c_str(), uiOmega, uiIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                 appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
                 appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);

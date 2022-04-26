@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_MeasureEM
+RotationJob : ESR_GaugeFixing
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -615,17 +615,18 @@ JobGaugeFixing:
     ShowParameterContent : 1
 
     Nt : 6
-    OmegaStart : 8
-    OmegaEnd : 8
+    OmegaStart : 0
+    OmegaEnd : 12
     IndexStart : 101
-    IndexEnd : 1500
+    IndexEnd : 3000
 
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\7000204\Nt6
-    LoadPrefix : SRF7000204_
+    SubFolderPrefix : H:\EW\54002\Nt6\EM
+    LoadPrefix : SRF540_02EM_
+    Middle : EM
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
-    SavePrefix : ./7000204/GF/GFSRF7000204_
+    SavePrefix : H:\EW\54002\GF\GFSRF540_02EM_
     UseLogADefinition : 0
     OnlyCheck : 0
     CheckAndFix : 0
