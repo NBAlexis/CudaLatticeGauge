@@ -1050,7 +1050,7 @@ void CFieldFermionKSSU3::InitialFieldWithFile(const CCString& sFileName, EFieldF
     BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
     if (NULL == data)
     {
-        appCrucial(_T("File not found: %s\n"), sFileName);
+        appCrucial(_T("File not found: %s\n"), sFileName.c_str());
         _FAIL_EXIT;
     }
     if (uiSize != static_cast<UINT>(sizeof(Real) * 6 * m_uiSiteCount))

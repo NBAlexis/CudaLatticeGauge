@@ -86,6 +86,7 @@ static QWORD* FoldDataMD5_OLD(UINT& iBlockCount, const BYTE* pInData, UINT iData
     iFinalCount = iFinalCount < iLength ? iLength - 1 : iFinalCount;
     const UINT iNewLength = ((iFinalCount >> 4) + 1) * 16;
     QWORD* pNewsValue = (QWORD*)malloc(sizeof(QWORD) * iNewLength);
+    assert(NULL != pNewsValue);
     memset(pNewsValue, 0, sizeof(QWORD) * iNewLength);
     memcpy(pNewsValue, retVal, sizeof(QWORD) * iLength);
     pNewsValue[iDataCount >> 2] |= 128 << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array

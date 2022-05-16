@@ -116,6 +116,7 @@ INT SimulateStaggeredRotation(CParameters& params)
         }
 
         CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
+        //CActionGaugePlaquette* pGaugeNoRotation = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
         CCString sHeader;
         sHeader.Format(_T("Nt%d"), uiNt);
         appSetLogHeader(sHeader);
@@ -152,7 +153,14 @@ INT SimulateStaggeredRotation(CParameters& params)
         if (bNeedBake && iBeforeEquib > 0)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-            pGaugeRotation->SetOmega(F(0.0));
+            if (NULL != pGaugeRotation)
+            {
+                pGaugeRotation->SetOmega(F(0.0));
+            }
+            else
+            {
+                appCrucial(_T("!!! Note you are using a no rotating action!\n"));
+            }
 
             appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
 
@@ -191,7 +199,14 @@ INT SimulateStaggeredRotation(CParameters& params)
             appSetLogHeader(sHeader);
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
 
-            pGaugeRotation->SetOmega(fSep * uiOmega);
+            if (NULL != pGaugeRotation)
+            {
+                pGaugeRotation->SetOmega(fSep * uiOmega);
+            }
+            else
+            {
+                appCrucial(_T("!!! NOTE: you are using non-rotating action!!!\n"));
+            }
 
             if (bAdditive)
             {

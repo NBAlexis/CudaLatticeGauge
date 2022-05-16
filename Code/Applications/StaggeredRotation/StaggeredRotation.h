@@ -54,9 +54,9 @@ WriteStringFileComplexArray(sFileNameWrite##measureName##lstName##In, lstName##m
 
 
 #define _CLG_EXPORT_CHIRALZSLICE(measureName, lstName, variableName, fileIdxHead) \
-CCString sFileNameWrite##measureName##lstName = _T("%s_condensate"); \
-sFileNameWrite##measureName##lstName = sFileNameWrite##measureName##lstName + _T(#measureName) + _T(#lstName) + _T("ZSlice_Nt%d_") + _T(#fileIdxHead) + _T("%d.csv"); \
-sFileNameWrite##measureName##lstName.Format(sFileNameWrite##measureName##lstName, sCSVSavePrefix.c_str(), _HC_Lt, variableName); \
+CCString sFileNameWrite##measureName##lstName##ZSlice = _T("%s_condensate"); \
+sFileNameWrite##measureName##lstName##ZSlice = sFileNameWrite##measureName##lstName##ZSlice + _T(#measureName) + _T(#lstName) + _T("ZSlice_Nt%d_") + _T(#fileIdxHead) + _T("%d.csv"); \
+sFileNameWrite##measureName##lstName##ZSlice.Format(sFileNameWrite##measureName##lstName##ZSlice, sCSVSavePrefix.c_str(), _HC_Lt, variableName); \
 TArray<TArray<CLGComplex>> lstName##measureName##ZSlice; \
 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
 { \
@@ -67,7 +67,7 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     } \
     lstName##measureName##ZSlice.AddItem(thisConfiguration); \
 } \
-WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName, lstName##measureName##ZSlice); 
+WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName##ZSlice, lstName##measureName##ZSlice); 
 
 
 #define _CLG_EXPORT_ANGULAR(measureName, lstName, variableName, fileIdxHead) \

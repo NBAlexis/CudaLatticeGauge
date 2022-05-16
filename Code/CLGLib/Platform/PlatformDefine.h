@@ -19,10 +19,12 @@
 #pragma warning(disable : 4505) /* local unreferenced function removed */
 #pragma warning(disable : 4100) /* unreferenced formal parameter */
 #pragma warning(disable : 4201) /* nonstandard extension used: nameless struct/union */
+#pragma warning(disable : 26812) /* enum related */
 
 //It dosen't work for intellisense warnings.
 #pragma warning(disable : 26451) /* arithmetic overflow */
 #pragma warning(disable : 26495) /* always initialize a member variable */
+
 
 #pragma endregion Warnings
 

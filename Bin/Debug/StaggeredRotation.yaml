@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_GaugeFixing
+RotationJob : ESR_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -17,16 +17,16 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 10
-    BeforeEquvibStep : 0
+    BeforeEquvibStep : 5
     EquvibSkip : 0
-    EquvibStep : 1
-    SaveStartIndex : 1015
+    EquvibStep : 5
+    SaveStartIndex : 0
     OmegaSep : 1
-    OmegaStart : 1
+    OmegaStart : 0
     MaxOmega : 0.008
-    MinNt : 6
-    MaxNt : 6
-    SavePrefix : ./SRF4980204_
+    MinNt : 4
+    MaxNt : 4
+    SavePrefix : ./RWSRF580018036_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -34,7 +34,7 @@ JobSimulate:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [6, 6, 6, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
@@ -49,8 +49,8 @@ JobSimulate:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
-    Nt6Polyakov : 0.022946210578
+    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    # Nt6Polyakov : 0.022946210578
 
     Updator:
 
@@ -82,13 +82,14 @@ JobSimulate:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.18
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -113,13 +114,14 @@ JobSimulate:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.18
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
@@ -144,13 +146,14 @@ JobSimulate:
     FermionField3:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.18
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
@@ -175,14 +178,15 @@ JobSimulate:
     FermionField4:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
         # Mass : 0.4
-        Mass : 0.04
+        Mass : 0.036
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
@@ -190,19 +194,20 @@ JobSimulate:
 
         # MC is to prepare
         # This is (x+0.0384/x)^{-1/4}
-        MC : [0.988087846183097, -0.0070337572362839966, 0.012149695891461821]
+        MC : [0.990577505843871, -0.005956027818373708, 0.010482604242040627]
 
         # MD is to calculate force
         # This is (x+0.0384/x)^{1/2}
-        MD : [1.0192839071626443, 0.015390840632470528, 0.0028328749479887365]
+        MD : [1.0152096028540707, 0.012843687857573033, 0.00254889085912725]
 
 
     Action1:
    
-        ActionName : CActionGaugePlaquetteRotating
+        # ActionName : CActionGaugePlaquetteRotating
+        ActionName : CActionGaugePlaquette
         CloverEnergy : 1
-        ShiftCoord : 1
-        Beta : 4.98
+        # ShiftCoord : 1
+        Beta : 5.8
         Omega : 0.0
 
     Action2:
