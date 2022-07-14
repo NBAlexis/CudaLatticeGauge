@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_Simulate
+RotationJob : ESR_MeasureREM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -1903,17 +1903,17 @@ JobMeasureREM:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.98
-    OmegaRange : 0.024
-    ListStart : 1
-    ListEnd : 1
+    GaugeBate : 4.94
+    ListStart : 0
+    ListEnd : 10
     StartN : 101
-    EndN : 2000
+    EndN : 105
     OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
-    MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
-    SaveFermionFile : 0
+    # MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
+    MagneticList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : ./510/Fermions/F510110022_
+    FermionFileHead : ./F494235047_EM0_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
@@ -1921,34 +1921,31 @@ JobMeasureREM:
     LoadFermionFile : F486295059_
     LoadFermionHead : G:\SRFloat\486295059\Fermion
 
-    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
-    ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
-    ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_Polyakov
-    FermionMomentum : 0
-    StochasticFieldCount : 10
-    StochasticGaussian : 1
+    ## EDJKSR_Polyakov, EDJKSR_AngularMomentum, EDJKSR_ChiralAndFermionMomentum
+    DistributionJob : EDJKSR_ChiralAndFermionMomentum
+    StochasticFieldCount : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 0
-    SubFolderPrefix : G:\SRFloat\4980204\Nt6\A40
+    SubFolder : 1
+    SubFolderPrefix : H:\REM\494\EM0\O
+    Middle : REM
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : G:\SRFloat\4980204\Nt6\A40\SRF4980204_40_
-    CSVSavePrefix : ./SRF4980204_40_
+    SavePrefix : SRF494235047_EM0_
+    CSVSavePrefix : ./SRF494235047_EM0_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [14, 14, 14, 6]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    FermionFieldCount : 2
+    FermionFieldCount : 3
     MeasureListLength : 9
     CacheStaple : 0
     AlsoCheckMD5 : 0
@@ -1968,25 +1965,18 @@ JobMeasureREM:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3REM
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.11
+        Mass : 0.047
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
-
-        # MD is to calculate force
-        # This is x^{-1/8}
-        # TMD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+        EMChange : 0.666666666666666667
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1999,25 +1989,42 @@ JobMeasureREM:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
+        FieldName : CFieldFermionKSSU3REM
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.022
+        Mass : 0.047
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
+        EMChange : -0.333333333333333333333333
 
         # MC is to prepare
-        # This is x^{1/16}
-        # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
 
         # MD is to calculate force
-        # This is x^{-1/8}
-        # MD : [0.8119871593409086, 0.002473563773173264, 0.02137567181944919, 0.2820048164513967, 0.002828181504328162, 0.04666636384428564, 0.7031369593015162]
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    FermionField3:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3REM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.235
+        FieldId : 4
+        PoolNumber : 15
+        EachSiteEta : 1
+        Period : [1, 1, 1, -1]
+        EMChange : -0.333333333333333333333333
 
         # MC is to prepare
         # This is x^{1/8}
@@ -2073,29 +2080,27 @@ JobMeasureREM:
         Restart : 500
         AbsoluteAccuracy : 1
 
-    MSSolver:
+    Solver3:
 
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 2
-        DiviationStep : 20
-        MaxStep : 500
-        Accuracy : 0.001
-        AbsoluteAccuracy : 1
-        # SolverName : CMultiShiftFOM
-        # SolverForFieldId : 2
-        # UseCudaForSmallMatrix : 0
-        # MaxDim : 30
-        # Accuracy : 0.0001
-        # Restart : 100
-        # AbsoluteAccuracy : 1
+        SolverForFieldId : 4
 
-    MSSolver2:
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
 
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 3
-        DiviationStep : 20
-        MaxStep : 500
-        Accuracy : 0.001
+        DiviationStep : 10
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
         AbsoluteAccuracy : 1
 
     Measure1:
@@ -2125,7 +2130,17 @@ JobMeasureREM:
         ShiftCenter : 1
         DebugDivation : 0
 
+
     Measure4:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 4
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 1
+        DebugDivation : 0
+
+    Measure5:
 
         MeasureName : CMeasureAngularMomentumKS
         FieldId : 2
@@ -2133,7 +2148,7 @@ JobMeasureREM:
         ShowResult : 0
         ShiftCenter : 1
 
-    Measure5:
+    Measure6:
 
         MeasureName : CMeasureAngularMomentumKS
         FieldId : 3
@@ -2141,7 +2156,15 @@ JobMeasureREM:
         ShowResult : 0
         ShiftCenter : 1
 
-    Measure6:
+    Measure7:
+
+        MeasureName : CMeasureAngularMomentumKS
+        FieldId : 4
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 1
+
+    Measure8:
 
         MeasureName : CMeasureAMomentumJG
         FieldId : 1
@@ -2151,18 +2174,6 @@ JobMeasureREM:
         MeasureApprox : 0
         ProjectivePlane : 1
         NaiveNabla : 0
-
-    Measure7:
-
-        MeasureName : CMeasureConnectedSusceptibilityKS
-        FieldId : 2
-        ShowResult : 0
-
-    Measure8:
-
-        MeasureName : CMeasureConnectedSusceptibilityKS
-        FieldId : 3
-        ShowResult : 0
 
     Measure9:
 

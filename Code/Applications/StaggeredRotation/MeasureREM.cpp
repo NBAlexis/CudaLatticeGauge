@@ -9,18 +9,88 @@
 
 #include "StaggeredRotation.h"
 
-__DEFINE_ENUM(EDistributionJobKS,
-    EDJKS_Polyakov,
-    EDJKS_Chiral,
-    EDJKS_AngularMomentum,
-    EDJKS_ChiralAndFermionMomentum,
-    EDJKS_PlaqutteEnergy,
-    EDJKS_CheckMD5,
-    EDJKS_VR,
-    EDJKS_DoubleToFloat,
+__DEFINE_ENUM(EDistributionJobKSREM,
+    EDJKSR_Polyakov,
+    EDJKSR_Chiral,
+    EDJKSR_AngularMomentum,
+    EDJKSR_ChiralAndFermionMomentum,
+    EDJKSR_PlaqutteEnergy,
+    EDJKSR_CheckMD5,
+    EDJKSR_VR,
+    EDJKSR_DoubleToFloat,
     )
 
 
+
+#define __REM_MEASURE_FERMION(ftype, savetag) \
+    if (0 == (savetag & uiLoadFermion)) \
+    { \
+        if (bZ4) \
+        { \
+            pF1##ftype->InitialField(EFIT_RandomZ4); \
+        } \
+        else \
+        { \
+            pF1##ftype->InitialField(EFIT_RandomGaussian); \
+        } \
+        pF1##ftype->FixBoundary(); \
+        pF1##ftype->CopyTo(pF2##ftype); \
+        pF1##ftype->InverseD(appGetLattice()->m_pGaugeField); \
+        pF1##ftype->FixBoundary(); \
+        if (bSaveFermion) \
+        { \
+            CCString sFermionFile = ""; \
+            sFermionFile.Format(_T("%s_%s_Nt%d_%s%d_%d_F%d"), sFermionHead.c_str(), #ftype, _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, uiSaveFermionStart + i); \
+            CCString sMD51 = pF1##ftype->SaveToFile(sFermionFile + _T("_F1.con")); \
+            CCString sMD52 = pF2##ftype->SaveToFile(sFermionFile + _T("_F2.con")); \
+            CCString sFileContent = ""; \
+            sFileContent = _T("Stochastic Fermion File for ") + sFileName; \
+            if (bZ4) \
+            { \
+                sFileContent = sFileContent + _T("\nZ4\n"); \
+            } \
+            else \
+            { \
+                sFileContent = sFileContent + _T("\nGaussian\n"); \
+            } \
+            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n"); \
+            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n"); \
+            sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n"); \
+            sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n"); \
+            sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(CCommonData::m_fBz) + _T("\n"); \
+            sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1##ftype->m_f2am) + _T("\n"); \
+            sFileContent = sFileContent + _T("Chage: ") + appFloatToString(pF1##ftype->GetQ()) + _T("\n"); \
+            sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1##ftype->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n"); \
+            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent); \
+        } \
+    } \
+    else \
+    { \
+        CCString sF1FileName = ""; \
+        CCString sF2FileName = ""; \
+        sF1FileName.Format(_T("%s%d/%s/%s_%s_Nt%d_%s%d_%d_F%d_F1.con"), \
+            sLoadFermionHead.c_str(), uiListIdx, #ftype, sLoadFermionFile.c_str(), #ftype, _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, i + 1); \
+        sF2FileName.Format(_T("%s%d/%s/%s_%s_Nt%d_%s%d_%d_F%d_F2.con"), \
+            sLoadFermionHead.c_str(), uiListIdx, #ftype, sLoadFermionFile.c_str(), #ftype, _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, i + 1); \
+        pF1##ftype->InitialFieldWithFile(sF1FileName, EFFT_CLGBin); \
+        pF2##ftype->InitialFieldWithFile(sF2FileName, EFFT_CLGBin); \
+    } \
+ \
+pCC##ftype->OnConfigurationAcceptedZ4( \
+    appGetLattice()->m_pGaugeField, \
+    NULL, \
+    pF2##ftype, \
+    pF1##ftype, \
+    0 == i, \
+    iFieldCount == i + 1); \
+\
+pFA##ftype->OnConfigurationAcceptedZ4( \
+    appGetLattice()->m_pGaugeField, \
+    NULL, \
+    pF2##ftype, \
+    pF1##ftype, \
+    0 == i, \
+    iFieldCount == i + 1); \
 
 
 INT MeasurementREM(CParameters& params)
@@ -57,10 +127,6 @@ INT MeasurementREM(CParameters& params)
     UINT iFieldCount = static_cast<UINT>(iVaule);
 
     iVaule = 0;
-    params.FetchValueINT(_T("AlsoCheckMD5"), iVaule);
-    UBOOL bCheckMd5 = (0 != iVaule);
-
-    iVaule = 0;
     params.FetchValueINT(_T("MeasureCCS"), iVaule);
     UBOOL bMeasureCCS = (0 != iVaule);
 
@@ -72,13 +138,17 @@ INT MeasurementREM(CParameters& params)
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
 
-    CCString sValue = _T("EDJ_Polyakov");
+    CCString sValue = _T("EDJKSR_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
-    EDistributionJobKS eJob = __STRING_TO_ENUM(EDistributionJobKS, sValue);
+    EDistributionJobKSREM eJob = __STRING_TO_ENUM(EDistributionJobKSREM, sValue);
 
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
     appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
+
+    CCString sMiddle;
+    params.FetchStringValue(_T("Middle"), sMiddle);
+    appGeneral(_T("middle: %s\n"), sMiddle.c_str());
 
     CCString sCSVSavePrefix;
     params.FetchStringValue(_T("CSVSavePrefix"), sCSVSavePrefix);
@@ -145,48 +215,41 @@ INT MeasurementREM(CParameters& params)
     TArray<TArray<CLGComplex>> lstPolyInZ;
     TArray<TArray<CLGComplex>> lstPolyOutZ;
 
-    //============================================
-    // Attention here heavy light is wrong
-    // "heavy" is light, "light" is heavy
-    //============================================
-    
+   
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-    CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
-    CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
-    CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
+    CMeasureChiralCondensateKS* pCCu = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+    CMeasureChiralCondensateKS* pCCd = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CMeasureChiralCondensateKS* pCCs = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
 
-    //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
+    CMeasureAngularMomentumKS* pFAu = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureAngularMomentumKS* pFAd = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+    CMeasureAngularMomentumKS* pFAs = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
+
+    CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
-    CFieldFermionKSSU3* pF1Light = NULL;
-    CFieldFermionKSSU3* pF2Light = NULL;
-    CFieldFermionKSSU3* pF1Heavy = NULL;
-    CFieldFermionKSSU3* pF2Heavy = NULL;
+    CFieldFermionKSSU3REM* pF1u = NULL;
+    CFieldFermionKSSU3REM* pF2u = NULL;
+    CFieldFermionKSSU3REM* pF1d = NULL;
+    CFieldFermionKSSU3REM* pF2d = NULL;
+    CFieldFermionKSSU3REM* pF1s = NULL;
+    CFieldFermionKSSU3REM* pF2s = NULL;
 
-    if (EDJKS_ChiralAndFermionMomentum == eJob
-        || EDJKS_Chiral == eJob)
+    if (EDJKSR_ChiralAndFermionMomentum == eJob
+        || EDJKSR_Chiral == eJob)
     {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
-        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
+        pF1u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2));
+        pF2u = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(2));
+        pF1d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3));
+        pF2d = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(3));
+        pF1s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4));
+        pF2s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4));
     }
 
     appSetLogDate(FALSE);
-    CFieldGaugeSU3* pStaple = NULL;
-    if (EDJKS_VR == eJob)
-    {
-        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
-    }
 
     for (UINT uiListIdx = iListStart; uiListIdx < iListEnd; ++uiListIdx)
     {
@@ -199,18 +262,19 @@ INT MeasurementREM(CParameters& params)
         appGeneral(_T("(* ==== Omega(%f) Magnetic(%f) ========= *)\n"), lstOmega[uiListIdx], lstMagnetic[uiListIdx]);
         pPL->Reset();
         pJG->Reset();
-        pCCLight->Reset();
-        pCCHeavy->Reset();
-        pFALight->Reset();
-        pFAHeavy->Reset();
-        pCCSLight->Reset();
-        pCCSHeavy->Reset();
-        pWilson->Reset();
+        pCCu->Reset();
+        pCCd->Reset();
+        pCCs->Reset();
+        pFAu->Reset();
+        pFAd->Reset();
+        pFAs->Reset();
 
-        pCCLight->SetFieldCount(iFieldCount);
-        pCCHeavy->SetFieldCount(iFieldCount);
-        pFALight->SetFieldCount(iFieldCount);
-        pFAHeavy->SetFieldCount(iFieldCount);
+        pCCu->SetFieldCount(iFieldCount);
+        pCCd->SetFieldCount(iFieldCount);
+        pCCs->SetFieldCount(iFieldCount);
+        pFAu->SetFieldCount(iFieldCount);
+        pFAd->SetFieldCount(iFieldCount);
+        pFAs->SetFieldCount(iFieldCount);
 
 #pragma region Measure
 
@@ -221,16 +285,16 @@ INT MeasurementREM(CParameters& params)
             CCString sTxtFileName;
             if (bSubFolder)
             {
-                sFileName.Format(_T("%s/REM%d/%sR_Nt%d_REM%d_%d.con"), sSubFolderPrefix.c_str(), uiListIdx, sSavePrefix.c_str(), _HC_Lt, uiListIdx, uiN);
-                sTxtFileName.Format(_T("%s/REM%d/%sR_Nt%d_REM%d_%d.txt"), sSubFolderPrefix.c_str(), uiListIdx, sSavePrefix.c_str(), _HC_Lt, uiListIdx, uiN);
+                sFileName.Format(_T("%s%d/%sR_Nt%d_%s%d_%d.con"), sSubFolderPrefix.c_str(), uiListIdx, sSavePrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN);
+                sTxtFileName.Format(_T("%s%d/%sR_Nt%d_%s%d_%d.txt"), sSubFolderPrefix.c_str(), uiListIdx, sSavePrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN);
             }
             else
             {
-                sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiListIdx, uiN);
-                sTxtFileName.Format(_T("%sR_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiListIdx, uiN);
+                sFileName.Format(_T("%sR_Nt%d_%s%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN);
+                sTxtFileName.Format(_T("%sR_Nt%d_%s%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN);
             }
             //appGeneral(_T("checking %s ..."), sFileName);
-            if (EDJKS_CheckMD5 == eJob || bCheckMd5)
+            if (EDJKSR_CheckMD5 == eJob)
             {
                 UINT uiSize = 0;
                 BYTE* fileContent = appGetFileSystem()->ReadAllBytes(sFileName, uiSize);
@@ -239,7 +303,7 @@ INT MeasurementREM(CParameters& params)
                 CCString sFileContent = appGetFileSystem()->ReadAllText(sTxtFileName);
                 if (sFileContent.Find(sMD5) >= 0)
                 {
-                    if (EDJKS_CheckMD5 == eJob)
+                    if (EDJKSR_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Found and good %s \n"), sFileName.c_str());
                     }
@@ -250,7 +314,7 @@ INT MeasurementREM(CParameters& params)
                 }
                 else if (sFileContent.Find(sMD5old) >= 0)
                 {
-                    if (EDJKS_CheckMD5 == eJob)
+                    if (EDJKSR_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Found and good but use old bad MD5 %s \n"), sFileName.c_str());
                     }
@@ -267,7 +331,7 @@ INT MeasurementREM(CParameters& params)
                 }
                 else
                 {
-                    if (EDJKS_CheckMD5 == eJob)
+                    if (EDJKSR_CheckMD5 == eJob)
                     {
                         appGeneral(_T("MD5 Not Found so add to it %s \n"), sFileName.c_str());
                     }
@@ -279,7 +343,7 @@ INT MeasurementREM(CParameters& params)
                     appGetFileSystem()->WriteAllText(sTxtFileName, sFileContent);
                 }
 
-                if (EDJKS_CheckMD5 == eJob)
+                if (EDJKSR_CheckMD5 == eJob)
                 {
                     continue;
                 }
@@ -289,305 +353,102 @@ INT MeasurementREM(CParameters& params)
 
             switch (eJob)
             {
-                case EDJKS_Polyakov:
+                case EDJKSR_Polyakov:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
-                case EDJKS_Chiral:
+                case EDJKSR_Chiral:
                 {
-                    for (UINT i = 0; i < iFieldCount; ++i)
-                    {
-                        if (bZ4)
-                        {
-                            pF1Light->InitialField(EFIT_RandomZ4);
-                        }
-                        else
-                        {
-                            pF1Light->InitialField(EFIT_RandomGaussian);
-                        }
-                        pF1Light->FixBoundary();
-                        pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Light->FixBoundary();
-                        if (bSaveFermion)
-                        {
-                            CCString sFermionFile = "";
-                            sFermionFile.Format(_T("%s_Light_Nt%d_REM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiListIdx, uiN, uiSaveFermionStart + i);
-                            CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
-                            CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
-                            CCString sFileContent = "";
-                            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
-                            if (bZ4)
-                            {
-                                sFileContent = sFileContent + _T("\nZ4\n");
-                            }
-                            else
-                            {
-                                sFileContent = sFileContent + _T("\nGaussian\n");
-                            }
-                            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
-                        }
-
-                        pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Light,
-                            pF1Light,
-                            0 == i,
-                            iFieldCount == i + 1);
-
-                        pFALight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Light,
-                            pF1Light,
-                            0 == i,
-                            iFieldCount == i + 1);
-
-                        if (bZ4)
-                        {
-                            pF1Heavy->InitialField(EFIT_RandomZ4);
-                        }
-                        else
-                        {
-                            pF1Heavy->InitialField(EFIT_RandomGaussian);
-                        }
-                        pF1Heavy->FixBoundary();
-                        pF1Heavy->CopyTo(pF2Heavy);
-                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
-                        pF1Heavy->FixBoundary();
-                        if (bSaveFermion)
-                        {
-                            CCString sFermionFile = "";
-                            sFermionFile.Format(_T("%s_Heavy_Nt%d_REM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiListIdx, uiN, uiSaveFermionStart + i);
-                            CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
-                            CCString sMD52 = pF2Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
-                            CCString sFileContent = "";
-                            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
-                            if (bZ4)
-                            {
-                                sFileContent = sFileContent + _T("\nZ4\n");
-                            }
-                            else
-                            {
-                                sFileContent = sFileContent + _T("\nGaussian\n");
-                            }
-                            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
-                        }
-
-                        pCCHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Heavy,
-                            pF1Heavy,
-                            0 == i,
-                            iFieldCount == i + 1);
-
-                        pFAHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Heavy,
-                            pF1Heavy,
-                            0 == i,
-                            iFieldCount == i + 1);
-                    }
-
-                    if (bMeasureCCS)
-                    {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                    }
+                    appCrucial(_T("Do not calculate chiral solely.\n"));
                 }
                 break;
-                case EDJKS_AngularMomentum:
+                case EDJKSR_AngularMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
                     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
-                case EDJKS_ChiralAndFermionMomentum:
+                case EDJKSR_ChiralAndFermionMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
                     pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
-                        if (0 == (1 & uiLoadFermion))
-                        {
-                            if (bZ4)
-                            {
-                                pF1Light->InitialField(EFIT_RandomZ4);
-                            }
-                            else
-                            {
-                                pF1Light->InitialField(EFIT_RandomGaussian);
-                            }
-                            pF1Light->FixBoundary();
-                            pF1Light->CopyTo(pF2Light);
-                            pF1Light->InverseD(appGetLattice()->m_pGaugeField);
-                            pF1Light->FixBoundary();
-                            if (bSaveFermion)
-                            {
-                                CCString sFermionFile = "";
-                                sFermionFile.Format(_T("%s_Light_Nt%d_REM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiListIdx, uiN, uiSaveFermionStart + i);
-                                CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
-                                CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
-                                CCString sFileContent = "";
-                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
-                                if (bZ4)
-                                {
-                                    sFileContent = sFileContent + _T("\nZ4\n");
-                                }
-                                else
-                                {
-                                    sFileContent = sFileContent + _T("\nGaussian\n");
-                                }
-                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Light->m_f2am) + _T("\n");
-                                sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
-                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
-                            }
-                        }
-                        else
-                        {
-                            CCString sF1FileName = "";
-                            CCString sF2FileName = "";
-                            sF1FileName.Format(_T("%s/REM%d/Light/%s_Light_Nt%d_REM%d_%d_F%d_F1.con"),
-                                sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, uiListIdx, uiN, i + 1);
-                            sF2FileName.Format(_T("%s/REM%d/Light/%s_Light_Nt%d_REM%d_%d_F%d_F2.con"),
-                                sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, uiListIdx, uiN, i + 1);
-                            pF1Light->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
-                            pF2Light->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
-                        }
+                        //if (0 == (1 & uiLoadFermion))
+                        //{
+                        //    if (bZ4)
+                        //    {
+                        //        pF1u->InitialField(EFIT_RandomZ4);
+                        //    }
+                        //    else
+                        //    {
+                        //        pF1u->InitialField(EFIT_RandomGaussian);
+                        //    }
+                        //    pF1u->FixBoundary();
+                        //    pF1u->CopyTo(pF2u);
+                        //    pF1u->InverseD(appGetLattice()->m_pGaugeField);
+                        //    pF1u->FixBoundary();
+                        //    if (bSaveFermion)
+                        //    {
+                        //        CCString sFermionFile = "";
+                        //        sFermionFile.Format(_T("%s_u_Nt%d_%s%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, uiSaveFermionStart + i);
+                        //        CCString sMD51 = pF1u->SaveToFile(sFermionFile + _T("_F1.con"));
+                        //        CCString sMD52 = pF2u->SaveToFile(sFermionFile + _T("_F2.con"));
+                        //        CCString sFileContent = "";
+                        //        sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                        //        if (bZ4)
+                        //        {
+                        //            sFileContent = sFileContent + _T("\nZ4\n");
+                        //        }
+                        //        else
+                        //        {
+                        //            sFileContent = sFileContent + _T("\nGaussian\n");
+                        //        }
+                        //        sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                        //        sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                        //        sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+                        //        sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
+                        //        sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(CCommonData::m_fBz) + _T("\n");
+                        //        sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1u->m_f) + _T("\n");
+                        //        sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1u->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                        //        appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    CCString sF1FileName = "";
+                        //    CCString sF2FileName = "";
+                        //    sF1FileName.Format(_T("%s%d/u/%s_Light_Nt%d_%s%d_%d_F%d_F1.con"),
+                        //        sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, i + 1);
+                        //    sF2FileName.Format(_T("%s%d/u/%s_Light_Nt%d_%s%d_%d_F%d_F2.con"),
+                        //        sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, sMiddle.c_str(), uiListIdx, uiN, i + 1);
+                        //    pF1u->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                        //    pF2u->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
+                        //}
 
-                        pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Light,
-                            pF1Light,
-                            0 == i,
-                            iFieldCount == i + 1);
+                        //pCCu->OnConfigurationAcceptedZ4(
+                        //    appGetLattice()->m_pGaugeField,
+                        //    NULL,
+                        //    pF2u,
+                        //    pF1u,
+                        //    0 == i,
+                        //    iFieldCount == i + 1);
 
-                        pFALight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Light,
-                            pF1Light,
-                            0 == i,
-                            iFieldCount == i + 1);
+                        //pFAu->OnConfigurationAcceptedZ4(
+                        //    appGetLattice()->m_pGaugeField,
+                        //    NULL,
+                        //    pF2u,
+                        //    pF1u,
+                        //    0 == i,
+                        //    iFieldCount == i + 1);
+                        __REM_MEASURE_FERMION(u, 1);
+                        __REM_MEASURE_FERMION(d, 2);
+                        __REM_MEASURE_FERMION(s, 4);
 
-                        if (0 == (2 & uiLoadFermion))
-                        {
-                            if (bZ4)
-                            {
-                                pF1Heavy->InitialField(EFIT_RandomZ4);
-                            }
-                            else
-                            {
-                                pF1Heavy->InitialField(EFIT_RandomGaussian);
-                            }
-                            pF1Heavy->FixBoundary();
-                            pF1Heavy->CopyTo(pF2Heavy);
-                            pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
-                            pF1Heavy->FixBoundary();
-                            if (bSaveFermion)
-                            {
-                                CCString sFermionFile = "";
-                                sFermionFile.Format(_T("%s_Heavy_Nt%d_REM%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiListIdx, uiN, uiSaveFermionStart + i);
-                                CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
-                                CCString sMD52 = pF2Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
-                                CCString sFileContent = "";
-                                sFileContent = _T("Stochastic Fermion File for ") + sFileName;
-                                if (bZ4)
-                                {
-                                    sFileContent = sFileContent + _T("\nZ4\n");
-                                }
-                                else
-                                {
-                                    sFileContent = sFileContent + _T("\nGaussian\n");
-                                }
-                                sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
-                                sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Heavy->m_f2am) + _T("\n");
-                                sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
-                                appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
-                            }
-                        }
-                        else
-                        {
-                            CCString sF1FileName = "";
-                            CCString sF2FileName = "";
-                            sF1FileName.Format(_T("%s/REM%d/Heavy/%s_Heavy_Nt%d_REM%d_%d_F%d_F1.con"),
-                                sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, uiListIdx, uiN, i + 1);
-                            sF2FileName.Format(_T("%s/REM%d/Heavy/%s_Heavy_Nt%d_REM%d_%d_F%d_F2.con"),
-                                sLoadFermionHead.c_str(), uiListIdx, sLoadFermionFile.c_str(), _HC_Lt, uiListIdx, uiN, i + 1);
-                            pF1Heavy->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
-                            pF2Heavy->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
-                        }
-
-                        pCCHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Heavy,
-                            pF1Heavy,
-                            0 == i,
-                            iFieldCount == i + 1);
-
-                        pFAHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Heavy,
-                            pF1Heavy,
-                            0 == i,
-                            iFieldCount == i + 1);
-                    }
-
-                    if (bMeasureCCS)
-                    {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     }
                 }
                 break;
-                case EDJKS_PlaqutteEnergy:
-                {
-                    //pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                }
-                break;
-                case EDJKS_VR:
-                    {
-                        appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-                        pWilson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        if (uiN == iStartN)
-                        {
-                            TArray<Real> lstRadius;
-                            for (INT i = 0; i < pWilson->m_lstR.Num(); ++i)
-                            {
-                                lstRadius.AddItem(_hostsqrt(static_cast<Real>(pWilson->m_lstR[i])));
-                            }
-                            CCString sRadiousFile;
-                            sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
-                            WriteStringFileRealArray(sRadiousFile, lstRadius);
-                        }
-                    }
-                break;
-                case EDJKS_DoubleToFloat:
-                    {
-                        CCString sSaveFileName;
-                        sSaveFileName.Format(_T("%s/%sR_Nt%d_REM%d_%d.con"), sCSVSavePrefix.c_str(), sSavePrefix.c_str(), _HC_Lt, uiListIdx, uiN);
-                        appGeneral(appGetLattice()->m_pGaugeField->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
-                    }
-                    break;
                 default:
                     break;
             }
@@ -606,7 +467,7 @@ INT MeasurementREM(CParameters& params)
         }
         appGeneral(_T("\n*)\n"));
 
-        if (EDJKS_CheckMD5 == eJob)
+        if (EDJKSR_CheckMD5 == eJob)
         {
             continue;
         }
@@ -615,7 +476,7 @@ INT MeasurementREM(CParameters& params)
 
         switch (eJob)
         {
-            case EDJKS_Polyakov:
+            case EDJKSR_Polyakov:
             {
                 CCString sFileNameWrite1;
                 CCString sFileNameWrite2;
@@ -678,48 +539,12 @@ INT MeasurementREM(CParameters& params)
                 }
             }
             break;
-            case EDJKS_Chiral:
+            case EDJKSR_Chiral:
             {
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiListIdx, REM);
-                if (pCCLight->m_bMeasureConnect)
-                {
-                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
-                }
-                
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiListIdx, REM);
-                if (pCCHeavy->m_bMeasureConnect)
-                {
-                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
-                }
-                
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiListIdx, REM);
 
-                if (uiListIdx == iListStart)
-                {
-                    TArray<Real> lstRadius;
-                    for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
-                    {
-                        lstRadius.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
-                    }
-                    CCString sRadiousFile;
-                    sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
-                    WriteStringFileRealArray(sRadiousFile, lstRadius);
-                }
-
-                if (bMeasureCCS)
-                {
-                    CCString sFileNameWriteCCS;
-                    sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
-                    sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
-                }
             }
             break;
-            case EDJKS_AngularMomentum:
+            case EDJKSR_AngularMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG, uiListIdx, REM);
                 _CLG_EXPORT_ANGULAR(pJG, JGS, uiListIdx, REM);
@@ -728,7 +553,7 @@ INT MeasurementREM(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiListIdx, REM);
             }
             break;
-            case EDJKS_ChiralAndFermionMomentum:
+            case EDJKSR_ChiralAndFermionMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG, uiListIdx, REM);
                 _CLG_EXPORT_ANGULAR(pJG, JGS, uiListIdx, REM);
@@ -736,84 +561,97 @@ INT MeasurementREM(CParameters& params)
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiListIdx, REM);
                 _CLG_EXPORT_ANGULAR(pJG, JGPot, uiListIdx, REM);
 
-                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiListIdx, REM);
-                if (pCCLight->m_bMeasureConnect)
+                _CLG_EXPORT_CHIRAL(pCCu, ChiralKS, uiListIdx, REM);
+                if (pCCu->m_bMeasureConnect)
                 {
-                    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp, uiListIdx, REM);
+                    _CLG_EXPORT_CHIRAL(pCCu, ConnectSusp, uiListIdx, REM);
                 }
                 
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS, uiListIdx, REM);
-                if (pCCHeavy->m_bMeasureConnect)
-                {
-                    _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp, uiListIdx, REM);
-                }
-                
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma3, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma4, uiListIdx, REM);
 
-                _CLG_EXPORT_CHIRAL(pFALight, OrbitalKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFALight, SpinKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFALight, PotentialKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, OrbitalKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, SpinKS, uiListIdx, REM);
-                _CLG_EXPORT_CHIRAL(pFAHeavy, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, ChiralKS, uiListIdx, REM);
+                if (pCCd->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCd, ConnectSusp, uiListIdx, REM);
+                }
+                
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma3, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma4, uiListIdx, REM);
+
+                _CLG_EXPORT_CHIRAL(pCCs, ChiralKS, uiListIdx, REM);
+                if (pCCs->m_bMeasureConnect)
+                {
+                    _CLG_EXPORT_CHIRAL(pCCs, ConnectSusp, uiListIdx, REM);
+                }
+
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma3, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma4, uiListIdx, REM);
+
+                _CLG_EXPORT_CHIRAL(pFAu, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAu, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAu, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAd, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAd, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAd, PotentialKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAs, OrbitalKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAs, SpinKS, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pFAs, PotentialKS, uiListIdx, REM);
 
                 if (uiListIdx == iListStart)
                 {
                     TArray<Real> lstRadius;
-                    for (INT i = 0; i < pCCLight->m_lstR.Num(); ++i)
+                    for (INT i = 0; i < pCCu->m_lstR.Num(); ++i)
                     {
-                        lstRadius.AddItem(F(0.5) * _hostsqrt(static_cast<Real>(pCCLight->m_lstR[i])));
+                        lstRadius.AddItem(F(0.5) * _hostsqrt(static_cast<Real>(pCCu->m_lstR[i])));
                     }
                     CCString sRadiousFile;
                     sRadiousFile.Format(_T("%s_condensateR.csv"), sCSVSavePrefix.c_str());
                     WriteStringFileRealArray(sRadiousFile, lstRadius);
                 }
 
-                if (bMeasureCCS)
-                {
-                    CCString sFileNameWriteCCS;
-                    sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
-                    sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
-                }
+                //if (bMeasureCCS)
+                //{
+                //    CCString sFileNameWriteCCS;
+                //    sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
+                //    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
+                //    sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
+                //    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
+                //}
             }
             break;
-            case EDJKS_PlaqutteEnergy:
-            {
-                //CCString sFileName;
-                //sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
-                //WriteStringFileRealArray(sFileName, pPE->m_lstData);
-            }
-            break;
-            case EDJKS_VR:
-                {
-                    CCString sCSVFile;
-                    sCSVFile.Format(_T("%s_VR_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
-                    TArray<TArray<CLGComplex>> vrs;
-                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                    {
-                        TArray<CLGComplex> thisConfiguration;
-                        for (INT i = 0; i < pWilson->m_lstR.Num(); ++i)
-                        {
-                            for (UINT t = 0; t < (_HC_Lt - 1); ++t)
-                            {
-                                thisConfiguration.AddItem(pWilson->m_lstC[j][i][t]);
-                            }
-                        }
-                        vrs.AddItem(thisConfiguration);
-                    }
-                    WriteStringFileComplexArray2(sCSVFile, vrs);
-                }
-            break;
-            case EDJKS_DoubleToFloat:
-                {
-                    //do nothing
-                }
-                break;
+            //case EDJKS_PlaqutteEnergy:
+            //{
+            //    //CCString sFileName;
+            //    //sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
+            //    //WriteStringFileRealArray(sFileName, pPE->m_lstData);
+            //}
+            //break;
+            //case EDJKS_VR:
+            //    {
+            //        CCString sCSVFile;
+            //        sCSVFile.Format(_T("%s_VR_Nt%d_REM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiListIdx);
+            //        TArray<TArray<CLGComplex>> vrs;
+            //        for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+            //        {
+            //            TArray<CLGComplex> thisConfiguration;
+            //            for (INT i = 0; i < pWilson->m_lstR.Num(); ++i)
+            //            {
+            //                for (UINT t = 0; t < (_HC_Lt - 1); ++t)
+            //                {
+            //                    thisConfiguration.AddItem(pWilson->m_lstC[j][i][t]);
+            //                }
+            //            }
+            //            vrs.AddItem(thisConfiguration);
+            //        }
+            //        WriteStringFileComplexArray2(sCSVFile, vrs);
+            //    }
+            //break;
+            //case EDJKS_DoubleToFloat:
+            //    {
+            //        //do nothing
+            //    }
+            //    break;
             default:
                 break;
         }
@@ -821,19 +659,21 @@ INT MeasurementREM(CParameters& params)
         appGeneral(_T("\n"));
     }
 
-    if (NULL != pStaple)
-    {
-        appSafeDelete(pStaple);
-    }
+    //if (NULL != pStaple)
+    //{
+    //    appSafeDelete(pStaple);
+    //}
 
-    if (EDJKS_CheckMD5 == eJob)
+    if (EDJKSR_CheckMD5 == eJob)
     {
-        if (NULL != pF1Light)
+        if (NULL != pF1u)
         {
-            pF1Light->Return();
-            pF2Light->Return();
-            pF1Heavy->Return();
-            pF2Heavy->Return();
+            pF1u->Return();
+            pF2u->Return();
+            pF1d->Return();
+            pF2d->Return();
+            pF1s->Return();
+            pF2s->Return();
         }
 
         appQuitCLG();
@@ -842,7 +682,7 @@ INT MeasurementREM(CParameters& params)
 
     switch (eJob)
     {
-        case EDJKS_Polyakov:
+        case EDJKSR_Polyakov:
         {
             CCString sFileNameWrite1;
             CCString sFileNameWrite2;
@@ -865,12 +705,14 @@ INT MeasurementREM(CParameters& params)
     appSetLogDate(TRUE);
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
-    if (NULL != pF1Light)
+    if (NULL != pF1u)
     {
-        pF1Light->Return();
-        pF2Light->Return();
-        pF1Heavy->Return();
-        pF2Heavy->Return();
+        pF1u->Return();
+        pF2u->Return();
+        pF1d->Return();
+        pF2d->Return();
+        pF1s->Return();
+        pF2s->Return();
     }
 
     appQuitCLG();
