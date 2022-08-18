@@ -1904,16 +1904,17 @@ JobMeasureREM:
     ShowParameterContent : 0
 
     GaugeBate : 4.94
-    ListStart : 0
+    ListStart : 1
     ListEnd : 10
     StartN : 101
-    EndN : 105
-    OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
-    # MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
-    MagneticList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    EndN : 150
+    # OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
+    OmegaList : [0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072]
+    MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
+    # MagneticList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     SaveFermionFile : 1
     FermionFileIndexStart : 1
-    FermionFileHead : ./F494235047_EM0_
+    FermionFileHead : ./F494235047_O6_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
@@ -1928,13 +1929,13 @@ JobMeasureREM:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\REM\494\EM0\O
+    SubFolderPrefix : G:\REM494\GF494\O6\EM
     Middle : REM
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF494235047_EM0_
-    CSVSavePrefix : ./SRF494235047_EM0_
+    SavePrefix : GFSRF494235047_O6_
+    CSVSavePrefix : G:\REM494\Chiral\O6\SRF494235047_O6_
 
     Dim : 4
     Dir : 4
@@ -2142,7 +2143,7 @@ JobMeasureREM:
 
     Measure5:
 
-        MeasureName : CMeasureAngularMomentumKS
+        MeasureName : CMeasureAngularMomentumKSREM
         FieldId : 2
         MeasureDist : 1
         ShowResult : 0
@@ -2150,7 +2151,7 @@ JobMeasureREM:
 
     Measure6:
 
-        MeasureName : CMeasureAngularMomentumKS
+        MeasureName : CMeasureAngularMomentumKSREM
         FieldId : 3
         MeasureDist : 1
         ShowResult : 0
@@ -2158,7 +2159,7 @@ JobMeasureREM:
 
     Measure7:
 
-        MeasureName : CMeasureAngularMomentumKS
+        MeasureName : CMeasureAngularMomentumKSREM
         FieldId : 4
         MeasureDist : 1
         ShowResult : 0

@@ -54,6 +54,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionWilsonNf2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquette.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteAcceleration.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBetaGradient.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
@@ -111,6 +112,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKSREM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBerryPhase.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
@@ -181,6 +183,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorOmelyan.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/CUpdator.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteAcceleration.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBetaGradient.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.cu
@@ -209,6 +212,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKSREM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingLandauCornell.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.cu
@@ -411,4 +415,24 @@ add_executable(StaggeredRotation
 
 target_compile_features(StaggeredRotation PUBLIC cxx_std_14)
 target_link_libraries(StaggeredRotation CLGLib)
+
+
+
+
+# ==================== 
+# BetaGradient 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/BetaGradient)
+add_executable(BetaGradient 
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/BetaGradient.h
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/Measure.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/BetaGradient.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/MeasureBetaScan.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/Simulate.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/SimulateBetaScan.cpp
+    )
+
+target_compile_features(BetaGradient PUBLIC cxx_std_14)
+target_link_libraries(BetaGradient CLGLib)
 

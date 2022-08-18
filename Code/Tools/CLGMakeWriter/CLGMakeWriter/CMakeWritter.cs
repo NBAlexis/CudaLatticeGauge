@@ -181,6 +181,7 @@ set_target_properties( CLGLib
 
             sContent += AddApplication(excutables["StaggeredSpectrum"]);
             sContent += AddApplication(excutables["StaggeredRotation"]);
+            sContent += AddApplication(excutables["BetaGradient"]);
 
             #endregion
 

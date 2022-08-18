@@ -53,6 +53,7 @@ namespace CLGMakeWriter
             apps.Add("ConstAcc", new CProjFile("ConstAcc"));
             apps.Add("StaggeredSpectrum", new CProjFile("StaggeredSpectrum"));
             apps.Add("StaggeredRotation", new CProjFile("StaggeredRotation"));
+            apps.Add("BetaGradient", new CProjFile("BetaGradient"));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 

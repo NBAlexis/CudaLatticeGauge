@@ -34,6 +34,7 @@
     <ClInclude Include="Data\Action\CActionFermionWilsonNf2.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquette.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteAcceleration.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBoost.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
@@ -91,6 +92,7 @@
     <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
     <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h" />
+    <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h" />
     <ClInclude Include="Measurement\CMeasureBerryPhase.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
@@ -163,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBoost.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu" />
@@ -191,6 +194,7 @@
     <CudaCompile Include="GaugeFixing\CGaugeFixingRandom.cu" />
     <CudaCompile Include="Measurement\CMeasureAMomentumStochastic.cu" />
     <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu" />
+    <CudaCompile Include="Measurement\CMeasureAngularMomentumKSREM.cu" />
     <CudaCompile Include="Measurement\CMeasureChiralCondensate.cu">
       <FileType>Document</FileType>
     </CudaCompile>

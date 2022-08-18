@@ -169,6 +169,7 @@ public:
                 }
             }
             appVsnprintf(m_cBuff, _kTraceBuffSize - 1, format, arg);
+            assert(NULL != m_pStdStream);
             *m_pStdStream << m_cBuff;
             if (CRUCIAL == level)
             {

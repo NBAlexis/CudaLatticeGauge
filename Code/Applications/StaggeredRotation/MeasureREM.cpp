@@ -223,9 +223,9 @@ INT MeasurementREM(CParameters& params)
     CMeasureChiralCondensateKS* pCCd = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCs = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
 
-    CMeasureAngularMomentumKS* pFAu = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-    CMeasureAngularMomentumKS* pFAd = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    CMeasureAngularMomentumKS* pFAs = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
+    CMeasureAngularMomentumKSREM* pFAu = dynamic_cast<CMeasureAngularMomentumKSREM*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureAngularMomentumKSREM* pFAd = dynamic_cast<CMeasureAngularMomentumKSREM*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+    CMeasureAngularMomentumKSREM* pFAs = dynamic_cast<CMeasureAngularMomentumKSREM*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
 
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
 

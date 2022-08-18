@@ -117,6 +117,10 @@ public:
 
     _FetchFunctionArray(Real)
 
+#if !_CLG_DOUBLEFLOAT
+    _FetchFunctionArray(DOUBLE)
+#endif
+
     UBOOL FetchStringVectorValue(const CCString& key, TArray<CCString>& value) const
     {
         if (m_pStringVector.Lookup(key, value))

@@ -463,6 +463,37 @@ static __device__ __inline__ deviceSU3 _deviceLinkMP(
 }
 
 /**
+ * Phase of the link with:
+ * Ax(Lx) = - q B ny
+ * Ay(n) = q B nx
+ */
+static __device__ __inline__ Real _devicePhaseM(const SSmallInt4& sPos, BYTE byDir, const SSmallInt4& sCenterSite, Real fQBz)
+{
+    if (1 == byDir) //y-dir
+    {
+        return static_cast<Real>(sPos.x - sCenterSite.x + F(0.5)) * fQBz;
+    }
+    if (0 == byDir) //x-dir
+    {
+        if (sPos.x == static_cast<INT>(_DC_Lx) - 1)
+        {
+            return static_cast<Real>(sPos.y - sCenterSite.y + F(0.5)) * (-fQBz);
+        }
+    }
+
+    return F(0.0);
+}
+
+/**
+ * This function assumes _DC_Dir = 4
+ */
+static __device__ __inline__ Real _devicePhaseM(UINT uiLinkIndex, const SSmallInt4& sCenterSite, Real fQBz)
+{
+    return _devicePhaseM(__deviceLinkIndexToInt4(uiLinkIndex), static_cast<BYTE>(uiLinkIndex & 3), sCenterSite, fQBz);
+}
+
+
+/**
 * big index is the index of walking table.
 * The plaqutte index may not be cached because n may out of boundary, so we calculate every one
 * n, n+mu, n+nu, n

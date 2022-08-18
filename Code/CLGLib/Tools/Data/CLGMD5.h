@@ -88,8 +88,9 @@ static QWORD* FoldDataMD5_OLD(UINT& iBlockCount, const BYTE* pInData, UINT iData
     QWORD* pNewsValue = (QWORD*)malloc(sizeof(QWORD) * iNewLength);
     assert(NULL != pNewsValue);
     memset(pNewsValue, 0, sizeof(QWORD) * iNewLength);
+    assert(iLength <= iNewLength);
     memcpy(pNewsValue, retVal, sizeof(QWORD) * iLength);
-    pNewsValue[iDataCount >> 2] |= 128 << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
+    pNewsValue[iDataCount >> 2] |= 128ULL << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
     pNewsValue[(((iDataCount + 8) >> 6) << 4) + 14] = iDataCount * 8; //Add length of string to end of array why?
 
     free(retVal);
@@ -367,9 +368,11 @@ static UINT* FoldDataMD5(UINT& iBlockCount, const BYTE* pInData, UINT iDataCount
     iFinalCount = iFinalCount < iLength ? iLength - 1 : iFinalCount;
     const UINT iNewLength = ((iFinalCount >> 4) + 1) * 16;
     UINT* pNewsValue = (UINT*)malloc(sizeof(UINT) * iNewLength);
+    assert(NULL != pNewsValue);
     memset(pNewsValue, 0, sizeof(UINT) * iNewLength);
+    assert(iLength <= iNewLength);
     memcpy(pNewsValue, retVal, sizeof(UINT) * iLength);
-    pNewsValue[iDataCount >> 2] |= 128 << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
+    pNewsValue[iDataCount >> 2] |= 128ULL << (8 * (iDataCount & 0x00000003)); //Add length of string to end of array
     pNewsValue[(((iDataCount + 8) >> 6) << 4) + 14] = iDataCount * 8; //Add length of string to end of array why?
 
     free(retVal);
