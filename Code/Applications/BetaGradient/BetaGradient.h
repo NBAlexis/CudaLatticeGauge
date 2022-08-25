@@ -21,7 +21,7 @@ __DEFINE_ENUM(EBetaGradientJob,
 
 #define _CLG_EXPORT_CHIRAL(measureName, lstName) \
 CCString sFileNameWrite##measureName##lstName = _T("%s_%s_condensate"); \
-CCString sFileNameWrite##measureName##lstName##ZSlice = _T("%s_%s_condensate"); \
+CCString sFileNameWrite##measureName##lstName##ZSlice = _T("%s_%s_condensateZSlice"); \
 sFileNameWrite##measureName##lstName = sFileNameWrite##measureName##lstName + _T(#measureName) + _T(#lstName) + _T(".csv"); \
 sFileNameWrite##measureName##lstName##ZSlice = sFileNameWrite##measureName##lstName##ZSlice + _T(#measureName) + _T(#lstName) + _T(".csv"); \
 sFileNameWrite##measureName##lstName.Format(sFileNameWrite##measureName##lstName, sCSVSavePrefix.c_str(), PrefixList[uiOmega].c_str()); \
