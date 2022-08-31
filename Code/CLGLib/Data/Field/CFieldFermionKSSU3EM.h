@@ -35,6 +35,7 @@ public:
 
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;
+    void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
 protected:
 
