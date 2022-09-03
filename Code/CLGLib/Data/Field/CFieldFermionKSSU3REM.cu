@@ -33,6 +33,8 @@ _kernelDFermionKSREM_Simple(
         deviceSU3Vector* pResultData,
         Real fam,
         Real fqBz,
+        BYTE byGaugeType,
+        UBOOL bTwistedBoundary,
         SSmallInt4 sCenter,
         BYTE byFieldId,
         UBOOL bDDagger,
@@ -45,16 +47,6 @@ _kernelDFermionKSREM_Simple(
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
 
-    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
-    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-
-    Real u1pX = F(0.0);
-    const Real u1pY = fX1 * fqBz;
-    if (sSite4.x == _DC_Lx - 1)
-    {
-        u1pX = -fY1 * fqBz;
-    }
-
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
@@ -65,43 +57,24 @@ _kernelDFermionKSREM_Simple(
 
         const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
         const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
-        const SSmallInt4 x_m_site = __deviceSiteIndexToInt4(x_m_mu_Fermion.m_uiSiteIndex);
 
         //Get Gamma mu
         const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
-        const Real fX2 = static_cast<Real>(x_m_site.x - sCenter.x + F(0.5));
-        const Real fY2 = static_cast<Real>(x_m_site.y - sCenter.y + F(0.5));
-
-        Real u1mX = F(0.0);
-        const Real u1mY = fX2 * fqBz;
-        if (x_m_site.x == _DC_Lx - 1)
-        {
-            u1mX = -fY2 * fqBz;
-        }
-
-        //Assuming periodic
-        //get U(x,mu), U^{dagger}(x-mu), 
         deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        if (0 == idir && sSite4.x == (_DC_Lx - 1))
+        deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
+
+        if (0 == idir || 1 == idir)
         {
-            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
-        }
-        else if (1 == idir)
-        {
-            x_Gauge_element.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
+            const SSmallInt4 x_m_site = __deviceSiteIndexToInt4(x_m_mu_Gauge.m_uiSiteIndex);
+            const Real forwardPhase = __deviceGetMagneticPhase(sSite4, sCenter, static_cast<BYTE>(idir), byGaugeType, bTwistedBoundary) * fqBz;
+            const Real backwardPhase = __deviceGetMagneticPhase(x_m_site, sCenter, static_cast<BYTE>(idir), byGaugeType, bTwistedBoundary) * fqBz;
+
+            x_Gauge_element.MulComp(_make_cuComplex(_cos(forwardPhase), _sin(forwardPhase)));
+            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(backwardPhase), _sin(backwardPhase)));
         }
 
-        deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
-        if (0 == idir && x_m_site.x == (_DC_Lx - 1))
-        {
-            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mX), _sin(u1mX)));
-        }
-        else if (1 == idir)
-        {
-            x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mY), _sin(u1mY)));
-        }
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -175,6 +148,8 @@ _kernelDFermionKS_PREM_XYTerm(
     Real fOmega,
 #endif
     Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
     SSmallInt4 sCenter,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -215,7 +190,7 @@ _kernelDFermionKS_PREM_XYTerm(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, sSite4, sCenter, fQBz,
+        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwistedBoundary,
             byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
             pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
@@ -275,6 +250,8 @@ _kernelDFermionKS_PREM_XYTau_Term(
     Real fOmega,
 #endif
     Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
     SSmallInt4 sCenter,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -301,7 +278,7 @@ _kernelDFermionKS_PREM_XYTau_Term(
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
         
         const deviceSU3Vector right = _deviceVXYTOptimizedEM(
-            pGauge, sSite4, sCenter, fQBz, 
+            pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwistedBoundary,
             byGaugeFieldId, bPlusX, bPlusY, bPlusT)
         .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
@@ -361,20 +338,15 @@ _kernelDFermionKSForceREM_Simple(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     Real fqBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
     SSmallInt4 sCenter,
     BYTE byFieldId)
 {
     intokernalInt4;
 
-    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
-    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-
-    Real u1pX = F(0.0);
-    const Real u1pY = fX1 * fqBz;
-    if (sSite4.x == _DC_Lx - 1)
-    {
-        u1pX = -fY1 * fqBz;
-    }
+    const Real fPhaseX = __deviceGetMagneticPhase(sSite4, sCenter, 0, byGaugeType, bTwistedBoundary) * fqBz;
+    const Real fPhaseY = __deviceGetMagneticPhase(sSite4, sCenter, 1, byGaugeType, bTwistedBoundary) * fqBz;
 
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
@@ -385,32 +357,25 @@ _kernelDFermionKSForceREM_Simple(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        deviceSU3 gaugeElement = pGauge[linkIndex];
+        if (0 == idir)
+        {
+            gaugeElement.MulComp(_make_cuComplex(_cos(fPhaseX), _sin(fPhaseX)));
+        }
+        else if (1 == idir)
+        {
+            gaugeElement.MulComp(_make_cuComplex(_cos(fPhaseY), _sin(fPhaseY)));
+        }
 
         for (UINT uiR = 0; uiR < uiRational; ++uiR)
         {
             const deviceSU3Vector* phi_i = pFermionPointers[uiR];
             const deviceSU3Vector* phi_id = pFermionPointers[uiR + uiRational];
 
-            deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
-            if (0 == idir && sSite4.x == (_DC_Lx - 1))
-            {
-                toContract.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
-            }
-            else if (1 == idir)
-            {
-                toContract.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
-            }
+            deviceSU3Vector toContract = gaugeElement.MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
             deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_id[uiSiteIndex], toContract);
 
-            toContract = pGauge[linkIndex].MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
-            if (0 == idir && sSite4.x == (_DC_Lx - 1))
-            {
-                toContract.MulComp(_make_cuComplex(_cos(u1pX), _sin(u1pX)));
-            }
-            else if (1 == idir)
-            {
-                toContract.MulComp(_make_cuComplex(_cos(u1pY), _sin(u1pY)));
-            }
+            toContract = gaugeElement.MulVector(phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
             thisTerm.Add(deviceSU3::makeSU3ContractV(toContract, phi_i[uiSiteIndex]));
 
             if (x_p_mu_Fermion.NeedToOpposite())
@@ -454,6 +419,8 @@ _kernelDFermionKSForce_PREM_XYTerm(
     Real fOmega,
 #endif
     Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
     SSmallInt4 sCenter, BYTE byMu, INT iTau,
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
@@ -482,8 +449,8 @@ _kernelDFermionKSForce_PREM_XYTerm(
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
-    const deviceSU3 vnn1 = _deviceLinkMP(pGauge, sSite4, sCenter, Llength, 1, fQBz, Ldirs);
-    const deviceSU3 vnn2 = _deviceLinkMP(pGauge, sSite4, sCenter, Rlength, 1, fQBz, Rdirs);
+    const deviceSU3 vnn1 = _deviceLinkMP(pGauge, sSite4, sCenter, Llength, 1, fQBz, byGaugeType, bTwistedBoundary, Ldirs);
+    const deviceSU3 vnn2 = _deviceLinkMP(pGauge, sSite4, sCenter, Rlength, 1, fQBz, byGaugeType, bTwistedBoundary, Rdirs);
 
     for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
     {
@@ -554,6 +521,8 @@ _kernelDFermionKSForce_PREM_XYTau_Term(
     DOUBLE fOmega,
 #endif
     Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
     SSmallInt4 sCenter,
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength)
@@ -574,8 +543,8 @@ _kernelDFermionKSForce_PREM_XYTau_Term(
     const Real eta124 = _deviceEta124(__deviceSiteIndexToInt4(sn1.m_uiSiteIndex));
     //=================================
     // 2. Find V(n,n1), V(n,n2)
-    const deviceSU3 vnn1 = _deviceLinkMP(pGauge, sSite4, sCenter, Llength, 1, fQBz, Ldirs);
-    const deviceSU3 vnn2 = _deviceLinkMP(pGauge, sSite4, sCenter, Rlength, 1, fQBz, Rdirs);
+    const deviceSU3 vnn1 = _deviceLinkMP(pGauge, sSite4, sCenter, Llength, 1, fQBz, byGaugeType, bTwistedBoundary, Ldirs);
+    const deviceSU3 vnn2 = _deviceLinkMP(pGauge, sSite4, sCenter, Rlength, 1, fQBz, byGaugeType, bTwistedBoundary, Rdirs);
 
     for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
     {
@@ -717,6 +686,76 @@ _giveupkernelDFermionKSForce_PR_XYTau_Term2(
 
 */
 
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelKSApplyGammaREM(
+    deviceSU3Vector* pMe,
+    const deviceSU3Vector* __restrict__ pOther,
+    const deviceSU3* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    BYTE byDir,
+    Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwistedBoundary,
+    SSmallInt4 sCenter)
+{
+    intokernalInt4;
+
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
+    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
+
+    deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+
+    //============= add phase ===============
+    //Note that, the coordinate should be used as same as the gauge
+    if (0 == byDir || 1 == byDir)
+    {
+        const SSmallInt4 x_m_site = __deviceSiteIndexToInt4(x_m_mu_Gauge.m_uiSiteIndex);
+        const Real forwardPhase = __deviceGetMagneticPhase(sSite4, sCenter, byDir, byGaugeType, bTwistedBoundary) * fQBz;
+        const Real backwardPhase = __deviceGetMagneticPhase(x_m_site, sCenter, byDir, byGaugeType, bTwistedBoundary) * fQBz;
+        x_Gauge_element.MulComp(_make_cuComplex(_cos(forwardPhase), _sin(forwardPhase)));
+        x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(backwardPhase), _sin(backwardPhase)));
+    }
+
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
+
+    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu = eta_mu + 1;
+    }
+
+    if (eta_mu & 1)
+    {
+        pMe[uiSiteIndex].MulReal(F(-1.0));
+    }
+
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu2 = eta_mu2 + 1;
+    }
+    if (eta_mu2 & 1)
+    {
+        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    else
+    {
+        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    pMe[uiSiteIndex].MulReal(F(0.5));
+}
+
 #pragma endregion
 
 
@@ -743,6 +782,8 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         pTarget,
         f2am,
         CCommonData::m_fBz * m_fQ,
+        m_byGaugeType,
+        m_bTwistedBoundary,
         CCommonData::m_sCenter,
         m_byFieldId,
         bDagger,
@@ -760,6 +801,8 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         1,
         CCommonData::m_fOmega,
         CCommonData::m_fBz * m_fQ,
+        m_byGaugeType,
+        m_bTwistedBoundary,
         CCommonData::m_sCenter,
         bDagger,
         eOCT,
@@ -778,6 +821,8 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         1,
         CCommonData::m_fOmega,
         CCommonData::m_fBz * m_fQ,
+        m_byGaugeType,
+        m_bTwistedBoundary,
         CCommonData::m_sCenter,
         bDagger,
         eOCT,
@@ -801,6 +846,8 @@ void CFieldFermionKSSU3REM::DerivateD0(
         m_pMDNumerator,
         m_rMD.m_uiDegree,
         CCommonData::m_fBz * m_fQ,
+        m_byGaugeType,
+        m_bTwistedBoundary,
         CCommonData::m_sCenter,
         m_byFieldId);
 
@@ -864,6 +911,8 @@ void CFieldFermionKSSU3REM::DerivateD0(
                     m_byFieldId,
                     CCommonData::m_fOmega,
                     CCommonData::m_fBz * m_fQ,
+                    m_byGaugeType,
+                    m_bTwistedBoundary,
                     CCommonData::m_sCenter,
                     static_cast<BYTE>(imu), iTau[pathidx],
                     L[0], L[1], L[2], LLength,
@@ -950,6 +999,8 @@ void CFieldFermionKSSU3REM::DerivateD0(
                         m_byFieldId,
                         CCommonData::m_fOmega,
                         CCommonData::m_fBz* m_fQ,
+                        m_byGaugeType,
+                        m_bTwistedBoundary,
                         CCommonData::m_sCenter,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength
@@ -969,11 +1020,86 @@ void CFieldFermionKSSU3REM::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionKSSU3EM::InitialOtherParameters(params);
     m_bEachSiteEta = TRUE;
+
+    INT iValue = 0;
+    params.FetchValueINT(_T("MagneticType"), iValue);
+    m_byGaugeType = static_cast<BYTE>(iValue);
+
+    iValue = 1;
+    params.FetchValueINT(_T("TwistedBoundary"), iValue);
+    m_bTwistedBoundary = (0 != iValue);
+}
+
+void CFieldFermionKSSU3REM::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+{
+    INT iDir = -1;
+    switch (eGamma)
+    {
+    case UNITY:
+    {
+        return;
+    }
+    case GAMMA1:
+    {
+        iDir = 0;
+    }
+    break;
+    case GAMMA2:
+    {
+        iDir = 1;
+    }
+    break;
+    case GAMMA3:
+    {
+        iDir = 2;
+    }
+    break;
+    case GAMMA4:
+    {
+        iDir = 3;
+    }
+    break;
+    }
+
+    if (iDir >= 0)
+    {
+        if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+        {
+            appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+            return;
+        }
+        const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+        CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+        preparethread;
+        _kernelKSApplyGammaREM << <block, threads >> > (
+            m_pDeviceData,
+            pPooled->m_pDeviceData,
+            pFieldSU3->m_pDeviceData,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pEtaMu,
+            static_cast<BYTE>(iDir),
+            CCommonData::m_fBz * m_fQ,
+            m_byGaugeType,
+            m_bTwistedBoundary,
+            CCommonData::m_sCenter
+            );
+
+        pPooled->Return();
+        return;
+    }
+
+    appCrucial(_T("Not implemented yet...\n"));
 }
 
 void CFieldFermionKSSU3REM::CopyTo(CField* U) const
 {
     CFieldFermionKSSU3EM::CopyTo(U);
+
+    CFieldFermionKSSU3REM* pTarget = dynamic_cast<CFieldFermionKSSU3REM*>(U);
+    pTarget->m_byGaugeType = m_byGaugeType;
+    pTarget->m_bTwistedBoundary = m_bTwistedBoundary;
 }
 
 CCString CFieldFermionKSSU3REM::GetInfos(const CCString& tab) const
@@ -985,6 +1111,8 @@ CCString CFieldFermionKSSU3REM::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
     sRet = sRet + tab + _T("fBz : ") + appFloatToString(CCommonData::m_fBz) + _T("\n");
     sRet = sRet + tab + _T("fQ : ") + appFloatToString(m_fQ) + _T("\n");
+    sRet = sRet + tab + _T("Magnetic gauge type (0. Ay=xB, 1. Ax=-yB, 2. Ay=xB/2 Ax=-yB/2) : ") + appIntToString(static_cast<INT>(m_byGaugeType)) + _T("\n");
+    sRet = sRet + tab + _T("Twisted boundary : ") + appIntToString(static_cast<INT>(m_bTwistedBoundary)) + _T("\n");
     return sRet;
 }
 

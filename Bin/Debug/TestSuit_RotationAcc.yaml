@@ -1307,6 +1307,7 @@ TestRotationProjectivePlaneU1:
 
 TestRotationEMProjectivePlane:
 
+    ## 6099.695333 6133.354076, 8884 twisted
     Dim : 4
     Dir : 4
     LatticeLength : [8, 8, 8, 4]
@@ -1357,6 +1358,8 @@ TestRotationEMProjectivePlane:
 
         Qa2Bz : 0.1
         EMChange : -0.333333333333333333
+        TwistedBoundary : 0
+        MagneticType : 2
 
         Period : [1, 1, 1, -1]
 
@@ -1375,6 +1378,8 @@ TestRotationEMProjectivePlane:
 
         Qa2Bz : 0.1
         EMChange : 0.6666666666666666666667
+        TwistedBoundary : 0
+        MagneticType : 2
 
         Period : [1, 1, 1, -1]
 

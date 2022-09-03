@@ -25,7 +25,9 @@ _kernelDFermionKS_PR_XYTermCopyREM(
     BYTE byFieldId,
     BYTE byGaugeFieldId,
     SSmallInt4 sCenter,
-    Real fQBz)
+    Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwisted)
 {
     intokernalInt4;
 
@@ -61,7 +63,7 @@ _kernelDFermionKS_PR_XYTermCopyREM(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, sSite4, sCenter, fQBz,
+        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwisted,
             byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
                 pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
@@ -96,7 +98,9 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
     BYTE byFieldId,
     BYTE byGaugeFieldId,
     SSmallInt4 sCenter,
-    Real fQBz)
+    Real fQBz,
+    BYTE byGaugeType,
+    UBOOL bTwisted)
 {
     intokernalInt4;
 
@@ -118,7 +122,7 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
 
         const deviceSU3Vector right = _deviceVXYTOptimizedEM(
-            pGauge, sSite4, sCenter, fQBz,
+            pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwisted,
             byGaugeFieldId, bPlusX, bPlusY, bPlusT)
             .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
@@ -169,7 +173,9 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
         m_byFieldId,
         1,
         CCommonData::m_sCenter,
-        CCommonData::m_fBz * pFieldREM->GetQ());
+        CCommonData::m_fBz * pFieldREM->GetQ(),
+        m_byGaugeType,
+        m_bTwistedBoundary);
 }
 
 void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
@@ -193,7 +199,22 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
         m_byFieldId,
         1,
         CCommonData::m_sCenter,
-        CCommonData::m_fBz * pFieldREM->GetQ());
+        CCommonData::m_fBz * pFieldREM->GetQ(),
+        m_byGaugeType,
+        m_bTwistedBoundary);
+}
+
+void CMeasureAngularMomentumKSREM::Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& params, BYTE byId)
+{
+    CMeasureAngularMomentumKS::Initial(pOwner, pLatticeData, params, byId);
+
+    INT iValue = 0;
+    params.FetchValueINT(_T("MagneticType"), iValue);
+    m_byGaugeType = static_cast<BYTE>(iValue);
+
+    iValue = 1;
+    params.FetchValueINT(_T("TwistedBoundary"), iValue);
+    m_bTwistedBoundary = (0 != iValue);
 }
 
 

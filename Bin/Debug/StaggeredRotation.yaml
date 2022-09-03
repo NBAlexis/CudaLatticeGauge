@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_MeasureEM
+RotationJob : ESR_SimulateREM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -1615,23 +1615,24 @@ JobSimulateREM:
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
 
-    BeforeEquvibStep : 50
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 300
+    EquvibStep : 1500
     SaveStartIndex : 0
-    ListStart : 10
+    ListStart : 1
     ListEnd : 10
-    OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
-    MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
-    SavePrefix : ./SRF490270054_
+    # OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
+    OmegaList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    MagneticList : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    SavePrefix : ./SRF486295059_
     Additive : 0
 
     # 53551575Nt4 Omega60 
-    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+    # Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
 
     Dim : 4
     Dir : 4
-    LatticeLength : [14, 14, 14, 6]
+    LatticeLength : [12, 12, 12, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
@@ -1645,8 +1646,8 @@ JobSimulateREM:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # Nt6FileName : ./SRF506130026_R_Nt6_O8_321.con
-    # Nt6Polyakov : 0.286030173302
+    Nt4FileName : ./SRF486295059_R_Nt4_O0_1000.con
+    Nt4Polyakov : 0.286030173302
 
     Updator:
 
@@ -1684,12 +1685,14 @@ JobSimulateREM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.27
+        Mass : 0.295
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
         EMChange : -0.333333333333333333
+        TwistedBoundary : 0
+        MagneticType : 2
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1708,12 +1711,14 @@ JobSimulateREM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.27
+        Mass : 0.295
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
         EMChange : -0.333333333333333333
+        TwistedBoundary : 0
+        MagneticType : 2
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1732,12 +1737,14 @@ JobSimulateREM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.054
+        Mass : 0.059
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
         EMChange : 0.6666666666666666667
+        TwistedBoundary : 0
+        MagneticType : 2
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1756,27 +1763,29 @@ JobSimulateREM:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.054
+        Mass : 0.059
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
         EMChange : -0.333333333333333333
+        TwistedBoundary : 0
+        MagneticType : 2
 
         # MC is to prepare
         # This is x^{1/8}
-        MC : [0.9885371983413638, -0.005454352306359983, 0.014492118912128918]
+        MC : [0.9864867225669327, -0.006181160483417139, 0.016123297883416914]
 
         # MD is to calculate force
         # This is x^{-1/4}
-        MD : [1.02206300082893, 0.011520006137625074, 0.006906228703456858]
+        MD : [1.0260760317495705, 0.013161857934304067, 0.007541358599232121]
 
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 4.9
+        Beta : 4.86
         Omega : 0.0
 
     Action2:

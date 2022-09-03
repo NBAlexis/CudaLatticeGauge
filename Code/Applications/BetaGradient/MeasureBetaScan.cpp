@@ -354,7 +354,10 @@ INT MeasurementBetaScan(CParameters& params)
                     }
                 }
                 WriteStringFileComplexArray(sFileNameWrite1, polyOut);
-                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
+                if (pPL->m_bMeasureZSlice)
+                {
+                    WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgZSlice);
+                }
             }
             break;
             case EBSMJ_Chiral:

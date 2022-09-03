@@ -333,8 +333,6 @@ _kernelKSApplyGammaEM(
     deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
 
-#pragma region apply EM field
-
     const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
     const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
     const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
@@ -405,8 +403,6 @@ _kernelKSApplyGammaEM(
     {
         x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(u1mT), _sin(u1mT)));
     }
-
-#pragma endregion
 
     if (x_m_mu_Gauge.NeedToDagger())
     {

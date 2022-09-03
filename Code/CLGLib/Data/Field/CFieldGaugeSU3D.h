@@ -355,16 +355,86 @@ static __device__ __inline__ deviceSU3 _deviceLink(
 }
 
 /**
+ * Get magnetic phase
+ * type0:
+ * Ay(n) = q B nx
+ * if twisted Ax(Lx) = - q B ny
+ *
+ * type1:
+ * Ax(n) = - q B ny
+ * if twisted Ay(Ly) = q B nx
+ *
+ * type2:
+ * Ax(n) = - q B ny/2
+ * Ay(n) = qB nx / 2
+ *
+ * if twisted
+ * Ax(Lx) = - q B ny
+ * Ay(Ly) = q B nx
+ *
+ */
+static __device__ __inline__ Real __deviceGetMagneticPhase(const SSmallInt4& sSite, const SSmallInt4& sCenter, BYTE byLink, BYTE byGaugeType, UBOOL bTwisted)
+{
+    if (0 != byLink && 1 != byLink)
+    {
+        return F(0.0);
+    }
+
+    if (0 == byGaugeType)
+    {
+        if (1 == byLink)
+        {
+            return static_cast<Real>(sSite.x - sCenter.x + F(0.5));
+        }
+        if (bTwisted && sSite.x == _DC_Lxi - 1)
+        {
+            return -static_cast<Real>(sSite.y - sCenter.y + F(0.5));
+        }
+        return F(0.0);
+    }
+
+    if (1 == byGaugeType)
+    {
+        if (0 == byLink)
+        {
+            return -static_cast<Real>(sSite.y - sCenter.y + F(0.5));
+        }
+        if (bTwisted && sSite.y == _DC_Lyi - 1)
+        {
+            return static_cast<Real>(sSite.x - sCenter.x + F(0.5));
+        }
+        return F(0.0);
+    }
+
+    if (0 == byLink)
+    {
+        if (bTwisted && sSite.x == _DC_Lxi - 1)
+        {
+            return -static_cast<Real>(sSite.y - sCenter.y + F(0.5));
+        }
+        return -static_cast<Real>(sSite.y - sCenter.y + F(0.5)) * F(0.5);
+    }
+
+    if (bTwisted && sSite.x == _DC_Lxi - 1)
+    {
+        return static_cast<Real>(sSite.x - sCenter.x + F(0.5));
+    }
+    return static_cast<Real>(sSite.x - sCenter.x + F(0.5)) * F(0.5);
+}
+
+/**
  * Same as _deviceLink, but with fixed electric-magnetic field
  * The electric-magnetic field is parameterized as Bz
  * For magnetic field between n1 and n2 is:
  * Ax(Lx) = - q B ny
  * Ay(n) = q B nx
+ *
+ * If no twisted boundary, then only Ay(n) = q B nx, others are zero
  */
 static __device__ __inline__ deviceSU3 _deviceLinkMP(
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sStartSite, const SSmallInt4& sCenterSite,
-    BYTE byLength, BYTE byFieldId, Real fQBz,
+    BYTE byLength, BYTE byFieldId, Real fQBz, BYTE byGaugeType, UBOOL bTwistedBoundary,
     const INT* __restrict__ pDir)
 {
     //length can be 0
@@ -393,33 +463,16 @@ static __device__ __inline__ deviceSU3 _deviceLinkMP(
             || (!newLink.NeedToDagger() && bDagger);
         if (!newLink.IsDirichlet())
         {
-            if (1 == newLink.m_byDir) //y-dir move
+            if (0 == newLink.m_byDir || 1 == newLink.m_byDir)
             {
                 const SSmallInt4 newSite = __deviceSiteIndexToInt4(newLink.m_uiSiteIndex);
-                const Real fXCoord = static_cast<Real>(newSite.x - sCenterSite.x + F(0.5));
                 if (bDaggerFinal)
                 {
-                    fPhase = fPhase - fXCoord;
+                    fPhase = fPhase - __deviceGetMagneticPhase(newSite, sCenterSite, newLink.m_byDir, byGaugeType, bTwistedBoundary);
                 }
                 else
                 {
-                    fPhase = fPhase + fXCoord;
-                }
-            }
-            else if (0 == newLink.m_byDir) //x-dir move
-            {
-                const SSmallInt4 newSite = __deviceSiteIndexToInt4(newLink.m_uiSiteIndex);
-                if (newSite.x == static_cast<INT>(_DC_Lx) - 1)
-                {
-                    const Real fYCoord = static_cast<Real>(newSite.y - sCenterSite.y + F(0.5));
-                    if (bDaggerFinal)
-                    {
-                        fPhase = fPhase + fYCoord;
-                    }
-                    else
-                    {
-                        fPhase = fPhase - fYCoord;
-                    }
+                    fPhase = fPhase + __deviceGetMagneticPhase(newSite, sCenterSite, newLink.m_byDir, byGaugeType, bTwistedBoundary);
                 }
             }
         }
