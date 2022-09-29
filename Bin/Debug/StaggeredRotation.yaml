@@ -1617,7 +1617,7 @@ JobSimulateREM:
 
     BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 1500
+    EquvibStep : 5
     SaveStartIndex : 0
     ListStart : 1
     ListEnd : 10
@@ -1640,6 +1640,7 @@ JobSimulateREM:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 5
     FermionFieldCount : 4
+    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
 
@@ -1647,7 +1648,7 @@ JobSimulateREM:
     ## Initial files
     ## ============================================================
     Nt4FileName : ./SRF486295059_R_Nt4_O0_1000.con
-    Nt4Polyakov : 0.286030173302
+    Nt4Polyakov : 0.109216712415
 
     Updator:
 
@@ -1690,9 +1691,8 @@ JobSimulateREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : -0.333333333333333333
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : -0.333333333333333333
+        EMFieldID : 6
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1716,9 +1716,8 @@ JobSimulateREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : -0.333333333333333333
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : -0.333333333333333333
+        EMFieldID : 6
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1742,9 +1741,8 @@ JobSimulateREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : 0.6666666666666666667
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : 0.6666666666666666667
+        EMFieldID : 6
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1768,9 +1766,8 @@ JobSimulateREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : -0.333333333333333333
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : -0.333333333333333333
+        EMFieldID : 6
 
         # MC is to prepare
         # This is x^{1/8}
@@ -1779,6 +1776,17 @@ JobSimulateREM:
         # MD is to calculate force
         # This is x^{-1/4}
         MD : [1.0260760317495705, 0.013161857934304067, 0.007541358599232121]
+
+    OtherGaugeField1:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 6
+        Period : [1, 1, 1, 1]
+        BzType : EURT_Bp_xy_notwist
+        BzValue : 0.1
 
     Action1:
    
@@ -1956,6 +1964,7 @@ JobMeasureREM:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 3
+    OtherGaugeFieldCount : 1
     MeasureListLength : 9
     CacheStaple : 0
     AlsoCheckMD5 : 0
@@ -1986,7 +1995,8 @@ JobMeasureREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : 0.666666666666666667
+        Charge : 0.666666666666666667
+        EMFieldID : 5
 
         # MC is to prepare
         # This is x^{1/8}
@@ -2010,7 +2020,8 @@ JobMeasureREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : -0.333333333333333333333333
+        Charge : -0.333333333333333333333333
+        EMFieldID : 5
 
         # MC is to prepare
         # This is x^{1/8}
@@ -2034,7 +2045,8 @@ JobMeasureREM:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
-        EMChange : -0.333333333333333333333333
+        Charge : -0.333333333333333333333333
+        EMFieldID : 5
 
         # MC is to prepare
         # This is x^{1/8}
@@ -2043,6 +2055,17 @@ JobMeasureREM:
         # MD is to calculate force
         # This is x^{-1/4}
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    OtherGaugeField1:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 5
+        Period : [1, 1, 1, 1]
+        BzType : EURT_Bp_xy_notwist
+        BzValue : 0.1
 
     Solver:
 

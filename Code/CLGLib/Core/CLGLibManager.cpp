@@ -234,6 +234,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     __FetchIntWithDefault(_T("FermionFieldCount"), 0);
     m_InitialCache.constIntegers[ECI_FermionFieldLength] = static_cast<UINT>(iVaules);
 
+    __FetchIntWithDefault(_T("OtherGaugeFieldCount"), 0);
+    m_InitialCache.constIntegers[ECI_OtherGaugeField] = static_cast<UINT>(iVaules);
+
     __FetchStringWithDefault(_T("RandomType"), _T("ER_Schrage"));
     m_InitialCache.eR = __STRING_TO_ENUM(ERandom, sValues);
 
@@ -457,6 +460,97 @@ void CCLGLibManager::CreateFermionBoundaryField(class CParameters& params) const
     const BYTE byFieldId = static_cast<BYTE>(iVaules);
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
     appGeneral(_T("Create the boundary fermion field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
+}
+
+void CCLGLibManager::CreateOtherGaugeFields(class CParameters& params) const
+{
+    INT iVaules = 0;
+    CCString sValues;
+
+    CCString sGaugeClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldGaugeSU3"));
+    sGaugeClassName = sValues;
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
+    const EFieldInitialType eGaugeInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+
+    __FetchIntWithDefault(_T("FieldId"), 2);
+    const BYTE byFieldId = static_cast<BYTE>(iVaules);
+    if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
+    {
+        appCrucial(_T("Unable to create the gauge field! with wrong field ID %s %d!"), sGaugeClassName.c_str(), byFieldId);
+        return;
+    }
+
+    CBase* pGaugeField = appCreate(sGaugeClassName);
+    CFieldGauge* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldGauge*>(pGaugeField)) : NULL;
+    if (NULL == pGauge)
+    {
+        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
+        return;
+    }
+
+    pGauge->m_byFieldId = byFieldId;
+    if (EFIT_ReadFromFile != eGaugeInitial)
+    {
+        pGauge->m_pOwner = m_pLatticeData;
+        pGauge->InitialField(eGaugeInitial);
+    }
+    else
+    {
+        CCString sFileType, sFileName;
+        if (!params.FetchStringValue(_T("GaugeFileType"), sFileType)
+            || !params.FetchStringValue(_T("GaugeFileName"), sFileName))
+        {
+            appCrucial(_T("Gauge initial type is EFIT_ReadFromFile, but cannot find GaugeFileType or GaugeFileName!\n"));
+            _FAIL_EXIT;
+        }
+        const EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
+        pGauge->m_pOwner = m_pLatticeData;
+        pGauge->InitialFieldWithFile(sFileName, eFileType);
+    }
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+    pGauge->InitialOtherParameters(params);
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    TArray<INT> periodic;
+    if (params.FetchValueArrayINT(_T("Period"), periodic))
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+    }
+
+    m_pLatticeData->m_pOtherFields.AddItem(pGauge);
+    m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pGauge);
+
+    appGeneral(_T("Create the gauge %s (field id %d) with initial: %s\n"), sGaugeClassName.c_str(), byFieldId, sValues.c_str());
+}
+
+void CCLGLibManager::CreateOtherGaugeBoundaryFields(class CParameters& params) const
+{
+    CCString sValues;
+    INT iVaules;
+    CCString sGaugeClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldBoundaryGaugeSU3"));
+    sGaugeClassName = sValues;
+
+    CBase* pGaugeField = appCreate(sGaugeClassName);
+    CFieldBoundary* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldBoundary*>(pGaugeField)) : NULL;
+
+    if (NULL == pGauge)
+    {
+        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
+    }
+    pGauge->InitialField(params);
+    __FetchIntWithDefault(_T("FieldId"), -1);
+    const BYTE byFieldId = static_cast<BYTE>(iVaules);
+    m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pGauge);
+    appGeneral(_T("Create the boundary gauge %s (id %d) with initial: %s\n"), sGaugeClassName.c_str(), byFieldId, sValues.c_str());
 }
 
 void CCLGLibManager::CreateIndexAndBoundary(class CParameters& params) const
@@ -747,6 +841,29 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             {
                 CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
                 CreateFermionBoundaryField(bcfermionField);
+            }
+            checkCudaErrors(cudaGetLastError());
+        }
+    }
+    checkCudaErrors(cudaGetLastError());
+
+    if (m_InitialCache.constIntegers[ECI_OtherGaugeField] > 0)
+    {
+        for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_OtherGaugeField]; ++i)
+        {
+            CCString sOtherGaugeSubParamName;
+            sOtherGaugeSubParamName.Format(_T("OtherGaugeField%d"), i);
+            if (params.Exist(sOtherGaugeSubParamName))
+            {
+                CParameters otherGaugeField = params.GetParameter(sOtherGaugeSubParamName);
+                CreateOtherGaugeFields(otherGaugeField);
+            }
+            checkCudaErrors(cudaGetLastError());
+            sOtherGaugeSubParamName.Format(_T("OtherGaugeBoundaryField%d"), i);
+            if (params.Exist(sOtherGaugeSubParamName))
+            {
+                CParameters bcgaugeField = params.GetParameter(sOtherGaugeSubParamName);
+                CreateOtherGaugeBoundaryFields(bcgaugeField);
             }
             checkCudaErrors(cudaGetLastError());
         }

@@ -23,6 +23,16 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
         return 1;
     }
 
+    Real fHdiff = F(0.5);
+    INT iAccept = 3;
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedHdiffDebug"), fHdiff);
+    sParam.FetchValueINT(_T("ExpectedAcceptDebug"), iAccept);
+#else
+    sParam.FetchValueReal(_T("ExpectedHdiff"), fHdiff);
+    sParam.FetchValueINT(_T("ExpectedAccept"), iAccept);
+#endif
+
     appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
     appGetLattice()->m_pUpdator->Update(3, TRUE);
     appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
@@ -32,9 +42,16 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(40, TRUE);
 #else
+    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(5, TRUE);
     Real fRes = pMeasure->m_fLastRealResult;
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+
+    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
+    const Real Hdiff = appGetLattice()->m_pUpdator->GetHDiff();
+    appGeneral(_T("accepted : expected >= %d res=%d\n"), iAccept, uiAccept);
+    appGeneral(_T("HDiff average : expected < %f res=%f\n"), fHdiff, Hdiff);
+
+    appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     if (appAbs(fRes - fExpected) > F(0.02))
     {
         return 1;
@@ -78,6 +95,12 @@ __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGr
 __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField);
 __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4);
 
+#if !_CLG_DEBUG
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGamma);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaProj);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEM);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEMProj);
+#endif
 
 
 

@@ -4,12 +4,11 @@
 // DESCRIPTION:
 //
 // REVISION:
-//  [09/24/2020 nbale]
+//  [09/29/2022 nbale]
 //=============================================================================
+#include "ElectricChemical.h"
 
-#include "StaggeredRotation.h"
-
-INT SimulateStaggeredRotationEM(CParameters& params)
+INT Simulate(CParameters& params)
 {
 #pragma region Parameters
 
@@ -17,60 +16,60 @@ INT SimulateStaggeredRotationEM(CParameters& params)
 
     INT iVaule = 99;
     params.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
-    const UINT iBeforeEquib = static_cast<UINT>(iVaule);
+    UINT iBeforeEquib = static_cast<UINT>(iVaule);
 
     iVaule = 6;
     params.FetchValueINT(_T("EquvibStep"), iVaule);
-    const UINT iEquib = static_cast<UINT>(iVaule);
+    UINT iEquib = static_cast<UINT>(iVaule);
 
     iVaule = 1;
     params.FetchValueINT(_T("EquvibSkip"), iVaule);
     UINT iEquibSkip = static_cast<UINT>(iVaule);
 
     iVaule = 0;
+    params.FetchValueINT(_T("SaveStartIndex"), iVaule);
+    UINT iSaveStartIndex = static_cast<UINT>(iVaule);
+
+    CCString sSavePrefix;
+    params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
+    appGeneral(_T("save prefix : %s\n"), sSavePrefix.c_str());
+
+    iVaule = 0;
     params.FetchValueINT(_T("ListStart"), iVaule);
-    const UINT iEMStart = static_cast<UINT>(iVaule);
+    const INT iListStart = iVaule;
 
     iVaule = 0;
     params.FetchValueINT(_T("ListEnd"), iVaule);
-    const UINT iEMEnd = static_cast<UINT>(iVaule);
+    const INT iListEnd = iVaule;
 
-    TArray<Real> lstMagnetic;
-    params.FetchValueArrayReal(_T("MagneticList"), lstMagnetic);
+    TArray<Real> lstElectric;
+    params.FetchValueArrayReal(_T("Electric"), lstElectric);
 
-    TArray<Real> lstOmega;
-    params.FetchValueArrayReal(_T("OmegaList"), lstOmega);
-
-    iVaule = 0;
-    params.FetchValueINT(_T("SaveStartIndex"), iVaule);
-    const UINT iSaveStartIndex = static_cast<UINT>(iVaule);
+    TArray<Real> lstChemical;
+    params.FetchValueArrayReal(_T("Chemical"), lstChemical);
 
     iVaule = 0;
     params.FetchValueINT(_T("Additive"), iVaule);
-    const UBOOL bAdditive = 0 != iVaule;
+    UBOOL bAdditive = 0 != iVaule;
 
     TArray<Real> old_polyakovs;
     params.FetchValueArrayReal(_T("Polyakovs"), old_polyakovs);
 
-    CCString sSavePrefix;
-    params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
-    appGeneral(_T("save prefix: %s\n"), sSavePrefix.c_str());
+    CCString sOldFileName;
+    const UBOOL bHasOldFile = params.FetchStringValue(_T("OldFileName"), sOldFileName);
+
+    Real fOldPolyakov = F(0.0);
+    if (bHasOldFile)
+    {
+        params.FetchValueReal(_T("OldPolyakov"), fOldPolyakov);
+    }
 
     CCString sFileName;
     TCHAR buff1[256];
     TCHAR buff2[256];
     CCString sInfo;
-#pragma endregion
 
-    //TArray<INT> latticeDecomp;
-    //params.FetchValueArrayINT(_T("LatticeLength"), latticeDecomp);
-    //latticeDecomp[3] = uiNt;
-    //TArray<CCString> sLatticeDecomp;
-    //sLatticeDecomp.AddItem(appIntToString(latticeDecomp[0]));
-    //sLatticeDecomp.AddItem(appIntToString(latticeDecomp[1]));
-    //sLatticeDecomp.AddItem(appIntToString(latticeDecomp[2]));
-    //sLatticeDecomp.AddItem(appIntToString(latticeDecomp[3]));
-    //params.SetStringVectorVaule(_T("LatticeLength"), sLatticeDecomp);
+#pragma endregion
 
     if (!appInitialCLG(params))
     {
@@ -78,18 +77,6 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         return 1;
     }
 
-    CCString sOldFileName;
-    Real fOldFilePolyakov = F(0.0);
-    CCString sFileKeyName;
-    CCString sPolyaKeyName;
-    sFileKeyName.Format(_T("Nt%dFileName"), _HC_Lt);
-    sPolyaKeyName.Format(_T("Nt%dPolyakov"), _HC_Lt);
-    params.FetchStringValue(sFileKeyName, sOldFileName);
-    params.FetchValueReal(sPolyaKeyName, fOldFilePolyakov);
-
-    appGeneral(_T("file: %s, |p| : %f\n"), sOldFileName.c_str(), fOldFilePolyakov);
-
-    CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(6));
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     TArray<TArray<CLGComplex>> polykovX_nx;
     TArray<CLGComplex> polykov;
@@ -101,33 +88,30 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         polykovX_nx.AddItem(a);
     }
 
-    CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
-    CCString sHeader;
-    sHeader.Format(_T("Nt%d"), _HC_Lt);
-    appSetLogHeader(sHeader);
-    appGeneral(_T("Run for Nt = %d, start baking.\n"), _HC_Lt);
+    CFieldFermionKSSU3GammaEM* pU = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSSU3GammaEM* pD = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetFieldById(3));
+    CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(4));
 
-    //=============== Check oldfiles ==================
     UBOOL bNeedBake = TRUE;
-    if (!bAdditive && !sOldFileName.IsEmpty())
+    if (!bAdditive && bHasOldFile)
     {
         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileName, EFFT_CLGBin);
         pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-        Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov);
+        Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldPolyakov);
 #if _CLG_DOUBLEFLOAT
         if (fError < F(1E-07))
 #else
         if (fError < F(1E-05))
 #endif
         {
-            appGeneral(_T("\n ================ Bake using old file =================\n"));
-            bNeedBake = FALSE;
+            appGeneral(_T("\n ================ Bake using old file %s =================\n"), sOldFileName.c_str());
         }
         else
         {
             appGeneral(_T("\n ================ have the initial file, but not matching.... %2.12f, %2.12f, diff=%f ===========\n"),
-                _cuCabsf(pPL->m_lstLoop[0]), fOldFilePolyakov, fError);
+                _cuCabsf(pPL->m_lstLoop[0]), fOldPolyakov, fError);
         }
+        bNeedBake = FALSE;
     }
 
     if (bAdditive)
@@ -137,18 +121,17 @@ INT SimulateStaggeredRotationEM(CParameters& params)
 
     if (bNeedBake && iBeforeEquib > 0)
     {
+        if (bHasOldFile)
+        {
+            appGeneral(_T("!!!! Has old file but still bake !!!!\n"));
+        }
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-        pGaugeRotation->SetOmega(F(0.0));
-        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), F(0.0));
-
-        appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
-
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
         appGetLattice()->m_pMeasurements->Reset();
         UINT uiAccepCountBeforeE = 0;
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
         {
-            const UINT uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, FALSE);
+            UINT uiAccepCountBeforeE2 = appGetLattice()->m_pUpdator->Update(1, FALSE);
             if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
             {
                 uiAccepCountBeforeE = uiAccepCountBeforeE2;
@@ -170,31 +153,35 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         appGeneral(_T("Not Baked\n"));
     }
 
-    UINT uiListIdx = iEMStart;
-    while (uiListIdx < iEMEnd)
+    for (INT uiOmega = iListStart; uiOmega < lstElectric.Num() && uiOmega < iListEnd; ++uiOmega)
     {
-        sHeader.Format(_T("Nt%dREM%d"), _HC_Lt, uiListIdx);
+        CCString sHeader;
+        sHeader.Format(_T("%d"), uiOmega);
         appSetLogHeader(sHeader);
-        appGeneral(_T("\n========= Omega=%f Magnetic=%f ==========\n"), lstOmega[uiListIdx], lstMagnetic[uiListIdx]);
+        appGeneral(_T("\n========= Electric =%f Chemical = %f  ==========\n"), lstElectric[uiOmega], lstChemical[uiOmega]);
 
-        pGaugeRotation->SetOmega(lstOmega[uiListIdx]);
-        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx]);
+        pU->m_fCoeffGamma54 = lstChemical[uiOmega];
+        pU->UpdatePooledParamters();
+        pD->m_fCoeffGamma54 = lstChemical[uiOmega];
+        pD->UpdatePooledParamters();
+        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0));
 
         if (bAdditive)
         {
-            if (old_polyakovs.Num() <= static_cast<INT>(uiListIdx))
+            Real fPolyaOld = F(0.0);
+            if (old_polyakovs.Num() <= static_cast<INT>(uiOmega))
             {
                 appGeneral(_T("\n ================ not have the initial value===========\n"));
                 appFailQuitCLG();
                 return 1;
             }
-            const Real fPolyaOld = old_polyakovs[uiListIdx];
+            fPolyaOld = old_polyakovs[uiOmega];
 
             appGetLattice()->m_pMeasurements->Reset();
-            sFileName.Format(_T("%sR_Nt%d_REM%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiListIdx, iSaveStartIndex);
+            sFileName.Format(_T("%sEC_%d_%d.con"), sSavePrefix.c_str(), uiOmega, iSaveStartIndex);
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-            const Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
+            Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
 #else
@@ -222,8 +209,7 @@ INT SimulateStaggeredRotationEM(CParameters& params)
             const UINT uiAcce = appGetLattice()->m_pUpdator->GetConfigurationCount();
             if (uiAcce != iConfigNumberNow)
             {
-                sFileName.Format(_T("R_Nt%d_REM%d_%d"), _HC_Lt, uiListIdx, uiAcce + iSaveStartIndex);
-                sFileName = sSavePrefix + sFileName;
+                sFileName.Format(_T("%sEC_%d_%d"), sSavePrefix.c_str(), uiOmega, uiAcce + iSaveStartIndex);
 
                 //=================================
                 //Save config
@@ -264,49 +250,13 @@ INT SimulateStaggeredRotationEM(CParameters& params)
 
 #pragma endregion
 
-        ++uiListIdx;
-
         appGetLattice()->m_pMeasurements->Reset();
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     }
 
-    appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), _HC_Lt);
-    appSetLogDate(FALSE);
-    const INT uiRealRuned = static_cast<INT>(iEMEnd - iEMStart);
-    assert(polykov.Num() == uiRealRuned);
+    appGeneral(_T("\n========= Finished! ==========\n\n"));
 
-    appGeneral(_T("|Polyakov|={\n"));
-    for (INT i = 0; i <= uiRealRuned; ++i)
-    {
-        appGeneral(i == uiRealRuned ? _T("%2.10f\n ") : _T("%2.10f,\n"),
-            _cuCabsf(polykov[i]));
-    }
-    appGeneral(_T("}\n\narg(Polyakov)={\n"));
-
-    for (INT i = 0; i <= uiRealRuned; ++i)
-    {
-        appGeneral(i == uiRealRuned ? _T("%2.10f\n ") : _T("%2.10f,\n"),
-            polykovphase[i]);
-    }
-
-    for (INT x = 0; x < static_cast<INT>(CCommonData::m_sCenter.x); ++x)
-    {
-        appGeneral(_T("Polyakov[x=%d]={\n"), x);
-        for (INT i = 0; i <= uiRealRuned; ++i)
-        {
-            appGeneral(i == uiRealRuned ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
-                polykovX_nx[x][i].x,
-                polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
-                appAbs(polykovX_nx[x][i].y)
-            );
-        }
-        appGeneral(_T("}\n\n"));
-    }
-
-    appSetLogDate(TRUE);
-
-    appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), _HC_Lt);
-    appQuitCLG();
+    appQuitCLG(); 
 
     return 0;
 }

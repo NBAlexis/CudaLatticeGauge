@@ -298,6 +298,50 @@ UINT TestGaugeInvarience(CParameters&)
 
 __REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience);
 
+UINT TestBackgroundField(CParameters&)
+{
+    CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(2));
+
+    appGeneral(_T("============ chemical potential ===========\n"));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ EZ 0 ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), F(0.1), F(0.0));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ EZ 1 ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_E_z, EURT_None, F(0.0), F(0.1), F(0.0));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 0 ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 0 no twist ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 1 ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 1 no twist ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 2 ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    appGeneral(_T("============ BZ 2 no twist ===========\n"));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->DebugPrintMe();
+
+    return 0;
+}
+
+__REGIST_TEST(TestBackgroundField, Misc, TestBackgroundField);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

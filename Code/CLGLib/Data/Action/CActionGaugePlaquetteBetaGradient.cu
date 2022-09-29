@@ -66,7 +66,7 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 )
 {
     intokernalInt4;
-    const BYTE uiDir = static_cast<const BYTE>(_DC_Dir);
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
     //Real test_force = F(0.0);
     //betaOverN = betaOverN * F(-0.5);
@@ -311,7 +311,6 @@ void CActionGaugePlaquetteGradient::SetBeta(const TArray <Real>& fBeta)
     }
     checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(DOUBLE) * _HC_Lz, cudaMemcpyHostToDevice));
 #else
-    param.FetchValueArrayReal(_T("Beta"), m_fBetaArray);
     for (INT i = 0; i < _HC_Lzi; ++i)
     {
         if (i < m_fBetaArray.Num())

@@ -181,6 +181,17 @@ void CLatticeData::ReCopyPooled() const
     }
 }
 
+void CLatticeData::ReCopyPooled(BYTE byId) const
+{
+    if (!m_pFieldPoolMap.Exist(byId))
+    {
+        appCrucial(_T("Get Pooled field failed!\n"));
+        return;
+    }
+    const CFieldPool* pool = m_pFieldPoolMap.GetAt(byId);
+    pool->ReCopyAll();
+}
+
 void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple) const
 {
     //accept gauge already copy to m_pGaugeField in Updator, maybe change this behavour in the furture.

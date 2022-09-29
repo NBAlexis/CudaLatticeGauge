@@ -482,6 +482,12 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3Gamma.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3GammaEM.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -801,6 +807,12 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu">
       <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3Gamma.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3GammaEM.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

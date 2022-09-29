@@ -69,6 +69,8 @@ protected:
     void CreateGaugeBoundaryField(class CParameters& params) const;
     void CreateFermionFields(class CParameters& params) const;
     void CreateFermionBoundaryField(class CParameters& params) const;
+    void CreateOtherGaugeFields(class CParameters& params) const;
+    void CreateOtherGaugeBoundaryFields(class CParameters& params) const;
     void CreateIndexAndBoundary(class CParameters& params) const;
     void CreateActionList(class CParameters& params);
     void CreateUpdator(class CParameters& params) const;

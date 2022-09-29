@@ -355,6 +355,75 @@ static __device__ __inline__ deviceSU3 _deviceLink(
 }
 
 /**
+ * After every move, it maps to inside the lattice
+ * Do NOT use it in projective plane boundary condition
+ */
+static __device__ __inline__ deviceSU3 _deviceLinkLong(
+    const deviceSU3* __restrict__ pDeviceData,
+    SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
+    const INT* __restrict__ pDir)
+{
+    //length can be 0
+    deviceSU3 sRet = deviceSU3::makeSU3Id();
+    for (BYTE i = 0; i < byLength; ++i)
+    {
+        if (0 == pDir[i])
+        {
+            continue;
+        }
+        UBOOL bDagger = FALSE;
+        const BYTE byDir = pDir[i] > 0 ?
+            static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
+
+        if (pDir[i] < 0) //Move
+        {
+            bDagger = TRUE;
+            _deviceSmallInt4Offset(sStartSite, pDir[i]);
+        }
+        const SIndex& newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(sStartSite) + byDir];
+        sStartSite = __deviceSiteIndexToInt4(newLink.m_uiSiteIndex);
+
+        if (0 == i)
+        {
+            if (!newLink.IsDirichlet())
+            {
+                sRet = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
+                if ((newLink.NeedToDagger() && !bDagger)
+                    || (!newLink.NeedToDagger() && bDagger)
+                    )
+                {
+                    sRet.Dagger();
+                }
+            }
+        }
+        else
+        {
+            if (!newLink.IsDirichlet())
+            {
+                if ((newLink.NeedToDagger() && !bDagger)
+                    || (!newLink.NeedToDagger() && bDagger)
+                    )
+                {
+                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+                else
+                {
+                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                }
+            }
+        }
+
+        if (pDir[i] > 0 && i < (byLength - 1)) //Move
+        {
+            _deviceSmallInt4Offset(sStartSite, pDir[i]);
+        }
+    }
+
+    return sRet;
+}
+
+#if discard
+/**
  * Get magnetic phase
  * type0:
  * Ay(n) = q B nx
@@ -544,7 +613,7 @@ static __device__ __inline__ Real _devicePhaseM(UINT uiLinkIndex, const SSmallIn
 {
     return _devicePhaseM(__deviceLinkIndexToInt4(uiLinkIndex), static_cast<BYTE>(uiLinkIndex & 3), sCenterSite, fQBz);
 }
-
+#endif
 
 /**
 * big index is the index of walking table.

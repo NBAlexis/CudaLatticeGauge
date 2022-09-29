@@ -1,0 +1,239 @@
+\subsection{\label{sec:GammaMatrixKS}Gamma matrix for KS Staggered fermion}
+
+\subsubsection{\label{sec:gamma1234ks}Gamma 1234}
+
+Defining
+\begin{equation}
+\begin{split}
+&link_{\mu}(2h)=\sum _{{\bf A}=n\setminus \mu \times 0,1} \eta _{\mu}(2h+{\bf A})\bar{\chi}(2h+{\bf A}+\mu)\chi(2h+{\bf A})+\bar{\chi}(2h+{\bf A})\chi (2h +{\bf A}+ \mu)
+\end{split}
+\end{equation}
+as a pair of line \textbf{in} one grid of $2^4$ hypercube, sum over other directions.
+Here $n\setminus \mu = (y,z,t)$ for $\mu=x$.
+
+It is easy to verify
+\begin{equation}
+\begin{split}
+&\frac{1}{16}link_{\mu}(2h)= \bar{q}\gamma _{\mu}\otimes I q\\
+&\frac{1}{16}link_{\mu}(2h+\mu)=\frac{1}{2}\left((\bar{q}(2h+2\mu)\gamma _{\mu}\otimes I q(2h)+\bar{q}(2h+2\mu)\gamma _5\otimes \tau_5\tau_{\mu} q(2h))\right.\\
+&\left.+(\bar{q}(2h\mu)\gamma _{\mu}\otimes I q(2h+2\mu)-\bar{q}(2h)\gamma _5\otimes \tau_5\tau_{\mu} q(2h+2\mu))\right)
+\end{split}
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+&\frac{1}{16}\left(link_{\mu}(2h)+\frac{1}{2}link_{\mu}(2h+\mu)+\frac{1}{2}link_{\mu}(2h-\mu)\right)\\
+&=2\bar{q}\gamma _{\mu}\otimes I q +a^2 \left[ \bar{q}\gamma _{\mu}\otimes I \Delta _{\mu} q\right]_+ - a \left[\bar{q}\gamma _5\otimes \tau_5\tau_{\mu} \partial _{\mu} q\right]_-
+\end{split}
+\end{equation}
+where
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&\left[ \hat{O}_1\bar{q}\Gamma \hat{O}_2 q \right]_{\pm} = \hat{O}_1\bar{q}\Gamma \hat{O}_2q \pm \hat{O}_2\bar{q}\Gamma \hat{O}_1 q \\
+&\partial _i q=\frac{q(2h+2)-q(2h-2)}{4a}\;\;\Delta _i q=\frac{q(2h+2)+q(2h-2)-2q(2h)}{4a^2}
+\end{split}
+\end{equation} 
+}
+
+After shift the first line, it is
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&(2a)^4\sum _h \bar{q}\gamma _{\mu}\otimes I q + \mathcal{O}(a) = a^4 \frac{1}{2}\sum _n\sum _{s=\pm 1}\left(\eta _{\mu}(n)\bar{\chi}(n\mu)\chi(n+s\mu)\right)\\
+&\mathcal{O}(a) =\frac{1}{2}(2a)^4\sum _h  \left(a^2 \left[ \bar{q}\gamma _{\mu}\otimes I \Delta _{\mu} q\right]_+ - a \left[\bar{q}\gamma _5\otimes \tau_5\tau_{\mu} \partial _{\mu} q\right]_-\right)
+\end{split}
+\end{equation} 
+}
+
+\subsubsection{\label{sec:gamma1213142334ks}Gamma 12, 13, 14, 23, 24}
+
+\textbf{\textcolor[rgb]{1,0,0}{Note, we use $\sigma _{12}^E=\frac{i}{2}\left(\gamma _1^E\gamma _2^E-\gamma _2^E\gamma _1^E\right)$ in this subsection.}}
+
+Defining
+\begin{equation}
+\begin{split}
+&plane_{ij}(2h)=\frac{1}{16}\sum _{ijkl=0, 1} \eta _i(2h+\vec{v}_{ijkl})\eta _j(2h+\vec{v}_{ijkl})\bar{\chi}(2h+\vec{v}_{ijkl})\chi(2h+\vec{1}_{ij}-\vec{v}_{ij} + \vec{v}_{kl})
+\end{split}
+\end{equation}
+where (taking $i,j=x,y$ for example) $\vec{v}_{ijkl}=(n_i,n_j,n_k,n_l)$, $\vec{v}_{ij}=(n_i,n_j,0,0)$, $\vec{v}_{kl}=(0,0,n_k,n_l)$, $\vec{1}_{ij}=(1,1,0,0)$. This is the diagonal lines of square $i,j$, sum over $k,l$.
+
+Then, for $i<j$, $\delta_{i,j}=\pm 1$
+\begin{equation}
+\begin{split}
+&plane_{ij}(2h)=\bar{q}(2h) i \sigma _{ij} q(2h)\\
+&plane_{ij}(2h+\vec{\delta} _i)=\frac{1}{2}\bar{q}(2h+2\vec{\delta} _i) \left(i \sigma _{ij} -\delta _i \gamma_5\gamma _j\otimes \tau _5\tau _i\right)q(2h)\\
+&+\frac{1}{2}\bar{q}(2h) \left(i \sigma _{ij} +\delta _i \gamma_5\gamma _j\otimes \tau _5\tau _i\right)q(2h+2\vec{\delta} _i)\\
+&plane_{ij}(2h+\vec{\delta} _j)=\frac{1}{2}\bar{q}(2h+2\vec{\delta} _j) \left(i \sigma _{ij} +\delta _j \gamma_5\gamma _i\otimes \tau _5\tau _j\right)q(2h)\\
+&+\frac{1}{2}\bar{q}(2h) \left(i \sigma _{ij} -\delta _j \gamma_5\gamma _i\otimes \tau _5\tau _j\right)q(2h+2\vec{\delta} _j)\\
+&plane_{ij}(2h+\vec{\delta} _{ij})=\frac{1}{4}\sum _{s_{i,j}=\pm 1}\left\{\bar{q}(2h+\vec{\delta}_{ij}-s_is_j\vec{s}_{ij})\right.\\
+&\left.\times \left(i\sigma_{ij}-s_i \gamma_5\gamma_i\otimes \tau _5\tau _j +s_j \gamma_5\gamma_j\otimes \tau _5\tau _i +s_is_j\frac{\tau_i\tau_j-\tau_j\tau_i}{2}\right)q(2h+\vec{\delta}_{ij}+s_is_j\vec{s}_{ij})\right\}\\
+\end{split}
+\end{equation}
+
+So, for $i<j$,
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&(2a)^4\sum _h \bar{q}i\sigma _{ij}\otimes I q + \mathcal{O}(a) = a^4 \frac{1}{4}\sum _n \sum _{s_{i,j}=\pm 1}\left(\eta _i(n)\eta _j(n)\bar{\chi}(n)\chi(n+\vec{s}_{ij})\right)\\
+&\mathcal{O}(a) =(2a)^4\sum _h P_1+(2a)^4\sum _h P_2\\
+&P_1=-a\left[\left(\partial _i \bar{q} \gamma_5\gamma_j\otimes \tau _5\tau _i -\partial _j \bar{q} \gamma_5\gamma_i\otimes \tau _5\tau _j\right)q\right]_- + a^2 \left[\bar{q}i\sigma _{ij}\left(\Delta_i + \Delta _ j\right)q\right]_+\\
+&P_2=\left[m_{ij}-m_{ji}\right]_-+\left[\bar{q}i\sigma _{ij}\left(a^4\Delta_i\Delta_j+a^2(\Delta_i+\Delta_j)\right)q+a^4\Delta_j \bar{q}i\sigma_{ij}\Delta_i q\right]_++a^2\left[\bar{q}\tau_{ij}\partial_i\partial_j q -\partial _i \bar{q}\tau_{ij}\partial _j q\right]_+\\
+&m_{ij}=\left(\frac{a}{2}+a^3\Delta _i\right)\bar{q}\gamma_5 \gamma_i\otimes \tau _5\tau _j \partial _j q +\bar{q} \gamma_5 \gamma_i\otimes \tau _5\tau _j\left(a^3 \partial _j \Delta _i +\frac{a}{2}\partial _j\right)q\\
+&\tau _{ij}=\frac{\tau_i\tau_j-\tau_j\tau_i}{2}
+\end{split}
+\end{equation} 
+}
+
+\subsubsection{\label{sec:gamma51234ks}Gamma 51234}
+
+After calculate, the result happens to be \textbf{opposite} to
+\begin{equation}
+\begin{split}
+&\gamma_5\gamma_1 = -\gamma_2\gamma_3\gamma_4\\
+&\gamma_5\gamma_2 =  \gamma_1\gamma_3\gamma_4\\
+&\gamma_5\gamma_3 = -\gamma_1\gamma_2\gamma_4\\
+&\gamma_5\gamma_4 =  \gamma_1\gamma_2\gamma_3\\
+\end{split}
+\end{equation} 
+
+Defining
+\begin{equation}
+\begin{split}
+&\eta _{51}(n) = \eta_2(n)\eta_3(n)\eta_4(n)\\
+&\eta _{52}(n) = \textcolor[rgb]{1,0,0}{-}\eta_1(n)\eta_3(n)\eta_4(n)\\
+&\eta _{53}(n) = \eta_1(n)\eta_2(n)\eta_4(n)\\
+&\eta _{54}(n) = \textcolor[rgb]{1,0,0}{-}\eta_1(n)\eta_2(n)\eta_3(n)\\
+\end{split}
+\end{equation} 
+
+Then, define the cube as
+\begin{equation}
+\begin{split}
+&cube_{i}(2h)=\frac{1}{16}\sum _{ijkl=0, 1} \eta _{5i}(2h+\vec{v}_{ijkl})\bar{\chi}(2h+\vec{v}_{ijkl})\chi(2h+\vec{1}_{jkl}-\vec{v}_{jkl} + \vec{v}_{i})
+\end{split}
+\end{equation}
+as the links connecting diagonal of cube $n\setminus i$, and then sum over $i$.
+
+\begin{equation}
+\begin{split}
+&\Gamma = \gamma _5\gamma _{\mu}\otimes I, \;\; G = \gamma _5\otimes \tau _{\mu},\;\; \Gamma _i = \gamma _{\mu}\gamma _i \otimes \tau _5 \tau _i,\;\;\Gamma _{ij} = \gamma _5\gamma _{\mu}\gamma _i \gamma _j\otimes \tau _j \tau _i,\\
+&CubeA_{\mu}(h_1,h_2)=\bar{q}(h_1)\Gamma q(h_2)\\
+&CubeB_{\mu}(h_1,h_2,i\neq \mu,s=\pm 1)=\frac{1}{2}\left[\bar{q}(h_1)\Gamma q(h_2)+s\bar{q}(h_1)\Gamma_i q(h_2)\right]\\
+&CubeC_{\mu}(h_1,h_2,i,j,s_i=\pm 1,s_j=\pm 1)=\frac{1}{4}\left[\bar{q}(h_1)\Gamma q(h_2)+\sum _{k=i,j}s_k\bar{q} (h_1)\Gamma_k q(h_2)+s_is_j\bar{q}(h_1)\Gamma _{ij}q(h_2)\right]\\
+&CubeD_{\mu}(h_1,h_2,s_{ijk\neq \mu}=\pm 1)=\frac{1}{8}\left[\bar{q}(h_1)\Gamma q(h_2)+\sum _{l\neq \mu}s_l \bar{q}(h_1)\Gamma _l q(h_2) -\sum _{a<b,a\neq \mu,b\neq \mu}s_as_b\bar{q}(h_1)\Gamma _{ab}q(h_2)\right.\\
+&\left.-s_is_js_k\bar{q}(h_2)G q(h_2)\right]
+\end{split}
+\end{equation}
+
+It can be verified $\delta=\pm 1$
+\begin{equation}
+\begin{split}
+&cube_{\mu}(2h)=CubeA_{\mu}(2h,2h)\\
+&cube_{\mu}(2h+\vec{\delta}_i)=\sum _{s=\pm 1}\left(CubeB_{\mu}(2h+2\vec{\delta}_i,2h,i,s)+CubeB_{\mu}(2h,2h+2\vec{\delta}_i,i,s)\right)\\
+&cube_{\mu}(2h+\vec{\delta}_{ij})=\sum _{s_{ij}=\pm 1}CubeC_{\mu}(2h+L_c(\delta _{ij},s_{ij}),2h+R_c(\delta _{ij},s_{ij}),i,j,s_i,s_j)\\
+&cube_{\mu}(2h+\vec{\delta}_{ijk})=\sum _{s_{ijk}=\pm 1}CubeD_{\mu}(2h+L_d(\delta _{ijk},s_{ijk}),2h+R_d(\delta _{ijk},s_{ijk}),s_{ijk})\\
+&L_{c,d}(\delta,s)=\vec{\delta} + \vec{s},\;\;R_{c,d}(\delta,s)=\vec{\delta} - \vec{s}\\
+\end{split}
+\end{equation}
+
+Finally
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&(2a)^4\sum _h \bar{q}\gamma _5\gamma _{\mu}\otimes I q + \mathcal{O}(a) = a^4 \frac{1}{8}\sum _n \sum _{s_{i,j,k\neq \mu }=\pm 1}\left(\eta _{5\mu}(n)\bar{\chi}(n)\chi(n+\vec{s}_{ijk})\right)\\
+&\mathcal{O}(a) =(2a)^4\sum _h \left(\frac{1}{2}\sum _{i\neq \mu}B_i+\frac{1}{4}\sum _{i\neq j\neq \mu}\sum _{P(i,j)}C_{ij}+\frac{1}{8}\sum _{P(i,j,k)}D_{ijk}\right)\\
+\end{split}
+\end{equation} 
+where $\sum _{P(i,j)}C_{ij}=C_{ij}+C_{ji}$, $\sum _{P(i,j,k)}D_{ijk}=D_{ijk}+D_{jki}+D_{kij}$ and
+\begin{equation}
+\begin{split}
+&B_i=2a\left[\partial _i\bar{q}\Gamma _i q\right]_- +2a^2\left[\Delta _i \bar{q}\Gamma  q\right]_+\\
+&C_{ij}=4a\left[\partial _i\bar{q}\Gamma _i q\right]_-+2a^2\left[2\Delta _i \bar{q}\Gamma  q +\partial _i \bar{q}\Gamma _{ij}\partial _j q -\partial _i\partial _j \bar{q}\Gamma _{ij}q\right]_+\\
+&+a^3\left[\partial _i \bar{q}\Gamma _i \Delta _j q +\partial _i\Delta _j \bar{q}\Gamma _i q\right]_-+a^4\left[\Delta _i \bar{q}\Gamma\Delta _j q+\Delta _i\Delta _i \bar{q}\Gamma  q\right]_+\\
+&D_{ijk}=\left[8a^6 \Delta _i\Delta _j \bar{q}\Gamma \Delta _k q +8a^4 \Delta _i \bar{q}\Gamma \Delta _j q +\left(\frac{8a^6}{3}\Delta _i\Delta j\Delta _k +8a^4\Delta _i\Delta _j + +8a^2 \Delta _i\right)\bar{q}\Gamma q\right]_+\\
+&+\left[8a^5\left(\partial _i\Delta _j \bar{q}\Gamma _i \Delta _k q+ \partial _i \Delta _k \bar{q}\Gamma _i \Delta _j q + \partial _i \bar{q}\Gamma _i \Delta _j\Delta _k q\right)\right.\\
+&\left. +8a^3\partial _i \bar{q}\left(\Gamma _i\Delta _j q+\Gamma _i \Delta _k q\right)+8a\partial _i \left(a^4\Delta _j\Delta _k + a^2(\Delta_j+\Delta _k)+1\right)\bar{q}\Gamma _q q\right]_-\\
+&+\left[8a^4\left(\partial _j\Delta _k \bar{q}\Gamma _{ij}\partial _j q + \partial _i\Delta _k \bar{q}\Gamma _{ij}\partial _j q - \partial _i \partial _j \bar{q}\Gamma _{ij}\Delta _k q\right)\right.\\
+&\left.+8a^2\partial _i\bar{q}\Gamma _{ij}\partial _j q - 8 a^2 \left(a^2\partial _j\partial _k\Delta _i + \partial _i\partial _j\right)\bar{q}\Gamma _{ij}q\right]_+ 
++\left[8a^3\partial _i\partial _j \bar{q} G \partial _k q - \frac{8a^3}{3}\partial _i\partial _j\partial _k \bar{q}G q\right]_-\\
+\end{split}
+\end{equation} 
+}
+
+
+
+\subsubsection{\label{sec:gamma5ks}Gamma5}
+
+I will give up on details.
+
+Note that, $\eta _1(n)=1$, so
+\begin{equation}
+\begin{split}
+&\eta_{51}(n)=\eta _2\eta_3\eta_4=\eta _1\eta _2\eta_3\eta_4
+\end{split}
+\end{equation} 
+
+It can be found that
+\begin{equation}
+\begin{split}
+&\bar{q}(2h)\gamma _5 q (2h)=\frac{1}{16}\sum _{s_{ijkl}=\pm 1}\eta_{51}(2h+\vec{s}_{ijkl})\bar{\chi}(2h+\vec{s}_{ijkl})\chi (2h+\vec{1}_{ijkl}-\vec{s}_{ijkl})\\
+\end{split}
+\end{equation} 
+which are diagonals of a hypercube.
+
+I will assume
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&(2a)^4\sum _h \bar{q}\gamma _5\otimes I q + \mathcal{O}(a) = a^4 \frac{1}{16}\sum _n \sum _{s_{i,j,k,l\neq \mu }=\pm 1}\left(\eta _{51}(n)\bar{\chi}(n)\chi(n+\vec{s}_{ijkl})\right)\\
+\end{split}
+\end{equation}
+}
+
+
+\subsubsection{\label{sec:gammaksdimension}Dimensions}
+
+Let $S_F= a^4 \sum \left(\bar{\psi} D \psi + 2am \bar{\psi}\psi\right)$.
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&S_F\sim a^0\\
+&\psi\sim a^{-2}\\
+&q\sim \chi\sim a^{-\frac{3}{2}}\\
+&\langle \bar{\chi}\chi \rangle  = 2 a \langle \bar{\psi}\psi \rangle \sim a^{-3}\\
+\end{split}
+\end{equation}
+}
+
+\subsubsection{\label{sec:gammakssimulations}Simulations}
+
+\textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&i C\bar{q}\gamma _{\mu}q \to i aC \sum _{n,\delta}\bar{\chi}(n)\chi (n+\delta)\\
+&i C\bar{q}\sigma _{\mu}q \to a C \sum _{n,\delta}\bar{\chi}(n)\chi (n+\delta)\\
+&C\bar{q}\gamma _5\gamma _{\mu}q \to \frac{aC}{4} \sum _{n,\delta}\bar{\chi}(n)\chi (n+\delta)\\
+&iC\bar{q}\gamma _5 q \to \frac{iaC}{8} \sum _{n,\delta}\bar{\chi}(n)\chi (n+\delta)\\
+&\frac{i\Omega}{2}\bar{q}\gamma _4\sigma _{12} q = \frac{\Omega}{2}\bar{q}\gamma _5\gamma _3 q \to \frac{a\Omega}{8} \sum _{n,\delta}\bar{\chi}(n)\chi (n+\delta)\\
+\end{split}
+\end{equation}
+}
+
+When simulating, there are cases that \textbf{\textcolor[rgb]{1,0,0}{pure imaginary coefficients}} are used.
+The difference is that, for \textbf{anti-hermitian} $D$ operator, the link should be
+\begin{equation}
+\begin{split}
+&C\bar{\chi}(n)L\chi (n+\delta) - C\bar{\chi}(n+\delta)L^{\dagger}\chi (n)\\
+&iC\bar{\chi}(n)L\chi (n+\delta) \textcolor[rgb]{1,0,0}{+} iC\bar{\chi}(n+\delta)L^{\dagger}\chi (n)\\
+\end{split}
+\end{equation}
+Therefore, for the pure imaginary case,
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial \omega _a}  D_{st0}=iC\left(\frac{\partial }{\partial \omega _a}L\right) \delta _{n,n+\mu} \textcolor[rgb]{1,0,0}{+}iC\left(\frac{\partial }{\partial \omega _a} L^{\dagger}\right)\delta _{n+\mu,n}\\
+&=iC\left(T^aL\right) \delta _{n,n+\mu} \textcolor[rgb]{1,0,0}{-}iC\left(L^{\dagger}T^a\right)\delta _{n+\mu,n}\\
+\end{split}
+\end{equation}
+
+Using `one link' function in the program, for $\sigma ^{ij}$ and $\gamma _5\gamma _{\mu}$, it is usual `+', for $\gamma _{\mu}, \gamma _5$, it is a `-'.

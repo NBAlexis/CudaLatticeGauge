@@ -30,27 +30,6 @@ public:
 
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;
-
-    static void Seperate(INT* full, INT iSep, INT* l, INT* r, BYTE& LL, BYTE& RL)
-    {
-        LL = static_cast<BYTE>(iSep);
-        RL = static_cast<BYTE>(3 - iSep);
-
-        for (INT i = 0; i < LL; ++i)
-        {
-            //trace back
-            l[i] = -full[iSep - i - 1];
-
-            //If iSep = 0, This loop will not enter
-            //If iSep = 1, This is -full[0]
-            //If iSep = 2, This is -full[1], -full[0]
-        }
-
-        for (INT i = 0; i < RL; ++i)
-        {
-            r[i] = full[iSep + i];
-        }
-    }
 };
 
 #pragma region device functions

@@ -32,9 +32,6 @@ __CLGIMPLEMENT_CLASS(CFieldGaugeU1Real)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialU1RealField(Real *pDevicePtr, EFieldInitialType eInitialType)
 {
-    CLGComplex id = _onec;
-    CLGComplex zero = _zeroc;
-
     intokernaldir;
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -42,9 +39,14 @@ _kernelInitialU1RealField(Real *pDevicePtr, EFieldInitialType eInitialType)
 
         switch (eInitialType)
         {
-        case EFIT_Identity:
+        case EFIT_Zero:
         {
             pDevicePtr[uiLinkIndex] = F(0.0);
+        }
+        break;
+        case EFIT_Identity:
+        {
+            pDevicePtr[uiLinkIndex] = F(1.0);
         }
         break;
         case EFIT_Random:
@@ -623,6 +625,133 @@ _kernelSetOneDirUnityPoint_U1Real(Real* pDeviceData, UINT uiSiteIndex, BYTE byDi
     }
 }
 
+/**
+ * At(n) = constant
+ * Az(Lz) = Lz Ez t
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsImagineChemical(Real* pDeviceData, Real fValue)
+{
+    intokernal;
+    pDeviceData[_deviceGetLinkIndex(uiSiteIndex, 3)] = fValue;
+}
+
+/**
+ * At(n) = - Ez z
+ * Az(Lz) = Lz Ez t
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsEz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
+{
+    intokernalInt4;
+    const UINT uiLinkT = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const Real fZ = sSite4.z - sCenter.z;
+    pDeviceData[uiLinkT] = -fEz * fZ;
+
+    if (sSite4.z == _DC_Lz - 1)
+    {
+        const UINT uiLinkZ = _deviceGetLinkIndex(uiSiteIndex, 2);
+        const Real fT = sSite4.w - sCenter.w;
+        pDeviceData[uiLinkZ] = _DC_Lz * fEz * fT;
+    }
+}
+
+/**
+ * Az(n) = Ez t
+ * At(Lt) = -Lt Ez z
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsEz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
+{
+    intokernalInt4;
+    const UINT uiLinkZ = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const Real fT = sSite4.w - sCenter.w;
+    pDeviceData[uiLinkZ] = fEz * fT;
+
+    if (sSite4.w == _DC_Lt - 1)
+    {
+        const UINT uiLinkT = _deviceGetLinkIndex(uiSiteIndex, 3);
+        const Real fZ = sSite4.z - sCenter.z;
+        pDeviceData[uiLinkT] = -_DC_Lti * fEz * fZ;
+    }
+}
+
+/**
+ * Projective plane, magnetic field
+ *
+ * Ay(n) = Bz nx
+ * if twisted Ax(Lx) = - q B ny
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsBz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+{
+    intokernalInt4;
+    const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const Real fX = sSite4.x - sCenter.x + F(0.5);
+    pDeviceData[uiLinkY] = fBz * fX;
+
+    if (bTwisted && sSite4.x == _DC_Lx - 1)
+    {
+        const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
+        const Real fY = sSite4.y - sCenter.y + F(0.5);
+        pDeviceData[uiLinkX] = -fBz * fY;
+    }
+}
+
+/**
+ * Projective plane, magnetic field
+ *
+ * Ax(n) = - Bz ny
+ * if twisted Ay(Ly) = q B nx
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsBz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+{
+    intokernalInt4;
+    const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const Real fY = sSite4.y - sCenter.y + F(0.5);
+    pDeviceData[uiLinkX] = -fBz * fY;
+
+    if (bTwisted && sSite4.y == _DC_Ly - 1)
+    {
+        const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
+        const Real fX = sSite4.x - sCenter.x + F(0.5);
+        pDeviceData[uiLinkY] = fBz * fX;
+    }
+}
+
+/**
+ * Projective plane, magnetic field
+ *
+ * Ax(n) = - q B ny/2
+ * Ay(n) = qB nx / 2
+ *
+ * if twisted
+ * Ax(Lx) = - q B ny
+ * Ay(Ly) = q B nx
+ */
+__global__ void _CLG_LAUNCH_BOUND
+_kernelInitialAsBz_Type2(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+{
+    intokernalInt4;
+
+    const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
+    const Real fX = sSite4.x - sCenter.x + F(0.5);
+    const Real fY = sSite4.y - sCenter.y + F(0.5);
+    pDeviceData[uiLinkX] = -fBz * fY * F(0.5);
+    pDeviceData[uiLinkY] = fBz * fX * F(0.5);
+
+    if (bTwisted && sSite4.x == _DC_Lx - 1)
+    {
+        pDeviceData[uiLinkX] = -fBz * fY;
+    }
+    if (bTwisted && sSite4.y == _DC_Ly - 1)
+    {
+        pDeviceData[uiLinkY] = fBz * fX;
+    }
+}
+
 #pragma endregion
 
 void CFieldGaugeU1Real::AxpyPlus(const CField* x)
@@ -708,11 +837,67 @@ void CFieldGaugeU1Real::MakeRandomGenerator()
     _kernelInitialU1RealField << <block, threads >> > (m_pDeviceData, EFIT_RandomGenerator);
 }
 
+void CFieldGaugeU1Real::InitialOtherParameters(CParameters& param)
+{
+    CFieldGauge::InitialOtherParameters(param);
+
+    if (EFIT_U1Real == m_eInitialType)
+    {
+        CCString sType;
+        Real fChemical = F(0.0);
+        Real fEz = F(0.0);
+        Real fBz = F(0.0);
+
+        EU1RealType eChemical = EURT_None;
+        EU1RealType eEz = EURT_None;
+        EU1RealType eBz = EURT_None;
+
+        sType = _T("EURT_None");
+
+        if (param.FetchStringValue(_T("ChemicalType"), sType))
+        {
+            eChemical = __STRING_TO_ENUM(EU1RealType, sType);
+            if (EURT_None != eChemical)
+            {
+                param.FetchValueReal(_T("ChemicalValue"), fChemical);
+            }
+        }
+
+        sType = _T("EURT_None");
+        if (param.FetchStringValue(_T("EzType"), sType))
+        {
+            eEz = __STRING_TO_ENUM(EU1RealType, sType);
+            if (EURT_None != eEz)
+            {
+                param.FetchValueReal(_T("EzValue"), fEz);
+            }
+        }
+
+        sType = _T("EURT_None");
+        if (param.FetchStringValue(_T("BzType"), sType))
+        {
+            eBz = __STRING_TO_ENUM(EU1RealType, sType);
+            if (EURT_None != eBz)
+            {
+                param.FetchValueReal(_T("BzValue"), fBz);
+            }
+        }
+
+        InitialU1Real(eChemical, eEz, eBz, fChemical, fEz, fBz);
+    }
+}
+
 /**
 *
 */
 void CFieldGaugeU1Real::InitialField(EFieldInitialType eInitialType)
 {
+    if (EFIT_U1Real == eInitialType)
+    {
+        m_eInitialType = EFIT_U1Real;
+        return;
+    }
+
     preparethread;
     _kernelInitialU1RealField << <block, threads >> > (m_pDeviceData, eInitialType);
 }
@@ -841,6 +1026,68 @@ void CFieldGaugeU1Real::InitialWithByte(BYTE* byData)
     }
     checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(Real) * m_uiLinkeCount, cudaMemcpyHostToDevice));
     free(readData);
+}
+
+void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz)
+{
+    m_eChemical = eChemicalType;
+    m_eE = eEType;
+    m_eB = eBType;
+    m_fChemical = fChemical;
+    m_feEz = feEz;
+    m_feBz = feBz;
+
+    preparethread;
+    _kernelInitialU1RealField << <block, threads >> > (m_pDeviceData, EFIT_Zero);
+
+    switch (eChemicalType)
+    {
+    case EURT_ImagineChemical:
+        _kernelInitialAsImagineChemical << <block, threads >> > (m_pDeviceData, fChemical);
+        break;
+    default:
+        appParanoiac(_T("No chemical set\n"));
+        break;
+    }
+
+    switch (eEType)
+    {
+    case EURT_E_t:
+        _kernelInitialAsEz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feEz);
+        break;
+    case EURT_E_z:
+        _kernelInitialAsEz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feEz);
+        break;
+    default:
+        appParanoiac(_T("No electric set\n"));
+        break;
+    }
+
+    switch (eBType)
+    {
+    case EURT_Bp_x:
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        break;
+    case EURT_Bp_y:
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        break;
+    case EURT_Bp_xy:
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        break;
+    case EURT_Bp_x_notwist:
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        break;
+    case EURT_Bp_y_notwist:
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        break;
+    case EURT_Bp_xy_notwist:
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        break;
+    default:
+        appParanoiac(_T("No magnetic set\n"));
+        break;
+    }
+
 }
 
 void CFieldGaugeU1Real::InitialWithByteCompressed(BYTE* byData)
@@ -1056,7 +1303,15 @@ void CFieldGaugeU1Real::SetOneDirectionZero(BYTE byDir)
     appCrucial(_T("U1Real Zero not supported\n"));
 }
 
-CFieldGaugeU1Real::CFieldGaugeU1Real() : CFieldGauge(), m_eInitialType(EFIT_Random)
+CFieldGaugeU1Real::CFieldGaugeU1Real()
+    : CFieldGauge()
+    , m_eInitialType(EFIT_Random)
+    , m_eChemical(EURT_None)
+    , m_eE(EURT_None)
+    , m_eB(EURT_None)
+    , m_fChemical(F(0.0))
+    , m_feEz(F(0.0))
+    , m_feBz(F(0.0))
 {
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceData, sizeof(Real) * m_uiLinkeCount));
 }
@@ -1184,7 +1439,8 @@ void CFieldGaugeU1Real::DebugPrintMe() const
     appSetLogDate(FALSE);
     for (UINT uiSite = 0; uiSite < m_uiLinkeCount / _HC_Dir; ++uiSite)
     {
-        appGeneral(_T(" --- site: %d --- "), uiSite);
+        SSmallInt4 site = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T(" --- site: %d %d %d %d --- "), site.x, site.y, site.z, site.w);
         for (UINT uiDir = 0; uiDir < _HC_Dir; ++uiDir)
         {
             const UINT uiLink = uiSite * _HC_Dir + uiDir;
@@ -1242,6 +1498,11 @@ CCString CFieldGaugeU1Real::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldGaugeU1Real\n");
     sRet = sRet + tab + _T("Initialed : ") + __ENUM_TO_STRING(EFieldInitialType, m_eInitialType) + _T("\n");
+
+    sRet = sRet + tab + _T("Chemical : ") + __ENUM_TO_STRING(EU1RealType, m_eChemical) + _T(" , v = ") + appFloatToString(m_fChemical) + _T("\n");
+    sRet = sRet + tab + _T("Electric : ") + __ENUM_TO_STRING(EU1RealType, m_eE) + _T(" , v = ") + appFloatToString(m_feEz) + _T("\n");
+    sRet = sRet + tab + _T("Magnetic : ") + __ENUM_TO_STRING(EU1RealType, m_eB) + _T(" , v = ") + appFloatToString(m_feBz) + _T("\n");
+
     return sRet;
 }
 

@@ -20,14 +20,13 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKS_PR_XYTermCopyREM(
     const deviceSU3Vector* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pGauge,
+    const Real* __restrict__ pU1,
     const BYTE* __restrict__ pEtaTable,
     deviceSU3Vector* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
     SSmallInt4 sCenter,
-    Real fQBz,
-    BYTE byGaugeType,
-    UBOOL bTwisted)
+    Real fCharge)
 {
     intokernalInt4;
 
@@ -63,7 +62,7 @@ _kernelDFermionKS_PR_XYTermCopyREM(
             this_eta_tau = this_eta_tau + 1;
         }
 
-        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwisted,
+        deviceSU3Vector right = _deviceVXXTauOptimizedEM(pGauge, pU1, sSite4, fCharge,
             byGaugeFieldId, bXorY, bPlusMu, bPlusTau).MulVector(
                 pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
 
@@ -94,13 +93,11 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKS_PR_XYTau_TermCopyREM(
     const deviceSU3Vector* __restrict__ pDeviceData,
     const deviceSU3* __restrict__ pGauge,
+    const Real* __restrict__ pU1,
     deviceSU3Vector* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
-    SSmallInt4 sCenter,
-    Real fQBz,
-    BYTE byGaugeType,
-    UBOOL bTwisted)
+    Real fCharge)
 {
     intokernalInt4;
 
@@ -122,7 +119,7 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
 
         const deviceSU3Vector right = _deviceVXYTOptimizedEM(
-            pGauge, sSite4, sCenter, fQBz, byGaugeType, bTwisted,
+            pGauge, pU1, sSite4, fCharge,
             byGaugeFieldId, bPlusX, bPlusY, bPlusT)
             .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
@@ -149,6 +146,82 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
     pResultData[uiSiteIndex].MulReal(F(0.125));
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelKSApplyGammaEtaCopyREM(
+    deviceSU3Vector* pMe,
+    const deviceSU3Vector* __restrict__ pOther,
+    const deviceSU3* __restrict__ pGauge,
+    const Real* __restrict__ pU1,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    const deviceSU3* __restrict__ pAphys,
+    Real fCharge,
+    SSmallInt4 sCenter)
+{
+    intokernalInt4;
+
+    BYTE byDir = 3;
+    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+
+    BYTE eta_mu = (pEtaTable[uiSiteIndex] >> byDir) & 1;
+    BYTE eta_mu2 = (pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1;
+
+    deviceSU3 x_Gauge_element = pGauge[linkIndex];
+    const Real forwardPhase = pU1[linkIndex] * fCharge;
+    x_Gauge_element.MulComp(_make_cuComplex(_cos(forwardPhase), _sin(forwardPhase)));
+    const UINT x_m_mu_link = _deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, x_m_mu_Gauge.m_byDir);
+    const Real backPhase = pU1[x_m_mu_link] * fCharge;
+    deviceSU3 x_m_mu_Gauge_element = pGauge[x_m_mu_link];
+    x_m_mu_Gauge_element.MulComp(_make_cuComplex(_cos(backPhase), _sin(backPhase)));
+
+    if (x_m_mu_Gauge.NeedToDagger())
+    {
+        x_m_mu_Gauge_element.Dagger();
+    }
+
+    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+    if (x_p_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu = eta_mu + 1;
+    }
+
+    if (eta_mu & 1)
+    {
+        pMe[uiSiteIndex].MulReal(F(-1.0));
+    }
+
+    if (x_m_mu_Fermion.NeedToOpposite())
+    {
+        eta_mu2 = eta_mu2 + 1;
+    }
+    if (eta_mu2 & 1)
+    {
+        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    else
+    {
+        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+    }
+    //pMe[uiSiteIndex].MulReal(F(0.5));
+
+    //Here it is gamma _4 psi, we still need r x Aphys times it
+    const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
+    const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //x ay - y ax
+    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0);
+    midY.MulReal(fX);
+    midX.MulReal(fY);
+    midY.Sub(midX);
+
+    pMe[uiSiteIndex] = midY.MulVector(pMe[uiSiteIndex]);
+}
+
 #pragma endregion
 
 void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
@@ -157,6 +230,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
     const deviceSU3* pGauge) const
 {
     const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
     if (NULL == pFieldREM)
     {
@@ -168,14 +242,13 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
     _kernelDFermionKS_PR_XYTermCopyREM << <block, threads >> > (
         pInverseZ4,
         pGauge,
+        pU1->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
         m_byFieldId,
         1,
         CCommonData::m_sCenter,
-        CCommonData::m_fBz * pFieldREM->GetQ(),
-        m_byGaugeType,
-        m_bTwistedBoundary);
+        pFieldREM->m_fQ);
 }
 
 void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
@@ -184,6 +257,7 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
     const deviceSU3* pGauge) const
 {
     const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
     if (NULL == pFieldREM)
     {
@@ -195,26 +269,35 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
     _kernelDFermionKS_PR_XYTau_TermCopyREM << <block, threads >> > (
         pInverseZ4,
         pGauge,
+        pU1->m_pDeviceData,
         pAppliedBuffer,
         m_byFieldId,
         1,
-        CCommonData::m_sCenter,
-        CCommonData::m_fBz * pFieldREM->GetQ(),
-        m_byGaugeType,
-        m_bTwistedBoundary);
+        pFieldREM->m_fQ);
 }
 
-void CMeasureAngularMomentumKSREM::Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& params, BYTE byId)
+void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const
 {
-    CMeasureAngularMomentumKS::Initial(pOwner, pLatticeData, params, byId);
+    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
-    INT iValue = 0;
-    params.FetchValueINT(_T("MagneticType"), iValue);
-    m_byGaugeType = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    params.FetchValueINT(_T("TwistedBoundary"), iValue);
-    m_bTwistedBoundary = (0 != iValue);
+    const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
+    if (NULL == pAphys)
+    {
+        appCrucial(_T("CMeasureAMomentumStochastic: A phys undefined.\n"));
+    }
+    preparethread;
+    _kernelKSApplyGammaEtaCopyREM << <block, threads >> > (
+        pAppliedBuffer,
+        pInverseZ4,
+        pGauge,
+        pU1->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pAphys->m_pDeviceData,
+        pFieldREM->m_fQ,
+        CCommonData::m_sCenter);
 }
 
 

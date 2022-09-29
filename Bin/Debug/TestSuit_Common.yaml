@@ -406,9 +406,9 @@ TestAnitiHermiticity:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -416,10 +416,6 @@ TestAnitiHermiticity:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-
-    # When GAMM5Test = 0, test whether (gamma5.D) is hermitian matrix
-    # When GAMM5Test = 1, test whether implemented D^+ is really (D)^+
-    GAMM5Test : 1
 
     Updator:
 
@@ -454,8 +450,9 @@ TestAnitiHermiticity:
         # FieldName : CFieldFermionKSSU3P4
         # FieldName : CFieldFermionKSSU3
         # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3EM
+        # FieldName : CFieldFermionKSSU3EM
         # FieldName : CFieldFermionKSU1
+        FieldName : CFieldFermionKSSU3Gamma
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -470,6 +467,11 @@ TestAnitiHermiticity:
         Qa2Ez : 0.1
         Qa2Bz : 0.1
         EMChange : -0.33333333333
+
+        Sigma14 : 0.14
+        Sigma23 : 0.23
+        Sigma24 : 0.24
+        Sigma34 : 0.34
 
         Period : [1, 1, 1, -1]
 
@@ -606,3 +608,46 @@ TestGaugeInvarience:
         ## 0 is recommanded
         AbsoluteAccuracy : 1
 
+TestBackgroundField:
+   
+    # When DOperator is implemented, use this to check sign problem
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    OtherGaugeFieldCount : 1
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+        # FieldName : CFieldGaugeU1
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+        
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    OtherGaugeField1:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+        ChemicalType : EURT_ImagineChemical
+        ChemicalValue : 0.1
+        EzType : EURT_None
+        EzValue : 0.0
+        BzType : EURT_None
+        BzValue : 0.0

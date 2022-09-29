@@ -93,6 +93,7 @@ public:
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.Exist(byId) ? m_pActionMap.GetAt(byId) : NULL; }
     class CField* GetPooledFieldById(BYTE byId);
     void ReCopyPooled() const;
+    void ReCopyPooled(BYTE byId) const;
 };
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);

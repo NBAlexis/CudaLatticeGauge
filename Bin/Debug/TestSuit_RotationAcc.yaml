@@ -1318,6 +1318,7 @@ TestRotationEMProjectivePlane:
     RandomSeed : 1234567
     ActionListLength : 3
     FermionFieldCount : 2
+    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     ExpectedRes : 0.43
     CacheStaple : 0
@@ -1355,11 +1356,10 @@ TestRotationEMProjectivePlane:
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+        EachSiteEta : 1
 
-        Qa2Bz : 0.1
-        EMChange : -0.333333333333333333
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : -0.333333333333333333
+        EMFieldID : 4
 
         Period : [1, 1, 1, -1]
 
@@ -1375,11 +1375,10 @@ TestRotationEMProjectivePlane:
         Mass : 0.5
         FieldId : 3
         PoolNumber : 15
+        EachSiteEta : 1
 
-        Qa2Bz : 0.1
-        EMChange : 0.6666666666666666666667
-        TwistedBoundary : 0
-        MagneticType : 2
+        Charge : 0.6666666666666666666667
+        EMFieldID : 4
 
         Period : [1, 1, 1, -1]
 
@@ -1387,6 +1386,17 @@ TestRotationEMProjectivePlane:
         MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
         # -1/4
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    OtherGaugeField1:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 4
+        Period : [1, 1, 1, 1]
+        BzType : EURT_Bp_xy_notwist
+        BzValue : 0.1
 
     Action1:
    

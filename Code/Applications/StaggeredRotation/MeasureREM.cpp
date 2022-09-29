@@ -57,9 +57,9 @@ __DEFINE_ENUM(EDistributionJobKSREM,
             sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n"); \
             sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n"); \
             sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n"); \
-            sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(CCommonData::m_fBz) + _T("\n"); \
+            sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(pU1->m_feBz) + _T("\n"); \
             sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1##ftype->m_f2am) + _T("\n"); \
-            sFileContent = sFileContent + _T("Chage: ") + appFloatToString(pF1##ftype->GetQ()) + _T("\n"); \
+            sFileContent = sFileContent + _T("Chage: ") + appFloatToString(pF1##ftype->m_fQ) + _T("\n"); \
             sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1##ftype->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n"); \
             appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent); \
         } \
@@ -126,9 +126,9 @@ INT MeasurementREM(CParameters& params)
     params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
     UINT iFieldCount = static_cast<UINT>(iVaule);
 
-    iVaule = 0;
-    params.FetchValueINT(_T("MeasureCCS"), iVaule);
-    UBOOL bMeasureCCS = (0 != iVaule);
+    //iVaule = 0;
+    //params.FetchValueINT(_T("MeasureCCS"), iVaule);
+    //UBOOL bMeasureCCS = (0 != iVaule);
 
     iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
@@ -218,6 +218,7 @@ INT MeasurementREM(CParameters& params)
    
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
+    CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(5));
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCu = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChiralCondensateKS* pCCd = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
@@ -254,7 +255,8 @@ INT MeasurementREM(CParameters& params)
     for (UINT uiListIdx = iListStart; uiListIdx < iListEnd; ++uiListIdx)
     {
         CCommonData::m_fOmega = lstOmega[uiListIdx];
-        CCommonData::m_fBz = lstMagnetic[uiListIdx];
+        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx]);
+
         if (NULL != pAG)
         {
             pAG->SetOmega(CCommonData::m_fOmega);
