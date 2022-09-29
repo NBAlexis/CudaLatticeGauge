@@ -21,6 +21,9 @@ namespace CLGMakeWriter
         public bool m_bDebug = true;
         public bool m_bWinOrUbuntu = true;
 
+        public bool m_bHasWilsonDiracRotation = false;
+        public bool m_bHasWilsonDiracMatching = false;
+
         //turn it off, recently we will not use this
         public bool m_bHasCompresser = false;
 
@@ -166,8 +169,15 @@ set_target_properties( CLGLib
 
             #region Add Applications
 
-            sContent += AddApplication(excutables["RotatingReproduce"]);
-            sContent += AddApplication(excutables["MatchingRho"]);
+            if (m_bHasWilsonDiracRotation)
+            {
+                sContent += AddApplication(excutables["RotatingReproduce"]);
+            }
+
+            if (m_bHasWilsonDiracMatching)
+            {
+                sContent += AddApplication(excutables["MatchingRho"]);
+            }
 
             if (m_bHasCompresser)
             {
@@ -182,6 +192,7 @@ set_target_properties( CLGLib
             sContent += AddApplication(excutables["StaggeredSpectrum"]);
             sContent += AddApplication(excutables["StaggeredRotation"]);
             sContent += AddApplication(excutables["BetaGradient"]);
+            sContent += AddApplication(excutables["ElectricChemical"]);
 
             #endregion
 

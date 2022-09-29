@@ -54,6 +54,7 @@ namespace CLGMakeWriter
             apps.Add("StaggeredSpectrum", new CProjFile("StaggeredSpectrum"));
             apps.Add("StaggeredRotation", new CProjFile("StaggeredRotation"));
             apps.Add("BetaGradient", new CProjFile("BetaGradient"));
+            apps.Add("ElectricChemical", new CProjFile("ElectricChemical"));
 
             writer.WritteTheFile(projSolPath, clgLibProj, apps);
 

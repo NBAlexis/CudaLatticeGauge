@@ -74,6 +74,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Gamma.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3GammaEM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.h
@@ -193,6 +195,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Gamma.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3GammaEM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.cu
@@ -338,43 +342,6 @@ target_link_libraries(CLGTest CLGLib)
 
 
 # ==================== 
-# RotatingReproduce 
-# =================
-
-include_directories(${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce)
-add_executable(RotatingReproduce 
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.h
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/AngularMomentumTest.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/GaugeFixingJob.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/PolykovDistrib.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotatingReproduce.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/RotationTest.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/RotatingReproduce/ThermalTest.cpp
-    )
-
-target_compile_features(RotatingReproduce PUBLIC cxx_std_14)
-target_link_libraries(RotatingReproduce CLGLib)
-
-
-
-
-# ==================== 
-# MatchingRho 
-# =================
-
-include_directories(${PROJECT_SOURCE_DIR}/Applications/MatchingRho)
-add_executable(MatchingRho 
-    ${PROJECT_SOURCE_DIR}/Applications/MatchingRho/MatchingRho.h
-    ${PROJECT_SOURCE_DIR}/Applications/MatchingRho/MatchingRho.cpp
-    )
-
-target_compile_features(MatchingRho PUBLIC cxx_std_14)
-target_link_libraries(MatchingRho CLGLib)
-
-
-
-
-# ==================== 
 # StaggeredSpectrum 
 # =================
 
@@ -435,4 +402,22 @@ add_executable(BetaGradient
 
 target_compile_features(BetaGradient PUBLIC cxx_std_14)
 target_link_libraries(BetaGradient CLGLib)
+
+
+
+
+# ==================== 
+# ElectricChemical 
+# =================
+
+include_directories(${PROJECT_SOURCE_DIR}/Applications/ElectricChemical)
+add_executable(ElectricChemical 
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/ElectricChemical.h
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Measure.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/ElectricChemical.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Simulate.cpp
+    )
+
+target_compile_features(ElectricChemical PUBLIC cxx_std_14)
+target_link_libraries(ElectricChemical CLGLib)
 
