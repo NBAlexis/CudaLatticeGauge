@@ -20,11 +20,21 @@ enum EChiralMeasureTypeKS
     ChiralKS = 0,
     ConnectSusp = 1,
 
-    CMTKSGamma3 = 2,
-    CMTKSGamma4 = 3,
-    //CMTKSGamma5 = 4,
-    //CMTKSGamma35 = 5,
-    //CMTKSGamma45 = 6,
+    CMTKSGamma1,
+    CMTKSGamma2,
+    CMTKSGamma3,
+    CMTKSGamma4,
+    CMTKSGamma5,
+    CMTKSGamma51,
+    CMTKSGamma52,
+    CMTKSGamma53,
+    CMTKSGamma54,
+    CMTKSSigma12,
+    CMTKSSigma13,
+    CMTKSSigma14,
+    CMTKSSigma23,
+    CMTKSSigma24,
+    CMTKSSigma34,
 
     ChiralKSMax,
 };
@@ -48,6 +58,7 @@ public:
         , m_uiMaxR(1)
         , m_uiEdge(1)
         , m_bShiftCenter(FALSE)
+        , m_bMeasureSigma12(FALSE)
         
         , m_bShowResult(FALSE)
         , m_bMeasureConnect(FALSE)
@@ -86,6 +97,7 @@ protected:
     UINT m_uiMaxR;
     UINT m_uiEdge;
     UBOOL m_bShiftCenter;
+    UBOOL m_bMeasureSigma12;
     UBOOL m_bShowResult;
 
 public:

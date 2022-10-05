@@ -2142,6 +2142,51 @@ void CFieldFermionKSSU3GammaEM::CopyTo(CField* U) const
     pOther->m_byEMFieldID = m_byEMFieldID;
 }
 
+void CFieldFermionKSSU3GammaEM::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+{
+    const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(m_byEMFieldID));
+    if (NULL == pU1)
+    {
+        appCrucial(_T("Background field cannot be found!\n"));
+        return;
+    }
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!\n"));
+        return;
+    }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+
+    CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    InitialField(EFIT_Zero);
+
+    //If it was gamma_mu or gamma_5 or sigmaij, it is i gamma mu and i gamma 5, therefore multiply -i
+    UBOOL bImag = (GAMMA1 == eGamma) || (GAMMA2 == eGamma) || (GAMMA3 == eGamma) || (GAMMA4 == eGamma) || (GAMMA5 == eGamma)
+        || (SIGMA12 == eGamma) || (SIGMA31 == eGamma) || (SIGMA41 == eGamma) || (SIGMA23 == eGamma) || (SIGMA42 == eGamma) || (SIGMA43 == eGamma);
+
+    //appApplyGammaKSEM is used for simulation, where (2a) is multiplied, so coefficient should be 0.5
+    //note that, finally the 2a is multiplied again, we decide to leave it to the Mathematica
+
+    appApplyGammaKSEM(
+        m_pDeviceData,
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData,
+        pU1->m_pDeviceData,
+        m_fCharge,
+        eGamma,
+        m_bEachSiteEta,
+        FALSE,
+        F(0.5),
+        bImag ? EOCT_Complex : EOCT_None,
+        F(1.0),
+        bImag ? _make_cuComplex(F(0.0), -F(1.0)) : _onec,
+        m_byFieldId,
+        1);
+
+    pPooled->Return();
+}
+
 CCString CFieldFermionKSSU3GammaEM::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3GammaEM\n");

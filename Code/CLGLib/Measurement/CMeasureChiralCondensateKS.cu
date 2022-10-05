@@ -173,6 +173,10 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     m_bShiftCenter = iValue != 0;
 
     iValue = 0;
+    param.FetchValueINT(_T("MeasureSigma12"), iValue);
+    m_bMeasureSigma12 = iValue != 0;
+
+    iValue = 0;
     param.FetchValueINT(_T("MeasureConnect"), iValue);
     m_bMeasureConnect = iValue != 0;
 
@@ -252,36 +256,59 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
                 pF2W->CopyTo(pAfterApplied);
             }
             break;
+        case CMTKSGamma1:
+        case CMTKSGamma2:
         case CMTKSGamma3:
-            {
-                pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA3);
-            }
-            break;
         case CMTKSGamma4:
+        case CMTKSGamma5:
+        case CMTKSGamma51:
+        case CMTKSGamma52:
+        case CMTKSGamma53:
+        case CMTKSGamma54:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA4);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, (EGammaMatrix)(i - 1));
             }
             break;
-        //case CMTKSGamma5:
-        //    {
-        //        pF2W->CopyTo(pAfterApplied);
-        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA5);
-        //    }
-        //    break;
-        //case CMTKSGamma35:
-        //    {
-        //        pF2W->CopyTo(pAfterApplied);
-        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA35);
-        //    }
-        //    break;
-        //case CMTKSGamma45:
-        //    {
-        //        pF2W->CopyTo(pAfterApplied);
-        //        pAfterApplied->ApplyGammaKS(pAcceptGauge, GAMMA45);
-        //    }
-        //    break;
+        case CMTKSSigma12:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                if (m_bMeasureSigma12)
+                {
+                    pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA12);
+                }
+            }
+            break;
+        case CMTKSSigma13:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA31);
+            }
+            break;
+        case CMTKSSigma14:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA41);
+            }
+            break;
+        case CMTKSSigma23:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA23);
+            }
+            break;
+        case CMTKSSigma24:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA42);
+            }
+            break;
+        case CMTKSSigma34:
+            {
+                pF2W->CopyTo(pAfterApplied);
+                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA43);
+            }
+            break;
         case ConnectSusp:
             {
                 pF2W->CopyTo(pAfterApplied);

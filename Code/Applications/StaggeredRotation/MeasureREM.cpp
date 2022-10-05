@@ -568,9 +568,22 @@ INT MeasurementREM(CParameters& params)
                 {
                     _CLG_EXPORT_CHIRAL(pCCu, ConnectSusp, uiListIdx, REM);
                 }
-                
+
+
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma1, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma2, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma4, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma5, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma51, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma52, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma53, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSGamma54, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma13, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma14, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma23, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma24, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCu, CMTKSSigma34, uiListIdx, REM);
 
                 _CLG_EXPORT_CHIRAL(pCCd, ChiralKS, uiListIdx, REM);
                 if (pCCd->m_bMeasureConnect)
@@ -578,8 +591,20 @@ INT MeasurementREM(CParameters& params)
                     _CLG_EXPORT_CHIRAL(pCCd, ConnectSusp, uiListIdx, REM);
                 }
                 
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma1, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma2, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma4, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma5, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma51, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma52, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma53, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSGamma54, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma13, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma14, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma23, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma24, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCd, CMTKSSigma34, uiListIdx, REM);
 
                 _CLG_EXPORT_CHIRAL(pCCs, ChiralKS, uiListIdx, REM);
                 if (pCCs->m_bMeasureConnect)
@@ -587,8 +612,20 @@ INT MeasurementREM(CParameters& params)
                     _CLG_EXPORT_CHIRAL(pCCs, ConnectSusp, uiListIdx, REM);
                 }
 
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma1, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma2, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma3, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma4, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma5, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma51, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma52, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma53, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSGamma54, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma13, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma14, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma23, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma24, uiListIdx, REM);
+                _CLG_EXPORT_CHIRAL(pCCs, CMTKSSigma34, uiListIdx, REM);
 
                 _CLG_EXPORT_CHIRAL(pFAu, OrbitalKS, uiListIdx, REM);
                 _CLG_EXPORT_CHIRAL(pFAu, SpinKS, uiListIdx, REM);

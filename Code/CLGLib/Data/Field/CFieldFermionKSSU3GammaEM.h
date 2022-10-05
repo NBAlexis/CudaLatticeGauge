@@ -30,6 +30,7 @@ public:
 
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;
+    void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
     Real m_fCharge;
     BYTE m_byEMFieldID;

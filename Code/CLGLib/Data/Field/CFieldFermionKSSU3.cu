@@ -627,98 +627,98 @@ _kernelMakeWallSourceKS(deviceSU3Vector* pDeviceData,
 }
 
 
-__global__ void _CLG_LAUNCH_BOUND
-_kernelKSApplyGamma(
-    deviceSU3Vector* pMe, 
-    const deviceSU3Vector* __restrict__ pOther,
-    const deviceSU3* __restrict__ pGauge,
-    const SIndex* __restrict__ pGaugeMove,
-    const SIndex* __restrict__ pFermionMove,
-    const BYTE* __restrict__ pEtaTable,
-    BYTE byDir)
-{
-    intokernal;
-    const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1)) ? F(-1.0) : F(1.0);
-    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
-    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
-    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
-
-    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
-    if (x_m_mu_Gauge.NeedToDagger())
-    {
-        x_m_mu_Gauge_element.Dagger();
-    }
-
-    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
-    if (x_p_mu_Fermion.NeedToOpposite())
-    {
-        pMe[uiSiteIndex].MulReal(F(-1.0));
-    }
-    if (x_m_mu_Fermion.NeedToOpposite())
-    {
-        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
-    }
-    else
-    {
-        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
-    }
-    pMe[uiSiteIndex].MulReal(F(0.5) * eta_mu);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelKSApplyGammaEta(
-    deviceSU3Vector* pMe,
-    const deviceSU3Vector* __restrict__ pOther,
-    const deviceSU3* __restrict__ pGauge,
-    const SIndex* __restrict__ pGaugeMove,
-    const SIndex* __restrict__ pFermionMove,
-    const BYTE* __restrict__ pEtaTable,
-    BYTE byDir)
-{
-    intokernal;
-
-    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
-    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
-    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
-    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
-
-    BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
-    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
-
-    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
-    if (x_m_mu_Gauge.NeedToDagger())
-    {
-        x_m_mu_Gauge_element.Dagger();
-    }
-
-    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
-    if (x_p_mu_Fermion.NeedToOpposite())
-    {
-        eta_mu = eta_mu + 1;
-    }
-
-    if (eta_mu & 1)
-    {
-        pMe[uiSiteIndex].MulReal(F(-1.0));
-    }
-
-    if (x_m_mu_Fermion.NeedToOpposite())
-    {
-        eta_mu2 = eta_mu2 + 1;
-    }
-    if (eta_mu2 & 1)
-    {
-        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
-    }
-    else
-    {
-        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
-    }
-    pMe[uiSiteIndex].MulReal(F(0.5));
-}
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernelKSApplyGamma(
+//    deviceSU3Vector* pMe, 
+//    const deviceSU3Vector* __restrict__ pOther,
+//    const deviceSU3* __restrict__ pGauge,
+//    const SIndex* __restrict__ pGaugeMove,
+//    const SIndex* __restrict__ pFermionMove,
+//    const BYTE* __restrict__ pEtaTable,
+//    BYTE byDir)
+//{
+//    intokernal;
+//    const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1)) ? F(-1.0) : F(1.0);
+//    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+//    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+//    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+//    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+//
+//    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+//    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+//    if (x_m_mu_Gauge.NeedToDagger())
+//    {
+//        x_m_mu_Gauge_element.Dagger();
+//    }
+//
+//    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+//    if (x_p_mu_Fermion.NeedToOpposite())
+//    {
+//        pMe[uiSiteIndex].MulReal(F(-1.0));
+//    }
+//    if (x_m_mu_Fermion.NeedToOpposite())
+//    {
+//        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+//    }
+//    else
+//    {
+//        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+//    }
+//    pMe[uiSiteIndex].MulReal(F(0.5) * eta_mu);
+//}
+//
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernelKSApplyGammaEta(
+//    deviceSU3Vector* pMe,
+//    const deviceSU3Vector* __restrict__ pOther,
+//    const deviceSU3* __restrict__ pGauge,
+//    const SIndex* __restrict__ pGaugeMove,
+//    const SIndex* __restrict__ pFermionMove,
+//    const BYTE* __restrict__ pEtaTable,
+//    BYTE byDir)
+//{
+//    intokernal;
+//
+//    const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
+//    const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+//    const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+//    const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+//
+//    BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
+//    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
+//
+//    const deviceSU3& x_Gauge_element = pGauge[linkIndex];
+//    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+//    if (x_m_mu_Gauge.NeedToDagger())
+//    {
+//        x_m_mu_Gauge_element.Dagger();
+//    }
+//
+//    pMe[uiSiteIndex] = x_Gauge_element.MulVector(pOther[x_p_mu_Fermion.m_uiSiteIndex]);
+//    if (x_p_mu_Fermion.NeedToOpposite())
+//    {
+//        eta_mu = eta_mu + 1;
+//    }
+//
+//    if (eta_mu & 1)
+//    {
+//        pMe[uiSiteIndex].MulReal(F(-1.0));
+//    }
+//
+//    if (x_m_mu_Fermion.NeedToOpposite())
+//    {
+//        eta_mu2 = eta_mu2 + 1;
+//    }
+//    if (eta_mu2 & 1)
+//    {
+//        pMe[uiSiteIndex].Sub(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+//    }
+//    else
+//    {
+//        pMe[uiSiteIndex].Add(x_m_mu_Gauge_element.MulVector(pOther[x_m_mu_Fermion.m_uiSiteIndex]));
+//    }
+//    pMe[uiSiteIndex].MulReal(F(0.5));
+//}
 
 
 #pragma endregion
@@ -1233,75 +1233,36 @@ void CFieldFermionKSSU3::ApplyGamma(EGammaMatrix eGamma)
 
 void CFieldFermionKSSU3::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
 {
-    INT iDir = -1;
-    switch (eGamma)
+    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
-    case UNITY:
-        {
-            return;
-        }
-    case GAMMA1:
-        {
-            iDir = 0;
-        }
-        break;
-    case GAMMA2:
-        {
-            iDir = 1;
-        }
-        break;
-    case GAMMA3:
-        {
-            iDir = 2;
-        }
-        break;
-    case GAMMA4:
-        {
-            iDir = 3;
-        }
-        break;
-    }
-
-    if (iDir >= 0)
-    {
-        if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-        {
-            appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
-            return;
-        }
-        const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-        CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-        checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
-        preparethread;
-        if (m_bEachSiteEta)
-        {
-            _kernelKSApplyGammaEta << <block, threads >> > (
-                m_pDeviceData,
-                pPooled->m_pDeviceData,
-                pFieldSU3->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pEtaMu,
-                static_cast<BYTE>(iDir));
-        }
-        else
-        {
-            _kernelKSApplyGamma << <block, threads >> > (
-                m_pDeviceData,
-                pPooled->m_pDeviceData,
-                pFieldSU3->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pEtaMu,
-                static_cast<BYTE>(iDir));
-        }
-
-        pPooled->Return();
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
         return;
     }
+    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+    InitialField(EFIT_Zero);
 
-    appCrucial(_T("Not implemented yet...\n"));
+    //If it was gamma_mu or gamma_5 or sigmaij, it is i gamma mu and i gamma 5, therefore multiply -i
+    UBOOL bImag = (GAMMA1 == eGamma) || (GAMMA2 == eGamma) || (GAMMA3 == eGamma) || (GAMMA4 == eGamma) || (GAMMA5 == eGamma)
+        || (SIGMA12 == eGamma) || (SIGMA31 == eGamma) || (SIGMA41 == eGamma) || (SIGMA23 == eGamma) || (SIGMA42 == eGamma) || (SIGMA43 == eGamma);
 
+    CFieldFermionKSSU3Gamma::appApplyGammaKS(
+        m_pDeviceData,
+        pPooled->m_pDeviceData,
+        pFieldSU3->m_pDeviceData,
+        eGamma,
+        m_bEachSiteEta,
+        FALSE,
+        F(0.5),
+        bImag ? EOCT_Complex : EOCT_None,
+        F(1.0),
+        bImag ? _make_cuComplex(F(0.0), -F(1.0)) : _onec,
+        m_byFieldId,
+        1
+    );
+
+    pPooled->Return();
 }
 
 
