@@ -90,7 +90,7 @@ INT Measurement(CParameters& params)
 
     iVaule = 0;
     params.FetchValueINT(_T("LoadFermion"), iVaule);
-    const UINT uiLoadFermion = iVaule;
+    //const UINT uiLoadFermion = iVaule;
 
     CCString sLoadFermionFile;
     params.FetchStringValue(_T("LoadFermionFile"), sLoadFermionFile);
@@ -369,9 +369,21 @@ INT Measurement(CParameters& params)
                 _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
             }
 
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma1);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma2);
             _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
             _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
-
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma51);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma52);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma12);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma13);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma14);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma23);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma24);
+            _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34);
 
             _CLG_EXPORT_CHIRAL(pCCHeavy, ChiralKS);
             if (pCCHeavy->m_bMeasureConnect)
@@ -379,8 +391,21 @@ INT Measurement(CParameters& params)
                 _CLG_EXPORT_CHIRAL(pCCHeavy, ConnectSusp);
             }
 
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma1);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma2);
             _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma3);
             _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma4);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma5);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma51);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma52);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma53);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSGamma54);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma12);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma13);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma14);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma23);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma24);
+            _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma34);
 
         }
         break;

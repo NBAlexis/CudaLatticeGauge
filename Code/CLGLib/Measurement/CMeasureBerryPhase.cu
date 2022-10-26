@@ -408,7 +408,7 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
         }
         else
         {
-            CalculateMomentumSpacePhiKS(m_pGaugeFixing);
+            CalculateMomentumSpacePhiKS(dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge));
             CalculateU1FieldKS();
         }
     }

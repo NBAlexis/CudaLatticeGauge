@@ -168,7 +168,8 @@ INT MeasurementEM(CParameters& params)
     CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    CMeasureBerryPhase* pBP = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
+    CMeasureBerryPhase* pBPu = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
+    CMeasureBerryPhase* pBPd = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
@@ -199,7 +200,8 @@ INT MeasurementEM(CParameters& params)
         pCCHeavy->Reset();
         pFALight->Reset();
         pFAHeavy->Reset();
-        pBP->Reset();
+        pBPu->Reset();
+        pBPd->Reset();
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
         pFALight->SetFieldCount(iFieldCount);
@@ -385,7 +387,8 @@ INT MeasurementEM(CParameters& params)
                 break;
                 case EDJKSEM_BerryPhase:
                 {
-                    pBP->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pBPu->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pBPd->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
 #if NotYet
@@ -617,8 +620,10 @@ INT MeasurementEM(CParameters& params)
             case EDJKSEM_BerryPhase:
             {
                 CCString sFileNameWriteBP;
-                sFileNameWriteBP.Format(_T("%s_BerryPhase_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBP->m_lstData);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseU_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray(sFileNameWriteBP, pBPu->m_lstData);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseD_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray(sFileNameWriteBP, pBPd->m_lstData);
             }
             break;
 #if NotYet

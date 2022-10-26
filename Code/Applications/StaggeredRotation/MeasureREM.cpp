@@ -58,6 +58,7 @@ __DEFINE_ENUM(EDistributionJobKSREM,
             sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n"); \
             sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n"); \
             sFileContent = sFileContent + _T("Magnetic: ") + appFloatToString(pU1->m_feBz) + _T("\n"); \
+            sFileContent = sFileContent + _T("MagneticType: ") + __ENUM_TO_STRING(EU1RealType, pU1->m_eB) + _T("\n"); \
             sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1##ftype->m_f2am) + _T("\n"); \
             sFileContent = sFileContent + _T("Chage: ") + appFloatToString(pF1##ftype->m_fQ) + _T("\n"); \
             sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1##ftype->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n"); \

@@ -283,7 +283,7 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 3
     OtherGaugeFieldCount : 1
-    MeasureListLength : 2
+    MeasureListLength : 3
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -419,6 +419,16 @@ JobMeasure:
 
         MeasureName : CMeasureChiralCondensateKS
         FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
+    Measure3:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 3
         MeasureDist : 1
         ShowResult : 0
         ShiftCenter : 0

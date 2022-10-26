@@ -98,7 +98,7 @@ INT Measurement(CParameters& params)
 
     iVaule = 0;
     params.FetchValueINT(_T("LoadFermion"), iVaule);
-    const UINT uiLoadFermion = iVaule;
+    //const UINT uiLoadFermion = iVaule;
 
     CCString sLoadFermionFile;
     params.FetchStringValue(_T("LoadFermionFile"), sLoadFermionFile);

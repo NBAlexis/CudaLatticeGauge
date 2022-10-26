@@ -1,7 +1,7 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_SimulateREM
+RotationJob : ESR_MeasureEM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -871,21 +871,21 @@ JobMeasureEM:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.3
+    GaugeBate : 5.4
     EMStart : 0
     EMEnd : 13
     ElectricList : [0., 0.2617993877991494, 0.5235987755982988, 0.7853981633974483, 1.0471975511965976, 1.3089969389957472, 1.5707963267948966, 1.8325957145940461, 2.0943951023931953, 2.356194490192345, 2.6179938779914944, 2.8797932657906435, 3.141592653589793]
     MagneticList : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     StartN : 101
-    EndN : 3000
+    EndN : 120
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F520_02EM_
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EDJKSEM_Polyakov, EDJKSEM_Chiral
-    DistributionJob : EDJKSEM_Chiral
+    ## EDJKSEM_Polyakov, EDJKSEM_Chiral, EDJKSEM_BerryPhase
+    DistributionJob : EDJKSEM_BerryPhase
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -893,12 +893,12 @@ JobMeasureEM:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\EW\53002\Nt6
+    SubFolderPrefix : H:\EW\54002\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : SRF530_02EM_
-    CSVSavePrefix : G:\EW\53002\Chiral\SRF530_02EM_
+    SavePrefix : GFSRF540_02EM_
+    CSVSavePrefix : ./SRF540_02EM_
 
     Dim : 4
     Dir : 4
@@ -911,7 +911,7 @@ JobMeasureEM:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 7
+    MeasureListLength : 8
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -1104,8 +1104,16 @@ JobMeasureEM:
     Measure7:
 
         MeasureName : CMeasureBerryPhase
-        FieldId : 1
-        ShowResult : 0
+        FieldId : 2
+        ShowRes : 1
+        WilsonDirac : 0
+        DoGaugeFixing : 0
+
+    Measure8:
+
+        MeasureName : CMeasureBerryPhase
+        FieldId : 3
+        ShowRes : 1
         WilsonDirac : 0
         DoGaugeFixing : 0
         
@@ -1622,9 +1630,9 @@ JobSimulateREM:
     ListStart : 1
     ListEnd : 10
     # OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
-    OmegaList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    OmegaList : [0.080, 0.080, 0.080, 0.080, 0.080, 0.080, 0.080, 0.080, 0.080, 0.080]
     MagneticList : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    SavePrefix : ./SRF486295059_
+    SavePrefix : ./SRF486295059_O5_
     Additive : 0
 
     # 53551575Nt4 Omega60 

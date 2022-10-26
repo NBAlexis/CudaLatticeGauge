@@ -53,7 +53,9 @@ inline INT vsnprintf_s(TCHAR* buffer, size_t sizeOfBuffer, const TCHAR* format, 
 
 inline TCHAR* strcpy_s(TCHAR* dest, size_t length, const TCHAR* source)
 {
-    return std::strncpy(dest, source, length);
+    TCHAR* ret = std::strncpy(dest, source, length - 1);
+    dest[length - 1] = 0;
+    return ret;
 }
 
 #endif
