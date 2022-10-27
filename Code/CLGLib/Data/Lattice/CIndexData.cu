@@ -118,12 +118,13 @@ UINT inline _GetDecompose(UINT volumn)
 
 void CIndexData::DebugPlaqutteTable()
 {
+    const UBOOL bLogData = appGetLogDate();
+    appSetLogDate(FALSE);
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
-
     SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
-    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pPlaqutteCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
 
     for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)
     {
@@ -136,7 +137,7 @@ void CIndexData::DebugPlaqutteTable()
         {
             for (UINT j = 0; j < uiPlaqLength; ++j)
             {
-                const UINT uiIdx = uiListIdx + i * uiPlaqLength + j;
+                const UINT uiIdx = i * uiPlaqLength + j;
                 const SIndex& idx = cache[uiListIdx + uiIdx];
                 const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
 
@@ -150,6 +151,7 @@ void CIndexData::DebugPlaqutteTable()
         }
     }
     appSafeFree(cache);
+    appSetLogDate(bLogData);
 }
 
 void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
@@ -182,6 +184,45 @@ void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
         appGeneral(_T("\n"));
     }
     appSafeFree(cache);
+}
+
+void CIndexData::DebugStapleTable()
+{
+    const UBOOL bLogData = appGetLogDate();
+    appSetLogDate(FALSE);
+    const UINT uiPlaqLength = 4;
+    const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
+    const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
+    SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink);
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, 
+        sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
+
+    for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)
+    {
+        const SSmallInt4 myself = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T("me = %d, %d, %d, %d\n"), myself.x, myself.y, myself.z, myself.w);
+
+        const UINT uiListIdx = uiSite * (uiPlaqLength - 1) * uiPlaqPerLink;
+
+        for (UINT i = 0; i < uiPlaqPerLink; ++i)
+        {
+            for (UINT j = 0; j < uiPlaqLength - 1; ++j)
+            {
+                const UINT uiIdx = i * (uiPlaqLength - 1) + j;
+                const SIndex& idx = cache[uiListIdx + uiIdx];
+                const SSmallInt4 coord = __hostSiteIndexToInt4(idx.m_uiSiteIndex);
+
+                appGeneral(_T("%s%s(%d,%d,%d,%d)_(%d)  "),
+                    (idx.m_byTag & _kDaggerOrOpposite ? "-" : "+"),
+                    (idx.m_byTag & _kDirichlet ? "D" : ""),
+                    coord.x, coord.y, coord.z, coord.w,
+                    idx.m_byDir);
+            }
+            appGeneral(_T("\n"));
+        }
+    }
+    appSafeFree(cache);
+    appSetLogDate(bLogData);
 }
 
 void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)

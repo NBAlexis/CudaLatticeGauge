@@ -57,8 +57,12 @@ public:
 
 #if !_CLG_DOUBLEFLOAT
     TArray<DOUBLE> m_lstData;
+    TArray<DOUBLE> m_lstDataXY;
+    TArray<DOUBLE> m_lstDataZT;
 #else
     TArray<Real> m_lstData;
+    TArray<Real> m_lstDataXY;
+    TArray<Real> m_lstDataZT;
 #endif
 
     UBOOL m_bWilsonDirac;
@@ -71,8 +75,12 @@ public:
     CFieldGaugeSU3* m_pGaugeFixing;
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* m_pResEachConfiguration;
+    DOUBLE* m_pResEachConfigurationXY;
+    DOUBLE* m_pResEachConfigurationZT;
 #else
     Real* m_pResEachConfiguration;
+    Real* m_pResEachConfigurationXY;
+    Real* m_pResEachConfigurationZT;
 #endif
 };
 

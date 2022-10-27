@@ -57,7 +57,7 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     BYTE byRegionId = 0;
     UBOOL bBoundary = FALSE;
     
-    for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
+    for (BYTE uiDir = 0; uiDir < 4; ++uiDir)
     {
         if (realCoord.m_byData4[uiDir] <= 0)
         {
@@ -71,6 +71,13 @@ _kernalBakeEdgePeriodicDirichletBoundary(
                 if (0 == bc.m_byData4[uiDir])
                 {
                     realCoord.m_byData4[uiDir] = 0;
+                }
+                else
+                {
+                    while (realCoord.m_byData4[uiDir] < 0)
+                    {
+                        realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+                    }
                 }
             }
 
@@ -98,6 +105,13 @@ _kernalBakeEdgePeriodicDirichletBoundary(
                 if (0 == bc.m_byData4[uiDir])
                 {
                     realCoord.m_byData4[uiDir] = _constIntegers[ECI_Lx + uiDir] - 1;
+                }
+                else
+                {
+                    while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+                    {
+                        realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+                    }
                 }
             }
 
@@ -146,10 +160,9 @@ _kernalBakeBondInfoPeriodicDirichletBoundary(
     UBOOL bDirich = FALSE;
     BYTE byZeroCount = 0;
     BYTE byZeroDir = 0;
-    for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
+    for (BYTE uiDir = 0; uiDir < 4; ++uiDir)
     {
-        if (realCoord.m_byData4[uiDir] <= 0 
-         && 0 == bc.m_byData4[uiDir])
+        if (realCoord.m_byData4[uiDir] <= 0 && 0 == bc.m_byData4[uiDir])
         {
             if (realCoord.m_byData4[uiDir] < 0)
             {
@@ -161,8 +174,7 @@ _kernalBakeBondInfoPeriodicDirichletBoundary(
                 byZeroDir = uiDir;
             }
         }
-        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1 
-             && 0 == bc.m_byData4[uiDir])
+        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1 && 0 == bc.m_byData4[uiDir])
         {
             bDirich = TRUE;
         }
@@ -227,7 +239,7 @@ _kernalBakeBoundGlue_DBC(
     UBOOL bBoundary = FALSE;
     UBOOL bPassDirichletEdge = FALSE;
     BYTE tagBoundDir = 0;
-    for (BYTE uiDir = static_cast<BYTE>(4 - _DC_Dir); uiDir < _DC_Dir; ++uiDir)
+    for (BYTE uiDir = 0; uiDir < 4; ++uiDir)
     {
         if (realCoord.m_byData4[uiDir] <= 0)
         {
@@ -241,6 +253,13 @@ _kernalBakeBoundGlue_DBC(
                 {
                     bPassDirichletEdge = TRUE;
                     realCoord.m_byData4[uiDir] = 0;
+                }
+                else
+                {
+                    while (realCoord.m_byData4[uiDir] < 0)
+                    {
+                        realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+                    }
                 }
             }
 
@@ -269,6 +288,13 @@ _kernalBakeBoundGlue_DBC(
                 {
                     bPassDirichletEdge = TRUE;
                     realCoord.m_byData4[uiDir] = _constIntegers[ECI_Lx + uiDir] - 1;
+                }
+                else
+                {
+                    while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+                    {
+                        realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+                    }
                 }
             }
 

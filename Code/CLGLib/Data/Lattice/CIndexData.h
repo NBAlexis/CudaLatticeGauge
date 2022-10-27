@@ -189,6 +189,8 @@ public:
 
     static void DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt);
 
+    static void DebugStapleTable();
+
     //=============================================================
     //Small Data
     UINT* m_pSmallData;

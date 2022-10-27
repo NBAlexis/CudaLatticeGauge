@@ -14,14 +14,6 @@
 
 __BEGIN_NAMESPACE
 
-__DEFINE_ENUM(EBoundaryCondition,
-    EBC_TorusSquare,
-    EBC_TorusAndDirichlet,
-    EBC_Max,
-    EBC_ForceDWORD = 0x7fffffff,
-    )
-
-
 struct SBoundCondition
 {
     SBoundCondition() {}

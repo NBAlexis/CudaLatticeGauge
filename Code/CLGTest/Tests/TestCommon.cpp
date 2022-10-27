@@ -342,6 +342,15 @@ UINT TestBackgroundField(CParameters&)
 
 __REGIST_TEST(TestBackgroundField, Misc, TestBackgroundField);
 
+UINT TestPlaqutteTable(CParameters&)
+{
+    //appGetLattice()->m_pIndexCache->DebugEdgeGlue(1, SSmallInt4(-1, -1, -1, -1));
+    appGetLattice()->m_pIndexCache->DebugStapleTable();
+    return 0;
+}
+
+__REGIST_TEST(TestPlaqutteTable, Misc, TestPlaqutteTable);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

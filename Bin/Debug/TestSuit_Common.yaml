@@ -651,3 +651,22 @@ TestBackgroundField:
         EzValue : 0.0
         BzType : EURT_None
         BzValue : 0.0
+
+TestPlaqutteTable:
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [4, 4, 4, 1]
+    LatticeIndex : CIndexSquare
+    # CBoundaryConditionPeriodicAndDirichletSquare, CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        Period : [1, 1, 1, 1]

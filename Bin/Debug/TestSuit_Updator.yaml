@@ -5,6 +5,7 @@ TestUpdatorLeapFrog:
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
     LatticeIndex : CIndexSquare
+    # CBoundaryConditionTorusSquare, CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
@@ -43,6 +44,7 @@ TestUpdatorLeapFrog:
         MeasureName : CMeasurePlaqutteEnergy
 
 TestUpdatorOmelyan:
+
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
@@ -122,6 +124,52 @@ TestUpdatorForceGradient:
     Measure1:
 
         MeasureName : CMeasurePlaqutteEnergy
+
+TestUpdatorForceGradient3D:
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [4, 4, 8, 1]
+    LatticeIndex : CIndexSquare
+    # CBoundaryConditionTorusSquare, CBoundaryConditionPeriodicAndDirichletSquare, CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.2064
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        CloverEnergy : 1
+        Beta : 3
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
 
 TestWilsonLoop:
 

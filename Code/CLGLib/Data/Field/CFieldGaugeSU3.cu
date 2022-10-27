@@ -357,9 +357,11 @@ _kernelPlaqutteEnergySU3_UseClover(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE stapleConstant,
     DOUBLE fBetaOverN,
     DOUBLE* results
 #else
+    Real stapleConstant,
     Real fBetaOverN,
     Real* results
 #endif
@@ -384,9 +386,9 @@ _kernelPlaqutteEnergySU3_UseClover(
         }
     }
 #if !_CLG_DOUBLEFLOAT
-    fRes = 18.0 - 0.25 * fRes;
+    fRes = stapleConstant - 0.25 * fRes;
 #else
-    fRes = F(18.0) - F(0.25) * fRes;
+    fRes = stapleConstant - F(0.25) * fRes;
 #endif
     results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
 }
@@ -396,9 +398,11 @@ _kernelPlaqutteEnergyUsingStableSU3(
     const deviceSU3 * __restrict__ pDeviceData,
     const deviceSU3 * __restrict__ pStableData,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE stapleConstant,
     DOUBLE betaOverN,
     DOUBLE* results
 #else
+    Real stapleConstant,
     Real betaOverN,
     Real* results
 #endif
@@ -416,11 +420,7 @@ _kernelPlaqutteEnergyUsingStableSU3(
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         //For each link, there are 6 staples
-#if !_CLG_DOUBLEFLOAT
-        resThisThread += (18.0 - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
-#else
-        resThisThread += (F(18.0) - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
-#endif
+        resThisThread += (stapleConstant - pDeviceData[linkIndex].MulDaggerC(pStableData[linkIndex]).ReTr());
     }
 
 #if !_CLG_DOUBLEFLOAT
@@ -1279,11 +1279,16 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
 #endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
-
+    appGeneral(_T("const %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite);
     preparethread;
     _kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+        3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
+#else
+        F(3.0) * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
+#endif
         betaOverN,
         _D_RealThreadBuffer);
 
@@ -1303,10 +1308,17 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CF
     }
     const CFieldGaugeSU3* pStableSU3 = dynamic_cast<const CFieldGaugeSU3*>(pStable);
 
+    //appGeneral(_T("const = %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink);
+
     preparethread;
     _kernelPlaqutteEnergyUsingStableSU3 << <block, threads >> > (
         m_pDeviceData, 
-        pStableSU3->m_pDeviceData, 
+        pStableSU3->m_pDeviceData,
+#if !_CLG_DOUBLEFLOAT
+        3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
+#else
+        F(3.0) * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
+#endif
         betaOverN, 
         _D_RealThreadBuffer);
 

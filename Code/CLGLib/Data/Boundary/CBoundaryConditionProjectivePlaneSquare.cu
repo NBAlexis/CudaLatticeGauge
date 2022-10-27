@@ -31,7 +31,7 @@ _kernalBakeEdgeProjectivePlaneBoundary(
     //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
     SBYTE signchange = 1;
-    for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
+    for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
         if (realCoord.m_byData4[uiDir] < 0)
         {
@@ -46,6 +46,13 @@ _kernalBakeEdgeProjectivePlaneBoundary(
             {
                 realCoord.m_byData4[0] = _DC_Lx - realCoord.m_byData4[0] - 1;
             }
+            else
+            {
+                while (realCoord.m_byData4[uiDir] < 0)
+                {
+                    realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+                }
+            }
         }
         else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
         {
@@ -59,6 +66,13 @@ _kernalBakeEdgeProjectivePlaneBoundary(
             if (1 == uiDir)
             {
                 realCoord.m_byData4[0] = _DC_Lx - realCoord.m_byData4[0] - 1;
+            }
+            else
+            {
+                while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+                {
+                    realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+                }
             }
         }
     }
@@ -98,7 +112,7 @@ _kernalBakeBoundGlueProjectivePlaneBoundary(
     //SBYTE signchange = 1;
     UBOOL bDaggerX = FALSE;
     UBOOL bDaggerY = FALSE;
-    for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
+    for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
         if (realCoord.m_byData4[uiDir] < 0)
         {
@@ -115,6 +129,13 @@ _kernalBakeBoundGlueProjectivePlaneBoundary(
                 realCoord.m_byData4[0] = _DC_Lx - realCoord.m_byData4[0] - 1;
                 bDaggerX = TRUE;
             }
+            else
+            {
+                while (realCoord.m_byData4[uiDir] < 0)
+                {
+                    realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
+                }
+            }
         }
         else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
         {
@@ -130,6 +151,13 @@ _kernalBakeBoundGlueProjectivePlaneBoundary(
             {
                 realCoord.m_byData4[0] = _DC_Lx - realCoord.m_byData4[0] - 1;
                 bDaggerX = TRUE;
+            }
+            else
+            {
+                while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+                {
+                    realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
+                }
             }
         }
     }

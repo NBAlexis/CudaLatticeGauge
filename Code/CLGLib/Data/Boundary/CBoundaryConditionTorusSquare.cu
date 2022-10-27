@@ -30,20 +30,33 @@ _kernalBakeEdgeTorusBoundary(
     //realCoord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z) - CIndexData::kCacheIndexEdge;
     //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
+    //UBOOL bDebug = FALSE;
+    //if (realCoord.m_byData4[3] < 0 || realCoord.m_byData4[3] > 1)
+    //{
+    //    bDebug = TRUE;
+    //}
+    //SSmallInt4 old(realCoord);
+
     SBYTE signchange = 1;
-    for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
+    for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
-        if (realCoord.m_byData4[uiDir] < 0)
+        while (realCoord.m_byData4[uiDir] < 0)
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];
         }
-        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+
+        while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];
         }
     }
+
+    //if (bDebug)
+    //{
+    //    printf("%d %d %d %d to %d %d %d %d\n", old.x, old.y, old.z, old.w, realCoord.x, realCoord.y, realCoord.z, realCoord.w);
+    //}
 
     const UINT uiSiteIndex = _deviceGetSiteIndex(realCoord);
     pDeviceData[idxAll] = SIndex(uiSiteIndex);
@@ -78,14 +91,15 @@ _kernalBakeBoundGlueTorusBoundary(
     //realCoord.w = static_cast<SBYTE>(idxAll % mods.z) - CIndexData::kCacheIndexEdge;
 
     SBYTE signchange = 1;
-    for (UINT uiDir = 4 - _DC_Dir; uiDir < _DC_Dir; ++uiDir)
+    for (UINT uiDir = 0; uiDir < 4; ++uiDir)
     {
-        if (realCoord.m_byData4[uiDir] < 0)
+        while (realCoord.m_byData4[uiDir] < 0)
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] + _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];
         }
-        else if (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
+
+        while (realCoord.m_byData4[uiDir] >= _constIntegers[ECI_Lx + uiDir])
         {
             realCoord.m_byData4[uiDir] = realCoord.m_byData4[uiDir] - _constIntegers[ECI_Lx + uiDir];
             signchange = signchange * bc.m_byData4[uiDir];

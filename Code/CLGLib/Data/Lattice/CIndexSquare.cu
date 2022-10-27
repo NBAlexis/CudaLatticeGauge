@@ -16,6 +16,9 @@ __CLGIMPLEMENT_CLASS(CIndexSquare)
 
 #pragma region Kernels
 
+/**
+ * This record multiply factors to recover site index to pDeviceData
+ */
 __global__ void _CLG_LAUNCH_BOUND_SINGLE
 _kernalBakeSmallData(UINT* pDeviceData)
 {
@@ -28,36 +31,13 @@ _kernalBakeSmallData(UINT* pDeviceData)
     pDeviceData[CIndexData::kPlaqLengthIdx] = 4;
     pDeviceData[CIndexData::kPlaqPerSiteIdx] = _DC_Dim * (_DC_Dim - 1) / 2;
     pDeviceData[CIndexData::kPlaqPerLinkIdx] = 2 * (_DC_Dim - 1);
+
+    //printf("kPlaqPerSiteIdx=%d kPlaqPerLinkIdx=%d\n", pDeviceData[CIndexData::kPlaqPerSiteIdx], pDeviceData[CIndexData::kPlaqPerLinkIdx]);
 }
 
 /**
-__global__ void _CLG_LAUNCH_BOUND
-_kernalBakeWalkingTable(UINT* pDeviceData, uint3 mods)
-{
-    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-    SSmallInt4 coord;
-    coord.x = static_cast<SBYTE>(idxAll / mods.x);
-    coord.y = static_cast<SBYTE>((idxAll % mods.x) / mods.y);
-    coord.z = static_cast<SBYTE>((idxAll % mods.y) / mods.z);
-    coord.w = static_cast<SBYTE>(idxAll % mods.z);
-
-    for (BYTE i = 0; i < 2 * _DC_Dir; ++i)
-    {
-        SSmallInt4 movingCoord = _deviceCoordMoving(coord, i);
-        if (movingCoord.x < 0) movingCoord.x = 0;
-        if (movingCoord.y < 0) movingCoord.y = 0;
-        if (movingCoord.z < 0) movingCoord.z = 0;
-        if (movingCoord.w < 0) movingCoord.w = 0;
-        if (movingCoord.x >= _DC_Lx + 2 * CIndexData::kCacheIndexEdge) movingCoord.x = _DC_Lx + 2 * CIndexData::kCacheIndexEdge - 1;
-        if (movingCoord.y >= _DC_Ly + 2 * CIndexData::kCacheIndexEdge) movingCoord.y = _DC_Ly + 2 * CIndexData::kCacheIndexEdge - 1;
-        if (movingCoord.z >= _DC_Lz + 2 * CIndexData::kCacheIndexEdge) movingCoord.z = _DC_Lz + 2 * CIndexData::kCacheIndexEdge - 1;
-        if (movingCoord.w >= _DC_Lt + 2 * CIndexData::kCacheIndexEdge) movingCoord.w = _DC_Lt + 2 * CIndexData::kCacheIndexEdge - 1;
-
-        pDeviceData[idxAll * 2 * _DC_Dir + i] = movingCoord.x * mods.x + movingCoord.y * mods.y + movingCoord.z * mods.z + movingCoord.w;
-    }
-}
-*/
-
+ * It calculate SSmallInt4 for every big-site
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeMappingTable(SSmallInt4* pDeviceData, uint3 mods)
 {
@@ -71,58 +51,16 @@ _kernalBakeMappingTable(SSmallInt4* pDeviceData, uint3 mods)
     pDeviceData[idxAll] = coord;
 }
 
-/* This does not work for Projective plane, so give up.
- 
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBakePlaqIndexAtSite2(SIndex* pResult, 
-    const UINT* __restrict__ pWalkingTable, 
-    const SIndex* __restrict__ pMappingTable, 
-    const UINT* __restrict__ pSmallDataTable,
-    const BYTE* __restrict__ pBondInfoTable)
-{
-    intokernalInt4;
-
-    const UINT uiDim = _DC_Dim;
-    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
-
-    //24
-    UINT iListIndex = uiSiteIndex 
-        * (pSmallDataTable[CIndexData::kPlaqPerSiteIdx] 
-         * pSmallDataTable[CIndexData::kPlaqLengthIdx]);
-
-    for (BYTE uiLink = 0; uiLink < uiDim; ++uiLink)
-    {
-        for (BYTE uiPlaq = uiLink + 1; uiPlaq < uiDim; ++uiPlaq)
-        {
-            pResult[iListIndex] = SIndex(uiSiteIndex, uiLink);
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiLink) ? _kDirichlet : 0;
-            ++iListIndex;
-
-            //start ----> uiLink
-            
-            UINT movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiLink)];
-            pResult[iListIndex] = pMappingTable[movedSite];
-            pResult[iListIndex].m_byDir = uiPlaq;
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, uiPlaq) ? _kDirichlet : 0;
-            ++iListIndex;
-
-            //start ----> uiPlaq
-            movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiPlaq)];
-            pResult[iListIndex] = pMappingTable[movedSite];
-            pResult[iListIndex].m_byDir = uiLink;
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, uiLink) ? _kDirichlet : 0;
-            pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
-            ++iListIndex;
-
-            pResult[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiPlaq) ? _kDirichlet : 0;
-            pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
-            ++iListIndex;
-        }
-    }
-}
-*/
-
+/**
+ * This bake the plaquttes for one site
+ * for each site, there are 6 plaquttes for 4D
+ * xy xz xt yz yt zt
+ * so the index count is 4x6 = 24
+ *
+ * for 3D there are 3 plaquttes
+ * xy, xz yz
+ * so the index count is 4x3 = 12
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelBakePlaqIndexAtSite(SIndex* pResult,
     const SIndex* __restrict__ pLinkTable,
@@ -170,81 +108,15 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
     }
 }
 
-/** This does not work with Projective plane, give up
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBakePlaqIndexAtLink2(SIndex* pResult, 
-    const UINT* __restrict__ pWalkingTable,
-    const SIndex* __restrict__ pMappingTable,
-    const UINT* __restrict__ pSmallDataTable,
-    const BYTE* __restrict__ pBondInfoTable)
-{
-    intokernalInt4;
-
-    UINT uiDim = _DC_Dim;
-    const UINT uiBigSiteIndex = _deviceGetBigIndex(sSite4, pSmallDataTable);
-    
-    for (UINT uiLinkDir = 0; uiLinkDir < uiDim; ++uiLinkDir)
-    {
-        UINT uiLinkIndex = uiSiteIndex * uiDim + uiLinkDir;
-
-        UINT iListIndex = uiLinkIndex
-            * (pSmallDataTable[CIndexData::kPlaqPerLinkIdx]
-            * (pSmallDataTable[CIndexData::kPlaqLengthIdx] - 1));
-
-        for (BYTE i = 0; i < uiDim; ++i)
-        {
-            if (i != uiLinkDir)
-            {
-                //=============================================
-                //add forward
-                //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
-                pResult[iListIndex] = SIndex(uiSiteIndex, i);
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, i) ? _kDirichlet : 0;
-                ++iListIndex;
-
-                //start ---> i
-                UINT movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + i)];
-                pResult[iListIndex] = pMappingTable[movedSite];
-                pResult[iListIndex].m_byDir = uiLinkDir;
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, uiLinkDir) ? _kDirichlet : 0;
-                ++iListIndex;
-
-                //start ---> uiLinkDir
-                movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + (uiDim + uiLinkDir)];
-                pResult[iListIndex] = pMappingTable[movedSite];
-                pResult[iListIndex].m_byDir = i;
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, i) ? _kDirichlet : 0;
-                pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
-                ++iListIndex;
-
-                //=============================================
-                //add backward
-                //[site-p_dir][p_dir]^-1, [site-p_dir][b_dir], [site-p_dir+b_dir][p_dir]
-                //i <---- start
-                movedSite = pWalkingTable[uiBigSiteIndex * 2 * uiDim + i];
-                pResult[iListIndex] = pMappingTable[movedSite];
-                pResult[iListIndex].m_byDir = i;
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, i) ? _kDirichlet : 0;
-                pResult[iListIndex].m_byTag |= _kDaggerOrOpposite;
-                ++iListIndex;
-
-                //
-                pResult[iListIndex] = SIndex(pResult[iListIndex - 1].m_uiSiteIndex, uiLinkDir);
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, uiLinkDir) ? _kDirichlet : 0;
-                ++iListIndex;
-
-                //last ----> uiLinkDir
-                movedSite = pWalkingTable[movedSite * 2 * uiDim + (uiDim + uiLinkDir)];
-                pResult[iListIndex] = pMappingTable[movedSite];
-                pResult[iListIndex].m_byDir = i;
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, movedSite, i) ? _kDirichlet : 0;
-                ++iListIndex;
-            }
-        }
-    }
-}
-*/
-
+/**
+ * This bake the staple
+ * for each link, there are 6 plaquttes for 4D
+ * for example, x-link
+ * the staple is xy, xz, xt for forward and backward
+ *
+ * for 3D there are 4 plaquttes
+ * xy, xz for forward and backward
+ */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelBakePlaqIndexAtLink(SIndex* pResult,
     const SIndex* __restrict__ pLinkTable,

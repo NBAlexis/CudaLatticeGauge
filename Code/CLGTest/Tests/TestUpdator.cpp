@@ -67,6 +67,8 @@ __REGIST_TEST(TestUpdator, Updator, TestUpdatorOmelyan);
 
 __REGIST_TEST(TestUpdator, Updator, TestUpdatorForceGradient);
 
+__REGIST_TEST(TestUpdator, Updator, TestUpdatorForceGradient3D);
+
 
 UINT TestWilsonLoop(CParameters& sParam)
 {
