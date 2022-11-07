@@ -488,6 +488,18 @@
     <ClInclude Include="Data\Field\CFieldFermionKSSU3GammaEM.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasurePolyakovU1XY.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasurePolyakovXY3D.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -813,6 +825,18 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3GammaEM.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasurePolyakovU1XY.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasurePolyakovXY3D.cu">
+      <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

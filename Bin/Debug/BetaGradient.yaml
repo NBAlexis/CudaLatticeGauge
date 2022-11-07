@@ -190,6 +190,7 @@ JobMeasure:
 
     SavePrefix : BG05_
     CSVSavePrefix : ./BS02/BetaGradient/Chiral/BG05_
+    DeltaBeta : 0.5
 
     Dim : 4
     Dir : 4

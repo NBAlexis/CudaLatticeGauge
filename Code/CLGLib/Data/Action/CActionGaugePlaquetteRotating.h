@@ -310,6 +310,8 @@ static __device__ __inline__ Real _deviceGi(
 * For 3 == mu, f(n) = f(n+mu)
 * This is also true for Dirichlet boundary condition, only Dirichlet on X-Y direction is assumed
 *
+* 0 -> r^2, 1 -> y^2, 2 -> x^2
+*
 * ==================================================
 * Note for periodic boundary condition:
 * For const SSmallInt4 sN_p_m = _deviceSmallInt4OffsetC(sSite4, mu + 1)

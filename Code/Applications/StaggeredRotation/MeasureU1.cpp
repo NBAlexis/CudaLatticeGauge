@@ -10,6 +10,7 @@
 #include "StaggeredRotation.h"
 
 __DEFINE_ENUM(EDistributionJobKSU1,
+    EDJKSU1_Polyakov,
     EDJKSU1_Chiral,
     )
 
@@ -66,7 +67,7 @@ INT MeasurementU1(CParameters& params)
     UBOOL bSubFolder = 0 != iVaule;
 
     CCString sValue = _T("EDJKSU1_Chiral");
-    params.FetchStringValue(_T("DistributionJob"), sValue);
+    params.FetchStringValue(_T("EDistributionJobKSU1"), sValue);
     EDistributionJobKSU1 eJob = __STRING_TO_ENUM(EDistributionJobKSU1, sValue);
 
     CCString sSavePrefix;
@@ -125,8 +126,10 @@ INT MeasurementU1(CParameters& params)
         r_omega_idx.AddItem(newlst);
     }
     TArray<Real> lstR;
-    //TArray<TArray<CLGComplex>> lstPolyIn;
-    //TArray<TArray<CLGComplex>> lstPolyOut;
+    TArray<TArray<CLGComplex>> lstPolyIn;
+    TArray<TArray<CLGComplex>> lstPolyOut;
+    TArray<TArray<Real>> lstPolyInAbs;
+    TArray<TArray<Real>> lstPolyOutAbs;
     //TArray<TArray<CLGComplex>> lstPolyInZ;
     //TArray<TArray<CLGComplex>> lstPolyOutZ;
 
@@ -137,7 +140,7 @@ INT MeasurementU1(CParameters& params)
     
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
-    //CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasurePolyakovU1XY* pPL = dynamic_cast<CMeasurePolyakovU1XY*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     //CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
@@ -180,7 +183,7 @@ INT MeasurementU1(CParameters& params)
             pAG->SetOmega(CCommonData::m_fOmega);
         }
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
-        //pPL->Reset();
+        pPL->Reset();
         //pJG->Reset();
         pCCLight->Reset();
         pCCHeavy->Reset();
@@ -272,11 +275,11 @@ INT MeasurementU1(CParameters& params)
 
             switch (eJob)
             {
-                //case EDJKS_Polyakov:
-                //{
-                //    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                //}
-                //break;
+                case EDJKSU1_Polyakov:
+                {
+                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                break;
                 case EDJKSU1_Chiral:
                 {
                     for (UINT i = 0; i < iFieldCount; ++i)
@@ -555,69 +558,66 @@ INT MeasurementU1(CParameters& params)
 
         switch (eJob)
         {
-            //case EDJKS_Polyakov:
-            //{
-            //    CCString sFileNameWrite1;
-            //    CCString sFileNameWrite2;
-            //    sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-            //    sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-            //    
-            //    //extract result
-            //    assert(static_cast<INT>(iEndN - iStartN + 1) * pPL->m_lstR.Num() == pPL->m_lstP.Num());
-            //    
-            //    if (uiOmega == iStartOmega)
-            //    {
-            //        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-            //        {
-            //            lstR.AddItem(F(0.5)* _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
-            //        }
-            //        WriteStringFileRealArray(sFileNameWrite1, lstR);
-            //    }
+            case EDJKSU1_Polyakov:
+            {
+                CCString sFileNameWrite1;
+                CCString sFileNameWrite2;
+                CCString sFileNameWrite3;
+                sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_R.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+                sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                sFileNameWrite3.Format(_T("%s_polyakovabs_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
 
-            //    TArray<TArray<CLGComplex>> polyakovOmgR;
-            //    TArray<CLGComplex> polyIn;
-            //    TArray<CLGComplex> polyOut;
+                //extract result
+                assert(static_cast<INT>(iEndN - iStartN + 1)* pPL->m_lstR.Num() == pPL->m_lstP.Num());
 
-            //    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-            //    {
-            //        TArray<CLGComplex> thisConfiguration;
-            //        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-            //        {
-            //            thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
-            //        }
-            //        polyakovOmgR.AddItem(thisConfiguration);
-            //        polyIn.AddItem(pPL->m_lstLoopInner[j]);
-            //        polyOut.AddItem(pPL->m_lstLoop[j]);
-            //    }
-            //    lstPolyIn.AddItem(polyIn);
-            //    lstPolyOut.AddItem(polyOut);
-            //    WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
+                if (uiOmega == iStartOmega)
+                {
+                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                    {
+                        lstR.AddItem(F(0.5) * _hostsqrt(static_cast<Real>(pPL->m_lstR[i])));
+                    }
+                    WriteStringFileRealArray(sFileNameWrite1, lstR);
+                }
 
-            //    if (pPL->m_bMeasureLoopZ)
-            //    {
-            //        CCString sFileNameWrite3;
-            //        sFileNameWrite3.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-            //        polyakovOmgR.RemoveAll();
-            //        polyIn.RemoveAll();
-            //        polyOut.RemoveAll();
+                TArray<TArray<CLGComplex>> polyakovOmgR;
+                TArray<CLGComplex> polyIn;
+                TArray<CLGComplex> polyOut;
 
-            //        for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-            //        {
-            //            TArray<CLGComplex> thisConfiguration;
-            //            for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-            //            {
-            //                thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
-            //            }
-            //            polyakovOmgR.AddItem(thisConfiguration);
-            //            polyIn.AddItem(pPL->m_lstLoopZInner[j]);
-            //            polyOut.AddItem(pPL->m_lstLoopZ[j]);
-            //        }
-            //        lstPolyInZ.AddItem(polyIn);
-            //        lstPolyOutZ.AddItem(polyOut);
-            //        WriteStringFileComplexArray2(sFileNameWrite3, polyakovOmgR);
-            //    }
-            //}
-            //break;
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    TArray<CLGComplex> thisConfiguration;
+                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                    {
+                        thisConfiguration.AddItem(pPL->m_lstP[j * pPL->m_lstR.Num() + i]);
+                    }
+                    polyakovOmgR.AddItem(thisConfiguration);
+                    polyIn.AddItem(pPL->m_lstLoopInner[j]);
+                    polyOut.AddItem(pPL->m_lstLoop[j]);
+                }
+                lstPolyIn.AddItem(polyIn);
+                lstPolyOut.AddItem(polyOut);
+                WriteStringFileComplexArray2(sFileNameWrite2, polyakovOmgR);
+
+                TArray<TArray<Real>> polyakovOmgRAbs;
+                TArray<Real> polyInAbs;
+                TArray<Real> polyOutAbs;
+
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    TArray<Real> thisConfiguration;
+                    for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                    {
+                        thisConfiguration.AddItem(pPL->m_lstPAbs[j * pPL->m_lstR.Num() + i]);
+                    }
+                    polyakovOmgRAbs.AddItem(thisConfiguration);
+                    polyInAbs.AddItem(pPL->m_lstLoopAbsInner[j]);
+                    polyOutAbs.AddItem(pPL->m_lstLoopAbs[j]);
+                }
+                lstPolyInAbs.AddItem(polyInAbs);
+                lstPolyOutAbs.AddItem(polyOutAbs);
+                WriteStringFileRealArray2(sFileNameWrite3, polyakovOmgRAbs);
+            }
+            break;
             case EDJKSU1_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
@@ -759,26 +759,27 @@ INT MeasurementU1(CParameters& params)
     //    return 0;
     //}
 
-    //switch (eJob)
-    //{
-    //    case EDJKS_Polyakov:
-    //    {
-    //        CCString sFileNameWrite1;
-    //        CCString sFileNameWrite2;
-    //        sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-    //        sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-    //        WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
-    //        WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
+    switch (eJob)
+    {
+        case EDJKSU1_Polyakov:
+        {
+            CCString sFileNameWrite1;
+            CCString sFileNameWrite2;
+            sFileNameWrite1.Format(_T("%s_polyakov_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            sFileNameWrite2.Format(_T("%s_polyakov_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            WriteStringFileComplexArray2(sFileNameWrite1, lstPolyIn);
+            WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOut);
 
-    //        sFileNameWrite1.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-    //        sFileNameWrite2.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-    //        WriteStringFileComplexArray2(sFileNameWrite1, lstPolyInZ);
-    //        WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
-    //    }
-    //    break;
-    //    default:
-    //        break;
-    //}
+            sFileNameWrite1.Format(_T("%s_polyakovabs_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            sFileNameWrite2.Format(_T("%s_polyakovabs_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            WriteStringFileRealArray2(sFileNameWrite1, lstPolyInAbs);
+            WriteStringFileRealArray2(sFileNameWrite2, lstPolyOutAbs);
+
+        }
+        break;
+        default:
+            break;
+    }
 
     appGeneral(_T("\n(*"));
     appSetLogDate(TRUE);

@@ -1,7 +1,10 @@
 # ESR_Simulate, ESR_Measure, ESR_GaugeFixing, 
 # ESR_SimulateEM, ESR_MeasureEM, ESR_SimulateU1, ESR_MeasureU1
 # ESR_SimulateREM, ESR_MeasureREM
-RotationJob : ESR_MeasureEM
+# ESR_SimulateQuenched, ESR_SimulateQuenchedU1
+# ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
+# ESR_Measure3D, ESR_MeasureU13D
+RotationJob : ESR_MeasureREM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -82,8 +85,8 @@ JobSimulate:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3
+        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -114,8 +117,8 @@ JobSimulate:
     FermionField2:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3
+        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -146,8 +149,8 @@ JobSimulate:
     FermionField3:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3
+        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -178,8 +181,8 @@ JobSimulate:
     FermionField4:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        # FieldName : CFieldFermionKSSU3R
-        FieldName : CFieldFermionKSSU3
+        FieldName : CFieldFermionKSSU3R
+        # FieldName : CFieldFermionKSSU3
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -203,10 +206,10 @@ JobSimulate:
 
     Action1:
    
-        # ActionName : CActionGaugePlaquetteRotating
-        ActionName : CActionGaugePlaquette
+        ActionName : CActionGaugePlaquetteRotating
+        # ActionName : CActionGaugePlaquette
         CloverEnergy : 1
-        # ShiftCoord : 1
+        ShiftCoord : 1
         Beta : 5.8
         Omega : 0.0
 
@@ -335,26 +338,26 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.94
-    OmegaRange : 0.128
+    GaugeBate : 5.0
+    OmegaRange : -2.0
     StartOmega : 0
-    EndOmega : 8
+    EndOmega : 20
     StartN : 101
-    EndN : 110
-    SaveFermionFile : 1
+    EndN : 1000
+    SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
-    LoadFermion : 1
+    LoadFermion : 0
     LoadFermionFile : F494235047_
     LoadFermionHead : H:\SRFloat\494235047\Fermion
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -362,16 +365,16 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\SRFloat\494235047\GF
+    SubFolderPrefix : I:\Rotation\50mQuenched
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF494235047_
-    CSVSavePrefix : ./SRF494235047_
+    SavePrefix : 50Quenchedm_
+    CSVSavePrefix : I:\Rotation\Polyakov\50mQuenched_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [16, 16, 16, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -534,7 +537,7 @@ JobMeasure:
         FieldId : 1
         ShowResult : 0
         MeasureDist : 1
-        MeasureZ : 1
+        MeasureZ : 0
         ShiftCenter : 1
 
     Measure2:
@@ -1428,7 +1431,6 @@ JobSimulateU1:
         FieldId : 1
         ShowResult : 1
 
-
 JobMeasureU1:
 
     ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
@@ -1437,34 +1439,34 @@ JobMeasureU1:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 1.5
+    GaugeBate : 20.0
     OmegaRange : 0.128
     StartOmega : 0
-    EndOmega : 1
-    StartN : 21
-    EndN : 300
+    EndOmega : 8
+    StartN : 101
+    EndN : 1000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./482325065/Fermion/FU11201
-    ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
-    EDistributionJobKSU1 : EDJKSU1_Chiral
+    ## EDJKSU1_Polyakov, EDJKSU1_Chiral
+    EDistributionJobKSU1 : EDJKSU1_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 0
-    SubFolderPrefix : ./482325065/1501/SRFU11501_
+    SubFolder : 1
+    SubFolderPrefix : I:\Rotation\QuenchU1\200
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
-    LoadType : EFFT_CLGBinDouble
+    LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./482325065/1501/SRFU11502_
-    CSVSavePrefix : ./482325065/Chiral/SRFU11501_
+    SavePrefix : 200QuenchedU1_
+    CSVSavePrefix : I:\Rotation\Polyakov\200QuenchedU1_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -1472,7 +1474,7 @@ JobMeasureU1:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 2
+    MeasureListLength : 3
     CacheStaple : 0
     AlsoCheckMD5 : 0
     MeasureCCS : 0
@@ -1609,6 +1611,12 @@ JobMeasureU1:
         ShowResult : 0
         ShiftCenter : 1
         DebugDivation : 0
+
+    Measure3:
+
+        MeasureName : CMeasurePolyakovU1XY
+        FieldId : 1
+        ShowResult : 0
 
 JobSimulateREM:
 
@@ -1930,37 +1938,37 @@ JobMeasureREM:
 
     GaugeBate : 4.94
     ListStart : 1
-    ListEnd : 10
+    ListEnd : 5
     StartN : 101
-    EndN : 150
+    EndN : 1500
     # OmegaList : [0.0, 0.012, 0.024, 0.036, 0.048, 0.060, 0.072, 0.084, 0.096, 0.108]
-    OmegaList : [0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072, 0.072]
+    OmegaList : [0.108, 0.108, 0.108, 0.108, 0.108, 0.108, 0.108, 0.108, 0.108, 0.108]
     MagneticList : [0.0, 0.698132, 1.39626, 2.0944, 2.79253, 3.49066, 4.18879, 4.88692, 5.58505, 6.28319]
     # MagneticList : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    SaveFermionFile : 1
+    SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_O6_
     # Load Fermion Not tested
     # To Load, set FermionFileHead = F4820204_, will load LoadFermionHead/O0/Light/F4820204_...
     # LoadFermion = 1, load light, 2, load heavy, 3 both 
-    LoadFermion : 0
-    LoadFermionFile : F486295059_
-    LoadFermionHead : G:\SRFloat\486295059\Fermion
+    LoadFermion : 7
+    LoadFermionFile : F494235047_O9_
+    LoadFermionHead : G:\REM494\Fermions\O9\REM
 
     ## EDJKSR_Polyakov, EDJKSR_AngularMomentum, EDJKSR_ChiralAndFermionMomentum
     DistributionJob : EDJKSR_ChiralAndFermionMomentum
-    StochasticFieldCount : 1
+    StochasticFieldCount : 10
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\REM494\GF494\O6\EM
+    SubFolderPrefix : G:\REM494\GF494\O9\EM
     Middle : REM
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : GFSRF494235047_O6_
-    CSVSavePrefix : G:\REM494\Chiral\O6\SRF494235047_O6_
+    SavePrefix : GFSRF494235047_O9_
+    CSVSavePrefix : SRF494235047_O9_
 
     Dim : 4
     Dir : 4
@@ -2232,3 +2240,465 @@ JobMeasureREM:
         Cabibbo : 1
         ProjIterate : 15
         HasT : 0
+
+JobSimulateQuenched:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    BeforeEquvibStep : 500
+    EquvibSkip : 0
+    EquvibStep : 1000
+    SaveStartIndex : 0
+    OmegaSep : 20
+    OmegaStart : 0
+    MaxOmega : -2.0
+    MinNt : 4
+    MaxNt : 4
+    SavePrefix : ./50Quenchedm_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [16, 16, 16, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    # Nt6Polyakov : 0.022946210578
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient 
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 5.0
+        Omega : 0.0
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+
+JobSimulateQuenchedU1:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    BeforeEquvibStep : 500
+    EquvibSkip : 0
+    EquvibStep : 1000
+    SaveStartIndex : 0
+    OmegaSep : 8
+    OmegaStart : 0
+    MaxOmega : 0.128
+    MinNt : 4
+    MaxNt : 4
+    SavePrefix : ./200QuenchedU1_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    # Nt6Polyakov : 0.022946210578
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [2, 100]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient 
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeU1
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotatingU1
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 20.0
+        Omega : 0.0
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovU1XY
+        FieldId : 1
+        ShowResult : 1
+
+JobSimulateQuenched3D:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    BeforeEquvibStep : 500
+    EquvibSkip : 0
+    EquvibStep : 1000
+    SaveStartIndex : 0
+    OmegaSep : 8
+    OmegaStart : 0
+    MaxOmega : 0.128
+    MinNt : 1
+    MaxNt : 1
+    SavePrefix : ./120Quenched3D_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [12, 12, 4, 1]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    # Nt6Polyakov : 0.022946210578
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient 
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating3D
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 12.0
+        Omega : 0.0
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY3D
+        FieldId : 1
+        ShowResult : 1
+        U1 : 0
+
+JobSimulateQuenchedU13D:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 10
+    BeforeEquvibStep : 500
+    EquvibSkip : 0
+    EquvibStep : 2000
+    SaveStartIndex : 0
+    OmegaSep : 8
+    OmegaStart : 0
+    MaxOmega : 0.128
+    MinNt : 1
+    MaxNt : 1
+    SavePrefix : ./500QuenchedU13D_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [12, 12, 4, 1]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
+    # Nt6Polyakov : 0.022946210578
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [2, 100]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient 
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeU1
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotatingU1_3D
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Beta : 50.0
+        Omega : 0.0
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY3D
+        FieldId : 1
+        ShowResult : 1
+        U1 : 1
+
+JobMeasure3D:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    GaugeBate : 12.0
+    OmegaRange : 0.128
+    StartOmega : 0
+    EndOmega : 8
+    StartN : 101
+    EndN : 1000
+    SaveFermionFile : 0
+    ## EDJKS3D_Polyakov, EDJKSU1_Chiral
+    DistributionJobKS3D : EDJKS3D_Polyakov
+    StochasticFieldCount : 1
+    StochasticGaussian : 1
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : I:\Rotation\120Quenched3D
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : 120Quenched3D_
+    CSVSavePrefix : I:\Rotation\Polyakov\120Quenched3D_
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [12, 12, 4, 1]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+    MeasureCCS : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY3D
+        FieldId : 1
+        ShowResult : 0
+        U1 : 0
+
+JobMeasureU13D:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    GaugeBate : 50.0
+    OmegaRange : 0.128
+    StartOmega : 0
+    EndOmega : 8
+    StartN : 101
+    EndN : 1000
+    SaveFermionFile : 0
+    ## EDJKS3D_Polyakov, EDJKSU1_Chiral
+    DistributionJobKS3D : EDJKS3D_Polyakov
+    StochasticFieldCount : 1
+    StochasticGaussian : 1
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : I:\Rotation\500Quenched3DU1
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : 500QuenchedU13D_
+    CSVSavePrefix : I:\Rotation\Polyakov\500QuenchedU13D_
+
+    Dim : 3
+    Dir : 3
+    LatticeLength : [12, 12, 4, 1]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+    MeasureCCS : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeU1
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY3D
+        FieldId : 1
+        ShowResult : 0
+        U1 : 1

@@ -1279,7 +1279,7 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
 #endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
-    appGeneral(_T("const %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite);
+    //appGeneral(_T("const %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite);
     preparethread;
     _kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
         m_byFieldId,

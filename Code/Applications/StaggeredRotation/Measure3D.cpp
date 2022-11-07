@@ -1,29 +1,22 @@
 //=============================================================================
-// FILENAME : Measure.cpp
+// FILENAME : Measure3D.cpp
 // 
 // DESCRIPTION:
 //
 // REVISION:
-//  [10/06/2020 nbale]
+//  [03/11/2022 nbale]
 //=============================================================================
 
 #include "StaggeredRotation.h"
 
-__DEFINE_ENUM(EDistributionJobKS,
-    EDJKS_Polyakov,
-    EDJKS_Chiral,
-    EDJKS_AngularMomentum,
-    EDJKS_ChiralAndFermionMomentum,
-    EDJKS_PlaqutteEnergy,
-    EDJKS_CheckMD5,
-    EDJKS_VR,
-    EDJKS_DoubleToFloat,
+__DEFINE_ENUM(EDistributionJobKS3D,
+    EDJKS3D_Polyakov,
     )
 
 
 
 
-INT Measurement(CParameters& params)
+INT Measurement3D(CParameters& params)
 {
 
 #pragma region read parameters
@@ -42,13 +35,14 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("StartN"), iVaule);
     UINT iStartN = static_cast<UINT>(iVaule);
 
-    iVaule = 1;
-    params.FetchValueINT(_T("FermionMomentum"), iVaule);
-    UBOOL bJF = 0 != iVaule;
-
     iVaule = 200;
     params.FetchValueINT(_T("EndN"), iVaule);
     UINT iEndN = static_cast<UINT>(iVaule);
+
+#if 0
+    iVaule = 1;
+    params.FetchValueINT(_T("FermionMomentum"), iVaule);
+    UBOOL bJF = 0 != iVaule;
 
     iVaule = 10;
     params.FetchValueINT(_T("StochasticFieldCount"), iVaule);
@@ -69,14 +63,15 @@ INT Measurement(CParameters& params)
     iVaule = 0;
     params.FetchValueINT(_T("UseZ4"), iVaule);
     UBOOL bZ4 = 0 != iVaule;
+#endif
 
     iVaule = 0;
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
 
-    CCString sValue = _T("EDJ_Polyakov");
-    params.FetchStringValue(_T("DistributionJob"), sValue);
-    EDistributionJobKS eJob = __STRING_TO_ENUM(EDistributionJobKS, sValue);
+    CCString sValue = _T("EDJKS3D_Polyakov");
+    params.FetchStringValue(_T("DistributionJobKS3D"), sValue);
+    EDistributionJobKS3D eJob = __STRING_TO_ENUM(EDistributionJobKS3D, sValue);
 
     CCString sSavePrefix;
     params.FetchStringValue(_T("SavePrefix"), sSavePrefix);
@@ -97,6 +92,7 @@ INT Measurement(CParameters& params)
     params.FetchValueReal(_T("OmegaRange"), fOmega);
     fOmega = fOmega / iEndOmega;
 
+    /*
     iVaule = 0;
     params.FetchValueINT(_T("SaveFermionFile"), iVaule);
     UBOOL bSaveFermion = 0 != iVaule;
@@ -120,6 +116,7 @@ INT Measurement(CParameters& params)
     CCString sLoadFermionHead;
     params.FetchStringValue(_T("LoadFermionHead"), sLoadFermionHead);
     appGeneral(_T("Load Fermion File Head: %s\n"), sLoadFermionHead.c_str());
+     */
 
     CCString sLoadType = _T("EFFT_CLGBin");
     EFieldFileType eLoadType = EFFT_CLGBin;
@@ -128,7 +125,7 @@ INT Measurement(CParameters& params)
         eLoadType = __STRING_TO_ENUM(EFieldFileType, sLoadType);
     }
     appGeneral(_T("load type: %s\n"), __ENUM_TO_STRING(EFieldFileType, eLoadType).c_str());
-
+   
     if (!appInitialCLG(params))
     {
         appCrucial(_T("Initial Failed!\n"));
@@ -150,8 +147,6 @@ INT Measurement(CParameters& params)
     TArray<TArray<CLGComplex>> lstPolyOut;
     TArray<TArray<Real>> lstPolyInAbs;
     TArray<TArray<Real>> lstPolyOutAbs;
-    TArray<TArray<CLGComplex>> lstPolyInZ;
-    TArray<TArray<CLGComplex>> lstPolyOutZ;
 
     //============================================
     // Attention here heavy light is wrong
@@ -160,65 +155,65 @@ INT Measurement(CParameters& params)
     
     CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
-    CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
-    CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
-    CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
-    CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
-    CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
-    CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
+    CMeasurePolyakovXY3D* pPL = dynamic_cast<CMeasurePolyakovXY3D*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    //CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
+    //CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    //CMeasureAngularMomentumKS* pFALight = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    //CMeasureAngularMomentumKS* pFAHeavy = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    //CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+    //CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
+    //CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
+    //CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
-    CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
+    //CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
-    CFieldFermionKSSU3* pF1Light = NULL;
-    CFieldFermionKSSU3* pF2Light = NULL;
-    CFieldFermionKSSU3* pF1Heavy = NULL;
-    CFieldFermionKSSU3* pF2Heavy = NULL;
+    //CFieldFermionKSSU3* pF1Light = NULL;
+    //CFieldFermionKSSU3* pF2Light = NULL;
+    //CFieldFermionKSSU3* pF1Heavy = NULL;
+    //CFieldFermionKSSU3* pF2Heavy = NULL;
 
-    if (EDJKS_ChiralAndFermionMomentum == eJob
-        || (EDJKS_AngularMomentum == eJob && bJF)
-        || EDJKS_Chiral == eJob)
-    {
-        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
-        pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
-    }
+    //if (EDJKS_ChiralAndFermionMomentum == eJob
+    //    || (EDJKS_AngularMomentum == eJob && bJF)
+    //    || EDJKS_Chiral == eJob)
+    //{
+    //    pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+    //    pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+    //    pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
+    //    pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
+    //}
 
     appSetLogDate(FALSE);
     CFieldGaugeSU3* pStaple = NULL;
-    if (EDJKS_VR == eJob)
-    {
-        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
-    }
+    //if (EDJKS_VR == eJob)
+    //{
+    //    pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+    //}
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
         CCommonData::m_fOmega = fOmega * uiOmega;
-        if (NULL != pAG)
-        {
-            pAG->SetOmega(CCommonData::m_fOmega);
-        }
+        //if (NULL != pAG)
+        //{
+        //    pAG->SetOmega(CCommonData::m_fOmega);
+        //}
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();
-        pJG->Reset();
-        pCCLight->Reset();
-        pCCHeavy->Reset();
-        pFALight->Reset();
-        pFAHeavy->Reset();
-        pCCSLight->Reset();
-        pCCSHeavy->Reset();
-        pWilson->Reset();
+        //pJG->Reset();
+        //pCCLight->Reset();
+        //pCCHeavy->Reset();
+        //pFALight->Reset();
+        //pFAHeavy->Reset();
+        //pCCSLight->Reset();
+        //pCCSHeavy->Reset();
+        //pWilson->Reset();
 
-        pCCLight->SetFieldCount(iFieldCount);
-        pCCHeavy->SetFieldCount(iFieldCount);
-        pFALight->SetFieldCount(iFieldCount);
-        pFAHeavy->SetFieldCount(iFieldCount);
+        //pCCLight->SetFieldCount(iFieldCount);
+        //pCCHeavy->SetFieldCount(iFieldCount);
+        //pFALight->SetFieldCount(iFieldCount);
+        //pFAHeavy->SetFieldCount(iFieldCount);
 
 #pragma region Measure
 
@@ -238,6 +233,7 @@ INT Measurement(CParameters& params)
                 sTxtFileName.Format(_T("%sR_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
             }
             //appGeneral(_T("checking %s ..."), sFileName);
+#if 0
             if (EDJKS_CheckMD5 == eJob || bCheckMd5)
             {
                 UINT uiSize = 0;
@@ -292,16 +288,17 @@ INT Measurement(CParameters& params)
                     continue;
                 }
             }
-            
+#endif
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
-                case EDJKS_Polyakov:
+                case EDJKS3D_Polyakov:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
+#if 0
                 case EDJKS_Chiral:
                 {
                     for (UINT i = 0; i < iFieldCount; ++i)
@@ -596,6 +593,7 @@ INT Measurement(CParameters& params)
                         appGeneral(appGetLattice()->m_pGaugeField->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
                     }
                     break;
+#endif
                 default:
                     break;
             }
@@ -614,16 +612,16 @@ INT Measurement(CParameters& params)
         }
         appGeneral(_T("\n*)\n"));
 
-        if (EDJKS_CheckMD5 == eJob)
-        {
-            continue;
-        }
+        //if (EDJKS_CheckMD5 == eJob)
+        //{
+        //    continue;
+        //}
 
 #pragma endregion
 
         switch (eJob)
         {
-            case EDJKS_Polyakov:
+            case EDJKS3D_Polyakov:
             {
                 CCString sFileNameWrite1;
                 CCString sFileNameWrite2;
@@ -682,31 +680,32 @@ INT Measurement(CParameters& params)
                 lstPolyOutAbs.AddItem(polyOutAbs);
                 WriteStringFileRealArray2(sFileNameWrite3, polyakovOmgRAbs);
 
-                if (pPL->m_bMeasureLoopZ)
-                {
-                    CCString sFileNameWrite4;
-                    sFileNameWrite4.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    polyakovOmgR.RemoveAll();
-                    polyIn.RemoveAll();
-                    polyOut.RemoveAll();
+                //if (pPL->m_bMeasureLoopZ)
+                //{
+                //    CCString sFileNameWrite4;
+                //    sFileNameWrite4.Format(_T("%s_polyakovZ_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                //    polyakovOmgR.RemoveAll();
+                //    polyIn.RemoveAll();
+                //    polyOut.RemoveAll();
 
-                    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
-                    {
-                        TArray<CLGComplex> thisConfiguration;
-                        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
-                        {
-                            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
-                        }
-                        polyakovOmgR.AddItem(thisConfiguration);
-                        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
-                        polyOut.AddItem(pPL->m_lstLoopZ[j]);
-                    }
-                    lstPolyInZ.AddItem(polyIn);
-                    lstPolyOutZ.AddItem(polyOut);
-                    WriteStringFileComplexArray2(sFileNameWrite4, polyakovOmgR);
-                }
+                //    for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                //    {
+                //        TArray<CLGComplex> thisConfiguration;
+                //        for (INT i = 0; i < pPL->m_lstR.Num(); ++i)
+                //        {
+                //            thisConfiguration.AddItem(pPL->m_lstPZ[j * pPL->m_lstR.Num() + i]);
+                //        }
+                //        polyakovOmgR.AddItem(thisConfiguration);
+                //        polyIn.AddItem(pPL->m_lstLoopZInner[j]);
+                //        polyOut.AddItem(pPL->m_lstLoopZ[j]);
+                //    }
+                //    lstPolyInZ.AddItem(polyIn);
+                //    lstPolyOutZ.AddItem(polyOut);
+                //    WriteStringFileComplexArray2(sFileNameWrite4, polyakovOmgR);
+                //}
             }
             break;
+#if 0
             case EDJKS_Chiral:
             {
                 _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS, uiOmega, O);
@@ -870,6 +869,7 @@ INT Measurement(CParameters& params)
                     //do nothing
                 }
                 break;
+#endif
             default:
                 break;
         }
@@ -882,23 +882,23 @@ INT Measurement(CParameters& params)
         appSafeDelete(pStaple);
     }
 
-    if (EDJKS_CheckMD5 == eJob)
-    {
-        if (NULL != pF1Light)
-        {
-            pF1Light->Return();
-            pF2Light->Return();
-            pF1Heavy->Return();
-            pF2Heavy->Return();
-        }
+    //if (EDJKS_CheckMD5 == eJob)
+    //{
+    //    if (NULL != pF1Light)
+    //    {
+    //        pF1Light->Return();
+    //        pF2Light->Return();
+    //        pF1Heavy->Return();
+    //        pF2Heavy->Return();
+    //    }
 
-        appQuitCLG();
-        return 0;
-    }
+    //    appQuitCLG();
+    //    return 0;
+    //}
 
     switch (eJob)
     {
-        case EDJKS_Polyakov:
+        case EDJKS3D_Polyakov:
         {
             CCString sFileNameWrite1;
             CCString sFileNameWrite2;
@@ -912,10 +912,10 @@ INT Measurement(CParameters& params)
             WriteStringFileRealArray2(sFileNameWrite1, lstPolyInAbs);
             WriteStringFileRealArray2(sFileNameWrite2, lstPolyOutAbs);
 
-            sFileNameWrite1.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-            sFileNameWrite2.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
-            WriteStringFileComplexArray2(sFileNameWrite1, lstPolyInZ);
-            WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
+            //sFileNameWrite1.Format(_T("%s_polyakovZ_Nt%d_In.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            //sFileNameWrite2.Format(_T("%s_polyakovZ_Nt%d_Out.csv"), sCSVSavePrefix.c_str(), _HC_Lt);
+            //WriteStringFileComplexArray2(sFileNameWrite1, lstPolyInZ);
+            //WriteStringFileComplexArray2(sFileNameWrite2, lstPolyOutZ);
         }
         break;
         default:
@@ -926,13 +926,13 @@ INT Measurement(CParameters& params)
     appSetLogDate(TRUE);
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
-    if (NULL != pF1Light)
-    {
-        pF1Light->Return();
-        pF2Light->Return();
-        pF1Heavy->Return();
-        pF2Heavy->Return();
-    }
+    //if (NULL != pF1Light)
+    //{
+    //    pF1Light->Return();
+    //    pF2Light->Return();
+    //    pF1Heavy->Return();
+    //    pF2Heavy->Return();
+    //}
 
     appQuitCLG();
 

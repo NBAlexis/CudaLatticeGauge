@@ -58,7 +58,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.h
@@ -128,7 +130,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovU1XY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoop.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoopWithPath.h
@@ -188,7 +192,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBetaGradient.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteBoost.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.cu
@@ -243,7 +249,9 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovU1XY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureTopologicChargeXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoop.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureWilsonLoopWithPath.cu

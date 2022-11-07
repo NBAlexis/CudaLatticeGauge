@@ -347,9 +347,11 @@ _kernelPlaqutteEnergyU1_UseClover(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE fSubConst,
     DOUBLE fBetaOverN,
     DOUBLE* results
 #else
+    Real fSubConst,
     Real fBetaOverN,
     Real* results
 #endif
@@ -369,7 +371,7 @@ _kernelPlaqutteEnergyU1_UseClover(
             //}
         }
     }
-    fRes = F(6.0) - F(0.25) * fRes;
+    fRes = fSubConst - F(0.25) * fRes;
     results[uiSiteIndex] = fRes * fBetaOverN;// *F(0.5);
 }
 
@@ -379,9 +381,11 @@ _kernelPlaqutteEnergyUsingStableU1(
     const CLGComplex* __restrict__ pDeviceData,
     const CLGComplex* __restrict__ pStableData,
 #if !_CLG_DOUBLEFLOAT
+    DOUBLE fSubConst,
     DOUBLE betaOverN,
     DOUBLE* results
 #else
+    Real fSubConst,
     Real betaOverN,
     Real* results
 #endif
@@ -395,7 +399,7 @@ _kernelPlaqutteEnergyUsingStableU1(
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         //For each link, there are 6 staples
-        resThisThread += (6.0 -(pDeviceData[linkIndex].x * pStableData[linkIndex].x + pDeviceData[linkIndex].y * pStableData[linkIndex].y));
+        resThisThread += (fSubConst -(pDeviceData[linkIndex].x * pStableData[linkIndex].x + pDeviceData[linkIndex].y * pStableData[linkIndex].y));
     }
 
     results[uiSiteIndex] = resThisThread * betaOverN * 0.25;
@@ -405,7 +409,7 @@ _kernelPlaqutteEnergyUsingStableU1(
     {
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         //For each link, there are 6 staples
-        resThisThread += (F(6.0) - (pDeviceData[linkIndex].x * pStableData[linkIndex].x + pDeviceData[linkIndex].y * pStableData[linkIndex].y));
+        resThisThread += (fSubConst - (pDeviceData[linkIndex].x * pStableData[linkIndex].x + pDeviceData[linkIndex].y * pStableData[linkIndex].y));
     }
 
     results[uiSiteIndex] = resThisThread * betaOverN * F(0.25);
@@ -1078,6 +1082,7 @@ Real CFieldGaugeU1::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
     _kernelPlaqutteEnergyU1_UseClover << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
         _D_RealThreadBuffer);
 
@@ -1099,8 +1104,9 @@ Real CFieldGaugeU1::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFi
 
     preparethread;
     _kernelPlaqutteEnergyUsingStableU1 << <block, threads >> > (
-        m_pDeviceData, 
-        pStableSU3->m_pDeviceData, 
+        m_pDeviceData,
+        pStableSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         betaOverN, 
         _D_RealThreadBuffer);
 

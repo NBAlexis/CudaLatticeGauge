@@ -81,6 +81,42 @@ int main(int argc, char * argv[])
         res = GaugeFixing(workingParam1);
     }
     break;
+    case ESR_SimulateQuenched:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateQuenched"));
+        res = SimulateStaggeredRotation(workingParam1);
+    }
+    break;
+    case ESR_SimulateQuenchedU1:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateQuenchedU1"));
+        res = SimulateStaggeredRotationU1(workingParam1);
+    }
+    break;
+    case ESR_SimulateQuenched3D:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateQuenched3D"));
+        res = SimulateStaggeredRotation3D(workingParam1);
+    }
+    break;
+    case ESR_SimulateQuenchedU13D:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateQuenchedU13D"));
+        res = SimulateStaggeredRotationU13D(workingParam1);
+    }
+    break;
+    case ESR_Measure3D:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobMeasure3D"));
+        res = Measurement3D(workingParam1);
+    }
+    break;
+    case ESR_MeasureU13D:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobMeasureU13D"));
+        res = Measurement3D(workingParam1);
+    }
+    break;
     default:
     break;
     }

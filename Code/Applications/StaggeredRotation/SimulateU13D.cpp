@@ -9,7 +9,7 @@
 
 #include "StaggeredRotation.h"
 
-INT SimulateStaggeredRotationU1(CParameters& params)
+INT SimulateStaggeredRotationU13D(CParameters& params)
 {
 #pragma region Parameters
 
@@ -104,7 +104,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             return 1;
         }
 
-        CMeasurePolyakovU1XY* pPE = dynamic_cast<CMeasurePolyakovU1XY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+        CMeasurePolyakovXY3D* pPE = dynamic_cast<CMeasurePolyakovXY3D*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
         TArray<CLGComplex> polykov;
 
         CActionGaugePlaquetteRotatingU1* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotatingU1*>(appGetLattice()->GetActionById(1));

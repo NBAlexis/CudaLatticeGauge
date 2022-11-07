@@ -168,8 +168,8 @@ INT MeasurementBetaScan(CParameters& params)
             CCString sTxtFileName;
             if (bSubFolder)
             {
-                sFileName.Format(_T("%s\\%s\\%sBetaScan_%s_%d.con"), sSubFolderName.c_str(), PrefixList[uiOmega].c_str(), sSavePrefix.c_str(), PrefixList[uiOmega].c_str(), uiN);
-                sTxtFileName.Format(_T("%s\\%s\\%sBetaScan_%s_%d.txt"), sSubFolderName.c_str(), PrefixList[uiOmega].c_str(), sSavePrefix.c_str(), PrefixList[uiOmega].c_str(), uiN);
+                sFileName.Format(_T("%s/%s/%sBetaScan_%s_%d.con"), sSubFolderName.c_str(), PrefixList[uiOmega].c_str(), sSavePrefix.c_str(), PrefixList[uiOmega].c_str(), uiN);
+                sTxtFileName.Format(_T("%s/%s/%sBetaScan_%s_%d.txt"), sSubFolderName.c_str(), PrefixList[uiOmega].c_str(), sSavePrefix.c_str(), PrefixList[uiOmega].c_str(), uiN);
             }
             else
             {

@@ -38,7 +38,9 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBoost.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h" />
@@ -108,7 +110,9 @@
     <ClInclude Include="Measurement\CMeasurePandChiralTalor.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
     <ClInclude Include="Measurement\CMeasurePolyakov.h" />
+    <ClInclude Include="Measurement\CMeasurePolyakovU1XY.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
+    <ClInclude Include="Measurement\CMeasurePolyakovXY3D.h" />
     <ClInclude Include="Measurement\CMeasureTopologicChargeXY.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoop.h" />
     <ClInclude Include="Measurement\CMeasureWilsonLoopWithPath.h" />
@@ -170,7 +174,9 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBoost.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3.cu" />
@@ -271,7 +277,9 @@
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />
+    <CudaCompile Include="Measurement\CMeasurePolyakovU1XY.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
+    <CudaCompile Include="Measurement\CMeasurePolyakovXY3D.cu" />
     <CudaCompile Include="Measurement\CMeasureTopologicChargeXY.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu" />
     <CudaCompile Include="Measurement\CMeasureWilsonLoopWithPath.cu" />

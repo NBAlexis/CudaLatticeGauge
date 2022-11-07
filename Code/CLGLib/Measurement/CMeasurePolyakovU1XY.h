@@ -1,15 +1,15 @@
 //=============================================================================
-// FILENAME : CMeasurePolyakovXY.h
+// FILENAME : CMeasurePolyakovU1XY.h
 // 
 // DESCRIPTION:
 // This is measurement for Polyakov loop
 //
 // REVISION:
-//  [05/29/2019 nbale]
+//  [29/10/2022 nbale]
 //=============================================================================
 
-#ifndef _CMEASUREPOLYAKOVXY_H_
-#define _CMEASUREPOLYAKOVXY_H_
+#ifndef _CMEASUREPOLYAKOVU1XY_H_
+#define _CMEASUREPOLYAKOVU1XY_H_
 
 __BEGIN_NAMESPACE
 
@@ -17,34 +17,33 @@ __BEGIN_NAMESPACE
 /**
 * No need to initial pRes = 0
 */
-extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes);
+extern CLGAPI void _PolyakovAtSiteU1(const CLGComplex* __restrict__ pDeviceBuffer, CLGComplex* pRes);
 
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovXY)
+__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovU1XY)
 
-class CLGAPI CMeasurePolyakovXY : public CMeasure
+class CLGAPI CMeasurePolyakovU1XY : public CMeasure
 {
-    __CLGDECLARE_CLASS(CMeasurePolyakovXY)
+    __CLGDECLARE_CLASS(CMeasurePolyakovU1XY)
 
 public:
 
     enum { _kGammaInInterests = 8, };
 
-    CMeasurePolyakovXY()
+    CMeasurePolyakovU1XY()
         : CMeasure()
           , m_pXYHostLoopDensity(NULL)
           , m_pZHostLoopDensity(NULL)
           , m_pTmpDeviceSum(NULL)
           , m_pXYDeviceLoopDensity(NULL)
           , m_pZDeviceLoopDensity(NULL)
+          , m_pTmpLoop(NULL)
+
+          , m_pTmpLoopZ(NULL)
 
           , m_pXYHostLoopDensityAbs(NULL)
           , m_pZHostLoopDensityAbs(NULL)
           , m_pXYDeviceLoopDensityAbs(NULL)
           , m_pZDeviceLoopDensityAbs(NULL)
-
-          , m_pTmpLoop(NULL)
-
-          , m_pTmpLoopZ(NULL)
 
           , m_pDistributionR(NULL)
           , m_pDistributionP(NULL)
@@ -65,7 +64,7 @@ public:
     {
     }
 
-    ~CMeasurePolyakovXY();
+    ~CMeasurePolyakovU1XY();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
@@ -84,14 +83,13 @@ protected:
     CLGComplex* m_pTmpDeviceSum;
     CLGComplex* m_pXYDeviceLoopDensity;
     CLGComplex* m_pZDeviceLoopDensity;
+    CLGComplex* m_pTmpLoop;
+    CLGComplex* m_pTmpLoopZ;
 
     Real* m_pXYHostLoopDensityAbs;
     Real* m_pZHostLoopDensityAbs;
     Real* m_pXYDeviceLoopDensityAbs;
     Real* m_pZDeviceLoopDensityAbs;
-
-    deviceSU3* m_pTmpLoop;
-    deviceSU3* m_pTmpLoopZ;
 
     //The count of points with x^2+y^2=r^2
     UINT* m_pDistributionR;
@@ -131,9 +129,6 @@ public:
     //inner
     TArray<CLGComplex> m_lstLoopZInner;
 
-    TArray<CLGComplex> m_lstLoopZAbs;
-    TArray<CLGComplex> m_lstLoopZAbsInner;
-
     //not using
     TArray<CLGComplex> m_lstLoopZDensity;
 
@@ -150,7 +145,7 @@ public:
 
 __END_NAMESPACE
 
-#endif //#ifndef _CMEASUREPOLYAKOVXY_H_
+#endif //#ifndef _CMEASUREPOLYAKOVU1XY_H_
 
 //=============================================================================
 // END OF FILE

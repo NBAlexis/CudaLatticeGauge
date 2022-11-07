@@ -129,7 +129,7 @@ TestUpdatorForceGradient3D:
 
     Dim : 3
     Dir : 3
-    LatticeLength : [4, 4, 8, 1]
+    LatticeLength : [16, 16, 32, 1]
     LatticeIndex : CIndexSquare
     # CBoundaryConditionTorusSquare, CBoundaryConditionPeriodicAndDirichletSquare, CBoundaryConditionProjectivePlaneSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -145,12 +145,12 @@ TestUpdatorForceGradient3D:
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
+        IntegratorStep : 50
 
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeU1
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -159,9 +159,11 @@ TestUpdatorForceGradient3D:
         
     Action1:
    
-        ActionName : CActionGaugePlaquette
+        ActionName : CActionGaugePlaquetteRotatingU1_3D
         CloverEnergy : 1
+        ShiftCoord : 1
         Beta : 3
+        Omega : 0.1
 
     Measure1:
 

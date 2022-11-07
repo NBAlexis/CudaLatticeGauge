@@ -239,11 +239,11 @@ _kernelAddChairTermSU3_Term12(
     const Real fXOmega = -(sSite4.x - sCenterSite.x) * fOmega;
 
     //===============
-    //+x Omega V412
+    //-x Omega V412
     const Real fV412 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 0, 1, uiN);
 
     //===============
-    //+x Omega V432
+    //-x Omega V432
     const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
     results[uiSiteIndex] = (fV412 + fV432) * betaOverN;
@@ -277,11 +277,11 @@ _kernelAddChairTermSU3_Term34(
     const Real fYOmega = (sSite4.y - sCenterSite.y) * fOmega;
 
     //===============
-    //-y Omega V421
+    //+y Omega V421
     const Real fV421 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 1, 0, uiN);
 
     //===============
-    //-y Omega V431
+    //+y Omega V431
     const Real fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 
     results[uiSiteIndex] = (fV421 + fV431) * betaOverN;
@@ -315,7 +315,7 @@ _kernelAddChairTermSU3_Term5(
     const Real fXYOmega2 = -(sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y) * fOmegaSq;
 
     //===============
-    //+Omega^2 xy V132
+    //-Omega^2 xy V132
     const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 
     results[uiSiteIndex] = fV132 * betaOverN;
@@ -349,7 +349,7 @@ _kernelAddForceChairTermSU3_Term1(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //+x Omega V412
+    //-x Omega V412
     //add force for dir=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
@@ -417,7 +417,7 @@ _kernelAddForceChairTermSU3_Term2(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //+x Omega V432
+    //-x Omega V432
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
@@ -485,7 +485,7 @@ _kernelAddForceChairTermSU3_Term3(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //-y Omega V421
+    //+y Omega V421
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
@@ -554,7 +554,7 @@ _kernelAddForceChairTermSU3_Term4(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //-y Omega V431
+    //+y Omega V431
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
@@ -623,7 +623,7 @@ _kernelAddForceChairTermSU3_Term5(
     betaOverN = -betaOverN * F(0.5) * fOmegaSq * F(0.125);
 
     //===============
-    //+Omega^2 xy V132
+    //-Omega^2 xy V132
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
@@ -896,7 +896,7 @@ _kernelAddChairTermSU3_Term5_Shifted(
     const DOUBLE fXYOmega2 = (sSite4.x - sCenterSite.x + 0.5) * (sSite4.y - sCenterSite.y + 0.5) * fOmegaSq;
 
     //===============
-    //+Omega^2 xy V142
+    //-Omega^2 xy V142
     const DOUBLE fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #else
     betaOverN = -F(0.125) * betaOverN;
@@ -934,7 +934,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //+x Omega V412
+    //-x Omega V412
     //add force for dir=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
@@ -1003,7 +1003,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
     betaOverN = -betaOverN * F(0.5) * fOmega * F(0.125);
 
     //===============
-    //+x Omega V432
+    //-x Omega V432
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 

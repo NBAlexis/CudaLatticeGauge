@@ -45,6 +45,21 @@ INT Simulate(CParameters& params)
     params.FetchValueINT(_T("ListEnd"), iVaule);
     const INT iListEnd = iVaule;
 
+#if _CLG_DOUBLEFLOAT
+
+    TArray<Real> fMiddleBeta;
+    params.FetchValueArrayReal(_T("MiddleBetaList"), fMiddleBeta);
+    if (fMiddleBeta.Num() != sPrefixList.Num() || sPrefixList.Num() < 1)
+    {
+        appCrucial(_T("sSavePrefix and fMiddleBeta not corrected!\n"));
+        return 0;
+    }
+
+    Real fDeltaBeta = 3.0;
+    params.FetchValueReal(_T("DeltaBeta"), fDeltaBeta);
+
+#else
+
     TArray<DOUBLE> fMiddleBeta;
     params.FetchValueArrayDOUBLE(_T("MiddleBetaList"), fMiddleBeta);
     if (fMiddleBeta.Num() != sPrefixList.Num() || sPrefixList.Num() < 1)
@@ -55,6 +70,8 @@ INT Simulate(CParameters& params)
 
     DOUBLE fDeltaBeta = 3.0;
     params.FetchValueDOUBLE(_T("DeltaBeta"), fDeltaBeta);
+
+#endif
 
     iVaule = 0;
     params.FetchValueINT(_T("Additive"), iVaule);
