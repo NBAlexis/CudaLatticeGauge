@@ -377,13 +377,16 @@ add_executable(StaggeredRotation
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.h
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure3D.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureU1.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate3D.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateBeta.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateU1.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateU13D.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/StaggeredRotation.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate.cpp
     )
