@@ -621,19 +621,39 @@ INT MeasurementEM(CParameters& params)
             {
                 CCString sFileNameWriteBP;
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseU_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPu->m_lstData);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstData);
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseD_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPd->m_lstData);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstData);
 
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseUXY_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPu->m_lstDataXY);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataXY);
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseDXY_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPd->m_lstDataXY);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataXY);
+
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseUXZ_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataXZ);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseDXZ_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataXZ);
+
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseUXT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataXT);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseDXT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataXT);
+
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseUYZ_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataYZ);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseDYZ_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataYZ);
+
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseUYT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataYT);
+                sFileNameWriteBP.Format(_T("%s_BerryPhaseDYT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataYT);
 
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseUZT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPu->m_lstDataZT);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPu->m_lstDataZT);
                 sFileNameWriteBP.Format(_T("%s_BerryPhaseDZT_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiEM);
-                WriteStringFileRealArray(sFileNameWriteBP, pBPd->m_lstDataZT);
+                WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataZT);
             }
             break;
 #if NotYet

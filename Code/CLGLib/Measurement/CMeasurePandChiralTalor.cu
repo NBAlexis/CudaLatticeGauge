@@ -17,7 +17,7 @@ __CLGIMPLEMENT_CLASS(CMeasurePandChiralTalor)
 #pragma region kernels
 
 /**
- * This is kappa * (-y g4 Dx + x g4 Dy - i g4 sigma12)
+ * This is kappa * g4.(-y Dx + x Dy - i sigma12)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTraceApplyM(
@@ -32,7 +32,7 @@ _kernelTraceApplyM(
 {
     intokernalInt4;
 
-    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    
     const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
@@ -148,12 +148,16 @@ _kernelTraceApplyM(
     }
 
     //=========================================
-    //-i * gamma_4 sigma_12
+    //-i * sigma_12
     pRes[uiSiteIndex] = sigma12.MulWilsonC(pRight[uiSiteIndex]);
-    pRes[uiSiteIndex] = gamma4.MulWilsonC(pRes[uiSiteIndex]);
     pRes[uiSiteIndex].MulComp(_make_cuComplex(F(0.0), static_cast<Real>(-fKappa)));
 
+    // -y + x -i * sigma_12
     pRes[uiSiteIndex].Sub(jl);
+
+    // gamma4(-y + x -i * sigma_12)
+    const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
+    pRes[uiSiteIndex] = gamma4.MulWilsonC(pRes[uiSiteIndex]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND

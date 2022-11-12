@@ -195,6 +195,7 @@ _kernelBerryCurvatureU1XY(
     BYTE byGaugeFieldId,
     const CLGComplex* __restrict__ pU1Field,
     BYTE byT,
+    INT dir1, INT dir2,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* pRes
 #else
@@ -210,31 +211,7 @@ _kernelBerryCurvatureU1XY(
     sSite4.w = byT;
     const UINT uiSiteSpatial = _ixy * _DC_Lz + sSite4.z;
 
-    const INT path[4] = { 1, 2, -1, -2 };
-    pRes[uiSiteSpatial] = _deviceLinkU1ArgSum(pU1Field, sSite4, 4, byGaugeFieldId, path);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBerryCurvatureU1ZT(
-    BYTE byGaugeFieldId,
-    const CLGComplex* __restrict__ pU1Field,
-    BYTE byT,
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE* pRes
-#else
-    Real* pRes
-#endif
-)
-{
-    SSmallInt4 sSite4;
-    const UINT _ixy = (threadIdx.x + blockIdx.x * blockDim.x);
-    sSite4.x = static_cast<SBYTE> (_ixy / _DC_Ly);
-    sSite4.y = static_cast<SBYTE> (_ixy % _DC_Ly);
-    sSite4.z = static_cast<SBYTE>(threadIdx.y + blockIdx.y * blockDim.y);
-    sSite4.w = byT;
-    const UINT uiSiteSpatial = _ixy * _DC_Lz + sSite4.z;
-
-    const INT path[4] = { 3, 4, -3, -4 };
+    const INT path[4] = { dir1, dir2, -dir1, -dir2 };
     pRes[uiSiteSpatial] = _deviceLinkU1ArgSum(pU1Field, sSite4, 4, byGaugeFieldId, path);
 }
 
@@ -335,6 +312,15 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
 {
     const dim3 block(_HC_DecompX, _HC_DecompY, 1); 
     const dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
+
+    TArray<DOUBLE> res;
+    TArray<DOUBLE> resXY;
+    TArray<DOUBLE> resXZ;
+    TArray<DOUBLE> resXT;
+    TArray<DOUBLE> resYZ;
+    TArray<DOUBLE> resYT;
+    TArray<DOUBLE> resZT;
+
     for (BYTE byT = 0; byT < _HC_Lt; ++byT)
     {
         _kernelBerryCurvatureU1 << <block, threads >> > (
@@ -344,47 +330,86 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
             _D_RealThreadBuffer
             );
 
-        m_pResEachConfiguration[byT] = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
+        res.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
             byGaugeFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
+            1, 2,
             _D_RealThreadBuffer
             );
 
-        m_pResEachConfigurationXY[byT] = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
+        resXY.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
-        _kernelBerryCurvatureU1ZT << <block, threads >> > (
+        _kernelBerryCurvatureU1XY << <block, threads >> > (
             byGaugeFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
+            1, 3,
             _D_RealThreadBuffer
             );
 
-        m_pResEachConfigurationZT[byT] = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
+        resXZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
+
+        _kernelBerryCurvatureU1XY << <block, threads >> > (
+            byGaugeFieldId,
+            m_pU1Field->m_pDeviceData,
+            byT,
+            1, 4,
+            _D_RealThreadBuffer
+            );
+
+        resXT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
+
+        _kernelBerryCurvatureU1XY << <block, threads >> > (
+            byGaugeFieldId,
+            m_pU1Field->m_pDeviceData,
+            byT,
+            2, 3,
+            _D_RealThreadBuffer
+            );
+
+        resYZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
+
+        _kernelBerryCurvatureU1XY << <block, threads >> > (
+            byGaugeFieldId,
+            m_pU1Field->m_pDeviceData,
+            byT,
+            2, 4,
+            _D_RealThreadBuffer
+            );
+
+        resYT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
+
+        _kernelBerryCurvatureU1XY << <block, threads >> > (
+            byGaugeFieldId,
+            m_pU1Field->m_pDeviceData,
+            byT,
+            3, 4,
+            _D_RealThreadBuffer
+            );
+
+        resZT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
     }
+
+    m_lstData.AddItem(res);
+    m_lstDataXY.AddItem(resXY);
+    m_lstDataXZ.AddItem(resXZ);
+    m_lstDataXT.AddItem(resXT);
+    m_lstDataYZ.AddItem(resYZ);
+    m_lstDataYT.AddItem(resYT);
+    m_lstDataZT.AddItem(resZT);
 }
 
 void CMeasureBerryPhase::AllocateBuffers()
 {
-#if !_CLG_DOUBLEFLOAT
-    m_pResEachConfiguration = (DOUBLE*)malloc(sizeof(DOUBLE) * _HC_Lt);
-    m_pResEachConfigurationXY = (DOUBLE*)malloc(sizeof(DOUBLE) * _HC_Lt);
-    m_pResEachConfigurationZT = (DOUBLE*)malloc(sizeof(DOUBLE) * _HC_Lt);
-#else
-    m_pResEachConfiguration = (Real*)malloc(sizeof(Real) * _HC_Lt);
-    m_pResEachConfigurationXY = (Real*)malloc(sizeof(Real) * _HC_Lt);
-    m_pResEachConfigurationZT = (Real*)malloc(sizeof(Real) * _HC_Lt);
-#endif
-
     m_pU1Field = new CFieldGaugeU1();
     m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 }
 
 CMeasureBerryPhase::~CMeasureBerryPhase()
 {
-    appSafeFree(m_pResEachConfiguration);
     appSafeDelete(m_pU1Field);
     appSafeDelete(m_pGaugeFixing);
     m_pMomentumField->Return();
@@ -461,50 +486,52 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
     {
         appSetLogDate(FALSE);
         appGeneral(_T("Berry phase: {"));
-    }
 
-    for (INT t = 0; t < _HC_Lti; ++t)
-    {
-        if (m_bShowRes)
+        for (INT t = 0; t < _HC_Lti; ++t)
         {
-            appGeneral(_T("%2.18f%s"),
-                m_pResEachConfiguration[t],
-                t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-            );
+            if (m_bShowRes)
+            {
+                appGeneral(_T("%2.18f%s"),
+                    m_lstData[m_uiConfigurationCount][t],
+                    t == (_HC_Lti - 1) ? _T("}") : _T(", ")
+                );
+            }
         }
 
-        m_lstData.AddItem(m_pResEachConfiguration[t]);
-    }
-    for (INT t = 0; t < _HC_Lti; ++t)
-    {
-        if (m_bShowRes)
+        appGeneral(_T("\n"));
+
+        appGeneral(_T("Berry phaseXY: {"));
+
+        for (INT t = 0; t < _HC_Lti; ++t)
         {
-            appGeneral(_T("%2.18f%s"),
-                m_pResEachConfigurationXY[t],
-                t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-            );
+            if (m_bShowRes)
+            {
+                appGeneral(_T("%2.18f%s"),
+                    m_lstDataXY[m_uiConfigurationCount][t],
+                    t == (_HC_Lti - 1) ? _T("}") : _T(", ")
+                );
+            }
         }
 
-        m_lstDataXY.AddItem(m_pResEachConfigurationXY[t]);
-    }
-    for (INT t = 0; t < _HC_Lti; ++t)
-    {
-        if (m_bShowRes)
+        appGeneral(_T("\n"));
+
+        appGeneral(_T("Berry phaseZT: {"));
+
+        for (INT t = 0; t < _HC_Lti; ++t)
         {
-            appGeneral(_T("%2.18f%s"),
-                m_pResEachConfigurationZT[t],
-                t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-            );
+            if (m_bShowRes)
+            {
+                appGeneral(_T("%2.18f%s"),
+                    m_lstDataZT[m_uiConfigurationCount][t],
+                    t == (_HC_Lti - 1) ? _T("}") : _T(", ")
+                );
+            }
         }
 
-        m_lstDataZT.AddItem(m_pResEachConfigurationZT[t]);
-    }
-
-    if (m_bShowRes)
-    {
         appGeneral(_T("\n"));
         appSetLogDate(TRUE);
     }
+
     ++m_uiConfigurationCount;
 }
 
@@ -515,62 +542,18 @@ void CMeasureBerryPhase::Average(UINT )
 
 void CMeasureBerryPhase::Report()
 {
-    appSetLogDate(FALSE);
-    assert(_HC_Lti * static_cast<INT>(m_uiConfigurationCount) == m_lstData.Num());
-#if !_CLG_DOUBLEFLOAT
-    TArray<DOUBLE> average;
-#else
-    TArray<Real> average;
-#endif
 
-    appGeneral(_T("================== Berry Phase ================\n"));
-
-    appGeneral(_T("{\n"));
-    for (UINT i = 0; i < m_uiConfigurationCount; ++i)
-    {
-        appGeneral(_T("{"));
-        for (INT t = 0; t < _HC_Lti; ++t)
-        {
-            appGeneral(_T("%2.18f%s"),
-                m_lstData[i * _HC_Lt + t],
-                t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-            );
-
-            if (0 == i)
-            {
-                average.AddItem(m_lstData[i * _HC_Lt + t]);
-            }
-            else
-            {
-                average[t] = average[t] + m_lstData[i * _HC_Lt + t];
-            }
-        }
-        if (i < m_uiConfigurationCount - 1)
-        {
-            appGeneral(_T("},\n"));
-        }
-        else
-        {
-            appGeneral(_T("}\n}\n"));
-        }
-    }
-
-    appGeneral(_T("================== Average Berry Phase ================\n{"));
-    for (INT t = 0; t < _HC_Lti; ++t)
-    {
-        appGeneral(_T("%2.18f%s"),
-            average[t] / m_uiConfigurationCount,
-            t == (_HC_Lti - 1) ? _T("}") : _T(", ")
-        );
-    }
-
-    appGeneral(_T("================== Berry Phase ================\n"));
-    appSetLogDate(TRUE);
 }
 
 void CMeasureBerryPhase::Reset()
 {
     m_lstData.Reset();
+    m_lstDataXY.Reset();
+    m_lstDataXZ.Reset();
+    m_lstDataXT.Reset();
+    m_lstDataYZ.Reset();
+    m_lstDataYT.Reset();
+    m_lstDataZT.Reset();
     m_uiConfigurationCount = 0;
 }
 

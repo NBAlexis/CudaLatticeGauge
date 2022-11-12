@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_MeasureREM
+RotationJob : ESR_MeasureEM
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -876,7 +876,7 @@ JobMeasureEM:
 
     GaugeBate : 5.4
     EMStart : 0
-    EMEnd : 13
+    EMEnd : 5
     ElectricList : [0., 0.2617993877991494, 0.5235987755982988, 0.7853981633974483, 1.0471975511965976, 1.3089969389957472, 1.5707963267948966, 1.8325957145940461, 2.0943951023931953, 2.356194490192345, 2.6179938779914944, 2.8797932657906435, 3.141592653589793]
     MagneticList : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     StartN : 101
@@ -896,7 +896,7 @@ JobMeasureEM:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\EW\54002\GF
+    SubFolderPrefix : G:\EW\54002\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 

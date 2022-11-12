@@ -28,7 +28,6 @@ public:
         , m_pMomentumField(NULL)
         , m_pU1Field(NULL)
         , m_pGaugeFixing(NULL)
-        , m_pResEachConfiguration(NULL)
     {
         
     }
@@ -56,13 +55,21 @@ public:
     void AllocateBuffers();
 
 #if !_CLG_DOUBLEFLOAT
-    TArray<DOUBLE> m_lstData;
-    TArray<DOUBLE> m_lstDataXY;
-    TArray<DOUBLE> m_lstDataZT;
+    TArray<TArray<DOUBLE>> m_lstData;
+    TArray<TArray<DOUBLE>> m_lstDataXY;
+    TArray<TArray<DOUBLE>> m_lstDataXZ;
+    TArray<TArray<DOUBLE>> m_lstDataXT;
+    TArray<TArray<DOUBLE>> m_lstDataYZ;
+    TArray<TArray<DOUBLE>> m_lstDataYT;
+    TArray<TArray<DOUBLE>> m_lstDataZT;
 #else
-    TArray<Real> m_lstData;
-    TArray<Real> m_lstDataXY;
-    TArray<Real> m_lstDataZT;
+    TArray<TArray<Real>> m_lstData;
+    TArray<TArray<Real>> m_lstDataXY;
+    TArray<TArray<Real>> m_lstDataXZ;
+    TArray<TArray<Real>> m_lstDataXT;
+    TArray<TArray<Real>> m_lstDataYZ;
+    TArray<TArray<Real>> m_lstDataYT;
+    TArray<TArray<Real>> m_lstDataZT;
 #endif
 
     UBOOL m_bWilsonDirac;
@@ -73,15 +80,6 @@ public:
     CFieldFermion* m_pMomentumField;
     CFieldGaugeU1* m_pU1Field;
     CFieldGaugeSU3* m_pGaugeFixing;
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE* m_pResEachConfiguration;
-    DOUBLE* m_pResEachConfigurationXY;
-    DOUBLE* m_pResEachConfigurationZT;
-#else
-    Real* m_pResEachConfiguration;
-    Real* m_pResEachConfigurationXY;
-    Real* m_pResEachConfigurationZT;
-#endif
 };
 
 __END_NAMESPACE

@@ -168,7 +168,8 @@ void WriteStringFileRealArray(const CCString& sFileName, const TArray<T>& lst, U
     file.close();
 }
 
-inline void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Real>>& lst, UBOOL bAppend = FALSE)
+template <class T>
+void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<T>>& lst, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     std::ofstream file;
