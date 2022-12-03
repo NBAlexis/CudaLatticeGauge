@@ -284,6 +284,8 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
 
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
     sRet = sTab + sInfos;
+    sInfos.Format(_T("Center : [%d, %d, %d, %d]\n"), CCommonData::m_sCenter.x, CCommonData::m_sCenter.y, CCommonData::m_sCenter.z, CCommonData::m_sCenter.w);
+    sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("Random : %s\n"), __ENUM_TO_STRING(ERandom, static_cast<ERandom>(m_uiRandomType)).c_str());
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("sizeof(Real) : %d and -1.2345 is %s\n"), sizeof(Real), sRealByte.c_str());
@@ -297,6 +299,8 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("SUN : %d\n"), _HC_SUN);
+    sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("Beta : %f\n"), CCommonData::m_fBeta);
     sRet = sRet + sTab + sInfos;
 
     for (INT i = 0; i < kMaxFieldCount; ++i)
@@ -336,7 +340,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pActionList.Num(); ++i)
     {
-        sRet = sRet + sTab + _T("OtherField") + appIntToString(i) + _T(" : \n");
+        sRet = sRet + sTab + _T("Action") + appIntToString(i) + _T(" : \n");
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
     }
 

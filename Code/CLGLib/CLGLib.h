@@ -305,6 +305,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureAngularMomentumKSREM.h"
 #include "Measurement/CMeasurePolyakovU1XY.h"
 #include "Measurement/CMeasurePolyakovXY3D.h"
+#include "Measurement/CMeasurePandChiralTalorKS.h"
 
 #include "Measurement/CMeasurementManager.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"

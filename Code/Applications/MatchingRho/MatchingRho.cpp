@@ -366,9 +366,16 @@ int main(int argc, char * argv[])
                 }
             }
 
-            appSetLogDate(FALSE);
-            appGeneral(0 == uiAccepCountAfterE % 50 ? _T("\n=") : _T("="));
-            appSetLogDate(TRUE);
+            if (0 == uiAccepCountAfterE % 100)
+            {
+                appGeneral(_T("\n %d ="), uiAccepCountAfterE);
+            }
+            else
+            {
+                appSetLogDate(FALSE);
+                appGeneral(0 == uiAccepCountAfterE % 50 ? _T("\n=") : _T("="));
+                appSetLogDate(TRUE);
+            }
         }
     }
     if (!bOnlyMeasure)

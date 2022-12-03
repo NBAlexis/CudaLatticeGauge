@@ -33,9 +33,21 @@ int main(int argc, char * argv[])
             res = Simulate(workingParam1);
         }
         break;
+    case EBGJ_SimulateQ:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulateQ"));
+            res = Simulate(workingParam1);
+        }
+        break;
     case EBGJ_SimulateScanBeta:
         {
             CParameters workingParam1 = params.GetParameter(_T("JobSimulateBetaScan"));
+            res = SimulateBetaScan(workingParam1);
+        }
+        break;
+    case EBGJ_SimulateScanQ:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulateBetaScanQ"));
             res = SimulateBetaScan(workingParam1);
         }
         break;

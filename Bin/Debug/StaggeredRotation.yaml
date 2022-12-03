@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_MeasureEM
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -338,12 +338,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.0
-    OmegaRange : -2.0
+    GaugeBate : 5.7
+    OmegaRange : 1.0
     StartOmega : 0
-    EndOmega : 20
-    StartN : 101
-    EndN : 1000
+    EndOmega : 1
+    StartN : 1
+    EndN : 10
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -356,25 +356,25 @@ JobMeasure:
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
-    ## EDJKS_DoubleToFloat
-    DistributionJob : EDJKS_Polyakov
+    ## EDJKS_DoubleToFloat, EDJKS_Taylor
+    DistributionJob : EDJKS_Taylor
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 1
+    SubFolder : 0
     SubFolderPrefix : I:\Rotation\50mQuenched
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : 50Quenchedm_
-    CSVSavePrefix : I:\Rotation\Polyakov\50mQuenched_
+    SavePrefix : ./57q/1/57Q_
+    CSVSavePrefix : ./57q/57Q1_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 4]
+    LatticeLength : [12, 12, 12, 4]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -382,7 +382,7 @@ JobMeasure:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 2
-    MeasureListLength : 9
+    MeasureListLength : 10
     CacheStaple : 0
     AlsoCheckMD5 : 0
     MeasureCCS : 0
@@ -601,6 +601,13 @@ JobMeasure:
 
         MeasureName : CMeasureWilsonLoopXY
         FieldId : 1
+        ShowResult : 0
+
+    Measure10:
+
+        MeasureName : CMeasurePandChiralTalorKS
+        FieldIdH : 2
+        FieldIdL : 3
         ShowResult : 0
 
     GaugeSmearing:

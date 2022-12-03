@@ -165,6 +165,8 @@ INT Measurement(CParameters& params)
         pPL->Reset();
         pCCLight->Reset();
         pCCLight->SetFieldCount(iFieldCount);
+        pCCHeavy->Reset();
+        pCCHeavy->SetFieldCount(iFieldCount);
 
         appGeneral(_T("(*"));
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)

@@ -523,12 +523,12 @@ void CMeasurePandChiralTalor::OnConfigurationAccepted(const CFieldGauge* pGauge,
 
 #if _CLG_DOUBLEFLOAT
     CLGComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
-    Real polyakovSiteCount = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
-    polyakovSum = cuCdivf_cr_host(polyakovSum, polyakovSiteCount);
+    //Real polyakovSiteCount = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
+    //polyakovSum = cuCdivf_cr_host(polyakovSum, polyakovSiteCount);
 #else
     cuDoubleComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
-    DOUBLE polyakovSiteCount = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
-    polyakovSum = cuCdivf_cd_host(polyakovSum, polyakovSiteCount);
+    //DOUBLE polyakovSiteCount = appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz);
+    //polyakovSum = cuCdivf_cd_host(polyakovSum, polyakovSiteCount);
 #endif
 
     m_lstPolyakov.AddItem(polyakovSum);

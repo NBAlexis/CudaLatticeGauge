@@ -17,6 +17,7 @@ __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_PlaqutteEnergy,
     EDJKS_CheckMD5,
     EDJKS_VR,
+    EDJKS_Taylor,
     EDJKS_DoubleToFloat,
     )
 
@@ -169,6 +170,8 @@ INT Measurement(CParameters& params)
     CMeasureConnectedSusceptibilityKS* pCCSLight = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
     CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
     CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
+    CMeasurePandChiralTalorKS* pTaylorLight = dynamic_cast<CMeasurePandChiralTalorKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(10));
+    //CMeasurePandChiralTalorKS* pTaylorHeavy = dynamic_cast<CMeasurePandChiralTalorKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(11));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
@@ -182,7 +185,8 @@ INT Measurement(CParameters& params)
 
     if (EDJKS_ChiralAndFermionMomentum == eJob
         || (EDJKS_AngularMomentum == eJob && bJF)
-        || EDJKS_Chiral == eJob)
+        || EDJKS_Chiral == eJob
+        || EDJKS_Taylor == eJob)
     {
         pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
         pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -214,6 +218,8 @@ INT Measurement(CParameters& params)
         pCCSLight->Reset();
         pCCSHeavy->Reset();
         pWilson->Reset();
+        pTaylorLight->Reset();
+        //pTaylorHeavy->Reset();
 
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->SetFieldCount(iFieldCount);
@@ -596,6 +602,141 @@ INT Measurement(CParameters& params)
                         appGeneral(appGetLattice()->m_pGaugeField->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
                     }
                     break;
+                case EDJKS_Taylor:
+                {
+                    //appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    pTaylorLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    //for (UINT i = 0; i < iFieldCount; ++i)
+                    //{
+                    //    if (0 == (1 & uiLoadFermion))
+                    //    {
+                    //        if (bZ4)
+                    //        {
+                    //            pF1Light->InitialField(EFIT_RandomZ4);
+                    //        }
+                    //        else
+                    //        {
+                    //            pF1Light->InitialField(EFIT_RandomGaussian);
+                    //        }
+                    //        pF1Light->FixBoundary();
+                    //        pF1Light->CopyTo(pF2Light);
+                    //        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                    //        pF1Light->FixBoundary();
+                    //        if (bSaveFermion)
+                    //        {
+                    //            CCString sFermionFile = "";
+                    //            sFermionFile.Format(_T("%s_Light_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
+                    //            CCString sMD51 = pF1Light->SaveToFile(sFermionFile + _T("_F1.con"));
+                    //            CCString sMD52 = pF2Light->SaveToFile(sFermionFile + _T("_F2.con"));
+                    //            CCString sFileContent = "";
+                    //            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                    //            if (bZ4)
+                    //            {
+                    //                sFileContent = sFileContent + _T("\nZ4\n");
+                    //            }
+                    //            else
+                    //            {
+                    //                sFileContent = sFileContent + _T("\nGaussian\n");
+                    //            }
+                    //            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                    //            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                    //            sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+                    //            sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
+                    //            sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Light->m_f2am) + _T("\n");
+                    //            sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                    //            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        CCString sF1FileName = "";
+                    //        CCString sF2FileName = "";
+                    //        sF1FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F1.con"),
+                    //            sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                    //        sF2FileName.Format(_T("%s/O%d/Light/%s_Light_Nt%d_O%d_%d_F%d_F2.con"),
+                    //            sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                    //        pF1Light->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                    //        pF2Light->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
+                    //    }
+
+                    //    pTaylor->OnConfigurationAcceptedZ4(
+                    //        appGetLattice()->m_pGaugeField,
+                    //        NULL,
+                    //        pF2Light,
+                    //        pF1Light,
+                    //        0 == i,
+                    //        iFieldCount == i + 1);
+
+                    //    if (0 == (2 & uiLoadFermion))
+                    //    {
+                    //        if (bZ4)
+                    //        {
+                    //            pF1Heavy->InitialField(EFIT_RandomZ4);
+                    //        }
+                    //        else
+                    //        {
+                    //            pF1Heavy->InitialField(EFIT_RandomGaussian);
+                    //        }
+                    //        pF1Heavy->FixBoundary();
+                    //        pF1Heavy->CopyTo(pF2Heavy);
+                    //        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                    //        pF1Heavy->FixBoundary();
+                    //        if (bSaveFermion)
+                    //        {
+                    //            CCString sFermionFile = "";
+                    //            sFermionFile.Format(_T("%s_Heavy_Nt%d_O%d_%d_F%d"), sFermionHead.c_str(), _HC_Lt, uiOmega, uiN, uiSaveFermionStart + i);
+                    //            CCString sMD51 = pF1Heavy->SaveToFile(sFermionFile + _T("_F1.con"));
+                    //            CCString sMD52 = pF2Heavy->SaveToFile(sFermionFile + _T("_F2.con"));
+                    //            CCString sFileContent = "";
+                    //            sFileContent = _T("Stochastic Fermion File for ") + sFileName;
+                    //            if (bZ4)
+                    //            {
+                    //                sFileContent = sFileContent + _T("\nZ4\n");
+                    //            }
+                    //            else
+                    //            {
+                    //                sFileContent = sFileContent + _T("\nGaussian\n");
+                    //            }
+                    //            sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
+                    //            sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
+                    //            sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
+                    //            sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
+                    //            sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Heavy->m_f2am) + _T("\n");
+                    //            sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                    //            appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        CCString sF1FileName = "";
+                    //        CCString sF2FileName = "";
+                    //        sF1FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F1.con"),
+                    //            sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                    //        sF2FileName.Format(_T("%s/O%d/Heavy/%s_Heavy_Nt%d_O%d_%d_F%d_F2.con"),
+                    //            sLoadFermionHead.c_str(), uiOmega, sLoadFermionFile.c_str(), _HC_Lt, uiOmega, uiN, i + 1);
+                    //        pF1Heavy->InitialFieldWithFile(sF1FileName, EFFT_CLGBin);
+                    //        pF2Heavy->InitialFieldWithFile(sF2FileName, EFFT_CLGBin);
+                    //    }
+
+                    //    pCCHeavy->OnConfigurationAcceptedZ4(
+                    //        appGetLattice()->m_pGaugeField,
+                    //        NULL,
+                    //        pF2Heavy,
+                    //        pF1Heavy,
+                    //        0 == i,
+                    //        iFieldCount == i + 1);
+
+                    //    pFAHeavy->OnConfigurationAcceptedZ4(
+                    //        appGetLattice()->m_pGaugeField,
+                    //        NULL,
+                    //        pF2Heavy,
+                    //        pF1Heavy,
+                    //        0 == i,
+                    //        iFieldCount == i + 1);
+                    //}
+
+                }
+                break;
                 default:
                     break;
             }
@@ -868,6 +1009,17 @@ INT Measurement(CParameters& params)
             case EDJKS_DoubleToFloat:
                 {
                     //do nothing
+                }
+                break;
+            case EDJKS_Taylor:
+                {
+                    CCString sFileName;
+                    sFileName.Format(_T("%sO%d_pl.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                    WriteStringFileComplexArray(sFileName, pTaylorLight->m_lstPolyakov);
+                    sFileName.Format(_T("%sO%d_s1.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                    WriteStringFileRealArray(sFileName, pTaylorLight->m_lstPolyakovSOmega);
+                    sFileName.Format(_T("%sO%d_s2.csv"), sCSVSavePrefix.c_str(), uiOmega);
+                    WriteStringFileRealArray(sFileName, pTaylorLight->m_lstPolyakovSOmegaSq);
                 }
                 break;
             default:

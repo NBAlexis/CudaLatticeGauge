@@ -15,11 +15,11 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 10
+    BeforeEquvibStep : 0
     EquvibSkip : 0
     EquvibStep : 20
     SaveStartIndex : 0
-    ListStart : 0
+    ListStart : 1
     ListEnd : 6
     Electric : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
     Chemical : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]

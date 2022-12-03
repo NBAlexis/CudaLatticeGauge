@@ -2194,6 +2194,8 @@ CCString CFieldFermionKSSU3GammaEM::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
 
+    sRet = sRet + tab + _T("shifted corrdinate : ") + (m_bEachSiteEta ? _T("1") : _T("0")) + _T("\n");
+
     sRet = sRet + tab + _T("Gamma1 : ") + appFloatToString(m_fCoeffGamma1) + _T("\n");
     sRet = sRet + tab + _T("Gamma2 : ") + appFloatToString(m_fCoeffGamma2) + _T("\n");
     sRet = sRet + tab + _T("Gamma3 : ") + appFloatToString(m_fCoeffGamma3) + _T("\n");
@@ -2212,7 +2214,7 @@ CCString CFieldFermionKSSU3GammaEM::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("Sigma24 : ") + appFloatToString(m_fCoeffSigma24) + _T("\n");
     sRet = sRet + tab + _T("Sigma34 : ") + appFloatToString(m_fCoeffSigma34) + _T("\n");
 
-    sRet = sRet + tab + _T("Sigma34 : ") + appFloatToString(m_fCharge) + _T("\n");
+    sRet = sRet + tab + _T("Charge : ") + appFloatToString(m_fCharge) + _T("\n");
 
     sRet = sRet + tab + _T("EMField ID : ") + appIntToString(m_byEMFieldID) + _T("\n");
 
