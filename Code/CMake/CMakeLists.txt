@@ -127,6 +127,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalorKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
@@ -248,6 +249,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJG.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggered.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureMesonCorrelatorStaggeredSimple2.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalorKS.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu

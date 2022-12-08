@@ -1,5 +1,5 @@
 # EBGJ_Simulate, EBGJ_Measure, EBGJ_SimulateScanBeta, EBGJ_MeasureScanBeta, EBGJ_GaugeFixing, EBGJ_SimulateQ, EBGJ_SimulateScanQ
-WorkJob : EBGJ_MeasureScanBeta
+WorkJob : EBGJ_Simulate
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -15,17 +15,17 @@ JobSimulate:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 10
+    BeforeEquvibStep : 2000
     EquvibSkip : 0
-    EquvibStep : 20
+    EquvibStep : 20000
     SaveStartIndex : 0
     ListStart : 0
-    ListEnd : 6
-    MiddleBetaList : [5.35, 5.36, 5.37, 5.38, 5.39, 5.4]
-    PrefixList : [535, 536, 537, 538, 539, 540]
+    ListEnd : 11
+    MiddleBetaList : [5.3, 5.304, 5.308, 5.312, 5.316, 5.32, 5.324, 5.328, 5.332, 5.336, 5.34]
+    PrefixList : [5300, 5304, 5308, 5312, 5316, 5320, 5324, 5328, 5332, 5336, 5340]
 
-    SavePrefix : ./BG05_
-    DeltaBeta : 0.5
+    SavePrefix : ./BG006/BG006_
+    DeltaBeta : 0.06
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -141,7 +141,7 @@ JobSimulate:
         SolverForFieldId : 2
         DiviationStep : 20
         MaxStep : 500
-        Accuracy : 0.000001
+        Accuracy : 0.001
         AbsoluteAccuracy : 1
         # SolverName : CMultiShiftFOM
         # SolverForFieldId : 2

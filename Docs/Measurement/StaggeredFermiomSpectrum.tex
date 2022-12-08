@@ -20,7 +20,7 @@ Following Ref.~\cite{staggeredQuarks}, the quark is defined on a $2^4$ hypercube
 &n_{\mu}=2h_{\mu}+s_{\mu},\;\;h_{\mu}=0,1,2,\ldots N_{\mu}/2-1,\;\;s_{\mu}=0,1\\
 \end{split}
 \end{equation}
-Without gauge field, the transform is
+Without gauge field, the transform is \textbf{\textcolor[rgb]{1,0,0}{NOTE: there are actually two conventions! We are not using Ref.~\cite{staggeredQuarks} here, but the other one for example used in Ref.~\cite{staggeredQuarks2}, see also Eq.~(30) of Ref.~\cite{MILC2009}.}}
 \begin{equation}
 \begin{split}
 &q_{\alpha,a}(h)=\frac{1}{C\sqrt{C}}\sum _{s_{\mu}} (\Gamma _{s})_{\alpha,a}V_{s}(2h)\chi (2h+s),\;\;\bar{q}_{\alpha,a}(h)=\frac{1}{C\sqrt{C}}\sum _{s} \bar{\chi} (2h+s)V^{\dagger}_{s}(2h)(\Gamma _{s}^{\dagger})_{\alpha,a}\\
@@ -455,3 +455,328 @@ $\gamma _4\gamma_5 \otimes \textcolor[rgb]{0,0,1}{\mathbb{I}}$($\eta$) & $3.08$ 
 \end{center}
 \caption{\label{tab:staggeredMeson2}Tested result with $\beta=5.0,N_f=2,am=0.25,4^3\times 8$ with $20+100$ configurations. The order of mass of pions are same as most of the Refs. In Ref, they find $\pi(\tau _5)<\pi(\tau _4\tau _5)<\pi(\tau _k\tau _5)<\pi(\tau _l\tau _m)<\pi(\tau _m\tau _4)<\pi(\tau _m)<\textcolor[rgb]{1,0,0}{\pi(\tau _4)<\omega}$. In Ref, they find $PS<VT<\textcolor[rgb]{1,0,0}{PV<SC}$ which is only partly consistent. In Ref. they find $\pi < \tilde{\pi} < \pi_3 < \tilde{\pi}_3<\rho_6^A$ which is consistent. In Ref they find $\pi(\tau _5)<\textcolor[rgb]{1,0,0}{\pi(\tau _k\tau _5)<\pi(\tau _4\tau _5)}<\textcolor[rgb]{1,0,0}{\pi(\tau _m\tau _4)<\pi(\tau _l\tau _m)}<\pi(\tau _m)<\textcolor[rgb]{1,0,0}{\pi(\tau _4)<\omega}$.}
 \end{table} 
+
+\subsubsection{\label{sec:SomeExplanation}Some explanation}
+
+The meson operator can be written as
+\begin{equation}
+\begin{split}
+&M(x)=\bar{q}_{f_1}(x) \Gamma _A \otimes \Gamma _B^{\dagger} q_{f_2}(x).\\
+\end{split}
+\end{equation}
+Usually,
+\begin{equation}
+\begin{split}
+&M(x)=\frac{1}{16}\sum _{n\in h}s_n\bar{\chi}_{f_1}(x+n) \chi_{f_2}(x+n+\delta _ n).\\
+\end{split}
+\end{equation}
+where $n$ are corners of hypercube, $s_n=\pm 1$ are signs, $\delta _n$ are shifts.
+The sum over color index is implied in the vector dot, $\bar{\chi} \chi$, where $\chi(x)$ is a SU3-vector.
+
+When $\Gamma _A = \Gamma _B$, $\delta _n = 0$, $M(x)$ are so called `local operators'.
+\begin{equation}
+\begin{split}
+&M_{\Gamma}(x)=\frac{1}{16}\sum _{n\in h}s_n\bar{\chi}_{f_1}(x+n) \chi_{f_2}(x+n).\\
+\end{split}
+\end{equation}
+
+As an example,
+\begin{equation}
+\begin{split}
+&M_{\gamma_5}(x)=\frac{1}{16}\sum _{n\in h} (-1)^{\sum _{i=1,2,3,4} n_i}\bar{\chi}_{f_1}(x+n) \chi_{f_2}(x+n)\\
+\end{split}
+\end{equation}
+
+We also need translational invariance, %\textbf{\textcolor[rgb]{1,0,0}{I don't know why and cannot find it, but it looks like}}
+\begin{equation}
+\begin{split}
+&\langle \bar{\chi}(x+1)\chi(x+1) \bar{\chi}(1)\chi(1)\rangle = \langle \bar{\chi}(x)\chi(x)\bar{\chi}(0)\chi(0) \rangle
+\end{split}
+\end{equation}
+
+For simplicity, we use,
+\begin{equation}
+\begin{split}
+&\sum _x = \sum _{x=0,1},\;\;\sum _{xy} = \sum _{x,y=0,1},\;\;\sum _{xyz} = \sum _{x,y,z=0,1},\;\sum _{xyzt} = \sum _{x,y,z,t=0,1}\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&M_{\gamma_5}(n)=\frac{1}{16}\sum _{xyzt} (-1)^{x+y+z+t}\bar{\chi}_{f_1}(n_x+x,n_y+y,n_z+z,n_t+t) \chi_{f_2}(n_x+x,n_y+y,n_z+z,n_t+t)\\
+&=\frac{1}{16}\left(\sum _{xyz} (-1)^{x+y+z}\bar{\chi}_{f_1}(n_x+x,n_y+y,n_z+z,n_t) \chi_{f_2}(n_x+x,n_y+y,n_z+z,n_t)\right.\\
+&\left.-\sum _{xyz} (-1)^{x+y+z}\bar{\chi}_{f_1}(n_x+x,n_y+y,n_z+z,n_t+1) \chi_{f_2}(n_x+x,n_y+y,n_z+z,n_t+1)\right)
+\end{split}
+\end{equation}
+
+For simplicity, we use $n+\delta$ to implicitly denote $(n_x+x,n_y+y,\ldots )$
+
+so that, for simplicity, we ignore the sum of indices
+\begin{equation}
+\begin{split}
+&\bar{M}_{\gamma_5}(n)M_{\gamma_5}(0)\\
+&=\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right) +\left(\sum s_x\bar{\chi}_{f_2}(\vec{x},n_t+1) \chi_{f_1}(\vec{x},n_t+1) \sum s_x \bar{\chi}_{f_1}(\vec{x},1) \chi_{f_2}(\vec{x},1)\right)\\
+&-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right)-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(\vec{x},1) \chi_{f_2}(\vec{x},1)\right)\\
+&=2\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right) \\
+&-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right)-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right)\\
+\end{split}
+\end{equation}
+
+We have used translational invariance.
+
+Similarly,
+\begin{equation}
+\begin{split}
+&\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(n+\vec{x},0) \chi_{f_2}(n+\vec{x},0)\\
+&= \left( \sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z,n_t) \chi_{f_1}(n+xy,n_z,n_t)-\sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z+1,n_t) \chi_{f_1}(n+xy,n_z+1,n_t)\right) \\
+&\times \left( \sum s_{xy}\bar{\chi}_{f_1}(xy,0,0) \chi_{f_1}(xy,0,0)-\sum s_{xy}\bar{\chi}_{f_1}(xy,1,0) \chi_{f_2}(xy,1,0)\right) \\
+&=\left(2\sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z,n_t) \chi_{f_1}(n+xy,n_z,n_t) - \sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z-1,n_t) \chi_{f_1}(\vec{x},z-1,t)- \sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z+1,n_t) \chi_{f_1}(n+xy,n_z+1,n_t)\right)\\
+&\times \sum s_{xy}\bar{\chi}_{f_1}(xy,0,0) \chi_{f_2}(xy,0,0)\\
+\end{split}
+\end{equation}
+
+If $\bar{\chi}(\vec{x},t_1)\chi (\vec{y},t_2)=f(|\vec{x}-\vec{y}|,t_1-t_2)$, than $\bar{\chi}(\vec{x},z+1,t)\chi (\vec{y},0,0) = \bar{\chi}(\vec{x},z-1,t)\chi (\vec{y},0,0)$
+\begin{equation}
+\begin{split}
+&\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(n+\vec{x},0) \chi_{f_2}(n+\vec{x},0)\\
+&=2\left(\sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z,n_t) \chi_{f_1}(n+xy,n_z,n_t) - \sum s_{xy}\bar{\chi}_{f_2}(n+xy,n_z+1,n_t) \chi_{f_1}(n+xy,n_z+1,n_t)\right)\\
+&\times \sum s_{xy}\bar{\chi}_{f_1}(xy,0,0) \chi_{f_2}(xy,0,0)\\
+&=2\sum_{xyz} s_{xyz}\bar{\chi}_{f_2}(n+xyz,n_t) \chi_{f_1}(n+xyz,n_t) \times \sum_{xy} s_{xy}\bar{\chi}_{f_1}(xy,0,0) \chi_{f_2}(xy,0,0)\\
+\end{split}
+\end{equation}
+
+Using similar steps, it is
+\begin{equation}
+\begin{split}
+&\sum_{xyz} s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum_{xyz} s_x \bar{\chi}_{f_1}(n+\vec{x},0) \chi_{f_2}(n+\vec{x},0)\\
+&=4\sum_{xyz} s_{xyz}\bar{\chi}_{f_2}(n+xyz,n_t) \chi_{f_1}(n+xyz,n_t) \times \sum_{x} s_{x}\bar{\chi}_{f_1}(x,0,0,0) \chi_{f_2}(x,0,0,0)\\
+&=8\sum_{xyz} s_{xyz}\bar{\chi}_{f_2}(n+xyz,n_t) \chi_{f_1}(n+xyz,n_t) \times \bar{\chi}_{f_1}(0,0,0,0) \chi_{f_2}(0,0,0,0)\\
+\end{split}
+\end{equation}
+
+We arrive at
+\begin{equation}
+\begin{split}
+&\bar{M}_{\gamma_5}(n)M_{\gamma_5}(0)\\
+&=8\sum _{xyz}(-1)^{x+y+z}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.-\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)-\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+\end{split}
+\end{equation}
+
+Similarly
+\begin{equation}
+\begin{split}
+&\bar{M}_{I}(n)M_{I}(0)\\
+&=8\sum _{xyz}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.+\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)+\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+&\bar{M}_{\gamma _4}(n)M_{\gamma _4}(0)\\
+&=8\sum _{xyz}(-1)^{x+y+z}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.+\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)+\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+&\bar{M}_{\gamma _4\gamma_5}(n)M_{\gamma _4\gamma _5}(0)\\
+&=8\sum _{xyz}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.-\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)-\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+\end{split}
+\end{equation}
+
+Define $C_{\Gamma}(x,t)=\bar{M}_{\Gamma}(x,t)M_{\Gamma}(0)$ as correlation functions, one have
+\begin{equation}
+\begin{split}
+&\left(C_{I}(x,t)+C_{\gamma_4\gamma_5}(x,t)\right)=32\sum _{xyz}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+&\left(C_{I}(x,t)-C_{\gamma_4\gamma_5}(x,t)\right)=16\sum _{xyz}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)+16\sum _{xyz}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+\end{split}
+\end{equation}
+
+Which is
+\begin{equation}
+\begin{split}
+&\sum _t\left(C_{I}(x,t)+C_{\gamma_4\gamma_5}(x,t)\right)=32\sum _{xyz}\sum _{n_t\in even}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+&\sum _t\left(C_{I}(x,t)-C_{\gamma_4\gamma_5}(x,t)\right)=32\sum _{xyz}\sum _{n_t\in odd}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+\end{split}
+\end{equation}
+
+\textbf{\textcolor[rgb]{1,0,0}{I don't know why, but we remove the sum over $t$ and denote $C$ as $C(n_t)$.}}, then denote
+\begin{equation}
+\begin{split}
+&C_{\Gamma}(n,n_t)=K_{\Gamma} \left(e^{-m_{\Gamma} n_t} + e^{-m_{\Gamma} (T-n_t)}\right)\\
+\end{split}
+\end{equation}
+
+So
+\begin{equation}
+\begin{split}
+&\sum _{xyz}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right) \\
+&\propto K_{I} \left(e^{-m_{I} t} + e^{-m_{I} (T-n_t)}\right)+(-1)^{n_t}K_{\gamma_4\gamma_5} \left(e^{-m_{\gamma_4\gamma_5} n_t} + e^{-m_{\gamma_4\gamma_5} (T-n_t)}\right)\\
+\end{split}
+\end{equation}
+
+similarly
+\begin{equation}
+\begin{split}
+&\sum _{xyz}(-1)^{x+y+z}\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right) \\
+&\propto K_{\gamma_4} \left(e^{-m_{\gamma_4} t} + e^{-m_{\gamma_4} (T-n_t)}\right)+(-1)^{n_t}K_{\gamma_5} \left(e^{-m_{\gamma_5} n_t} + e^{-m_{\gamma_5} (T-n_t)}\right)\\
+\end{split}
+\end{equation}
+They are the first two lines in Table~\ref{tab:staggeredMeson}. Using the fact that $A_4$ in Table~\ref{tab:staggeredMeson} is always $0$, $\eta _4\zeta_4 =(-1)^{x+y+z}$.
+
+Except for that, generally, 
+\begin{equation}
+\begin{split}
+&\sum _{xyz}\phi(xyz)\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right) \\
+&\propto K_{\Gamma} \left(e^{-m_{\Gamma} t} + e^{-m_{\Gamma} (T-n_t)}\right)+(-1)^{n_t}K_{\Gamma\gamma_4\gamma_5} \left(e^{-m_{\Gamma\gamma_4\gamma_5} n_t} + e^{-m_{\Gamma\gamma_4\gamma_5} (T-n_t)}\right)\\
+\end{split}
+\end{equation}
+
+For example,
+\begin{equation}
+\begin{split}
+&\bar{M}_{\gamma_1}(n)M_{\gamma_1}(0)\\
+&=8\sum _{xyz}(-1)^{y+z}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.-\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)-\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+&\bar{M}_{\gamma _3\gamma_2}(n)M_{\gamma _3\gamma_2}(0)\\
+&=8\sum _{xyz}(-1)^{y+z}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.+\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)+\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+\end{split}
+\end{equation}
+
+This is the forth line of Table~\ref{tab:staggeredMeson}, note that $eta_4\zeta_4\eta_1\zeta_1\epsilon = (-1)^{x+y+z} \times 1 \times 1 \times (-1)^{y+z} \times (-1)^{x+y+z} = (-1)^{y+z}$.
+
+$\bar{M}_{\gamma _1}$, $\bar{M}_{\gamma _2}$ and $\bar{M}_{\gamma _3}$ are often combined as one channel, and the correlation to measure is
+\begin{equation}
+\begin{split}
+\sum _{xyz}\left((-1)^{x+y}+(-1)^{y+z}+(-1)^{x+z}\right)\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+\end{split}
+\end{equation}
+
+Similarly, the $\gamma _i \gamma _5$ and $\gamma _i \gamma _4$ corresponds to the third line of Table~\ref{tab:staggeredMeson}, 
+\begin{equation}
+\begin{split}
+&\bar{M}_{\gamma_1\gamma_5}(n)M_{\gamma_1\gamma_5}(0)\\
+&=8\sum _{xyz}(-1)^{x}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.+\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)+\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+&\bar{M}_{\gamma _1\gamma_4}(n)M_{\gamma _1\gamma_4}(0)\\
+&=8\sum _{xyz}(-1)^{x}\left[2\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right. \\
+&\left.-\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)-\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right]\\
+\end{split}
+\end{equation}
+the correlation to measure is
+\begin{equation}
+\begin{split}
+\sum _{xyz}\left((-1)^{x}+(-1)^{y}+(-1)^{z}\right)\left(\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+\end{split}
+\end{equation}
+
+Those are the only 4 local correlators correspond to only 8 local operators.
+
+\subsubsection{\label{AnotherSimpleApproach}Another simple approach}
+
+Form the above it can be seen that, if one only cares about local operators, one needs to calculate 4 correlators, they are
+\begin{equation}
+\begin{split}
+&\sum _{\vec{A}}W(\vec{A})\left(\bar{\chi}_{f_2}(n+\vec{A},n_t) \chi_{f_1}(n+\vec{A},n_t) \bar{\chi}_{f_1}(0) \chi_{f_2}(0)\right)\\
+\end{split}
+\end{equation}
+where $\vec{A}$ are $8$ corners of a cube, and the corresponding mesons are listed in Table~\cite{tab:staggeredMeson3}
+\begin{table}
+\begin{center}
+\begin{tabular}{cccc}
+\hline
+ & $W$ & Part. interp. $\Gamma$ & Oppo. parity $\Gamma$ \\
+PS & 1 & $\epsilon (1)$ & $\pi (\gamma _4\gamma _5)$ \\
+VT & $(-1)^x+(-1)^y+(-1)^z$ & $b_1 (\gamma _i \gamma _5)$ & $\rho(\gamma _i \gamma _4)$\\
+PV & $(-1)^{x+y}+(-1)^{y+z}+(-1)^{x+z}$ & $a_1 (\gamma _j\gamma _k)$ & $\rho_2 (\gamma _i)$ \\
+S & $(-1)^{x+y+z}$ & $\sigma (\gamma _4)$ & $\pi _2 (\gamma _5)$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab:staggeredMeson3}Four channels for local operators, see also Ref.~\cite{Gottlieb:1988gr}.}
+\end{table} 
+
+Then, using
+\begin{equation}
+\begin{split}
+&\langle \psi _1\psi_2 \bar{\psi} _3 \bar{\psi}_4\rangle = \left(M^{-1}\right)_{1,4}\left(M^{-1}\right)_{2,3}- \left(M^{-1}\right)_{1,3}\left(M^{-1}\right)_{2,4}.\\
+\end{split}
+\end{equation}
+
+Neglecting the `connected' part, it is (From here, we explicitly add the sum of the color index)
+\begin{equation}
+\begin{split}
+&P_A=\langle \sum _{\vec{A},c_1,c_2}W(\vec{A})\left(\bar{\chi}_{c_1,f_2}(n+\vec{A},n_t) \chi_{c_1,f_1}(n+\vec{A},n_t) \bar{\chi}_{c_2,f_1}(0) \chi_{c_2,f_2}(0)\right) \rangle\\
+&=-\sum _{\vec{A},c_1,c_2}W(\vec{A}) \left(D_{f_1}^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)\left(D_{f_2}^{-1}\right)\left(0,c_2|n+\vec{A},n_t,c_1\right)\\
+\end{split}
+\end{equation}
+
+To calculate it efficiently, we shift the second matrix to $(n+\vec{A},n_t,c_1|0,c_2)$, which means
+\begin{equation}
+\begin{split}
+&P_A=\langle \sum _{\vec{A},c_1,c_2}W(\vec{A})\left(\bar{\chi}_{c_1,f_2}(n+\vec{A},n_t) \chi_{c_1,f_1}(n+\vec{A},n_t) \bar{\chi}_{c_2,f_1}(0) \chi_{c_2,f_2}(0)\right) \rangle\\
+&=-\sum _{\vec{A},c_1,c_2}W(\vec{A}) \left(D_{f_1}^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)\left((D_{f_2}^{\dagger})^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)^*\\
+\end{split}
+\end{equation}
+
+Absorbing the constant $-1$ into the factors, this is the Eq.~(3) of Ref.~\cite{Gottlieb:1988gr}. It looks that there is no way to merge the colors, at least three different sources for different colors should be used.
+
+The $\left(D_{f_1}^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)$ can be obtained by using the point source, that
+\begin{equation}
+\begin{split}
+&\begin{pmatrix} D^{-1}(0,r|0,r) \\ D^{-1}(0,g|0,r) \\ D^{-1}(0,b|0,r) \\ D^{-1}(1,r|0,r) \\ D^{-1}(1,g|0,r) \\ D^{-1}(1,b|0,r) \\ \ldots \\ D^{-1}(n,t,r|0,r) \\ D^{-1}(n,t,g|0,r) \\ D^{-1}(n,t,b|0,r) \end{pmatrix} = D^{-1} \begin{pmatrix} 1 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ \ldots \\ 0 \\ 0 \\ 0 \end{pmatrix}\\
+\end{split}
+\end{equation}
+
+If $f_1=f_2$, it is more convenient to use $D\left((DD^{\dagger})^{-1} s\right)$ and $D^{\dagger}\left((DD^{\dagger})^{-1} s\right)$ to calculate $D^{-1}s$ and $(D^{\dagger})^{-1}s$.
+
+\textbf{\textcolor[rgb]{1,0,0}{Why is the result real numbers?}}
+
+\begin{enumerate}
+    \item Gauge fixing to Coulomb gauge, if use wall source.
+    \item Build $3$ wall(or point) sources, $s_{c}(x) = \sum _{c', x}\delta _{cc'} \delta _{x,0} \delta _{t,0}$, which is $0$-corner of all cubic in $0$-time slice.
+    \item Calculate $6$ propagators, $p_{f_1,c_1c_2}(x)=(D_{f_1}^{-1})s_{c_1}(x,c_2)$, $p_{f_2,c_1c_2}(x)=((D_{f_2}^{\dagger})^{-1})s_{c_1}(x,c_2)$, if $f_1=f_2$, use $(DD^{\dagger})^{-1} s$ to build $D^{-1}s$ and $(D^{\dagger})^{-1}s$.
+    \item Now, $p_{f_1}(2n+A)$ is $\left(D_{f_1}^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)$, $p_{f_2}(2n+A)$ is $\left((D_{f_2}^{\dagger})^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)$, linear combine them as $\sum _{\vec{A},c_1,c_2}W(\vec{A}) \left(D_{f_1}^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)\left((D_{f_2}^{\dagger})^{-1}\right)\left(n+\vec{A},n_t,c_1|0,c_2\right)^*$.
+    \item Now we sum over $2n$, same as Ref.~\cite{Gottlieb:1988gr}, note that, $P_M(t)=\sum _{n}\sum _A \sum _{c1,c2} W(\vec{A})p_{f_1,c_1,c_2}(2n+A,t)p^*_{f_2,c_1,c_2}(2n+A,t)$, is $P_M(t)=\sum _{n}W(n) \sum _{c1,c2} p_{f_1,c_1,c_2}(n,t)p^*_{f_2,c_1,c_2}(n,t)$.
+\end{enumerate}
+
+Note that, since $p_{f_1}\neq p_{f_2}$, there is no guarantee that $p_{f_1}p_{f_2}^*$ is a real number.
+To avoid imaginary part, we always use $|p_{f_1}||p_{f_1}|$ before sum over the phase.
+
+\subsubsection{\label{TheComplecateApproach}The complicated approach}
+
+If we do not shift the correlators, then it is impossible to calculate the $8$ operators using one~(counting color index, it is 3) propagator.
+
+For example, if two propagators are used, $16$ states can be built, however, the usual $\rho$ meson cannot be built~\cite{Gupta:1990mr}.
+
+To build every time-local operators, at least $8$ propagators (counting color index, it is $24$) are needed.
+
+To move on, we again write the correlators which are not shifted, they are already listed in Sec.~\ref{sec:SomeExplanation}.
+\begin{equation}
+\begin{split}
+&\bar{M}_{\gamma_5}(n)M_{\gamma_5}(0)\\
+&=2\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t) \chi_{f_1}(n+\vec{x},n_t) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right) \\
+&-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t+1) \chi_{f_1}(n+\vec{x},n_t+1) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right)-\left(\sum s_x\bar{\chi}_{f_2}(n+\vec{x},n_t-1) \chi_{f_1}(n+\vec{x},n_t-1) \sum s_x \bar{\chi}_{f_1}(\vec{x},0) \chi_{f_2}(\vec{x},0)\right)\\
+\end{split}
+\end{equation}
+
+Denote the sign function as phase $\phi$, in this approach,
+\begin{equation}
+\begin{split}
+&\sum _t\left(C_{\Gamma}(x,t)+C_{\Gamma\gamma_4\gamma_5}(x,t)\right)=4\sum _{n_t\in even}\left(\sum _{A}\phi(A)\bar{\chi}_{f_2}(n+\vec{A},n_t) \chi_{f_1}(n+\vec{A},n_t) \sum _{B}\phi(B)\bar{\chi}_{f_1}(\vec{B},t=0) \chi_{f_2}(\vec{B},t=0)\right)\\
+&\sum _t\left(C_{\Gamma}(x,t)-C_{\Gamma\gamma_4\gamma_5}(x,t)\right)=4\sum _{n_t\in odd}\left(\sum _{A}\phi(A)\bar{\chi}_{f_2}(n+\vec{A},n_t) \chi_{f_1}(n+\vec{A},n_t) \sum _{B}\phi(B)\bar{\chi}_{f_1}(\vec{B},t=0) \chi_{f_2}(\vec{B},t=0)\right)\\
+\end{split}
+\end{equation}
+
+So, there are $8\times 8 = 64$ propagators,
+\begin{equation}
+\begin{split}
+&G_{f,AB,t}=\bar{\chi}_{f}(n+\vec{A},n_t)\chi _{f}(\vec{B},0)\\
+&\left(C_{\Gamma}(x,t)+(-1)^{n_t}C_{\Gamma\gamma_4\gamma_5}(x,t)\right)=4 \sum _{AB}\phi(A)\phi(B) G_{f_1,AB,t} \left(G_{f_2,AB,t}\right)\\
+\end{split}
+\end{equation}
+
+At first sight, $64$ propagators are needed, however, for one $B$, $8$ elements can be obtained for each $A$, that is, $1$ propagator to calculate $r(B)=\sum _A s(A) \bar{\chi}(n+\vec{A},n_t) \chi (B,0)$, then, the step is
+\begin{enumerate}
+    \item Gauge fixing to Coulomb gauge, because we will use wall source.
+    \item Build $3\times 8$ wall sources, $s_{c,B}(x) = \sum _{c', x}\delta _{cc'} \delta _{x,B} \delta _{t,0}$, where $B$ runs over $8$ corners of a cubic.
+    \item Calculate $6 \times 8$ propagators, $p_{f_1,c_1c_2,B}(x)=(D_{f_1}^{-1})s_{c_1,B}(x,c_2)$, $p_{f_2,c_1c_2,B}(x)=((D_{f_2}^{\dagger})^{-1})s_{c_1,B}(x,c_2)$, if $f_1=f_2$, use $(DD^{\dagger})^{-1} s$ to build $D^{-1}s$ and $(D^{\dagger})^{-1}s$.
+    \item Now, $p_{f_1,B}(2n+A)$ is $G_{f_1,AB,t}$, $p^*_{f_2,B}(2n+A)$ is $G_{f_2,AB,t}$, linear combine them as $\sum _{AB}\phi(A)\phi(B) G_{f_1,AB,t} \left(G_{f_2,AB,t}\right)$.
+\end{enumerate}
+

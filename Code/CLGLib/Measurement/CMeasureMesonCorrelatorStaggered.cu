@@ -462,6 +462,9 @@ void CMeasureMesonCorrelatorStaggered::CalculateSources(const CFieldGauge* pGaug
     }
 }
 
+/**
+ * use sink as Eq.~(2.5) of ref. 10.1016/0550-3213(94)90475-8
+ */
 void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
 {
     deviceSU3Vector* w1[24];
@@ -508,6 +511,9 @@ void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
     }
 }
 
+/**
+ * use sink as Eq.~(2.10) of ref. 10.1016/0550-3213(94)90475-8
+ */
 void CMeasureMesonCorrelatorStaggered::SimplerVersion()
 {
     CFieldFermionKSSU3* sinks[24];

@@ -107,6 +107,7 @@
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggered.h" />
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h" />
+    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.h" />
     <ClInclude Include="Measurement\CMeasurePandChiralTalor.h" />
     <ClInclude Include="Measurement\CMeasurePandChiralTalorKS.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
@@ -276,6 +277,7 @@
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu" />
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu" />
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalorKS.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />

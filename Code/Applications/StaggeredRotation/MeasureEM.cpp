@@ -15,7 +15,7 @@ __DEFINE_ENUM(EDistributionJobKSEM,
     EDJKSEM_Polyakov,
     EDJKSEM_Chiral,
     EDJKSEM_BerryPhase,
-
+    EDJKSEM_Meson,
     )
 
 
@@ -170,6 +170,7 @@ INT MeasurementEM(CParameters& params)
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     CMeasureBerryPhase* pBPu = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
     CMeasureBerryPhase* pBPd = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
+    CMeasureMesonCorrelatorStaggeredSimple2* pMeson = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
@@ -206,6 +207,8 @@ INT MeasurementEM(CParameters& params)
         pCCHeavy->SetFieldCount(iFieldCount);
         pFALight->SetFieldCount(iFieldCount);
         pFAHeavy->SetFieldCount(iFieldCount);
+
+        pMeson->Reset();
 
         CCommonData::m_fBz = lstM[uiEM];
         CCommonData::m_fEz = lstE[uiEM];
@@ -389,6 +392,11 @@ INT MeasurementEM(CParameters& params)
                 {
                     pBPu->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     pBPd->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                break;
+                case EDJKSEM_Meson:
+                {
+                    pMeson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                 }
                 break;
 #if NotYet
@@ -656,6 +664,46 @@ INT MeasurementEM(CParameters& params)
                 WriteStringFileRealArray2(sFileNameWriteBP, pBPd->m_lstDataZT);
             }
             break;
+            case EDJKSEM_Meson:
+                {
+                    static const TCHAR* heads[16] =
+                    {
+                        "PSuu",
+                        "PSud",
+                        "PSdu",
+                        "PSdd",
+                        "VTuu",
+                        "VTud",
+                        "VTdu",
+                        "VTdd",
+                        "PVuu",
+                        "PVud",
+                        "PVdu",
+                        "PVdd",
+                        "Suu",
+                        "Sud",
+                        "Sdu",
+                        "Sdd"
+                    };
+                    for (INT i = 0; i < 16; ++i)
+                    {
+                        TArray<TArray<DOUBLE>> onemesonconfig;
+                        for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                        {
+                            TArray<DOUBLE> onemeson_oneconfig;
+                            for (INT uiT = 0; uiT < _HC_Lt - 1; ++uiT)
+                            {
+                                onemeson_oneconfig.AddItem(pMeson->m_lstResults[j][i][uiT]);
+                            }
+                            onemesonconfig.AddItem(onemeson_oneconfig);
+                        }
+
+                        CCString sFileNameMeson;
+                        sFileNameMeson.Format(_T("%s_%s_Nt%d_EM%d.csv"), sCSVSavePrefix.c_str(), heads[i], _HC_Lt, uiEM);
+                        WriteStringFileRealArray2(sFileNameMeson, onemesonconfig);
+                    }
+                }
+                break;
 #if NotYet
             case EDJKS_AngularMomentum:
             {

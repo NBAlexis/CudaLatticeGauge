@@ -1,37 +1,38 @@
 //=============================================================================
-// FILENAME : CMeasureMesonCorrelatorStaggeredSimple.h
+// FILENAME : CMeasureMesonCorrelatorStaggeredSimple2.h
 // 
 // DESCRIPTION:
-// This is the 10.1016/0550-3213(88)90396-3 (see the appendix)
-// It use only ONE propagator, and not gauge fixing things
+// This is the 10.1103/PhysRevD.38.2245
+// It uses 3 propagators, if wall source is used, gauge fixing is needed
+// It supports charged mesons
 //
-// REVISION:
-//  [10/04/2020 nbale]
+// REVISION: [dd-mm-yy]
+//  [08/12/2022 nbale]
 //=============================================================================
 
-#ifndef _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE_H_
-#define _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE_H_
+#ifndef _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE2_H_
+#define _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE2_H_
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CMeasureMesonCorrelatorStaggeredSimple)
+__CLG_REGISTER_HELPER_HEADER(CMeasureMesonCorrelatorStaggeredSimple2)
 
-class CLGAPI CMeasureMesonCorrelatorStaggeredSimple : public CMeasure
+class CLGAPI CMeasureMesonCorrelatorStaggeredSimple2 : public CMeasure
 {
-    __CLGDECLARE_CLASS(CMeasureMesonCorrelatorStaggeredSimple)
+    __CLGDECLARE_CLASS(CMeasureMesonCorrelatorStaggeredSimple2)
 public:
 
-    enum { _kMesonCorrelatorTypeSimple = 4 };
-
-    CMeasureMesonCorrelatorStaggeredSimple() : CMeasure()
+    CMeasureMesonCorrelatorStaggeredSimple2() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)
         , m_uiConfigurationCount(0)
         , m_bShowResult(FALSE)
+        , m_bWallSource(TRUE)
+        , m_byFieldID2(0)
     {
         
     }
-    ~CMeasureMesonCorrelatorStaggeredSimple();
+    ~CMeasureMesonCorrelatorStaggeredSimple2();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
     void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
@@ -42,8 +43,18 @@ public:
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
+    UBOOL HasOtherField() const
+    {
+        return m_byFieldID2 > 0 && m_byFieldID2 != m_byFieldId;
+    }
 
 protected:
+
+    void BuildSource();
+    void IniverseSource(const CFieldGauge* pGaugeField);
+    void ReleaseSource();
+
+    TArray<CFieldFermionKSSU3*> m_pSources;
 
     Real* m_pDevicePropogators;
 
@@ -60,6 +71,7 @@ public:
     TArray<TArray<DOUBLE>> m_lstAverageResults;
 
     //m_lstResults[conf][type][t]
+    //for nf = 1 + 1, type is: type1uu, type1ud, type1dd, type1du, type2uu, type2ud, type2dd, type2du, ...
     TArray<TArray<TArray<DOUBLE>>> m_lstResults;
 #else
     TArray<TArray<Real>> m_lstAverageResults;
@@ -69,40 +81,13 @@ public:
 #endif
     UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
+    UBOOL m_bWallSource;
+    BYTE m_byFieldID2;
 };
-
-#pragma region device functions
-
-static __device__ __inline__ SBYTE _deviceStaggeredFermionSimplePhase(const SSmallInt4& sSite, BYTE byType)
-{
-    SBYTE ret = 1;
-    switch (byType)
-    {
-    case 1:
-        ret = 3 - ((sSite.x & 1) << 1)
-                - ((sSite.y & 1) << 1)
-                - ((sSite.z & 1) << 1);
-        //printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
-        break;
-    case 2:
-        ret = 3 - (((sSite.x + sSite.y) & 1) << 1)
-                - (((sSite.y + sSite.z) & 1) << 1)
-                - (((sSite.x + sSite.z) & 1) << 1);
-        break;
-    case 3:
-        ret = 1 - (((sSite.x + sSite.y + sSite.z) & 1) << 1);
-        break;
-    default:
-        break;
-    }
-    return ret;
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 
-#endif //#ifndef _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE_H_
+#endif //#ifndef _CMEASUREMESONCORRELATORSTAGGEREDSIMPLE2_H_
 
 //=============================================================================
 // END OF FILE

@@ -14,31 +14,6 @@ __BEGIN_NAMESPACE
 
 #pragma region kernels
 
-static __device__ __inline__ SBYTE _deviceStaggeredFermionSimplePhase(const SSmallInt4& sSite, BYTE byType)
-{
-    SBYTE ret = 1;
-    switch (byType)
-    {
-    case 1:
-        ret = 3 - ((sSite.x & 1) << 1)
-                - ((sSite.y & 1) << 1)
-                - ((sSite.z & 1) << 1);
-        //printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
-        break;
-    case 2:
-        ret = 3 - (((sSite.x + sSite.y) & 1) << 1)
-                - (((sSite.y + sSite.z) & 1) << 1)
-                - (((sSite.x + sSite.z) & 1) << 1);
-        break;
-    case 3:
-        ret = 1 - (((sSite.x + sSite.y + sSite.z) & 1) << 1);
-        break;
-    default:
-        break;
-    }
-    return ret;
-}
-
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPickPropagatorsSimple(
     const deviceSU3Vector* __restrict__ propagator,
