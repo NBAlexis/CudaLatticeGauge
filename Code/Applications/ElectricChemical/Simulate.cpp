@@ -166,7 +166,7 @@ INT Simulate(CParameters& params)
         pD->UpdatePooledParamters();
         pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0));
 
-        pU1->DebugPrintMe();
+        //pU1->DebugPrintMe();
 
         if (bAdditive)
         {

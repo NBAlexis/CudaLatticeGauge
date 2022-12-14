@@ -428,6 +428,7 @@ target_link_libraries(BetaGradient CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/ElectricChemical)
 add_executable(ElectricChemical 
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/ElectricChemical.h
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/ElectricChemical.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Simulate.cpp

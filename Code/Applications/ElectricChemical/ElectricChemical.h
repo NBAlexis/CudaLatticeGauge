@@ -294,6 +294,7 @@ inline void AppendStringFile(const CCString& sFileName, const CCString& sContent
 
 extern INT Simulate(CParameters& params);
 extern INT Measurement(CParameters& params);
+extern INT GaugeFixing(CParameters& params);
 
 
 //=============================================================================

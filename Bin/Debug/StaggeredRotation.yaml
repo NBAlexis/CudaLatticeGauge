@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_MeasureEM
+RotationJob : ESR_SimulateQuenched
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -2268,16 +2268,16 @@ JobSimulateQuenched:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 10
-    BeforeEquvibStep : 500
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 1000
+    EquvibStep : 20000
     SaveStartIndex : 0
-    OmegaSep : 20
-    OmegaStart : 0
-    MaxOmega : -2.0
+    OmegaSep : 8
+    OmegaStart : 1
+    MaxOmega : 0.016
     MinNt : 4
     MaxNt : 4
-    SavePrefix : ./50Quenchedm_
+    SavePrefix : ./57Quenched_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -2285,7 +2285,7 @@ JobSimulateQuenched:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [16, 16, 16, 4]
+    LatticeLength : [12, 12, 12, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
@@ -2300,8 +2300,8 @@ JobSimulateQuenched:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # Nt6FileName : ./SRF4980204_R_Nt6_O1_1015.con
-    # Nt6Polyakov : 0.022946210578
+    Nt4FileName : ./57Quenched_R_Nt4_O0_1000.con
+    Nt4Polyakov : 0.022946210578
 
     Updator:
 
@@ -2333,7 +2333,7 @@ JobSimulateQuenched:
         ActionName : CActionGaugePlaquetteRotating
         CloverEnergy : 1
         ShiftCoord : 1
-        Beta : 5.0
+        Beta : 5.7
         Omega : 0.0
 
     Measure1:

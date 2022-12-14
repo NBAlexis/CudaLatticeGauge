@@ -81,3 +81,47 @@ where $n$ runs over $16$ corners, and the link is for the diagonal corners.
 
 \subsubsection{\label{StaggeredFermionTwoGamma}Multiplication of Gamma matrix}
 
+\subsubsection{\label{DimensionOfCondensation}Dimension of condensations}
+
+Although, not related, but the Polyakov loop is also summarized here.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{cccc}
+\hline
+ & $q(x)\sim O[\frac{3}{2}]$ & $\chi(x) \sim \frac{1}{\sqrt{2a}}q(x) \sim O[2]$ & $\chi(x) \sim \frac{a^2}{\sqrt{2a}}q(x) \sim O[0]$ \\
+ & $\int d^4 x \bar{q}Dq \sim O[0]$ & $a^4\sum _n \bar{\chi}D\chi \sim O[0]$ & $\sum _n \bar{\chi}D\chi \sim O[0]$ \\
+ & $m\bar{q}q \sim O[4]$ & $am \bar{\chi}\chi \sim O[4]$ & $am \bar{\chi}\chi \sim O[0]$ \\
+cond. & $c=\int d^4 x\langle\bar{q}q \rangle \sim O[-1]$ & $2a \times a^4\sum _n \langle \bar{\chi}\chi \rangle \sim O[-1]$ & $2a \sum _n \langle \bar{\chi}\chi \rangle \sim O[-1]$ \\ 
+c-den. & $\frac{1}{V}\int d^4 x\langle\bar{q}q \rangle \sim O[3]$ & $\frac{1}{a^4\prod N_i} 2a^5\sum _n \langle \bar{\chi}\chi \rangle \sim O[3]$ & $\frac{1}{a^4\prod N_i} 2a \sum _n \langle \bar{\chi}\chi \rangle \sim O[3]$ \\ 
+ &  &  & $\frac{1}{\prod N_i} \frac{2}{a^3} {\rm tr}[D^{-1}] \sim O[3]$ \\ 
+ &  &  & $\frac{N_f}{4\prod N_i} \frac{2}{a^3} {\rm tr}[D^{-1}] \sim O[3]$ \\ 
+ susp. & $s \sim c^2 \sim O[-2]$ & & $\langle (2a {\rm tr}[D^{-1}])^2\rangle - \langle 2a {\rm tr}[D^{-1}]\rangle ^2 \sim O[-2]$ \\
+ & & & $4a^2\left(\langle ({\rm tr}[D^{-1}])^2\rangle - \langle {\rm tr}[D^{-1}]\rangle ^2\right) \sim O[-2]$ \\
+ s-den. & & & $\frac{4a^2}{a^4 \prod N_i}\left(\langle ({\rm tr}[D^{-1}])^2\rangle - \langle {\rm tr}[D^{-1}]\rangle ^2\right) \sim O[2]$ \\
+             & & & $\frac{4a^2 N_f^2}{16a^4 \prod N_i}\left(\langle ({\rm tr}[D^{-1}])^2\rangle - \langle {\rm tr}[D^{-1}]\rangle ^2\right) \sim O[2]$ \\
+ $s/T^2$ & $s/T^2\sim O[0]$ & & $\frac{4a^2 N_f^2}{16a^4 \prod N_i}\frac{N_t^2}{a^{-2}}\left(\langle ({\rm tr}[D^{-1}])^2\rangle - \langle {\rm tr}[D^{-1}]\rangle ^2\right) \sim O[0]$\\
+ & & & $\frac{4N_f^2N_t^2}{16\prod N_i}\left(\langle ({\rm tr}[D^{-1}])^2\rangle - \langle {\rm tr}[D^{-1}]\rangle ^2\right) \sim O[0]$\\
+ & & & $d=\frac{{\rm tr}[D^{-1}]}{\prod N_i}$\\
+ & & & $\frac{4N_f^2N_t^2 \prod N_i}{16}\left(\langle d^2\rangle - \langle d \rangle ^2\right) \sim O[0]$\\
+\hline 
+\end{tabular}
+\end{center}
+\caption{\label{tab:DimensionOfCondensation}Dimension of condensations.}
+\end{table} 
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ccc} 
+\hline
+$P$ & $\int d^3 x p(x) \sim O[-3]$ & $a^3 \sum _x p(x) \sim O[-3]$ \\
+$L$ & $\frac{1}{V}\int d^3 x p(x) \sim O[0]$ & $L=\frac{a^3}{a^3 \prod N_i} \sum _x p(x) \sim O[0]$ \\
+$\chi _P$ & $\chi _P\sim \int d^3 x p(x) \int d^3 y p(y) \sim O[-6]$ & $(a^3 \sum _x p(x))^2 \sim O[-6]$ \\
+$\chi _P/V$ & $\chi _P/V\sim \int d^3 x p(x) \int d^3 y p(y)/V \sim O[-3]$ & $(a^3\prod N_i) L^2 \sim O[-3]$ \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab:DimensionOfPolyakov}Dimension of Polyakov loop.}
+\end{table} 
+
+
