@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_SimulateQuenched
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -339,11 +339,11 @@ JobMeasure:
     ShowParameterContent : 0
 
     GaugeBate : 5.7
-    OmegaRange : 1.0
-    StartOmega : 0
-    EndOmega : 1
-    StartN : 1
-    EndN : 10
+    OmegaRange : 0.016
+    StartOmega : 1
+    EndOmega : 8
+    StartN : 101
+    EndN : 50000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -357,20 +357,20 @@ JobMeasure:
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat, EDJKS_Taylor
-    DistributionJob : EDJKS_Taylor
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
-    SubFolder : 0
-    SubFolderPrefix : I:\Rotation\50mQuenched
+    SubFolder : 1
+    SubFolderPrefix : H:\57QRS
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./57q/1/57Q_
-    CSVSavePrefix : ./57q/57Q1_
+    SavePrefix : 57QR_
+    CSVSavePrefix : ./57QR_
 
     Dim : 4
     Dir : 4

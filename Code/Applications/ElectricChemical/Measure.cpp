@@ -12,6 +12,7 @@
 __DEFINE_ENUM(EGradientMeasureJob,
     EGMJ_Polyakov,
     EGMJ_Chiral,
+    EGMJ_Meson,
     EGMJ_DoubleToFloat,
     )
 
@@ -120,7 +121,8 @@ INT Measurement(CParameters& params)
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
-    
+    CMeasureMesonCorrelatorStaggeredSimple2* pMeson = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple2*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+
     CFieldFermionKSSU3GammaEM* pU = NULL;
     CFieldFermionKSSU3GammaEM* pD = NULL;
 
@@ -167,6 +169,8 @@ INT Measurement(CParameters& params)
         pCCLight->SetFieldCount(iFieldCount);
         pCCHeavy->Reset();
         pCCHeavy->SetFieldCount(iFieldCount);
+
+        pMeson->Reset();
 
         appGeneral(_T("(*"));
         for (UINT uiN = iStartN; uiN <= iEndN; ++uiN)
@@ -313,6 +317,11 @@ INT Measurement(CParameters& params)
                 }
             }
             break;
+            case EGMJ_Meson:
+                {
+                    pMeson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                break;
             default:
                 break;
             }
@@ -409,6 +418,46 @@ INT Measurement(CParameters& params)
             _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma24);
             _CLG_EXPORT_CHIRAL(pCCHeavy, CMTKSSigma34);
 
+        }
+        break;
+        case EGMJ_Meson:
+        {
+            static const TCHAR* heads[16] =
+            {
+                "PSuu",
+                "PSud",
+                "PSdu",
+                "PSdd",
+                "VTuu",
+                "VTud",
+                "VTdu",
+                "VTdd",
+                "PVuu",
+                "PVud",
+                "PVdu",
+                "PVdd",
+                "Suu",
+                "Sud",
+                "Sdu",
+                "Sdd"
+            };
+            for (INT i = 0; i < 16; ++i)
+            {
+                TArray<TArray<DOUBLE>> onemesonconfig;
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    TArray<DOUBLE> onemeson_oneconfig;
+                    for (INT uiT = 0; uiT < _HC_Lti - 1; ++uiT)
+                    {
+                        onemeson_oneconfig.AddItem(pMeson->m_lstResults[j][i][uiT]);
+                    }
+                    onemesonconfig.AddItem(onemeson_oneconfig);
+                }
+
+                CCString sFileNameMeson;
+                sFileNameMeson.Format(_T("%s_%s_%d.csv"), sCSVSavePrefix.c_str(), heads[i], uiOmega);
+                WriteStringFileRealArray2(sFileNameMeson, onemesonconfig);
+            }
         }
         break;
         default:

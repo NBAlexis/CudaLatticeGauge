@@ -248,19 +248,19 @@ JobMeasure:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 6
-    Electric : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
-    Chemical : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
-    StartN : 1
-    EndN : 20
-    SaveFermionFile : 1
+    ListEnd : 9
+    Electric : [0, 0.1308996939, 0.2617993878, 0.3926990817, 0.5235987756, 0.6544984695, 0.7853981634, 0.9162978573, 1.047197551]
+    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    StartN : 101
+    EndN : 2000
+    SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EGMJ_Polyakov, EGMJ_Chiral
-    DistributionJob : EGMJ_Chiral
+    ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
+    DistributionJob : EGMJ_Meson
     FermionMomentum : 0
     StochasticFieldCount : 1
     CheckGaugeFixing : 0
@@ -275,7 +275,7 @@ JobMeasure:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 24, 6]
+    LatticeLength : [12, 12, 12, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -283,7 +283,7 @@ JobMeasure:
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 3
     OtherGaugeFieldCount : 1
-    MeasureListLength : 3
+    MeasureListLength : 4
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -434,6 +434,15 @@ JobMeasure:
         ShiftCenter : 0
         DebugDivation : 0
         ZSlice : 1
+
+    Measure4:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple2
+        FieldId : 2
+        FieldId2 : 3
+        ShowResult : 0
+        WallSource : 1
+        DoGaugeFixing : 0
 
 JobGaugeFixing:
 

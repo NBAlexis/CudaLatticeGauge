@@ -691,7 +691,7 @@ INT MeasurementEM(CParameters& params)
                         for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
                         {
                             TArray<DOUBLE> onemeson_oneconfig;
-                            for (INT uiT = 0; uiT < _HC_Lt - 1; ++uiT)
+                            for (INT uiT = 0; uiT < _HC_Lti - 1; ++uiT)
                             {
                                 onemeson_oneconfig.AddItem(pMeson->m_lstResults[j][i][uiT]);
                             }
