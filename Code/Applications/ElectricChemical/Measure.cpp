@@ -179,8 +179,8 @@ INT Measurement(CParameters& params)
             CCString sTxtFileName;
             if (bSubFolder)
             {
-                sFileName.Format(_T("%s\\EC%d\\%sEC_%d_%d.con"), sSubFolderName.c_str(), uiOmega, sSavePrefix.c_str(), uiOmega, uiN);
-                sTxtFileName.Format(_T("%s\\EC%d\\%sEC_%d_%d.txt"), sSubFolderName.c_str(), uiOmega, sSavePrefix.c_str(), uiOmega, uiN);
+                sFileName.Format(_T("%s/EC%d/%sEC_%d_%d.con"), sSubFolderName.c_str(), uiOmega, sSavePrefix.c_str(), uiOmega, uiN);
+                sTxtFileName.Format(_T("%s/EC%d/%sEC_%d_%d.txt"), sSubFolderName.c_str(), uiOmega, sSavePrefix.c_str(), uiOmega, uiN);
             }
             else
             {
