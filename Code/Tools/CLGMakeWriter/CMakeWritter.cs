@@ -76,6 +76,9 @@ namespace CLGMakeWriter
             sContent += "if (DEFINED CUDASM)\n";
             sContent += "    set(CUDA_CMP \"compute_${CUDASM}\")\n";
             sContent += "    set(CUDA_SM \"sm_${CUDASM}\")\n";
+            sContent += "    if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES)\n";
+            sContent += "        set (CMAKE_CUDA_ARCHITECTURES ${CUDASM})\n";
+            sContent += "    endif(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)\n";
             sContent += "endif()\n\n";
 
             sContent += "project(CLG LANGUAGES CXX CUDA)\n\n";

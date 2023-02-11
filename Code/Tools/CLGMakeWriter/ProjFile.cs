@@ -58,10 +58,10 @@ namespace CLGMakeWriter
             m_sName = sAppName;
 
             string sProjPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, 
-                string.Format("../../../../../../Applications/{0}", sAppName)
+                string.Format("../../Code/Applications/{0}", sAppName)
             });
             string sFileName = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, 
-                string.Format("../../../../../../Applications/{0}/{0}.vcxproj", sAppName)
+                string.Format("../../Code/Applications/{0}/{0}.vcxproj", sAppName)
             });
 
             m_sProjectDir = sProjPath + "/";

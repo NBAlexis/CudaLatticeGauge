@@ -1,5 +1,5 @@
 # EEC_Simulate, EEC_Measure, EEC_GaugeFixing
-WorkJob : EEC_Simulate
+WorkJob : EEC_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -247,12 +247,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    ListStart : 0
+    ListStart : 1
     ListEnd : 9
     Electric : [0, 0.1308996939, 0.2617993878, 0.3926990817, 0.5235987756, 0.6544984695, 0.7853981634, 0.9162978573, 1.047197551]
     Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     StartN : 101
-    EndN : 2000
+    EndN : 3000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
@@ -260,22 +260,22 @@ JobMeasure:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
-    DistributionJob : EGMJ_Meson
+    DistributionJob : EGMJ_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : ./BS02/BetaGradient/Nt6
+    SubFolderPrefix : G:\EC\Nt6\530\E0
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : BG05_
-    CSVSavePrefix : ./BS02/BetaGradient/Chiral/BG05_
+    SavePrefix : EC530_Electric0_
+    CSVSavePrefix : G:\EC\Measure\530_E0_Polyakov\EC530_Electric0_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 12]
+    LatticeLength : [8, 8, 24, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1

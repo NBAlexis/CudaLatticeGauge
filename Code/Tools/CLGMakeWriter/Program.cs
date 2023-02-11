@@ -13,20 +13,22 @@ namespace CLGMakeWriter
     {
         static void Main(string[] args)
         {
-            string sSolFileName = System.AppDomain.CurrentDomain.BaseDirectory + "../../../../../../CudaLatticeGauge.sln";
+            Console.WriteLine(System.AppDomain.CurrentDomain.BaseDirectory);
+            string sSolFileName = System.AppDomain.CurrentDomain.BaseDirectory + "../../Code/CudaLatticeGauge.sln";
+            Console.WriteLine(File.Exists(sSolFileName));
             //string textSol;
 
 
-            string projSolPath = Path.Combine(new[]{ System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../"});
-            string projSolFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CudaLatticeGauge.sln" });
+            string projSolPath = Path.Combine(new[]{ System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/" });
+            string projSolFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CudaLatticeGauge.sln" });
 
-            string projCLGLibPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGLib" });
-            string projCLGLibFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGLib/CLGLib.vcxproj" });
-            string projCLGLibFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGLib/CLGLib.vcxproj.filters" });
+            string projCLGLibPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGLib" });
+            string projCLGLibFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGLib/CLGLib.vcxproj" });
+            string projCLGLibFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGLib/CLGLib.vcxproj.filters" });
 
-            string projCLGTestPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest" });
-            string projCLGTestFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj" });
-            string projCLGTestFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../../../../../CLGTest/CLGTest.vcxproj.filters" });
+            string projCLGTestPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGTest" });
+            string projCLGTestFilePath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGTest/CLGTest.vcxproj" });
+            string projCLGTestFilterPath = Path.Combine(new[] { System.AppDomain.CurrentDomain.BaseDirectory, "../../Code/CLGTest/CLGTest.vcxproj.filters" });
 
             if (!File.Exists(projSolFilePath)
              || !File.Exists(projCLGLibFilePath)

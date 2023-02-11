@@ -19,7 +19,7 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/ElectricChemical.yaml"), params);
 #endif
 
-    CCString sJob = _T("EBGJ_Simulate");
+    CCString sJob = _T("EEC_Simulate");
 
     params.FetchStringValue(_T("WorkJob"), sJob);
     EElectricChemical eJob = __STRING_TO_ENUM(EElectricChemical, sJob);
