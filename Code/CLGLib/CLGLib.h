@@ -285,7 +285,6 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureAction.h"
 #include "Measurement/CMeasureMesonCorrelator.h"
 #include "Measurement/CMeasureAMomentumJG.h"
-#include "Measurement/CMeasureAMomentumJF.h"
 #include "Measurement/CMeasureChargeAndCurrents.h"
 #include "Measurement/CMeasureTopologicChargeXY.h"
 #include "Measurement/CMeasurePolyakovXY.h"

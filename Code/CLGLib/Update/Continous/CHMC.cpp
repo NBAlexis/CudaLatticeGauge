@@ -111,22 +111,22 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         if (m_bMetropolis || m_bTestHDiff)
         {
 #if !_CLG_DOUBLEFLOAT
-            DOUBLE fDiff = fEnergy - fEnergyNew;
+            m_fLastHDiff = fEnergy - fEnergyNew;
 #else
-            Real fDiff = fEnergy - fEnergyNew;
+            m_fLastHDiff = fEnergy - fEnergyNew;
 #endif
             if (m_bTestHDiff)
             {
-                m_lstHDiff.AddItem(fDiff);
+                m_lstHDiff.AddItem(m_fLastHDiff);
                 m_lstH.AddItem(fEnergy);
             }
 
             if (!m_bTestHDiff)
             {
 #if !_CLG_DOUBLEFLOAT
-                diff_H = _hostexpd(fDiff);  // Delta H (SA)
+                diff_H = _hostexpd(m_fLastHDiff);  // Delta H (SA)
 #else
-                diff_H = _hostexp(fDiff);  // Delta H (SA)
+                diff_H = _hostexp(m_fLastHDiff);  // Delta H (SA)
 #endif
                 rand = GetRandomReal();
             }
@@ -134,12 +134,12 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             BYTE byUpdateChange = 0;
             if (m_bAdaptiveUpdate)
             {
-                if (fDiff < m_fGrowStep && m_pIntegrator->GetStepCount() < m_uiMaxStep)
+                if (m_fLastHDiff < m_fGrowStep && m_pIntegrator->GetStepCount() < m_uiMaxStep)
                 {
                     byUpdateChange = 1;
                     m_pIntegrator->ChangeStepCount(TRUE);
                 }
-                else if (appAbs(fDiff) < m_fReduceStep && m_pIntegrator->GetStepCount() > m_uiMinStep)
+                else if (appAbs(m_fLastHDiff) < m_fReduceStep && m_pIntegrator->GetStepCount() > m_uiMinStep)
                 {
                     byUpdateChange = 2;
                     m_pIntegrator->ChangeStepCount(FALSE);
@@ -149,7 +149,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             //Metropolis
             appGeneral(_T(" HMC: step = %d, H_dff = %f (%f - %f)%s\n"),
                 i + 1,
-                fDiff,
+                m_fLastHDiff,
                 fEnergy,
                 fEnergyNew,
                 0 == byUpdateChange ? _T("") : (1 == byUpdateChange ? _T(", step++") : _T(", step--"))

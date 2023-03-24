@@ -179,6 +179,11 @@ static __device__ __inline__ deviceSU3 _deviceXXT_MM(
 */
 
 //11 sec
+/**
+* byMu = bXorY ? 0 : 1
+* so that, when bXorY = 1, it is partial_X
+*          when bXorY = 0, it is partial_Y
+*/
 static __device__ __inline__ deviceSU3 _deviceVXXTauOptimized(
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sStartSite, BYTE byFieldId,

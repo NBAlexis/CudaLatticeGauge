@@ -344,7 +344,7 @@ _kernelAddChairTermSU3_Term12_Shifted_NoOmega(
 
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5)) * fOmega;
+    const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5));
 
     //===============
     //+x Omega V412
@@ -431,7 +431,7 @@ _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq(
     const DOUBLE fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5)) * fOmegaSq;
+    const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5));
 
     //===============
     //+Omega^2 xy V142

@@ -16,6 +16,14 @@ __CLGIMPLEMENT_CLASS(CMeasureAngularMomentumKS)
 
 #pragma region kernels
 
+/**
+* XorY is the coefficient
+* YorX is the shift
+* XorY = 0, YorX = 1, is the x Dy term
+* XorY = 1, YorX = 0, is the y Dx term
+* 
+* Note that, bXorY is whether x or y.
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionKS_PR_XYTermCopy(
     const deviceSU3Vector* __restrict__ pDeviceData,
@@ -416,7 +424,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
         for (UINT i = 0; i < EAngularMeasureMax; ++i)
         {
             _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
-            m_cTmpSum[i] = _zeroc;
+            //m_cTmpSum[i] = _zeroc;
 
             if (m_bMeasureZSlice)
             {
@@ -425,7 +433,8 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
         }
     }
 
-    const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    //The "-1" comes from <qbar M q> = -tr[M D^{-1}]
+    //const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     const CFieldFermionKSSU3 * pF1W = dynamic_cast<const CFieldFermionKSSU3*>(pZ4);
     const CFieldFermionKSSU3* pF2W = dynamic_cast<const CFieldFermionKSSU3*>(pInverseZ4);
     CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
@@ -467,11 +476,11 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             );
 
 #if !_CLG_DOUBLEFLOAT
-        const CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));
+        //const CLGComplex thisSum = _cToFloat(appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer));
 #else
-        const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+        //const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 #endif
-        m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
+        //m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
     }
 
     pAfterApplied->Return();
@@ -481,6 +490,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
     if (bEnd)
     {
         TransformFromXYDataToRData_C(
+            TRUE,
             m_bShiftCenter,
             m_uiMaxR,
             m_uiEdge,
@@ -501,7 +511,8 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
 
         if (m_bMeasureZSlice)
         {
-            const Real fDemon = F(1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
+            // Z-Slice is not used currently
+            const Real fDemon = F(-1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
             for (INT i = 0; i < static_cast<INT>(EAngularMeasureMax); ++i)
             {
                 checkCudaErrors(cudaMemcpy(m_pHostZBuffer, m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz, cudaMemcpyDeviceToHost));

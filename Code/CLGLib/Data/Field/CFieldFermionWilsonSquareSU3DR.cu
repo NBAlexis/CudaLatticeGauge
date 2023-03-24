@@ -332,6 +332,11 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
     pResultData[uiSiteIndex] = term3;
 }
 
+/**
+* Note that, at last it is substracted from the result-data
+* so it is 
+* -kappa[(1-GA)T_{x+} + (1 + GA)T_{x-} - y O (T_{x+} - T_{x-})]
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
@@ -400,6 +405,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     //U(x,mu) phi(x+ mu)
     deviceWilsonVectorSU3 u_phi_x_p_m = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     
+    // -yT_{x+}
     if (x_p_mu_Fermion.NeedToOpposite())
     {
         //printf("OppositeX x=%d y=%d z=%d t=%d\n", static_cast<INT>(sSite4.x), static_cast<INT>(sSite4.y), static_cast<INT>(sSite4.z), static_cast<INT>(sSite4.w));
@@ -432,6 +438,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     //U^{dagger}(x-mu) phi(x-mu)
     deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
 
+    //+yT_{x-}
     if (x_m_mu_Fermion.NeedToOpposite())
     {
         result.Sub(u_dagger_phi_x_m_m);
@@ -478,6 +485,9 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     pResultData[uiSiteIndex].Sub(result);
 }
 
+/**
+* -kappa[(1-GA)T_{y+} + (1 + GA)T_{y-} + x O (T_{y+} - T_{y-})]
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
@@ -564,6 +574,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     }
     else
     {
+        //(1 - GA + x GA4)
         result.Add(u_phi_x_p_m);
         result.Sub(gammaMu.MulWilsonC(u_phi_x_p_m));
         u_phi_x_p_m.MulReal(fXOmega);
@@ -589,6 +600,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     }
     else
     {
+        //(1 + GA - x GA4)
         result.Add(u_dagger_phi_x_m_m);
         result.Add(gammaMu.MulWilsonC(u_dagger_phi_x_m_m));
         u_dagger_phi_x_m_m.MulReal(fXOmega);
@@ -730,6 +742,13 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     pResultData[uiSiteIndex].Sub(result);
 }
 
+/**
+* Note that [GA4, S12] = 0
+* 
+*  it is -kappa  [(cos(O/2) + i sin(O/2) s12E)(1-GA4) T_+ + (cos(O/2) - i sin(O/2) s12E) (1+GA4)T_-]
+*  so it is -kappa [ (1-GA4)exp(+iO/2 s12E) T_+ + (1+GA4)exp(-iO/2 s12E) T_-]
+*  so it is -kappa [ (1-GA4)exp(-iO/2 s12) T_+ + (1+GA4)exp(+iO/2 s12) T_-]
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     const deviceWilsonVectorSU3* __restrict__ pDeviceData,
@@ -815,7 +834,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     }
     else
     {
-        //-k(cos_m_1 - i sin sigma12)(1-gamma4)
+        //-k(cos_m_1 + i sin sigma12)(1-gamma4)
         result.Add(cospart);
     }
 

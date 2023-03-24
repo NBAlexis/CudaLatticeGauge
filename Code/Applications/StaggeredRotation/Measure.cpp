@@ -353,13 +353,13 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
-                        pFALight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Light,
-                            pF1Light,
-                            0 == i,
-                            iFieldCount == i + 1);
+                        //pFALight->OnConfigurationAcceptedZ4(
+                        //    appGetLattice()->m_pGaugeField,
+                        //    NULL,
+                        //    pF2Light,
+                        //    pF1Light,
+                        //    0 == i,
+                        //    iFieldCount == i + 1);
 
                         if (bZ4)
                         {
@@ -402,13 +402,13 @@ INT Measurement(CParameters& params)
                             0 == i,
                             iFieldCount == i + 1);
 
-                        pFAHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
-                            NULL,
-                            pF2Heavy,
-                            pF1Heavy,
-                            0 == i,
-                            iFieldCount == i + 1);
+                        //pFAHeavy->OnConfigurationAcceptedZ4(
+                        //    appGetLattice()->m_pGaugeField,
+                        //    NULL,
+                        //    pF2Heavy,
+                        //    pF1Heavy,
+                        //    0 == i,
+                        //    iFieldCount == i + 1);
                     }
 
                     if (bMeasureCCS)

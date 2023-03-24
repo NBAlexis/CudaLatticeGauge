@@ -3,9 +3,10 @@
 // 
 // DESCRIPTION:
 // NOTE:
-//
+//          2 is added because of Nf=2
+// 
 // JL :     Ji decomposition orbit angular momentum, (1/i) psidagger r x D psi
-//             It is 2 kappa gamma4 (x(Ty^+-Ty^-) - y(Tx^+-Tx^-)).
+//             It is 2 kappa gamma4 (y(T_{x+}-T_{x-}) - x(T_{y+}-T_{y-})).
 //
 // JS :     Ji decomposition spin angular momentum, (1/2) psidagger Sigma psi
 //             It is -2 kappa { 0.5 i sigma12 [(1 - gamma4) T+ - (1 + gamma4) T-] }
@@ -14,6 +15,8 @@
 // JLJM :   Jaffe-Manohar decomposition orbit angular momentum, (1/i) psidagger r x partial psi, not gauge inv.
 //          at Coulomb gauge, JLJM = JLPure
 // JPot :   Wak decomposition, Lpot g x (psidagger r x Aphys psi), Note in our definition, g A -> A.
+// 
+// Note that, psi is scaled, so a further 2 kappa must be divided after this measurement.
 //
 // REVISION:
 //  [07/10/2019 nbale]

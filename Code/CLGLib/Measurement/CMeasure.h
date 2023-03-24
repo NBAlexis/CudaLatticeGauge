@@ -260,8 +260,13 @@ public:
     /**
      * TransformFromXYDataToRData_C and TransformFromXYDataToRData_R
      * is for Stochastic measurements
+     * 
+     * Sometimes, we need to set bMinus = TRUE, because
+     * <qbar M q> = - tr[MD^{-1}]
+     * but tr[MD^{-1}] is measured
      */
     static void TransformFromXYDataToRData_C(
+        UBOOL bMinus,
         UBOOL bShiftCenter,
         UINT uiMaxR,
         UINT uiEdgeR,

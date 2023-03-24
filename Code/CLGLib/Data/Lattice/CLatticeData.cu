@@ -302,6 +302,8 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("Beta : %f\n"), CCommonData::m_fBeta);
     sRet = sRet + sTab + sInfos;
+    sInfos.Format(_T("H diff : %f\n"), m_pUpdator->GetLastHDiff());
+    sRet = sRet + sTab + sInfos;
 
     for (INT i = 0; i < kMaxFieldCount; ++i)
     {

@@ -88,7 +88,7 @@ protected:
     CLGComplex* m_pDeviceZBuffer[ChiralKSMax];
     CLGComplex* m_pHostXYBuffer;
     CLGComplex* m_pHostZBuffer;
-    CLGComplex m_cTmpSum[ChiralKSMax];
+    //CLGComplex m_cTmpSum[ChiralKSMax];
 
     UINT* m_pDistributionR;
     CLGComplex* m_pDistribution;

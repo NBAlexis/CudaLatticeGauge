@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing, ERJ_RotationTest}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -13,17 +13,17 @@ JobThermal:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 0
+    BeforeEquvibStep : 10
     EquvibSkip : 0
-    EquvibStep : 3000
-    SaveStartIndex : 5001
-    OmegaSep : 20
+    EquvibStep : 300
+    SaveStartIndex : 0
+    OmegaSep : 8
     OmegaStart : 0
-    MaxOmega : 0.14
+    MaxOmega : 0.128
     MinNt : 3
     MaxNt : 3
-    SavePrefix : ./47516/NC47516_
-    Additive : 1
+    SavePrefix : ./NC49010_
+    Additive : 0
     ExponentialPrecision : 0
 
     # 53551575Nt4 Omega60 
@@ -39,6 +39,7 @@ JobThermal:
     Dir : 4
     LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
@@ -103,7 +104,7 @@ JobThermal:
 
         FieldName : CFieldFermionWilsonSquareSU3DR
         FieldInitialType : EFIT_RandomGaussian
-        Hopping : 0.16
+        Hopping : 0.1
         FieldId : 2
         PoolNumber : 2
         Period : [0, 0, 1, -1]
@@ -118,7 +119,7 @@ JobThermal:
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        Beta : 4.75
+        Beta : 4.9
         Omega : 0.0
 
     Action2:

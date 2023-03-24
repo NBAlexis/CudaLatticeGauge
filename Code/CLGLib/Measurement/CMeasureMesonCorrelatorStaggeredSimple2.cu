@@ -51,7 +51,7 @@ _kernelPickPropagatorsSimple2(
             #pragma unroll
             for (BYTE byC2 = 0; byC2 < 3; ++byC2)
             {
-                sumovercolor = _cuCaddf(sumovercolor, cuCmulf(pf1[byC1][uiSiteIndex].m_ve[byC2], _cuConjf(pf2[byC1][uiSiteIndex].m_ve[byC2])));
+                sumovercolor = _cuCaddf(sumovercolor, _cuCmulf(pf1[byC1][uiSiteIndex].m_ve[byC2], _cuConjf(pf2[byC1][uiSiteIndex].m_ve[byC2])));
             }
         }
 
@@ -108,7 +108,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwne
 #if !_CLG_DOUBLEFLOAT
         m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1) * 4);
 #else
-        m_pResPropogators = (Real*)malloc(sizeof(Real) * _kMesonCorrelatorTypeSimple * (_HC_Lt - 1) * 4);
+        m_pResPropogators = (Real*)malloc(sizeof(Real) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1) * 4);
 #endif
     }
     else
@@ -116,7 +116,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwne
 #if !_CLG_DOUBLEFLOAT
         m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
 #else
-        m_pResPropogators = (Real*)malloc(sizeof(Real) * _kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
+        m_pResPropogators = (Real*)malloc(sizeof(Real) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
 #endif        
     }
 

@@ -1,5 +1,5 @@
-# ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing
-StaggeredSpectrumJob : ESSJ_Measure
+# ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing, ESSJ_SimulateQuenched
+StaggeredSpectrumJob : ESSJ_SimulateQuenched
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -316,7 +316,7 @@ JobMeasure:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     ActionListLength : 2
-    FermionFieldCount : 1
+    FermionFieldCount : 5
     MeasureListLength : 6
     CacheStaple : 1
     DoSmearing : 1
@@ -724,3 +724,75 @@ JobGaugeFixing:
         CheckErrorStep : 200
         MaxIterate : 20000
 
+
+JobSimulateQuenched:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    BeforeEquvibStep : 200
+    EquvibStep : 1000
+    SaveStartIndex : 0
+
+    SavePrefix : ./Q570_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 108]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 1
+    FermionFieldCount : 0
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+
+        DebugForce : 0
+        # InnerLeapfrog : 1
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 30
+        # NestedStep : 20
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        # FieldInitialType : EFIT_ReadFromFile
+        # GaugeFileType : EFFT_CLGBin
+        # GaugeFileName : ./P4980204_Matching_122.con
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        CloverEnergy : 0
+        Beta : 5.7
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

@@ -577,7 +577,12 @@ void CMeasure::XYDataToRdistri_C(
     _kernelXY_To_RAverage_C << <block3, threads3 >> > (count, result);
 }
 
+/**
+* Sometimes, we need to set bMinus = TRUE, because
+* <qbar M q> = - tr[MD^{-1}]
+*/
 void CMeasure::TransformFromXYDataToRData_C(
+    UBOOL bMinus,
     UBOOL bShiftCenter,
     UINT uiMaxR,
     UINT uiEdgeR,
@@ -615,7 +620,7 @@ void CMeasure::TransformFromXYDataToRData_C(
             uiConfig,
             uiMaxR,
             uiEdgeR,
-            F(1.0) / static_cast<Real>(uiFieldCount * _HC_Lz * _HC_Lt), 
+            (bMinus ? F(-1.0) : F(1.0)) / static_cast<Real>(uiFieldCount * _HC_Lz * _HC_Lt),
             0 == i
         );
     }

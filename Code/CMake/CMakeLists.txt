@@ -116,7 +116,6 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/GaugeFixing/CGaugeFixingRandom.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasure.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumStochastic.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKSREM.h
@@ -244,7 +243,6 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexData.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAMomentumJF.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensateKS.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureConnectedChiralSusceptibilityKS.cu
@@ -312,6 +310,7 @@ add_library(CLGLib STATIC
 # As this is a public compile feature anything that links to 
 # CLGLib will also build with -std=c++14
 target_compile_features(CLGLib PUBLIC cxx_std_14)
+set_property(TARGET CLGLib PROPERTY CXX_STANDARD 14)
  
 # We need to explicitly state that we need all CUDA files in the 
 # CLGLib library to be built with -dc as the member functions 

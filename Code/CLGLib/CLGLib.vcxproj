@@ -93,7 +93,6 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h" />
     <ClInclude Include="Measurement\CMeasure.h" />
     <ClInclude Include="Measurement\CMeasureAction.h" />
-    <ClInclude Include="Measurement\CMeasureAMomentumJF.h" />
     <ClInclude Include="Measurement\CMeasureAMomentumStochastic.h" />
     <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h" />
     <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h" />
@@ -269,7 +268,6 @@
     <ClCompile Include="Platform\CFile.cpp" />
     <ClCompile Include="Tools\CYAMLParser.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverBiCGstab.cpp" />
-    <CudaCompile Include="Measurement\CMeasureAMomentumJF.cu" />
     <CudaCompile Include="Measurement\CMeasureChargeAndCurrents.cu" />
     <CudaCompile Include="Measurement\CMeasureChiralCondensateKS.cu" />
     <CudaCompile Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.cu" />

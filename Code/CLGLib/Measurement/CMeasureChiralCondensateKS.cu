@@ -224,7 +224,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         for (UINT i = 0; i < ChiralKSMax; ++i)
         {
             _ZeroXYPlaneC(m_pDeviceXYBuffer[i]);
-            m_cTmpSum[i] = _zeroc;
+            //m_cTmpSum[i] = _zeroc;
             if (m_bDebugDivation)
             {
                 m_lstDebugData[i].RemoveAll();
@@ -237,7 +237,8 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         }
     }
 
-    const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    // oneOuiVolume is only used in debug deviation, "-1" is for <qbar M q> = -tr[MD^{-1}]
+    const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     const CFieldFermionKS * pF1W = dynamic_cast<const CFieldFermionKS*>(pZ4);
     const CFieldFermionKS* pF2W = dynamic_cast<const CFieldFermionKS*>(pInverseZ4);
     CFieldFermionKS* pAfterApplied = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
@@ -360,7 +361,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 #else
         const CLGComplex thisSum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 #endif
-        m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
+        //m_cTmpSum[i] = _cuCaddf(m_cTmpSum[i], cuCmulf_cr(thisSum, oneOuiVolume));
         if (m_bDebugDivation)
         {
             m_lstDebugData[i].AddItem(cuCmulf_cr(thisSum, oneOuiVolume));
@@ -387,6 +388,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         }
 
         TransformFromXYDataToRData_C(
+            TRUE,
             m_bShiftCenter,
             m_uiMaxR,
             m_uiEdge,
@@ -407,7 +409,8 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
 
         if (m_bMeasureZSlice)
         {
-            const Real fDemon = F(1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
+            // "-1" comes from <qbar M q> = -tr[M D^{-1}]
+            const Real fDemon = F(-1.0) / static_cast<Real> (m_uiFieldCount * _HC_Lx * _HC_Ly * _HC_Lt);
             for (INT i = 0; i < static_cast<INT>(ChiralKSMax); ++i)
             {
                 checkCudaErrors(cudaMemcpy(m_pHostZBuffer, m_pDeviceZBuffer[i], sizeof(CLGComplex) * _HC_Lz, cudaMemcpyDeviceToHost));

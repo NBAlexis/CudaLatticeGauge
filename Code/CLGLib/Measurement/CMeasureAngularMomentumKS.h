@@ -3,6 +3,10 @@
 // 
 // DESCRIPTION:
 // NOTE: 
+// 
+// JL = qbar GA4 (y Dx - x Dy)q
+// JS = qbar (i/2) GA4 S12E q
+// 
 //
 // REVISION:
 //  [01/17/2021 nbale]
@@ -74,7 +78,7 @@ protected:
     CLGComplex* m_pDeviceZBuffer[EAngularMeasureMax];
     CLGComplex* m_pHostXYBuffer;
     CLGComplex* m_pHostZBuffer;
-    CLGComplex m_cTmpSum[EAngularMeasureMax];
+    //CLGComplex m_cTmpSum[EAngularMeasureMax];
 
     UINT* m_pDistributionR;
     CLGComplex* m_pDistribution;

@@ -17,10 +17,9 @@ __CLGIMPLEMENT_CLASS(CMeasureAMomentumStochastic)
 #pragma region kernels
 
 /**
- * Here JL is using y(T^+ - T^-) - x(T^+ - T^-)
+ * Here JL is using kappa [y(T^+ - T^-) - x(T^+ - T^-)]
  * Note that we are using fmY = -static_cast<Real>(sSite4.y - sCenter.y) = -y
- * By definition this is in fact -JL
- *
+ * it is jl.sub(-y T+) so it is y T+
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJL(
@@ -42,10 +41,6 @@ _kernelDotAndGatherXYAMomentumJL(
     Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
-
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma region JL
-#endif
 
     //idir = mu
     #pragma unroll
@@ -183,10 +178,6 @@ _kernelDotAndGatherXYAMomentumJL(
             }
         }
     }
-
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma endregion
-#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(jl);
 
@@ -276,15 +267,13 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         {
             if (0 == idir)
             {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                //+ k y Omega gamma4 U(x,mu) phi(x+mu)
                 u_phi_x_p_m.MulReal(fmY);
                 jl.Sub(u_phi_x_p_m);
             }
             else if (1 == idir)
             {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                //- k x Omega gamma4 U(x,mu) phi(x+mu)
                 u_phi_x_p_m.MulReal(fmX);
                 jl.Add(u_phi_x_p_m);
             }
@@ -313,15 +302,13 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         {
             if (0 == idir)
             {
-                //- k y Omega x_p_m
-                //+ k y Omega gamma4 U(x,mu) phi(x+ mu)
+                //- k y Omega gamma4 U(x,-mu) phi(x-mu)
                 u_dagger_phi_x_m_m.MulReal(fmY);
                 jl.Add(u_dagger_phi_x_m_m);
             }
             else if (1 == idir)
             {
-                //+ k x Omega x_p_m
-                //- k x Omega gamma4 U(x,mu) phi(x+ mu)
+                //+ k x Omega gamma4 U(x,-mu) phi(x-mu)
                 u_dagger_phi_x_m_m.MulReal(fmX);
                 jl.Sub(u_dagger_phi_x_m_m);
             }
@@ -339,7 +326,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
 
 /**
  * Simplified version
- * Not support naive anymore
+ * Only support naive
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJPure(
@@ -630,18 +617,10 @@ _kernelDotAndGatherXYAMomentumJS(
 
     UINT uiXY = threadIdx.x + blockIdx.x * blockDim.x;
 
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma region JS
-#endif
-
     const deviceWilsonVectorSU3 right_element(pRight[uiSiteIndex]);
     deviceWilsonVectorSU3 js(__chiralGamma[SIGMA12E].MulWilsonC(right_element));
     js = __chiralGamma[GAMMA4].MulWilsonC(js);
     js.MulComp(_make_cuComplex(F(0.0), F(-1.0)));
-
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma endregion
-#endif
 
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(js);
 
@@ -649,12 +628,41 @@ _kernelDotAndGatherXYAMomentumJS(
 }
 
 /**
- * JS = (gamma4-1) T+  +  (1+gamma4) T-
- * Note that, the T+ term multiply 0.5, it is in fact -0.5, that is -0.5(1-gamma4)T+
- *
- * 0.5 i sigma12 [(1 - gamma4) T+ - (1 + gamma4) T-]
- *
- * Still need a "2 kappa"
+ * JS = -kappa i/2 s12E [(1-GA4)T_+  -  (1+GA4)T_-]
+ * 
+ * From the action point of view
+ * 
+ * -kappa  [(cos(O/2) + i sin(O/2) s12E) (1-GA4) T_+ + (cos(O/2) - i sin(O/2) s12E) (1+GA4) T_-]
+ * so it is:
+ * -kappa  [(1/2)(-sin(O/2) + i sin(O/2) s12E) (1-GA4)T_+ + (-sin(O/2) - i cos(O/2) s12E) (1+GA4)T_-]
+ * -kappa  [(1/2)(-sin(O/2) + i cos(O/2) s12E) (1-GA4)T_+ + (-sin(O/2) - i cos(O/2) s12E) (1+GA4)T_-]
+ * -kappa  [(1/2)( + i  s12E) (1-GA4)T_+ + ( - i  s12E) (1+GA4)T_-]
+ * -kappa  (1/2) i s12E [(1-GA4)T_+ - (1+GA4)T_-]
+ * 
+ * or it is:
+ * -kappa [exp(iO/2 s12E)(1-GA4)T_+  +  exp(-iO/2 s12E)(1+GA4)T_-]
+ * -kappa [i/2 s12E(1-GA4)T_+  -  i/2 s12E(1+GA4)T_-]
+ * -kappa i/2 s12E [(1-GA4)T_+  -  (1+GA4)T_-]
+ * 
+ * 
+ * for distritization point of view
+ * it is (i/2) qbar GA4 S12E q
+ * it is (i/2) qbar GA4 S12E q/m
+ * = (i/2) qbar GA4 S12E q/(m+4/a)
+ * using kappa = 1/(2am + 8), 2a kappa = 1/(m+4/a)
+ * so it is 
+ * a kappa i qbar GA4 S12E q
+ * it is kappa i qbar GA4 S12E (q+ + q-) / 2
+ * = kappa i qbar GA4 S12E (q+ + q-) / 2 - kappa i qbar S12E (q+ - q-) / 2
+ * = kappa i qbar S12E ( (GA4-1)q+ + (GA4+1)q-) / 2
+ * = -i/2 kappa qbar S12E ( (1-GA4)q+ - (1+GA4)q-) 
+ * = -kappa i/2 s12E [(1-GA4)T_+ - (1+GA4)T_-]
+ * 
+ * Note that:
+ * when x = 0 + b i
+ * Im[x] = b = -i x
+ * so, if we measure kappa 1/2 s12E [(1-GA4)T_+ - (1+GA4)T_-], it is a pure imaginary term
+ * Im[kappa 1/2 s12E [(1-GA4)T_+ - (1+GA4)T_-]] - -kappa i/2 s12E [(1-GA4)T_+ - (1+GA4)T_-]
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDotAndGatherXYAMomentumJS_Exp(
@@ -673,10 +681,6 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
     const gammaMatrix& sigma12 = __chiralGamma[SIGMA12E];
-
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma region JS
-#endif
 
     //idir = mu
     //=========================
@@ -706,8 +710,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
 
     //hopping terms
 
-    //U(x,mu) phi(x+ mu)
-    //U(x,mu) phi(x+ mu)
+    //(1-GA4)U(x,mu) phi(x+mu)
     deviceWilsonVectorSU3 js = x_Gauge_element.MulWilsonVector(x_p_mu_Fermion_element);
     js.Sub(gamma4.MulWilsonC(js));
     //only sin part
@@ -718,6 +721,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     }
     //js.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? F(0.5) : -F(0.5)));
 
+    //(1+GA4)U(x,-mu) phi(x-mu)
     deviceWilsonVectorSU3 u_dagger_phi_x_m_m = x_m_mu_Gauge_element.MulWilsonVector(x_m_mu_Fermion_element);
     u_dagger_phi_x_m_m.Add(gamma4.MulWilsonC(u_dagger_phi_x_m_m));
     //simplified, to multiply 0.5 at last
@@ -727,17 +731,16 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     }
     //u_dagger_phi_x_m_m.MulComp(_make_cuComplex(F(0.0), x_m_mu_Fermion.NeedToOpposite() ? -F(0.5) : F(0.5)));
 
+    //s12E ((1-GA4)T+ - (1+GA4)T-)
     js.Sub(u_dagger_phi_x_m_m); //here was add which is wrong, see D operator this is Add, but the sin bring a sign
     js = sigma12.MulWilsonC(js);
 
-#if _CLG_WIN && !defined(__CUDACC__)
-#pragma endregion
-#endif
-
     CLGComplex cDotRes = pLeft[uiSiteIndex].ConjugateDotC(js);
 
-    //0.5 i, so is -cDotRes.y
-    atomicAdd(&resultXYPlaneJS[uiXY], -cDotRes.y * F(0.5));
+    //0.5 i, so is cDotRes.y
+    // 0.5 Im[s12E ((1-GA4)T+ - (1+GA4)T-)]
+    // It was - 0.5 i s12E ((1-GA4)T+ - (1+GA4)T-)
+    atomicAdd(&resultXYPlaneJS[uiXY], cDotRes.y * F(0.5));
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -1045,7 +1048,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
     if (bEnd)
     {
-        //2.0 is for the flavour
+        //2.0 is for the flavour, "-1" is because bar{q} M q = -tr[M D^{-1}]
         const Real fDivider = -F(2.0) * CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
 
         XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, m_byFieldId);

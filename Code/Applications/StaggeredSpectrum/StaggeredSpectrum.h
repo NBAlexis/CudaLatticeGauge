@@ -14,6 +14,7 @@ __DEFINE_ENUM(EStaggeredSpectrumJob,
     ESSJ_Simulate,
     ESSJ_GaugeFixing,
     ESSJ_Measure,
+    ESSJ_SimulateQuenched,
     )
 
 __DEFINE_ENUM(EStaggeredSpectrumMeasure,

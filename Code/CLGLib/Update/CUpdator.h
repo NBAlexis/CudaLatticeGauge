@@ -38,6 +38,7 @@ public:
         , m_uiMaxStep(100)
         , m_fGrowStep(F(-0.3))
         , m_fReduceStep(F(0.03))
+        , m_fLastHDiff(0.0)
     {
     }
 
@@ -136,6 +137,11 @@ public:
     }
 #endif
 
+    Real GetLastHDiff() const
+    {
+        return static_cast<Real>(m_fLastHDiff);
+    }
+
     void SetSaveConfiguration(UBOOL bSave, const CCString& sPrefix)
     {
         m_bSaveConfigurations = bSave;
@@ -158,9 +164,11 @@ protected:
 #if !_CLG_DOUBLEFLOAT
     TArray<DOUBLE> m_lstHDiff;
     TArray<DOUBLE> m_lstH;
+    DOUBLE m_fLastHDiff;
 #else
     TArray<Real> m_lstHDiff;
     TArray<Real> m_lstH;
+    Real m_fLastHDiff;
 #endif
 };
 

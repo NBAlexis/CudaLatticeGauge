@@ -338,12 +338,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 5.7
-    OmegaRange : 0.016
-    StartOmega : 1
+    GaugeBate : 4.86
+    OmegaRange : 0.128
+    StartOmega : 0
     EndOmega : 8
     StartN : 101
-    EndN : 50000
+    EndN : 200
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -357,7 +357,7 @@ JobMeasure:
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat, EDJKS_Taylor
-    DistributionJob : EDJKS_Polyakov
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -365,16 +365,16 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : H:\57QRS
+    SubFolderPrefix : G:\SRFloat\486295059\GF
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : 57QR_
-    CSVSavePrefix : ./57QR_
+    SavePrefix : GFSRF486295059_
+    CSVSavePrefix : ./SRF486295059_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 4]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -407,7 +407,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.235
+        Mass : 0.295
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
@@ -438,7 +438,7 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.047
+        Mass : 0.059
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1

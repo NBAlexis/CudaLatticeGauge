@@ -45,6 +45,12 @@ int main(int argc, char * argv[])
         res = StaggeredGaugeFixing(workingParam2);
     }
     break;
+    case ESSJ_SimulateQuenched:
+    {
+        CParameters workingParam1 = params.GetParameter(_T("JobSimulateQuenched"));
+        res = SimulateStaggered(workingParam1);
+    }
+    break;
     default:
 
     break;
