@@ -338,12 +338,13 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
+    FreeFermion : 1
     GaugeBate : 4.86
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
     StartN : 101
-    EndN : 200
+    EndN : 110
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -370,11 +371,11 @@ JobMeasure:
     LoadType : EFFT_CLGBinFloat
 
     SavePrefix : GFSRF486295059_
-    CSVSavePrefix : ./SRF486295059_
+    CSVSavePrefix : ./FSRF486295059_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 8]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare

@@ -338,6 +338,10 @@ INT MeasurePolyakovDist(CParameters& params)
     params.FetchValueINT(_T("SubFolder"), iVaule);
     UBOOL bSubFolder = 0 != iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("FreeFermion"), iVaule);
+    const UBOOL bFreeFermion = 0 != iVaule;
+
     CCString sValue = _T("EDJ_Polyakov");
     params.FetchStringValue(_T("DistributionJob"), sValue);
     EDistributionJob eJob = __STRING_TO_ENUM(EDistributionJob, sValue);
@@ -445,7 +449,14 @@ INT MeasurePolyakovDist(CParameters& params)
                 break;
             }
 
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+            if (bFreeFermion)
+            {
+                appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+            }
+            else
+            {
+                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+            }
             
             switch (eJob)
             {

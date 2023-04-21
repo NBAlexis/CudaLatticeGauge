@@ -116,6 +116,7 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
 
 /**
  * To calculate spin, there is no site out of lattice
+ * we use E_i = -{U_{4i}}_{TA}
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGaugeSpin(
@@ -130,7 +131,7 @@ _kernelCalculateGaugeSpin(
     
     if (!site.IsDirichlet())
     {
-        //Note i A phys is i x A phys
+        //Note iAphys is ia x A_phys
         UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
         UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
         deviceSU3 beforeTrace = pE[uiLinkX].MulC(piAphys[uiLinkY]);
@@ -317,7 +318,7 @@ _kernelCalculateJGPot(
 }
 
 /**
- *
+ * nablaE = { -sum_i U_{4,i}U_{4,-i} }_{TA}
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGPotProjectivePlane(
@@ -819,7 +820,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 fBetaOverN);
 
             _AverageXYPlane(m_pDeviceDataBuffer);
-            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
 
             for (UINT i = 1; i < _HC_Ly; ++i)
@@ -873,7 +874,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             }
 
             _AverageXYPlane(m_pDeviceDataBuffer);
-            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real)* _HC_Lx* _HC_Ly, cudaMemcpyDeviceToHost));
+            checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
 
             for (UINT i = 1; i < _HC_Ly; ++i)

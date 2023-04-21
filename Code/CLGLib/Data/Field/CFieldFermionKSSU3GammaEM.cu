@@ -345,15 +345,15 @@ _kernelKSApplyGamma1234EM(
     {
         fGammCoefficient = -fGammCoefficient;
     }
-    result.MulComp(_make_cuComplex(F(0.0), fGammCoefficient));
+    result.MulComp(_make_cuComplex(F(0.0), fGammCoefficient * eta_mu));
 
     switch (eCoeff)
     {
     case EOCT_Real:
-        result.MulReal(fCoeff * eta_mu);
+        result.MulReal(fCoeff);
         break;
     case EOCT_Complex:
-        result.MulComp(cuCmulf_cr(cCoeff, eta_mu));
+        result.MulComp(cCoeff);
         break;
     }
 

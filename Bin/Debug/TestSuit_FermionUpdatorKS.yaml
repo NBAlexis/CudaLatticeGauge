@@ -1309,7 +1309,7 @@ TestFermionUpdatorKSGamma:
         FieldId : 2
         PoolNumber : 15
 
-        EachSiteEta : 1
+        # EachSiteEta : 1
 
         Gamma1 : 0.1
         Gamma2 : 0.2
@@ -1320,7 +1320,7 @@ TestFermionUpdatorKSGamma:
         Gamma25 : 0.25
         Gamma35 : 0.35
         Gamma45 : 0.45
-        # Sigma12 : 0.12
+        Sigma12 : 0.12
         Sigma13 : 0.13
         Sigma14 : 0.14
         Sigma23 : 0.23
@@ -1355,7 +1355,7 @@ TestFermionUpdatorKSGamma:
    
         ActionName : CActionGaugePlaquette
         Beta : 3.0
-        CloverEnergy : 1
+        # CloverEnergy : 1
 
     Action2:
 
@@ -1525,7 +1525,7 @@ TestFermionUpdatorKSGammaEM:
         FieldId : 2
         PoolNumber : 15
 
-        EachSiteEta : 1
+        # EachSiteEta : 1
 
         Gamma1 : 0.1
         Gamma2 : 0.2
@@ -1536,7 +1536,7 @@ TestFermionUpdatorKSGammaEM:
         Gamma25 : 0.25
         Gamma35 : 0.35
         Gamma45 : 0.45
-        # Sigma12 : 0.12
+        Sigma12 : 0.12
         Sigma13 : 0.13
         Sigma14 : 0.14
         Sigma23 : 0.23
@@ -1585,7 +1585,7 @@ TestFermionUpdatorKSGammaEM:
    
         ActionName : CActionGaugePlaquette
         Beta : 3.0
-        CloverEnergy : 1
+        # CloverEnergy : 1
 
     Action2:
 

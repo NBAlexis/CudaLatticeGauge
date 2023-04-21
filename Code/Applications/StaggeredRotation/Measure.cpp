@@ -114,6 +114,10 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("LoadFermion"), iVaule);
     const UINT uiLoadFermion = iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("FreeFermion"), iVaule);
+    const UBOOL bFreeFermion = 0 != iVaule;
+
     CCString sLoadFermionFile;
     params.FetchStringValue(_T("LoadFermionFile"), sLoadFermionFile);
     appGeneral(_T("Load Fermion File Name: %s\n"), sLoadFermionFile.c_str());
@@ -299,7 +303,14 @@ INT Measurement(CParameters& params)
                 }
             }
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            if (bFreeFermion)
+            {
+                appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+            }
+            else
+            {
+                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            }
 
             switch (eJob)
             {

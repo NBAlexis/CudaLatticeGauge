@@ -14,6 +14,8 @@ __DEFINE_ENUM(EElectricChemical,
     EEC_Simulate,
     EEC_Measure,
     EEC_GaugeFixing,
+    EEC_SimulateRW,
+    EEC_MeasureRW,
     )
 
 
@@ -40,7 +42,10 @@ for (UINT j = 0; j < (iEndN - iStartN + 1); ++j) \
     } \
 } \
 WriteStringFileComplexArray(sFileNameWrite##measureName##lstName, lstName##measureName); \
-WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName##ZSlice, lstName##measureName##ZSlice); 
+if (measureName->m_bMeasureZSlice) \
+{ \
+    WriteStringFileComplexArray2(sFileNameWrite##measureName##lstName##ZSlice, lstName##measureName##ZSlice); \
+}
 
 
 
@@ -296,7 +301,8 @@ inline void AppendStringFile(const CCString& sFileName, const CCString& sContent
 extern INT Simulate(CParameters& params);
 extern INT Measurement(CParameters& params);
 extern INT GaugeFixing(CParameters& params);
-
+extern INT SimulateRW(CParameters& params);
+extern INT MeasureRW(CParameters& params);
 
 //=============================================================================
 // END OF FILE

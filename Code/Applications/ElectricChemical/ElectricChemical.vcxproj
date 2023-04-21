@@ -27,7 +27,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MeasureImageChemical.cpp" />
     <ClCompile Include="Simulate.cpp" />
+    <ClCompile Include="SimulateRW.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ElectricChemical.h" />

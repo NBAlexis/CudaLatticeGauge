@@ -433,7 +433,9 @@ add_executable(ElectricChemical
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/ElectricChemical.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/MeasureImageChemical.cpp
     ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/Simulate.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ElectricChemical/SimulateRW.cpp
     )
 
 target_compile_features(ElectricChemical PUBLIC cxx_std_14)

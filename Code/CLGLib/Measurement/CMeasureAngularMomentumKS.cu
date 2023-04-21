@@ -37,13 +37,15 @@ _kernelDFermionKS_PR_XYTermCopy(
     intokernalInt4;
 
     pResultData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
-    const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    //const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    const INT eta_tau = pEtaTable[uiSiteIndex] >> 3;
 
     #pragma unroll
     for (UINT idx = 0; idx < 8; ++idx)
     {
-        const UBOOL bPlusMu = idx & 2;
+        const UBOOL bPlusMu  = idx & 2;
         const UBOOL bPlusTau = idx & 4;
+        //x or y, and y or x is the derivate, not coefficient
         const UINT bXorY = idx & 1;
         const UINT bYorX = 1 - bXorY;
         SSmallInt4 sTargetSite = sSite4;
@@ -57,8 +59,9 @@ _kernelDFermionKS_PR_XYTermCopy(
         sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
 
         //note that bYorX = 1, it is x partial_y term, therefore is '-'
-        INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
-            + bYorX;
+        //INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+        INT this_eta_tau = (bPlusTau ? eta_tau : (pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3))
+                         + bYorX;
 
         if (sTargetBigIndex.NeedToOpposite())
         {
@@ -119,12 +122,13 @@ _kernelDFermionKS_PR_XYTau_TermCopy(
         const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
 
         const deviceSU3Vector right = _deviceVXYTOptimized(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT)
-            .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
+        .MulVector(pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
         const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
 
         //eta124 of site is almost always -target, so use left or right is same
         //The only exception is on the boundary
         INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+
         if (sTargetBigIndex.NeedToOpposite())
         {
             eta124 = eta124 + 1;
@@ -162,8 +166,8 @@ _kernelKSApplyGammaEtaCopy(
     const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
     const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
-    BYTE eta_mu = (pEtaTable[uiSiteIndex] >> byDir) & 1;
-    BYTE eta_mu2 = (pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1;
+    BYTE eta_mu = pEtaTable[uiSiteIndex] >> byDir;
+    BYTE eta_mu2 = pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir;
 
     const deviceSU3& x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, x_m_mu_Gauge.m_byDir)];

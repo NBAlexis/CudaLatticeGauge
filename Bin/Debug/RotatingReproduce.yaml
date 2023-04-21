@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing, ERJ_RotationTest}
-RotatingJob : ERJ_Thermal
+RotatingJob : ERJ_PolyakovDist
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 
@@ -169,14 +169,15 @@ JobPolyakovDist:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    GaugeBate : 4.75
+    FreeFermion : 1
+    GaugeBate : 4.82
     OmegaRange : 0.14
     StartOmega : 0
-    EndOmega : 20
+    EndOmega : 7
     StartN : 101
-    EndN : 10000
+    EndN : 1100
     ## EDJ_Polyakov, EDJ_Chiral, EDJ_AngularMomentum, EDJ_ChiralAndFermionMomentum, EDJ_PlaqutteEnergy
-    DistributionJob : EDJ_Polyakov
+    DistributionJob : EDJ_ChiralAndFermionMomentum
     FermionMomentum : 0
     StochasticFieldCount : 16
     StochasticGaussian : 1
@@ -192,7 +193,7 @@ JobPolyakovDist:
     # SavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Nt6\NC540161_
     # CSVSavePrefix : H:\NotUsingCLGConfig\Extrapolation\540161Nt6\Polyakov\NC540161_
     SavePrefix : NC47516_
-    CSVSavePrefix : H:\configs\newresf\47516\Polyakov\NC47516_
+    CSVSavePrefix : FNC48216_
     # CSVSavePrefix : G:\configs\Extrapolation\502161Nt4\Polyakov\NC502161_
 
     ## SavePrefix : ../../../ThermalCircle/Final150+320xStep/gf49616/Nt3/GFN49616_
@@ -244,13 +245,13 @@ JobPolyakovDist:
     Solver:
         SolverForFieldId : 2
 
-        SolverName : CSLASolverBiCGStab
+        # SolverName : CSLASolverBiCGStab
         ## Accuracy : 0.0000001
 
         DiviationStep : 50
         MaxStep : 1
 
-        # SolverName : CSLASolverGMRES
+        SolverName : CSLASolverGMRES
         # double
         Accuracy : 0.0000001
         # float

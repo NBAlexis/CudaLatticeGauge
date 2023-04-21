@@ -39,7 +39,7 @@ _kernelKSApplyGamma1234(
 {
     intokernal;
 
-    const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1)) ? F(-1.0) : F(1.0);
+    const Real eta_mu = ((pEtaTable[uiSiteIndex] >> byDir) & 1) ? F(-1.0) : F(1.0);
     const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byDir);
     const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
     const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
@@ -71,21 +71,24 @@ _kernelKSApplyGamma1234(
     {
         fGammCoefficient = -fGammCoefficient;
     }
-    result.MulComp(_make_cuComplex(F(0.0), fGammCoefficient));
+    result.MulComp(_make_cuComplex(F(0.0), fGammCoefficient * eta_mu));
 
     switch (eCoeff)
     {
     case EOCT_Real:
-        result.MulReal(fCoeff * eta_mu);
+        result.MulReal(fCoeff);
         break;
     case EOCT_Complex:
-        result.MulComp(cuCmulf_cr(cCoeff, eta_mu));
+        result.MulComp(cCoeff);
         break;
     }
 
     pMe[uiSiteIndex].Add(result);
 }
 
+/**
+* This function applys i Gamma_i on the field
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelKSApplyGammaEta1234(
     deviceSU3Vector* pMe,
@@ -108,11 +111,11 @@ _kernelKSApplyGammaEta1234(
     const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
     const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
 
-    BYTE eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> byDir) & 1));
-    BYTE eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir) & 1));
+    BYTE eta_mu = pEtaTable[uiSiteIndex] >> byDir;
+    BYTE eta_mu2 = pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> byDir;
 
     const deviceSU3& x_Gauge_element = pGauge[linkIndex];
-    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
+    deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, x_m_mu_Gauge.m_byDir)];
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();

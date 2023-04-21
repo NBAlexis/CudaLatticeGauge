@@ -45,6 +45,18 @@ int main(int argc, char * argv[])
             res = GaugeFixing(workingParam1);
         }
         break;
+    case EEC_SimulateRW:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulateRW"));
+            res = SimulateRW(workingParam1);
+        }
+        break;
+    case EEC_MeasureRW:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobMeasureImageChemical"));
+            res = MeasureRW(workingParam1);
+        }
+        break;
     default:
         break;
     }

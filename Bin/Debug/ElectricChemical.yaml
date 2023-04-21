@@ -1,5 +1,5 @@
-# EEC_Simulate, EEC_Measure, EEC_GaugeFixing
-WorkJob : EEC_Measure
+# EEC_Simulate, EEC_Measure, EEC_GaugeFixing, EEC_SimulateRW, EEC_MeasureRW
+WorkJob : EEC_MeasureRW
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -281,7 +281,7 @@ JobMeasure:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    FermionFieldCount : 3
+    FermionFieldCount : 2
     OtherGaugeFieldCount : 1
     MeasureListLength : 4
     CacheStaple : 0
@@ -501,3 +501,283 @@ JobGaugeFixing:
         CheckErrorStep : 200
         MaxIterate : 20000
         Mixed : 1
+
+JobSimulateRW:
+
+    ## Log options
+    ## Verbose will always show in stdout
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    ## VerboseOutput = { "stdout" for only stdout, "timestamp" for "timestamp.log" or other specified filename }
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+    # If use double, set to 0 will be faster, if use single point float, use 8
+    ExponentialPrecision : 0
+    BeforeEquvibStep : 0
+    EquvibSkip : 0
+    EquvibStep : 20
+    SaveStartIndex : 0
+    ListStart : 1
+    ListEnd : 6
+    # Electric : [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    Chemical : [0.0, -0.1, -0.2, -0.3, -0.4, -0.5]
+
+    SavePrefix : ./EC530_02_
+    Additive : 0
+
+    # 53551575Nt4 Omega60 
+    # Polyakovs : [0.2548793495166105009, 0.2674676527142243465, 0.28727804358433550130, 0.36891834544115924644, 0.3714890358030488316, 0.4434429554952389631, 0.5203437138701659326, 0.6383689173717348941, 0.7112141902124326872, 0.8122419471662560913, 0.9025054366091994723]
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    ActionListLength : 2
+    FermionFieldCount : 1
+    OtherGaugeFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    ## ============================================================
+    ## Initial files
+    ## ============================================================
+    # OldFileName : ./6000204/SRF6000204_R_Nt6_O1_1466.con
+    # OldPolyakov : 0.605417311192
+
+    Updator:
+
+        UpdatorType : CHMC
+        Metropolis : 1
+        ReportMeasure : 0
+        Adaptive : 1
+        MinMaxStep : [4, 50]
+        GrowReduceThreshold : [-0.3, 0.02]
+        InnerLeapfrog : 1
+        DebugForce : 0
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # CIntegratorNestedOmelyan CIntegratorNested11Stage
+        IntegratorType : CIntegratorNestedOmelyan
+        # IntegratorType : CIntegratorOmelyan 
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        NestedStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3Gamma
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 15
+
+        Gamma4 : 0.1
+
+        Period : [1, 1, 1, -1]
+        # MC is to prepare
+
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        CloverEnergy : 0
+        ShiftCoord : 0
+        Beta : 5.3
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 20
+        MaxStep : 500
+        Accuracy : 0.000001
+        AbsoluteAccuracy : 1
+        # SolverName : CMultiShiftFOM
+        # SolverForFieldId : 2
+        # UseCudaForSmallMatrix : 0
+        # MaxDim : 30
+        # Accuracy : 0.0001
+        # Restart : 100
+        # AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 1
+
+JobMeasureImageChemical:
+
+    ## VerboseLevel = {CRUCIAL, GENERAL, DETAILED, PARANOIAC}
+    VerboseLevel : GENERAL
+    VerboseOutput : datetime
+    ShowDeviceInformation : 0
+    ShowParameterContent : 0
+
+    ListStart : 0
+    ListEnd : 7
+    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    StartN : 101
+    EndN : 500
+    SaveFermionFile : 0
+    FermionFileIndexStart : 1
+    FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
+    LoadFermion : 0
+    LoadFermionFile : F4980204_
+    LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
+    ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
+    DistributionJob : EGMJ_Polyakov
+    FermionMomentum : 0
+    StochasticFieldCount : 1
+    CheckGaugeFixing : 0
+    UseZ4 : 1
+    SubFolder : 1
+    SubFolderPrefix : G:\EC\Nt6\530\E0
+    # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
+    LoadType : EFFT_CLGBinFloat
+
+    SavePrefix : EC530_Electric0_
+    CSVSavePrefix : G:\EC\Measure\530_E0_Polyakov\EC530_Electric0_
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_XORWOW
+    RandomSeedType : ERST_Timestamp
+    FermionFieldCount : 1
+    OtherGaugeFieldCount : 1
+    MeasureListLength : 2
+    CacheStaple : 0
+    AlsoCheckMD5 : 0
+    FreeFermion : 0
+
+    Gauge:
+
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+        
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3Gamma
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.2
+        FieldId : 2
+        PoolNumber : 15
+
+        Gamma4 : 0.1
+
+        Period : [1, 1, 1, -1]
+        # MC is to prepare
+
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 1
+        ShowResult : 0
+        MeasureDist : 1
+        MeasureZ : 1
+        ShiftCenter : 0
+        ZSlice : 1
+
+    Measure2:
+
+        MeasureName : CMeasureChiralCondensateKS
+        FieldId : 2
+        MeasureDist : 1
+        ShowResult : 0
+        ShiftCenter : 0
+        DebugDivation : 0
+        ZSlice : 1
+
