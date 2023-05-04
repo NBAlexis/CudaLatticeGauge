@@ -33,6 +33,8 @@ public:
     CCString GetInfos(const CCString& tab) const override;
     void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
+    //whether gamma1,2,3,4 are applied as imaginary
+    UBOOL m_bImagine;
     Real m_fCoeffGamma1;
     Real m_fCoeffGamma2;
     Real m_fCoeffGamma3;

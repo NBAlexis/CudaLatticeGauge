@@ -1117,6 +1117,63 @@ void CFieldFermionKSSU3::DebugPrintMe() const
     appSafeFree(toprint);
 }
 
+void CFieldFermionKSSU3::DebugPrintRed() const
+{
+    deviceSU3Vector* toprint = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
+    checkCudaErrors(cudaMemcpy(toprint, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
+    UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
+
+    appGeneral(_T("\n{"));
+    for (UINT uiSite = 0; uiSite < m_uiSiteCount - 1; ++uiSite)
+    {
+        if (appAbs(toprint[uiSite].m_ve[0].x) < F(0.00001) && appAbs(toprint[uiSite].m_ve[0].y) < F(0.00001))
+        {
+            appGeneral(_T("0,"));
+        }
+        else if (appAbs(toprint[uiSite].m_ve[0].x) < F(0.00001))
+        {
+            appGeneral(_T("%f I,"), toprint[uiSite].m_ve[0].y);
+        }
+        else if (appAbs(toprint[uiSite].m_ve[0].y) < F(0.00001))
+        {
+            appGeneral(_T("%f,"), toprint[uiSite].m_ve[0].x);
+        }
+        else
+        {
+            appGeneral(_T("%f %s %f I,"),
+                toprint[uiSite].m_ve[0].x,
+                toprint[uiSite].m_ve[0].y > F(0.0) ? _T("+") : _T("-"),
+                appAbs(toprint[uiSite].m_ve[0].y)
+            );
+        }
+    }
+    if (appAbs(toprint[m_uiSiteCount - 1].m_ve[0].x) < F(0.00001) && appAbs(toprint[m_uiSiteCount - 1].m_ve[0].y) < F(0.00001))
+    {
+        appGeneral(_T("0}\n"));
+    }
+    else if (appAbs(toprint[m_uiSiteCount - 1].m_ve[0].x) < F(0.00001))
+    {
+        appGeneral(_T("%f I}\n"), toprint[m_uiSiteCount - 1].m_ve[0].y);
+    }
+    else if (appAbs(toprint[m_uiSiteCount - 1].m_ve[0].y) < F(0.00001))
+    {
+        appGeneral(_T("%f}\n"), toprint[m_uiSiteCount - 1].m_ve[0].x);
+    }
+    else
+    {
+        appGeneral(_T("%f %s %f I}\n"),
+            toprint[m_uiSiteCount - 1].m_ve[0].x,
+            toprint[m_uiSiteCount - 1].m_ve[0].y > F(0.0) ? _T("+") : _T("-"),
+            appAbs(toprint[m_uiSiteCount - 1].m_ve[0].y)
+        );
+    }
+
+    appSetLogDate(bLogDate);
+
+    appSafeFree(toprint);
+}
+
 void CFieldFermionKSSU3::CopyTo(CField* U) const
 {
     if (NULL == U || EFT_FermionStaggeredSU3 != U->GetFieldType())

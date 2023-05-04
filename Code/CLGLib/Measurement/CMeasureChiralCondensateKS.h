@@ -80,6 +80,8 @@ public:
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }    
 
+    TArray<TArray<CLGComplex>> ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;
+
 protected:
     
     UINT m_uiConfigurationCount;

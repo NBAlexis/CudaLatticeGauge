@@ -667,20 +667,20 @@ JobMeasureImageChemical:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 7
-    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    StartN : 101
-    EndN : 500
+    ListEnd : 11
+    Chemical : [0.5, 0.4, 0.3, 0.2, 0.1, 0.0, -0.1, -0.2, -0.3, -0.4, -0.5]
+    StartN : 1
+    EndN : 10
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
-    DistributionJob : EGMJ_Polyakov
+    ## EGMJRW_Polyakov, EGMJRW_Chiral, EGMJRW_ChiralDiagnal
+    DistributionJob : EGMJRW_Chiral
     FermionMomentum : 0
-    StochasticFieldCount : 1
+    StochasticFieldCount : 100
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
@@ -689,11 +689,11 @@ JobMeasureImageChemical:
     LoadType : EFFT_CLGBinFloat
 
     SavePrefix : EC530_Electric0_
-    CSVSavePrefix : G:\EC\Measure\530_E0_Polyakov\EC530_Electric0_
+    CSVSavePrefix : ./EC530_FF_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 4]
+    LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -704,7 +704,7 @@ JobMeasureImageChemical:
     MeasureListLength : 2
     CacheStaple : 0
     AlsoCheckMD5 : 0
-    FreeFermion : 0
+    FreeFermion : 1
 
     Gauge:
 
@@ -769,7 +769,7 @@ JobMeasureImageChemical:
         MeasureDist : 1
         MeasureZ : 1
         ShiftCenter : 0
-        ZSlice : 1
+        ZSlice : 0
 
     Measure2:
 
@@ -779,5 +779,5 @@ JobMeasureImageChemical:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
-        ZSlice : 1
+        ZSlice : 0
 

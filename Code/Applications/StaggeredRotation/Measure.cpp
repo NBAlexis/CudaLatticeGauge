@@ -19,6 +19,7 @@ __DEFINE_ENUM(EDistributionJobKS,
     EDJKS_VR,
     EDJKS_Taylor,
     EDJKS_DoubleToFloat,
+    EDJKS_AngularMomentumDiagnal,
     )
 
 
@@ -190,7 +191,8 @@ INT Measurement(CParameters& params)
     if (EDJKS_ChiralAndFermionMomentum == eJob
         || (EDJKS_AngularMomentum == eJob && bJF)
         || EDJKS_Chiral == eJob
-        || EDJKS_Taylor == eJob)
+        || EDJKS_Taylor == eJob
+        || EDJKS_AngularMomentumDiagnal == eJob)
     {
         pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
         pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -748,6 +750,19 @@ INT Measurement(CParameters& params)
 
                 }
                 break;
+                case EDJKS_AngularMomentumDiagnal:
+                    {
+                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                        CCString sFileLightDiagnal;
+                        CCString sFileHeavyDiagnal;
+                        sFileLightDiagnal.Format(_T("%s_diagnallight_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                        sFileHeavyDiagnal.Format(_T("%s_diagnalheavy_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                        TArray<TArray<CLGComplex>> lightdiagnal = pFALight->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Light, pF2Light);
+                        TArray<TArray<CLGComplex>> heavydiagnal = pFAHeavy->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Heavy, pF2Heavy);
+                        WriteStringFileComplexArray2(sFileLightDiagnal, lightdiagnal);
+                        WriteStringFileComplexArray2(sFileHeavyDiagnal, heavydiagnal);
+                    }
+                    break;
                 default:
                     break;
             }

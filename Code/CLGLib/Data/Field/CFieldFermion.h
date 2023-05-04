@@ -198,6 +198,8 @@ public:
     virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
     virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
 
+    UINT GetSiteCount() const { return m_uiSiteCount; }
+
 protected:
 
     virtual UBOOL InverseD_eo(const CField*)

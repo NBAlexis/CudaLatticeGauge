@@ -229,14 +229,15 @@ public:
 
     void ReCopyAll() const
     {
-        for (INT i = 0; i < m_pPool.Num(); ++i)
+        for (INT i = 0; i < m_pAll.Num(); ++i)
         {
-            m_pOrignal->CopyTo(m_pPool[i]);
+            m_pOrignal->CopyTo(m_pAll[i]);
         }
     }
 
     CField* m_pOrignal;
     TArray<CField*> m_pPool;
+    TArray<CField*> m_pAll;
 
 protected:
 
@@ -244,6 +245,7 @@ protected:
     {
         CField* pNew = m_pOrignal->GetCopy();
         pNew->m_pPool = this;
+        m_pAll.AddItem(pNew);
         return pNew;
     }
 };

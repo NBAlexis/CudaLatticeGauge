@@ -491,6 +491,142 @@ void CMeasureChiralCondensateKS::Reset()
     m_lstR.RemoveAll();
 }
 
+TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+{
+    TArray<TArray<CLGComplex>> ret;
+    CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(pooled1);
+    CFieldFermionKS* pF2 = dynamic_cast<CFieldFermionKS*>(pooled2);
+    if (NULL == pF1 || NULL == pF2 || NULL == pAcceptGauge)
+    {
+        appCrucial(_T("CMeasureChiralCondensateKS only work with CFieldFermionKS"));
+        return ret;
+    }
+    
+    UINT uiSiteCount = pF1->GetSiteCount();
+    TArray<CLGComplex> rets[ChiralKSMax];
+    for (UINT x = 0; x < uiSiteCount; ++x)
+    {
+        BYTE maxC = 0;
+        switch (pF1->GetFieldType())
+        {
+        case EFT_FermionStaggeredSU3:
+            maxC = 3;
+            break;
+        case EFT_FermionStaggeredU1:
+            maxC = 1;
+            break;
+        }
+
+        for (BYTE c = 0; c < maxC; ++c)
+        {
+            SFermionSource source;
+            source.m_eSourceType = EFS_Point;
+            source.m_byColorIndex = c;
+            source.m_sSourcePoint = __hostSiteIndexToInt4(x);
+            pF1->InitialAsSource(source);
+            pF1->InverseD(appGetLattice()->m_pGaugeField);
+
+            for (BYTE i = 0; i < ChiralKSMax; ++i)
+            {
+                switch ((EChiralMeasureTypeKS)i)
+                {
+                case CMTKSGamma1:
+                case CMTKSGamma2:
+                case CMTKSGamma3:
+                case CMTKSGamma4:
+                case CMTKSGamma5:
+                case CMTKSGamma51:
+                case CMTKSGamma52:
+                case CMTKSGamma53:
+                case CMTKSGamma54:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, (EGammaMatrix)(i - 1));
+                    }
+                    break;
+                case CMTKSSigma12:
+                    {
+                        pF1->CopyTo(pF2);
+                        if (m_bMeasureSigma12)
+                        {
+                            pF2->ApplyGammaKS(pAcceptGauge, SIGMA12);
+                        }
+                    }
+                    break;
+                case CMTKSSigma13:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA31);
+                    }
+                    break;
+                case CMTKSSigma14:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA41);
+                    }
+                    break;
+                case CMTKSSigma23:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA23);
+                    }
+                    break;
+                case CMTKSSigma24:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA42);
+                    }
+                    break;
+                case CMTKSSigma34:
+                    {
+                        pF1->CopyTo(pF2);
+                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA43);
+                    }
+                    break;
+                case ConnectSusp:
+                    {
+                        pF1->CopyTo(pF2);
+                        if (m_bMeasureConnect)
+                        {
+                            pF2->InverseD(pAcceptGauge);
+                        }
+                    }
+                    break;
+                default:
+                    pF1->CopyTo(pF2);
+                    break;
+                }
+
+                switch (pF1->GetFieldType())
+                {
+                case EFT_FermionStaggeredSU3:
+                    {
+                        CFieldFermionKSSU3* pF2SU3 = dynamic_cast<CFieldFermionKSSU3*>(pF2);
+                        deviceSU3Vector hostv[1];
+                        checkCudaErrors(cudaMemcpy(hostv, pF2SU3->m_pDeviceData + x, sizeof(deviceSU3Vector), cudaMemcpyDeviceToHost));
+                        rets[i].AddItem(hostv->m_ve[c]);
+                    }
+                    break;
+                case EFT_FermionStaggeredU1:
+                    {
+                        CFieldFermionKSU1* pF2U1 = dynamic_cast<CFieldFermionKSU1*>(pF2);
+                        CLGComplex hostv[1];
+                        checkCudaErrors(cudaMemcpy(hostv, pF2U1->m_pDeviceData + x, sizeof(CLGComplex), cudaMemcpyDeviceToHost));
+                        rets[i].AddItem(hostv[0]);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    for (BYTE i = 0; i < ChiralKSMax; ++i)
+    {
+        ret.AddItem(rets[i]);
+    }
+    return ret;
+}
+
 __END_NAMESPACE
 
 //=============================================================================

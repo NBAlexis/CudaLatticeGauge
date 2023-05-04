@@ -12,6 +12,7 @@
 __DEFINE_ENUM(EGradientMeasureRWJob,
     EGMJRW_Polyakov,
     EGMJRW_Chiral,
+    EGMJRW_ChiralDiagnal,
     )
 
 INT MeasureRW(CParameters& params)
@@ -127,7 +128,7 @@ INT MeasureRW(CParameters& params)
 
     pU = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetFieldById(2));
 
-    if (EGMJRW_Chiral == eJob)
+    if (EGMJRW_Chiral == eJob || EGMJRW_ChiralDiagnal == eJob)
     {
         pF1Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2));
         pF2Light = dynamic_cast<CFieldFermionKSSU3Gamma*>(appGetLattice()->GetPooledFieldById(2));
@@ -264,6 +265,16 @@ INT MeasureRW(CParameters& params)
                 }
             }
             break;
+            case EGMJRW_ChiralDiagnal:
+                {
+                    //appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    //appGeneral(_T("debug gamma4 : %f, %f\n"), pF1Light->m_fCoeffGamma4, pF2Light->m_fCoeffGamma4);
+                    CCString sFileDiagnal;
+                    sFileDiagnal.Format(_T("%s_diagnal_Nt%d_IC%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                    TArray<TArray<CLGComplex>> lightdiagnal = pCCLight->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Light, pF2Light);
+                    WriteStringFileComplexArray2(sFileDiagnal, lightdiagnal);
+                }
+                break;
             default:
                 break;
             }

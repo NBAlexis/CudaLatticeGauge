@@ -1341,6 +1341,8 @@ void CFieldFermionKSSU3Gamma::DOperatorKS(void* pTargetBuffer, const void* pBuff
 
     if (abs(m_fCoeffGamma1) > _CLG_FLT_EPSILON)
     {
+        //bImag ? _make_cuComplex(F(0.0), -F(1.0)) : _onec,
+
         appApplyGammaKS(pTargetBuffer, pBuffer, pGaugeBuffer, GAMMA1, m_bEachSiteEta, bDagger, m_fCoeffGamma1, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
@@ -1635,6 +1637,7 @@ void CFieldFermionKSSU3Gamma::DerivateD0(
 
 CFieldFermionKSSU3Gamma::CFieldFermionKSSU3Gamma()
     : CFieldFermionKSSU3()
+    , m_bImagine(TRUE)
     , m_fCoeffGamma1(F(0.0))
     , m_fCoeffGamma2(F(0.0))
     , m_fCoeffGamma3(F(0.0))
@@ -1663,6 +1666,16 @@ CFieldFermionKSSU3Gamma::~CFieldFermionKSSU3Gamma()
 void CFieldFermionKSSU3Gamma::InitialOtherParameters(CParameters & params)
 {
     CFieldFermionKSSU3::InitialOtherParameters(params);
+
+    INT iValue = 1;
+    if (params.FetchValueINT(_T("Imagine"), iValue))
+    {
+        m_bImagine = (0 != iValue);
+        if (!m_bImagine)
+        {
+            appCrucial(_T("NOTE: Imagine is set to be FALSE, the M.C. has sign problem!!! Do this only in measure!!!\n"));
+        }
+    }
 
     Real fValue = F(0.0);
     if (params.FetchValueReal(_T("Gamma1"), fValue))

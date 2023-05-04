@@ -37,6 +37,7 @@ public:
     void InitialWithByte(BYTE* byData) override;
     void InitialOtherParameters(CParameters& params) override;
     void DebugPrintMe() const override;
+    void DebugPrintRed() const;
 
     void Dagger() override;
 

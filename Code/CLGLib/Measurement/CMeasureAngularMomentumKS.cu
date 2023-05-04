@@ -376,6 +376,22 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
         CCommonData::m_sCenter);
 }
 
+void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
+    deviceSU3Vector* pAppliedBuffer,
+    const deviceSU3Vector* pInverseZ4,
+    const deviceSU3* pGauge, BYTE byFieldId)
+{
+    preparethread;
+    _kernelDFermionKS_PR_XYTermCopy << <block, threads >> > (
+        pInverseZ4,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pAppliedBuffer,
+        byFieldId,
+        1,
+        CCommonData::m_sCenter);
+}
+
 void CMeasureAngularMomentumKS::ApplySpinMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4, 
@@ -387,6 +403,17 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(
         pGauge,
         pAppliedBuffer,
         m_byFieldId,
+        1);
+}
+
+void CMeasureAngularMomentumKS::ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId)
+{
+    preparethread;
+    _kernelDFermionKS_PR_XYTau_TermCopy << <block, threads >> > (
+        pInverseZ4,
+        pGauge,
+        pAppliedBuffer,
+        fieldId,
         1);
 }
 
@@ -595,6 +622,69 @@ void CMeasureAngularMomentumKS::Reset()
         m_lstCondZSlice[i].RemoveAll();
     }
     m_lstR.RemoveAll();
+}
+
+TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+{
+    TArray<TArray<CLGComplex>> ret;
+    CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(pooled1);
+    CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pooled2);
+    const CFieldGaugeSU3* pAcceptGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
+    if (NULL == pF1 || NULL == pF2 || NULL == pAcceptGauge)
+    {
+        appCrucial(_T("CMeasureAngularMomentumKS only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
+        return ret;
+    }
+
+    deviceSU3Vector hostv[1];
+    UINT uiSiteCount = pF1->GetSiteCount();
+
+    TArray<CLGComplex> rets[EAngularMeasureMax];
+    for (UINT x = 0; x < uiSiteCount; ++x)
+    {
+        for (BYTE c = 0; c < 3; ++c)
+        {
+            SFermionSource source;
+            source.m_eSourceType = EFS_Point;
+            source.m_byColorIndex = c;
+            source.m_sSourcePoint = __hostSiteIndexToInt4(x);
+            pF1->InitialAsSource(source);
+            pF1->InverseD(appGetLattice()->m_pGaugeField);
+            
+            for (BYTE i = 0; i < EAngularMeasureMax; ++i)
+            {
+                pF1->CopyTo(pF2);
+                switch ((EAngularMeasureTypeKS)i)
+                {
+                case OrbitalKS:
+                {
+                    ApplyOrbitalMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                }
+                break;
+                case SpinKS:
+                {
+                    ApplySpinMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                }
+                break;
+                case PotentialKS:
+                {
+                    ApplyPotentialMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                }
+                break;
+                }
+
+                checkCudaErrors(cudaMemcpy(hostv, pF2->m_pDeviceData + x, sizeof(deviceSU3Vector), cudaMemcpyDeviceToHost));
+                rets[i].AddItem(hostv->m_ve[c]);
+            }
+        }
+    }
+
+    for (BYTE i = 0; i < EAngularMeasureMax; ++i)
+    {
+        ret.AddItem(rets[i]);
+    }
+
+    return ret;
 }
 
 __END_NAMESPACE

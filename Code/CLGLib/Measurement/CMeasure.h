@@ -376,7 +376,7 @@ public:
 
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override
     {
-        appCrucial(_T("Should not use SourceSanning"));
+        appCrucial(_T("Should not use SourceSanning\n"));
     }
 
     /**
@@ -384,7 +384,7 @@ public:
     */
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override
     {
-        appCrucial(_T("OnConfigurationAcceptedZ4 not implemented"));
+        appCrucial(_T("OnConfigurationAcceptedZ4 not implemented\n"));
     }
 
     UBOOL IsGaugeMeasurement() const override = 0;
@@ -392,6 +392,13 @@ public:
     UBOOL IsZ4Source() const override { return TRUE; }
     UINT GetFieldCount() const { return m_uiFieldCount; }
     void SetFieldCount(UINT uiFieldCount) { m_uiFieldCount = uiFieldCount; }
+
+    virtual TArray<TArray<CLGComplex>> ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+    {
+        TArray<TArray<CLGComplex>> ret;
+        appCrucial(_T("ExportDiagnal not implemented\n"));
+        return ret;
+    }
 
 protected:
 

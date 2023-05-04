@@ -343,8 +343,8 @@ JobMeasure:
     OmegaRange : 0.128
     StartOmega : 0
     EndOmega : 8
-    StartN : 101
-    EndN : 110
+    StartN : 1
+    EndN : 1
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -357,8 +357,8 @@ JobMeasure:
 
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
-    ## EDJKS_DoubleToFloat, EDJKS_Taylor
-    DistributionJob : EDJKS_ChiralAndFermionMomentum
+    ## EDJKS_DoubleToFloat, EDJKS_Taylor, EDJKS_AngularMomentumDiagnal
+    DistributionJob : EDJKS_AngularMomentumDiagnal
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -371,14 +371,14 @@ JobMeasure:
     LoadType : EFFT_CLGBinFloat
 
     SavePrefix : GFSRF486295059_
-    CSVSavePrefix : ./FSRF486295059_
+    CSVSavePrefix : ./FSRF486295059I_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 8]
+    LatticeLength : [8, 8, 8, 4]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -414,6 +414,8 @@ JobMeasure:
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
 
+        # RealRotation : 0
+
         # MC is to prepare
         # This is x^{1/16}
         # MC : [1.109108385887779, -0.0005451962529273048, -0.007909917031211402, -0.1977561813514901, 0.0038701125117755527, 0.05933575214147947, 0.9516029959098663]
@@ -444,6 +446,8 @@ JobMeasure:
         PoolNumber : 15
         EachSiteEta : 1
         Period : [1, 1, 1, -1]
+
+        # RealRotation : 0
 
         # MC is to prepare
         # This is x^{1/16}
