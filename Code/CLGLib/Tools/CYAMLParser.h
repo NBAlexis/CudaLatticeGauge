@@ -97,9 +97,9 @@ public:
 
     _FetchFunction(Real)
 
-#if !_CLG_DOUBLEFLOAT
+    _FetchFunction(FLOAT)
+
     _FetchFunction(DOUBLE)
-#endif
 
     UBOOL FetchStringValue(const CCString& key, CCString& value) const
     {
