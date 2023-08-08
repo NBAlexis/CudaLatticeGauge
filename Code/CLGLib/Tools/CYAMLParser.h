@@ -117,9 +117,9 @@ public:
 
     _FetchFunctionArray(Real)
 
-#if !_CLG_DOUBLEFLOAT
+    _FetchFunctionArray(FLOAT)
+
     _FetchFunctionArray(DOUBLE)
-#endif
 
     UBOOL FetchStringVectorValue(const CCString& key, TArray<CCString>& value) const
     {
