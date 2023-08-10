@@ -12,6 +12,7 @@
 __DEFINE_ENUM(EBetaScanMeasureJob,
     EBSMJ_Polyakov,
     EBSMJ_Chiral,
+    EBSMJ_Wilson,
     EBSMJ_DoubleToFloat,
     )
 
@@ -125,6 +126,9 @@ INT MeasurementBetaScan(CParameters& params)
 
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
+    CMeasureWilsonLoop* pWL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     //CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
 
@@ -153,6 +157,7 @@ INT MeasurementBetaScan(CParameters& params)
         }
         appGeneral(_T("(* ==== Beta(%f) ========= *)\n"), BetaList[uiOmega]);
         pPL->Reset();
+        pWL->Reset();
         pCCLight->Reset();
         //pCCHeavy->Reset();
 
@@ -215,6 +220,24 @@ INT MeasurementBetaScan(CParameters& params)
                 case EBSMJ_Polyakov:
                 {
                     pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                }
+                break;
+                case EBSMJ_Wilson:
+                {
+                    appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
+                    appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+                    pWL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    if (uiN == iStartN)
+                    {
+                        TArray<Real> lstRadius;
+                        for (INT i = 0; i < pWL->m_lstR.Num(); ++i)
+                        {
+                            lstRadius.AddItem(_hostsqrt(static_cast<Real>(pWL->m_lstR[i])));
+                        }
+                        CCString sRadiousFile;
+                        sRadiousFile.Format(_T("%s_VR_R.csv"), sCSVSavePrefix.c_str());
+                        WriteStringFileRealArray(sRadiousFile, lstRadius);
+                    }
                 }
                 break;
                 case EBSMJ_Chiral:
@@ -383,6 +406,26 @@ INT MeasurementBetaScan(CParameters& params)
                 */
             }
             break;
+            case EBSMJ_Wilson:
+            {
+                CCString sCSVFile;
+                sCSVFile.Format(_T("%s_VR_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
+                TArray<TArray<CLGComplex>> vrs;
+                for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)
+                {
+                    TArray<CLGComplex> thisConfiguration;
+                    for (INT i = 0; i < pWL->m_lstR.Num(); ++i)
+                    {
+                        for (UINT t = 0; t < (_HC_Lt - 1); ++t)
+                        {
+                            thisConfiguration.AddItem(pWL->m_lstC[j][i][t]);
+                        }
+                    }
+                    vrs.AddItem(thisConfiguration);
+                }
+                WriteStringFileComplexArray2(sCSVFile, vrs);
+            }
+            break;
             default:
                 break;
         }
@@ -401,6 +444,8 @@ INT MeasurementBetaScan(CParameters& params)
         //pF1Heavy->Return();
         //pF2Heavy->Return();
     }
+
+    appSafeDelete(pStaple);
 
     appQuitCLG();
 

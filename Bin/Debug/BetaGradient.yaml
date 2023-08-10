@@ -559,7 +559,7 @@ JobMeasureBetaScan:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 1
-    MeasureListLength : 2
+    MeasureListLength : 3
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -639,6 +639,26 @@ JobMeasureBetaScan:
         ShiftCenter : 0
         DebugDivation : 0
         ZSlice : 0
+
+    Measure3:
+
+        MeasureName : CMeasureWilsonLoop
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        AlphaLeft : 2.3
+        AlphaRight : 1
+        Iterate : 26
+        # Cabibbo-Marinani projection is not correctly implemented
+        Cabibbo : 1
+        ProjIterate : 15
+        HasT : 0
+
+        # SmearingName : CGaugeSmearingAPEStout
+        # Rho : 0.1
+        # HasT : 0
+        # Iterate : 50
 
 JobSimulateQ:
 
