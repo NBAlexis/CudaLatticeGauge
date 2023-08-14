@@ -88,8 +88,11 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
 
     for (UINT i = 0; i < iSteps; ++i)
     {
+        //m_pOwner->FixAllFieldBoundary();
+        //m_pOwner->m_pGaugeField->DebugPrintMe();
         m_pIntegrator->Prepare(bAccepted, i);
         m_pOwner->FixAllFieldBoundary();
+
         if (m_bMetropolis || m_bTestHDiff)
         {
             fEnergy = m_pIntegrator->GetEnergy(TRUE);

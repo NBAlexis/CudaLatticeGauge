@@ -1530,8 +1530,17 @@ void CFieldGaugeSU3::DebugPrintMe() const
 
     for (UINT uiLink = 0; uiLink < m_uiLinkeCount; ++uiLink)
     {
-        appGeneral(_T(" --- %d ---\n {{%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I}}\n"),
+        UINT uiSite = uiLink / _HC_Dir;
+        UINT uiDir = uiLink % _HC_Dir;
+        SSmallInt4 site = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T(" --- %d(%d, %d, %d, %d)_%d ---\n {{%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I},\n {%f %s %f I, %f %s %f I, %f %s %f I}}\n"),
             uiLink,
+            static_cast<INT>(site.x),
+            static_cast<INT>(site.y),
+            static_cast<INT>(site.z),
+            static_cast<INT>(site.w),
+            uiDir,
+
             pToPrint[uiLink].m_me[0].x,
             pToPrint[uiLink].m_me[0].y > F(0.0) ? _T("+") : _T("-"),
             appAbs(pToPrint[uiLink].m_me[0].y),

@@ -30,6 +30,14 @@ _kernelPlaqutteEnergySU3_UseCloverGradient(
 )
 {
     intokernalInt4;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].IsDirichlet())
+    {
+        results[uiSiteIndex] = F(0.0);
+        //printf("x=%d y=%d z=%d w=%d\n", sSite4.x, sSite4.y, sSite4.z, sSite4.w);
+        return;
+    }
 
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fRes = 0.0;
@@ -53,6 +61,7 @@ _kernelPlaqutteEnergySU3_UseCloverGradient(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelStapleAtSiteSU3CacheIndexGradient(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
@@ -67,6 +76,12 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 {
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+    //UBOOL bBoundStartFromDirichlet = FALSE;
+    //if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].IsDirichlet())
+    //{
+    //    bBoundStartFromDirichlet = TRUE;
+    //}
 
     //Real test_force = F(0.0);
     //betaOverN = betaOverN * F(-0.5);
@@ -75,6 +90,11 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, static_cast<BYTE>(idir)))
+        {
+            continue;
+        }
+
         UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
         deviceSU3 res = deviceSU3::makeSU3Zero();
 
@@ -84,8 +104,13 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
         BYTE zNotFound = 1;
         for (INT i = 0; i < plaqCount; ++i)
         {
+            BYTE diricCount = 0;
             const SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
-            deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
+            if (first.IsDirichlet())
+            {
+                ++diricCount;
+            }
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
 
             const SSmallInt4 firstn = __deviceSiteIndexToInt4(first.m_uiSiteIndex);
             z1 = firstn.z;
@@ -103,7 +128,12 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
             for (INT j = 1; j < plaqLengthm1; ++j)
             {
                 const SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                if (nextlink.IsDirichlet())
+                {
+                    ++diricCount;
+                }
+                //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -123,19 +153,40 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
                 }
             }
 
-            if (zNotFound)
+            if (diricCount < plaqLengthm1)
             {
-                toAdd.MulReal(betaOverN[z1] * F(-0.5));
-            }
-            else
-            {
-                if (z2 >= _DC_Lz)
+                // If more than 3(including 3) of the edges are Dirichlet, 
+                // the plaqutte dose NOT exist.
+                if (zNotFound)
                 {
-                    z2 = 0;
+                    toAdd.MulReal(betaOverN[z1] * F(-0.5));
                 }
-                toAdd.MulReal(F(-0.25) * (betaOverN[z1] + betaOverN[z2]));
+                else
+                {
+                    if (z2 >= _DC_Lz)
+                    {
+                        if (diricCount > 0)
+                        {
+                            z2 = _DC_Lz - 1;
+                        }
+                        else
+                        {
+                            z2 = 0;
+                        }
+                    }
+                    toAdd.MulReal(F(-0.25) * (betaOverN[z1] + betaOverN[z2]));
+                }
+                if (diricCount > 0)
+                {
+                    toAdd.MulReal(F(0.5));
+                }
+                res.Add(toAdd);
             }
-            res.Add(toAdd);
+            //else
+            //{
+            //    printf("do we have this?\n");
+            //}
+            //printf("diricCount=%d\n", diricCount);
         }
         if (NULL != pStapleData)
         {
@@ -143,16 +194,19 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
         }
 
         //staple calculated
-        deviceSU3 force(pDeviceData[linkIndex]);
-        force.MulDagger(res);
-        //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
-        force.Ta();
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, static_cast<BYTE>(idir)))
+        {
+            deviceSU3 force(pDeviceData[linkIndex]);
+            force.MulDagger(res);
+            //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
+            force.Ta();
 
-        //this is the average over 4 cornels, so this is different for different dirs
-        //force.MulReal(betaOverN);
+            //this is the average over 4 cornels, so this is different for different dirs
+            //force.MulReal(betaOverN);
 
-        //force is additive
-        pForceData[linkIndex].Add(force);
+            //force is additive
+            pForceData[linkIndex].Add(force);
+        }
     }
 }
 
@@ -174,6 +228,8 @@ Real CActionGaugePlaquetteGradient::CalculatePlaqutteEnergyUseClover(const CFiel
 #endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    //pGauge->FixBoundary();
+    //pGauge->DebugPrintMe();
 
     preparethread;
     _kernelPlaqutteEnergySU3_UseCloverGradient << <block, threads >> > (
@@ -192,6 +248,7 @@ void CActionGaugePlaquetteGradient::CalculateForceAndStaple(const CFieldGaugeSU3
     assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
 
     _kernelStapleAtSiteSU3CacheIndexGradient << <block, threads >> > (
+        pGauge->m_byFieldId,
         pGauge->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,

@@ -195,7 +195,7 @@ TestBoundaryMapping:
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
 
-        Period : [0, 0, 1, 1]
+        Period : [1, 1, 0, 1]
 
     GaugeBoundary:
 
@@ -208,7 +208,7 @@ TestBoundaryMapping:
         Hopping : 0.1355
         FieldId : 2
         PoolNumber : 26
-        Period : [0, 0, 1, -1]
+        Period : [1, 1, 0, -1]
 
     FermionField2:
         

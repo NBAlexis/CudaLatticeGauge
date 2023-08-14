@@ -18,6 +18,8 @@ __DEFINE_ENUM(EBetaGradientJob,
     EBGJ_SimulateQ,
     EBGJ_SimulateScanQ,
     EBGJ_GaugeFixing,
+    EBGJ_Simulate2,
+    EBGJ_Measure2,
     )
 
 

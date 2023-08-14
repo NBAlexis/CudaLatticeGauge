@@ -552,6 +552,9 @@ void CFieldGaugeSU3D::FixBoundary()
 
     preparethread;
     _kernelFixBoundarySU3_D << <block, threads >> > (m_pDeviceData);
+
+    //DebugPrintMe();
+    //INT i = 0;
 }
 
 void CFieldGaugeSU3D::TransformToIA()

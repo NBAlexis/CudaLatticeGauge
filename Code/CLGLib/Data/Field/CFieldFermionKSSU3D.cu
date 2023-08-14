@@ -60,6 +60,8 @@ _kernelDFermionKS_D(
         const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
         const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
         deviceSU3Vector res = deviceSU3Vector::makeZeroSU3Vector();
+
+        //UBOOL btestpf = FALSE;
         if (!x_p_mu_Fermion.IsDirichlet())
         {
             const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIndex, idir);
@@ -69,8 +71,10 @@ _kernelDFermionKS_D(
             {
                 res.MulReal(F(-1.0));
             }
+            //btestpf = TRUE;
         }
 
+        //UBOOL btestmf = FALSE;
         if (!x_m_mu_Fermion.IsDirichlet())
         {
             const deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3DirSIndex(pGauge, x_m_mu_Gauge, 1);
@@ -83,12 +87,23 @@ _kernelDFermionKS_D(
             {
                 res.Sub(u_dagger_phi_x_m_m);
             }
+            //btestmf = TRUE;
         }
+        //if (!btestpf && !btestmf)
+        //{
+        //    printf("both p fermion and m fermion are dirichlet?\n");
+        //}
+
         res.MulReal(eta_mu);
         result.Add(res);
     }
 
     pResultData[uiSiteIndex].MulReal(f2am);
+    //if (__cuCabsSqf(result.m_ve[0]) + __cuCabsSqf(result.m_ve[1]) + __cuCabsSqf(result.m_ve[2]) < 1.0e-10)
+    //{
+    //    printf("zero result!\n");
+    //}
+
     if (bDDagger)
     {
         pResultData[uiSiteIndex].Sub(result);
@@ -133,6 +148,11 @@ _kernelDFermionKSForce_D(
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
+        if (__idx->_deviceIsBondOnSurface(uiBigIndex, static_cast<BYTE>(idir)))
+        {
+            continue;
+        }
+
         //Get Gamma mu
         const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         //x, mu
@@ -148,7 +168,7 @@ _kernelDFermionKSForce_D(
         {
             const deviceSU3Vector* phi_i = pFermionPointers[uiR];
             const deviceSU3Vector* phi_id = pFermionPointers[uiR + uiRational];
-
+            //const deviceSU3 gaugelink = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIndex, idir);
             deviceSU3Vector toContract = pGauge[linkIndex].MulVector(phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
             deviceSU3 thisTerm = deviceSU3::makeSU3ContractV(phi_id[uiSiteIndex], toContract);
 
@@ -233,6 +253,7 @@ _kernelDFermionKS_FixBoundary(
     const UINT uiBigIndex = __bi(sSite4);
     if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex].IsDirichlet())
     {
+        //printf("has dirichlet\n");
         pDeviceData[uiSiteIndex] = deviceSU3Vector::makeZeroSU3Vector();
     }
 }
@@ -250,7 +271,6 @@ void CFieldFermionKSSU3D::PrepareForHMC(const CFieldGauge* pGauge)
     InitialField(EFIT_RandomGaussian);
     FixBoundary();
     D_MC(pGauge);
-
     FixBoundary();
 
     if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())

@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
 {
     CParameters params;
 #if _CLG_DEBUG
-    CYAMLParser::ParseFile(_T("StaggeredRotation.yaml"), params);
+    CYAMLParser::ParseFile(_T("BetaGradient.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/BetaGradient.yaml"), params);
 #endif
@@ -51,9 +51,21 @@ int main(int argc, char * argv[])
             res = SimulateBetaScan(workingParam1);
         }
         break;
+    case EBGJ_Simulate2:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobSimulate2"));
+            res = Simulate(workingParam1);
+        }
+        break;
     case EBGJ_Measure:
         {
             CParameters workingParam1 = params.GetParameter(_T("JobMeasure"));
+            res = Measurement(workingParam1);
+        }
+        break;
+    case EBGJ_Measure2:
+        {
+            CParameters workingParam1 = params.GetParameter(_T("JobMeasure2"));
             res = Measurement(workingParam1);
         }
         break;

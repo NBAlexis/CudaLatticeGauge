@@ -115,6 +115,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pFieldB->CopyTo(pW);
     pFieldB->CopyTo(pS);
     pFieldB->CopyTo(pSA);
+
     pW->Dagger();
     pW->CopyTo(pW0);
     cuDoubleComplex delta = pW0->Dot(pR);

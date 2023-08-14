@@ -342,7 +342,9 @@ INT MeasurementBetaScan(CParameters& params)
             }
             else
             {
+                appSetLogDate(FALSE);
                 appGeneral(_T("="));
+                appSetLogDate(TRUE);
             }
             
         }
@@ -416,7 +418,7 @@ INT MeasurementBetaScan(CParameters& params)
                     TArray<CLGComplex> thisConfiguration;
                     for (INT i = 0; i < pWL->m_lstR.Num(); ++i)
                     {
-                        for (UINT t = 0; t < (_HC_Lt - 1); ++t)
+                        for (UINT t = 0; t < _HC_Lt / 2; ++t)
                         {
                             thisConfiguration.AddItem(pWL->m_lstC[j][i][t]);
                         }

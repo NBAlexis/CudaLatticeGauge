@@ -45,6 +45,10 @@ INT Simulate(CParameters& params)
     params.FetchValueINT(_T("ListEnd"), iVaule);
     const INT iListEnd = iVaule;
 
+    iVaule = 0;
+    params.FetchValueINT(_T("BetaStride"), iVaule);
+    const INT iBetaStride = iVaule;
+
 #if _CLG_DOUBLEFLOAT
 
     TArray<Real> fMiddleBeta;
@@ -115,9 +119,91 @@ INT Simulate(CParameters& params)
 
     CActionGaugePlaquetteGradient* pGaugeGradient = dynamic_cast<CActionGaugePlaquetteGradient*>(appGetLattice()->GetActionById(1));
     TArray<DOUBLE> betaArray;
-    for (INT i = 0; i < _HC_Lzi; ++i)
+    if (0 == iBetaStride)
     {
-        betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[0]);
+        for (INT i = 0; i < _HC_Lzi; ++i)
+        {
+            betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[0]);
+        }
+    }
+    else
+    {
+        if (11 != _HC_Lzi)
+        {
+            appCrucial(_T("Lz must be 11"));
+        }
+        DOUBLE upper = fMiddleBeta[0] + fDeltaBeta;
+        DOUBLE lower = fMiddleBeta[0] - fDeltaBeta;
+
+        if (1 == iBetaStride)
+        {
+            // ----- . ++++++
+            for (INT i = 0; i < 5; ++i)
+            {
+                betaArray.AddItem(lower);
+            }
+
+            betaArray.AddItem(fMiddleBeta[0]);
+
+            for (INT i = 0; i < 5; ++i)
+            {
+                betaArray.AddItem(upper);
+            }
+        }
+        else if (2 == iBetaStride)
+        {
+            // ---- ... +++++
+            for (INT i = 0; i < 4; ++i)
+            {
+                betaArray.AddItem(lower);
+            }
+
+            for (INT i = -1; i <= 1; ++i)
+            {
+                betaArray.AddItem(fMiddleBeta[0] + i * 0.5 * fDeltaBeta);
+            }
+
+            for (INT i = 0; i < 4; ++i)
+            {
+                betaArray.AddItem(upper);
+            }
+        }
+        else if (3 == iBetaStride)
+        {
+            // --- ..... +++
+            for (INT i = 0; i < 3; ++i)
+            {
+                betaArray.AddItem(lower);
+            }
+
+            for (INT i = -2; i <= 2; ++i)
+            {
+                betaArray.AddItem(fMiddleBeta[0] + i * 0.333333333333333 * fDeltaBeta);
+            }
+
+            for (INT i = 0; i < 3; ++i)
+            {
+                betaArray.AddItem(upper);
+            }
+        }
+        else if (4 == iBetaStride)
+        {
+            // --- ..... +++
+            for (INT i = 0; i < 2; ++i)
+            {
+                betaArray.AddItem(lower);
+            }
+
+            for (INT i = -3; i <= 3; ++i)
+            {
+                betaArray.AddItem(fMiddleBeta[0] + i * 0.25 * fDeltaBeta);
+            }
+
+            for (INT i = 0; i < 2; ++i)
+            {
+                betaArray.AddItem(upper);
+            }
+        }
     }
     pGaugeGradient->SetBeta(betaArray);
 
