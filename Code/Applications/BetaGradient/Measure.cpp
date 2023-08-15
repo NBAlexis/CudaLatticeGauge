@@ -138,9 +138,91 @@ INT Measurement(CParameters& params)
     {
         pGaugeGradient = dynamic_cast<CActionGaugePlaquetteGradient*>(appGetLattice()->GetActionById(1));
         TArray<DOUBLE> betaArray;
-        for (INT i = 0; i < _HC_Lzi; ++i)
+        if (0 == iBetaStride)
         {
-            betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[0]);
+            for (INT i = 0; i < _HC_Lzi; ++i)
+            {
+                betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[0]);
+            }
+        }
+        else
+        {
+            if (15 != _HC_Lzi)
+            {
+                appCrucial(_T("Lz must be 11"));
+            }
+            DOUBLE upper = fMiddleBeta[0] + fDeltaBeta;
+            DOUBLE lower = fMiddleBeta[0] - fDeltaBeta;
+
+            if (1 == iBetaStride)
+            {
+                // ----- . ++++++
+                for (INT i = 0; i < 7; ++i)
+                {
+                    betaArray.AddItem(lower);
+                }
+
+                betaArray.AddItem(fMiddleBeta[0]);
+
+                for (INT i = 0; i < 7; ++i)
+                {
+                    betaArray.AddItem(upper);
+                }
+            }
+            else if (2 == iBetaStride)
+            {
+                // ---- ... +++++
+                for (INT i = 0; i < 6; ++i)
+                {
+                    betaArray.AddItem(lower);
+                }
+
+                for (INT i = -1; i <= 1; ++i)
+                {
+                    betaArray.AddItem(fMiddleBeta[0] + i * 0.5 * fDeltaBeta);
+                }
+
+                for (INT i = 0; i < 6; ++i)
+                {
+                    betaArray.AddItem(upper);
+                }
+            }
+            else if (3 == iBetaStride)
+            {
+                // --- ..... +++
+                for (INT i = 0; i < 5; ++i)
+                {
+                    betaArray.AddItem(lower);
+                }
+
+                for (INT i = -2; i <= 2; ++i)
+                {
+                    betaArray.AddItem(fMiddleBeta[0] + i * 0.333333333333333 * fDeltaBeta);
+                }
+
+                for (INT i = 0; i < 5; ++i)
+                {
+                    betaArray.AddItem(upper);
+                }
+            }
+            else if (4 == iBetaStride)
+            {
+                // --- ..... +++
+                for (INT i = 0; i < 4; ++i)
+                {
+                    betaArray.AddItem(lower);
+                }
+
+                for (INT i = -3; i <= 3; ++i)
+                {
+                    betaArray.AddItem(fMiddleBeta[0] + i * 0.25 * fDeltaBeta);
+                }
+
+                for (INT i = 0; i < 4; ++i)
+                {
+                    betaArray.AddItem(upper);
+                }
+            }
         }
         pGaugeGradient->SetBeta(betaArray);
     }
@@ -178,29 +260,29 @@ INT Measurement(CParameters& params)
             {
                 for (INT i = 0; i < _HC_Lzi; ++i)
                 {
-                    betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[0]);
+                    betaArray.AddItem(sin((-1.0 + 2.0 * i / static_cast<DOUBLE>(_HC_Lzi)) * PI) * fDeltaBeta + fMiddleBeta[uiOmega]);
                 }
             }
             else
             {
-                if (11 != _HC_Lzi)
+                if (15 != _HC_Lzi)
                 {
                     appCrucial(_T("Lz must be 11"));
                 }
-                DOUBLE upper = fMiddleBeta[0] + fDeltaBeta;
-                DOUBLE lower = fMiddleBeta[0] - fDeltaBeta;
+                DOUBLE upper = fMiddleBeta[uiOmega] + fDeltaBeta;
+                DOUBLE lower = fMiddleBeta[uiOmega] - fDeltaBeta;
 
                 if (1 == iBetaStride)
                 {
                     // ----- . ++++++
-                    for (INT i = 0; i < 5; ++i)
+                    for (INT i = 0; i < 7; ++i)
                     {
                         betaArray.AddItem(lower);
                     }
 
-                    betaArray.AddItem(fMiddleBeta[0]);
+                    betaArray.AddItem(fMiddleBeta[uiOmega]);
 
-                    for (INT i = 0; i < 5; ++i)
+                    for (INT i = 0; i < 7; ++i)
                     {
                         betaArray.AddItem(upper);
                     }
@@ -208,17 +290,17 @@ INT Measurement(CParameters& params)
                 else if (2 == iBetaStride)
                 {
                     // ---- ... +++++
-                    for (INT i = 0; i < 4; ++i)
+                    for (INT i = 0; i < 6; ++i)
                     {
                         betaArray.AddItem(lower);
                     }
 
                     for (INT i = -1; i <= 1; ++i)
                     {
-                        betaArray.AddItem(fMiddleBeta[0] + i * 0.5 * fDeltaBeta);
+                        betaArray.AddItem(fMiddleBeta[uiOmega] + i * 0.5 * fDeltaBeta);
                     }
 
-                    for (INT i = 0; i < 4; ++i)
+                    for (INT i = 0; i < 6; ++i)
                     {
                         betaArray.AddItem(upper);
                     }
@@ -226,17 +308,17 @@ INT Measurement(CParameters& params)
                 else if (3 == iBetaStride)
                 {
                     // --- ..... +++
-                    for (INT i = 0; i < 3; ++i)
+                    for (INT i = 0; i < 5; ++i)
                     {
                         betaArray.AddItem(lower);
                     }
 
                     for (INT i = -2; i <= 2; ++i)
                     {
-                        betaArray.AddItem(fMiddleBeta[0] + i * 0.333333333333333 * fDeltaBeta);
+                        betaArray.AddItem(fMiddleBeta[uiOmega] + i * 0.333333333333333 * fDeltaBeta);
                     }
 
-                    for (INT i = 0; i < 3; ++i)
+                    for (INT i = 0; i < 5; ++i)
                     {
                         betaArray.AddItem(upper);
                     }
@@ -244,17 +326,17 @@ INT Measurement(CParameters& params)
                 else if (4 == iBetaStride)
                 {
                     // --- ..... +++
-                    for (INT i = 0; i < 2; ++i)
+                    for (INT i = 0; i < 4; ++i)
                     {
                         betaArray.AddItem(lower);
                     }
 
                     for (INT i = -3; i <= 3; ++i)
                     {
-                        betaArray.AddItem(fMiddleBeta[0] + i * 0.25 * fDeltaBeta);
+                        betaArray.AddItem(fMiddleBeta[uiOmega] + i * 0.25 * fDeltaBeta);
                     }
 
-                    for (INT i = 0; i < 2; ++i)
+                    for (INT i = 0; i < 4; ++i)
                     {
                         betaArray.AddItem(upper);
                     }

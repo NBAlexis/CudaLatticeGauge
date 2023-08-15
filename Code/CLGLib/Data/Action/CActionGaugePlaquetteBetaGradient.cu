@@ -159,10 +159,19 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
                 // the plaqutte dose NOT exist.
                 if (zNotFound)
                 {
+                    //zNotFound means this is a plaqutte not have z bounds
                     toAdd.MulReal(betaOverN[z1] * F(-0.5));
                 }
                 else
                 {
+                    if (0 == z1)
+                    {
+                        if (diricCount > 0)
+                        {
+                            z1 = z2;
+                        }
+                    }
+
                     if (z2 >= _DC_Lz)
                     {
                         if (diricCount > 0)

@@ -320,15 +320,15 @@ JobSimulate2:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 2000
+    BeforeEquvibStep : 1000
     EquvibSkip : 0
-    EquvibStep : 30000
+    EquvibStep : 20000
     SaveStartIndex : 0
     ListStart : 0
     ListEnd : 8
     MiddleBetaList : [5.29, 5.3, 5.31, 5.32, 5.33, 5.34, 5.35, 5.36]
     PrefixList : [529, 530, 531, 532, 533, 534, 535, 536]
-    BetaStride : 1
+    BetaStride : 4
 
     SavePrefix : ./BG2_01_
     DeltaBeta : 0.15
@@ -339,7 +339,7 @@ JobSimulate2:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 11, 6]
+    LatticeLength : [12, 12, 15, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
