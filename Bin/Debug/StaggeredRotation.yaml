@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_Measure
+RotationJob : ESR_SimulateQuenched
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -2273,13 +2273,13 @@ JobSimulateQuenched:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 10
-    BeforeEquvibStep : 0
+    BeforeEquvibStep : 10
     EquvibSkip : 0
-    EquvibStep : 20000
+    EquvibStep : 10
     SaveStartIndex : 0
     OmegaSep : 8
-    OmegaStart : 1
-    MaxOmega : 0.016
+    OmegaStart : 0
+    MaxOmega : 0.128
     MinNt : 4
     MaxNt : 4
     SavePrefix : ./57Quenched_
@@ -2290,10 +2290,10 @@ JobSimulateQuenched:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 4]
+    LatticeLength : [5, 5, 4, 2]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
-    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -2305,8 +2305,8 @@ JobSimulateQuenched:
     ## ============================================================
     ## Initial files
     ## ============================================================
-    Nt4FileName : ./57Quenched_R_Nt4_O0_1000.con
-    Nt4Polyakov : 0.022946210578
+    # Nt4FileName : ./57Quenched_R_Nt4_O0_1000.con
+    # Nt4Polyakov : 0.022946210578
 
     Updator:
 
@@ -2328,16 +2328,20 @@ JobSimulateQuenched:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
         FieldInitialType : EFIT_Random
 
-        Period : [1, 1, 1, 1]
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3 
 
     Action1:
    
         ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 1
-        ShiftCoord : 1
+        # CloverEnergy : 1
+        # ShiftCoord : 1
         Beta : 5.7
         Omega : 0.0
 

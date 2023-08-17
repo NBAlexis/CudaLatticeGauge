@@ -488,8 +488,9 @@ void CMeasurePolyakovXY::Average(UINT )
 
 void CMeasurePolyakovXY::Report()
 {
+    UINT uiHalf = (_HC_Lx + 1) / 2;
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
-    assert(static_cast<UINT>(m_uiConfigurationCount * CCommonData::m_sCenter.x)
+    assert(static_cast<UINT>(m_uiConfigurationCount * uiHalf)
         == static_cast<UINT>(m_lstLoopDensity.Num()));
 
     appSetLogDate(FALSE);
@@ -521,17 +522,17 @@ void CMeasurePolyakovXY::Report()
     for (UINT k = 0; k < m_uiConfigurationCount; ++k)
     {
         appGeneral(_T("{"));
-        for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
+        for (UINT i = 0; i < uiHalf; ++i)
         {
-            LogGeneralComplex(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+            LogGeneralComplex(m_lstLoopDensity[k * uiHalf + i]);
 
             if (0 == k)
             {
-                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * uiHalf + i]);
             }
             else
             {
-                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * uiHalf + i]);
             }
 
             if (k == m_uiConfigurationCount - 1)
