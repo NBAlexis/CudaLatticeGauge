@@ -225,6 +225,33 @@ protected:
     SBYTE m_byEvenFieldId;
 };
 
+
+__DEFINE_ENUM(EMeasureDiagnal,
+    EMD_D,
+    EMD_InverseD,
+    EMD_Gamma1,
+    EMD_Gamma2,
+    EMD_Gamma3,
+    EMD_Gamma4,
+    EMD_Gamma5,
+    EMD_Sigma12,
+    EMD_Sigma13,
+    EMD_Sigma14,
+    EMD_Sigma23,
+    EMD_Sigma24,
+    EMD_Sigma34,
+    EMD_Gamma51,
+    EMD_Gamma52,
+    EMD_Gamma53,
+    EMD_Gamma54,
+
+    EMD_Max,
+    )
+
+extern CLGAPI void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, const class CFieldGauge* pGauge, const class CFieldFermionWilsonSquareSU3* pFermion);
+
+extern CLGAPI void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, const class CFieldGauge* pGauge, const class CFieldFermionKSSU3* pFermion);
+
 __END_NAMESPACE
 
 #endif //#ifndef _CFIELDFERMION_H_

@@ -79,6 +79,14 @@ __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedOmelyan);
 
 __REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedForceGradient);
 
+//#if !_CLG_DEBUG
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma1);
+
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma2);
+
+//#endif
+
 UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 {
     CMeasureMesonCorrelator* pMeasure = dynamic_cast<CMeasureMesonCorrelator*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));

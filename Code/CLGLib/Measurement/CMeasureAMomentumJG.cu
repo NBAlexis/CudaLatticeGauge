@@ -66,6 +66,57 @@ _kernelCalculateAngularMomentumJG(
 }
 
 /**
+* Copy from _kernelAdd4PlaqutteTermSU3_Test and _kernelAddChairTermSU3_Term5
+* 
+*/
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateAngularMomentumS2(
+    const deviceSU3* __restrict__ pDeviceData,
+    Real* pBuffer,
+    SSmallInt4 sCenterSite,
+    Real betaOverN,
+    BYTE byFieldId)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    Real fRes = F(0.0);
+
+    if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
+    {
+        const Real betaOverN1over8 = F(0.125) * betaOverN;
+        const Real fXYOmega2 = -(sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y);
+
+        //===============
+        //-Omega^2 xy V132
+        const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
+
+        fRes = fV132 * betaOverN1over8;
+
+        Real fXSq = (sSite4.x - sCenterSite.x);
+        fXSq = fXSq * fXSq;
+        Real fYSq = (sSite4.y - sCenterSite.y);
+        fYSq = fYSq * fYSq;
+
+        //======================================================
+        //4-plaqutte terms
+        //Omega^2 x^2 Retr[1 - U_2,3]
+        const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
+
+        //Omega^2 y^2 Retr[1 - U_1,3]
+        const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
+
+        //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
+        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
+
+        fRes += (fU23 + fU13 + fU12) * betaOverN;
+    }
+
+    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
+}
+
+
+/**
  * In _deviceChairTerm, the projective plane is already considered
  * So we need only to check the x and y
  */
@@ -112,6 +163,52 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
     }
 
     atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes);
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateAngularMomentumS2ProjectivePlane(
+    const deviceSU3* __restrict__ pDeviceData,
+    Real* pBuffer,
+    SSmallInt4 sCenterSite,
+    Real betaOverN,
+    BYTE byFieldId)
+{
+    intokernalOnlyInt4;
+
+    const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
+    Real fRes = F(0.0);
+
+    if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
+    {
+        const Real betaOverN1over8 = -F(0.125) * betaOverN;
+        const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5));
+
+        //===============
+        //-Omega^2 xy V132
+        const Real fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
+
+        fRes = fV132 * betaOverN1over8;
+
+        Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
+        fXSq = fXSq * fXSq;
+        Real fYSq = (sSite4.y - sCenterSite.y + F(0.5));
+        fYSq = fYSq * fYSq;
+
+        //======================================================
+        //4-plaqutte terms
+        //Omega^2 x^2 Retr[1 - U_2,3]
+        const Real fU23 = fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiN, sSite4, byFieldId);
+
+        //Omega^2 y^2 Retr[1 - U_1,3]
+        const Real fU13 = fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiN, sSite4, byFieldId);
+
+        //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
+        const Real fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiN, sSite4, byFieldId);
+
+        fRes += (fU23 + fU13 + fU12) * betaOverN;
+    }
+
+    atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], fRes);
 }
 
 /**
@@ -795,6 +892,57 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         appDetailed(_T("\n"));
     }
 
+#pragma region measure s2
+
+    _ZeroXYPlane(m_pDeviceDataBuffer);
+
+    if (m_bProjectivePlane)
+    {
+        _kernelCalculateAngularMomentumS2ProjectivePlane << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pDeviceDataBuffer,
+            CCommonData::m_sCenter,
+            fBetaOverN,
+            m_byFieldId);
+    }
+    else
+    {
+        _kernelCalculateAngularMomentumS2 << <block, threads >> > (
+            pGaugeSU3->m_pDeviceData,
+            m_pDeviceDataBuffer,
+            CCommonData::m_sCenter,
+            fBetaOverN,
+            m_byFieldId);
+    }
+
+    _AverageXYPlane(m_pDeviceDataBuffer);
+    checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaGetLastError());
+
+    for (UINT i = 1; i < _HC_Ly; ++i)
+    {
+        for (UINT j = 1; j < _HC_Lx; ++j)
+        {
+            m_lstResJGS2.AddItem(m_pHostDataBuffer[j * _HC_Ly + i]);
+        }
+    }
+
+    if (m_bMeasureDistribution)
+    {
+        XYDataToRdistri_R(
+            m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
+            m_uiMaxR, FALSE, m_byFieldId);
+
+        checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
+        FillDataWithR_R(
+            m_lstJGS2, &m_lstJGS2Inner, m_lstJGS2All, m_lstR,
+            m_pHostDistributionJG, m_pHostDistributionR,
+            m_uiConfigurationCount, m_uiMaxR, m_uiEdgeR, F(1.0), FALSE
+        );
+    }
+
+#pragma endregion
+
 
     if (m_bMeasureSpin)
     {
@@ -1133,6 +1281,12 @@ void CMeasureAMomentumJG::Report()
 
     appGeneral(_T("===================================================\n"));
 
+    appGeneral(_T("\n===================================================\n"));
+    appGeneral(_T("=========== Angular Momentum S2 of sites ==========\n"), CCommonData::m_sCenter.x);
+    appGeneral(_T("===================================================\n"));
+
+    ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS2);
+
     if (m_bMeasureSpin)
     {
         appGeneral(_T("\n===================================================\n"));
@@ -1191,6 +1345,7 @@ void CMeasureAMomentumJG::Reset()
     m_lstResJGChenApprox2.RemoveAll();
     m_lstResJGSurf.RemoveAll();
     m_lstResJGPot.RemoveAll();
+    m_lstResJGS2.RemoveAll();
 
     m_lstR.RemoveAll();
     m_lstJG.RemoveAll();
@@ -1200,6 +1355,7 @@ void CMeasureAMomentumJG::Reset()
     m_lstJGChenApprox2.RemoveAll();
     m_lstJGSurf.RemoveAll();
     m_lstJGPot.RemoveAll();
+    m_lstJGS2.RemoveAll();
 
     m_lstJGAll.RemoveAll();
     m_lstJGInner.RemoveAll();
@@ -1215,6 +1371,8 @@ void CMeasureAMomentumJG::Reset()
     m_lstJGSurfInner.RemoveAll();
     m_lstJGPotAll.RemoveAll();
     m_lstJGPotInner.RemoveAll();
+    m_lstJGS2All.RemoveAll();
+    m_lstJGS2Inner.RemoveAll();
 }
 
 __END_NAMESPACE

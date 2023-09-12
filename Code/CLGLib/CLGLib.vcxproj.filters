@@ -290,9 +290,6 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Measurement\CMeasureAMomentumJG.h">
-      <Filter>Measurement</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h">
       <Filter>Measurement</Filter>
     </ClInclude>
@@ -407,9 +404,6 @@
     <ClInclude Include="Measurement\CMeasureWilsonLoop.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggered.h">
-      <Filter>Measurement</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureChiralCondensateKS.h">
       <Filter>Measurement</Filter>
     </ClInclude>
@@ -418,9 +412,6 @@
     </ClInclude>
     <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h">
       <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h">
-      <Filter>Measurement</Filter>
     </ClInclude>
     <ClInclude Include="Data\Field\CFieldFermionKSSU3EM.h">
       <Filter>Data\Field</Filter>
@@ -438,9 +429,6 @@
       <Filter>Measurement</Filter>
     </ClInclude>
     <ClInclude Include="Measurement\CMeasurePandChiralTalor.h">
-      <Filter>Measurement</Filter>
-    </ClInclude>
-    <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h">
       <Filter>Measurement</Filter>
     </ClInclude>
     <ClInclude Include="Tools\Data\CLGMD5.h">
@@ -473,9 +461,6 @@
     <ClInclude Include="Data\Field\CFieldFermionKSSU3REM.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h">
-      <Filter>Measurement</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
@@ -502,6 +487,24 @@
     </ClInclude>
     <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.h">
       <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggered.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureAMomentumJG.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.h">
+      <Filter>Data\Field</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -605,6 +608,9 @@
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftNested.cpp">
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Field\CFieldFermion.cpp">
+      <Filter>Data\Field</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -669,9 +675,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DR.cu">
       <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu">
-      <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureChargeAndCurrents.cu">
       <Filter>Measurement</Filter>
@@ -754,9 +757,6 @@
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu">
-      <Filter>Measurement</Filter>
-    </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureChiralCondensateKS.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
@@ -768,9 +768,6 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu">
       <Filter>Measurement\GaugeSmearing</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu">
-      <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3EM.cu">
       <Filter>Data\Field</Filter>
@@ -785,9 +782,6 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu">
-      <Filter>Measurement</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureWilsonLoopWithPath.cu">
@@ -814,9 +808,6 @@
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3REM.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
-    <CudaCompile Include="Measurement\CMeasureAngularMomentumKSREM.cu">
-      <Filter>Measurement</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
@@ -841,8 +832,26 @@
     <CudaCompile Include="Measurement\CMeasurePandChiralTalorKS.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureAngularMomentumKS.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureAngularMomentumKSREM.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggered.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureMesonCorrelatorStaggeredSimple2.cu">
       <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu">
+      <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

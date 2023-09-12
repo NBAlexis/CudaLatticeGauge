@@ -1,6 +1,6 @@
 # EBGJ_Simulate, EBGJ_Measure, EBGJ_Simulate2, EBGJ_Measure2, 
 # EBGJ_SimulateScanBeta, EBGJ_MeasureScanBeta, EBGJ_GaugeFixing, EBGJ_SimulateQ, EBGJ_SimulateScanQ
-WorkJob : EBGJ_Simulate2
+WorkJob : EBGJ_MeasureScanBeta
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -837,25 +837,25 @@ JobMeasureBetaScan:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 11
-    BetaList : [5.45, 5.5, 5.55, 5.6, 5.65, 5.7, 5.75, 5.8, 5.85, 5.9, 5.95]
-    PrefixList : [545, 550, 555, 560, 565, 570, 575, 580, 585, 590, 595]
-    StartN : 1991
-    EndN : 2000
+    ListEnd : 10
+    BetaList : [5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5]
+    PrefixList : [56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+    StartN : 101
+    EndN : 2300
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaScan/Fermion/FB02_
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson
+    ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular
     DistributionJob : EBSMJ_Wilson
     FermionMomentum : 0
     StochasticFieldCount : 10
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : F:\Builds\DoubleBuild-8-10\Release\ScanQ
+    SubFolderPrefix : E:\DoubleBuild-8-10\Release\BSQ
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinDouble
 
@@ -871,7 +871,7 @@ JobMeasureBetaScan:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 1
-    MeasureListLength : 3
+    MeasureListLength : 4
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -955,6 +955,17 @@ JobMeasureBetaScan:
     Measure3:
 
         MeasureName : CMeasureWilsonLoop
+
+    Measure4:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+        MeasureDist : 1
+        MeasureSpin : 1
+        MeasureApprox : 0
+        ProjectivePlane : 0
+        NaiveNabla : 0
 
     GaugeSmearing:
 

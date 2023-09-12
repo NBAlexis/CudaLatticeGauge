@@ -1,0 +1,168 @@
+
+TestDMatrixKS:
+   
+    # When DOperator is implemented, use this to check sign problem
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+    Sites : [0, 1, 2, 253, 254, 255]
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+        
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3R
+
+        FieldInitialType : EFIT_Zero
+
+        EachSiteEta : 1
+
+        # 2am
+        Mass : 0.1
+        FieldId : 2
+        PoolNumber : 15
+
+        Qa2Ez : 0.1
+        Qa2Bz : 0.1
+        EMChange : -0.33333333333
+
+        Gamma54 : 0.1
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1
+
+
+
+TestFermionMatrixKS:
+   
+    # When DOperator is implemented, use this to check sign problem
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    FermionFieldCount : 1
+    MeasureListLength : 0
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Identity
+        Period : [1, 1, 1, 1]
+        
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3Gamma
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_RandomGaussian
+
+        Mass : 0.05
+        FieldId : 2
+        PoolNumber : 15
+
+        # EachSiteEta : 1
+
+        Gamma1 : 0.1
+        Gamma2 : 0.2
+        Gamma3 : 0.3
+        Gamma4 : 0.4
+        Gamma5 : 0.5
+        Gamma51 : 0.15
+        Gamma52 : 0.25
+        Gamma53 : 0.35
+        Gamma54 : 0.45
+        Sigma12 : 0.12
+        Sigma13 : 0.13
+        Sigma14 : 0.14
+        Sigma23 : 0.23
+        Sigma24 : 0.24
+        Sigma34 : 0.34
+
+        Period : [1, 1, 1, -1]
+        MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
+        MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
+
+    Solver:
+
+        SolverForFieldId : 2
+
+        # SolverName : CSLASolverBiCGStab
+        # Accuracy : 0.00000001
+
+        DiviationStep : 50
+        MaxStep : 1
+
+        SolverName : CSLASolverGMRES
+        MaxDim : 15
+
+        # SolverName : CSLASolverGCRODR
+        Accuracy : 0.0000001
+        # MDim : 26
+        # KDim : 5
+        # RecalculateR : 5
+        # DeflateSpace : EEDT_SVD
+
+        Restart : 500
+        AbsoluteAccuracy : 1

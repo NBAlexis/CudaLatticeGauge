@@ -102,6 +102,8 @@ public:
 
     UBOOL NeedToFixBoundary() const { return m_bNeedToFixBoundary; }
 
+    class CBoundaryCondition* GetBoudanryCondition() const { return m_pBoundaryCondition; }
+
     class CBoundaryCondition * m_pBoundaryCondition;
     UBOOL m_bNeedToFixBoundary;
 };

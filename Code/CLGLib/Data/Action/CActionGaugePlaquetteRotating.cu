@@ -56,15 +56,15 @@ _kernelAdd4PlaqutteTermSU3_Test(
     //======================================================
     //4-plaqutte terms
     //Omega^2 x^2 Retr[1 - U_2,3]
-    const Real fU14 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
+    const Real fU23 = fOmegaSq * fXSq * _device4PlaqutteTerm(pDeviceData, 1, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 y^2 Retr[1 - U_1,3]
-    const Real fU24 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
+    const Real fU13 = fOmegaSq * fYSq * _device4PlaqutteTerm(pDeviceData, 0, 2, uiBigIdx, sSite4, byFieldId);
 
     //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
-    const Real fU34 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
+    const Real fU12 = fOmegaSq * (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 
-    results[uiSiteIndex] = (fU14 + fU24 + fU34) * betaOverN;
+    results[uiSiteIndex] = (fU23 + fU13 + fU12) * betaOverN;
 }
 
 /**

@@ -4,7 +4,7 @@
 # ESR_SimulateQuenched, ESR_SimulateQuenchedU1
 # ESR_SimulateQuenched3D, ESR_SimulateQuenchedU13D
 # ESR_Measure3D, ESR_MeasureU13D
-RotationJob : ESR_SimulateQuenched
+RotationJob : ESR_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -338,13 +338,13 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    FreeFermion : 1
-    GaugeBate : 4.86
-    OmegaRange : 0.128
+    FreeFermion : 0
+    GaugeBate : 4.87
+    OmegaRange : 0.14
     StartOmega : 0
-    EndOmega : 8
-    StartN : 1
-    EndN : 1
+    EndOmega : 20
+    StartN : 101
+    EndN : 12000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -358,7 +358,7 @@ JobMeasure:
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat, EDJKS_Taylor, EDJKS_AngularMomentumDiagnal
-    DistributionJob : EDJKS_AngularMomentumDiagnal
+    DistributionJob : EDJKS_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 10
     StochasticGaussian : 1
@@ -366,16 +366,18 @@ JobMeasure:
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\SRFloat\486295059\GF
+    SubFolderPrefix : G:\configs\newresf\48716\Nt3
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
-
-    SavePrefix : GFSRF486295059_
-    CSVSavePrefix : ./FSRF486295059I_
+    
+    # R for most cases, Rotate for only configurations
+    MiddleString : Rotate
+    SavePrefix : NC48716_
+    CSVSavePrefix : ./NC48716_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 4]
+    LatticeLength : [12, 12, 12, 3]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -390,10 +392,10 @@ JobMeasure:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
         FieldInitialType : EFIT_Random
 
-        Period : [1, 1, 1, 1]
+        Period : [0, 0, 1, 1]
 
     GaugeBoundary:
 
@@ -543,7 +545,7 @@ JobMeasure:
         ShowResult : 0
         MeasureDist : 1
         MeasureZ : 0
-        ShiftCenter : 1
+        ShiftCenter : 0
 
     Measure2:
 

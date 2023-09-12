@@ -291,6 +291,9 @@ CCString CFieldFermionKSSU3D::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
+
+    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
+    sRet = sRet + tab + _T("boundary : [") + appIntToString(boundary.x) + _T(", ") + appIntToString(boundary.y) + _T(", ") + appIntToString(boundary.z) + _T(", ") + appIntToString(boundary.w) + _T("]\n");
     return sRet;
 }
 

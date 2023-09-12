@@ -8,7 +8,7 @@
 //
 // We assume lx * ly < max-thread
 //
-// JG               : r x (E x B)
+// JG               : r x (E x B),   JG is also S1, where S = S0 + OmegaI S1 + OmegaI^2 S2
 // JS               : E x Aphys
 // JGChen           : E (r x Dpure) Aphys, gauge inv. version
 // JGChenApprox     : E (r x Dpure) Aphys, use Dpure a = partial - i g [Apure, a],
@@ -113,6 +113,7 @@ protected:
     TArray<Real> m_lstResJGChenApprox2;
     TArray<Real> m_lstResJGSurf;
     TArray<Real> m_lstResJGPot;
+    TArray<Real> m_lstResJGS2;
 
     UBOOL m_bMeasureSpin;
     UBOOL m_bNaiveNabla;
@@ -159,6 +160,11 @@ public:
     TArray<Real> m_lstJGPotInner;
     //jg surf as function of R
     TArray<Real> m_lstJGPot;
+
+    TArray<Real> m_lstJGS2All;
+    TArray<Real> m_lstJGS2Inner;
+    //s2 as function of R
+    TArray<Real> m_lstJGS2;
 };
 
 __END_NAMESPACE

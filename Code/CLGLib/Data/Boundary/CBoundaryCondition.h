@@ -59,6 +59,8 @@ public:
 
     virtual UBOOL NeedToFixBoundary() const { return FALSE; }
 
+    SSmallInt4 GetFieldBC(BYTE byFieldId) const { return m_FieldBC[byFieldId]; }
+
 protected:
 
     /**

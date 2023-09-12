@@ -13,6 +13,7 @@ __DEFINE_ENUM(EBetaScanMeasureJob,
     EBSMJ_Polyakov,
     EBSMJ_Chiral,
     EBSMJ_Wilson,
+    EBSMJ_Angular,
     EBSMJ_DoubleToFloat,
     )
 
@@ -127,6 +128,7 @@ INT MeasurementBetaScan(CParameters& params)
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureWilsonLoop* pWL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
+    CMeasureAMomentumJG* pAMJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
     CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
 
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
@@ -138,6 +140,7 @@ INT MeasurementBetaScan(CParameters& params)
     CFieldFermionKSSU3* pF2Light = NULL;
     //CFieldFermionKSSU3* pF1Heavy = NULL;
     //CFieldFermionKSSU3* pF2Heavy = NULL;
+
 
     if (EBSMJ_Chiral == eJob)
     {
@@ -155,11 +158,16 @@ INT MeasurementBetaScan(CParameters& params)
         {
             pAG->SetBeta(BetaList[uiOmega]);
         }
+        else
+        {
+            CCommonData::m_fBeta = BetaList[uiOmega];
+        }
         appGeneral(_T("(* ==== Beta(%f) ========= *)\n"), BetaList[uiOmega]);
         pPL->Reset();
         pWL->Reset();
         pCCLight->Reset();
         //pCCHeavy->Reset();
+        pAMJG->Reset();
 
         pCCLight->SetFieldCount(iFieldCount);
         //pCCHeavy->SetFieldCount(iFieldCount);
@@ -330,6 +338,12 @@ INT MeasurementBetaScan(CParameters& params)
                     }
                 }
                 break;
+                case EBSMJ_Angular:
+                    {
+                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                        pAMJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -428,6 +442,16 @@ INT MeasurementBetaScan(CParameters& params)
                 WriteStringFileComplexArray2(sCSVFile, vrs);
             }
             break;
+            case EBSMJ_Angular:
+                {
+                    _CLG_EXPORT_ANGULAR(pAMJG, JG, uiOmega, O);
+                    _CLG_EXPORT_ANGULAR(pAMJG, JGS2, uiOmega, O);
+                    _CLG_EXPORT_ANGULAR(pAMJG, JGS, uiOmega, O);
+                    _CLG_EXPORT_ANGULAR(pAMJG, JGChen, uiOmega, O);
+                    _CLG_EXPORT_ANGULAR(pAMJG, JGSurf, uiOmega, O);
+                    _CLG_EXPORT_ANGULAR(pAMJG, JGPot, uiOmega, O);
+                }
+                break;
             default:
                 break;
         }

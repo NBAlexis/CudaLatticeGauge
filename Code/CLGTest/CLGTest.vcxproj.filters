@@ -41,6 +41,9 @@
     <ClCompile Include="Tests\TestRotationAcc.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestFermionMatrix.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
@@ -88,6 +91,9 @@
       <Filter>YAMLs</Filter>
     </None>
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdatorKS.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_FermionMatrix.yaml">
       <Filter>YAMLs</Filter>
     </None>
   </ItemGroup>

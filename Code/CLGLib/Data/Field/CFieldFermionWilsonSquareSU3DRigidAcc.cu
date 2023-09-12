@@ -450,6 +450,10 @@ CCString CFieldFermionWilsonSquareSU3DRigidAcc::GetInfos(const CCString &tab) co
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DRigidAcc\n");
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
     sRet = sRet + tab + _T("G2 : ") + appFloatToString(m_fG2) + _T("\n");
+
+    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
+    sRet = sRet + tab + _T("boundary : [") + appIntToString(boundary.x) + _T(", ") + appIntToString(boundary.y) + _T(", ") + appIntToString(boundary.z) + _T(", ") + appIntToString(boundary.w) + _T("]\n");
+
     return sRet;
 }
 

@@ -1031,3 +1031,162 @@ TestBerryPhase:
 
 
 
+TestFermionUpdatorWilsonDiracGamma1:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.530
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 50
+        # NestedStep : 3
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3Gamma
+        # FieldName : CFieldFermionWilsonSquareSU3D
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        ExpGamma : 1
+
+        Gamma1 : 0.1
+        Gamma2 : 0.2
+        Gamma3 : 0.3
+        Gamma4 : 0.4
+        Gamma5 : 0.5
+        Gamma51 : 0.15
+        Gamma52 : 0.25
+        Gamma53 : 0.35
+        Gamma54 : 0.45
+        Sigma12 : 0.12
+        Sigma13 : 0.13
+        Sigma14 : 0.14
+        Sigma23 : 0.23
+        Sigma24 : 0.24
+        Sigma34 : 0.34
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 50
+        Accuracy : 0.00005
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestFermionUpdatorWilsonDiracGamma2:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.530
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 100
+        # NestedStep : 3
+
+    Gauge:
+    
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_Random
+        
+    FermionField1:
+        
+        FieldName : CFieldFermionWilsonSquareSU3Gamma
+        # FieldName : CFieldFermionWilsonSquareSU3D
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+
+        ExpGamma : 0
+
+        Gamma1 : 0.1
+        Gamma2 : 0.2
+        Gamma3 : 0.3
+        Gamma4 : 0.4
+        Gamma5 : 0.5
+        Gamma51 : 0.15
+        Gamma52 : 0.25
+        Gamma53 : 0.35
+        Gamma54 : 0.45
+        Sigma12 : 0.12
+        Sigma13 : 0.13
+        Sigma14 : 0.14
+        Sigma23 : 0.23
+        Sigma24 : 0.24
+        Sigma34 : 0.34
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 50
+        Accuracy : 0.000001
+        Restart : 50
+        AbsoluteAccuracy : 1
+
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 5.5
+
+    Action2:
+
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

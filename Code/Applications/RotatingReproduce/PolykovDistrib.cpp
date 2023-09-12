@@ -694,6 +694,7 @@ INT MeasurePolyakovDist(CParameters& params)
             case EDJ_AngularMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS2);
                 _CLG_EXPORT_ANGULAR(pJG, JGS);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen);
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf);
@@ -725,6 +726,7 @@ INT MeasurePolyakovDist(CParameters& params)
             case EDJ_ChiralAndFermionMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG);
+                _CLG_EXPORT_ANGULAR(pJG, JGS2);
                 _CLG_EXPORT_ANGULAR(pJG, JGS);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen);
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf);

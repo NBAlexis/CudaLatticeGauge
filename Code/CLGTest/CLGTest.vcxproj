@@ -28,6 +28,7 @@
     <ClCompile Include="Tests\TestAngularMomentum.cpp" />
     <ClCompile Include="Tests\TestBoundary.cpp" />
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
+    <ClCompile Include="Tests\TestFermionMatrix.cpp" />
     <ClCompile Include="Tests\TestFermionUpdator.cpp" />
     <ClCompile Include="Tests\TestCommon.cpp" />
     <ClCompile Include="Tests\TestKSUpdator.cpp" />
@@ -47,6 +48,7 @@
     <None Include="..\..\Bin\Debug\TestSuit_Boundary.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Common.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_FermionMatrix.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdator.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdatorKS.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FileIO.yaml" />

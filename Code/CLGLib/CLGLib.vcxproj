@@ -70,6 +70,7 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.h" />
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.h" />
+    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3D.h" />
     <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h" />
     <ClInclude Include="Data\Field\CFieldGaugeU1.h" />
@@ -196,6 +197,7 @@
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.cu" />
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.cu" />
+    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeSU3TreeImproved.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeU1.cu" />
     <CudaCompile Include="Data\Field\CFieldGaugeU1Real.cu" />
@@ -216,6 +218,7 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
+    <ClCompile Include="Data\Field\CFieldFermion.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <FileType>Document</FileType>

@@ -92,6 +92,10 @@ INT Measurement(CParameters& params)
     params.FetchStringValue(_T("SubFolderPrefix"), sSubFolderPrefix);
     appGeneral(_T("sub folder prefix: %s\n"), sSubFolderPrefix.c_str());
 
+    CCString sMiddleString = _T("R");
+    params.FetchStringValue(_T("MiddleString"), sMiddleString);
+    appGeneral(_T("middle string: %s\n"), sMiddleString.c_str());
+
     Real fBeta = F(0.0);
     params.FetchValueReal(_T("GaugeBate"), fBeta);
 
@@ -241,13 +245,13 @@ INT Measurement(CParameters& params)
             CCString sTxtFileName;
             if (bSubFolder)
             {
-                sFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
-                sTxtFileName.Format(_T("%s/O%d/%sR_Nt%d_O%d_%d.txt"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sFileName.Format(_T("%s/O%d/%s%s_Nt%d_O%d_%d.con"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), sMiddleString.c_str(), _HC_Lt, uiOmega, uiN);
+                sTxtFileName.Format(_T("%s/O%d/%s%s_Nt%d_O%d_%d.txt"), sSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), sMiddleString.c_str(), _HC_Lt, uiOmega, uiN);
             }
             else
             {
-                sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
-                sTxtFileName.Format(_T("%sR_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
+                sFileName.Format(_T("%s%s_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), sMiddleString.c_str(), _HC_Lt, uiOmega, uiN);
+                sTxtFileName.Format(_T("%s%s_Nt%d_O%d_%d.txt"), sSavePrefix.c_str(), sMiddleString.c_str(), _HC_Lt, uiOmega, uiN);
             }
             //appGeneral(_T("checking %s ..."), sFileName);
             if (EDJKS_CheckMD5 == eJob || bCheckMd5)
@@ -918,6 +922,7 @@ INT Measurement(CParameters& params)
             case EDJKS_AngularMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG, uiOmega, O);
+                _CLG_EXPORT_ANGULAR(pJG, JGS2, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGS, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiOmega, O);
@@ -927,6 +932,7 @@ INT Measurement(CParameters& params)
             case EDJKS_ChiralAndFermionMomentum:
             {
                 _CLG_EXPORT_ANGULAR(pJG, JG, uiOmega, O);
+                _CLG_EXPORT_ANGULAR(pJG, JGS2, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGS, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGChen, uiOmega, O);
                 _CLG_EXPORT_ANGULAR(pJG, JGSurf, uiOmega, O);

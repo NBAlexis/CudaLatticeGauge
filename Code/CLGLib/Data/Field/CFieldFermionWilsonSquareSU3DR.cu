@@ -2037,6 +2037,10 @@ CCString CFieldFermionWilsonSquareSU3DR::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
     sRet = sRet + tab + _T("Naive : ") + (m_bNaive ? _T("1") : _T("0"));
     sRet = sRet + tab + _T("Exponential : ") + (m_bExponential ? _T("1") : _T("0"));
+
+    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
+    sRet = sRet + tab + _T("boundary : [") + appIntToString(boundary.x) + _T(", ") + appIntToString(boundary.y) + _T(", ") + appIntToString(boundary.z) + _T(", ") + appIntToString(boundary.w) + _T("]\n");
+
     return sRet;
 }
 

@@ -1,5 +1,5 @@
 # {ERJ_AngularMomentum, ERJ_Thermal, ERJ_PolyakovDist, ERJ_GaugeFixing, ERJ_RotationTest}
-RotatingJob : ERJ_PolyakovDist
+RotatingJob : ERJ_Thermal
 VerboseLevel : PARANOIAC
 VerboseOutput : datetime
 

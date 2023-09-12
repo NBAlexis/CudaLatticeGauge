@@ -89,7 +89,7 @@ JobSimulate:
         FieldId : 2
         PoolNumber : 15
 
-        Gamma45 : 0.1
+        Gamma54 : 0.1
         Charge : 0.6666666666666666667
         EMFieldID : 4
 
@@ -115,7 +115,7 @@ JobSimulate:
         FieldId : 3
         PoolNumber : 15
 
-        Gamma45 : 0.1
+        Gamma54 : 0.1
         Charge : -0.3333333333333333333333
         EMFieldID : 4
 
@@ -310,7 +310,7 @@ JobMeasure:
         FieldId : 2
         PoolNumber : 15
 
-        Gamma45 : 0.1
+        Gamma54 : 0.1
         Charge : 0.6666666666666666667
         EMFieldID : 4
 
@@ -336,7 +336,7 @@ JobMeasure:
         FieldId : 3
         PoolNumber : 15
 
-        Gamma45 : 0.1
+        Gamma54 : 0.1
         Charge : -0.3333333333333333333333
         EMFieldID : 4
 

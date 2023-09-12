@@ -93,6 +93,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Gamma.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3TreeImproved.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1.h
@@ -217,6 +218,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Gamma.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3TreeImproved.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeU1Real.cu
@@ -271,6 +273,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftGMRES.cpp
@@ -338,6 +341,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestAngularMomentum.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestBoundary.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestConfigurationFileIO.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionMatrix.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestCommon.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestKSUpdator.cpp
