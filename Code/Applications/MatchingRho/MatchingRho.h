@@ -25,17 +25,6 @@ __DEFINE_ENUM(ECondList,
     );
 
 
-#if !_CLG_WIN
-
-void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
-{
-    static TCHAR tmpBuff[10];
-    appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);
-    appSprintf(buff, uiBuffLength, tmpBuff, fVaule);
-}
-
-#endif
-
 void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);

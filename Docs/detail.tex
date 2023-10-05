@@ -110,6 +110,16 @@
     basicstyle=\footnotesize\ttfamily,
 }
 
+\lstdefinestyle{yaml}{
+     basicstyle=\color{blue}\footnotesize,
+     rulecolor=\color{black},
+     string=[s]{'}{'},
+     stringstyle=\color{blue},
+     comment=[l]{:},
+     commentstyle=\color{black},
+     morecomment=[l]{-}
+ }
+
 \section{\label{sec:data}Data}
 
 \input "data/index.tex"
@@ -192,6 +202,14 @@
 \input "Applications/DataAnalyse.tex"
 
 \input "Applications/ConstantAcceleration.tex"
+
+\clearpage
+
+\section{\label{sec:SomeResults}Some Results}
+
+\input "Results/MatchingQuench.tex"
+
+\input "Results/ResQuench.tex"
 
 \clearpage
 

@@ -11,17 +11,6 @@
 
 enum { kExportDigital = 20, };
 
-#if !_CLG_WIN
-
-void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
-{
-    static TCHAR tmpBuff[10];
-    appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);
-    appSprintf(buff, uiBuffLength, tmpBuff, fVaule);
-}
-
-#endif
-
 void WriteStringFile(const CCString& sFileName, const CCString& sContent)
 {
     appGetFileSystem()->WriteAllText(sFileName, sContent);

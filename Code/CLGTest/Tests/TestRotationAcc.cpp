@@ -767,6 +767,8 @@ UINT TestBetaGradient(CParameters& sParam)
 }
 
 __REGIST_TEST(TestRotation, Updator, TestRotation);
+__REGIST_TEST(TestRotation, Updator, TestRotationTorus);
+
 __REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 
 //This has sign problem..

@@ -1,0 +1,58 @@
+\subsection{\label{matchingquench}Matching quenched}
+
+The first set of result is for $12^3 \times 48$, in the quenched approximation, torus boundary.
+
+\begin{lstlisting}[style=yaml]
+GaugeSmearing:
+
+    SmearingName : CGaugeSmearingAPEProj
+    AlphaLeft : 2.3
+    AlphaRight : 1
+    Iterate : 26
+    # Cabibbo-Marinani projection is not correctly implemented
+    Cabibbo : 1
+    ProjIterate : 15
+    HasT : 0
+\end{lstlisting}
+
+The Wilson loop is calculated using $\Delta t = [2a, 6a]$, and $r^2\leq 20 a^2$, $200+(100+1900)\times 13$ configurations are generated, the statistical error is calculated using only jackknife.
+\textcolor[rgb]{0,0,1}{Autocorrelation shows that the $\tau _{\rm int}\approx 0.5$ for all beta.}
+The results are in Table.~\ref{tab.res.matchingquench1}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+    \hline    
+$\beta$ & $r_0/a$ & $r_1/a$ & $a^{-1}$ & $c(\beta)r_0$ & $c(\beta)a$\\
+& & & (MeV) & & \\
+\hline
+$5.45$ & $1.727(5)$ & $1.193(22)$ & $ 681(2)$ & $-1.070(62)$ & $-0.619(36)$\\
+\hline
+$5.5$  & $1.884(4)$ & $1.325(8)$  & $ 742(2)$ & $-1.160(31)$ & $-0.616(16)$\\
+\hline
+$5.55$ & $2.065(3)$ & $1.458(3)$  & $ 814(1)$ & $-1.307(15)$ & $-0.633(7)$\\
+\hline
+$5.6$  & $2.312(3)$ & $1.637(1)$  & $ 911(1)$ & $-1.507(8)$  & $-0.652(3)$\\
+\hline
+$5.65$ & $2.595(2)$ & $1.845(1)$  & $1022(1)$ & $-1.716(5)$  & $-0.661(2)$\\ 
+\hline
+$5.7$  & $2.932(3)$ & $2.091(1)$  & $1155(1)$ & $-1.965(4)$  & $-0.670(1)$\\
+\hline
+$5.75$ & $3.317(3)$ & $2.368(1)$  & $1307(1)$ & $-2.251(3)$  & $-0.679(1)$\\
+\hline
+$5.8$  & $3.693(3)$ & $2.644(2)$  & $1455(1)$ & $-2.501(3)$  & $-0.677(1)$\\
+\hline
+$5.85$ & $4.119(4)$ & $2.953(3)$  & $1623(2)$ & $-2.791(3)$  & $-0.678(1)$\\
+\hline
+$5.9$  & $4.532(5)$ & $3.255(3)$  & $1785(2)$ & $-3.053(4)$  & $-0.674(1)$\\
+\hline
+$5.95$ & $4.958(5)$ & $3.568(3)$  & $1953(2)$ & $-3.311(4)$  & $-0.668(1)$\\
+\hline
+$6.0$  & $5.435(6)$ & $3.919(4)$  & $2141(2)$ & $-3.596(4)$  & $-0.662(1)$\\
+\hline
+$6.05$ & $5.867(8)$ & $4.238(5)$  & $2312(3)$ & $-3.833(5)$  & $-0.653(1)$\\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{tab.res.matchingquench1}Result of matching}
+\end{table}

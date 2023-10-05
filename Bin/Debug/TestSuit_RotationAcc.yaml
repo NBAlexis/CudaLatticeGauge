@@ -11,7 +11,7 @@ TestRotation:
     RandomSeed : 1234567
     ActionListLength : 2
     FermionFieldCount : 1
-    MeasureListLength : 7
+    MeasureListLength : 6
     ExpectedRes : 0.59
     CacheStaple : 0
     BeforeEquvibStep : 5
@@ -101,32 +101,160 @@ TestRotation:
 
     Measure3:
 
-        MeasureName : CMeasureAMomentumJF
-        FieldId : 2
-        ShowResult : 1
-        Naive : 1
-        Exponential : 0
-
-    Measure4:
-
         MeasureName : CMeasureChargeAndCurrents
         FieldId : 2
         ShowResult : 1
 
-    Measure5:
+    Measure4:
 
         MeasureName : CMeasureTopologicChargeXY
         FieldId : 2
         ShowResult : 1
         GaugeSmearing : 1
 
-    Measure6:
+    Measure5:
 
         MeasureName : CMeasurePolyakovXY
         FieldId : 2
         ShowResult : 1
 
-    Measure7:
+    Measure6:
+
+        MeasureName : CMeasureChiralCondensate
+        FieldId : 2
+        FieldCount : 5
+
+    GaugeSmearing:
+
+        SmearingName : CGaugeSmearingAPEProj
+        Alpha : 0.1
+        Iterate : 3
+        ProjIterate : 6
+
+TestRotationTorus:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.59
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3DR
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [0, 0, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+        Naive : 1
+        Exponential : 1
+
+    BoundaryFermionField1:
+
+        FieldName : CFieldBoundaryWilsonSquareSU3
+        FieldId : 2
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+        CloverEnergy : 1
+        ShiftCoord : 0
+
+    Action2:
+        ActionName : CActionFermionWilsonNf2
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGCRODR
+        SolverForFieldId : 2
+        MDim : 25
+        KDim : 5
+        RecalculateR : 5
+        DeflateSpace : EEDT_SVD
+        Accuracy : 0.00001
+
+        ##SolverName : CSLASolverGMRES
+        ##SolverForFieldId : 2
+        ##MaxDim : 20
+        ##Accuracy : 0.00001
+
+        Restart : 100
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+    Measure2:
+
+        MeasureName : CMeasureAMomentumJG
+        FieldId : 1
+        ShowResult : 1
+
+    Measure3:
+
+        MeasureName : CMeasureChargeAndCurrents
+        FieldId : 2
+        ShowResult : 1
+
+    Measure4:
+
+        MeasureName : CMeasureTopologicChargeXY
+        FieldId : 2
+        ShowResult : 1
+        GaugeSmearing : 1
+
+    Measure5:
+
+        MeasureName : CMeasurePolyakovXY
+        FieldId : 2
+        ShowResult : 1
+
+    Measure6:
 
         MeasureName : CMeasureChiralCondensate
         FieldId : 2

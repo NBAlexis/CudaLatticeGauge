@@ -77,26 +77,7 @@ WriteStringFileRealArray2(sFileNameWrite##lstName, lstName##OverR); \
 WriteStringFileRealArray(sFileNameWrite##lstName##In, lstName##In); \
 WriteStringFileRealArray(sFileNameWrite##lstName##All, lstName##All);
 
-
-#if !_CLG_WIN
-inline void strerror_s(TCHAR* buffer, size_t bufferSize, INT error)
-{
-    strcpy(buffer, strerror(error));
-}
-#endif
-
 enum { kExportDigital = 20, };
-
-#if !_CLG_WIN
-
-inline void _gcvt_s(TCHAR* buff, UINT uiBuffLength, Real fVaule, UINT uiDigit)
-{
-    static TCHAR tmpBuff[10];
-    appSprintf(tmpBuff, 10, _T("%s.%df"), _T("%"), uiDigit);
-    appSprintf(buff, uiBuffLength, tmpBuff, fVaule);
-}
-
-#endif
 
 inline void WriteStringFile(const CCString& sFileName, const CCString& sContent)
 {

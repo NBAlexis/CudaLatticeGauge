@@ -849,22 +849,22 @@ JobMeasureBetaScan:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular
-    DistributionJob : EBSMJ_Wilson
+    DistributionJob : EBSMJ_Angular
     FermionMomentum : 0
     StochasticFieldCount : 10
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : E:\DoubleBuild-8-10\Release\BSQ
+    SubFolderPrefix : F:\Builds\FloatBuild-8-21\Release\BSQ
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
-    LoadType : EFFT_CLGBinDouble
+    LoadType : EFFT_CLGBinFloat
 
     SavePrefix : BSQ_
     CSVSavePrefix : BSQ_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 48]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
