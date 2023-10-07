@@ -36,6 +36,15 @@ public:
     void OnFinishTrajectory(UBOOL bAccepted) override;
     CCString GetInfos(const CCString &tab) const override;
 
+    void EnergyDirichlet(const class CFieldGaugeSU3* pGauge);
+    void EnergyProjectivePlane(const class CFieldGaugeSU3* pGauge);
+    void EnergyTorus(const class CFieldGaugeSU3* pGauge);
+
+    void CalculateForceOnGaugeDirichlet(const class CFieldGaugeSU3* pGauge, class CFieldGaugeSU3* pForce) const;
+    void CalculateForceOnGaugeProjectivePlane(const class CFieldGaugeSU3* pGauge, class CFieldGaugeSU3* pForce) const;
+    void CalculateForceOnGaugeTorus(const class CFieldGaugeSU3* pGauge, class CFieldGaugeSU3* pForce) const;
+
+
 #if !_CLG_DOUBLEFLOAT
     void SetBeta(DOUBLE fBeta);
     void SetOmega(DOUBLE fOmega);
@@ -53,6 +62,7 @@ public:
 #endif
     UBOOL m_bCloverEnergy;
     UBOOL m_bShiftHalfCoord;
+    UBOOL m_bTorus;
 
     //===== test functions ======
     DOUBLE XYTerm1(const class CFieldGauge* pGauge);
@@ -313,7 +323,7 @@ static __device__ __inline__ Real _deviceGi(
 * 0 -> r^2, 1 -> y^2, 2 -> x^2
 *
 * ==================================================
-* Note for periodic boundary condition:
+* Note for periodic boundary condition: 
 * For const SSmallInt4 sN_p_m = _deviceSmallInt4OffsetC(sSite4, mu + 1)
 * sN_p_m.mu can be -1, which leads to a wrong (sN_p_m.y - sCenter.y)
 * This '-1' should be set to L_mu - 1. If we consider add the plaquttes as clovers,
@@ -326,6 +336,10 @@ static __device__ __inline__ Real _deviceFi(
     const SSmallInt4& sCenter,
     UINT uiN, BYTE i, BYTE mu, BYTE nu)
 {
+    //for torus, we need to calculate sSite4 first, because sSite4.x might be -1
+    //const SSmallInt4 sSite4 = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sSite4Start)].m_uiSiteIndex);
+    
+
     const SSmallInt4 sN_p_mu = _deviceSmallInt4OffsetC(sSite4, mu + 1);
     const SIndex& n_p_mu__idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sN_p_mu)];
     const SSmallInt4 site_N_p_mu = __deviceSiteIndexToInt4(n_p_mu__idx.m_uiSiteIndex);
@@ -357,7 +371,7 @@ static __device__ __inline__ Real _deviceFi(
 
     if (0 == i)
     {
-
+        //return F(0.0);
         return F(0.25) * static_cast<Real>(x1 * x1 + y1 * y1
             + x2 * x2 + y2 * y2
             + x3 * x3 + y3 * y3
@@ -448,13 +462,14 @@ static __device__ __inline__ Real _deviceFiShifted(
  */
 static __device__ __inline__ deviceSU3 _deviceStapleTermGfactor(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, Real fOmegaSq,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE i, UBOOL bShifted = FALSE)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
-    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
     const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
 
     const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
@@ -482,6 +497,12 @@ static __device__ __inline__ deviceSU3 _deviceStapleTermGfactor(
     const Real fLFactor = bShifted
         ? _deviceFiShifted(byFieldId, sSite, sCenter, i, mu, nu)
         : _deviceFi(byFieldId, sSite, sCenter, uiBigIndex, i, mu, nu);
+
+    if (bTorus)
+    {
+        n_m_nu = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(n_m_nu)].m_uiSiteIndex);
+    }
+
     const Real fRFactor = bShifted
         ? _deviceFiShifted(byFieldId, n_m_nu, sCenter, i, mu, nu)
         : _deviceFi(byFieldId, n_m_nu, sCenter, __bi(n_m_nu), i, mu, nu);

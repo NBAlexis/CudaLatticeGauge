@@ -766,8 +766,13 @@ UINT TestBetaGradient(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestRotation, Updator, TestRotation);
-__REGIST_TEST(TestRotation, Updator, TestRotationTorus);
+__REGIST_TEST(TestRotation, Rotation, TestRotation);
+
+__REGIST_TEST(TestRotation, Rotation, TestRotationQuenchDirichlet);
+__REGIST_TEST(TestRotation, Rotation, TestRotationQuenchDirichletShiftCenter);
+__REGIST_TEST(TestRotation, Rotation, TestRotationQuenchTorus);
+__REGIST_TEST(TestRotation, Rotation, TestRotationQuenchTorusShiftCenter);
+__REGIST_TEST(TestRotation, Rotation, TestRotationQuenchProjectivePlane);
 
 __REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 

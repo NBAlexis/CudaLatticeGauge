@@ -78,6 +78,7 @@ _kernelAdd4PlaqutteTermU1_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermU1_XYZ_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
@@ -103,12 +104,12 @@ _kernelAddForce4PlaqutteTermU1_XYZ_Shifted(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         //mu = idir, nu = 4, i = mu
-        CLGComplex stap = _deviceStapleTermGfactorU1(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        CLGComplex stap = _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir],
             idx[2 * idir],
             TRUE);
-        stap = _cuCaddf(stap, _deviceStapleTermGfactorU1(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        stap = _cuCaddf(stap, _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir + 1],
             idx[2 * idir + 1],
@@ -693,7 +694,7 @@ UBOOL CActionGaugePlaquetteRotatingU1::CalculateForceOnGauge(const CFieldGauge *
     else
     {
 
-        _kernelAddForce4PlaqutteTermU1_XYZ_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForce4PlaqutteTermU1_XYZ_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, FALSE, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
         

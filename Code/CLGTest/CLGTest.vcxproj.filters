@@ -96,5 +96,8 @@
     <None Include="..\..\Bin\Debug\TestSuit_FermionMatrix.yaml">
       <Filter>YAMLs</Filter>
     </None>
+    <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
   </ItemGroup>
 </Project>

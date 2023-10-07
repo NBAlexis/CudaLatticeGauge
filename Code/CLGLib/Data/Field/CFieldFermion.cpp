@@ -44,66 +44,71 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, co
                 switch (eType)
                 {
                 case EMD_D:
-                {
-                    pF1->D(pGauge);
-                }
-                break;
+                    {
+                        pF1->D(pGauge);
+                    }
+                    break;
                 case EMD_InverseD:
-                {
-                    pF1->InverseD(pGauge);
-                }
-                break;
+                    {
+                        pF1->InverseD(pGauge);
+                    }
+                    break;
                 case EMD_Gamma1:
                 case EMD_Gamma2:
                 case EMD_Gamma3:
                 case EMD_Gamma4:
                 case EMD_Gamma5:
-                {
-                    pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
+                    }
+                    break;
                 case EMD_Sigma12:
-                {
-                    pF1->ApplyGamma(SIGMA12);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA12);
+                    }
+                    break;
                 case EMD_Sigma13:
-                {
-                    pF1->ApplyGamma(SIGMA31);
-                    scale = F(-1.0);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA31);
+                        scale = F(-1.0);
+                    }
+                    break;
                 case EMD_Sigma14:
-                {
-                    pF1->ApplyGamma(SIGMA41);
-                    scale = F(-1.0);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA41);
+                        scale = F(-1.0);
+                    }
+                    break;
                 case EMD_Sigma23:
-                {
-                    pF1->ApplyGamma(SIGMA23);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA23);
+                    }
+                    break;
                 case EMD_Sigma24:
-                {
-                    pF1->ApplyGamma(SIGMA42);
-                    scale = F(-1.0);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA42);
+                        scale = F(-1.0);
+                    }
+                    break;
                 case EMD_Sigma34:
-                {
-                    pF1->ApplyGamma(SIGMA43);
-                    scale = F(-1.0);
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(SIGMA43);
+                        scale = F(-1.0);
+                    }
+                    break;
                 case EMD_Gamma51:
                 case EMD_Gamma52:
                 case EMD_Gamma53:
                 case EMD_Gamma54:
-                {
-                    pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
-                }
-                break;
+                    {
+                        pF1->ApplyGamma(static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
+                    }
+                    break;
+                default:
+                    {
+                        appCrucial(_T("eType not implemented for ExportDiagnalWilsonSU3: %s"), __ENUM_TO_STRING(EMeasureDiagnal, eType).c_str());
+                    }
+                    break;
                 }
 
                 checkCudaErrors(cudaMemcpy(hostv, pF1->m_pDeviceData, sizeof(deviceSU3Vector) * uiSiteCount, cudaMemcpyDeviceToHost));
@@ -157,15 +162,15 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             switch (eType)
             {
             case EMD_D:
-            {
-                pF1->D(pGauge);
-            }
-            break;
+                {
+                    pF1->D(pGauge);
+                }
+                break;
             case EMD_InverseD:
-            {
-                pF1->InverseD(pGauge);
-            }
-            break;
+                {
+                    pF1->InverseD(pGauge);
+                }
+                break;
             case EMD_Gamma1:
             case EMD_Gamma2:
             case EMD_Gamma3:
@@ -211,6 +216,11 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Gamma54:
                 {
                     pF1->ApplyGammaKS(pGauge, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
+                }
+                break;
+            default:
+                {
+                    appCrucial(_T("eType not implemented for ExportDiagnalWilsonSU3: %s"), __ENUM_TO_STRING(EMeasureDiagnal, eType).c_str());
                 }
                 break;
             }

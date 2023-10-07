@@ -54,6 +54,7 @@
     <None Include="..\..\Bin\Debug\TestSuit_FileIO.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_GaugeFixing.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Random.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_RotationAcc.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Solver.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Updator.yaml" />

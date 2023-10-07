@@ -446,13 +446,14 @@ static __device__ __inline__ Real _deviceChairTermU1(const CLGComplex* __restric
  */
 static __device__ __inline__ CLGComplex _deviceStapleTermGfactorU1(
     BYTE byFieldId,
+    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, Real fOmegaSq,
     UINT uiBigIndex, BYTE mu, BYTE nu, BYTE i, UBOOL bShifted = FALSE)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
-    const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
+    SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
     const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
 
     const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
@@ -480,6 +481,12 @@ static __device__ __inline__ CLGComplex _deviceStapleTermGfactorU1(
     const Real fLFactor = bShifted
         ? _deviceFiShifted(byFieldId, sSite, sCenter, i, mu, nu)
         : _deviceFi(byFieldId, sSite, sCenter, uiBigIndex, i, mu, nu);
+
+    if (bTorus)
+    {
+        n_m_nu = __deviceSiteIndexToInt4(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(n_m_nu)].m_uiSiteIndex);
+    }
+
     const Real fRFactor = bShifted
         ? _deviceFiShifted(byFieldId, n_m_nu, sCenter, i, mu, nu)
         : _deviceFi(byFieldId, n_m_nu, sCenter, __bi(n_m_nu), i, mu, nu);

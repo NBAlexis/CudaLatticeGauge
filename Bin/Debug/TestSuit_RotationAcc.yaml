@@ -135,7 +135,7 @@ TestRotationTorus:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [13, 13, 12, 6]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
@@ -145,7 +145,7 @@ TestRotationTorus:
     ActionListLength : 1
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.59
+    ExpectedRes : 0.369222
     CacheStaple : 0
     BeforeEquvibStep : 5
     EquvibStep : 20
@@ -202,6 +202,7 @@ TestRotationTorus:
         Omega : 0.2
         CloverEnergy : 1
         ShiftCoord : 0
+        Torus : 1
 
     Action2:
         ActionName : CActionFermionWilsonNf2

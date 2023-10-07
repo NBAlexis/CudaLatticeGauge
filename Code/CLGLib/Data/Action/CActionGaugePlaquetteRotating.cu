@@ -155,6 +155,7 @@ _kernelAdd4PlaqutteTermSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermSU3_XY(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -187,11 +188,15 @@ _kernelAddForce4PlaqutteTermSU3_XY(
         //for xz, yz, i=1,2
         //for xy, i = 0
 
-        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, 
+        //idir = 0: xz, xy with coefficient 1 0
+        //idir = 1: yz, yx with coefficient 2 0
+        //idir = 2: zx, zy with coefficient 1 2
+
+        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir, 
             byOtherDir[2 * idir],
             idx[2 * idir]));
-        stap.Add(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        stap.Add(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir + 1],
             idx[2 * idir + 1]));
@@ -733,6 +738,7 @@ _kernelAdd4PlaqutteTermSU3_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -758,12 +764,12 @@ _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         //mu = idir, nu = 4, i = mu
-        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir],
             idx[2 * idir],
             TRUE));
-        stap.Add(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        stap.Add(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir + 1],
             idx[2 * idir + 1],
@@ -1595,6 +1601,7 @@ CActionGaugePlaquetteRotating::CActionGaugePlaquetteRotating()
     , m_fOmega(F(0.0))
     , m_bCloverEnergy(FALSE)
     , m_bShiftHalfCoord(FALSE)
+    , m_bTorus(FALSE)
     , m_fLastEnergy(F(0.0))
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
@@ -1671,6 +1678,10 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     INT iShiftCoord = 0;
     param.FetchValueINT(_T("ShiftCoord"), iShiftCoord);
     m_bShiftHalfCoord = (0 != iShiftCoord);
+
+    INT iTorus = 0;
+    param.FetchValueINT(_T("Torus"), iTorus);
+    m_bTorus = (0 != iTorus);
 }
 
 #if !_CLG_DOUBLEFLOAT
@@ -1698,6 +1709,8 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
         appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
         return TRUE;
     }
+
+#if old_cold
 
     preparethread;
 
@@ -1745,6 +1758,21 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
     }
 
+#endif
+
+    if (m_bTorus)
+    {
+        CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
+    }
+    else if (m_bShiftHalfCoord)
+    {
+        CalculateForceOnGaugeProjectivePlane(pGaugeSU3, pForceSU3);
+    }
+    else
+    {
+        CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
+    }
+
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
 }
@@ -1762,6 +1790,8 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
     {
         return m_fLastEnergy;
     }
+
+#if old_code
 
     if (m_bCloverEnergy)
     {
@@ -1880,6 +1910,27 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
 
     }
 
+#endif
+
+    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    if (NULL == pGaugeSU3)
+    {
+        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
+        return m_fNewEnergy;
+    }
+
+    if (m_bTorus)
+    {
+        EnergyTorus(pGaugeSU3);
+    }
+    else if (m_bShiftHalfCoord)
+    {
+        EnergyProjectivePlane(pGaugeSU3);
+    }
+    else
+    {
+        EnergyDirichlet(pGaugeSU3);
+    }
 
     return m_fNewEnergy;
 }
@@ -1916,6 +1967,242 @@ DOUBLE CActionGaugePlaquetteRotating::XYTerm2(const class CFieldGauge* pGauge)
 
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
+
+
+/**
+* In the case of Dirichlet, 
+* m_bShiftHalfCoord = FALSE
+* m_bCloverEnergy = FALSE
+* 
+*/
+void CActionGaugePlaquetteRotating::EnergyDirichlet(const class CFieldGaugeSU3* pGaugeSU3)
+{
+    assert(!m_bShiftHalfCoord && !m_bCloverEnergy);
+    m_fNewEnergy = pGaugeSU3->CalculatePlaqutteEnergy(m_fBetaOverN);
+
+    preparethread;
+    appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
+
+    //======== this is only for test ================
+    //_kernelAdd4PlaqutteTermSU3_Test << <block, threads >> > (
+    //    pGaugeSU3->m_byFieldId,
+    //    pGaugeSU3->m_pDeviceData,
+    //    CCommonData::m_sCenter,
+    //    m_fBetaOverN,
+    //    m_fOmega * m_fOmega,
+    //    _D_RealThreadBuffer);
+
+    _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term12 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term34 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term5 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+/**
+* In the case of ProjectivePlane,
+* m_bShiftHalfCoord = TRUE
+* m_bCloverEnergy = TRUE
+*
+*/
+void CActionGaugePlaquetteRotating::EnergyProjectivePlane(const class CFieldGaugeSU3* pGaugeSU3)
+{
+    assert(m_bShiftHalfCoord && m_bCloverEnergy);
+
+    m_fNewEnergy = pGaugeSU3->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
+    preparethread;
+    appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
+
+    _kernelAdd4PlaqutteTermSU3_Shifted << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+
+    _kernelAddChairTermSU3_Term12_Shifted << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+
+    _kernelAddChairTermSU3_Term34_Shifted << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term5_Shifted << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+void CActionGaugePlaquetteRotating::EnergyTorus(const class CFieldGaugeSU3* pGaugeSU3)
+{
+    m_fNewEnergy = pGaugeSU3->CalculatePlaqutteEnergy(m_fBetaOverN);
+
+    preparethread;
+    appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
+
+    _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term12 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term34 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+    _kernelAddChairTermSU3_Term5 << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
+        pGaugeSU3->m_pDeviceData,
+        CCommonData::m_sCenter,
+        m_fBetaOverN,
+        m_fOmega * m_fOmega,
+        _D_RealThreadBuffer);
+
+    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+}
+
+void CActionGaugePlaquetteRotating::CalculateForceOnGaugeDirichlet(const class CFieldGaugeSU3* pGaugeSU3, class CFieldGaugeSU3* pForceSU3) const
+{
+    preparethread;
+    _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+}
+
+void CActionGaugePlaquetteRotating::CalculateForceOnGaugeProjectivePlane(const class CFieldGaugeSU3* pGaugeSU3, class CFieldGaugeSU3* pForceSU3) const
+{
+    preparethread;
+    _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term1_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term2_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term3_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term4_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term5_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+}
+
+void CActionGaugePlaquetteRotating::CalculateForceOnGaugeTorus(const class CFieldGaugeSU3* pGaugeSU3, class CFieldGaugeSU3* pForceSU3) const
+{
+    preparethread;
+    _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+    _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+}
+
 
 //Real CActionGaugePlaquetteRotating::GetEnergyPerPlaqutte() const
 //{

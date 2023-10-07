@@ -99,6 +99,7 @@ _kernelAdd4PlaqutteTermSU33D(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermSU3_XY3D(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -132,13 +133,13 @@ _kernelAddForce4PlaqutteTermSU3_XY3D(
         }
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx, 
+        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir, 
             byOtherDir[idir],
             idx[idir]));
         if (2 == idir)
         {
-            stap.Add(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+            stap.Add(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
                 idir,
                 byOtherDir[idir + 1],
                 idx[idir + 1]));
@@ -504,6 +505,7 @@ _kernelAdd4PlaqutteTermSU3_Shifted3D(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -528,14 +530,14 @@ _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D(
     {
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
-        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        deviceSU3 stap(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[idir],
             idx[idir],
             TRUE));
         if (2 == idir)
         {
-            stap.Add(_deviceStapleTermGfactor(byFieldId, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+            stap.Add(_deviceStapleTermGfactor(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
                 idir,
                 byOtherDir[idir + 1],
                 idx[idir + 1],
@@ -877,7 +879,7 @@ UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGauge(const CFieldGauge *
 
     if (!m_bShiftHalfCoord)
     {
-        _kernelAddForce4PlaqutteTermSU3_XY3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForce4PlaqutteTermSU3_XY3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
         _kernelAddForceChairTermSU3_Term13D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
@@ -892,7 +894,7 @@ UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGauge(const CFieldGauge *
     else
     {
 
-        _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
         
         _kernelAddForceChairTermSU3_Term1_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,

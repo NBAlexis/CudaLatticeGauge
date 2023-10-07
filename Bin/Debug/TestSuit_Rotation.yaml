@@ -1,0 +1,313 @@
+
+# ==============================================
+# Quenched
+# ==============================================
+TestRotationQuenchDirichlet:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [13, 13, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.369222
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestRotationQuenchDirichletShiftCenter:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [12, 12, 12, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.369222
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+        ShiftCoord : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestRotationQuenchTorus:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [13, 13, 12, 6]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.369222
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+        CloverEnergy : 1
+        ShiftCoord : 0
+        Torus : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestRotationQuenchTorusShiftCenter:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [13, 13, 12, 6]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.369222
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+        ShiftCoord : 1
+        Torus : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestRotationQuenchProjectivePlane:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [13, 13, 12, 6]
+    LatticeIndex : CIndexSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.369222
+    CacheStaple : 0
+    BeforeEquvibStep : 5
+    EquvibStep : 20
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 80
+        NestedStep : 6
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+       
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRotating
+        Beta : 5.0
+        Omega : 0.2
+        CloverEnergy : 1
+        ShiftCoord : 0
+        Torus : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+# ==============================================
+# Wilson Dirac
+# ==============================================
+
+# ==============================================
+# Staggered
+# ==============================================
+
+# ==============================================
+# U1
+# ==============================================
+
+# ==============================================
+# 3D
+# ==============================================
