@@ -953,6 +953,7 @@ CCString CFieldFermionKSSU3R::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("RealRotation : ") + appIntToString(m_bRealRotation) + _T("\n");
     return sRet;
 }
 

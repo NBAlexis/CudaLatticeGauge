@@ -3,7 +3,7 @@ TestDebug:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [6, 6, 4, 8]
+    LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
 
@@ -13,8 +13,13 @@ TestDebug:
 
     Gauge:
     
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
         FieldInitialType : EFIT_Random
+        Period : [1, 1, 0, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
 
 TestOperators:
 
@@ -319,10 +324,11 @@ TestGamm5Hermiticity:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 4]
+    LatticeLength : [5, 5, 4, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -350,16 +356,23 @@ TestGamm5Hermiticity:
     Gauge:
     
         ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
         
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
         # FieldName : CFieldFermionWilsonSquareSU3
-        FieldName : CFieldFermionWilsonSquareSU3Gamma
+        # FieldName : CFieldFermionWilsonSquareSU3Gamma
+        FieldName : CFieldFermionWilsonSquareSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -388,6 +401,12 @@ TestGamm5Hermiticity:
         Sigma24 : 0.24
         Sigma34 : 0.34
 
+        Naive : 1
+        Exponential : 1
+        ShiftCenter : 0
+
+        Period : [1, 1, 1, -1]
+
     Solver:
 
         SolverName : CSLASolverBiCGStab
@@ -404,8 +423,13 @@ TestGamm5Hermiticity:
 
     Action1:
    
-        ActionName : CActionGaugePlaquette
+        # ActionName : CActionGaugePlaquette
+        ActionName : CActionGaugePlaquetteRotating
         Beta : 3
+
+        Omega : 0.2
+        CloverEnergy : 1
+        ShiftCoord : 1
 
     Action2:
 
@@ -425,9 +449,9 @@ TestAnitiHermiticity:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    # LatticeBoundary : CBoundaryConditionTorusSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -453,6 +477,7 @@ TestAnitiHermiticity:
         ## FieldType = {CFieldGaugeSU3}
         FieldName : CFieldGaugeSU3
         # FieldName : CFieldGaugeU1
+        # FieldName : CFieldGaugeSU3DR
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -471,12 +496,13 @@ TestAnitiHermiticity:
         # FieldName : CFieldFermionKSSU3R
         # FieldName : CFieldFermionKSSU3EM
         # FieldName : CFieldFermionKSU1
-        FieldName : CFieldFermionKSSU3Gamma
+        # FieldName : CFieldFermionKSSU3Gamma
+        FieldName : CFieldFermionKSSU3DR
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        EachSiteEta : 1
+        # EachSiteEta : 1
 
         # 2am
         Mass : 0.5

@@ -29,6 +29,7 @@ _kernelDFermionKS_R_XYTerm(
     deviceSU3Vector* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
+    UBOOL bShiftCenter,
     UBOOL bXorY,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
@@ -50,7 +51,7 @@ _kernelDFermionKS_R_XYTerm(
         pResultData[uiSiteIndex] = result;
         return;
     }
-
+    const Real shift = bShiftCenter ? F(0.5) : F(0.0);
     #pragma unroll
     for (UINT idx = 0; idx < 4; ++idx)
     {
@@ -81,11 +82,11 @@ _kernelDFermionKS_R_XYTerm(
             }
             if (bXorY)
             {
-                eta_tau = eta_tau * (sSite4.y - sCenter.y);
+                eta_tau = eta_tau * (sSite4.y - sCenter.y + shift);
             }
             else
             {
-                eta_tau = eta_tau * (sCenter.x - sSite4.x);
+                eta_tau = eta_tau * (sCenter.x - sSite4.x - shift);
             }
         }
         else
@@ -99,11 +100,11 @@ _kernelDFermionKS_R_XYTerm(
             sTargetSite = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
             if (bXorY)
             {
-                eta_tau = eta_tau * (sTargetSite.y - sCenter.y);
+                eta_tau = eta_tau * (sTargetSite.y - sCenter.y + shift);
             }
             else
             {
-                eta_tau = eta_tau * (sCenter.x - sTargetSite.x);
+                eta_tau = eta_tau * (sCenter.x - sTargetSite.x - shift);
             }
         }
 
@@ -249,6 +250,7 @@ _kernelDFermionKSForce_R_XYTerm(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
+    UBOOL bShiftCenter,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
 #else
@@ -273,10 +275,11 @@ _kernelDFermionKSForce_R_XYTerm(
         return;
     }
     const SSmallInt4 site_n1 = __deviceSiteIndexToInt4(sn1.m_uiSiteIndex);
+    const Real shift = bShiftCenter ? F(0.5) : F(0.0);
     //y Dx and -x Dy
     const Real fNv = (0 == byMu)
-        ? static_cast<Real>(site_n1.y - sCenter.y)
-        : static_cast<Real>(sCenter.x - site_n1.x);
+        ? static_cast<Real>(site_n1.y - sCenter.y + shift)
+        : static_cast<Real>(sCenter.x - site_n1.x - shift);
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
@@ -454,6 +457,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         m_byFieldId,
         1,
+        m_bShiftCenter,
         TRUE,
         CCommonData::m_fOmega,
         CCommonData::m_sCenter,
@@ -469,6 +473,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         m_byFieldId,
         1,
+        m_bShiftCenter,
         FALSE,
         CCommonData::m_fOmega,
         CCommonData::m_sCenter,
@@ -488,7 +493,6 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         eOCT,
         fRealCoeff,
         cCmpCoeff);
-
 }
 
 void CFieldFermionKSSU3DR::DerivateD0(
@@ -549,6 +553,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                     m_pMDNumerator,
                     m_rMD.m_uiDegree,
                     m_byFieldId,
+                    m_bShiftCenter,
                     CCommonData::m_fOmega, CCommonData::m_sCenter,
                     static_cast<BYTE>(imu), iMu[pathidx],
                     L[0], L[1], L[2], LLength,
@@ -623,9 +628,25 @@ void CFieldFermionKSSU3DR::DerivateD0(
 
 #pragma endregion
 
+void CFieldFermionKSSU3DR::InitialOtherParameters(CParameters& params)
+{
+    CFieldFermionKSSU3D::InitialOtherParameters(params);
+
+    INT iShiftCenter = 0;
+    if (params.FetchValueINT(_T("ShiftCenter"), iShiftCenter))
+    {
+        m_bShiftCenter = (0 != iShiftCenter);
+    }
+}
+
 void CFieldFermionKSSU3DR::CopyTo(CField* U) const
 {
     CFieldFermionKSSU3::CopyTo(U);
+    CFieldFermionKSSU3DR* pOther = dynamic_cast<CFieldFermionKSSU3DR*>(U);
+    if (NULL != pOther)
+    {
+        pOther->m_bShiftCenter = m_bShiftCenter;
+    }
 }
 
 CCString CFieldFermionKSSU3DR::GetInfos(const CCString& tab) const
@@ -635,6 +656,7 @@ CCString CFieldFermionKSSU3DR::GetInfos(const CCString& tab) const
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("ShiftCenter : ") + appIntToString(m_bShiftCenter) + _T("\n");
     return sRet;
 }
 

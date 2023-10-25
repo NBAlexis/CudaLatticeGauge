@@ -4,9 +4,6 @@
 // DESCRIPTION:
 //
 // Dirichlet and rotation
-// 
-// It also supports torus and projective plane boundary condition
-// NOTE: In the case of projective plane, the Omega GA4 (x Dy - y Dx) term does not satisfy Gamma5-Hermiticity on the boundary, so we made a modification
 //
 // REVISION:
 //  [05/19/2019 nbale]
@@ -32,7 +29,6 @@ public:
         : CFieldFermionWilsonSquareSU3D()
         , m_bNaive(TRUE)
         , m_bExponential(FALSE)
-        , m_bShiftCenter(FALSE)
     {
     }
 
@@ -45,7 +41,6 @@ public:
 
     UBOOL m_bNaive;
     UBOOL m_bExponential;
-    UBOOL m_bShiftCenter;
 };
 
 __END_NAMESPACE

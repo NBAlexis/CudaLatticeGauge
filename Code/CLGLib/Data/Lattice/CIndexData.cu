@@ -320,6 +320,51 @@ void CIndexData::DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt)
     appSafeFree(tb);
 }
 
+void CIndexData::DebugLinkDirichletOrDagger(BYTE byFieldId)
+{
+    const UINT uiSize = (_HC_Lx + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge)
+        * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge);
+
+    SIndex* tb = (SIndex*)malloc(sizeof(SIndex) * uiSize * _HC_Dir);
+    checkCudaErrors(cudaMemcpy(tb,
+        appGetLattice()->m_pIndexCache->m_pIndexLinkToSIndex[byFieldId],
+        sizeof(SIndex) * uiSize * _HC_Dir, cudaMemcpyDeviceToHost));
+
+    const UBOOL bLogDate = appGetLogDate();
+    appSetLogDate(FALSE);
+    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
+    {
+        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
+        INT x = static_cast<INT>(coord.x);
+        INT y = static_cast<INT>(coord.y);
+        INT z = static_cast<INT>(coord.z);
+        INT t = static_cast<INT>(coord.w);
+        if (x >= 0 && x < _HC_Lxi
+            && y >= 0 && y < _HC_Lyi
+            && z >= 0 && z < _HC_Lzi
+            && t >= 0 && t < _HC_Lti)
+        {
+            for (BYTE byDir = 0; byDir < _HC_Dir; ++byDir)
+            {
+                const SIndex& idx = tb[uiBigIdx * _HC_Dir + byDir];
+                if (0 != (_kDirichlet & idx.m_byTag))
+                {
+                    appGeneral(_T("(%d, %d, %d, %d)_%d is dirichlet\n"), x, y, z, t, byDir);
+                }
+                if (0 != (_kDaggerOrOpposite & idx.m_byTag))
+                {
+                    appGeneral(_T("(%d, %d, %d, %d)_%d is reversed\n"), x, y, z, t, byDir);
+                }
+            }
+        }
+    }
+    appSetLogDate(bLogDate);
+
+    appSafeFree(tb);
+}
+
 void CIndex::CalculateSiteCount(class CIndexData* pData) const
 {
     INT hostres[2] = { 0, 0 };
@@ -362,6 +407,8 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
     checkCudaErrors(cudaFree(deviceRes));
     appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
 }
+
+
 
 __END_NAMESPACE
 

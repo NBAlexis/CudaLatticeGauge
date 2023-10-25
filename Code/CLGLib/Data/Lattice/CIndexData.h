@@ -191,6 +191,8 @@ public:
 
     static void DebugStapleTable();
 
+    static void DebugLinkDirichletOrDagger(BYTE byFieldId);
+
     //=============================================================
     //Small Data
     UINT* m_pSmallData;

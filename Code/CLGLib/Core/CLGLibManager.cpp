@@ -71,6 +71,45 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     }
 
     TArray<INT> intValues;
+
+#if _CLG_DEBUG
+    if (!params.FetchValueArrayINT(_T("LatticeLengthDebug"), intValues))
+    {
+        if (!params.FetchValueArrayINT(_T("LatticeLength"), intValues))
+        {
+            appCrucial(_T("LatticeLength not found, will use 8x8x8x8"));
+            intValues.RemoveAll();
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+        }
+        else if (intValues[0] < 1
+            || intValues[1] < 1
+            || intValues[2] < 1
+            || intValues[3] < 1)
+        {
+            appCrucial(_T("Lattice length is invalid, will use 8x8x8x8"));
+            intValues.RemoveAll();
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+            intValues.AddItem(8);
+        }
+    }
+    else if (intValues[0] < 1
+        || intValues[1] < 1
+        || intValues[2] < 1
+        || intValues[3] < 1)
+    {
+        appCrucial(_T("Lattice length is invalid, will use 8x8x8x8"));
+        intValues.RemoveAll();
+        intValues.AddItem(8);
+        intValues.AddItem(8);
+        intValues.AddItem(8);
+        intValues.AddItem(8);
+    }
+#else
     if (!params.FetchValueArrayINT(_T("LatticeLength"), intValues))
     {
         appCrucial(_T("LatticeLength not found, will use 8x8x8x8"));
@@ -92,6 +131,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
         intValues.AddItem(8);
         intValues.AddItem(8);
     }
+#endif
 
     m_InitialCache.constIntegers[ECI_Lx] = static_cast<UINT>(intValues[0]);
     m_InitialCache.constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);

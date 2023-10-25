@@ -284,7 +284,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term1_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, 0);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term1_4));
@@ -299,7 +299,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term1_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 0, 3, 0);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term1_2));
@@ -313,7 +313,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term1_1 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_1 = _deviceStapleChairTerm2ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, 0);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term1_1));
@@ -347,7 +347,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term2_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, 0);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term2_4));
@@ -361,7 +361,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term2_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 3, 0);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term2_2));
@@ -375,7 +375,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const CLGComplex staple_term2_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, 0);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term2_3));
@@ -410,7 +410,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term3_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, 1);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term3_4));
@@ -424,7 +424,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term3_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 1, 3, 1);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term3_1));
@@ -439,7 +439,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term3_2 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_2 = _deviceStapleChairTerm2ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, 1);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term3_2));
@@ -474,7 +474,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term4_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, 1);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term4_4));
@@ -489,7 +489,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term4_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 3, 1);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term4_1));
@@ -503,7 +503,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const CLGComplex staple_term4_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, 1);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term4_3));
@@ -537,7 +537,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term5_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, 2);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term5_1));
@@ -550,7 +550,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term5_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 0, 2);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term5_2));
@@ -563,7 +563,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term5_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, FALSE, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, 2);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term5_3));

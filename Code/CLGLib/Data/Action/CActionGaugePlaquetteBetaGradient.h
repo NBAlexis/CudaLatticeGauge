@@ -3,6 +3,7 @@
 // 
 // DESCRIPTION:
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
+// It always use clover energy so don't need to set clover energy
 //
 // REVISION:
 //  [08/15/2022 nbale]

@@ -24,6 +24,13 @@ class CLGAPI CFieldFermionKSSU3DR : public CFieldFermionKSSU3D
 
 public:
 
+    CFieldFermionKSSU3DR() : CFieldFermionKSSU3D()
+        , m_bShiftCenter(FALSE)
+    {
+
+    }
+
+    void InitialOtherParameters(CParameters& params) override;
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
     void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
@@ -50,6 +57,8 @@ public:
             r[i] = full[iSep + i];
         }
     }
+
+    UBOOL m_bShiftCenter;
 };
 
 __END_NAMESPACE

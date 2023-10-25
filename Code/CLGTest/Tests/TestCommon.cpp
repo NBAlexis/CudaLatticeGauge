@@ -246,7 +246,8 @@ UINT TestAnitiHermiticity(CParameters&)
 
 UINT TestDebugFunction(CParameters&)
 {
-    CCudaHelper::DebugFunction();
+    //CCudaHelper::DebugFunction();
+    CIndexData::DebugLinkDirichletOrDagger(1);
     return 0;
 }
 

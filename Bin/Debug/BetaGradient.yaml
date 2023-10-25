@@ -1,6 +1,6 @@
 # EBGJ_Simulate, EBGJ_Measure, EBGJ_Simulate2, EBGJ_Measure2, 
 # EBGJ_SimulateScanBeta, EBGJ_MeasureScanBeta, EBGJ_GaugeFixing, EBGJ_SimulateQ, EBGJ_SimulateScanQ
-WorkJob : EBGJ_MeasureScanBeta
+WorkJob : EBGJ_Measure2
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -320,18 +320,20 @@ JobSimulate2:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 1000
+    BeforeEquvibStep : 200
     EquvibSkip : 0
     EquvibStep : 20000
     SaveStartIndex : 0
     ListStart : 0
-    ListEnd : 8
-    MiddleBetaList : [5.29, 5.3, 5.31, 5.32, 5.33, 5.34, 5.35, 5.36]
-    PrefixList : [529, 530, 531, 532, 533, 534, 535, 536]
-    BetaStride : 4
+    ListEnd : 1
+    # MiddleBetaList : [5.29, 5.3, 5.31, 5.32, 5.33, 5.34, 5.35, 5.36]
+    # PrefixList : [529, 530, 531, 532, 533, 534, 535, 536]
+    MiddleBetaList : [6.0]
+    PrefixList : [529]
+    BetaStride : 1
 
-    SavePrefix : ./BG2_01_
-    DeltaBeta : 0.15
+    SavePrefix : ./BG2/BG2_test1_
+    DeltaBeta : 0.0
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -346,7 +348,7 @@ JobSimulate2:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
-    ActionListLength : 2
+    ActionListLength : 1
     FermionFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
@@ -370,10 +372,11 @@ JobSimulate2:
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         # CIntegratorNestedOmelyan CIntegratorNested11Stage
-        IntegratorType : CIntegratorNestedOmelyan
-        # IntegratorType : CIntegratorOmelyan 
+        # IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 100
+        # IntegratorStep : 8
         NestedStep : 20
         Omelyan2Lambda : 0.38636665500756728
 
@@ -477,11 +480,11 @@ JobMeasure2:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 11
-    MiddleBetaList : [5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2]
-    PrefixList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+    ListEnd : 1
+    MiddleBetaList : [5.29]
+    PrefixList : [529]
     StartN : 101
-    EndN : 10000
+    EndN : 20000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
@@ -489,23 +492,24 @@ JobMeasure2:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EGMJ_Polyakov, EGMJ_Chiral
-    DistributionJob : EGMJ_Chiral
+    DistributionJob : EGMJ_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 10
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 0
-    SubFolderPrefix : ./BS02/BetaGradient/Nt6
+    SubFolderPrefix : H:\BG2\BG2_test2_
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ./BGQ05_
-    CSVSavePrefix : ./BGQ05_
-    DeltaBeta : 0.5
+    SavePrefix : ./BG2/BG2_test1_
+    CSVSavePrefix : ./BG2/BG2_test1_
+    DeltaBeta : 0.0
+    BetaStride : 1
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 3, 2]
+    LatticeLength : [12, 12, 15, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -518,10 +522,10 @@ JobMeasure2:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3D
         FieldInitialType : EFIT_Random
 
-        Period : [1, 1, 1, 1]
+        Period : [1, 1, 0, 1]
 
     GaugeBoundary:
 
@@ -530,7 +534,7 @@ JobMeasure2:
     FermionField1:
         
         ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3
+        FieldName : CFieldFermionKSSU3D
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -540,7 +544,7 @@ JobMeasure2:
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 0
-        Period : [1, 1, 1, -1]
+        Period : [1, 1, 0, -1]
 
         # MC is to prepare
         # This is x^{1/8}

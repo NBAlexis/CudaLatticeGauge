@@ -57,15 +57,17 @@ class CLGAPI CParameters
 {
 public:
 
-    CParameters() {;}
-    CParameters(const CParameters& other) 
+    CParameters() { }
+    CParameters(const CCString& sName) : m_sName(sName) { }
+    CParameters(const CParameters& other)
+        : m_sName(other.m_sName)
     { 
         m_pStrings = other.m_pStrings;
         m_pStringVector = other.m_pStringVector;
         m_pParameters = other.m_pParameters;
     }
 
-    ~CParameters() {;}
+    ~CParameters() {}
 
     void SetStringVaule(const CCString& key, const CCString& value)
     {
@@ -161,6 +163,7 @@ public:
 
     inline void Copy(const CParameters& other)
     {
+        m_sName = other.m_sName;
         m_pStrings = other.m_pStrings;
         m_pStringVector = other.m_pStringVector;
         m_pParameters = other.m_pParameters;
@@ -172,7 +175,11 @@ public:
         return *this;
     }
 
+    CCString GetName() const { return m_sName; }
+
 private:
+
+    CCString m_sName;
 
     // scalar
     THashMap<CCString, CCString>               m_pStrings;
@@ -191,9 +198,9 @@ public:
     static void ParseFile(const CCString& params_file, CParameters& params);
 
     //These are functions for parse
-    static void Parse(ISTREAM& iss, CParameters& params)
+    static void Parse(const CCString& sName, ISTREAM& iss, CParameters& params)
     {
-        const INT result = ParseStream(iss, params);
+        const INT result = ParseStream(sName, iss, params);
 
         if (result != EXIT_SUCCESS) 
         {
@@ -202,7 +209,7 @@ public:
         }
     }
 
-    static INT ParseStream(ISTREAM& iss, CParameters& params);
+    static INT ParseStream(const CCString &sName, ISTREAM& iss, CParameters& params);
     static INT ParseLine(TCHAR *buf, CCString& key, CCString& value);
     static INT ParseVector(TCHAR *buf, TArray<CCString>& vec);
 };

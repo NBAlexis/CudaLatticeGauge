@@ -923,6 +923,7 @@ _kernelAddChairTermSU3_Term5_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term1_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -946,7 +947,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, 0);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term1_4);
@@ -963,7 +964,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 0, 3, 0);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term1_2);
@@ -979,7 +980,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, 0);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term1_1);
@@ -992,6 +993,7 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term2_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -1015,7 +1017,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, 0);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term2_4);
@@ -1031,7 +1033,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 3, 0);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term2_2);
@@ -1047,7 +1049,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, 0);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term2_3);
@@ -1061,6 +1063,7 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term3_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -1084,7 +1087,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, 1);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term3_4);
@@ -1100,7 +1103,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 1, 3, 1);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term3_1);
@@ -1117,7 +1120,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, 1);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term3_2);
@@ -1131,6 +1134,7 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term4_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -1154,7 +1158,7 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, 1);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term4_4);
@@ -1171,7 +1175,7 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 3, 1);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term4_1);
@@ -1187,7 +1191,7 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, 1);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term4_3);
@@ -1201,6 +1205,7 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term5_Shifted(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3* pForceData,
@@ -1223,7 +1228,7 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, 2);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term5_1);
@@ -1238,7 +1243,7 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 0, 2);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term5_2);
@@ -1253,7 +1258,7 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term5_3 = _deviceStapleChairTerm2Shifted(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const deviceSU3 staple_term5_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, 2);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term5_3);
@@ -1760,11 +1765,13 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGauge(const CFieldGauge * p
 
 #endif
 
+    const CBoundaryCondition* pBC = appGetLattice()->m_pIndex->GetBoudanryCondition();
+
     if (m_bTorus)
     {
         CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
     }
-    else if (m_bShiftHalfCoord)
+    else if (NULL != dynamic_cast<const CBoundaryConditionProjectivePlaneSquare*>(pBC))
     {
         CalculateForceOnGaugeProjectivePlane(pGaugeSU3, pForceSU3);
     }
@@ -1919,11 +1926,13 @@ Real CActionGaugePlaquetteRotating::Energy(UBOOL bBeforeEvolution, const class C
         return m_fNewEnergy;
     }
 
+    const CBoundaryCondition* pBC = appGetLattice()->m_pIndex->GetBoudanryCondition();
+
     if (m_bTorus)
     {
         EnergyTorus(pGaugeSU3);
     }
-    else if (m_bShiftHalfCoord)
+    else if (NULL != dynamic_cast<const CBoundaryConditionProjectivePlaneSquare*>(pBC))
     {
         EnergyProjectivePlane(pGaugeSU3);
     }
@@ -2090,56 +2099,103 @@ void CActionGaugePlaquetteRotating::EnergyProjectivePlane(const class CFieldGaug
 
 void CActionGaugePlaquetteRotating::EnergyTorus(const class CFieldGaugeSU3* pGaugeSU3)
 {
+    //assert(!m_bShiftHalfCoord);
+
     m_fNewEnergy = pGaugeSU3->CalculatePlaqutteEnergy(m_fBetaOverN);
 
     preparethread;
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
-    _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega * m_fOmega,
-        _D_RealThreadBuffer);
+    if (m_bShiftHalfCoord)
+    {
+        _kernelAdd4PlaqutteTermSU3_Shifted << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega * m_fOmega,
+            _D_RealThreadBuffer);
 
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-    _kernelAddChairTermSU3_Term12 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega,
-        _D_RealThreadBuffer);
 
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+        _kernelAddChairTermSU3_Term12_Shifted << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-    _kernelAddChairTermSU3_Term34 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega,
-        _D_RealThreadBuffer);
 
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+        _kernelAddChairTermSU3_Term34_Shifted << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
-    _kernelAddChairTermSU3_Term5 << <block, threads >> > (
-        pGaugeSU3->m_byFieldId,
-        pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
-        m_fBetaOverN,
-        m_fOmega * m_fOmega,
-        _D_RealThreadBuffer);
+        _kernelAddChairTermSU3_Term5_Shifted << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega * m_fOmega,
+            _D_RealThreadBuffer);
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    }
+    else
+    {
+        _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega * m_fOmega,
+            _D_RealThreadBuffer);
 
-    m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term12 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term34 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+
+        _kernelAddChairTermSU3_Term5 << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
+            pGaugeSU3->m_pDeviceData,
+            CCommonData::m_sCenter,
+            m_fBetaOverN,
+            m_fOmega * m_fOmega,
+            _D_RealThreadBuffer);
+
+        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    }
 }
 
 void CActionGaugePlaquetteRotating::CalculateForceOnGaugeDirichlet(const class CFieldGaugeSU3* pGaugeSU3, class CFieldGaugeSU3* pForceSU3) const
 {
     preparethread;
+
     _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
@@ -2165,42 +2221,66 @@ void CActionGaugePlaquetteRotating::CalculateForceOnGaugeProjectivePlane(const c
     _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term1_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term2_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term3_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term4_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term5_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 }
 
 void CActionGaugePlaquetteRotating::CalculateForceOnGaugeTorus(const class CFieldGaugeSU3* pGaugeSU3, class CFieldGaugeSU3* pForceSU3) const
 {
     preparethread;
-    _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+    if (m_bShiftHalfCoord)
+    {
+        _kernelAddForce4PlaqutteTermSU3_XYZ_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term1_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term2_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+        _kernelAddForceChairTermSU3_Term3_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+        _kernelAddForceChairTermSU3_Term4_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term5_Shifted << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+    }
+    else
+    {
+        _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
+
+        _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+            pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
+    }
 }
 
 
@@ -2229,6 +2309,11 @@ CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
     sRet = tab + _T("Name : CActionGaugePlaquetteRotating\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
+
+    sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0"));
+    sRet = sRet + tab + _T("Clover : ") + (m_bCloverEnergy ? _T("1") : _T("0"));
+    sRet = sRet + tab + _T("Torus : ") + (m_bTorus ? _T("1") : _T("0"));
+
     CCString sCenter;
     sCenter.Format(_T("Center: [%d, %d, %d, %d]\n")
         , static_cast<INT>(CCommonData::m_sCenter.x)

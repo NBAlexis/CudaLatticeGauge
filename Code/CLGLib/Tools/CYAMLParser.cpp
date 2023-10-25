@@ -73,7 +73,7 @@ void CParameters::Dump(const CCString& indent) const
 
 #pragma region CYAMLParser
 
-INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
+INT CYAMLParser::ParseStream(const CCString &sName, ISTREAM& iss, CParameters& params)
 {
     INT retv = EXIT_SUCCESS;
 
@@ -90,6 +90,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
     INT current_indent = 0;
 
     UBOOL expect_map = FALSE;
+    CCString sLastName = sName;
 
     while (iss.getline(buf, buf_size))
     {
@@ -114,7 +115,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
             }
 
             // start new level
-            current_params = new CParameters;
+            current_params = new CParameters(sLastName);
             current_indent = indent;
 
             expect_map = FALSE;
@@ -196,6 +197,7 @@ INT CYAMLParser::ParseStream(ISTREAM& iss, CParameters& params)
 
             // push current environment to stack
             levels.push(level_t(indent, env_t(key, current_params)));
+            sLastName = key;
         }
     }
 
@@ -380,7 +382,7 @@ void CYAMLParser::ParseFile(const CCString& params_file, CParameters& params)
 
 
     ISTRINGSTREAM iss(buf);
-    Parse(iss, params);
+    Parse(params_file, iss, params);
 
     appSafeDeleteArray(buf);
 }

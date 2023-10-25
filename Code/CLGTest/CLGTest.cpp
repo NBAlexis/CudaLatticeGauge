@@ -28,7 +28,7 @@ UINT RunTest(CParameters&params, TestList* pTest)
     timer.Start();
     const UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
-    appGeneral(_T("=========== Finished, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), uiErrors, timer.Elapsed());
+    appGeneral(_T("=========== Finished %s, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), pTest->m_sParamName, uiErrors, timer.Elapsed());
 
     //Final
     appQuitCLG();
