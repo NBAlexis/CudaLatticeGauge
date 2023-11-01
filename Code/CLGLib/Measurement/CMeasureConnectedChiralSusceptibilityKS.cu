@@ -70,25 +70,19 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGaug
 #endif
 
 #if !_CLG_DOUBLEFLOAT
-    m_lstResults.AddItem(_cToFloat(cuCadd(cuCadd(color1, color2), color3)));
+    UpdateComplexResult(_cToFloat(cuCadd(cuCadd(color1, color2), color3)));
 #else
-    m_lstResults.AddItem(_cuCaddf(_cuCaddf(color1, color2), color3));
+    UpdateComplexResult(_cuCaddf(_cuCaddf(color1, color2), color3));
 #endif
     pSourceZeroCopy->Return();
 
     if (m_bShowResult)
     {
         appGeneral(_T("Connected Chiral susp:"));
-        LogGeneralComplex(m_lstResults[m_lstResults.Num() - 1], FALSE);
+        LogGeneralComplex(GetLastCmpRes(), FALSE);
         appGeneral(_T("\n"));
     }
     m_pSourceZero->Return();
-    ++m_uiConfigurationCount;
-}
-
-void CMeasureConnectedSusceptibilityKS::Average(UINT)
-{
-
 }
 
 void CMeasureConnectedSusceptibilityKS::Report()
@@ -98,28 +92,19 @@ void CMeasureConnectedSusceptibilityKS::Report()
     appGeneral(_T(" =======================================================\n\n"));
     CLGComplex average = _zeroc;
     appGeneral(_T("{"));
-    for (INT i = 0; i < m_lstResults.Num(); ++i)
+    for (INT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        LogGeneralComplex(m_lstResults[m_lstResults.Num() - 1], FALSE);
+        LogGeneralComplex(CmpResAtI(i), FALSE);
     }
     appGeneral(_T("}\n\n"));
 
-    average.x = average.x / m_lstResults.Num();
-    average.y = average.y / m_lstResults.Num();
+    average.x = average.x / m_uiConfigurationCount;
+    average.y = average.y / m_uiConfigurationCount;
 
     appGeneral(_T(" ============average: "));
     LogGeneralComplex(average, FALSE);
     appGeneral(_T("========= \n"));
 }
-
-void CMeasureConnectedSusceptibilityKS::Reset()
-{
-    m_uiConfigurationCount = 0;
-    m_lstResults.RemoveAll();
-}
-
-
-
 
 __END_NAMESPACE
 

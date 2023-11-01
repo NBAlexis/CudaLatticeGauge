@@ -35,7 +35,6 @@ class CLGAPI CMeasureAMomentumStochastic : public CMeasureStochastic
 public:
     CMeasureAMomentumStochastic()
         : CMeasureStochastic()
-        , m_uiConfigurationCount(0)
         , m_pDeviceXYBufferJL(NULL)
         , m_pDeviceXYBufferJS(NULL)
         , m_pDeviceXYBufferJLPure(NULL)
@@ -71,7 +70,6 @@ public:
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -80,7 +78,6 @@ public:
 
 protected:
     
-    UINT m_uiConfigurationCount;
     Real* m_pDeviceXYBufferJL;
     Real* m_pDeviceXYBufferJS;
     Real* m_pDeviceXYBufferJLPure;

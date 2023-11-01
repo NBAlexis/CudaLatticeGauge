@@ -15,7 +15,7 @@ __BEGIN_NAMESPACE
 
 void CParameters::Dump(const CCString& indent) const
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     appGeneral(_T("%sScalar<string>:\n"), indent.c_str());
     TArray<CCString> allKeys = m_pStrings.GetAllKeys();
@@ -66,7 +66,7 @@ void CParameters::Dump(const CCString& indent) const
         }
     }
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 #pragma endregion CParameters

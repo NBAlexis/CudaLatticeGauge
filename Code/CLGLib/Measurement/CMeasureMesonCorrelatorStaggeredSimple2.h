@@ -25,7 +25,6 @@ public:
     CMeasureMesonCorrelatorStaggeredSimple2() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)
-        , m_uiConfigurationCount(0)
         , m_bShowResult(FALSE)
         , m_bWallSource(TRUE)
         , m_byFieldID2(0)
@@ -37,7 +36,6 @@ public:
 
     void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -79,7 +77,6 @@ public:
     //m_lstResults[conf][type][t]
     TArray<TArray<TArray<Real>>> m_lstResults;
 #endif
-    UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
     UBOOL m_bWallSource;
     BYTE m_byFieldID2;

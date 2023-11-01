@@ -1,6 +1,6 @@
 # EBGJ_Simulate, EBGJ_Measure, EBGJ_Simulate2, EBGJ_Measure2, 
 # EBGJ_SimulateScanBeta, EBGJ_MeasureScanBeta, EBGJ_GaugeFixing, EBGJ_SimulateQ, EBGJ_SimulateScanQ
-WorkJob : EBGJ_Measure2
+WorkJob : EBGJ_SimulateScanQ
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -1086,15 +1086,15 @@ JobSimulateBetaScanQ:
     ShowParameterContent : 0
     # If use double, set to 0 will be faster, if use single point float, use 8
     ExponentialPrecision : 0
-    BeforeEquvibStep : 2000
+    BeforeEquvibStep : 0
     EquvibSkip : 0
-    EquvibStep : 10000
+    EquvibStep : 1000
     SaveStartIndex : 0
     ListStart : 0
-    ListEnd : 11
-    BetaList : [5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2]
-    PrefixList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
-    SavePrefix : ./BSQ_
+    ListEnd : 12
+    BetaList : [6.7, 6.8, 6.9, 7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8]
+    PrefixList : [67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]
+    SavePrefix : ./BSITest/BSQI_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -1111,13 +1111,13 @@ JobSimulateBetaScanQ:
     ActionListLength : 1
     FermionFieldCount : 0
     MeasureListLength : 1
-    CacheStaple : 1
+    CacheStaple : 0
 
     ## ============================================================
     ## Initial files
     ## ============================================================
-    # OldFileName : ./6000204/SRF6000204_R_Nt6_O1_1466.con
-    # OldPolyakov : 0.605417311192
+    OldFileName : ./BSITest/BSQI_BetaScan_70_1000.con
+    OldPolyakov : 0.080230765045
 
     Updator:
 
@@ -1141,7 +1141,7 @@ JobSimulateBetaScanQ:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3
+        FieldName : CFieldGaugeSU3TreeImproved
         FieldInitialType : EFIT_Random
 
         Period : [1, 1, 1, 1]

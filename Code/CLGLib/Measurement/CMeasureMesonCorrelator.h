@@ -19,12 +19,11 @@ class CLGAPI CMeasureMesonCorrelator : public CMeasure
 {
     __CLGDECLARE_CLASS(CMeasureMesonCorrelator)
 public:
-    CMeasureMesonCorrelator() : CMeasure(), m_uiResoultCount(0) {}
+    CMeasureMesonCorrelator() : CMeasure() {}
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
     void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -53,7 +52,6 @@ public:
     TArray<TArray<Real>> m_lstResults;
     TArray<TArray<Real>> m_lstResultsLastConf;
 #endif
-    UINT m_uiResoultCount;
     //This is a complex field at each site
     CLGComplex * m_pDeviceCorrelator;
 };

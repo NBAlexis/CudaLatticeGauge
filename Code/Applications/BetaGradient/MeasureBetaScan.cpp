@@ -150,7 +150,7 @@ INT MeasurementBetaScan(CParameters& params)
         //pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
     }
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     for (INT uiOmega = iListStart; uiOmega < BetaList.Num() && uiOmega < iListEnd; ++uiOmega)
     {
@@ -350,15 +350,15 @@ INT MeasurementBetaScan(CParameters& params)
 
             if (uiNewLine > 0 && ((iEndN - uiN + 1) % uiNewLine == 0))
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
-                appSetLogDate(FALSE);
+                appPushLogDate(FALSE);
                 appGeneral(_T("="));
-                appSetLogDate(TRUE);
+                appPopLogDate();
             }
             
         }
@@ -460,7 +460,7 @@ INT MeasurementBetaScan(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     if (NULL != pF1Light)

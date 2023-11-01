@@ -140,18 +140,19 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
 
 void CMeasurementManager::OnUpdateFinished(UBOOL bReport)
 {
+    
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
         if (NULL != m_lstAllMeasures[i])
         {
-            m_lstAllMeasures[i]->Average(m_iAcceptedConfigurationCount);
+            assert(m_iAcceptedConfigurationCount == m_lstAllMeasures[i]->GetConfigurationCount());
+            m_lstAllMeasures[i]->Average();
             if (bReport)
             {
                 m_lstAllMeasures[i]->Report();
             }
         }
     }
-    m_iAcceptedConfigurationCount = 0;
 }
 
 void CMeasurementManager::Reset()

@@ -269,11 +269,11 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
 
     if (m_bShowResult)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         appGeneral(_T("Loop is "));
         LogGeneralComplex(m_lstLoop[m_lstLoop.GetCount() - 1]);
         appGeneral(_T(" Abs is %f\n"), m_lstLoopAbs[m_lstLoopAbs.GetCount() - 1]);
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
 
     if (m_bShowResult)
@@ -306,18 +306,13 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
     ++m_uiConfigurationCount;
 }
 
-void CMeasurePolyakovXY3D::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasurePolyakovXY3D::Report()
 {
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
     assert(static_cast<UINT>(m_uiConfigurationCount * CCommonData::m_sCenter.x)
         == static_cast<UINT>(m_lstLoopDensity.Num()));
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
     m_lstAverageLoopDensity.RemoveAll();
 
@@ -371,12 +366,12 @@ void CMeasurePolyakovXY3D::Report()
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasurePolyakovXY3D::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstLoop.RemoveAll();
     m_lstLoopInner.RemoveAll();
     m_lstLoopAbs.RemoveAll();

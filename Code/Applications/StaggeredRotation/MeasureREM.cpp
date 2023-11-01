@@ -251,7 +251,7 @@ INT MeasurementREM(CParameters& params)
         pF2s = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetPooledFieldById(4));
     }
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     for (UINT uiListIdx = iListStart; uiListIdx < iListEnd; ++uiListIdx)
     {
@@ -458,9 +458,9 @@ INT MeasurementREM(CParameters& params)
 
             if ((iEndN - uiN + 1) % uiNewLine == 0)
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
@@ -742,7 +742,7 @@ INT MeasurementREM(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     if (NULL != pF1u)

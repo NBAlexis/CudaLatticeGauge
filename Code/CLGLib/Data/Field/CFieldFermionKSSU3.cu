@@ -1121,8 +1121,7 @@ void CFieldFermionKSSU3::DebugPrintRed() const
 {
     deviceSU3Vector* toprint = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * m_uiSiteCount);
     checkCudaErrors(cudaMemcpy(toprint, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
-    UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     appGeneral(_T("\n{"));
     for (UINT uiSite = 0; uiSite < m_uiSiteCount - 1; ++uiSite)
@@ -1169,7 +1168,7 @@ void CFieldFermionKSSU3::DebugPrintRed() const
         );
     }
 
-    appSetLogDate(bLogDate);
+    appPopLogDate();
 
     appSafeFree(toprint);
 }

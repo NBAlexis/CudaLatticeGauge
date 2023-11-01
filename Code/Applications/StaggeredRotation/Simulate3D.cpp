@@ -177,14 +177,14 @@ INT SimulateStaggeredRotation3D(CParameters& params)
                 }
             }
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
-            appSetLogDate(FALSE);
+            appPushLogDate(FALSE);
             appGeneral(_T("\n|<P>|,arg<P>={\n"));
             for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
             {
                 appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
             }
             appGeneral(_T("}\n"));
-            appSetLogDate(TRUE);
+            appPopLogDate();
         }
         else
         {
@@ -300,7 +300,7 @@ INT SimulateStaggeredRotation3D(CParameters& params)
         }
 
         appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), uiNt);
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         assert(polykov.Num() == static_cast<INT>(iAfterEquib + 1));
 
         appGeneral(_T("|Polyakov|={\n"));
@@ -331,7 +331,7 @@ INT SimulateStaggeredRotation3D(CParameters& params)
             appGeneral(_T("}\n\n"));
         }
 
-        appSetLogDate(TRUE);
+        appPopLogDate();
 
         appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), uiNt);
         appQuitCLG();

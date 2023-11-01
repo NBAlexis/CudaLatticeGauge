@@ -99,7 +99,16 @@ TestUpdatorForceGradient:
     RandomSeed : 1234567
     ActionListLength : 1
     MeasureListLength : 1
+
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 45
+    MetropolisDebug : 10
+    ExpectMiss : 3
+    ExpectMissDebug : 2
     ExpectedRes : 0.2064
+    ExpectedResDebug : 0.2064
+
 
     Updator:
         UpdatorType : CHMC
@@ -138,7 +147,15 @@ TestUpdatorForceGradient3D:
     RandomSeed : 1234567
     ActionListLength : 1
     MeasureListLength : 1
+
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 45
+    MetropolisDebug : 10
+    ExpectMiss : 3
+    ExpectMissDebug : 2
     ExpectedRes : 0.2064
+    ExpectedResDebug : 0.068861
 
     Updator:
         UpdatorType : CHMC
@@ -231,3 +248,50 @@ TestWilsonLoop:
         # Rho : 0.08
         # HasT : 0
         # Iterate : 25
+
+TestUpdatorTreeImproved:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    MeasureListLength : 1
+
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 45
+    MetropolisDebug : 10
+    ExpectMiss : 3
+    ExpectMissDebug : 2
+    ExpectedRes : 0.2064
+    ExpectedResDebug : 0.292609
+
+
+    Updator:
+        UpdatorType : CHMC
+        Metropolis : 1
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3TreeImproved
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquette
+        Beta : 3
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy

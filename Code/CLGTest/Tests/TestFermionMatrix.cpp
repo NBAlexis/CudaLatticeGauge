@@ -51,7 +51,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
 
 
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     appGeneral(_T("\nres=\n{\n"));
     for (UINT i = 0; i < uiSiteCount; ++i)
     {
@@ -128,7 +128,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
             }
         }
     }
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     //print it
 

@@ -400,7 +400,7 @@ INT MeasurePolyakovDist(CParameters& params)
     CMeasureAction * pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     CFieldFermionWilsonSquareSU3* pF1 = NULL;
     CFieldFermionWilsonSquareSU3* pF2 = NULL;
@@ -587,9 +587,9 @@ INT MeasurePolyakovDist(CParameters& params)
 
             if ((iEndN - uiN + 1) % uiNewLine == 0)
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
@@ -772,7 +772,7 @@ INT MeasurePolyakovDist(CParameters& params)
             {
                 CCString sFileName;
                 sFileName.Format(_T("%s_plaqutte.csv"), sCSVSavePrefix.c_str());
-                WriteStringFileRealArray(sFileName, pPE->m_lstData);
+                pPE->WriteRealListToFile(sFileName);
             }
             break;
             default:
@@ -824,7 +824,7 @@ INT MeasurePolyakovDist(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     if (NULL != pF1)

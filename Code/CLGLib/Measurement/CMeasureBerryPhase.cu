@@ -484,7 +484,7 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
     //Gather result
     if (m_bShowRes)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         appGeneral(_T("Berry phase: {"));
 
         for (INT t = 0; t < _HC_Lti; ++t)
@@ -529,15 +529,10 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
         }
 
         appGeneral(_T("\n"));
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
 
     ++m_uiConfigurationCount;
-}
-
-void CMeasureBerryPhase::Average(UINT )
-{
-
 }
 
 void CMeasureBerryPhase::Report()
@@ -547,6 +542,8 @@ void CMeasureBerryPhase::Report()
 
 void CMeasureBerryPhase::Reset()
 {
+    CMeasure::Reset();
+
     m_lstData.Reset();
     m_lstDataXY.Reset();
     m_lstDataXZ.Reset();
@@ -554,7 +551,6 @@ void CMeasureBerryPhase::Reset()
     m_lstDataYZ.Reset();
     m_lstDataYT.Reset();
     m_lstDataZT.Reset();
-    m_uiConfigurationCount = 0;
 }
 
 __END_NAMESPACE

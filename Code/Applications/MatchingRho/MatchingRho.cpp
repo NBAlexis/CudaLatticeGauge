@@ -372,9 +372,9 @@ int main(int argc, char * argv[])
             }
             else
             {
-                appSetLogDate(FALSE);
+                appPushLogDate(FALSE);
                 appGeneral(0 == uiAccepCountAfterE % 50 ? _T("\n=") : _T("="));
-                appSetLogDate(TRUE);
+                appPopLogDate();
             }
         }
     }
@@ -388,7 +388,7 @@ int main(int argc, char * argv[])
         {
             pPL->Report();
 
-            appSetLogDate(FALSE);
+            appPushLogDate(FALSE);
 
             //extract result
             assert(static_cast<INT>(iEquib)* pPL->m_lstR.Num() == pPL->m_lstP.Num());
@@ -420,7 +420,7 @@ int main(int argc, char * argv[])
 
             appGeneral(_T("\n};\n"));
 
-            appSetLogDate(TRUE);
+            appPopLogDate();
         }
     }
 
@@ -430,7 +430,7 @@ int main(int argc, char * argv[])
 
     if ((!bOnlyMeasure || bMeasureFermion) && NULL != pMC)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
 
         __Show_Correlator(pion);
         __Show_Correlator(rho);
@@ -439,12 +439,12 @@ int main(int argc, char * argv[])
         __Show_Correlator(rho3);
         __Show_Correlator(rho0);
 
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
 
     if (bOnlyMeasure && bMeasureCondensation && NULL != pCC)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
 
         appGeneral(_T("\n ==================== condensation ==============\n\n")); 
         appGeneral(_T("{\n")); 
@@ -477,7 +477,7 @@ int main(int argc, char * argv[])
             WriteStringFileComplexArray(sCSVFileName, thisConfiguration);
         } 
 
-        appSetLogDate(TRUE);
+        appPopLogDate();
 
         for (UINT iType = 0; iType < 1/*CMeasureChiralCondensate::_kCondMeasureCount*/; ++iType)
         {

@@ -28,9 +28,8 @@ public:
 
         , m_pTmpDeviceRes(NULL)
         , m_pDevicePath(NULL)
-
-        , m_uiConfigurationCount(0)
     {
+
     }
 
     ~CMeasureWilsonLoopWithPath();
@@ -38,9 +37,7 @@ public:
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
-    void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
@@ -53,11 +50,7 @@ protected:
     UBOOL m_bShowResult;
     CLGComplex* m_pTmpDeviceRes;
     INT* m_pDevicePath;
-    UINT m_uiConfigurationCount;
 
-public:
-
-    TArray<CLGComplex> m_lstRes;
 };
 
 

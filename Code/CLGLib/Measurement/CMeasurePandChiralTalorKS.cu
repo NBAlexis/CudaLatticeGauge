@@ -655,13 +655,9 @@ void CMeasurePandChiralTalorKS::ApplyM(CFieldFermionKSSU3* pTarget, const CField
 
 }
 
-void CMeasurePandChiralTalorKS::Average(UINT)
-{
-    //nothing to do
-}
-
 void CMeasurePandChiralTalorKS::Report()
 {
+    appPushLogDate(FALSE);
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
@@ -706,12 +702,12 @@ void CMeasurePandChiralTalorKS::Report()
     }
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasurePandChiralTalorKS::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
         m_lstTraceRes[i].RemoveAll();

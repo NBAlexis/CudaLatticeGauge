@@ -185,7 +185,7 @@ INT Measurement3D(CParameters& params)
     //    pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
     //}
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     CFieldGaugeSU3* pStaple = NULL;
     //if (EDJKS_VR == eJob)
     //{
@@ -600,9 +600,9 @@ INT Measurement3D(CParameters& params)
 
             if (uiNewLine > 0 && ((iEndN - uiN + 1) % uiNewLine == 0))
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
@@ -923,7 +923,7 @@ INT Measurement3D(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     //if (NULL != pF1Light)

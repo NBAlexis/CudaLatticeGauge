@@ -645,7 +645,7 @@ void CCLGFFTHelper::PrintTestArray3D(CLGComplex* hostArray)
 
 void CCLGFFTHelper::TestFFT()
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     CLGComplex* dD3Res;
     CLGComplex* hD3Res = (CLGComplex*)malloc(_tfftMX * _tfftMY * _tfftMZ * sizeof(CLGComplex));
@@ -726,7 +726,7 @@ void CCLGFFTHelper::TestFFT()
     appGeneral(_T("InverseFourier[sour] Sqrt[%d] - res2 //Abs//Max\n"), _tfftMX * _tfftMY * _tfftMZ * _tfftMT);
     appGeneral(_T("sour %d - res3 //Abs//Max\n"), _tfftMX * _tfftMY * _tfftMZ * _tfftMT);
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     free(hD3Res);
     free(hD3Source);

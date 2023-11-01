@@ -143,7 +143,7 @@ INT Measurement(CParameters& params)
         pF2Heavy = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetPooledFieldById(3));
     }
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     appGeneral(_T("(* ==== Start Measure ========= *)\n"));
     pPL->Reset();
     pCCLight->Reset();
@@ -328,9 +328,9 @@ INT Measurement(CParameters& params)
 
             if (uiNewLine > 0 && ((iEndN - uiN + 1) % uiNewLine == 0))
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
@@ -468,7 +468,7 @@ INT Measurement(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     if (NULL != pF1Light)

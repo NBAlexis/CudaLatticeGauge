@@ -1291,8 +1291,7 @@ void CFieldGaugeU1::DebugPrintMe() const
     //Since Debug Print Me is only used to debug, we do it slow but convinient
     CLGComplex* pToPrint = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
     checkCudaErrors(cudaMemcpy(pToPrint, m_pDeviceData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
-    UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     for (UINT uiSite = 0; uiSite < m_uiLinkeCount / _HC_Dir; ++uiSite)
     {
         appGeneral(_T(" --- site: %d --- "), uiSite);
@@ -1307,7 +1306,7 @@ void CFieldGaugeU1::DebugPrintMe() const
         }
         appGeneral(_T("\n"));
     }
-    appSetLogDate(bLogDate);
+    appPopLogDate();
     free(pToPrint);
 }
 

@@ -55,43 +55,19 @@ void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, co
     }
 
 #if !_CLG_DOUBLEFLOAT
-    m_lstData.AddItem(static_cast<Real>(plaqutteEneregy));
+    UpdateRealResult(static_cast<Real>(plaqutteEneregy));
 #else
-    m_lstData.AddItem(plaqutteEneregy);
+    UpdateRealResult(plaqutteEneregy);
 #endif
     appParanoiac(_T(" === Action Energy Measured === energy = %f\n"), plaqutteEneregy);
 }
 
-void CMeasureAction::Average(UINT )
-{
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE fAdd = 0.0;
-    for (INT i = 0; i < m_lstData.Num(); ++i)
-    {
-        fAdd += m_lstData[i];
-    }
-    m_fLastRealResult = static_cast<Real>(fAdd / m_lstData.Num());
-    appParanoiac(_T(" === Action Averaged (%d measures) === energy = %f\n"), m_lstData.Num(), m_fLastRealResult);
-#else
-    Real fAdd = F(0.0);
-    for (INT i = 0; i < m_lstData.Num(); ++i)
-    {
-        fAdd += m_lstData[i];
-    }
-    m_fLastRealResult = fAdd / m_lstData.Num();
-    appParanoiac(_T(" === Action Averaged (%d measures) === energy = %f\n"), m_lstData.Num(), m_fLastRealResult);
-#endif
-}
-
 void CMeasureAction::Report()
 {
-    appGeneral(_T(" === Action Averaged === energy = %f\n\n"), m_fLastRealResult);
+    Average();
+    appGeneral(_T(" === Action Averaged === energy = %f\n\n"), GetAverageRealRes());
 }
 
-void CMeasureAction::Reset()
-{
-    m_lstData.RemoveAll();
-}
 
 __END_NAMESPACE
 

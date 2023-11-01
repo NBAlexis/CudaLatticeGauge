@@ -163,7 +163,6 @@ CMeasureChargeAndCurrents::CMeasureChargeAndCurrents()
     , m_pHostDataBuffer(NULL)
     , m_pDeviceDataBuffer(NULL)
     , m_pOperatorData(NULL)
-    , m_uiConfigurationCount(0)
     , m_bShowResult(TRUE)
 {
     ////see: https://stackoverflow.com/questions/9000388/device-function-pointers
@@ -308,14 +307,9 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
     }
 }
 
-void CMeasureChargeAndCurrents::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureChargeAndCurrents::Report()
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     assert(m_uiConfigurationCount * (_HC_Lx - 1) * _kGammaInInterests == static_cast<UINT>(m_lstAllRes.Num()));
     TArray<Real> tmpSum;
@@ -381,12 +375,12 @@ void CMeasureChargeAndCurrents::Report()
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureChargeAndCurrents::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstAllRes.RemoveAll();
 }
 

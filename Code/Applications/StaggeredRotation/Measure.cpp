@@ -204,7 +204,7 @@ INT Measurement(CParameters& params)
         pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
     }
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     CFieldGaugeSU3* pStaple = NULL;
     if (EDJKS_VR == eJob)
     {
@@ -773,9 +773,9 @@ INT Measurement(CParameters& params)
 
             if (uiNewLine > 0 && ((iEndN - uiN + 1) % uiNewLine == 0))
             {
-                appSetLogDate(TRUE);
+                appPushLogDate(TRUE);
                 appGeneral(_T("\n="));
-                appSetLogDate(FALSE);
+                appPopLogDate();
             }
             else
             {
@@ -913,9 +913,9 @@ INT Measurement(CParameters& params)
                 {
                     CCString sFileNameWriteCCS;
                     sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
+                    pCCSLight->WriteCmpListToFile(sFileNameWriteCCS);
                     sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
+                    pCCSHeavy->WriteCmpListToFile(sFileNameWriteCCS);
                 }
             }
             break;
@@ -1005,9 +1005,9 @@ INT Measurement(CParameters& params)
                 {
                     CCString sFileNameWriteCCS;
                     sFileNameWriteCCS.Format(_T("%s_lightCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSLight->m_lstResults);
+                    pCCSLight->WriteCmpListToFile(sFileNameWriteCCS);
                     sFileNameWriteCCS.Format(_T("%s_heavyCCS_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    WriteStringFileComplexArray(sFileNameWriteCCS, pCCSHeavy->m_lstResults);
+                    pCCSHeavy->WriteCmpListToFile(sFileNameWriteCCS);
                 }
             }
             break;
@@ -1107,7 +1107,7 @@ INT Measurement(CParameters& params)
     }
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
     if (NULL != pF1Light)

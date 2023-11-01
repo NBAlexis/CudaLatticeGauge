@@ -64,7 +64,6 @@ public:
         , m_uiEdgeR(1)
         , m_bMeasureDistribution(FALSE)
 
-        , m_uiConfigurationCount(0)
         , m_bShowResult(TRUE)
 
         , m_bMeasureSpin(FALSE)
@@ -81,7 +80,6 @@ public:
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -104,7 +102,6 @@ protected:
     UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
 
-    UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
     TArray<Real> m_lstRes;
     TArray<Real> m_lstResJGS;

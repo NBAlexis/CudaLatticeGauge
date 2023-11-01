@@ -57,7 +57,7 @@ int main(int argc, char * argv[])
 
     if (EJT_Matching == eJob)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         for (UINT iIndex = iStartIndex; iIndex <= iEndIndex; ++iIndex)
         {
             CCString sFileNameLoad;
@@ -70,7 +70,7 @@ int main(int argc, char * argv[])
             appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileNameSave);
             appGeneral(_T("=%s"), 0 == (iIndex % 50) ? _T("\n") : _T(""));
         }
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     else if (EJT_Rotate == eJob)
     {

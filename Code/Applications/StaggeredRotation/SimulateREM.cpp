@@ -156,14 +156,14 @@ INT SimulateStaggeredRotationEM(CParameters& params)
             }
         }
         assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         appGeneral(_T("\n|<P>|,arg<P>={\n"));
         for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
         {
             appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
         }
         appGeneral(_T("}\n"));
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     else
     {
@@ -271,7 +271,7 @@ INT SimulateStaggeredRotationEM(CParameters& params)
     }
 
     appGeneral(_T("\n========= Nt=%d finished! ==========\n\n"), _HC_Lt);
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     const INT uiRealRuned = static_cast<INT>(iEMEnd - iEMStart);
     assert(polykov.Num() == uiRealRuned);
 
@@ -303,7 +303,7 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         appGeneral(_T("}\n\n"));
     }
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= Nt=%d finished! ==========\n"), _HC_Lt);
     appQuitCLG();

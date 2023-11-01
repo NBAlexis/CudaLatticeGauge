@@ -44,7 +44,8 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 #else
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(5, TRUE);
-    Real fRes = pMeasure->m_fLastRealResult;
+    pMeasure->Average();
+    Real fRes = pMeasure->GetAverageRealRes();
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
     const Real Hdiff = appGetLattice()->m_pUpdator->GetHDiff();

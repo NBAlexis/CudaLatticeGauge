@@ -46,7 +46,7 @@ INT StaggeredGaugeFixing(CParameters& params)
     if (bOnlyCheck)
     {
         appGeneral(_T("====== Start: %d to %d ======\n"), iIndexStart, iIndexEnd);
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         for (UINT uiIndex = iIndexStart; uiIndex <= iIndexEnd; ++uiIndex)
         {
             CCString sSaveFile;
@@ -96,7 +96,7 @@ INT StaggeredGaugeFixing(CParameters& params)
                 appGeneral(_T("\nBad : %d, is %2.20f\n"), uiIndex, fRes);
             }
         }
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     else
     {

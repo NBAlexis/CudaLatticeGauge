@@ -205,7 +205,7 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
 #else
     m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
 #endif
-    m_uiResoultCount = 0;
+    m_uiConfigurationCount = 0;
 }
 
 void CMeasureMesonCorrelator::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
@@ -213,14 +213,9 @@ void CMeasureMesonCorrelator::OnConfigurationAccepted(const CFieldGauge* pGaugeF
     CalculateCorrelator(pGaugeField, pStapleField);
 }
 
-void CMeasureMesonCorrelator::Average(UINT)
-{
-    //do nothing
-}
-
 void CMeasureMesonCorrelator::Report()
 {
-    if (0 == m_uiResoultCount)
+    if (0 == m_uiConfigurationCount)
     {
         appGeneral(_T("Not measured yet.\n"));
         return;
@@ -231,10 +226,10 @@ void CMeasureMesonCorrelator::Report()
         return;
     }
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     assert(m_lstResults.Num() == m_lstGammas.Num());
-    appGeneral(_T("CMeasureMesonCorrelator final report: Number of configurations = %d\n"), m_uiResoultCount);
+    appGeneral(_T("CMeasureMesonCorrelator final report: Number of configurations = %d\n"), m_uiConfigurationCount);
     for (INT i = 0; i < m_lstResults.Num(); ++i)
     {
         assert(m_lstResults[i].Num() == static_cast<INT>(m_uiLt));
@@ -266,14 +261,14 @@ void CMeasureMesonCorrelator::Report()
         appGeneral(_T("\n"));
     }
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureMesonCorrelator::Reset()
 {
+    CMeasure::Reset();
     m_uiLt = _HC_Lt;
     m_f2OverVolumnSqrt = F(2.0) / _hostsqrt(static_cast<Real>(_HC_Volume));
-    m_uiResoultCount = 0;
     m_lstResults.RemoveAll();
     m_lstResultsLastConf.RemoveAll();
 }
@@ -380,7 +375,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
         }
         appParanoiac(_T("\n"));
         //anverage
-        if (m_uiResoultCount == 0)
+        if (m_uiConfigurationCount == 0)
         {
 #if !_CLG_DOUBLEFLOAT
             TArray<DOUBLE> thisGammaResult;
@@ -401,11 +396,11 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
             {
                 m_lstResultsLastConf[i][j] = sumSpatial[j];
                 m_lstResults[i][j] = 
-                    (m_lstResults[i][j] * m_uiResoultCount + sumSpatial[j]) / (m_uiResoultCount + 1);
+                    (m_lstResults[i][j] * m_uiConfigurationCount + sumSpatial[j]) / (m_uiConfigurationCount + 1);
             }
         }
     }
-    ++m_uiResoultCount;
+    ++m_uiConfigurationCount;
 
     for (UINT i = 0; i < 12; ++i)
     {

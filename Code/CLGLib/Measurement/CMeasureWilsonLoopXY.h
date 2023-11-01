@@ -33,7 +33,6 @@ public:
         , m_pHostCorrelatorCounter(NULL)
         , m_uiMaxLengthSq(1)
 
-        , m_uiConfigurationCount(0)
         , m_bShowResult(FALSE)
     {
     }
@@ -43,7 +42,6 @@ public:
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -61,7 +59,6 @@ protected:
 
     UINT m_uiMaxLengthSq;
 
-    UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
 
 public:

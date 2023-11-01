@@ -258,11 +258,11 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
     const UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
     res[0].x = res[0].x / uiSiteNumber;
     res[0].y = res[0].y / uiSiteNumber;
-    m_lstAverageLoop.AddItem(res[0]);
+    UpdateComplexResult(res[0], FALSE);
 
     if (m_bShowResult)
     {
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         appDetailed(_T("==================== Polyakov Loop ============================\n"));
         appDetailed(_T("=== <P> = %f + %f I\n"), res[0].x, res[0].y);
     }
@@ -308,25 +308,18 @@ void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptG
 
     if (m_bShowResult)
     {
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     ++m_uiConfigurationCount;
 }
 
-void CMeasurePolyakov::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasurePolyakov::Report()
 {
-    assert(m_uiConfigurationCount == static_cast<UINT>(m_lstAverageLoop.Num()));
+    Average();
     assert(static_cast<UINT>(m_uiConfigurationCount * m_lstR.Num())
         == static_cast<UINT>(m_lstC.Num()));
 
-    appSetLogDate(FALSE);
-    CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
-
+    appPushLogDate(FALSE);
 
     TArray<CLGComplex> tmpLoop;
     TArray<CLGComplex> tmpCorrelator;
@@ -339,16 +332,11 @@ void CMeasurePolyakov::Report()
     appGeneral(_T("{"));
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        tmpChargeSum.x += m_lstAverageLoop[i].x;
-        tmpChargeSum.y += m_lstAverageLoop[i].y;
-        LogGeneralComplex(m_lstAverageLoop[i]);
+        LogGeneralComplex(CmpResAtI(i));
     }
     appGeneral(_T("}\n"));
 
-    tmpChargeSum.x = tmpChargeSum.x / m_uiConfigurationCount;
-    tmpChargeSum.y = tmpChargeSum.y / m_uiConfigurationCount;
-    m_cAverageLoop = tmpChargeSum;
-    appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f arg(P) = %2.12f ------------- \n"), _cuCabsf(tmpChargeSum), __cuCargf(tmpChargeSum));
+    appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f arg(P) = %2.12f ------------- \n"), _cuCabsf(GetAverageCmpRes()), __cuCargf(GetAverageCmpRes()));
 
     m_lstAverageC.RemoveAll();
 
@@ -406,15 +394,14 @@ void CMeasurePolyakov::Report()
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasurePolyakov::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstR.RemoveAll();
     m_lstC.RemoveAll();
-    m_lstAverageLoop.RemoveAll();
 }
 
 __END_NAMESPACE

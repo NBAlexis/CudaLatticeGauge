@@ -38,9 +38,10 @@ public:
         , m_bNeedSmearing(FALSE)
         , m_byId(0)
         , m_byFieldId(0)
-        , m_fLastRealResult(F(0.0))
-        , m_cLastComplexResult()
+        , m_uiConfigurationCount(0)
+        , m_fAverageRealRes(F(0.0))
     {
+        m_cAverageCmpRes = _zeroc;
     }
 
     virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -79,9 +80,14 @@ public:
         appCrucial(_T("OnConfigurationAcceptedZ4 not implemented"));
     }
 
-    virtual void Average(UINT uiConfigurationCount) = 0;
+    virtual void Average();
     virtual void Report() = 0;
-    virtual void Reset() = 0;
+    virtual void Reset()
+    {
+        m_uiConfigurationCount = 0;
+        m_lstRealResults.RemoveAll();
+        m_lstComplexResults.RemoveAll();
+    }
 
     virtual UBOOL IsGaugeMeasurement() const = 0;
     virtual UBOOL IsSourceScanning() const = 0;
@@ -363,8 +369,78 @@ protected:
 public:
     //============================================================
     //some simple measurement only produce real or complex results
-    Real m_fLastRealResult;
-    CLGComplex m_cLastComplexResult;
+    UINT GetConfigurationCount() const 
+    {
+        return m_uiConfigurationCount;
+    }
+
+    Real GetLastRealRes() const
+    {
+        assert(m_lstRealResults.Num() > 0);
+        return (m_lstRealResults.Num() > 0) ? m_lstRealResults[m_lstRealResults.Num() - 1] : F(0.0);
+    }
+
+    CLGComplex GetLastCmpRes() const
+    {
+        assert(m_lstComplexResults.Num() > 0);
+        return (m_lstComplexResults.Num() > 0) ? m_lstComplexResults[m_lstComplexResults.Num() - 1] : _zeroc;
+    }
+
+    //========================
+    //Make sure average has been called so that average is calculated.
+    Real GetAverageRealRes() const
+    {
+        return m_fAverageRealRes;
+    }
+
+    CLGComplex GetAverageCmpRes() const
+    {
+        return m_cAverageCmpRes;
+    }
+
+    Real RealResAtI(INT i) const
+    {
+        assert(i < m_lstRealResults.Num() && i >= 0);
+        return (i < m_lstRealResults.Num() && i >= 0) ? m_lstRealResults[i] : F(0.0);
+    }
+
+    CLGComplex CmpResAtI(INT i) const
+    {
+        assert(i < m_lstComplexResults.Num() && i >= 0);
+        return (i < m_lstComplexResults.Num() && i >= 0) ? m_lstComplexResults[i] : _zeroc;
+    }
+
+    void WriteRealListToFile(const CCString& sFileName) const;
+    void WriteCmpListToFile(const CCString& sFileName) const;
+
+protected:
+
+    void UpdateRealResult(Real fResult, UBOOL bUpdateConfigurationCount = TRUE)
+    {
+        if (bUpdateConfigurationCount)
+        {
+            ++m_uiConfigurationCount;
+        }
+        m_lstRealResults.AddItem(fResult);
+    }
+
+    void UpdateComplexResult(CLGComplex fResult, UBOOL bUpdateConfigurationCount = TRUE)
+    {
+        if (bUpdateConfigurationCount)
+        {
+            ++m_uiConfigurationCount;
+        }
+        m_lstComplexResults.AddItem(fResult);
+    }
+
+    UINT m_uiConfigurationCount;
+
+private:
+
+    TArray<Real> m_lstRealResults;
+    TArray<CLGComplex> m_lstComplexResults;
+    Real m_fAverageRealRes;
+    CLGComplex m_cAverageCmpRes;
     
 };
 

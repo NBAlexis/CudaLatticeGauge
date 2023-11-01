@@ -401,11 +401,6 @@ void CMeasureMesonCorrelatorStaggeredSimple2::ReleaseSource()
     m_pSources.RemoveAll();
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple2::Average(UINT)
-{
-
-}
-
 void CMeasureMesonCorrelatorStaggeredSimple2::Report()
 {
     appGeneral(_T(" =====================================================\n"));
@@ -460,14 +455,11 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Report()
 
 void CMeasureMesonCorrelatorStaggeredSimple2::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstResults.RemoveAll();
     m_lstAverageResults.RemoveAll();
     ReleaseSource();
 }
-
-
-
 
 __END_NAMESPACE
 

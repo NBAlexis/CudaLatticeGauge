@@ -87,8 +87,7 @@ UINT inline _GetDecompose(UINT volumn)
 //    SIndex* stb = (SIndex*)malloc(sizeof(SIndex) * uiSize);
 //    checkCudaErrors(cudaMemcpy(tb, appGetLattice()->m_pIndexCache->m_pWalkingTable, sizeof(UINT) * uiSize * 2 * _HC_Dir, cudaMemcpyDeviceToHost));
 //    checkCudaErrors(cudaMemcpy(stb, appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[1], sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
-//    const UBOOL bLogDate = appGetLogDate();
-//    appSetLogDate(FALSE);
+//    appPushLogDate(FALSE);
 //    for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
 //    {
 //        const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
@@ -110,7 +109,7 @@ UINT inline _GetDecompose(UINT volumn)
 //            7, mappingIdx4.x, mappingIdx4.y, mappingIdx4.z, mappingIdx4.w
 //        );
 //    }
-//    appSetLogDate(bLogDate);
+//    appPopLogDate();
 //
 //    appSafeFree(tb);
 //    appSafeFree(stb);
@@ -118,8 +117,7 @@ UINT inline _GetDecompose(UINT volumn)
 
 void CIndexData::DebugPlaqutteTable()
 {
-    const UBOOL bLogData = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
@@ -151,7 +149,7 @@ void CIndexData::DebugPlaqutteTable()
         }
     }
     appSafeFree(cache);
-    appSetLogDate(bLogData);
+    appPopLogDate();
 }
 
 void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
@@ -188,8 +186,7 @@ void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
 
 void CIndexData::DebugStapleTable()
 {
-    const UBOOL bLogData = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
@@ -222,7 +219,7 @@ void CIndexData::DebugStapleTable()
         }
     }
     appSafeFree(cache);
-    appSetLogDate(bLogData);
+    appPopLogDate();
 }
 
 void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)
@@ -238,8 +235,7 @@ void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)
         appGetLattice()->m_pIndexCache->m_pIndexPositionToSIndex[byFieldId], 
         sizeof(SIndex) * uiSize, cudaMemcpyDeviceToHost));
 
-    const UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
     {
         const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
@@ -265,7 +261,7 @@ void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)
             }
         }
     }
-    appSetLogDate(bLogDate);
+    appPopLogDate();
 
     appSafeFree(tb);
 }
@@ -282,8 +278,7 @@ void CIndexData::DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt)
         appGetLattice()->m_pIndexCache->m_pIndexLinkToSIndex[byFieldId],
         sizeof(SIndex) * uiSize * _HC_Dir, cudaMemcpyDeviceToHost));
 
-    const UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
     {
         const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
@@ -315,7 +310,7 @@ void CIndexData::DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt)
             }
         }
     }
-    appSetLogDate(bLogDate);
+    appPopLogDate();
 
     appSafeFree(tb);
 }
@@ -332,8 +327,7 @@ void CIndexData::DebugLinkDirichletOrDagger(BYTE byFieldId)
         appGetLattice()->m_pIndexCache->m_pIndexLinkToSIndex[byFieldId],
         sizeof(SIndex) * uiSize * _HC_Dir, cudaMemcpyDeviceToHost));
 
-    const UBOOL bLogDate = appGetLogDate();
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     for (UINT uiBigIdx = 0; uiBigIdx < uiSize; ++uiBigIdx)
     {
         const SSmallInt4 coord = _hostBigIndexToInt4(uiBigIdx);
@@ -360,7 +354,7 @@ void CIndexData::DebugLinkDirichletOrDagger(BYTE byFieldId)
             }
         }
     }
-    appSetLogDate(bLogDate);
+    appPopLogDate();
 
     appSafeFree(tb);
 }

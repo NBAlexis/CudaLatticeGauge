@@ -96,7 +96,7 @@ INT GaugeFixing(CParameters& params)
         for (UINT uiOmega = iOmegaStart; uiOmega <= iOmegaEnd; ++uiOmega)
         {
             appGeneral(_T("====== Start %s%d : %d to %d ======\n"), sMiddle.c_str(), uiOmega, iIndexStart, iIndexEnd);
-            appSetLogDate(FALSE);
+            appPushLogDate(FALSE);
             for (UINT uiIndex = iIndexStart; uiIndex <= iIndexEnd; ++uiIndex)
             {
                 CCString sSaveFile;
@@ -159,7 +159,7 @@ INT GaugeFixing(CParameters& params)
                     appGeneral(_T("\nBad %s%d : %d, is %2.20f\n"), sMiddle.c_str(), uiOmega, uiIndex, fRes);
                 }
             }
-            appSetLogDate(TRUE);
+            appPopLogDate();
         }
     }
     else

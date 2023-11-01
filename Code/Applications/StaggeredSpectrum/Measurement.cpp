@@ -541,7 +541,7 @@ INT Measurement(CParameters& params)
 #pragma region Measure
 
     appGeneral(_T("(*\n"));
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     CFieldFermionKSSU3* pF1Light = NULL;
     CFieldFermionKSSU3* pF2Light = NULL;
@@ -730,14 +730,15 @@ INT Measurement(CParameters& params)
 
         if ((iEndN - uiN + 1) % uiNewLine == 0)
         {
-            appSetLogDate(TRUE);
+            appPushLogDate(TRUE);
             appGeneral(_T("\n="));
-            appSetLogDate(FALSE);
+            appPopLogDate();
         }
         else
         {
-            appSetLogDate(FALSE);
+            appPushLogDate(FALSE);
             appGeneral(_T("="));
+            appPopLogDate();
         }
 
     }
@@ -956,7 +957,7 @@ INT Measurement(CParameters& params)
     appGeneral(_T("\n"));
 
     appGeneral(_T("\n(*"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 
     appGeneral(_T("\n=====================================\n========= finished! ==========\n*)"));
 

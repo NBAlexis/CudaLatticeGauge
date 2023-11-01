@@ -24,7 +24,6 @@ public:
 
     CMeasureChiralCondensate()
         : CMeasureStochastic()
-        , m_uiConfigurationCount(0)
         , m_pHostXYBuffer(NULL)
 
         , m_pDistributionR(NULL)
@@ -45,7 +44,6 @@ public:
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -54,8 +52,6 @@ public:
 
 protected:
     
-    UINT m_uiConfigurationCount;
-
     CLGComplex* m_pDeviceXYBuffer[_kCondMeasureCount];
     CLGComplex* m_pHostXYBuffer;
     CLGComplex m_cTmpSum[_kCondMeasureCount];

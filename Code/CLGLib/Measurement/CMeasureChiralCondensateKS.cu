@@ -421,6 +421,8 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             }
         }
 
+        UpdateRealResult(m_lstCondAll[0][m_uiConfigurationCount].x, FALSE);
+        UpdateComplexResult(m_lstCondAll[0][m_uiConfigurationCount], FALSE);
         ++m_uiConfigurationCount;
     }
 }
@@ -430,13 +432,9 @@ void CMeasureChiralCondensateKS::OnConfigurationAccepted(const CFieldGauge* pGau
 
 }
 
-void CMeasureChiralCondensateKS::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureChiralCondensateKS::Report()
 {
+    appPushLogDate(FALSE);
     for (UINT i = 0; i < ChiralKSMax; ++i)
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
@@ -475,12 +473,12 @@ void CMeasureChiralCondensateKS::Report()
     }
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureChiralCondensateKS::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
     for (UINT i = 0; i < ChiralKSMax; ++i)
     {
         m_lstCondAll[i].RemoveAll();

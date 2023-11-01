@@ -47,7 +47,7 @@
 //reduce the thread count is expansive, so _CLG_USE_LAUNCH_BOUND = 1 is recommanded
 //It's better to complie using the maximum thread per block of the device of the computer.
 #if _CLG_DEBUG
-#define _CLG_USE_LAUNCH_BOUND 0
+#define _CLG_USE_LAUNCH_BOUND 1
 #else
 #define _CLG_USE_LAUNCH_BOUND 1
 #endif

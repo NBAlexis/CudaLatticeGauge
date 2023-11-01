@@ -169,11 +169,6 @@ void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(const CFiel
     ++m_uiConfigurationCount;
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple::Average(UINT)
-{
-
-}
-
 void CMeasureMesonCorrelatorStaggeredSimple::Report()
 {
     appGeneral(_T(" =====================================================\n"));
@@ -228,7 +223,7 @@ void CMeasureMesonCorrelatorStaggeredSimple::Report()
 
 void CMeasureMesonCorrelatorStaggeredSimple::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstResults.RemoveAll();
     m_lstAverageResults.RemoveAll();
 }

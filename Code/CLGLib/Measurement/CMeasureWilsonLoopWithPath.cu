@@ -142,17 +142,16 @@ void CMeasureWilsonLoopWithPath::OnConfigurationAccepted(const class CFieldGauge
             static_cast<BYTE>(m_lstPath.Num()), 
             m_byFieldId, m_pTmpDeviceRes);
         checkCudaErrors(cudaMemcpy(hostRes, m_pTmpDeviceRes, sizeof(CLGComplex), cudaMemcpyDeviceToHost));
-        m_lstRes.AddItem(hostRes[0]);
+        UpdateComplexResult(hostRes[0]);
 
         if (m_bShowResult)
         {
             appGeneral(_T("loop = "));
-            appSetLogDate(FALSE);
+            appPushLogDate(FALSE);
             LogGeneralComplex(hostRes[0], FALSE);
             appGeneral(_T("\n"));
-            appSetLogDate(TRUE);
+            appPopLogDate();
         }
-        ++m_uiConfigurationCount;
 
         return;
     }
@@ -172,52 +171,37 @@ void CMeasureWilsonLoopWithPath::OnConfigurationAccepted(const class CFieldGauge
     sum.x = sum.x / _HC_Volume;
     sum.y = sum.y / _HC_Volume;
 
-    m_lstRes.AddItem(sum);
+    UpdateComplexResult(sum);
 
     if (m_bShowResult)
     {
         appGeneral(_T("loop = "));
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         LogGeneralComplex(sum, FALSE);
         appGeneral(_T("\n"));
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
-    ++m_uiConfigurationCount;
-}
-
-void CMeasureWilsonLoopWithPath::Average(UINT)
-{
-    //nothing to do
 }
 
 void CMeasureWilsonLoopWithPath::Report()
 {
-    appSetLogDate(FALSE);
+    Average();
+    appPushLogDate(FALSE);
 
-    CLGComplex average = _zeroc;
     appGeneral(_T("{\n"));
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        LogGeneralComplex(m_lstRes[i], i + 1 < m_uiConfigurationCount);
-        _cuCaddf(average, m_lstRes[i]);
+        LogGeneralComplex(CmpResAtI(i), i + 1 < m_uiConfigurationCount);
     }
     appGeneral(_T("\n}\n"));
     if (m_uiConfigurationCount > 0)
     {
-        average.x = average.x / m_uiConfigurationCount;
-        average.y = average.y / m_uiConfigurationCount;
         appGeneral(_T("Average = "));
-        LogGeneralComplex(average, FALSE);
+        LogGeneralComplex(GetAverageCmpRes(), FALSE);
         appGeneral(_T("\n\n"));
     }
 
-    appSetLogDate(TRUE);
-}
-
-void CMeasureWilsonLoopWithPath::Reset()
-{
-    m_uiConfigurationCount = 0;
-    m_lstRes.RemoveAll();
+    appPopLogDate();
 }
 
 __END_NAMESPACE

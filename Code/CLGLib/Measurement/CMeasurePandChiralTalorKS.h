@@ -32,7 +32,6 @@ class CLGAPI CMeasurePandChiralTalorKS : public CMeasureStochastic
 public:
     CMeasurePandChiralTalorKS()
         : CMeasureStochastic()
-        , m_uiConfigurationCount(0)
         , m_bShowResult(TRUE)
     {
     }
@@ -41,7 +40,6 @@ public:
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -50,7 +48,6 @@ public:
 
 protected:
     
-    UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
 
     static void ApplyM(CFieldFermionKSSU3* pTarget, const CFieldFermionKSSU3* pSource, const CFieldGaugeSU3* pGauge);

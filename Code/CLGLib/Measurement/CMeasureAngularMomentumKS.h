@@ -35,7 +35,6 @@ public:
 
     CMeasureAngularMomentumKS()
         : CMeasureStochastic()
-        , m_uiConfigurationCount(0)
         , m_pHostXYBuffer(NULL)
         , m_pHostZBuffer(NULL)
 
@@ -59,7 +58,6 @@ public:
     void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
     void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
     void Reset() override;
 
@@ -77,8 +75,6 @@ protected:
     virtual void ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const;
     virtual void ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const;
     
-
-    UINT m_uiConfigurationCount;
 
     CLGComplex* m_pDeviceXYBuffer[EAngularMeasureMax];
     CLGComplex* m_pDeviceZBuffer[EAngularMeasureMax];

@@ -36,7 +36,6 @@
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestRotationAcc.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
-    <ClCompile Include="Tests\TestSU3Generator.cpp" />
     <ClCompile Include="Tests\TestUpdator.cpp" />
     <ClCompile Include="Tests\TestGaugeFixing.cpp" />
   </ItemGroup>

@@ -16,10 +16,16 @@ TestRotationWilsonDiracDirichlet:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.591390
     CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.591390
+    ExpectedResDebug : 0.591390
 
     Updator:
 
@@ -108,12 +114,17 @@ TestRotationWilsonDiracTorus:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
+    CacheStaple : 0
+    ExponentialPrecision : 10
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
     ExpectedRes : 0.445789
     ExpectedResRelease : 0.369222
-    CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
-    ExponentialPrecision : 10
 
     Updator:
 
@@ -199,10 +210,16 @@ TestRotationWilsonDiracProjectivePlane:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.538359
     CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.538359
+    ExpectedResDebug : 0.538359
 
     Updator:
 
@@ -295,9 +312,16 @@ TestRotationKSDirichlet:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.536160
     CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.536160
+    ExpectedResDebug : 0.413
 
     Updator:
 
@@ -405,9 +429,16 @@ TestRotationKSTorus:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.480466
     CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.480466
+    ExpectedResDebug : 0.413
 
     Updator:
 
@@ -514,9 +545,16 @@ TestRotationKSProjectivePlane:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.414636
     CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.414636
+    ExpectedResDebug : 0.413
 
     Updator:
 
@@ -631,10 +669,16 @@ TestRotationEMProjectivePlane:
     FermionFieldCount : 2
     OtherGaugeFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.43
     CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.43
+    ExpectedResDebug : 0.43
 
     Updator:
 
@@ -792,9 +836,16 @@ TestRotationProjectivePlaneU1:
     ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
-    ExpectedResDebug : 0.138
-    ExpectedRes : 0.107689
     CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.107689
+    ExpectedResDebug : 0.138
 
     Updator:
 
@@ -1086,6 +1137,15 @@ TestRotationQuenched3D:
     MeasureListLength : 1
     CacheStaple : 0
 
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.607305
+    ExpectedResDebug : 0.607305
+
     ## ============================================================
     ## Initial files
     ## ============================================================
@@ -1127,10 +1187,7 @@ TestRotationQuenched3D:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakovXY3D
-        FieldId : 1
-        ShowResult : 0
-        U1 : 0
+        MeasureName : CMeasurePlaqutteEnergy
 
 TestRotationQuenchedU13D:
 
@@ -1155,6 +1212,15 @@ TestRotationQuenchedU13D:
     MaxNt : 1
     SavePrefix : ./500QuenchedU13D_
     Additive : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.641533
+    ExpectedResDebug : 0.641533
 
     # 53551575Nt4 Omega60 
     Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
@@ -1214,10 +1280,7 @@ TestRotationQuenchedU13D:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakovXY3D
-        FieldId : 1
-        ShowResult : 0
-        U1 : 1
+        MeasureName : CMeasurePlaqutteEnergy
 
 # ==============================================
 # Rotation and beta gradient

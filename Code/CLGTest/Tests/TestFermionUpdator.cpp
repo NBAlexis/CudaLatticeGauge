@@ -27,7 +27,8 @@ UINT TestFermionUpdator(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(40, TRUE);
 #else
     appGetLattice()->m_pUpdator->Update(10, TRUE);
-    Real fRes = pMeasure->m_fLastRealResult;
+    pMeasure->Average();
+    Real fRes = pMeasure->GetAverageRealRes();
     appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
     if (appAbs(fRes - fExpected) > F(0.02))
     {
@@ -176,7 +177,8 @@ UINT TestFermionUpdatorL(CParameters& sParam)
     pMeasure->Reset();
     appGetLattice()->m_pUpdator->Update(static_cast<UINT>(updates - 1), TRUE);
 
-    const Real fRes = pMeasure->m_fLastRealResult;
+    pMeasure->Average();
+    const Real fRes = pMeasure->GetAverageRealRes();
     const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
     const Real fH = appGetLattice()->m_pUpdator->GetHValue();
 

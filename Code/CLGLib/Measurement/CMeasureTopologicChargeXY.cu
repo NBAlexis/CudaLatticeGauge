@@ -124,7 +124,7 @@ void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGaug
     {
         appDetailed(_T("\n\n ==================== Topological Charge (%d con)============================ \n\n"), m_uiConfigurationCount);
     }
-    m_lstCharge.AddItem(fCharge);
+    UpdateRealResult(fCharge, FALSE);
     if (m_bShowResult)
     {
         appDetailed(_T("Charge is %f\n"), fCharge);
@@ -148,18 +148,12 @@ void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGaug
     }
 }
 
-void CMeasureTopologicChargeXY::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureTopologicChargeXY::Report()
 {
-    assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCharge.Num()));
+    Average();
     assert(m_uiConfigurationCount * (_HC_Lx - 1) * (_HC_Ly - 1) == static_cast<UINT>(m_lstXYDensity.Num()));
 
-    appSetLogDate(FALSE);
-    Real tmpChargeSum = F(0.0);
+    appPushLogDate(FALSE);
 
     appGeneral(_T("\n\n==========================================================================\n"));
     appGeneral(_T("==================== Topological Charge (%d con)============================\n"), m_uiConfigurationCount);
@@ -169,12 +163,11 @@ void CMeasureTopologicChargeXY::Report()
     appGeneral(_T("{"));
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        tmpChargeSum += m_lstCharge[i];
-        appGeneral(_T("%2.12f,  "), m_lstCharge[i]);
+        appGeneral(_T("%2.12f,  "), RealResAtI(i));
     }
     appGeneral(_T("}\n"));
 
-    appGeneral(_T("\n ----------- average charge = %2.12f ------------- \n"), tmpChargeSum / m_uiConfigurationCount);
+    appGeneral(_T("\n ----------- average charge = %2.12f ------------- \n"), GetAverageRealRes());
 
     appGeneral(_T("\n ----------- charge density ------------- \n"));
 
@@ -217,13 +210,12 @@ void CMeasureTopologicChargeXY::Report()
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureTopologicChargeXY::Reset()
 {
-    m_uiConfigurationCount = 0;
-    m_lstCharge.RemoveAll();
+    CMeasure::Reset();
     m_lstXYDensity.RemoveAll();
 }
 

@@ -372,6 +372,11 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
             m_cTmpSum[i] = cuCmulf_cr(m_cTmpSum[i], fDiv2);
             appDetailed(_T("\n Condensate %d = %2.12f + %2.12f\n"), i, m_cTmpSum[i].x, m_cTmpSum[i].y);
             m_lstCondAll[i].AddItem(m_cTmpSum[i]);
+            if (0 == i)
+            {
+                UpdateRealResult(m_cTmpSum[i].x, FALSE);
+                UpdateComplexResult(m_cTmpSum[i], FALSE);
+            }
         }
 
         ++m_uiConfigurationCount;
@@ -383,13 +388,9 @@ void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge
 
 }
 
-void CMeasureChiralCondensate::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureChiralCondensate::Report()
 {
+    appPushLogDate(FALSE);
     for (UINT i = 0; i < _kCondMeasureCount; ++i)
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
@@ -428,12 +429,13 @@ void CMeasureChiralCondensate::Report()
     }
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureChiralCondensate::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
+
     for (UINT i = 0; i < _kCondMeasureCount; ++i)
     {
         m_lstCondAll[i].RemoveAll();

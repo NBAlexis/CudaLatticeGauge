@@ -563,13 +563,9 @@ void CMeasureAngularMomentumKS::OnConfigurationAccepted(const CFieldGauge* pGaug
 
 }
 
-void CMeasureAngularMomentumKS::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureAngularMomentumKS::Report()
 {
+    appPushLogDate(FALSE);
     for (UINT i = 0; i < EAngularMeasureMax; ++i)
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstCondAll[i].Num()));
@@ -608,12 +604,13 @@ void CMeasureAngularMomentumKS::Report()
     }
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureAngularMomentumKS::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
+
     for (UINT i = 0; i < EAngularMeasureMax; ++i)
     {
         m_lstCondAll[i].RemoveAll();

@@ -73,7 +73,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
 {
 #if !_CLG_DOUBLEFLOAT
     //When there is div, we use double instead of float
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     TArray<cuDoubleComplex> betas;
     TArray<cuDoubleComplex> zeta;
     TArray<cuDoubleComplex> zetaold;
@@ -250,10 +250,10 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pS->Return();
     pSA->Return();
     pWA->Return();
-    appSetLogDate(TRUE);
+    appPopLogDate();
     return bDone;
 #else
-    appSetLogDate(FALSE);
+appPushLogDate(FALSE);
     TArray<CLGComplex> betas;
     TArray<CLGComplex> zeta;
     TArray<CLGComplex> zetaold;
@@ -428,7 +428,7 @@ UBOOL CMultiShiftBiCGStab::Solve(TArray<CField*>& pFieldX, const TArray<CLGCompl
     pS->Return();
     pSA->Return();
     pWA->Return();
-    appSetLogDate(TRUE);
+    appPopLogDate();
     return bDone;
 #endif
 }

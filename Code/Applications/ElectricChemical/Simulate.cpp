@@ -139,14 +139,14 @@ INT Simulate(CParameters& params)
             }
         }
         assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
-        appSetLogDate(FALSE);
+        appPushLogDate(FALSE);
         appGeneral(_T("\n|<P>|,arg<P>={\n"));
         for (INT i = 0; i < pPL->m_lstLoop.Num(); ++i)
         {
             appGeneral(_T("{%f, %f},\n"), _cuCabsf(pPL->m_lstLoop[i]), __cuCargf(pPL->m_lstLoop[i]));
         }
         appGeneral(_T("}\n"));
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     else
     {

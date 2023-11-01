@@ -728,11 +728,6 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge
     ++m_uiConfigurationCount;
 }
 
-void CMeasureMesonCorrelatorStaggered::Average(UINT)
-{
-
-}
-
 void CMeasureMesonCorrelatorStaggered::Report()
 {
     appGeneral(_T(" =====================================================\n"));
@@ -787,7 +782,7 @@ void CMeasureMesonCorrelatorStaggered::Report()
 
 void CMeasureMesonCorrelatorStaggered::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstResults.RemoveAll();
     m_lstAverageResults.RemoveAll();
 }

@@ -36,7 +36,6 @@ public:
         : m_eLevel(CRUCIAL)
         , m_pStream(NULL)
         , m_pStdStream(NULL)
-        , m_bLogDate(TRUE)
     {
         Initial(CRUCIAL);
     }
@@ -155,7 +154,8 @@ public:
             {
                 *m_pStdStream << _T("\033[31;1m");
             }
-            if (m_bLogDate)
+            UBOOL bLogData = (m_lstLogDate.Num() > 0) ? m_lstLogDate[m_lstLogDate.Num() - 1] : TRUE;
+            if (bLogData)
             {
                 static TCHAR timeBuffer[256];
                 if (level <= GENERAL)
@@ -193,9 +193,9 @@ public:
         }
     }
 
-    inline void SetLogDate(UBOOL bLog) { m_bLogDate = bLog; }
+    inline void PushLogDate(UBOOL bLog) { m_lstLogDate.PushBack(bLog); }
+    inline void PopLogDate() { m_lstLogDate.Pop(); }
     inline void SetLogHeader(const CCString& sHeader) { m_sTraceHeader = sHeader; }
-    inline UBOOL GetLogDate() const { return m_bLogDate; }
 
 private:
 
@@ -203,7 +203,7 @@ private:
     OSTREAM * m_pStream;
     OSTREAM * m_pStdStream;
     TCHAR m_cBuff[_kTraceBuffSize];
-    UBOOL m_bLogDate;
+    TArray<UBOOL> m_lstLogDate;
     CCString m_sTraceHeader;
 };
 
@@ -233,14 +233,14 @@ inline void appFlushLog()
     GTracer.Flush();
 }
 
-inline UBOOL appGetLogDate()
+inline void appPopLogDate()
 {
-    return GTracer.GetLogDate();
+    GTracer.PopLogDate();
 }
 
-inline void appSetLogDate(UBOOL bLog)
+inline void appPushLogDate(UBOOL bLog)
 {
-    GTracer.SetLogDate(bLog);
+    GTracer.PushLogDate(bLog);
 }
 
 inline void appSetLogHeader(const CCString& sHeader)

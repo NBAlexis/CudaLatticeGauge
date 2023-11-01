@@ -67,7 +67,7 @@ void CMultiShiftNested::AllocateBuffers(const CField*)
 
 UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase , const CField* )
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 #if _CLG_DEBUG
     if (cn.Num() > 2)
     {
@@ -137,7 +137,7 @@ UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex
         CCommonData::m_fShiftedMass = fShiftedMass;
         m_pNestedSolver->Solve(pFieldKS, pFieldB, pGaugeFeild, toSolve, ESP_Once, NULL);
     }
-    appSetLogDate(TRUE);
+    appPopLogDate();
     return TRUE;
 }
 

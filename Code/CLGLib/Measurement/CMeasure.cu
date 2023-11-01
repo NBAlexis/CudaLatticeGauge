@@ -175,6 +175,47 @@ _kernelInitialDist(UINT* pCount, Real* pValue, CLGComplex* pValueC)
 
 #pragma endregion
 
+void CMeasure::Average()
+{
+    appPushLogDate(FALSE);
+    if (m_lstRealResults.Num() > 0)
+    {
+        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstRealResults.Num()));
+        m_fAverageRealRes = F(0.0);
+        for (INT i = 0; i < m_lstRealResults.Num(); ++i)
+        {
+            m_fAverageRealRes += m_lstRealResults[i];
+        }
+        m_fAverageRealRes = m_fAverageRealRes / m_uiConfigurationCount;
+        appParanoiac(_T(" === Averaged (%d measures) === %f\n"), m_uiConfigurationCount, m_fAverageRealRes);
+    }
+
+    if (m_lstComplexResults.Num() > 0)
+    {
+        assert(m_uiConfigurationCount == static_cast<UINT>(m_lstComplexResults.Num()));
+        m_cAverageCmpRes = _zeroc;
+        for (INT i = 0; i < m_lstRealResults.Num(); ++i)
+        {
+            m_cAverageCmpRes.x += m_lstComplexResults[i].x;
+            m_cAverageCmpRes.y += m_lstComplexResults[i].y;
+        }
+        m_cAverageCmpRes.x = m_cAverageCmpRes.x / m_uiConfigurationCount;
+        m_cAverageCmpRes.y = m_cAverageCmpRes.y / m_uiConfigurationCount;
+        appParanoiac(_T(" === Averaged (%d measures) === %f + %f \n"), m_uiConfigurationCount, m_cAverageCmpRes.x, m_cAverageCmpRes.y);
+    }
+    appPopLogDate();
+}
+
+void CMeasure::WriteRealListToFile(const CCString& sFileName) const
+{
+    WriteRealArray(sFileName, m_lstRealResults);
+}
+
+void CMeasure::WriteCmpListToFile(const CCString& sFileName) const
+{
+    WriteComplexArray(sFileName, m_lstComplexResults);
+}
+
 void CMeasure::FillDataWithR_R(
     TArray<Real>& arrData,
     TArray<Real>* arrInner,

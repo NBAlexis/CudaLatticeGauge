@@ -1264,14 +1264,9 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     ++m_uiConfigurationCount;
 }
 
-void CMeasureAMomentumJG::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureAMomentumJG::Report()
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     appGeneral(_T("\n===================================================\n"));
     appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), CCommonData::m_sCenter.x);
@@ -1332,12 +1327,13 @@ void CMeasureAMomentumJG::Report()
     appGeneral(_T("===================================================\n"));
     appGeneral(_T("===================================================\n"));
 
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureAMomentumJG::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
+
     m_lstRes.RemoveAll();
     m_lstResJGS.RemoveAll();
     m_lstResJGChen.RemoveAll();

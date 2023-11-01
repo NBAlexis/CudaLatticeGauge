@@ -348,7 +348,10 @@ void CMeasureWilsonLoopXY::OnConfigurationAccepted(const class CFieldGauge* pAcc
     //extract res
     checkCudaErrors(cudaMemcpy(m_pHostCorrelatorCounter, m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(m_pHostCorrelator, m_pCorrelator, sizeof(CLGComplex) * m_uiMaxLengthSq * tm1, cudaMemcpyDeviceToHost));
-
+    if (m_bShowResult)
+    {
+        appPushLogDate(FALSE);
+    }
     TArray<TArray<CLGComplex>> thisConf;
     if (0 == m_uiConfigurationCount)
     {
@@ -413,14 +416,9 @@ void CMeasureWilsonLoopXY::OnConfigurationAccepted(const class CFieldGauge* pAcc
 
     if (m_bShowResult)
     {
-        appSetLogDate(TRUE);
+        appPopLogDate();
     }
     ++m_uiConfigurationCount;
-}
-
-void CMeasureWilsonLoopXY::Average(UINT)
-{
-    //nothing to do
 }
 
 void CMeasureWilsonLoopXY::Report()
@@ -433,7 +431,7 @@ void CMeasureWilsonLoopXY::Report()
     assert((_HC_Lt - 1)
         == static_cast<UINT>(m_lstC[0][0].Num()));
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     const UINT tm1 = _HC_Lt - 1;
     TArray<CLGComplex> tmpLoop;
     TArray<CLGComplex> tmpCorrelator;
@@ -509,12 +507,12 @@ void CMeasureWilsonLoopXY::Report()
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureWilsonLoopXY::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasure::Reset();
     m_lstR.RemoveAll();
     m_lstC.RemoveAll();
 }

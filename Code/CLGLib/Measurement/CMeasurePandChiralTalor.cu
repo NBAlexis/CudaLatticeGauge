@@ -567,13 +567,9 @@ void CMeasurePandChiralTalor::OnConfigurationAccepted(const CFieldGauge* pGauge,
     m_lstPolyakovSOmegaSq.AddItem(omegasqterm);
 }
 
-void CMeasurePandChiralTalor::Average(UINT)
-{
-    //nothing to do
-}
-
 void CMeasurePandChiralTalor::Report()
 {
+    appPushLogDate(FALSE);
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstTraceRes[i].Num()));
@@ -618,12 +614,12 @@ void CMeasurePandChiralTalor::Report()
     }
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasurePandChiralTalor::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
     for (UINT i = 0; i < ECPCTTT_Max; ++i)
     {
         m_lstTraceRes[i].RemoveAll();

@@ -95,7 +95,7 @@ void CMultiShiftFOM::ReleaseBuffers()
 
 UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
     assert(0 == m_lstVectors.Num());
     for (UINT i = 0; i < m_uiMaxDim; ++i)
     {
@@ -247,6 +247,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
                 m_lstVectors[k]->Return();
             }
             m_lstVectors.RemoveAll();
+            appPopLogDate();
             return TRUE;
         }
 
@@ -261,6 +262,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         m_lstVectors[i]->Return();
     }
     m_lstVectors.RemoveAll();
+    appPopLogDate();
     return FALSE;
 }
 

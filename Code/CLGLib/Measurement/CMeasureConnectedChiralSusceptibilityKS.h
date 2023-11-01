@@ -22,7 +22,6 @@ public:
 
     CMeasureConnectedSusceptibilityKS() : CMeasure()
         , m_pSourceZero(NULL)
-        , m_uiConfigurationCount(0)
         , m_bShowResult(FALSE)
     {
         
@@ -32,9 +31,7 @@ public:
 
     void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
-    void Average(UINT uiConfigurationCount) override;
     void Report() override;
-    void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
@@ -45,8 +42,6 @@ protected:
 
 public:
 
-    TArray<CLGComplex> m_lstResults;
-    UINT m_uiConfigurationCount;
     UBOOL m_bShowResult;
 };
 

@@ -8,9 +8,6 @@
     <ClCompile Include="Tests\TestUpdator.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
-    <ClCompile Include="Tests\TestSU3Generator.cpp">
-      <Filter>Tests</Filter>
-    </ClCompile>
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp">
       <Filter>Tests</Filter>
     </ClCompile>

@@ -36,7 +36,8 @@ UINT TestBoundary(CParameters& sParam)
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(20, TRUE);
 
-    const Real fRes = pMeasure->m_fLastRealResult;
+    pMeasure->Average();
+    Real fRes = pMeasure->GetAverageRealRes();
     appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.02))

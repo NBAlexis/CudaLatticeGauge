@@ -1250,17 +1250,12 @@ void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGa
     //do nothing, we use OnConfigurationAcceptedZ4 instead
 }
 
-void CMeasureAMomentumStochastic::Average(UINT )
-{
-    //nothing to do
-}
-
 void CMeasureAMomentumStochastic::Report()
 {
     assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJL.Num());
     assert(static_cast<INT>(m_uiConfigurationCount) * m_lstR.Num() == m_lstJS.Num());
 
-    appSetLogDate(FALSE);
+    appPushLogDate(FALSE);
 
     appGeneral(_T("jgr={"));
 
@@ -1295,12 +1290,12 @@ void CMeasureAMomentumStochastic::Report()
     ReportDistributeWithR_R(m_uiConfigurationCount, m_lstR.Num(), m_lstJPot);
 
     appGeneral(_T("==========================================================================\n"));
-    appSetLogDate(TRUE);
+    appPopLogDate();
 }
 
 void CMeasureAMomentumStochastic::Reset()
 {
-    m_uiConfigurationCount = 0;
+    CMeasureStochastic::Reset();
 
     m_lstR.RemoveAll();
     m_lstJL.RemoveAll();

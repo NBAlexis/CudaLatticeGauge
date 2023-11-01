@@ -43,30 +43,14 @@ void CMeasurePlaqutteEnergy::OnConfigurationAccepted(const CFieldGauge* pAcceptG
 #else
     const Real plaqEnergy = F(1.0) - plaqutteEneregy;
 #endif
-    m_lstData.AddItem(plaqEnergy);
-    m_fLastRealResult = plaqEnergy;
+    UpdateRealResult(plaqEnergy);
     appParanoiac(_T(" === Plaqutte Energy Measured === energy = %f\n"), plaqEnergy);
-}
-
-void CMeasurePlaqutteEnergy::Average(UINT )
-{
-    Real fAdd = F(0.0);
-    for (INT i = 0; i < m_lstData.Num(); ++i)
-    {
-        fAdd += m_lstData[i];
-    }
-    m_fLastRealResult = fAdd / m_lstData.Num();
-    appParanoiac(_T(" === Plaqutte Energy Averaged (%d measures) === energy = %f\n"), m_lstData.Num(), m_fLastRealResult);
 }
 
 void CMeasurePlaqutteEnergy::Report()
 {
-    appGeneral(_T(" === Plaqutte Energy Averaged === energy = %f\n\n"), m_fLastRealResult);
-}
-
-void CMeasurePlaqutteEnergy::Reset()
-{
-    m_lstData.RemoveAll();
+    Average();
+    appGeneral(_T(" === Plaqutte Energy Averaged === energy = %f\n\n"), GetAverageRealRes());
 }
 
 __END_NAMESPACE
