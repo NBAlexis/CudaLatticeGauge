@@ -139,11 +139,12 @@ def JacknifeWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showProgress="", showF
     return unbaisr0, argsr0, unbaisr1, argsr1, unbaisc0, argsc0
 
 
-def PrintAsMathematicaArray(arr) -> str:
+def PrintAsMathematicaArray(arr, header="") -> str:
     ret = str(np.array(arr))
     ret = ret.replace("\n", "")
     ret = ret.replace("\r", "")
     ret = ret.replace(" ", ",")
+    ret = ret.replace("j", "I")
     oldLen = len(ret)
     ret = ret.replace(",,", ",")
     while len(ret) != oldLen:
@@ -154,4 +155,7 @@ def PrintAsMathematicaArray(arr) -> str:
     ret = ret.replace(",}", "}")
     ret = ret.replace("{,", "{")
     ret = ret.replace("e", "*^")
+    ret = ret + ";"
+    if 0 != len(header):
+        ret = header + "=" + ret
     return ret

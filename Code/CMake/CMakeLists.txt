@@ -349,7 +349,6 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRandom.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRotationAcc.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp
-    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSU3Generator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGaugeFixing.cpp
     )
