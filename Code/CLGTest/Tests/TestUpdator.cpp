@@ -22,7 +22,7 @@ UINT TestUpdateCommon(CParameters& sParam)
     INT iValue = 0;
 #if !_CLG_DEBUG
     iValue = 3;
-    sParam.FetchValueReal(_T("BeforeMetropolis"), iValue);
+    sParam.FetchValueINT(_T("BeforeMetropolis"), iValue);
 #else
     iValue = 1;
     sParam.FetchValueINT(_T("BeforeMetropolisDebug"), iValue);
@@ -31,7 +31,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 
 #if !_CLG_DEBUG
     iValue = 12;
-    sParam.FetchValueReal(_T("Metropolis"), iValue);
+    sParam.FetchValueINT(_T("Metropolis"), iValue);
 #else
     iValue = 4;
     sParam.FetchValueINT(_T("MetropolisDebug"), iValue);
@@ -40,7 +40,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 
 #if !_CLG_DEBUG
     iValue = 2;
-    sParam.FetchValueReal(_T("ExpectMiss"), iValue);
+    sParam.FetchValueINT(_T("ExpectMiss"), iValue);
 #else
     iValue = 1;
     sParam.FetchValueINT(_T("ExpectMissDebug"), iValue);

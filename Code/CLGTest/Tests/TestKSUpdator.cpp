@@ -61,7 +61,7 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 #endif
 
 #if !_CLG_DEBUG
-    const Real fRes = pMeasure->m_fLastRealResult;
+    const Real fRes = pMeasure->GetLastRealRes();
     appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.01))
