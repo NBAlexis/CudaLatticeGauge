@@ -497,7 +497,8 @@ TestAnitiHermiticity:
         # FieldName : CFieldFermionKSSU3EM
         # FieldName : CFieldFermionKSU1
         # FieldName : CFieldFermionKSSU3Gamma
-        FieldName : CFieldFermionKSSU3DR
+        # FieldName : CFieldFermionKSSU3DR
+        FieldName : CFieldFermionKSSU3Acc
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
@@ -530,9 +531,11 @@ TestAnitiHermiticity:
 
     Action1:
    
-        ActionName : CActionGaugePlaquetteRotating
+        # ActionName : CActionGaugePlaquetteRotating
+        ActionName : CActionGaugePlaquetteAcceleration
         Beta : 3
         Omega : 0.2
+        AccG : 0.1
 
     Action2:
 

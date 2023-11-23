@@ -25,7 +25,7 @@ _kernelEnergy_RigidAcc(
     const deviceSU3 * __restrict__ pDeviceData,
     BYTE byFieldId,
     Real betaOverN, Real fG,
-    Real* results)
+    DOUBLE* results)
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
@@ -62,6 +62,7 @@ _kernelEnergy_RigidAcc_Simplified(
     const SIndex* __restrict__ pCachedIndex,
     BYTE plaqLength, BYTE plaqCount,
     Real betaOverN, Real fG,
+    UBOOL bDirichlet,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* results
 #else
@@ -122,13 +123,12 @@ _kernelEnergy_RigidAcc_Simplified(
         //  5: 34
         if (2 == i || 4 == i || 5 == i)
         {
-            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu);
+            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu, bDirichlet);
         }
         else
         {
-            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeft(sSite4, fG, mu, nu);
+            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeft(sSite4, fG, mu, nu, bDirichlet);
         }
-        
     }
 
     results[uiSiteIndex] = resThisThread * betaOverN;
@@ -148,6 +148,7 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
     deviceSU3* pForceData,
     Real betaOverN, 
     Real fG,
+    UBOOL bDirichlet,
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -177,7 +178,6 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             const BYTE nu = first.m_byDir;
 
-            ////sSite4.z should be IsDirichlet, but almost assume Z Dirichlet everywhere
             //if (mu != 2 && nu != 2 && 0 == sSite4.z)
             //{
             //    //All U on surface, the dynamic links with z=0 are U_z links
@@ -196,22 +196,22 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
 
                 if (mu == 3 || nu == 3) //one of mu nu is t
                 {
-                    fFactorG = _deviceGnRigidAccRightTri(sSite4, fG, mu, nu);
+                    fFactorG = _deviceGnRigidAccRightTri(sSite4, fG, mu, nu, bDirichlet);
                 }
                 else
                 {
-                    fFactorG = _deviceGnRigidAccRight(sSite4, fG, mu, nu);
+                    fFactorG = _deviceGnRigidAccRight(sSite4, fG, mu, nu, bDirichlet);
                 }
             }
             else
             {
                 if (mu == 3 || nu == 3) //one of mu nu is t
                 {
-                    fFactorG = _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu);
+                    fFactorG = _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu, bDirichlet);
                 }
                 else
                 {
-                    fFactorG = _deviceGnRigidAccLeft(sSite4, fG, mu, nu);
+                    fFactorG = _deviceGnRigidAccLeft(sSite4, fG, mu, nu, bDirichlet);
                 }
             }
 
@@ -256,6 +256,7 @@ CActionGaugePlaquetteRigidAcc::CActionGaugePlaquetteRigidAcc()
     , m_fNewEnergy(F(0.0))
     , m_fBetaOverN(F(0.1))
     , m_uiPlaqutteCount(0)
+    , m_bDirichlet(FALSE)
 {
 }
 
@@ -304,6 +305,10 @@ void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CP
     {
         CCommonData::m_sCenter.z = 0;
     }
+
+    INT iVaule = 1;
+    param.FetchValueINT(_T("Dirichlet"), iVaule);
+    m_bDirichlet = (0 != iVaule);
 }
 
 void CActionGaugePlaquetteRigidAcc::SetBeta(Real fBeta)
@@ -332,6 +337,7 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGauge(const CFieldGauge * p
         pForceSU3->m_pDeviceData, 
         m_fBetaOverN, 
         CCommonData::m_fG,
+        m_bDirichlet,
         pGaugeSU3->m_byFieldId);
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -364,7 +370,7 @@ Real CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class C
     //        CCommonData::m_fG,
     //        _D_RealThreadBuffer);
 
-    //m_fNewEnergy = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    //Real fEnergy2 = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
     _kernelEnergy_RigidAcc_Simplified << <block, threads >> > (
         pGaugeSU3->m_pDeviceData,
@@ -373,6 +379,7 @@ Real CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class C
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         m_fBetaOverN,
         CCommonData::m_fG,
+        m_bDirichlet,
         _D_RealThreadBuffer);
 
     m_fNewEnergy = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -392,6 +399,7 @@ CCString CActionGaugePlaquetteRigidAcc::GetInfos(const CCString &tab) const
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteRigidAcc\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Acc : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
+    sRet = sRet + tab + _T("Dirichlet : ") + appIntToString(m_bDirichlet) + _T("\n");
     return sRet;
 }
 

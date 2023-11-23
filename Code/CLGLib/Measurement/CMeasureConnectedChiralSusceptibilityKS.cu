@@ -92,7 +92,7 @@ void CMeasureConnectedSusceptibilityKS::Report()
     appGeneral(_T(" =======================================================\n\n"));
     CLGComplex average = _zeroc;
     appGeneral(_T("{"));
-    for (INT i = 0; i < m_uiConfigurationCount; ++i)
+    for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
         LogGeneralComplex(CmpResAtI(i), FALSE);
     }

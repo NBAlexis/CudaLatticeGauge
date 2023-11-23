@@ -235,7 +235,7 @@ UINT TestAnitiHermiticity(CParameters&)
     CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
     CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2));
     UINT uiErrors = pF1->TestAntiHermitian(pGauge);
-    //CCudaHelper::DebugFunction();
+    appGeneral(_T("=== Tested Fermion: \n %s \n"), pF1->GetInfos(_T("     ")).c_str());
     pF1->Return();
 
     return uiErrors;

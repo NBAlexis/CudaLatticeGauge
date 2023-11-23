@@ -191,8 +191,9 @@ _kernelAddForce4PlaqutteTermSU3_Acc(
 * Split to 6 functions
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term413_3_Acc(
+_kernelAddForceChairTermSU3_Term413_Acc(
     BYTE byFieldId,
+    const SSmallInt4& sCenter,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -201,77 +202,46 @@ _kernelAddForceChairTermSU3_Term413_3_Acc(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    betaOverN = betaOverN * fG * F(0.125);
+    betaOverN = betaOverN * F(0.5) * fG * F(0.125);
 
     //===============
-    //g t V413
     //add force for rho=3
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Acc(byFieldId, pDeviceData, sSite4, uiBigIdx,
-        2, 0, 3);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term413_4_Acc(
-    BYTE byFieldId,
-    const deviceSU3 * __restrict__ pDeviceData,
-    deviceSU3 *pForceData,
-    Real betaOverN, Real fG)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    betaOverN = betaOverN * fG * F(0.125);
+    const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const deviceSU3 staple_term3 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        2, 0, 3, _deviceHi_Acc);
+    deviceSU3 force3(pDeviceData[uiLink3]);
+    force3.MulDagger(staple_term3);
+    force3.Ta();
+    force3.MulReal(betaOverN);
+    pForceData[uiLink3].Add(force3);
 
     //===============
-    //g t V413
     //add force for mu=4
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Acc(byFieldId, pDeviceData, sSite4, uiBigIdx,
-        3, 0, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term413_1_Acc(
-    BYTE byFieldId,
-    const deviceSU3 * __restrict__ pDeviceData,
-    deviceSU3 *pForceData,
-    Real betaOverN, Real fG)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    betaOverN = betaOverN * fG * F(0.125);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const deviceSU3 staple_term4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        3, 0, 2, _deviceHi_Acc);
+    deviceSU3 force4(pDeviceData[uiLink4]);
+    force4.MulDagger(staple_term4);
+    force4.Ta();
+    force4.MulReal(betaOverN);
+    pForceData[uiLink4].Add(force4);
 
     //===============
-    //+x Omega V413
     //add force for nu=1
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 0);
-
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Acc(byFieldId, pDeviceData, sSite4, uiBigIdx,
-        3, 0, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+    const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
+    const deviceSU3 staple_term1 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        3, 0, 2, _deviceHi_Acc);
+    deviceSU3 force1(pDeviceData[uiLink1]);
+    force1.MulDagger(staple_term1);
+    force1.Ta();
+    force1.MulReal(betaOverN);
+    pForceData[uiLink1].Add(force1);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term423_3_Acc(
+_kernelAddForceChairTermSU3_Term423_Acc(
     BYTE byFieldId,
+    const SSmallInt4& sCenter,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
     Real betaOverN, Real fG)
@@ -280,73 +250,42 @@ _kernelAddForceChairTermSU3_Term423_3_Acc(
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    betaOverN = betaOverN * fG * F(0.125);
+    betaOverN = betaOverN * F(0.5) * fG * F(0.125);
 
     //===============
-    //g t V413
+    //g t V423
     //add force for rho=3
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Acc(byFieldId, pDeviceData, sSite4, uiBigIdx,
-        2, 1, 3);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term423_4_Acc(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    deviceSU3* pForceData,
-    Real betaOverN, Real fG)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    betaOverN = betaOverN * fG * F(0.125);
+    const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
+    const deviceSU3 staple_term3 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        2, 1, 3, _deviceHi_Acc);
+    deviceSU3 force3(pDeviceData[uiLink3]);
+    force3.MulDagger(staple_term3);
+    force3.Ta();
+    force3.MulReal(betaOverN);
+    pForceData[uiLink3].Add(force3);
 
     //===============
-    //g t V413
     //add force for mu=4
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const deviceSU3 staple_term = _deviceStapleChairTerm1_Acc(byFieldId, pDeviceData, sSite4, uiBigIdx,
-        3, 1, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddForceChairTermSU3_Term423_2_Acc(
-    BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    deviceSU3* pForceData,
-    Real betaOverN, Real fG)
-{
-    intokernalInt4;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    betaOverN = betaOverN * fG * F(0.125);
+    const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
+    const deviceSU3 staple_term4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        3, 1, 2, _deviceHi_Acc);
+    deviceSU3 force4(pDeviceData[uiLink4]);
+    force4.MulDagger(staple_term4);
+    force4.Ta();
+    force4.MulReal(betaOverN);
+    pForceData[uiLink4].Add(force4);
 
     //===============
-    //+x Omega V413
-    //add force for nu=1
-    UINT uiLink = _deviceGetLinkIndex(uiSiteIndex, 1);
+    //add force for nu=2
+    const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    const deviceSU3 staple_term = _deviceStapleChairTerm2_Acc(byFieldId, pDeviceData, 
-        sSite4, uiBigIdx,
-        3, 1, 2);
-    deviceSU3 force(pDeviceData[uiLink]);
-    force.MulDagger(staple_term);
-    force.Ta();
-    force.MulReal(betaOverN);
-    pForceData[uiLink].Add(force);
+    const deviceSU3 staple_term2 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenter, sSite4, uiSiteIndex, uiBigIdx,
+        3, 1, 2, _deviceHi_Acc);
+    deviceSU3 force2(pDeviceData[uiLink2]);
+    force2.MulDagger(staple_term2);
+    force2.Ta();
+    force2.MulReal(betaOverN);
+    pForceData[uiLink2].Add(force2);
 }
 
 #pragma endregion
@@ -435,23 +374,12 @@ UBOOL CActionGaugePlaquetteAcceleration::CalculateForceOnGauge(const CFieldGauge
         CCommonData::m_fG * CCommonData::m_fG,
         pGauge->m_byFieldId);
 
-    _kernelAddForceChairTermSU3_Term413_3_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+    _kernelAddForceChairTermSU3_Term413_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, CCommonData::m_sCenter, pGaugeSU3->m_pDeviceData,
         pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    _kernelAddForceChairTermSU3_Term413_4_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
+    _kernelAddForceChairTermSU3_Term423_Acc << <block, threads >> > (pGaugeSU3->m_byFieldId, CCommonData::m_sCenter, pGaugeSU3->m_pDeviceData,
         pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
-    _kernelAddForceChairTermSU3_Term413_1_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
-
-    _kernelAddForceChairTermSU3_Term423_3_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
-
-    _kernelAddForceChairTermSU3_Term423_4_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
-
-    _kernelAddForceChairTermSU3_Term423_2_Acc << <block, threads >> >(pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-        pForceSU3->m_pDeviceData, m_fBetaOverN, CCommonData::m_fG);
 
     checkCudaErrors(cudaDeviceSynchronize());
     return TRUE;
@@ -510,7 +438,7 @@ CCString CActionGaugePlaquetteAcceleration::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteAcceleration\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
+    sRet = sRet + tab + _T("fG : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }
 

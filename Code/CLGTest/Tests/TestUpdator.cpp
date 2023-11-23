@@ -85,7 +85,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount() - uiBeforeMetropolis;
     const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
-    const Real fLastHDiff = appGetLattice()->m_pUpdator->GetLastHDiff();
+    const Real fLastHDiff = appAbs(appGetLattice()->m_pUpdator->GetLastHDiff());
 #if _CLG_DEBUG
     appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.3. last HDiff = %f : expected < 0.15\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
 #else

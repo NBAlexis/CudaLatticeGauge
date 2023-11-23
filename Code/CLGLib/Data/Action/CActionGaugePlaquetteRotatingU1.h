@@ -1100,66 +1100,82 @@ static __device__ __inline__ CLGComplex _deviceStapleT2U1(
 
 static __device__ __inline__ CLGComplex _deviceStapleS1ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, mu + 1);
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, nu + 1);
-
+    const UINT uiN_p_nu = __bi(n_p_nu);
     const SIndex& n_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_mu) + nu];
-    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+    const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_p_nu * _DC_Dir + mu];
+    const SIndex& uiSiteN_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_nu];
 
     CLGComplex ret = _deviceS1U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho);
     ret = _cuCmulf(ret, _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
     ret = _cuCmulf(ret, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, n_p_mu__nu, byFieldId)));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, sSite, n_p_nu, i));
+    ret = cuCmulf_cr(ret, 
+        _deviceHi(byFieldId, sCenter,
+        sSite,
+        n_p_nu,
+        __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex], uiSiteN_p_nu, fpt));
 
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleS2ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
     const SSmallInt4 n_m_nu_p_mu = _deviceSmallInt4OffsetC(n_m_nu, __fwd(mu));
-    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_nu) + mu];
+    const UINT uiN_m_nu = __bi(n_m_nu);
+    const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_nu * _DC_Dir + mu];
     const SIndex& n_m_nu_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_nu_p_mu) + nu];
+    const SIndex& uiSiteN_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_nu];
 
     CLGComplex ret = _deviceS2U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho);
     ret = _cuCmulf(ret, _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_nu__mu, byFieldId));
     ret = _cuCmulf(ret, _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_nu_p_mu__nu, byFieldId));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, sSite, n_m_nu, i));
+    ret = cuCmulf_cr(ret, _deviceHi(byFieldId, sCenter,
+        sSite,
+        n_m_nu,
+        __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex], uiSiteN_m_nu, fpt));
 
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleS3ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
 
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
+
     const SIndex& n__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + nu];
     const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu];
 
     CLGComplex ret = _deviceGetGaugeBCU1DirSIndex(pDeviceData, n__nu, byFieldId);
     ret = _cuCmulf(ret, _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_p_nu__mu, byFieldId));
     ret = _cuCmulf(ret, _deviceS3U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, n_p_mu, n_p_mu_p_nu, i));
+    ret = cuCmulf_cr(ret, _deviceHi(byFieldId, sCenter,
+        n_p_mu,
+        n_p_mu_p_nu,
+        uiSiteN_p_mu, uiSiteN_p_mu_p_nu, fpt));
 
     return ret;
 
@@ -1167,99 +1183,120 @@ static __device__ __inline__ CLGComplex _deviceStapleS3ShiftedU1(
 
 static __device__ __inline__ CLGComplex _deviceStapleS4ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_mu_m_nu = _deviceSmallInt4OffsetC(n_p_mu, __bck(nu));
     const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite, __bck(nu));
 
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_m_nu = __bi(n_p_mu_m_nu);
     const UINT n_m_nu_bi4 = __bi4(n_m_nu);
 
     const SIndex& n_m_nu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + nu];
     const SIndex& n_m_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][n_m_nu_bi4 + mu];
 
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_m_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_m_nu];
+
     CLGComplex ret = _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_nu__nu, byFieldId);
     ret = _cuCmulf(_cuConjf(ret), _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_nu__mu, byFieldId));
     ret = _cuCmulf(ret, _deviceS4U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, n_p_mu, n_p_mu_m_nu, i));
+    ret = cuCmulf_cr(ret, _deviceHi(byFieldId, sCenter,
+        n_p_mu,
+        n_p_mu_m_nu,
+        uiSiteN_p_mu, uiSiteN_p_mu_m_nu, fpt));
 
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleT1ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_p_mu = _deviceSmallInt4OffsetC(sSite, __fwd(mu));
     const SSmallInt4 n_p_nu = _deviceSmallInt4OffsetC(sSite, __fwd(nu));
     const SSmallInt4 n_p_mu_p_nu = _deviceSmallInt4OffsetC(n_p_mu, __fwd(nu));
 
+    const UINT uiN_p_mu = __bi(n_p_mu);
+    const UINT uiN_p_mu_p_nu = __bi(n_p_mu_p_nu);
+
     const SIndex& n__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIndex * _DC_Dir + mu];
     const SIndex& n_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_p_nu) + mu];
+
+    const SIndex& uiSiteN_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu];
+    const SIndex& uiSiteN_p_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_p_mu_p_nu];
 
     CLGComplex ret = _deviceGetGaugeBCU1DirSIndex(pDeviceData, n__mu, byFieldId);
     ret = _cuCmulf(ret, _deviceT1U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
     ret = _cuCmulf(ret, _cuConjf(_deviceGetGaugeBCU1DirSIndex(pDeviceData, n_p_nu__mu, byFieldId)));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, n_p_mu, n_p_mu_p_nu, i));
+    ret = cuCmulf_cr(ret, _deviceHi(byFieldId, sCenter,
+        n_p_mu,
+        n_p_mu_p_nu,
+        uiSiteN_p_mu, uiSiteN_p_mu_p_nu, fpt));
 
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleT2ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
     const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite, __bck(mu));
     const SSmallInt4 n_m_mu_p_nu = _deviceSmallInt4OffsetC(n_m_mu, __fwd(nu));
 
-    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_mu) + mu];
-    const SIndex& n_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(n_m_mu_p_nu) + mu];
+    const UINT uiN_m_mu = __bi(n_m_mu);
+    const UINT uiN_m_mu_p_nu = __bi(n_m_mu_p_nu);
+
+    const SIndex& n_m_mu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu * _DC_Dir + mu];
+    const SIndex& n_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiN_m_mu_p_nu * _DC_Dir + mu];
+
+    const SIndex& uiSiteN_m_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu];
+    const SIndex& uiSiteN_m_mu_p_nu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN_m_mu_p_nu];
 
     CLGComplex ret = _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_mu__mu, byFieldId);
     ret = _cuCmulf(_cuConjf(ret), _deviceT2U1(byFieldId, pDeviceData, sSite, uiBigIndex, mu, nu, rho));
     ret = _cuCmulf(ret, _deviceGetGaugeBCU1DirSIndex(pDeviceData, n_m_mu_p_nu__mu, byFieldId));
 
-    ret = cuCmulf_cr(ret, _deviceHiShifted(byFieldId, bTorus, sCenter, n_m_mu, n_m_mu_p_nu, i));
+    ret = cuCmulf_cr(ret, _deviceHi(byFieldId, sCenter,
+        n_m_mu,
+        n_m_mu_p_nu,
+        uiSiteN_m_mu, uiSiteN_m_mu_p_nu, fpt));
 
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleChairTerm1ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
-    CLGComplex ret = _deviceStapleS1ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i);
-    ret = _cuCaddf(ret, _deviceStapleS2ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
-    ret = _cuCaddf(ret, _deviceStapleS3ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
-    ret = _cuCaddf(ret, _deviceStapleS4ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
+    CLGComplex ret = _deviceStapleS1ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt);
+    ret = _cuCaddf(ret, _deviceStapleS2ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt));
+    ret = _cuCaddf(ret, _deviceStapleS3ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt));
+    ret = _cuCaddf(ret, _deviceStapleS4ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt));
     return ret;
 }
 
 static __device__ __inline__ CLGComplex _deviceStapleChairTerm2ShiftedU1(
     BYTE byFieldId,
-    UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
     const SSmallInt4& sCenter, const SSmallInt4& sSite, UINT uiSiteIndex,
-    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, BYTE i)
+    UINT uiBigIndex, BYTE mu, BYTE nu, BYTE rho, _deviceCoeffFunctionPointer fpt)
 {
-    CLGComplex ret = _deviceStapleT1ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i);
-    ret = _cuCaddf(ret, _deviceStapleT2ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, i));
-    ret = _cuCaddf(ret, _deviceStapleT1ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, i));
-    ret = _cuCaddf(ret, _deviceStapleT2ShiftedU1(byFieldId, bTorus, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, i));
+    CLGComplex ret = _deviceStapleT1ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt);
+    ret = _cuCaddf(ret, _deviceStapleT2ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, mu, nu, rho, fpt));
+    ret = _cuCaddf(ret, _deviceStapleT1ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, fpt));
+    ret = _cuCaddf(ret, _deviceStapleT2ShiftedU1(byFieldId, pDeviceData, sCenter, sSite, uiSiteIndex, uiBigIndex, rho, nu, mu, fpt));
     return ret;
 }
 

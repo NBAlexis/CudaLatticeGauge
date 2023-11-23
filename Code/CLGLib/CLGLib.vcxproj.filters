@@ -506,6 +506,9 @@
     <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3Acc.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -851,6 +854,9 @@
       <Filter>Measurement</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3Acc.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

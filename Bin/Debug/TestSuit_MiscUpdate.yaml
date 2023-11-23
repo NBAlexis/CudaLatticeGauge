@@ -1,4 +1,111 @@
 
+# ==============================================
+# Acceleration
+# ==============================================
+
+TestAccelerationTorus:
+
+    DeviceIndex : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [10, 10, 10, 6]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    ExponentialPrecision : 10
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.417784
+    ExpectedResDebug : 0.591390
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 5
+        NestedStep : 10
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3Acc
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteAcceleration
+        Beta : 5.0
+        AccG : 0.1
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
 
 
 
@@ -104,114 +211,6 @@ TestAcceleration:
         MeasureDist : 1
 
 
-TestRigidAcceleration:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [8, 8, 8, 4]
-    LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    ThreadAutoDecompose : 1
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-    ActionListLength : 2
-    FermionFieldCount : 1
-    MeasureListLength : 3
-    ExpectedRes : 0.73
-    CacheStaple : 0
-    BeforeEquvibStep : 5
-    EquvibStep : 20
-
-    Updator:
-
-        ## UpdatorType = { CHMC }
-        UpdatorType : CHMC
-
-        Metropolis : 1
-
-        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorNestedForceGradient
-        # IntegratorType : CIntegratorForceGradient
-        IntegratorStepLength : 1
-        IntegratorStep : 30
-        NestedStep : 5
-
-    Gauge:
-    
-        ## FieldType = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU3D
-
-        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
-        FieldInitialType : EFIT_Random
-
-        Period : [1, 1, 0, 1]
-
-    GaugeBoundary:
-
-        FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-
-       FieldName : CFieldFermionWilsonSquareSU3DRigidAcc
-       FieldInitialType : EFIT_RandomGaussian
-       Hopping : 0.16
-       G2 : 0.1
-       FieldId : 2
-       PoolNumber : 26
-       Period : [1, 1, 0, -1]
-
-    BoundaryFermionField1:
-
-        FieldName : CFieldBoundaryWilsonSquareSU3
-        FieldId : 2
-        
-    Action1:
-   
-        ActionName : CActionGaugePlaquetteRigidAcc
-        Beta : 5.0
-        AccG : 0.1
-
-    Action2:
-        ActionName : CActionFermionWilsonNf2
-        FieldId : 2
-
-    Solver:
-
-        SolverName : CSLASolverGCRODR
-        SolverForFieldId : 2
-        MDim : 25
-        KDim : 5
-        RecalculateR : 5
-        DeflateSpace : EEDT_SVD
-        Accuracy : 0.0000001
-
-        # SolverName : CSLASolverGMRES
-        # SolverForFieldId : 2
-        # MaxDim : 20
-        # Accuracy : 0.0000001
-
-        Restart : 400
-        AbsoluteAccuracy : 1
-
-    Measure1:
-
-        MeasureName : CMeasurePlaqutteEnergy
-
-    Measure2:
-
-        MeasureName : CMeasurePolyakovXY
-        FieldId : 1
-        ShowResult : 1
-        MeasureDist : 1
-
-    Measure3:
-
-        MeasureName : CMeasureChiralCondensate
-        FieldId : 2
-        FieldCount : 4
-        ShowResult : 1
-        MeasureDist : 1
-
 
 TestBoost:
 
@@ -313,269 +312,9 @@ TestBoost:
         ShowResult : 1
         MeasureDist : 1
 
-
-TestRotationProjectivePlane:
-
-    Dim : 4
-    Dir : 4
-    LatticeLength : [8, 8, 8, 8]
-    LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
-    # LatticeBoundary : CBoundaryConditionTorusSquare
-    ThreadAutoDecompose : 1
-    ExponentialPrecision : 10
-    RandomType : ER_Schrage
-    RandomSeed : 1234567
-    ActionListLength : 5
-    FermionFieldCount : 4
-    MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.433
-    CacheStaple : 0
-
-    Updator:
-
-        UpdatorType : CHMC
-        Metropolis : 1
-        DebugForce : 1
-        SaveConfiguration : 0
-        # 
-        InnerLeapfrog : 1
-        # IntegratorType : CIntegratorForceGradient
-        # IntegratorType : CIntegratorOmelyan
-        IntegratorType : CIntegratorNestedOmelyan
-        IntegratorStepLength : 1
-        IntegratorStep : 15
-        NestedStep : 20
-
-    Gauge:
-    
-        FieldName : CFieldGaugeSU3
-        FieldInitialType : EFIT_Random
-        # FieldInitialType : EFIT_ReadFromFile
-        # GaugeFileType : EFFT_CLGBinFloat
-        # GaugeFileName : ../Release/_testconfig3.con_
-
-        
-        Period : [1, 1, 1, 1]
-        
-    GaugeBoundary:
-
-        FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.5
-        FieldId : 2
-        PoolNumber : 15
-
-        EachSiteEta : 1
-
-        Period : [1, 1, 1, -1]
-
-        # MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
-        # MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
-
-    FermionField2:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.5
-        FieldId : 3
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
-
-    FermionField3:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.5
-        FieldId : 4
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
-
-    FermionField4:
-        
-        ## FieldName = {CFieldFermionWilsonSquareSU3}
-        FieldName : CFieldFermionKSSU3R
-
-        ## { EFIT_Zero, EFIT_RandomGaussian }
-        FieldInitialType : EFIT_RandomGaussian
-
-        #2am
-        Mass : 0.1
-        FieldId : 5
-        PoolNumber : 15
-        EachSiteEta : 1
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{-1/4}
-        MC : [0.9978329250885234, -0.0002646370372494943, -0.005242495983708363, -0.05132795574499987, 0.0014112674973475747, 0.018606350871330606, 0.1389288245559177]
-
-        # MD is to calculate force
-        # 4a^2 delta M = 0.24, this is (x+0.24/x)^{1/2}
-        MD : [1.0033088073721765, 0.013117370003957315, 0.033326660644525476, 0.06925834819900765, 0.0003570778476993038, 0.007524833114582129, 0.07279809256217702]
-
-    Solver:
-
-        SolverName : CSLASolverGMRES
-        SolverForFieldId : 2
-        MaxDim : 20
-        Accuracy : 0.0001
-        Restart : 15
-        AbsoluteAccuracy : 1
-
-    MSSolver:
-
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 2
-        DiviationStep : 10
-        MaxStep : 500
-        Accuracy : 0.0001
-        AbsoluteAccuracy : 1
-        # SolverName : CMultiShiftFOM
-        # SolverForFieldId : 2
-        # UseCudaForSmallMatrix : 0
-        # MaxDim : 30
-        # Accuracy : 0.0001
-        # Restart : 100
-        # AbsoluteAccuracy : 1
-
-    MSSolver2:
-
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 3
-        DiviationStep : 10
-        MaxStep : 50
-        Accuracy : 0.0001
-        AbsoluteAccuracy : 1
-
-    MSSolver3:
-
-        SolverName : CMultiShiftBiCGStab
-        SolverForFieldId : 4
-        DiviationStep : 10
-        MaxStep : 50
-        Accuracy : 0.0001
-        AbsoluteAccuracy : 1
-
-    MSSolver4:
-
-        # SolverName : CMultiShiftBiCGStab
-        # SolverForFieldId : 5
-        # DiviationStep : 30
-        # MaxStep : 50
-        # Accuracy : 0.00001
-        # AbsoluteAccuracy : 1
-
-        # SolverName : CMultiShiftBiCGStab
-        SolverName : CMultiShiftNested
-        SolverForFieldId : 5
-        # DiviationStep : 20
-        DiviationStep : 50
-        # MaxStep : 500
-        Accuracy : 0.0001
-        AbsoluteAccuracy : 1
-        
-        NestedSolver :
-            SolverForFieldId : 5
-
-            # SolverName : CSLASolverBiCGStab
-            # Accuracy : 0.00000001
-
-            DiviationStep : 50
-            MaxStep : 1
-
-            SolverName : CSLASolverGMRES
-            MaxDim : 15
-
-            # SolverName : CSLASolverGCRODR
-            Accuracy : 0.00001
-            # MDim : 26
-            # KDim : 5
-            # RecalculateR : 5
-            # DeflateSpace : EEDT_SVD
-
-            Restart : 500
-            AbsoluteAccuracy : 1
-
-    Action1:
-   
-        # ActionName : CActionGaugePlaquette
-        ActionName : CActionGaugePlaquetteRotating
-        CloverEnergy : 1
-        ShiftCoord : 1
-        Beta : 4.5
-        Omega : 0.2
-
-    Action2:
-
-        ActionName : CActionFermionKS
-        FieldId : 2
-
-    Action3:
-
-        ActionName : CActionFermionKS
-        FieldId : 3
-
-    Action4:
-
-        ActionName : CActionFermionKS
-        FieldId : 4
-
-    Action5:
-
-        ActionName : CActionFermionKS
-        FieldId : 5
-
-    Measure1:
-
-        MeasureName : CMeasurePlaqutteEnergy
-
+# ==============================================
+# Electric magnetic
+# ==============================================
 
 TestEMSimple:
 
@@ -683,7 +422,9 @@ TestEMSimple:
 
 
 
-
+# ==============================================
+# Beta gradient
+# ==============================================
 
 
 

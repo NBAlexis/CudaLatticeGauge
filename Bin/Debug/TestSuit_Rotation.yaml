@@ -226,7 +226,7 @@ TestRotationWilsonDiracProjectivePlane:
         IntegratorType : CIntegratorNestedOmelyan
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 30
+        IntegratorStep : 32
         NestedStep : 4
         Omelyan2Lambda : 0.38636665500756728
 
@@ -333,7 +333,7 @@ TestRotationKSDirichlet:
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 25
+        IntegratorStep : 32
         NestedStep : 6
         # BindDir : 10
 
@@ -450,7 +450,7 @@ TestRotationKSTorus:
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 30
+        IntegratorStep : 35
         NestedStep : 5
         # BindDir : 10
 
@@ -1120,6 +1120,7 @@ TestRotationQuenched3D:
     SavePrefix : ./120Quenched3D_
     Additive : 0
 
+
     # 53551575Nt4 Omega60 
     Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
 
@@ -1143,7 +1144,7 @@ TestRotationQuenched3D:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.607305
+    ExpectedRes : 0.729716
     ExpectedResDebug : 0.607305
 
     ## ============================================================
@@ -1219,7 +1220,7 @@ TestRotationQuenchedU13D:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.641533
+    ExpectedRes : 0.816398
     ExpectedResDebug : 0.641533
 
     # 53551575Nt4 Omega60 

@@ -828,6 +828,21 @@ void CCLGLibManager::InitialIndexBuffer() const
 
 UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 {
+    //==================================
+    // set device
+    //==================================
+    INT iDeviceIndex = 0;
+    if (params.FetchValueINT(_T("DeviceIndex"), iDeviceIndex))
+    {
+        checkCudaErrors(cudaSetDevice(iDeviceIndex));
+
+        cudaDeviceProp deviceProp;
+        cudaGetDeviceProperties(&deviceProp, iDeviceIndex);
+        appGeneral("\nDevice %d: \"%s\"\n", iDeviceIndex, deviceProp.name);
+    }
+
+    //==================================
+
     m_pCudaHelper = new CCudaHelper();
     m_pLatticeData = new CLatticeData();
     m_pFileSystem = new CFileSystem();

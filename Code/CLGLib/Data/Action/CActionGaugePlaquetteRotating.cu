@@ -337,6 +337,7 @@ _kernelAddChairTermSU3_Term5(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term1(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -361,7 +362,7 @@ _kernelAddForceChairTermSU3_Term1(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
         const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 0, 1, 0);
+            3, 0, 1, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term1_4);
         force4.Ta();
@@ -377,7 +378,7 @@ _kernelAddForceChairTermSU3_Term1(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
         const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            1, 0, 3, 0);
+            1, 0, 3, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term1_2);
         force2.Ta();
@@ -393,7 +394,7 @@ _kernelAddForceChairTermSU3_Term1(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
         const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 0, 1, 0);
+            3, 0, 1, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term1_1);
         force1.Ta();
@@ -405,6 +406,7 @@ _kernelAddForceChairTermSU3_Term1(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term2(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -429,7 +431,7 @@ _kernelAddForceChairTermSU3_Term2(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
         const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 2, 1, 0);
+            3, 2, 1, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term2_4);
         force4.Ta();
@@ -445,7 +447,7 @@ _kernelAddForceChairTermSU3_Term2(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
         const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            1, 2, 3, 0);
+            1, 2, 3, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term2_2);
         force2.Ta();
@@ -461,7 +463,7 @@ _kernelAddForceChairTermSU3_Term2(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
         const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 2, 1, 0);
+            3, 2, 1, bTorus ? _deviceHi0T : _deviceHi0);
         deviceSU3 force3(pDeviceData[uiLink3]);
         force3.MulDagger(staple_term2_3);
         force3.Ta();
@@ -473,6 +475,7 @@ _kernelAddForceChairTermSU3_Term2(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term3(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -497,7 +500,7 @@ _kernelAddForceChairTermSU3_Term3(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
         const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 1, 0, 1);
+            3, 1, 0, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term3_4);
         force4.Ta();
@@ -513,7 +516,7 @@ _kernelAddForceChairTermSU3_Term3(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
         const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            0, 1, 3, 1);
+            0, 1, 3, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term3_1);
         force1.Ta();
@@ -529,7 +532,7 @@ _kernelAddForceChairTermSU3_Term3(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
         const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 1, 0, 1);
+            3, 1, 0, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term3_2);
         force2.Ta();
@@ -542,6 +545,7 @@ _kernelAddForceChairTermSU3_Term3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term4(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -566,7 +570,7 @@ _kernelAddForceChairTermSU3_Term4(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     {
         const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 2, 0, 1);
+            3, 2, 0, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force4(pDeviceData[uiLink4]);
         force4.MulDagger(staple_term4_4);
         force4.Ta();
@@ -582,7 +586,7 @@ _kernelAddForceChairTermSU3_Term4(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
         const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            0, 2, 3, 1);
+            0, 2, 3, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term4_1);
         force1.Ta();
@@ -598,7 +602,7 @@ _kernelAddForceChairTermSU3_Term4(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
         const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            3, 2, 0, 1);
+            3, 2, 0, bTorus ? _deviceHi1T : _deviceHi1);
         deviceSU3 force3(pDeviceData[uiLink3]);
         force3.MulDagger(staple_term4_3);
         force3.Ta();
@@ -611,6 +615,7 @@ _kernelAddForceChairTermSU3_Term4(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermSU3_Term5(
     BYTE byFieldId,
+    UBOOL bTorus,
     const deviceSU3 * __restrict__ pDeviceData,
     SSmallInt4 sCenterSite,
     deviceSU3 *pForceData,
@@ -634,7 +639,7 @@ _kernelAddForceChairTermSU3_Term5(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     {
         const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            0, 2, 1, 2);
+            0, 2, 1, bTorus ? _deviceHi2T : _deviceHi2);
         deviceSU3 force1(pDeviceData[uiLink1]);
         force1.MulDagger(staple_term5_1);
         force1.Ta();
@@ -649,7 +654,7 @@ _kernelAddForceChairTermSU3_Term5(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     {
         const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            1, 2, 0, 2);
+            1, 2, 0, bTorus ? _deviceHi2T : _deviceHi2);
         deviceSU3 force2(pDeviceData[uiLink2]);
         force2.MulDagger(staple_term5_2);
         force2.Ta();
@@ -664,7 +669,7 @@ _kernelAddForceChairTermSU3_Term5(
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     {
         const deviceSU3 staple_term5_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-            0, 2, 1, 2);
+            0, 2, 1, bTorus ? _deviceHi2T : _deviceHi2);
         deviceSU3 force3(pDeviceData[uiLink3]);
         force3.MulDagger(staple_term5_3);
         force3.Ta();
@@ -947,8 +952,8 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 0, 1, 0);
+    const deviceSU3 staple_term1_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 0, 1, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term1_4);
     force4.Ta();
@@ -964,8 +969,8 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        1, 0, 3, 0);
+    const deviceSU3 staple_term1_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        1, 0, 3, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term1_2);
     force2.Ta();
@@ -980,8 +985,8 @@ _kernelAddForceChairTermSU3_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 0, 1, 0);
+    const deviceSU3 staple_term1_1 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 0, 1, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term1_1);
     force1.Ta();
@@ -1017,8 +1022,8 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 2, 1, 0);
+    const deviceSU3 staple_term2_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 2, 1, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term2_4);
     force4.Ta();
@@ -1033,8 +1038,8 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        1, 2, 3, 0);
+    const deviceSU3 staple_term2_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        1, 2, 3, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term2_2);
     force2.Ta();
@@ -1049,8 +1054,8 @@ _kernelAddForceChairTermSU3_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 2, 1, 0);
+    const deviceSU3 staple_term2_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 2, 1, bTorus ? _deviceHiShiftedT0 : _deviceHiShifted0);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term2_3);
     force3.Ta();
@@ -1087,8 +1092,8 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 1, 0, 1);
+    const deviceSU3 staple_term3_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 1, 0, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term3_4);
     force4.Ta();
@@ -1103,8 +1108,8 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        0, 1, 3, 1);
+    const deviceSU3 staple_term3_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        0, 1, 3, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term3_1);
     force1.Ta();
@@ -1120,8 +1125,8 @@ _kernelAddForceChairTermSU3_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 1, 0, 1);
+    const deviceSU3 staple_term3_2 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 1, 0, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term3_2);
     force2.Ta();
@@ -1158,8 +1163,8 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 2, 0, 1);
+    const deviceSU3 staple_term4_4 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 2, 0, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force4(pDeviceData[uiLink4]);
     force4.MulDagger(staple_term4_4);
     force4.Ta();
@@ -1175,8 +1180,8 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        0, 2, 3, 1);
+    const deviceSU3 staple_term4_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        0, 2, 3, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term4_1);
     force1.Ta();
@@ -1191,8 +1196,8 @@ _kernelAddForceChairTermSU3_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        3, 2, 0, 1);
+    const deviceSU3 staple_term4_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        3, 2, 0, bTorus ? _deviceHiShiftedT1 : _deviceHiShifted1);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term4_3);
     force3.Ta();
@@ -1228,8 +1233,8 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        0, 2, 1, 2);
+    const deviceSU3 staple_term5_1 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        0, 2, 1, bTorus ? _deviceHiShiftedT2 : _deviceHiShifted2);
     deviceSU3 force1(pDeviceData[uiLink1]);
     force1.MulDagger(staple_term5_1);
     force1.Ta();
@@ -1243,8 +1248,8 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        1, 2, 0, 2);
+    const deviceSU3 staple_term5_2 = _deviceStapleChairTerm1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        1, 2, 0, bTorus ? _deviceHiShiftedT2 : _deviceHiShifted2);
     deviceSU3 force2(pDeviceData[uiLink2]);
     force2.MulDagger(staple_term5_2);
     force2.Ta();
@@ -1258,8 +1263,8 @@ _kernelAddForceChairTermSU3_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const deviceSU3 staple_term5_3 = _deviceStapleChairTerm2Shifted(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
-        0, 2, 1, 2);
+    const deviceSU3 staple_term5_3 = _deviceStapleChairTerm2(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+        0, 2, 1, bTorus ? _deviceHiShiftedT2 : _deviceHiShifted2);
     deviceSU3 force3(pDeviceData[uiLink3]);
     force3.MulDagger(staple_term5_3);
     force3.Ta();
@@ -2199,19 +2204,19 @@ void CActionGaugePlaquetteRotating::CalculateForceOnGaugeDirichlet(const class C
     _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-    _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+    _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
         pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 }
 
@@ -2266,19 +2271,19 @@ void CActionGaugePlaquetteRotating::CalculateForceOnGaugeTorus(const class CFiel
         _kernelAddForce4PlaqutteTermSU3_XY << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermSU3_Term1 << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermSU3_Term2 << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermSU3_Term3 << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermSU3_Term4 << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermSU3_Term5 << <block, threads >> > (pGaugeSU3->m_byFieldId, TRUE, pGaugeSU3->m_pDeviceData, CCommonData::m_sCenter,
             pForceSU3->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
     }
 }

@@ -172,6 +172,49 @@ Finally
 
 The $V_{\mu\nu\rho}$ force is derived in the `Rotation' chapter.
 
+We have two kinds of $V$ to calculate, one for $\mu$, $\rho$ and the other is for $\nu$.
+
+The result is
+\begin{equation}
+  \begin{split}
+  &S[U_{\mu}(n)]={\rm Retr}[U_{\mu}(n)M^{\dagger}(n)],\;\; S[U_{\nu}(n)]={\rm Retr}[U_{\nu}(n)N^{\dagger}(n)]
+  \end{split}
+  \end{equation}
+  with
+  \textcolor[rgb]{0,0,0.8}{
+  \begin{equation}
+  \begin{split}
+  &M(n)=\frac{1}{8}\left((g(n)+g(n+a\nu))S_1U_{\mu}(n+a\nu)U^{-1}_{\nu}(n+a\mu)\right.\\
+  &\left.+(g(n)+g(n-a\nu))S_2U_{\mu}(n-a\nu)U_{\nu}(n+a\mu-a\nu)\right.\\
+  &\left.+(g(n+a\mu)+g(n+a\mu+a\nu))U_{\nu}(n)U_{\mu}(n+a\nu)S_3\right.\\
+  &\left.+(g(n+a\mu)+g(n+a\mu-a\nu))U^{-1}_{\nu}(n-a\nu)U_{\mu}(n-a\nu)S_4\right)\\
+  &S_1=U_{\rho}(n)U_{\nu}(n+a\rho)U^{-1}_{\rho}(n+a\nu)-U^{-1}_{\rho}(n-a\rho)U_{\nu}(n-a\rho)U_{\rho}(n+a\nu-a\rho)\\
+  &S_2=U_{\rho}(n)U^{-1}_{\nu}(n-a\nu+a\rho)U^{-1}_{\rho}(n-a\nu)-U^{-1}_{\rho}(n-a\rho)U^{-1}_{\nu}(n-a\nu-a\rho)U_{\rho}(n-a\nu-a\rho)\\
+  &S_3=U^{-1}_{\rho}(n+a\mu-a\rho+a\nu)U^{-1}_{\nu}(n+a\mu-a\rho)U_{\rho}(n+a\mu-a\rho)\\
+  &-U_{\rho}(n+a\mu+a\nu)U^{-1}_{\nu}(n+a\mu+a\rho)U^{-1}_{\rho}(n+a\mu)\\
+  &S_4=U^{-1}_{\rho}(n+a\mu-a\rho-a\nu)U_{\nu}(n+a\mu-a\rho-a\nu)U_{\rho}(n+a\mu-a\rho)\\
+  &-U_{\rho}(n+a\mu-a\nu)U_{\nu}(n+a\mu+a\rho-a\nu)U^{-1}_{\rho}(n+a\mu)
+  \end{split}
+  \end{equation}
+  }
+  and
+  \textcolor[rgb]{0,0,0.8}{
+  \begin{equation}
+  \begin{split}
+  &N(n)=\frac{1}{8}(N(\mu,\rho)(n)+N(\rho,\mu)(n))\\
+  &N(\mu,\rho)(n)=\left\{(g(n+a\mu)+g(n+a\nu+a\mu))U_{\mu}(n)T_1U^{-1}_{\mu}(n+a\nu)\right.\\
+  &\left.+(g(n-a\mu)+g(n+a\nu-a\mu))U^{-1}_{\mu}(n-a\mu)T_2U_{\mu}(n+a\nu-a\mu)\right\},\\
+  &T_1=U^{-1}_{\rho}(n+a\mu-a\rho)U_{\nu}(n+a\mu-a\rho)U_{\rho}(n+a\nu+a\mu-a\rho)\\
+  &-U_{\rho}(n+a\mu)U_{\nu}(n+a\mu+a\rho)U^{-1}_{\rho}(n+a\nu+a\mu),\\
+  &T_2=U_{\rho}(n-a\mu)U_{\nu}(n-a\mu+a\rho)U^{-1}_{\rho}(n+a\nu-a\mu)\\
+  &-U^{-1}_{\rho}(n-a\mu-a\rho)U_{\nu}(n-a\mu-a\rho)U_{\rho}(n+a\nu-a\mu-a\rho),\\
+  \end{split}
+  \end{equation}
+  }
+  
+  \textbf{Note, instead of $S_G[U_{\mu}]=-U_{\mu} \Sigma ^{\dagger}_{\mu}$, here it is $S_G[U_{\mu}]=\textcolor[rgb]{1,0,0}{+}U_{\mu} M^{\dagger} _{\mu}$ and $S_G[U_{\mu}]=\textcolor[rgb]{1,0,0}{+}U_{\mu} N^{\dagger} _{\mu}$.}
+
+
 \subsubsection{\label{sec:AnotherAcceleration}Rigid Acceleration}
 
 Another metric of constant acceleration $g$ at ${\bf z}$ direction is

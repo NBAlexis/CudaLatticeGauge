@@ -77,6 +77,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Acc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Gamma.h
@@ -204,6 +205,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3D.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3DR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3EM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3Gamma.cu
