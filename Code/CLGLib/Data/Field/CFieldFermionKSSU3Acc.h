@@ -3,8 +3,9 @@
 // 
 // DESCRIPTION:
 // 
+// This is only suitable when gt >> 1, this uses Galilean transform
 // 
-// gammai (pi + iAi) + gz gammaz (pt+iAt) + m
+// gammai (pi + iAi) + gt gammaz (pt+iAt) + m
 // 
 //
 // REVISION:

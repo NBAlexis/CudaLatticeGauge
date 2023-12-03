@@ -13,6 +13,14 @@ def LoadMathematicaCSV(fileName: str):
         contents = contents.replace(" ", "")
         c = StringIO(contents)
         d = np.loadtxt(c, delimiter=",", dtype=str)
+        try:
+            d = d.astype(complex)
+        except:
+            for i in range(len(d)):
+                try:
+                    ds = d[i].astype(complex)
+                except:
+                    print(d[i])
         d = d.astype(complex)
         return d
 
@@ -28,7 +36,7 @@ def PrintProgressBar(title, d, n):
     print(process, end='', flush=True)
 
 
-def JacknifeMean(lst, progressBarTitle = ""):
+def JacknifeMean(lst, progressBarTitle=""):
     size = len(lst)
     orignalv = np.mean(lst)
     argsv = 0
@@ -46,7 +54,7 @@ def JacknifeMean(lst, progressBarTitle = ""):
     return unbaisv, np.sqrt(argsv)
 
 
-def JacknifeCumulant(lst, progressBarTitle = ""):
+def JacknifeCumulant(lst, progressBarTitle=""):
     size = len(lst)
     orignalv = np.mean(lst * lst) - np.mean(lst) * np.mean(lst)
     argsv = 0
@@ -155,6 +163,26 @@ def PrintAsMathematicaArray(arr, header="") -> str:
     ret = ret.replace(",}", "}")
     ret = ret.replace("{,", "{")
     ret = ret.replace("e", "*^")
+    ret = ret + ";"
+    if 0 != len(header):
+        ret = header + "=" + ret
+    return ret
+
+
+def PrintAsMatlabArray(arr, header="") -> str:
+    ret = str(np.array(arr))
+    ret = ret.replace("\n", "")
+    ret = ret.replace("\r", "")
+    ret = ret.replace(" ", ",")
+    ret = ret.replace("j", "i")
+    oldLen = len(ret)
+    ret = ret.replace(",,", ",")
+    while len(ret) != oldLen:
+        oldLen = len(ret)
+        ret = ret.replace(",,", ",")
+        ret = ret.replace(" i", "i")
+    ret = ret.replace(",]", "]")
+    ret = ret.replace("[,", "[")
     ret = ret + ";"
     if 0 != len(header):
         ret = header + "=" + ret

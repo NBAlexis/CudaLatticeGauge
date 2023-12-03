@@ -12,11 +12,12 @@
 
 __DEFINE_ENUM(EAccJob,
     EAJ_Simulate,
-    EAJ_SimulateBoost,
-    EAJ_MeasureGauge,
+    EAJ_SimulateQ,
+    EAJ_Measure,
     )
 
 extern INT SimulateAcc(CParameters& params);
+extern INT Measurement(CParameters& params);
 
 //=============================================================================
 // END OF FILE

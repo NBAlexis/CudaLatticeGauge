@@ -38,22 +38,22 @@ _kernelEnergy_RigidAcc(
     }
 
     const Real OnePlusGZ = fG * sSite4.z + F(1.0);
-    const Real OnePlusGZSq = OnePlusGZ * OnePlusGZ;
+    const Real OneOverOnePlusGZ = F(1.0) / (OnePlusGZ * OnePlusGZ);
     deviceSU3 toSub(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 0, byFieldId));
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 1, byFieldId));
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 2, byFieldId));
 
 
-    toSub.MulReal(OnePlusGZSq); //Now this is (1+gz)^2(U14 + U24 + U34)
+    toSub.MulReal(OneOverOnePlusGZ); //Now this is (1/(1+gz)^2)(U14 + U24 + U34)
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 1, byFieldId));
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 0, 2, byFieldId));
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 1, 2, byFieldId));
-    //Now this is U12 + U13 + U23 + (1+gz)^2(U14 + U24 + U34)
+    //Now this is U12 + U13 + U23 + (1/(1+gz)^2)(U14 + U24 + U34)
 
-    const Real toAdd = F(9.0) + F(9.0) * OnePlusGZSq - toSub.ReTr() * F(0.25);
-    //Now this is ReTr[3 - U12 - U13 - U23 + (1+gz)^2 (3 - U14 - U24 - U34)]
+    const Real toAdd = F(9.0) * OnePlusGZ + F(9.0) / OnePlusGZ - toSub.ReTr() * F(0.25) * OnePlusGZ;
+    //Now this is ReTr[(1+gz)(3 - U12 - U13 - U23) + (1/(1+gz)) (3 - U14 - U24 - U34)]
 
-    results[uiSiteIndex] = betaOverN * toAdd * OnePlusGZ;
+    results[uiSiteIndex] = betaOverN * toAdd;
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -123,11 +123,11 @@ _kernelEnergy_RigidAcc_Simplified(
         //  5: 34
         if (2 == i || 4 == i || 5 == i)
         {
-            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu, bDirichlet);
+            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccTimeLeft(sSite4, fG, mu, nu, bDirichlet);
         }
         else
         {
-            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccLeft(sSite4, fG, mu, nu, bDirichlet);
+            resThisThread += (F(3.0) - toAdd.ReTr()) * _deviceGnRigidAccSpatialLeft(sSite4, fG, mu, nu, bDirichlet);
         }
     }
 
@@ -196,22 +196,22 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
 
                 if (mu == 3 || nu == 3) //one of mu nu is t
                 {
-                    fFactorG = _deviceGnRigidAccRightTri(sSite4, fG, mu, nu, bDirichlet);
+                    fFactorG = _deviceGnRigidAccTimeRight(sSite4, fG, mu, nu, bDirichlet);
                 }
                 else
                 {
-                    fFactorG = _deviceGnRigidAccRight(sSite4, fG, mu, nu, bDirichlet);
+                    fFactorG = _deviceGnRigidAccSpatialRight(sSite4, fG, mu, nu, bDirichlet);
                 }
             }
             else
             {
                 if (mu == 3 || nu == 3) //one of mu nu is t
                 {
-                    fFactorG = _deviceGnRigidAccLeftTri(sSite4, fG, mu, nu, bDirichlet);
+                    fFactorG = _deviceGnRigidAccTimeLeft(sSite4, fG, mu, nu, bDirichlet);
                 }
                 else
                 {
-                    fFactorG = _deviceGnRigidAccLeft(sSite4, fG, mu, nu, bDirichlet);
+                    fFactorG = _deviceGnRigidAccSpatialLeft(sSite4, fG, mu, nu, bDirichlet);
                 }
             }
 
@@ -237,7 +237,6 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
         //staple calculated
         deviceSU3 force(pDeviceData[linkIndex]);
         force.MulDagger(res);
-        //test_force += F(-2.0) * betaOverN * __SU3Generators[8].MulC(force).ImTr();
         force.Ta();
         force.MulReal(betaOverN);
 

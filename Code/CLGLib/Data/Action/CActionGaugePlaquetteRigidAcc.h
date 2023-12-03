@@ -3,8 +3,6 @@
 // 
 // DESCRIPTION:
 // 
-// Dirichlet boundary is assumed
-// We assume Z direction is Dirichlet, and Nz=0 is not included, for simplicity
 // 
 // it corresponds to:
 // 
@@ -12,6 +10,8 @@
 //    0      -1      0      0
 //    0       0     -1      0
 //    0       0      0     -1
+// 
+// S = (1+gz)(f12^2 + f13^2 + f23^2) + (1/(1+gz))(f01^2+f02^2+f03^2)
 //
 // REVISION:
 //  [07/31/2020 nbale]
@@ -70,8 +70,9 @@ protected:
 /**
  * We assume Z direction is Dirichlet, and Nz=0 is not included
  * g(n) = f(n) + f(n+mu) + f(n+nu) + f(n+mu+nu)
+ * f(n) = 1 + g z
  */
-static __device__ __inline__ Real _deviceGnRigidAccLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
+static __device__ __inline__ Real _deviceGnRigidAccSpatialLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
     if (mu == 2 || nu == 2)
     {
@@ -99,7 +100,7 @@ static __device__ __inline__ Real _deviceGnRigidAccLeft(const SSmallInt4& sSite,
 /**
  * g(n-nu) = f(n-nu) + f(n+mu-nu) + f(n) + f(n+mu)
  */
-static __device__ __inline__ Real _deviceGnRigidAccRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
+static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
     if (mu == 2)
     {
@@ -147,57 +148,55 @@ static __device__ __inline__ Real _deviceGnRigidAccRight(const SSmallInt4& sSite
 /**
  * We assume Z direction is Dirichlet, and Nz=0 is not included
  * g(n) = f(n) + f(n+mu) + f(n+nu) + f(n+mu+nu)
- * Note: f(n) = (1 + g z)^3 so it is [(1 + g z)^3 + (1 + g (z+1))^3]/2
- * NOT (1 + g z + 1 + g(z+1) )^3
+ * f(n) = 1/(1 + g z)
  */
-static __device__ __inline__ Real _deviceGnRigidAccLeftTri(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
+static __device__ __inline__ Real _deviceGnRigidAccTimeLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = fG * sSite.z + F(1.0);
+    const Real ret = F(1.0) / (fG * sSite.z + F(1.0));
     if (mu == 2 || nu == 2)
     {
-        Real ret2 = fG * (sSite.z + 1) + F(1.0);
+        Real ret2 = F(1.0) / (fG * (sSite.z + 1) + F(1.0));
         if (0 == sSite.z && bDirichlet)
         {
-            return ret2 * ret2 * ret2 * F(0.5);
+            return ret2 * F(0.5);
         }
 
         if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
         {
             if (bDirichlet)
             {
-                return ret * ret * ret * F(0.5);
+                return ret * F(0.5);
             }
             else
             {
-                // sSite.z + 1 =0
+                // sSite.z + 1 = 0
                 ret2 = F(1.0);
             }
         }
-
-        return F(0.5) * (ret * ret * ret + ret2 * ret2 * ret2);
+        return F(0.5) * (ret + ret2);
     }
-    return ret * ret * ret;
+    return ret;
 }
 
 /**
  * g(n-nu) = f(n-nu) + f(n+mu-nu) + f(n) + f(n+mu)
  */
-static __device__ __inline__ Real _deviceGnRigidAccRightTri(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
+static __device__ __inline__ Real _deviceGnRigidAccTimeRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    Real ret = fG * sSite.z + F(1.0);
+    Real ret = F(1.0) / (fG * sSite.z + F(1.0));
     if (2 == mu)
     {
-        Real ret2 = fG * (sSite.z + 1) + F(1.0);
+        Real ret2 = F(1.0) / (fG * (sSite.z + 1) + F(1.0));
         if (0 == sSite.z && bDirichlet)
         {
-            return ret2 * ret2 * ret2 * F(0.5);
+            return ret2 * F(0.5);
         }
 
         if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
         {
             if (bDirichlet)
             {
-                return ret * ret * ret * F(0.5);
+                return ret * F(0.5);
             }
             else
             {
@@ -206,7 +205,7 @@ static __device__ __inline__ Real _deviceGnRigidAccRightTri(const SSmallInt4& sS
             }
         }
 
-        return F(0.5) * (ret * ret * ret + ret2 * ret2 * ret2);
+        return F(0.5) * (ret + ret2);
     }
 
     if (2 == nu)
@@ -216,20 +215,20 @@ static __device__ __inline__ Real _deviceGnRigidAccRightTri(const SSmallInt4& sS
             if (bDirichlet)
             {
                 printf("should never be here!\n");
-                return ret * ret * ret * F(0.5);
+                return ret * F(0.5);
             }
-            const Real ret2 = fG * (_DC_Lz - 1) + F(1.0);
-            return F(0.5) * (ret * ret * ret + ret2 * ret2 * ret2);
+            const Real ret2 = F(1.0) / (fG * (_DC_Lz - 1) + F(1.0));
+            return F(0.5) * (ret + ret2);
         }
         if (1 == sSite.z && bDirichlet)
         {
-            return ret * ret * ret * F(0.5);
+            return ret * F(0.5);
         }
-        const Real ret2 = fG * (sSite.z - 1) + F(1.0);
-        return F(0.5) * (ret * ret * ret + ret2 * ret2 * ret2);
+        const Real ret2 = F(1.0) / (fG * (sSite.z - 1) + F(1.0));
+        return F(0.5) * (ret + ret2);
     }
 
-    return ret * ret * ret;
+    return ret;
 }
 
 #pragma endregion

@@ -29,20 +29,20 @@ int main(int argc, char * argv[])
     {
     case EAJ_Simulate:
     {
-        CParameters workingParam1 = params.GetParameter(_T("JobSimulate"));
-        res = SimulateAcc(workingParam1);
+        CParameters workingParam = params.GetParameter(_T("JobSimulate"));
+        res = SimulateAcc(workingParam);
     }
     break;
-    case EAJ_SimulateBoost:
+    case EAJ_SimulateQ:
     {
-        CParameters workingParam1 = params.GetParameter(_T("JobSimulateBoost"));
-        res = SimulateAcc(workingParam1);
+        CParameters workingParam = params.GetParameter(_T("JobSimulateQ"));
+        res = SimulateAcc(workingParam);
     }
     break;
-    case EAJ_MeasureGauge:
+    case EAJ_Measure:
     {
-        //CParameters workingParam2 = params.GetParameter(_T("JobThermal"));
-
+        CParameters workingParam = params.GetParameter(_T("JobMeasure"));
+        res = Measurement(workingParam);
     }
     break;
     }

@@ -944,7 +944,7 @@ JobMeasureBetaScan:
         MeasureDist : 1
         MeasureZ : 0
         ShiftCenter : 0
-        ZSlice : 0
+        ZSlice : 1
 
     Measure2:
 
@@ -954,7 +954,7 @@ JobMeasureBetaScan:
         ShowResult : 0
         ShiftCenter : 0
         DebugDivation : 0
-        ZSlice : 0
+        ZSlice : 1
 
     Measure3:
 

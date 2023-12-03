@@ -282,9 +282,11 @@ __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenched3D);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchedU13D);
 
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationDirichlet);
-
 __REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationTorus);
+
+__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationDirichletQ);
+
+__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationTorusQ);
 
 //__REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 

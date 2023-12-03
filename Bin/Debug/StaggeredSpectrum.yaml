@@ -1,5 +1,5 @@
 # ESSJ_Simulate, ESSJ_Measure, ESSJ_GaugeFixing, ESSJ_SimulateQuenched
-StaggeredSpectrumJob : ESSJ_SimulateQuenched
+StaggeredSpectrumJob : ESSJ_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -299,16 +299,16 @@ JobMeasure:
     StartN : 201
     EndN : 205
     # {ESSM_Polyakov, ESSM_Wilson, ESSM_Correlator, ESSM_CorrelatorSimple, ESSM_Chiral}
-    MeasureType : ESSM_Chiral
-    SavePrefix : G:\SRMatching\Projective\482325065\Matching\P482325065_
+    MeasureType : ESSM_CorrelatorSimple
+    SavePrefix : G:\SRMatching\Torus\472\GF\GFT47204509_
     # Chiral, Meson, MesonSimple, Polyakov, Wilson
-    CSVSavePrefix : ./P482325065_
+    CSVSavePrefix : ./T47204509_
     UseZ4 : 1
-    StochasticFieldCount : 4
+    StochasticFieldCount : 10
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 24]
+    LatticeLength : [12, 12, 12, 48]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -467,7 +467,7 @@ JobMeasure:
         # This is (x+0.0375/x)^{1/2}
         # MD : [1.0187866320412073, 0.015082426781553434, 0.002799952674759453]
 
-                # MC is to prepare
+        # MC is to prepare
         # This is (x+0.0384/x)^{-1/4}
         MC : [0.988087846183097, -0.0070337572362839966, 0.012149695891461821]
 

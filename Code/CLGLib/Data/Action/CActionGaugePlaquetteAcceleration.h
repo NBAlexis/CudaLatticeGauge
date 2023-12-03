@@ -4,14 +4,15 @@
 // DESCRIPTION:
 // 
 // Periodic boundary is assumed
-// 
+// This is only suitable when gt<<1, this is Galilean transform
 // 
 // it corresponds to:
 // 1 - g^2 t^2    0      0    g t
 //     0         -1      0     0
 //     0          0     -1     0
-//   -g t         0      0    -1
+//    g t         0      0    -1
 //
+// f01^2 + f02^2 + f03^2 + f12^2 + f13^2 + f23^2 + g^2t^2(f13^2 + f23^2) - 2gt(f01f13 + f02f23)
 // REVISION:
 //  [07/27/2020 nbale]
 //=============================================================================
@@ -69,6 +70,7 @@ protected:
 /**
  * This is 0.5 g^2 (t^2 + (t+1)^2), note that when t+1=Lt, it is 0.5 g^2 t^2
  */
+/*
 static __device__ __inline__ Real _deviceGnAcc(const SSmallInt4& sSite, Real fGsq)
 {
     if (sSite.w == static_cast<SBYTE>(_DC_Lt) - 1)
@@ -77,11 +79,13 @@ static __device__ __inline__ Real _deviceGnAcc(const SSmallInt4& sSite, Real fGs
     }
     return F(0.5) * (F(2.0) * sSite.w * sSite.w + F(2.0) * sSite.w + F(1.0)) * fGsq;
 }
+*/
 
 /**
  * If mu = 0, or 1, it is (1+g(n)) staple
  * If mu = 2, it is usual staple
  */
+/*
 static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_XY(
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
@@ -130,7 +134,7 @@ static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_XY(
     return left;
 }
 
-static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_T(
+static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_Z(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SSmallInt4& sSite,
@@ -170,6 +174,7 @@ static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_T(
 
     return left;
 }
+*/
 
 /**
 * g t
@@ -181,7 +186,7 @@ static __device__ __inline__ Real _deviceHi_Acc(
     const SIndex& uiSiteBI)
 {
     site = __deviceSiteIndexToInt4(uiSiteBI.m_uiSiteIndex);
-    return static_cast<Real>(site.w);
+    return -F(2.0) * static_cast<Real>(site.w);
 }
 
 #pragma endregion
