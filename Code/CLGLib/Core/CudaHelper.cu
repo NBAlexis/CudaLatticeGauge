@@ -12,6 +12,7 @@
 __BEGIN_NAMESPACE
 
 __constant__ UINT _constIntegers[kContentLength];
+__constant__ INT _constSignedIntegers[kContentLength];
 __constant__ Real _constFloats[kContentLength];
 __constant__ CRandom* __r;
 __constant__ CIndexData* __idx;
@@ -477,6 +478,7 @@ void CCudaHelper::DebugFunction()
 void CCudaHelper::CopyConstants() const
 {
     checkCudaErrors(cudaMemcpyToSymbol(_constIntegers, m_ConstIntegers, sizeof(UINT) * kContentLength));
+    checkCudaErrors(cudaMemcpyToSymbol(_constSignedIntegers, m_ConstSignedIntegers, sizeof(UINT) * kContentLength));
     checkCudaErrors(cudaMemcpyToSymbol(_constFloats, m_ConstFloats, sizeof(Real) * kContentLength));
 }
 

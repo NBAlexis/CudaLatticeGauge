@@ -81,9 +81,6 @@
     <None Include="..\..\Bin\Debug\TestSuit_Updator.yaml">
       <Filter>YAMLs</Filter>
     </None>
-    <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml">
-      <Filter>YAMLs</Filter>
-    </None>
     <None Include="..\..\Bin\Debug\TestSuit_MiscUpdate.yaml">
       <Filter>YAMLs</Filter>
     </None>

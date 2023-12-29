@@ -257,7 +257,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
@@ -272,9 +271,9 @@ _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
 #if !_CLG_DOUBLEFLOAT
-    DOUBLE fXSq = (sSite4.x - sCenterSite.x + 0.5);
+    DOUBLE fXSq = (sSite4.x - _DC_Centerx + 0.5);
     fXSq = fXSq * fXSq;
-    DOUBLE fYSq = (sSite4.y - sCenterSite.y + 0.5);
+    DOUBLE fYSq = (sSite4.y - _DC_Centery + 0.5);
     fYSq = fYSq * fYSq;
 
     //======================================================
@@ -288,9 +287,9 @@ _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq(
     //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
     const DOUBLE fU12 = (fXSq + fYSq) * _device4PlaqutteTerm(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #else
-    Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
+    Real fXSq = (sSite4.x - _DC_Centerx + F(0.5));
     fXSq = fXSq * fXSq;
-    Real fYSq = (sSite4.y - sCenterSite.y + F(0.5));
+    Real fYSq = (sSite4.y - _DC_Centery + F(0.5));
     fYSq = fYSq * fYSq;
 
     //======================================================
@@ -316,7 +315,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term12_Shifted_NoOmega(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
@@ -332,7 +330,7 @@ _kernelAddChairTermSU3_Term12_Shifted_NoOmega(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXOmega = (sSite4.x - sCenterSite.x + 0.5);
+    const DOUBLE fXOmega = (sSite4.x - _DC_Centerx + 0.5);
 
     //===============
     //- x Omega V412
@@ -344,7 +342,7 @@ _kernelAddChairTermSU3_Term12_Shifted_NoOmega(
 
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5));
+    const Real fXOmega = (sSite4.x - _DC_Centerx + F(0.5));
 
     //===============
     //+x Omega V412
@@ -363,7 +361,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term34_Shifted_NoOmega(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
@@ -379,7 +376,7 @@ _kernelAddChairTermSU3_Term34_Shifted_NoOmega(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fYOmega = (sSite4.y - sCenterSite.y + 0.5);
+    const DOUBLE fYOmega = (sSite4.y - _DC_Centery + 0.5);
 
     //===============
     //+ y Omega V421
@@ -390,7 +387,7 @@ _kernelAddChairTermSU3_Term34_Shifted_NoOmega(
     const DOUBLE fV431 = fYOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 #else
     betaOverN = F(0.125) * betaOverN;
-    const Real fYOmega = (sSite4.y - sCenterSite.y + F(0.5));
+    const Real fYOmega = (sSite4.y - _DC_Centery + F(0.5));
 
     //===============
     //-y Omega V421
@@ -408,7 +405,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
@@ -424,14 +420,14 @@ _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXYOmega2 = (sSite4.x - sCenterSite.x + 0.5) * (sSite4.y - sCenterSite.y + 0.5);
+    const DOUBLE fXYOmega2 = (sSite4.x - _DC_Centerx + 0.5) * (sSite4.y - _DC_Centery + 0.5);
 
     //===============
     //-Omega^2 xy V142
     const DOUBLE fV132 = fXYOmega2 * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5));
+    const Real fXYOmega2 = (sSite4.x - _DC_Centerx + F(0.5)) * (sSite4.y - _DC_Centery + F(0.5));
 
     //===============
     //+Omega^2 xy V142
@@ -595,7 +591,6 @@ void CMeasurePandChiralTalorKS::OnConfigurationAccepted(const CFieldGauge* pGaug
     _kernelAddChairTermSU3_Term12_Shifted_NoOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
     DOUBLE omegaterm = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -603,7 +598,6 @@ void CMeasurePandChiralTalorKS::OnConfigurationAccepted(const CFieldGauge* pGaug
     _kernelAddChairTermSU3_Term34_Shifted_NoOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
     omegaterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -614,7 +608,6 @@ void CMeasurePandChiralTalorKS::OnConfigurationAccepted(const CFieldGauge* pGaug
     _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
 
@@ -624,7 +617,6 @@ void CMeasurePandChiralTalorKS::OnConfigurationAccepted(const CFieldGauge* pGaug
     _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
     omegasqterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -643,7 +635,7 @@ void CMeasurePandChiralTalorKS::ApplyM(CFieldFermionKSSU3* pTarget, const CField
         pTarget->m_pDeviceData,
         pSource->m_byFieldId,
         pGauge->m_byFieldId,
-        CCommonData::m_sCenter);
+        _HC_Center);
 
 
     _kernelDFermionKS_PR_XYTau_Term_NoOmega << <block, threads >> > (

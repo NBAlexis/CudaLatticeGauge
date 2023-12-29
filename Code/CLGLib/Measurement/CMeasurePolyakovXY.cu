@@ -344,9 +344,9 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             m_lstPZSliceAbs.AddItem(m_pZHostLoopDensityAbs [i] / fFactor);
         }
     }
-    for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
+    for (UINT i = _HC_Centerx; i < _HC_Lx; ++i)
     {
-        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y]);
+        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + _HC_Centery]);
     }
 
     TransformFromXYDataToRDataOnce_C(
@@ -437,10 +437,10 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
         _kernelPolyakovZTraceOfSiteXY << <block3, threads3 >> > (m_pTmpLoopZ, m_pXYDeviceLoopDensity);
 
         checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensity, m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
-        for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
+        for (UINT i = _HC_Centerx; i < _HC_Lx; ++i)
         {
             m_lstLoopZDensity.AddItem(m_pXYHostLoopDensity[
-                i * _HC_Ly + CCommonData::m_sCenter.y]);
+                i * _HC_Ly + _HC_Centery]);
         }
 
         TransformFromXYDataToRDataOnce_C(

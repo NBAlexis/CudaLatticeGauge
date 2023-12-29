@@ -23,7 +23,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelTraceApplyM(
     const deviceWilsonVectorSU3* __restrict__ pRight,
     deviceWilsonVectorSU3* pRes,
-    SSmallInt4 sCenter,
     const DOUBLE fKappa,
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
@@ -37,8 +36,8 @@ _kernelTraceApplyM(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
-    const Real fmY = -static_cast<Real>((sSite4.y - sCenter.y) * fKappa);
-    const Real fmX = -static_cast<Real>((sSite4.x - sCenter.x) * fKappa);
+    const Real fmY = -static_cast<Real>((sSite4.y - _DC_Centery) * fKappa);
+    const Real fmX = -static_cast<Real>((sSite4.x - _DC_Centerx) * fKappa);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -222,7 +221,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelActionTalorOmega(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE* results
 #else
@@ -241,7 +239,7 @@ _kernelActionTalorOmega(
     }
 
     betaOverN = F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - sCenterSite.x);
+    const Real fXOmega = (sSite4.x - _DC_Centerx);
 
     //===============
     //+x Omega V412
@@ -252,7 +250,7 @@ _kernelActionTalorOmega(
     const Real fV432 = fXOmega * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
 
-    const Real fYOmega = -(sSite4.y - sCenterSite.y);
+    const Real fYOmega = -(sSite4.y - _DC_Centery);
 
     //===============
     //-y Omega V421
@@ -273,7 +271,6 @@ _kernelActionTalorOmegaSq(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     const DOUBLE betaOverN, DOUBLE* results
 #else
@@ -339,15 +336,15 @@ _kernelActionTalorOmegaSq(
         //r^2 (1-U_{xy}) + y^2 U_{xz} + x^2 U_{yz}
 
 #if !_CLG_DOUBLEFLOAT
-        res += static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, mushift, nushift));
+        res += static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, uiN, idx0, mushift, nushift));
 #else
-        res += betaOverN * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, sCenterSite, uiN, idx0, mushift, nushift);
+        res += betaOverN * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, uiN, idx0, mushift, nushift);
 #endif
     }
 
     if (!__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
     {
-        const Real fXYOmega2 = -(sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y);
+        const Real fXYOmega2 = -(sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery);
 
         //===============
         //+Omega^2 xy V132
@@ -417,7 +414,6 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
     _kernelTraceApplyM << <block, threads >> > (
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
@@ -449,7 +445,6 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
     _kernelTraceApplyM << <block, threads >> > (
         pTmp->m_pDeviceData,
         pF2W->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
@@ -537,7 +532,6 @@ void CMeasurePandChiralTalor::OnConfigurationAccepted(const CFieldGauge* pGauge,
     _kernelActionTalorOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
 
@@ -554,7 +548,6 @@ void CMeasurePandChiralTalor::OnConfigurationAccepted(const CFieldGauge* pGauge,
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-        CCommonData::m_sCenter,
         CCommonData::m_fBeta,
         _D_RealThreadBuffer);
 

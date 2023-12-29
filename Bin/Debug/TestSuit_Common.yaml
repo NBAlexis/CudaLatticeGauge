@@ -498,7 +498,7 @@ TestAnitiHermiticity:
         # FieldName : CFieldFermionKSU1
         # FieldName : CFieldFermionKSSU3Gamma
         # FieldName : CFieldFermionKSSU3DR
-        FieldName : CFieldFermionKSSU3Acc
+        FieldName : CFieldFermionKSSU3RigidAcc
 
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian

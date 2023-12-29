@@ -282,11 +282,19 @@ __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenched3D);
 __REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchedU13D);
 
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationTorus);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorus);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationDirichletQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletQ);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestAccelerationTorusQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusMidCenterQ);
+
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletMidCenterQ);
+
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusQ);
+
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc);
+
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter);
 
 //__REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 

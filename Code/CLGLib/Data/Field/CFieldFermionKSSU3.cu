@@ -456,7 +456,14 @@ UBOOL CFieldFermionKSSU3::CalculateForce(
     {
         CFieldFermionKSSU3* phi_ks = dynamic_cast<CFieldFermionKSSU3*>(phii[i]);
         phi_ks->CopyTo(phiid[i]);
-        phiid[i]->D0(pGauge);
+        if (m_bDiagonalMass)
+        {
+            phiid[i]->D(pGauge);
+        }
+        else
+        {
+            phiid[i]->D0(pGauge);
+        }
 
         hostPointers[i] = phi_ks->m_pDeviceData;
         hostPointers[i + m_rMD.m_uiDegree] = phiid[i]->m_pDeviceData;
@@ -1353,9 +1360,14 @@ void CFieldFermionKSSU3::DWithMass(const CField* pGauge, Real fMass, EOperatorCo
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
-        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!\n"));
         return;
     }
+    if (m_bDiagonalMass)
+    {
+        appCrucial(_T("In the cass mass is not a number, should not in here!\n"));
+    }
+
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
@@ -1382,6 +1394,11 @@ void CFieldFermionKSSU3::D0(const CField* pGauge)
         appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
         return;
     }
+    if (m_bDiagonalMass)
+    {
+        appCrucial(_T("In the cass mass is not a number, should not in here except for check anti-hermiticity!\n"));
+    }
+
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
@@ -1492,9 +1509,14 @@ void CFieldFermionKSSU3::DdaggerWithMass(const CField* pGauge, Real fMass, EOper
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
-        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!\n"));
         return;
     }
+    if (m_bDiagonalMass)
+    {
+        appCrucial(_T("In the cass mass is not a number, should not in here!\n"));
+    }
+
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
@@ -1572,9 +1594,14 @@ void CFieldFermionKSSU3::DDdaggerWithMass(const CField* pGauge, Real fMass, EOpe
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
-        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!"));
+        appCrucial(_T("CFieldFermionKSSU3 can only play with gauge SU3!\n"));
         return;
     }
+    if (m_bDiagonalMass)
+    {
+        appCrucial(_T("In the cass mass is not a number, should not in here!\n"));
+    }
+
     const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
     Real fRealCoeff = fCoeffReal;
@@ -1815,6 +1842,7 @@ CCString CFieldFermionKSSU3::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
     sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("Diagonal Mass : ") + appIntToString(m_bDiagonalMass) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
     return sRet;

@@ -36,7 +36,6 @@ _kernelDFermionKS_R_XYTerm(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -82,11 +81,11 @@ _kernelDFermionKS_R_XYTerm(
             }
             if (bXorY)
             {
-                eta_tau = eta_tau * (sSite4.y - sCenter.y + shift);
+                eta_tau = eta_tau * (sSite4.y - _DC_Centery + shift);
             }
             else
             {
-                eta_tau = eta_tau * (sCenter.x - sSite4.x - shift);
+                eta_tau = eta_tau * (_DC_Centerx - sSite4.x - shift);
             }
         }
         else
@@ -100,11 +99,11 @@ _kernelDFermionKS_R_XYTerm(
             sTargetSite = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
             if (bXorY)
             {
-                eta_tau = eta_tau * (sTargetSite.y - sCenter.y + shift);
+                eta_tau = eta_tau * (sTargetSite.y - _DC_Centery + shift);
             }
             else
             {
-                eta_tau = eta_tau * (sCenter.x - sTargetSite.x - shift);
+                eta_tau = eta_tau * (_DC_Centerx - sTargetSite.x - shift);
             }
         }
 
@@ -256,7 +255,7 @@ _kernelDFermionKSForce_R_XYTerm(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter, BYTE byMu, INT iMu,
+    BYTE byMu, INT iMu,
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
     BYTE byContribution)
@@ -278,8 +277,8 @@ _kernelDFermionKSForce_R_XYTerm(
     const Real shift = bShiftCenter ? F(0.5) : F(0.0);
     //y Dx and -x Dy
     const Real fNv = (0 == byMu)
-        ? static_cast<Real>(site_n1.y - sCenter.y + shift)
-        : static_cast<Real>(sCenter.x - site_n1.x - shift);
+        ? static_cast<Real>(site_n1.y - _DC_Centery + shift)
+        : static_cast<Real>(_DC_Centerx - site_n1.x - shift);
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
@@ -460,7 +459,6 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         m_bShiftCenter,
         TRUE,
         CCommonData::m_fOmega,
-        CCommonData::m_sCenter,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -476,7 +474,6 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         m_bShiftCenter,
         FALSE,
         CCommonData::m_fOmega,
-        CCommonData::m_sCenter,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -554,7 +551,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                     m_rMD.m_uiDegree,
                     m_byFieldId,
                     m_bShiftCenter,
-                    CCommonData::m_fOmega, CCommonData::m_sCenter,
+                    CCommonData::m_fOmega,
                     static_cast<BYTE>(imu), iMu[pathidx],
                     L[0], L[1], L[2], LLength,
                     R[0], R[1], R[2], RLength,

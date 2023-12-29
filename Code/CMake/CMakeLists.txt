@@ -85,14 +85,13 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3RigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DR.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Gamma.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3D.h
@@ -213,12 +212,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3P4.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3REM.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSSU3RigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionKSU1R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Boost.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DEven.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DREven.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3DRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermionWilsonSquareSU3Gamma.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGaugeSU3TreeImproved.cu

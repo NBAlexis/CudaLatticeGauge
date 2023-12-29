@@ -16,27 +16,27 @@ __CLGIMPLEMENT_CLASS(CMeasureChargeAndCurrents)
 
 #pragma region device functions
 
-__device__ void _deviceMeasure0(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure0(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     //do nothing
 }
 
-__device__ void _deviceMeasure1(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure1(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA1].MulWilsonC(element);
 }
 
-__device__ void _deviceMeasure2(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure2(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA2].MulWilsonC(element);
 }
 
-__device__ void _deviceMeasure3(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure3(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA3].MulWilsonC(element);
 }
 
-__device__ void _deviceMeasure4(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure4(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA4].MulWilsonC(element);
 }
@@ -44,7 +44,7 @@ __device__ void _deviceMeasure4(const SSmallInt4& site, const SSmallInt4& sCente
 /**
 * -i kappa gamma_4 sigma_12
 */
-__device__ void _deviceMeasure5(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure5(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[SIGMA12E].MulWilsonC(element);
     element = __chiralGamma[GAMMA4].MulWilsonC(element);
@@ -54,9 +54,9 @@ __device__ void _deviceMeasure5(const SSmallInt4& site, const SSmallInt4& sCente
 /**
 * gamma_1 + y Omega gamma_4
 */
-__device__ void _deviceMeasure6(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure6(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
-    const Real fYOmega = static_cast<Real>(site.y - sCenter.y) * fOmega;
+    const Real fYOmega = static_cast<Real>(site.y - _DC_Centery) * fOmega;
     deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(element);
     toAdd.MulReal(fYOmega);
     element = __chiralGamma[GAMMA1].MulWilsonC(element);
@@ -66,9 +66,9 @@ __device__ void _deviceMeasure6(const SSmallInt4& site, const SSmallInt4& sCente
 /**
 * gamma_2 - x Omega gamma_4
 */
-__device__ void _deviceMeasure7(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure7(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
-    const Real fXOmega = static_cast<Real>(site.x - sCenter.x) * fOmega;
+    const Real fXOmega = static_cast<Real>(site.x - _DC_Centerx) * fOmega;
     deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(element);
     toAdd.MulReal(fXOmega);
     element = __chiralGamma[GAMMA2].MulWilsonC(element);
@@ -78,7 +78,7 @@ __device__ void _deviceMeasure7(const SSmallInt4& site, const SSmallInt4& sCente
 /**
 * gamma_4 gamma_5
 */
-__device__ void _deviceMeasure8(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
+__device__ void _deviceMeasure8(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element)
 {
     element = __chiralGamma[GAMMA4].MulWilsonC(element);
     element = __chiralGamma[GAMMA5].MulWilsonC(element);
@@ -111,7 +111,6 @@ _CLG_LAUNCH_(12, 8)
 _kernel_Gammas(
     deviceWilsonVectorSU3** pSources,
     SSmallInt4 sSite4,
-    SSmallInt4 sCenter,
     Real fKappa,
     Real fOmega,
     BYTE byArrayIdx,
@@ -135,7 +134,7 @@ _kernel_Gammas(
     }
 
     deviceWilsonVectorSU3 right_element(pSources[uiCS][uiSiteIndex]);
-    (*_cMeasureFuncs[uiMeasureFunction])(sSite4, sCenter, fKappa, fOmega, right_element);
+    (*_cMeasureFuncs[uiMeasureFunction])(sSite4, fKappa, fOmega, right_element);
 
     //Note that, it is not res[byArrayIdx] = result
     //It is res[c,s] = delta_{cc}delta_ss result[c,s]
@@ -240,7 +239,6 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
     _kernel_Gammas << <_blocks, _thread1 >> > (
         ppDevicePtr,
         sourceSite,
-        CCommonData::m_sCenter,
         CCommonData::m_fKai,
         static_cast<Real>(CCommonData::m_fOmega),
         static_cast<BYTE>(sourceSite.x), //array idx

@@ -46,7 +46,6 @@
     <None Include="..\..\Bin\Debug\TestSuit.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Boundary.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Common.yaml" />
-    <None Include="..\..\Bin\Debug\TestSuit_EvenOdd.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionMatrix.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdator.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionUpdatorKS.yaml" />

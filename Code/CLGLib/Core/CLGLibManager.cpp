@@ -137,10 +137,6 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_Ly] = static_cast<UINT>(intValues[1]);
     m_InitialCache.constIntegers[ECI_Lz] = static_cast<UINT>(intValues[2]);
     m_InitialCache.constIntegers[ECI_Lt] = static_cast<UINT>(intValues[3]);
-    CCommonData::m_sCenter.x = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lx] / 2);
-    CCommonData::m_sCenter.y = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Ly] / 2);
-    CCommonData::m_sCenter.z = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lz] / 2);
-    CCommonData::m_sCenter.w = static_cast<SBYTE>(m_InitialCache.constIntegers[ECI_Lt] / 2);
     m_InitialCache.constIntegers[ECI_Volume] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2] * intValues[3]);
     m_InitialCache.constIntegers[ECI_Volume_xyz] = static_cast<UINT>(intValues[0] * intValues[1] * intValues[2]);
     m_InitialCache.constIntegers[ECI_MultX] = static_cast<UINT>(intValues[1] * intValues[2] * intValues[3]);
@@ -151,6 +147,36 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     latticeDim.AddItem(intValues[0] * intValues[1]); //xy
     latticeDim.AddItem(intValues[2]); //z
     latticeDim.AddItem(intValues[3]); //t
+
+    if (params.FetchValueArrayINT(_T("Center"), intValues))
+    {
+        if (4 == intValues.Num())
+        {
+            m_InitialCache.constSignedIntegers[ECSI_CenterX] = intValues[0];
+            m_InitialCache.constSignedIntegers[ECSI_CenterY] = intValues[1];
+            m_InitialCache.constSignedIntegers[ECSI_CenterZ] = intValues[2];
+            m_InitialCache.constSignedIntegers[ECSI_CenterT] = intValues[3];
+            SSmallInt4 sCenter(
+                static_cast<SBYTE>(intValues[0]),
+                static_cast<SBYTE>(intValues[1]),
+                static_cast<SBYTE>(intValues[2]),
+                static_cast<SBYTE>(intValues[3]));
+            m_InitialCache.constIntegers[ECI_Center] = sCenter.m_uiData;
+        }
+    }
+    else
+    {
+        m_InitialCache.constSignedIntegers[ECSI_CenterX] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lx] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterY] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Ly] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterZ] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lz] / 2);;
+        m_InitialCache.constSignedIntegers[ECSI_CenterT] = static_cast<INT>(m_InitialCache.constIntegers[ECI_Lt] / 2);;
+        SSmallInt4 sCenter(
+            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterX]),
+            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterY]),
+            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterZ]),
+            static_cast<SBYTE>(m_InitialCache.constSignedIntegers[ECSI_CenterT]));
+        m_InitialCache.constIntegers[ECI_Center] = sCenter.m_uiData;
+    }
 
     m_InitialCache.constIntegers[ECI_PlaqutteCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir] * (m_InitialCache.constIntegers[ECI_Dir] - 1) / 2;
     m_InitialCache.constIntegers[ECI_LinkCount] = m_InitialCache.constIntegers[ECI_Volume] * m_InitialCache.constIntegers[ECI_Dir];
@@ -320,6 +346,7 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     }
 
     memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
+    memcpy(m_pCudaHelper->m_ConstSignedIntegers, m_InitialCache.constSignedIntegers, sizeof(INT)* kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);
     m_pCudaHelper->CopyConstants();
     m_pCudaHelper->AllocateTemeraryBuffers(_HC_Volume);

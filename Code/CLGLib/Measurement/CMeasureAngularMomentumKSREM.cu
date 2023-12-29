@@ -156,8 +156,7 @@ _kernelKSApplyGammaEtaCopyREM(
     const SIndex* __restrict__ pFermionMove,
     const BYTE* __restrict__ pEtaTable,
     const deviceSU3* __restrict__ pAphys,
-    Real fCharge,
-    SSmallInt4 sCenter)
+    Real fCharge)
 {
     intokernalInt4;
 
@@ -209,8 +208,8 @@ _kernelKSApplyGammaEtaCopyREM(
     //pMe[uiSiteIndex].MulReal(F(0.5));
 
     //Here it is gamma _4 psi, we still need r x Aphys times it
-    const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-    const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+    const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
+    const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
     deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
@@ -247,7 +246,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
         pAppliedBuffer,
         m_byFieldId,
         1,
-        CCommonData::m_sCenter,
+        _HC_Center,
         pFieldREM->m_fQ);
 }
 
@@ -296,8 +295,7 @@ void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pApplie
         appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAphys->m_pDeviceData,
-        pFieldREM->m_fQ,
-        CCommonData::m_sCenter);
+        pFieldREM->m_fQ);
 }
 
 

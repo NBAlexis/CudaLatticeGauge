@@ -3,7 +3,7 @@
 // 
 // DESCRIPTION:
 // 
-// This is only suitable when gt >> 1, this uses Galilean transform
+// This is only suitable when gt << 1, this uses Galilean transform
 // 
 // gammai (pi + iAi) + gt gammaz (pt+iAt) + m
 // 

@@ -94,7 +94,7 @@ void CMeasureWilsonLoopWithPath::Initial(CMeasurementManager* pOwner, CLatticeDa
     {
         TArray<INT> thePoint;
         param.FetchValueArrayINT(_T("Point"), thePoint);
-        m_sPoint = CCommonData::m_sCenter;
+        m_sPoint = _HC_Center;
         if (thePoint.Num() > 3)
         {
             m_sPoint.x = static_cast<SBYTE>(thePoint[0]);

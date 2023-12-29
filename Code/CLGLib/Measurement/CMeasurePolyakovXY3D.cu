@@ -219,9 +219,9 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
     
     checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensity, m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensityAbs, m_pXYDeviceLoopDensityAbs, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
-    for (UINT i = CCommonData::m_sCenter.x; i < _HC_Lx; ++i)
+    for (UINT i = _HC_Centerx; i < _HC_Lx; ++i)
     {
-        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + CCommonData::m_sCenter.y]);
+        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + _HC_Centery]);
     }
 
     TransformFromXYDataToRDataOnce_C(
@@ -309,7 +309,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
 void CMeasurePolyakovXY3D::Report()
 {
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
-    assert(static_cast<UINT>(m_uiConfigurationCount * CCommonData::m_sCenter.x)
+    assert(static_cast<UINT>(m_uiConfigurationCount * _HC_Centerx)
         == static_cast<UINT>(m_lstLoopDensity.Num()));
 
     appPushLogDate(FALSE);
@@ -341,17 +341,17 @@ void CMeasurePolyakovXY3D::Report()
     for (UINT k = 0; k < m_uiConfigurationCount; ++k)
     {
         appGeneral(_T("{"));
-        for (UINT i = 0; i < static_cast<UINT>(CCommonData::m_sCenter.x); ++i)
+        for (UINT i = 0; i < static_cast<UINT>(_HC_Centerx); ++i)
         {
-            LogGeneralComplex(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+            LogGeneralComplex(m_lstLoopDensity[k * _HC_Centerx + i]);
 
             if (0 == k)
             {
-                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * _HC_Centerx + i]);
             }
             else
             {
-                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * CCommonData::m_sCenter.x + i]);
+                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * _HC_Centerx + i]);
             }
 
             if (k == m_uiConfigurationCount - 1)

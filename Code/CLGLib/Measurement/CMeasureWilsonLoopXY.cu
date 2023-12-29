@@ -270,8 +270,8 @@ void CMeasureWilsonLoopXY::OnConfigurationAccepted(const class CFieldGauge* pAcc
         SSmallInt4(-1, -1, 0, 0)
     };
 
-    SBYTE sCenterX = CCommonData::m_sCenter.x;
-    SBYTE sCenterY = CCommonData::m_sCenter.y;
+    SBYTE sCenterX = static_cast<SBYTE>(_HC_Centerx);
+    SBYTE sCenterY = static_cast<SBYTE>(_HC_Centery);
     SSmallInt4 sCenter[8] =
     {
         SSmallInt4(sCenterX, sCenterY, 0, 0),

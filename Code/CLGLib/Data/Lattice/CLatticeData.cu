@@ -21,7 +21,7 @@ Real CLGAPI CCommonData::m_fOmega = F(0.0);
 Real CLGAPI CCommonData::m_fKai = F(0.0);
 Real CLGAPI CCommonData::m_fG = F(0.0);
 Real CLGAPI CCommonData::m_fShiftedMass = F(0.0);
-SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);
+//SSmallInt4 CLGAPI CCommonData::m_sCenter = SSmallInt4(0,0,0,0);
 UBOOL CLGAPI CCommonData::m_bStoreStaple = TRUE;
 UBOOL CLGAPI CCommonData::m_bStoreLastSolution = TRUE;
 UBOOL CLGAPI CCommonData::m_bStochasticGaussian = FALSE;
@@ -284,7 +284,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
 
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
     sRet = sTab + sInfos;
-    sInfos.Format(_T("Center : [%d, %d, %d, %d]\n"), CCommonData::m_sCenter.x, CCommonData::m_sCenter.y, CCommonData::m_sCenter.z, CCommonData::m_sCenter.w);
+    sInfos.Format(_T("Center : [%d, %d, %d, %d]\n"), _HC_Centerx, _HC_Centery, _HC_Centerz, _HC_Centert);
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("Random : %s\n"), __ENUM_TO_STRING(ERandom, static_cast<ERandom>(m_uiRandomType)).c_str());
     sRet = sRet + sTab + sInfos;

@@ -107,13 +107,233 @@ TestAccelerationTorus:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-
 TestAccelerationDirichletQ:
 
     DeviceIndex : 0
     Dim : 4
     Dir : 4
     LatticeLength : [10, 10, 10, 6]
+    Center : [0, 0, 0, 0]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    ExponentialPrecision : 10
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.420602
+    ExpectedResDebug : 0.591390
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 50
+        # NestedStep : 10
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 0, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3Acc
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 0, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.1
+        Dirichlet : 1
+        
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestAccelerationTorusQ:
+
+    DeviceIndex : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [10, 10, 10, 6]
+    Center : [0, 0, 0, 0]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    ExponentialPrecision : 10
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.411029
+    ExpectedResDebug : 0.591390
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        # IntegratorType : CIntegratorNestedForceGradient
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 50
+        # NestedStep : 10
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3Acc
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{1/8}
+        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
+
+        # MD is to calculate force
+        # This is x^{-1/4}
+        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.1
+        Dirichlet : 0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestAccelerationDirichletMidCenterQ:
+
+    DeviceIndex : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [10, 10, 11, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -218,12 +438,12 @@ TestAccelerationDirichletQ:
         MeasureName : CMeasurePlaqutteEnergy
 
 
-TestAccelerationTorusQ:
+TestAccelerationTorusMidCenterQ:
 
     DeviceIndex : 0
     Dim : 4
     Dir : 4
-    LatticeLength : [10, 10, 10, 6]
+    LatticeLength : [10, 10, 11, 6]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
@@ -327,7 +547,6 @@ TestAccelerationTorusQ:
 
         MeasureName : CMeasurePlaqutteEnergy
 
-
 TestAcceleration:
 
     Dim : 4
@@ -428,7 +647,236 @@ TestAcceleration:
         ShowResult : 1
         MeasureDist : 1
 
+TestAccelerationTorusKSRigidAcc:
 
+    DeviceIndex : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [10, 10, 10, 4]
+    Center : [0, 0, 0, 0]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    ExponentialPrecision : 10
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.411029
+    ExpectedResDebug : 0.591390
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 12
+        NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3RigidAcc
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{Nf/4}
+        # Below is x^{1/4} for x in [0.003, 10]
+        # MC : [2.9140793684396193, -0.001212266022313083, -0.035373858106390606, -0.6963311505183447, -30.33909516304439, 0.005932309305491118, 0.10546382752615112, 1.2318037028026203, 18.337532080403754]
+        # Below is x^{1/4} for x in [0.003, 1]
+        MC : [1.531280194634773, -0.0009470074905847871, -0.022930177968880357, -1.1924853242122515, 0.005144532232063201, 0.07551561111396712, 1.33879448659906]
+
+        # MD is to calculate force
+        # This is x^{-Nf/4}
+        # Below is x^{-1/2} for x in [0.003, 5]
+        # MD : [0.10766321959713898, 0.05460286899613074, 0.17434330058619443, 0.5478537483736408, 2.136161290401259, 0.0013800897677292737, 0.038086851631660014, 0.5061779682257695, 5.976219042043034]
+        # Below is x^{-1/2} for x in [0.003, 1]
+        MD : [0.3904603900276521, 0.051109377580161014, 0.14082862345293673, 0.5964845035452123, 0.001277919285647929, 0.028616544606686445, 0.4105999721114422]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.2
+        Dirichlet : 0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+
+TestAccelerationTorusKSRigidAccMidCenter:
+
+    DeviceIndex : 0
+    Dim : 4
+    Dir : 4
+    LatticeLength : [10, 10, 11, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    ExponentialPrecision : 10
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    FermionFieldCount : 1
+    MeasureListLength : 1
+    CacheStaple : 0
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+    ExpectedRes : 0.411029
+    ExpectedResDebug : 0.591390
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 12
+        NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU3
+
+    FermionField1:
+
+        FieldName : CFieldFermionKSSU3RigidAcc
+        FieldInitialType : EFIT_RandomGaussian
+
+        # 2am
+        Mass : 0.5
+        FieldId : 2
+        PoolNumber : 15
+
+        Period : [1, 1, 1, -1]
+
+        # MC is to prepare
+        # This is x^{Nf/4}
+        # Below is x^{1/4} for x in [0.003, 10]
+        # MC : [2.9140793684396193, -0.001212266022313083, -0.035373858106390606, -0.6963311505183447, -30.33909516304439, 0.005932309305491118, 0.10546382752615112, 1.2318037028026203, 18.337532080403754]
+        # Below is x^{1/4} for x in [0.003, 1]
+        MC : [1.531280194634773, -0.0009470074905847871, -0.022930177968880357, -1.1924853242122515, 0.005144532232063201, 0.07551561111396712, 1.33879448659906]
+
+        # MD is to calculate force
+        # This is x^{-Nf/4}
+        # Below is x^{-1/2} for x in [0.003, 5]
+        # MD : [0.10766321959713898, 0.05460286899613074, 0.17434330058619443, 0.5478537483736408, 2.136161290401259, 0.0013800897677292737, 0.038086851631660014, 0.5061779682257695, 5.976219042043034]
+        # Below is x^{-1/2} for x in [0.003, 1]
+        MD : [0.3904603900276521, 0.051109377580161014, 0.14082862345293673, 0.5964845035452123, 0.001277919285647929, 0.028616544606686445, 0.4105999721114422]
+        
+    Action1:
+   
+        ActionName : CActionGaugePlaquetteRigidAcc
+        Beta : 5.0
+        AccG : 0.1
+        Dirichlet : 0
+
+    Action2:
+
+        ActionName : CActionFermionKS
+        FieldId : 2
+
+    Solver:
+
+        SolverName : CSLASolverGMRES
+        SolverForFieldId : 2
+        MaxDim : 20
+        Accuracy : 0.0000001
+
+        Restart : 400
+        AbsoluteAccuracy : 1
+
+    MSSolver:
+
+        SolverName : CMultiShiftBiCGStab
+        SolverForFieldId : 2
+        DiviationStep : 100
+        MaxStep : 50
+        Accuracy : 0.00001
+        AbsoluteAccuracy : 1
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
 
 TestBoost:
 

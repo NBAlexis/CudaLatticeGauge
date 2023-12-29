@@ -52,7 +52,6 @@ _kernelAverageOverZT_XYPlaneC(CLGComplex* pBuffer)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelXY_To_R_C(
     const CLGComplex* __restrict__ jgsXY,
-    SSmallInt4 sCenter, 
     UINT uiMax, 
     BYTE byFieldId,
     CLGComplex* result,
@@ -63,8 +62,8 @@ _kernelXY_To_R_C(
     const INT iX = static_cast<INT>(uiXY / _DC_Ly);
     const INT iY = static_cast<INT>(uiXY % _DC_Ly);
     INT iC;
-    const INT iCenterX = static_cast<INT>(sCenter.x);
-    const INT iCenterY = static_cast<INT>(sCenter.y);
+    const INT iCenterX = _DC_Centerx;
+    const INT iCenterY = _DC_Centery;
     if (bShiftCenter)
     {
         iC = (((iCenterX - iX) * 2) - 1) * (((iCenterX - iX) * 2) - 1)
@@ -78,8 +77,8 @@ _kernelXY_To_R_C(
 
     //In the following, sSite is only used for Dirichlet check
     SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
+    sSite4.z = _DC_Centerz;
+    sSite4.w = _DC_Centert;
     sSite4.x = static_cast<SBYTE>(iX);
     sSite4.y = static_cast<SBYTE>(iY);
     if (iC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
@@ -107,7 +106,6 @@ _kernelXY_To_RAverage_C(const UINT* __restrict__ pCount, CLGComplex* pValue)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelXY_To_R_R(
     const Real* __restrict__ jgsXY,
-    SSmallInt4 sCenter,
     UINT uiMax,
     BYTE byFieldId,
     Real* result,
@@ -118,8 +116,8 @@ _kernelXY_To_R_R(
     const INT iX = static_cast<INT>(uiXY / _DC_Ly);
     const INT iY = static_cast<INT>(uiXY % _DC_Ly);
     INT iC;
-    const INT iCenterX = static_cast<INT>(sCenter.x);
-    const INT iCenterY = static_cast<INT>(sCenter.y);
+    const INT iCenterX = _DC_Centerx;
+    const INT iCenterY = _DC_Centery;
     if (bShiftCenter)
     {
         iC = (((iCenterX - iX) * 2) - 1) * (((iCenterX - iX) * 2) - 1)
@@ -132,8 +130,8 @@ _kernelXY_To_R_R(
     }
 
     SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
+    sSite4.z = _DC_Centerz;
+    sSite4.w = _DC_Centert;
     sSite4.x = static_cast<SBYTE>(iX);
     sSite4.y = static_cast<SBYTE>(iY);
     if (iC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
@@ -574,7 +572,6 @@ void CMeasure::XYDataToRdistri_R(
 
     _kernelXY_To_R_R << <block2, threads2 >> > (
         source,
-        CCommonData::m_sCenter,
         uiMaxR,
         byFieldId,
         result,
@@ -607,7 +604,6 @@ void CMeasure::XYDataToRdistri_C(
 
     _kernelXY_To_R_C << <block2, threads2 >> > (
         source,
-        CCommonData::m_sCenter,
         uiMaxR,
         byFieldId,
         result,

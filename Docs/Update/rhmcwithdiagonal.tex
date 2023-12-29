@@ -1,0 +1,178 @@
+\subsection{\label{sec:rhmc_diagonal}\index{RHMC}The RHMC for staggered fermion with diagonal mass term}
+
+In this section, we consider that
+\begin{equation}
+\begin{split}
+&D(m)=D_{st}+M(m)\\
+\end{split}
+\end{equation}
+where $M$ is not a number but a diagonal matrix.
+
+$\bullet$ Calculate the action
+
+\begin{equation}
+\begin{split}
+&\exp(-S)=\left(\det [D(m_{ud})]\right)^{\frac{1}{2}}\left(\det [D]\right)^{\frac{1}{4}} \exp (-S_G)\\
+\end{split}
+\end{equation}
+
+The problem is how to evaluate $\left(\det [D]\right)^{\alpha}$. Before that, we have to prepare some tools.
+
+\subsubsection{\label{sec:hmcofrhmc_diagonal}The RHMC with \texorpdfstring{$N_f=2$}{Nf=2} and with diagonal mass term}
+
+We mainly follow Ref.~\cite{staggeredRHMC}.
+
+Similar as the HMC, the first step is to rewrite the action use a Boson field~(pseudo-fermion field), still starting with
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \prod _{f=1}^{N_f} \mathcal {D}[\bar{\psi}_f]\mathcal {D}[\psi _f]\left(\det D\right)^{\frac{1}{4}}\exp \left(-S_G[U]\right)\\
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&D(n|m)=2M(n|m)\delta _{m,n} \textcolor[rgb]{1,0,0}{+} \sum _{\mu}\eta _{\mu}(n)\left(U_{\mu}(n) \delta _{n,n+\mu} - U_{-\mu}(n)\delta _{n,n-\mu}\right)\\
+\end{split}
+\end{equation}
+
+Note that
+\begin{equation}
+\begin{split}
+&\begin{pmatrix} ia & b \\ -b & -i a\end{pmatrix}\begin{pmatrix} A & 0 \\ 0 & B\end{pmatrix} = \begin{pmatrix} iaA & bB \\ -bA & -i aB\end{pmatrix}.\\
+&\begin{pmatrix} A & 0 \\ 0 & B\end{pmatrix}\begin{pmatrix} ia & b \\ -b & -i a\end{pmatrix} = \begin{pmatrix} iaA & bA \\ -bB & -i aB\end{pmatrix}.\\
+&[D_{0}, M]\neq 0\\
+\end{split}
+\end{equation}
+
+Still we use $A=4a^2D^{\dagger}D\neq -D_{0}^2+4a^2m^2$, and $A^{\dagger}=A$.
+\begin{equation}
+\begin{split}
+&\det A = \frac{1}{ \det A^{-1} }=\int \mathcal{D}[\phi] \exp (-\phi^{\dagger} A^{-1} \phi).\\
+\end{split}
+\end{equation}
+For $N_f=2$ it is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-1} \phi \right)
+\end{split}
+\end{equation}
+
+The true fourth root method is taken here as
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U] \left(\det A \right)^{\frac{N_f}{4}}\exp \left(-S_G[U]\right)\\
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-\frac{N_f}{4}} \phi \right)\\
+\end{split}
+\end{equation}
+
+In the following, we concentrate on
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} A^{-\frac{1}{2}} \phi \right)\\
+\end{split}
+\end{equation}
+
+$\bullet$ Pseudofermion refreshment of staggered fermion
+
+Similarly it is always,
+\begin{equation}
+\begin{split}
+&Z_{MC}=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} \left(A^{-\frac{1}{4}}\right)^2 \phi \right)\\
+&Z_{MD}=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-\phi ^{\dagger} r_2(A) \phi \right)\\
+\end{split}
+\end{equation}
+where $r_2(A)\approx A^{-\frac{1}{2}}$.
+
+Then, the refreshment step is:
+
+Let $\chi$ be random \textbf{complex} numbers according to $\exp (-\chi ^{\dagger}\chi)$. Let $A^{-\frac{1}{4}}\phi=\chi$, $\phi$ is the random \textbf{complex} number satisfying distribution we want ($\exp (-\phi^{\dagger} \left(A^{-\frac{1}{4}}\right)^{\dagger} A^{-\frac{1}{4}} \phi)$). So, first get $\chi$ and then let $\phi = A^{\textcolor[rgb]{1,0,0}{+}\frac{1}{4}}\chi$.
+
+$\bullet$ MD step of staggered fermion
+
+Let $A^{-\frac{1}{2}}=c_0+\sum _i \frac{\alpha _i }{A+\beta _i} $, it is
+\begin{equation}
+\begin{split}
+&Z=\int \mathcal{D}[U]  \mathcal {D}[\phi]\exp \left(-S_G[U]-c_0\phi ^{\dagger} \phi -\sum_i \phi ^{\dagger}\frac{\alpha _i }{A+\beta _i} \phi\right)
+\end{split}
+\end{equation}
+then (for any matrix, $\frac{\partial M^{-1}}{\partial x} = M^{-1}\frac{\partial M}{\partial x} M^{-1}$)
+\begin{equation}
+\begin{split}
+&F=-iT_a \frac{\partial }{\partial \omega _a}\left(\sum_i \phi ^{\dagger}\frac{\alpha _i }{A+\beta _i} \phi\right)\\
+&=-iT_a \sum_i \left(\phi ^{\dagger}\frac{\sqrt{\alpha _i} }{(A+\beta _i)} \left(\frac{\partial }{\partial \omega _a} A \right) \frac{\sqrt{\alpha _i} }{(A+\beta _i)} \phi\right)\\
+\end{split}
+\end{equation}
+Now, let $\phi _{i} =  \frac{\sqrt{\alpha _i} }{(A+\beta _i)} \phi$, \textbf{\textcolor[rgb]{1,0,0}{it is required and satisfied that, $\left(\frac{\sqrt{\alpha _i} }{(A+\beta _i)} \right)^{\dagger}=\frac{\sqrt{\alpha _i} }{(A+\beta _i)} $ when $A$ is Hermitian} }, it is
+\begin{equation}
+\begin{split}
+&F=-iT_a \sum _i \phi _{i}^{\dagger} \left(\frac{\partial }{\partial \omega _a} A \right) \phi _{i}\\
+\end{split}
+\end{equation}
+
+We need to calculate $\frac{\partial A}{\partial \omega _a}$, which is
+\begin{equation}
+\begin{split}
+&A=D^{\dagger}D\\
+&\frac{\partial }{\partial \omega _a}A = \left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{0}\right)D+D^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}D^{\dagger}_{0}\right)\phi _{i,d}+\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\phi _i\\
+&=\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\phi _i\right)^{\dagger}+\left(\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\phi _i\right)\\
+&=2{\rm Re}\left[\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\phi _i\right]
+\end{split}
+\end{equation}
+with $\phi _{i,d}=D\phi _i$.
+
+\begin{equation}
+\begin{split}
+&\frac{\partial }{\partial \omega _a}  D_{0}=\sum _{\mu}\left(\eta _{\mu}(n)\left(\frac{\partial }{\partial \omega _a}U_{\mu}(n)\right) \delta _{n,n+\mu} - \textcolor[rgb]{1,0,0}{\eta _{\mu}(n+\mu)}\left(\frac{\partial }{\partial \omega _a} U^{\dagger}_{\mu}(n)\right)\delta _{n+\mu,n}\right)\\
+&=i\eta _{\mu}(n)\left(\left(T_aU_{\mu}(n)\right) \delta _{n,n+\mu} + \left(U^{\dagger}_{\mu}(n)T_a\right)\delta _{n+\mu,n}\right)\\
+\end{split}
+\end{equation}
+note that the $\eta _{\mu} (n+\mu)$ follows $\delta _{\textcolor[rgb]{1,0,0}{n+\mu},n}$. The last step we use $\eta _{\mu}(n+\mu)=\eta_{\mu}(n)$.
+The $T_a=T_a^{\dagger}$, let
+\begin{equation}
+\begin{split}
+&\phi _A = \phi _i, \phi _B = T_aU_{\mu}(n)\phi _i\\
+&\phi _C = \phi _{i,d}, \phi _D = T_aU_{\mu}(n)\phi _{i,d}\\
+\end{split}
+\end{equation}
+it is
+\begin{equation}
+\begin{split}
+&\phi _{i,d}^{\dagger}\left(\frac{\partial }{\partial \omega _a}D_{0}\right)\phi _i = i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu) \phi _A(n)\right)\\
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i=i\eta(n)\left(\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right)-i\eta(n)\left(\phi _B^{\dagger}(n+\mu)\phi _C(n) + \phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\\
+&=i\eta (n)\left\{\left(\phi _C^{\dagger}(n)\phi _B(n+\mu)-\phi _B^{\dagger}(n+\mu)\phi _C(n)\right)+\left( \phi _D^{\dagger}(n+\mu)\phi _A(n)-\phi _A^{\dagger}(n)\phi _D(n+\mu)\right)\right\}\\
+&=-2\eta (n) {\rm Im}\left[\phi _C^{\dagger}(n)\phi _B(n+\mu) + \phi _D^{\dagger}(n+\mu)\phi _A(n)\right]\\
+&=-2\eta (n) {\rm Im}\left[\phi _{i,d}^{\dagger}T_aU_{\mu}(n) \delta _{n,n+\mu}\phi _i + \phi _{i,d}^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)T_a\delta _{n+\mu,n}\phi _i\right]\\
+\end{split}
+\end{equation}
+let $M(n|m)=U_{\mu}(n) \delta _{n,n+\mu}$, it is
+\begin{equation}
+\begin{split}
+&\phi _i^{\dagger}\left(\frac{\partial }{\partial \omega _a}A\right)\phi _i = -2\eta (n) {\rm Imtr}\left\{T_a  \left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+T_a \left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}\\
+\end{split}
+\end{equation}
+One can verify that for any matrix \textcolor[rgb]{0,0,1}{
+\begin{equation}
+\begin{split}
+&2i \sum _a T_a {\rm Im tr}[T_a M] = -2 i \sum _a T_a {\rm Re tr}[i T_a M] = \{M\}_{TA}\\
+&2i \sum _a T_a {\rm Im tr}[i T_a M] = 2 i \sum _a T_a {\rm Re tr}[T_a M] = \{i M\}_{TA}\\
+\end{split}
+\end{equation}
+}
+so
+\begin{equation}
+\begin{split}
+&F_{\mu}(n)=-iT_a \sum _i \phi _{i}^{\dagger} \left(\frac{\partial }{\partial \omega _a} A \right) \phi _{i}\\
+&=\eta _{\mu}(n) \sum _a \sum _i 2i T_a{\rm Imtr}\left\{T_a  \left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+T_a \left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}\\
+&=\eta _{\mu}(n) \sum _i \left\{\left[\left(U_{\mu}(n)\phi _i(n+\mu)\right)\phi _{i,d}^{\dagger}(n)\right]+\left[\phi _i(n)(U_{\mu}(n)\phi _{i,d}(n+\mu))^{\dagger}\right]\right\}_{TA}
+\end{split}
+\label{eq.staggeredformnf2}
+\end{equation}
+with
+\begin{equation}
+\begin{split}
+&\phi _i = \frac{\sqrt{\alpha _i} }{(D^{\dagger}D)+\beta _i} \phi,\;\;\alpha _i,\beta _i \in A^{-\frac{1}{2}}\\
+&\phi _{i,d}=\textcolor[rgb]{1,0,0}{D}\phi _i\\
+\end{split}
+\end{equation}
+

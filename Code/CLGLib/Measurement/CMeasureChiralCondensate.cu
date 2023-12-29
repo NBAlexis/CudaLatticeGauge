@@ -42,7 +42,6 @@ _kernelDotMeasureAll(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     const deviceWilsonVectorSU3* __restrict__ pMe,
     const deviceWilsonVectorSU3* __restrict__ pOther, 
     CLGComplex* resultXYPlan,
@@ -74,7 +73,7 @@ _kernelDotMeasureAll(
         break;
     case 7:
         {
-            const Real fYOmega = static_cast<Real>(sSite4.y - sCenter.y)* fOmega;
+            const Real fYOmega = static_cast<Real>(sSite4.y - _DC_Centery)* fOmega;
             deviceWilsonVectorSU3 toAdd(__chiralGamma[GAMMA4].MulWilsonC(right));
             toAdd.MulReal(fYOmega);
             right = __chiralGamma[GAMMA1].MulWilsonC(right);
@@ -83,7 +82,7 @@ _kernelDotMeasureAll(
         break;
     case 8:
         {
-            const Real fXOmega = static_cast<Real>(sSite4.x - sCenter.x)* fOmega;
+            const Real fXOmega = static_cast<Real>(sSite4.x - _DC_Centerx)* fOmega;
             deviceWilsonVectorSU3 toAdd = __chiralGamma[GAMMA4].MulWilsonC(right);
             toAdd.MulReal(fXOmega);
             right = __chiralGamma[GAMMA2].MulWilsonC(right);
@@ -124,7 +123,7 @@ __global__ void
 _CLG_LAUNCH_BOUND
 _kernelChiralCondensateMeasureDist(
     const CLGComplex* __restrict__ CondXY,
-    SSmallInt4 sCenter, UINT uiMax, BYTE byFieldId, UBOOL bCalcR,
+    UINT uiMax, BYTE byFieldId, UBOOL bCalcR,
     UINT* counter, 
     CLGComplex* CondR
 )
@@ -132,12 +131,12 @@ _kernelChiralCondensateMeasureDist(
     UINT uiXY = (threadIdx.x + blockIdx.x * blockDim.x);
     INT uiX = static_cast<INT>(uiXY / _DC_Ly);
     INT uiY = static_cast<INT>(uiXY % _DC_Ly);
-    UINT uiC = (sCenter.x - uiX) * (sCenter.x - uiX)
-        + (sCenter.y - uiY) * (sCenter.y - uiY);
+    UINT uiC = (_DC_Centerx - uiX) * (_DC_Centerx - uiX)
+        + (_DC_Centery - uiY) * (_DC_Centery - uiY);
 
     SSmallInt4 sSite4;
-    sSite4.z = sCenter.z;
-    sSite4.w = sCenter.w;
+    sSite4.z = _DC_Centerz;
+    sSite4.w = _DC_Centert;
     sSite4.x = static_cast<SBYTE>(uiX);
     sSite4.y = static_cast<SBYTE>(uiY);
     if (uiC <= uiMax && !__idx->_deviceGetMappingIndex(sSite4, byFieldId).IsDirichlet())
@@ -266,7 +265,6 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
         _kernelDotMeasureAll << <block, threads >> > (
             i,
             CCommonData::m_fOmega,
-            CCommonData::m_sCenter,
             pF1W->m_pDeviceData,
             pF2W->m_pDeviceData,
             m_pDeviceXYBuffer[i],
@@ -299,7 +297,6 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
 
                 _kernelChiralCondensateMeasureDist << <block2, threads2 >> > (
                     m_pDeviceXYBuffer[i],
-                    CCommonData::m_sCenter,
                     m_uiMaxR,
                     m_byFieldId,
                     0 == i,

@@ -19,6 +19,7 @@ struct CLGAPI SCLGLibManangerInitialCache
 {
     ERandom eR;
     UINT constIntegers[kContentLength];
+    INT constSignedIntegers[kContentLength];
     Real constFloats[kContentLength];
 };
 

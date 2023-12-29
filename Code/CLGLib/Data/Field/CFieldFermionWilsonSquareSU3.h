@@ -121,9 +121,13 @@ public:
 
 protected:
 
+#if Discard_Even_odd_decomposition
+
     UBOOL InverseD_eo(const CField*) override;
     UBOOL InverseDdagger_eo(const CField*) override;
     UBOOL InverseDDdagger_eo(const CField*) override;
+
+#endif
 
     Real m_fKai;
 

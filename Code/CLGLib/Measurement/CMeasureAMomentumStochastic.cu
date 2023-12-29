@@ -28,7 +28,7 @@ _kernelDotAndGatherXYAMomentumJL(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId, UBOOL bNaive, SSmallInt4 sCenter,
+    BYTE byFieldId, UBOOL bNaive,
     Real * resultXYPlaneJL)
 {
     intokernalInt4;
@@ -37,8 +37,8 @@ _kernelDotAndGatherXYAMomentumJL(
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -196,7 +196,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId, SSmallInt4 sCenter,
+    BYTE byFieldId,
     Real* resultXYPlaneJL)
 {
     intokernalInt4;
@@ -205,8 +205,8 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
     UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -336,7 +336,7 @@ _kernelDotAndGatherXYAMomentumJPure(
     const deviceSU3* __restrict__ pAphys,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId, SSmallInt4 sCenter,
+    BYTE byFieldId, 
     Real* resultXYPlaneJL)
 {
     intokernalInt4;
@@ -345,8 +345,8 @@ _kernelDotAndGatherXYAMomentumJPure(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
@@ -486,7 +486,7 @@ _kernelDotAndGatherXYAMomentumJJM(
     const deviceWilsonVectorSU3* __restrict__ pRight,
     const deviceSU3* __restrict__ pAphys,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId, SSmallInt4 sCenter,
+    BYTE byFieldId,
     Real* resultXYPlaneJL)
 {
     intokernalInt4;
@@ -495,8 +495,8 @@ _kernelDotAndGatherXYAMomentumJJM(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const gammaMatrix gamma4 = __chiralGamma[GAMMA4];
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     deviceWilsonVectorSU3 jl = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     const deviceWilsonVectorSU3 x_Fermion_element = _deviceGetFermionBCWilsonSU3(pRight, sIdx, byFieldId);
@@ -767,7 +767,6 @@ _kernelDotAndGatherXYAMomentumJPot(
     const deviceWilsonVectorSU3* __restrict__ pLeft,
     const deviceWilsonVectorSU3* __restrict__ pRight,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     Real* resultXYPlaneJPot)
 {
@@ -781,8 +780,8 @@ _kernelDotAndGatherXYAMomentumJPot(
         return;
     }
 
-    const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fY = static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
 
     //x ay - y ax
     deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
@@ -949,7 +948,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             m_byFieldId,
-            CCommonData::m_sCenter,
             m_pDeviceXYBufferJL
             );
     }
@@ -963,7 +961,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             m_byFieldId,
             FALSE,
-            CCommonData::m_sCenter,
             m_pDeviceXYBufferJL
             );
     }
@@ -1003,7 +1000,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         pF2W->m_pDeviceData,
         pF1W->m_pDeviceData,
         pAphys->m_pDeviceData,
-        CCommonData::m_sCenter,
         m_byFieldId,
         m_pDeviceXYBufferJPot
         );
@@ -1028,7 +1024,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
                 m_byFieldId,
-                CCommonData::m_sCenter,
                 m_pDeviceXYBufferJLPure
                 );
 
@@ -1038,7 +1033,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 pAphys->m_pDeviceData,
                 appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
                 m_byFieldId,
-                CCommonData::m_sCenter,
                 m_pDeviceXYBufferJLJM
                 );
         }

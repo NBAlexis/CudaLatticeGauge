@@ -88,7 +88,7 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("TestSuit_MiscUpdate.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_Solver.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_Updator.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_EvenOdd.yaml"), params);
+    //CYAMLParser::ParseFile(_T("TestSuit_EvenOdd.yaml"), params);
 #else
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Common.yaml"), params);
@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_MiscUpdate.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Solver.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Updator.yaml"), params);
-    CYAMLParser::ParseFile(_T("../Debug/TestSuit_EvenOdd.yaml"), params);
+    //CYAMLParser::ParseFile(_T("../Debug/TestSuit_EvenOdd.yaml"), params);
 #endif
     appSetupLog(params);
 

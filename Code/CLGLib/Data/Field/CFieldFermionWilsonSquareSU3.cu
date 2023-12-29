@@ -1302,6 +1302,7 @@ CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
 
 #pragma region Even Odd Preconditioner
 
+#if Discard_Even_odd_decomposition
 
 /**
  * Calculate phi_even
@@ -1390,6 +1391,8 @@ UBOOL CFieldFermionWilsonSquareSU3::InverseDDdagger_eo(const CField* pGauge)
     }
     return InverseDdagger_eo(pGauge);
 }
+
+#endif
 
 #pragma endregion
 

@@ -15,7 +15,7 @@
 
 __BEGIN_NAMESPACE
 
-typedef void(*_deviceMeasureFunc)(const SSmallInt4& site, const SSmallInt4& sCenter, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element);
+typedef void(*_deviceMeasureFunc)(const SSmallInt4& site, Real fKappa, Real fOmega, deviceWilsonVectorSU3& element);
 
 __CLG_REGISTER_HELPER_HEADER(CMeasureChargeAndCurrents)
 

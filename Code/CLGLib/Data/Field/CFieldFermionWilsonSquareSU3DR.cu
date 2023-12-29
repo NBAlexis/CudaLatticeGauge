@@ -38,7 +38,6 @@ _kernelDFermionWilsonSquareSU3_DR(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
@@ -56,8 +55,8 @@ _kernelDFermionWilsonSquareSU3_DR(
 
     const gammaMatrix& gamma5 = __chiralGamma[GAMMA5];
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
-    const Real fYkOmega = (bShiftCenter ? (sSite4.y - sCenter.y + F(0.5)) : static_cast<Real>(sSite4.y - sCenter.y)) * fOmega * kai;
-    const Real fXkOmega = (bShiftCenter ? (sSite4.x - sCenter.x + F(0.5)) : static_cast<Real>(sSite4.x - sCenter.x)) * fOmega * kai;
+    const Real fYkOmega = (bShiftCenter ? (sSite4.y - _DC_Centery + F(0.5)) : static_cast<Real>(sSite4.y - _DC_Centery)) * fOmega * kai;
+    const Real fXkOmega = (bShiftCenter ? (sSite4.x - _DC_Centerx + F(0.5)) : static_cast<Real>(sSite4.x - _DC_Centerx)) * fOmega * kai;
 
     deviceWilsonVectorSU3 right_element = bDDagger ? gamma5.MulWilsonC(pDeviceData[uiSiteIndex]) : pDeviceData[uiSiteIndex];
 
@@ -265,7 +264,6 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
@@ -305,8 +303,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_0(
     deviceWilsonVectorSU3 term3 = deviceWilsonVectorSU3(right_element);
 
     const Real fkOmega = fOmega * kai;
-    const Real fYkOmega = static_cast<Real>(sSite4.y - sCenter.y) * fkOmega;
-    const Real fXkOmega = static_cast<Real>(sSite4.x - sCenter.x) * fkOmega;
+    const Real fYkOmega = static_cast<Real>(sSite4.y - _DC_Centery) * fkOmega;
+    const Real fXkOmega = static_cast<Real>(sSite4.x - _DC_Centerx) * fkOmega;
 
     //res = res + 2 (y-x) k Omega right - i k gamma4 sigma12 right
     //-2(y-x) k Omega right
@@ -355,7 +353,6 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
@@ -376,7 +373,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
     const gammaMatrix& gammaMu = __chiralGamma[GAMMA1];
 
-    const Real fYOmega = (bShiftCenter ? (sSite4.y - sCenter.y + F(0.5)) : static_cast<Real>(sSite4.y - sCenter.y)) * fOmega;
+    const Real fYOmega = (bShiftCenter ? (sSite4.y - _DC_Centery + F(0.5)) : static_cast<Real>(sSite4.y - _DC_Centery)) * fOmega;
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
 
@@ -524,7 +521,6 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
 #else
     Real fOmega,
 #endif
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
@@ -545,7 +541,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
     const gammaMatrix& gammaMu = __chiralGamma[GAMMA2];
 
-    const Real fXOmega = (bShiftCenter ? (sSite4.x - sCenter.x + F(0.5)) : static_cast<Real>(sSite4.x - sCenter.x)) * fOmega;
+    const Real fXOmega = (bShiftCenter ? (sSite4.x - _DC_Centerx + F(0.5)) : static_cast<Real>(sSite4.x - _DC_Centerx)) * fOmega;
 
     deviceWilsonVectorSU3 result = deviceWilsonVectorSU3::makeZeroWilsonVectorSU3();
     //idir = mu, we have x, y and t term but no z term
@@ -674,7 +670,6 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -1399,7 +1394,6 @@ _kernelDWilsonForceSU3_DR_X_Naive(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    SSmallInt4 sCenter,
     UBOOL bShiftCenter,
     Real fKai,
 #if !_CLG_DOUBLEFLOAT
@@ -1412,7 +1406,7 @@ _kernelDWilsonForceSU3_DR_X_Naive(
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    Real fYOmega = (bShiftCenter ? (sSite4.y - sCenter.y + F(0.5)) : static_cast<Real>(sSite4.y - sCenter.y)) * fOmega;
+    Real fYOmega = (bShiftCenter ? (sSite4.y - _DC_Centery + F(0.5)) : static_cast<Real>(sSite4.y - _DC_Centery)) * fOmega;
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
@@ -1468,7 +1462,6 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    SSmallInt4 sCenter,
     UBOOL bShiftCenter,
     Real fKai,
 #if !_CLG_DOUBLEFLOAT
@@ -1481,7 +1474,7 @@ _kernelDWilsonForceSU3_DR_Y_Naive(
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    Real fXOmega = (bShiftCenter ? (sSite4.x - sCenter.x + F(0.5)) : static_cast<Real>(sSite4.x - sCenter.x)) * fOmega;
+    Real fXOmega = (bShiftCenter ? (sSite4.x - _DC_Centerx + F(0.5)) : static_cast<Real>(sSite4.x - _DC_Centerx)) * fOmega;
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
@@ -1535,7 +1528,6 @@ _kernelDWilsonForceSU3_DR_X(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    SSmallInt4 sCenter,
     UBOOL bShiftCenter,
     Real fKai,
 #if !_CLG_DOUBLEFLOAT
@@ -1548,7 +1540,7 @@ _kernelDWilsonForceSU3_DR_X(
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    Real fYOmega = (bShiftCenter ? (sSite4.y - sCenter.y + F(0.5)) : static_cast<Real>(sSite4.y - sCenter.y)) * fOmega;
+    Real fYOmega = (bShiftCenter ? (sSite4.y - _DC_Centery + F(0.5)) : static_cast<Real>(sSite4.y - _DC_Centery)) * fOmega;
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
@@ -1620,7 +1612,6 @@ _kernelDWilsonForceSU3_DR_Y(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pFermionMove,
     deviceSU3* pForce,
-    SSmallInt4 sCenter,
     UBOOL bShiftCenter,
     Real fKai,
 #if !_CLG_DOUBLEFLOAT
@@ -1633,7 +1624,7 @@ _kernelDWilsonForceSU3_DR_Y(
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex& sSite = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    Real fXOmega = (bShiftCenter ? (sSite4.x - sCenter.x + F(0.5)) : static_cast<Real>(sSite4.x - sCenter.x)) * fOmega;
+    Real fXOmega = (bShiftCenter ? (sSite4.x - _DC_Centerx + F(0.5)) : static_cast<Real>(sSite4.x - _DC_Centerx)) * fOmega;
     const gammaMatrix& gamma4 = __chiralGamma[GAMMA4];
 
     //x, mu
@@ -1810,7 +1801,6 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             pTarget,
             m_fKai,
             CCommonData::m_fOmega,
-            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -1827,7 +1817,6 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_bShiftCenter,
             m_fKai,
             CCommonData::m_fOmega,
-            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -1844,7 +1833,6 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_bShiftCenter,
             m_fKai,
             CCommonData::m_fOmega,
-            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -1859,7 +1847,6 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pTarget,
             m_fKai,
-            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             eOCT,
@@ -1896,7 +1883,6 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_bShiftCenter,
             m_fKai,
             CCommonData::m_fOmega,
-            CCommonData::m_sCenter,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -2023,7 +2009,6 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            CCommonData::m_sCenter, 
             m_bShiftCenter,
             m_fKai, 
             CCommonData::m_fOmega,
@@ -2035,7 +2020,6 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            CCommonData::m_sCenter, 
             m_bShiftCenter,
             m_fKai, 
             CCommonData::m_fOmega,
@@ -2049,7 +2033,6 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            CCommonData::m_sCenter, 
             m_bShiftCenter,
             m_fKai, 
             CCommonData::m_fOmega, 
@@ -2061,7 +2044,6 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pGauge,
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             pForceSU3,
-            CCommonData::m_sCenter, 
             m_bShiftCenter,
             m_fKai, 
             CCommonData::m_fOmega, 

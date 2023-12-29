@@ -641,17 +641,17 @@ _kernelInitialAsImagineChemical(Real* pDeviceData, Real fValue)
  * Az(Lz) = Lz Ez t
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsEz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
+_kernelInitialAsEz_Type0(Real* pDeviceData, Real fEz)
 {
     intokernalInt4;
     const UINT uiLinkT = _deviceGetLinkIndex(uiSiteIndex, 3);
-    const Real fZ = sSite4.z - sCenter.z;
+    const Real fZ = sSite4.z - _DC_Centerz;
     pDeviceData[uiLinkT] = -fEz * fZ;
 
     if (sSite4.z == _DC_Lz - 1)
     {
         const UINT uiLinkZ = _deviceGetLinkIndex(uiSiteIndex, 2);
-        const Real fT = sSite4.w - sCenter.w;
+        const Real fT = sSite4.w - _DC_Centert;
         pDeviceData[uiLinkZ] = _DC_Lz * fEz * fT;
     }
 }
@@ -661,17 +661,17 @@ _kernelInitialAsEz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
  * At(Lt) = -Lt Ez z
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsEz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
+_kernelInitialAsEz_Type1(Real* pDeviceData, Real fEz)
 {
     intokernalInt4;
     const UINT uiLinkZ = _deviceGetLinkIndex(uiSiteIndex, 2);
-    const Real fT = sSite4.w - sCenter.w;
+    const Real fT = sSite4.w - _DC_Centert;
     pDeviceData[uiLinkZ] = fEz * fT;
 
     if (sSite4.w == _DC_Lt - 1)
     {
         const UINT uiLinkT = _deviceGetLinkIndex(uiSiteIndex, 3);
-        const Real fZ = sSite4.z - sCenter.z;
+        const Real fZ = sSite4.z - _DC_Centerz;
         pDeviceData[uiLinkT] = -_DC_Lti * fEz * fZ;
     }
 }
@@ -683,17 +683,17 @@ _kernelInitialAsEz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fEz)
  * if twisted Ax(Lx) = - q B ny
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type0(Real* pDeviceData, Real fBz, UBOOL bTwisted)
 {
     intokernalInt4;
     const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-    const Real fX = sSite4.x - sCenter.x + F(0.5);
+    const Real fX = sSite4.x - _DC_Centerx + F(0.5);
     pDeviceData[uiLinkY] = fBz * fX;
 
     if (bTwisted && sSite4.x == _DC_Lx - 1)
     {
         const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
-        const Real fY = sSite4.y - sCenter.y + F(0.5);
+        const Real fY = sSite4.y - _DC_Centery + F(0.5);
         pDeviceData[uiLinkX] = -fBz * fY;
     }
 }
@@ -705,17 +705,17 @@ _kernelInitialAsBz_Type0(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL 
  * if twisted Ay(Ly) = q B nx
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted)
 {
     intokernalInt4;
     const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
-    const Real fY = sSite4.y - sCenter.y + F(0.5);
+    const Real fY = sSite4.y - _DC_Centery + F(0.5);
     pDeviceData[uiLinkX] = -fBz * fY;
 
     if (bTwisted && sSite4.y == _DC_Ly - 1)
     {
         const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-        const Real fX = sSite4.x - sCenter.x + F(0.5);
+        const Real fX = sSite4.x - _DC_Centerx + F(0.5);
         pDeviceData[uiLinkY] = fBz * fX;
     }
 }
@@ -731,14 +731,14 @@ _kernelInitialAsBz_Type1(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL 
  * Ay(Ly) = q B nx
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type2(Real* pDeviceData, SSmallInt4 sCenter, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted)
 {
     intokernalInt4;
 
     const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
     const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-    const Real fX = sSite4.x - sCenter.x + F(0.5);
-    const Real fY = sSite4.y - sCenter.y + F(0.5);
+    const Real fX = sSite4.x - _DC_Centerx + F(0.5);
+    const Real fY = sSite4.y - _DC_Centery + F(0.5);
     pDeviceData[uiLinkX] = -fBz * fY * F(0.5);
     pDeviceData[uiLinkY] = fBz * fX * F(0.5);
 
@@ -1053,10 +1053,10 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
     switch (eEType)
     {
     case EURT_E_t:
-        _kernelInitialAsEz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feEz);
+        _kernelInitialAsEz_Type0 << <block, threads >> > (m_pDeviceData, feEz);
         break;
     case EURT_E_z:
-        _kernelInitialAsEz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feEz);
+        _kernelInitialAsEz_Type1 << <block, threads >> > (m_pDeviceData, feEz);
         break;
     default:
         appParanoiac(_T("No electric set\n"));
@@ -1066,22 +1066,22 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
     switch (eBType)
     {
     case EURT_Bp_x:
-        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
         break;
     case EURT_Bp_y:
-        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
         break;
     case EURT_Bp_xy:
-        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, TRUE);
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
         break;
     case EURT_Bp_x_notwist:
-        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
         break;
     case EURT_Bp_y_notwist:
-        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
         break;
     case EURT_Bp_xy_notwist:
-        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, CCommonData::m_sCenter, feBz, FALSE);
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
         break;
     default:
         appParanoiac(_T("No magnetic set\n"));

@@ -329,13 +329,7 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h">
       <Filter>GaugeFixing</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Field\CFieldFermionKSSU3.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Tools\Math\CRationalApproximation.h">
@@ -507,6 +501,9 @@
       <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Data\Field\CFieldFermionKSSU3Acc.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldFermionKSSU3RigidAcc.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
   </ItemGroup>
@@ -718,13 +715,7 @@
     <CudaCompile Include="Measurement\CMeasure.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DEven.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DREven.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu">
@@ -857,6 +848,9 @@
       <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldFermionKSSU3Acc.cu">
+      <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldFermionKSSU3RigidAcc.cu">
       <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -391,21 +391,21 @@ void CActionGaugePlaquetteBoost::Initial(class CLatticeData* pOwner, const CPara
     param.FetchValueReal(_T("Boost"), fG);
     CCommonData::m_fG = fG;
 
-    TArray<INT> centerArray;
-    param.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        SSmallInt4 sCenter;
-        sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        sCenter.w = static_cast<SBYTE>(centerArray[3]);
-        CCommonData::m_sCenter = sCenter;
-    }
-    else
-    {
-        CCommonData::m_sCenter.w = 0;
-    }
+    //TArray<INT> centerArray;
+    //param.FetchValueArrayINT(_T("Center"), centerArray);
+    //if (centerArray.Num() > 3)
+    //{
+    //    SSmallInt4 sCenter;
+    //    sCenter.x = static_cast<SBYTE>(centerArray[0]);
+    //    sCenter.y = static_cast<SBYTE>(centerArray[1]);
+    //    sCenter.z = static_cast<SBYTE>(centerArray[2]);
+    //    sCenter.w = static_cast<SBYTE>(centerArray[3]);
+    //    CCommonData::m_sCenter = sCenter;
+    //}
+    //else
+    //{
+    //    CCommonData::m_sCenter.w = 0;
+    //}
 }
 
 void CActionGaugePlaquetteBoost::SetBeta(Real fBeta)

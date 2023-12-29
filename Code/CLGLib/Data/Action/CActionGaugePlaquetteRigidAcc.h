@@ -74,27 +74,26 @@ protected:
  */
 static __device__ __inline__ Real _deviceGnRigidAccSpatialLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
+    const Real ret = fG * (sSite.z - _DC_Centerz) + F(1.0);
+
     if (mu == 2 || nu == 2)
     {
-        if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
+        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
+        const Real ret2 = fG * (zp1 - _DC_Centerz) + F(1.0);
+        if (bDirichlet)
         {
-            if (bDirichlet)
+            if (0 == sSite.z)
             {
-                return (fG * sSite.z + F(1.0)) * F(0.5);
+                return ret2 * F(0.5);
             }
-            else
+            else if (0 == zp1)
             {
-                //(gz+1) + (g(z+1)+1) = (gz+1)+ (g*0 + 1)
-                return (fG * sSite.z + F(2.0)) * F(0.5);
+                return ret * F(0.5);
             }
         }
-        if ((0 == sSite.z) && bDirichlet)
-        {
-            return (fG + F(1.0)) * F(0.5);
-        }
-        return fG * F(0.5) * (sSite.z + sSite.z + 1) + F(1.0);
+        return F(0.5) * (ret + ret2);
     }
-    return fG * sSite.z + F(1.0);
+    return ret;
 }
 
 /**
@@ -102,46 +101,48 @@ static __device__ __inline__ Real _deviceGnRigidAccSpatialLeft(const SSmallInt4&
  */
 static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    if (mu == 2)
+    const Real ret = fG * (sSite.z - _DC_Centerz) + F(1.0);
+    if (2 == mu)
     {
-        if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
+        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
+        const Real ret2 = fG * (zp1 - _DC_Centerz) + F(1.0);
+
+        if (bDirichlet)
         {
-            if (bDirichlet)
+            if (0 == sSite.z)
             {
-                return (fG * sSite.z + F(1.0)) * F(0.5);
+                return ret2 * F(0.5);
             }
-            else
+            else if (0 == zp1)
             {
-                //(gz+1) + (g(z+1)+1) = (gz+1)+ (g*0 + 1)
-                return (fG * sSite.z + F(2.0)) * F(0.5);
+                return ret * F(0.5);
             }
         }
-        if ((0 == sSite.z) && bDirichlet)
-        {
-            return (fG + F(1.0)) * F(0.5);
-        }
-        return fG * F(0.5) * (sSite.z + sSite.z + 1) + F(1.0);
-    }
-    if (nu == 2) 
-    {
-        if (0 == sSite.z)
-        {
-            if (bDirichlet)
-            {
-                printf("should never be here!\n");
-                return (fG + F(1.0)) * F(0.5);
-            }
-            // g*0 + 1 + g*(Lz-1) + 1
-            return (fG * (_DC_Lz - 1) + F(2.0)) * F(0.5);
-        }
-        if (1 == sSite.z && bDirichlet)
-        {
-            return (fG + F(1.0)) * F(0.5);
-        }
-        return fG * F(0.5) * (sSite.z + sSite.z - 1) + F(1.0);
+
+        return F(0.5) * (ret + ret2);
     }
 
-    return fG * sSite.z + F(1.0);
+    if (2 == nu)
+    {
+        const SBYTE zm1 = (0 == sSite.z) ? (static_cast<SBYTE>(_DC_Lz) - 1) : (sSite.z - 1);
+        const Real ret2 = fG * (zm1 - _DC_Centerz) + F(1.0);
+
+        if (bDirichlet)
+        {
+            if (0 == sSite.z)
+            {
+                printf("should never be here!\n");
+                return ret * F(0.5);
+            }
+            else if (1 == sSite.z)
+            {
+                return ret * F(0.5);
+            }
+        }
+        return F(0.5) * (ret + ret2);
+    }
+
+    return ret;
 }
 
 
@@ -152,25 +153,21 @@ static __device__ __inline__ Real _deviceGnRigidAccSpatialRight(const SSmallInt4
  */
 static __device__ __inline__ Real _deviceGnRigidAccTimeLeft(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    const Real ret = F(1.0) / (fG * sSite.z + F(1.0));
+    const Real ret = F(1.0) / (fG * (sSite.z - _DC_Centerz) + F(1.0));
+
     if (mu == 2 || nu == 2)
     {
-        Real ret2 = F(1.0) / (fG * (sSite.z + 1) + F(1.0));
-        if (0 == sSite.z && bDirichlet)
+        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
+        const Real ret2 = F(1.0) / (fG * (zp1 - _DC_Centerz) + F(1.0));
+        if (bDirichlet)
         {
-            return ret2 * F(0.5);
-        }
-
-        if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
-        {
-            if (bDirichlet)
+            if (0 == sSite.z)
+            {
+                return ret2 * F(0.5);
+            }
+            else if (0 == zp1)
             {
                 return ret * F(0.5);
-            }
-            else
-            {
-                // sSite.z + 1 = 0
-                ret2 = F(1.0);
             }
         }
         return F(0.5) * (ret + ret2);
@@ -183,25 +180,21 @@ static __device__ __inline__ Real _deviceGnRigidAccTimeLeft(const SSmallInt4& sS
  */
 static __device__ __inline__ Real _deviceGnRigidAccTimeRight(const SSmallInt4& sSite, Real fG, BYTE mu, BYTE nu, UBOOL bDirichlet)
 {
-    Real ret = F(1.0) / (fG * sSite.z + F(1.0));
+    const Real ret = F(1.0) / (fG * (sSite.z - _DC_Centerz) + F(1.0));
     if (2 == mu)
     {
-        Real ret2 = F(1.0) / (fG * (sSite.z + 1) + F(1.0));
-        if (0 == sSite.z && bDirichlet)
-        {
-            return ret2 * F(0.5);
-        }
+        const SBYTE zp1 = (static_cast<SBYTE>(_DC_Lz - 1) == sSite.z) ? 0 : (sSite.z + 1);
+        const Real ret2 = F(1.0) / (fG * (zp1 - _DC_Centerz) + F(1.0));
 
-        if (sSite.z == static_cast<SBYTE>(_DC_Lz) - 1)
+        if (bDirichlet)
         {
-            if (bDirichlet)
+            if (0 == sSite.z)
+            {
+                return ret2 * F(0.5);
+            }
+            else if (0 == zp1)
             {
                 return ret * F(0.5);
-            }
-            else
-            {
-                // sSite.z + 1 =0
-                ret2 = F(1.0);
             }
         }
 
@@ -210,21 +203,21 @@ static __device__ __inline__ Real _deviceGnRigidAccTimeRight(const SSmallInt4& s
 
     if (2 == nu)
     {
-        if (0 == sSite.z)
+        const SBYTE zm1 = (0 == sSite.z) ? (static_cast<SBYTE>(_DC_Lz) - 1) : (sSite.z - 1);
+        const Real ret2 = F(1.0) / (fG * (zm1 - _DC_Centerz) + F(1.0));
+
+        if (bDirichlet)
         {
-            if (bDirichlet)
+            if (0 == sSite.z)
             {
                 printf("should never be here!\n");
                 return ret * F(0.5);
             }
-            const Real ret2 = F(1.0) / (fG * (_DC_Lz - 1) + F(1.0));
-            return F(0.5) * (ret + ret2);
+            else if (1 == sSite.z)
+            {
+                return ret * F(0.5);
+            }
         }
-        if (1 == sSite.z && bDirichlet)
-        {
-            return ret * F(0.5);
-        }
-        const Real ret2 = F(1.0) / (fG * (sSite.z - 1) + F(1.0));
         return F(0.5) * (ret + ret2);
     }
 

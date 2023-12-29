@@ -25,6 +25,7 @@ _kernelEnergy_RigidAcc(
     const deviceSU3 * __restrict__ pDeviceData,
     BYTE byFieldId,
     Real betaOverN, Real fG,
+    SSmallInt4 sCenter,
     DOUBLE* results)
 {
     intokernalInt4;
@@ -37,7 +38,7 @@ _kernelEnergy_RigidAcc(
         return;
     }
 
-    const Real OnePlusGZ = fG * sSite4.z + F(1.0);
+    const Real OnePlusGZ = fG * (sSite4.z - sCenter.z) + F(1.0);
     const Real OneOverOnePlusGZ = F(1.0) / (OnePlusGZ * OnePlusGZ);
     deviceSU3 toSub(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 0, byFieldId));
     toSub.Add(_deviceClover(pDeviceData, sSite4, uiBigIdx, 3, 1, byFieldId));
@@ -289,21 +290,21 @@ void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CP
     param.FetchValueReal(_T("AccG"), fG);
     CCommonData::m_fG = fG;
 
-    TArray<INT> centerArray;
-    param.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        SSmallInt4 sCenter;
-        sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        sCenter.w = static_cast<SBYTE>(centerArray[3]);
-        CCommonData::m_sCenter = sCenter;
-    }
-    else
-    {
-        CCommonData::m_sCenter.z = 0;
-    }
+    //TArray<INT> centerArray;
+    //param.FetchValueArrayINT(_T("Center"), centerArray);
+    //if (centerArray.Num() > 3)
+    //{
+    //    SSmallInt4 sCenter;
+    //    sCenter.x = static_cast<SBYTE>(centerArray[0]);
+    //    sCenter.y = static_cast<SBYTE>(centerArray[1]);
+    //    sCenter.z = static_cast<SBYTE>(centerArray[2]);
+    //    sCenter.w = static_cast<SBYTE>(centerArray[3]);
+    //    CCommonData::m_sCenter = sCenter;
+    //}
+    //else
+    //{
+    //    CCommonData::m_sCenter.z = 0;
+    //}
 
     INT iVaule = 1;
     param.FetchValueINT(_T("Dirichlet"), iVaule);

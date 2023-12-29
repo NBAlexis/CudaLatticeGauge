@@ -18,10 +18,11 @@ __BEGIN_NAMESPACE
 
 enum 
 {
-    kContentLength = 256, kMaxFieldCount = 16,
+    kContentLength = 64, kMaxFieldCount = 16,
 };
 
 extern __constant__ UINT _constIntegers[kContentLength];
+extern __constant__ INT _constSignedIntegers[kContentLength];
 extern __constant__ Real _constFloats[kContentLength];
 
 /**
@@ -103,7 +104,19 @@ enum EConstIntId
     ECI_UseLogADefinition, // A = U.TA() ? or A = Log(U)
     ECI_OtherGaugeField,
 
+    ECI_Center,
+
     ECI_ForceDWORD = 0x7fffffff,
+};
+
+enum EConstSignedIntId
+{
+    ECSI_CenterX,
+    ECSI_CenterY,
+    ECSI_CenterZ,
+    ECSI_CenterT,
+
+    ECSI_ForceDWORD = 0x7fffffff,
 };
 
 enum EConstFloatId
@@ -164,6 +177,7 @@ public:
     static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
 
     UINT m_ConstIntegers[kContentLength];
+    INT m_ConstSignedIntegers[kContentLength];
     Real m_ConstFloats[kContentLength];
 
     #pragma region global temperary buffers

@@ -25,6 +25,7 @@ public:
         : CFieldFermion()
         , m_bEachSiteEta(FALSE)
         , m_f2am(F(0.01))
+        , m_bDiagonalMass(FALSE)
         , m_pMDNumerator(NULL)
     {
         
@@ -64,6 +65,7 @@ public:
         CField::CopyTo(U);
         CFieldFermionKS* pField = dynamic_cast<CFieldFermionKS*>(U);
         pField->m_f2am = m_f2am;
+        pField->m_bDiagonalMass = m_bDiagonalMass;
         pField->m_rMC = m_rMC;
         pField->m_rMD = m_rMD;
         pField->m_bEachSiteEta = m_bEachSiteEta;
@@ -114,6 +116,9 @@ public:
     UBOOL m_bEachSiteEta;
 
     Real m_f2am;
+
+    //in case mass term is not a number
+    UBOOL m_bDiagonalMass;
 
 protected:
 

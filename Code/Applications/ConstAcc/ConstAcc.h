@@ -13,7 +13,9 @@
 __DEFINE_ENUM(EAccJob,
     EAJ_Simulate,
     EAJ_SimulateQ,
+    EAJ_SimulateQMidCenter,
     EAJ_Measure,
+    EAJ_MeasureMidCenter,
     )
 
 extern INT SimulateAcc(CParameters& params);

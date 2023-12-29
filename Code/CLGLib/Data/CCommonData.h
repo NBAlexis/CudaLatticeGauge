@@ -42,6 +42,17 @@
 #define _HC_Lzi (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Lz]))
 #define _HC_Lti (static_cast<INT>(appGetCudaHelper()->m_ConstIntegers[ECI_Lt]))
 
+#define _DC_Center SSmallInt4(_constIntegers[ECI_Center])
+#define _DC_Centerx (_constSignedIntegers[ECSI_CenterX])
+#define _DC_Centery (_constSignedIntegers[ECSI_CenterY])
+#define _DC_Centerz (_constSignedIntegers[ECSI_CenterZ])
+#define _DC_Centert (_constSignedIntegers[ECSI_CenterT])
+#define _HC_Center SSmallInt4(appGetCudaHelper()->m_ConstIntegers[ECI_Center])
+#define _HC_Centerx (appGetCudaHelper()->m_ConstSignedIntegers[ECSI_CenterX])
+#define _HC_Centery (appGetCudaHelper()->m_ConstSignedIntegers[ECSI_CenterY])
+#define _HC_Centerz (appGetCudaHelper()->m_ConstSignedIntegers[ECSI_CenterZ])
+#define _HC_Centert (appGetCudaHelper()->m_ConstSignedIntegers[ECSI_CenterT])
+
 #define _DC_Volume (_constIntegers[ECI_Volume])
 #define _HC_Volume (appGetCudaHelper()->m_ConstIntegers[ECI_Volume])
 #define _DC_Volume_xyz (_constIntegers[ECI_Volume_xyz])
@@ -153,6 +164,7 @@ __DEFINE_ENUM(ESolverPhase,
         __device__ __host__ SSmallInt4() {}
         __device__ __host__ SSmallInt4(const SSmallInt4& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
         __device__ __host__ SSmallInt4(SBYTE inx, SBYTE iny, SBYTE inz, SBYTE inw) : x(inx), y(iny), z(inz), w(inw) {}
+        __device__ __host__ SSmallInt4(UINT uiData) : m_uiData(uiData) {}
 
         union
         {
@@ -448,7 +460,7 @@ public:
     //Used in rotating frame. Since the fermion fields are copied,
     //it is convinient to set all parameters at one place
     
-    static SSmallInt4 m_sCenter;
+    //static SSmallInt4 m_sCenter;
 
     //Use for acceleration, Since the fermion fields are copied,
     static Real m_fG;

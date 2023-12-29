@@ -181,7 +181,6 @@ static __device__ __inline__ deviceSU3 _deviceStapleTerm_Acc_Z(
 */
 static __device__ __inline__ Real _deviceHi_Acc(
     BYTE byFieldId,
-    const SSmallInt4& center,
     SSmallInt4 site,
     const SIndex& uiSiteBI)
 {

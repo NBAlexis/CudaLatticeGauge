@@ -62,7 +62,7 @@ public:
      *              gamma 5  -> 1/8 x chichi
      * 
      * Note: 2a is multiplied, therefore when measuring, one should use half coefficient
-     * Note: Gamma_mu, and Sigma _ ij, the "i" is NOT multiplied, when simulating, it should be "i"
+     * Note: Gamma_mu, and Sigma _ ij, the "i" is already multiplied so that no sign problem when simulating, it should be "-i" if recover the sign problem
      * Note: SIGMA31 is SIGMA13
      *       SIGMA41 is SIGMA14
      *       SIGMA42 is SIGMA24

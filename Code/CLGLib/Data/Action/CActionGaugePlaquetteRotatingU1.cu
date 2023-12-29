@@ -24,7 +24,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAdd4PlaqutteTermU1_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
@@ -39,9 +38,9 @@ _kernelAdd4PlaqutteTermU1_Shifted(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
 #if !_CLG_DOUBLEFLOAT
-    DOUBLE fXSq = (sSite4.x - sCenterSite.x + 0.5);
+    DOUBLE fXSq = (sSite4.x - _DC_Centerx + 0.5);
     fXSq = fXSq * fXSq;
-    DOUBLE fYSq = (sSite4.y - sCenterSite.y + 0.5);
+    DOUBLE fYSq = (sSite4.y - _DC_Centery + 0.5);
     fYSq = fYSq * fYSq;
 
     //======================================================
@@ -55,9 +54,9 @@ _kernelAdd4PlaqutteTermU1_Shifted(
     //Omega^2 (x^2 + y^2) Retr[1 - U_1,2]
     const DOUBLE fU12 = (fXSq + fYSq) * _device4PlaqutteTermU1(pDeviceData, 0, 1, uiBigIdx, sSite4, byFieldId);
 #else
-    Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
+    Real fXSq = (sSite4.x - _DC_Centerx + F(0.5));
     fXSq = fXSq * fXSq;
-    Real fYSq = (sSite4.y - sCenterSite.y + F(0.5));
+    Real fYSq = (sSite4.y - _DC_Centery + F(0.5));
     fYSq = fYSq * fYSq;
 
     //======================================================
@@ -80,7 +79,6 @@ _kernelAddForce4PlaqutteTermU1_XYZ_Shifted(
     BYTE byFieldId,
     UBOOL bTorus,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq
@@ -104,12 +102,12 @@ _kernelAddForce4PlaqutteTermU1_XYZ_Shifted(
         const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
 
         //mu = idir, nu = 4, i = mu
-        CLGComplex stap = _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        CLGComplex stap = _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir],
             idx[2 * idir],
             TRUE);
-        stap = _cuCaddf(stap, _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sCenterSite, sSite4, fOmegaSq, uiBigIdx,
+        stap = _cuCaddf(stap, _deviceStapleTermGfactorU1(byFieldId, bTorus, pDeviceData, sSite4, fOmegaSq, uiBigIdx,
             idir,
             byOtherDir[2 * idir + 1],
             idx[2 * idir + 1],
@@ -129,7 +127,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermU1_Term12_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
@@ -145,7 +142,7 @@ _kernelAddChairTermU1_Term12_Shifted(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXOmega = (sSite4.x - sCenterSite.x + 0.5) * fOmega;
+    const DOUBLE fXOmega = (sSite4.x - _DC_Centerx + 0.5) * fOmega;
 
     //===============
     //- x Omega V412
@@ -157,7 +154,7 @@ _kernelAddChairTermU1_Term12_Shifted(
 
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXOmega = (sSite4.x - sCenterSite.x + F(0.5)) * fOmega;
+    const Real fXOmega = (sSite4.x - _DC_Centerx + F(0.5)) * fOmega;
 
     //===============
     //+x Omega V412
@@ -176,7 +173,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermU1_Term34_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega,
     DOUBLE* results
@@ -192,7 +188,7 @@ _kernelAddChairTermU1_Term34_Shifted(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = 0.125 * betaOverN;
-    const DOUBLE fYOmega = (sSite4.y - sCenterSite.y + 0.5) * fOmega;
+    const DOUBLE fYOmega = (sSite4.y - _DC_Centery + 0.5) * fOmega;
 
     //===============
     //+ y Omega V421
@@ -203,7 +199,7 @@ _kernelAddChairTermU1_Term34_Shifted(
     const DOUBLE fV431 = fYOmega * _deviceChairTermU1(pDeviceData, byFieldId, sSite4, 3, 2, 0, uiN);
 #else
     betaOverN = F(0.125) * betaOverN;
-    const Real fYOmega = (sSite4.y - sCenterSite.y + F(0.5)) * fOmega;
+    const Real fYOmega = (sSite4.y - _DC_Centery + F(0.5)) * fOmega;
 
     //===============
     //-y Omega V421
@@ -221,7 +217,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddChairTermU1_Term5_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
@@ -237,14 +232,14 @@ _kernelAddChairTermU1_Term5_Shifted(
 
 #if !_CLG_DOUBLEFLOAT
     betaOverN = -0.125 * betaOverN;
-    const DOUBLE fXYOmega2 = (sSite4.x - sCenterSite.x + 0.5) * (sSite4.y - sCenterSite.y + 0.5) * fOmegaSq;
+    const DOUBLE fXYOmega2 = (sSite4.x - _DC_Centerx + 0.5) * (sSite4.y - _DC_Centery + 0.5) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
     const DOUBLE fV132 = fXYOmega2 * _deviceChairTermU1(pDeviceData, byFieldId, sSite4, 0, 2, 1, uiN);
 #else
     betaOverN = -F(0.125) * betaOverN;
-    const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5)) * fOmegaSq;
+    const Real fXYOmega2 = (sSite4.x - _DC_Centerx + F(0.5)) * (sSite4.y - _DC_Centery + F(0.5)) * fOmegaSq;
 
     //===============
     //+Omega^2 xy V142
@@ -262,7 +257,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermU1_Term1_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega
@@ -284,7 +278,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term1_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, _deviceHiShifted0);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term1_4));
@@ -299,7 +293,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term1_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         1, 0, 3, _deviceHiShifted0);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term1_2));
@@ -313,7 +307,7 @@ _kernelAddForceChairTermU1_Term1_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term1_1 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term1_1 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 0, 1, _deviceHiShifted0);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term1_1));
@@ -325,7 +319,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermU1_Term2_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega
@@ -347,7 +340,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term2_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, _deviceHiShifted0);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term2_4));
@@ -361,7 +354,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term2_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 3, _deviceHiShifted0);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term2_2));
@@ -375,7 +368,7 @@ _kernelAddForceChairTermU1_Term2_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const CLGComplex staple_term2_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term2_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 1, _deviceHiShifted0);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term2_3));
@@ -388,7 +381,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermU1_Term3_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega
@@ -410,7 +402,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term3_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, _deviceHiShifted1);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term3_4));
@@ -424,7 +416,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term3_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 1, 3, _deviceHiShifted1);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term3_1));
@@ -439,7 +431,7 @@ _kernelAddForceChairTermU1_Term3_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term3_2 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term3_2 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 1, 0, _deviceHiShifted1);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term3_2));
@@ -452,7 +444,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermU1_Term4_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmega
@@ -474,7 +465,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term4_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_4 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, _deviceHiShifted1);
     CLGComplex force4 = pDeviceData[uiLink4];
     force4 = _cuCmulf(force4, _cuConjf(staple_term4_4));
@@ -489,7 +480,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term4_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 3, _deviceHiShifted1);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term4_1));
@@ -503,7 +494,7 @@ _kernelAddForceChairTermU1_Term4_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
     //{
-    const CLGComplex staple_term4_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term4_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         3, 2, 0, _deviceHiShifted1);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term4_3));
@@ -516,7 +507,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelAddForceChairTermU1_Term5_Shifted(
     BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceData,
-    SSmallInt4 sCenterSite,
     CLGComplex* pForceData,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq
@@ -537,7 +527,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
     //{
-    const CLGComplex staple_term5_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_1 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, _deviceHiShifted2);
     CLGComplex force1 = pDeviceData[uiLink1];
     force1 = _cuCmulf(force1, _cuConjf(staple_term5_1));
@@ -550,7 +540,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
     //{
-    const CLGComplex staple_term5_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_2 = _deviceStapleChairTerm1ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         1, 2, 0, _deviceHiShifted2);
     CLGComplex force2 = pDeviceData[uiLink2];
     force2 = _cuCmulf(force2, _cuConjf(staple_term5_2));
@@ -563,7 +553,7 @@ _kernelAddForceChairTermU1_Term5_Shifted(
 
     //if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
     //{
-    const CLGComplex staple_term5_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sCenterSite, sSite4, uiSiteIndex, uiBigIdx,
+    const CLGComplex staple_term5_3 = _deviceStapleChairTerm2ShiftedU1(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
         0, 2, 1, _deviceHiShifted2);
     CLGComplex force3 = pDeviceData[uiLink3];
     force3 = _cuCmulf(force3, _cuConjf(staple_term5_3));
@@ -632,17 +622,17 @@ void CActionGaugePlaquetteRotatingU1::Initial(class CLatticeData* pOwner, const 
 #endif
 
 
-    TArray<INT> centerArray;
-    param.FetchValueArrayINT(_T("Center"), centerArray);
-    if (centerArray.Num() > 3)
-    {
-        SSmallInt4 sCenter;
-        sCenter.x = static_cast<SBYTE>(centerArray[0]);
-        sCenter.y = static_cast<SBYTE>(centerArray[1]);
-        sCenter.z = static_cast<SBYTE>(centerArray[2]);
-        sCenter.w = static_cast<SBYTE>(centerArray[3]);
-        CCommonData::m_sCenter = sCenter;
-    }
+    //TArray<INT> centerArray;
+    //param.FetchValueArrayINT(_T("Center"), centerArray);
+    //if (centerArray.Num() > 3)
+    //{
+    //    SSmallInt4 sCenter;
+    //    sCenter.x = static_cast<SBYTE>(centerArray[0]);
+    //    sCenter.y = static_cast<SBYTE>(centerArray[1]);
+    //    sCenter.z = static_cast<SBYTE>(centerArray[2]);
+    //    sCenter.w = static_cast<SBYTE>(centerArray[3]);
+    //    CCommonData::m_sCenter = sCenter;
+    //}
 
     INT iUsing4Plaq = 0;
     if (param.FetchValueINT(_T("CloverEnergy"), iUsing4Plaq))
@@ -694,23 +684,23 @@ UBOOL CActionGaugePlaquetteRotatingU1::CalculateForceOnGauge(const CFieldGauge *
     else
     {
 
-        _kernelAddForce4PlaqutteTermU1_XYZ_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, FALSE, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForce4PlaqutteTermU1_XYZ_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, FALSE, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
 
         
-        _kernelAddForceChairTermU1_Term1_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermU1_Term1_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermU1_Term2_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermU1_Term2_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega);
         
-        _kernelAddForceChairTermU1_Term3_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermU1_Term3_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermU1_Term4_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermU1_Term4_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega);
 
-        _kernelAddForceChairTermU1_Term5_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, CCommonData::m_sCenter,
+        _kernelAddForceChairTermU1_Term5_Shifted << <block, threads >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData,
             pForceU1->m_pDeviceData, m_fBetaOverN, m_fOmega * m_fOmega);
     }
 
@@ -759,7 +749,6 @@ Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class
         _kernelAdd4PlaqutteTermU1_Shifted << <block, threads >> > (
             pGaugeU1->m_byFieldId,
             pGaugeU1->m_pDeviceData,
-            CCommonData::m_sCenter,
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);
@@ -770,7 +759,6 @@ Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class
         _kernelAddChairTermU1_Term12_Shifted << <block, threads >> > (
             pGaugeU1->m_byFieldId,
             pGaugeU1->m_pDeviceData,
-            CCommonData::m_sCenter,
             m_fBetaOverN, 
             m_fOmega, 
             _D_RealThreadBuffer);
@@ -780,7 +768,6 @@ Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class
         _kernelAddChairTermU1_Term34_Shifted << <block, threads >> > (
             pGaugeU1->m_byFieldId,
             pGaugeU1->m_pDeviceData,
-            CCommonData::m_sCenter,
             m_fBetaOverN,
             m_fOmega,
             _D_RealThreadBuffer);
@@ -789,7 +776,6 @@ Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class
         _kernelAddChairTermU1_Term5_Shifted << <block, threads >> > (
             pGaugeU1->m_byFieldId,
             pGaugeU1->m_pDeviceData,
-            CCommonData::m_sCenter,
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);
@@ -852,10 +838,10 @@ void CActionGaugePlaquetteRotatingU1::SetOmega(Real fOmega)
     CCommonData::m_fOmega = fOmega;
 }
 
-void CActionGaugePlaquetteRotatingU1::SetCenter(const SSmallInt4 &newCenter)
-{
-    CCommonData::m_sCenter = newCenter;
-}
+//void CActionGaugePlaquetteRotatingU1::SetCenter(const SSmallInt4 &newCenter)
+//{
+//    CCommonData::m_sCenter = newCenter;
+//}
 
 CCString CActionGaugePlaquetteRotatingU1::GetInfos(const CCString &tab) const
 {
@@ -863,13 +849,6 @@ CCString CActionGaugePlaquetteRotatingU1::GetInfos(const CCString &tab) const
     sRet = tab + _T("Name : CActionGaugePlaquetteRotatingU1\n");
     sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
-    CCString sCenter;
-    sCenter.Format(_T("Center: [%d, %d, %d, %d]\n")
-        , static_cast<INT>(CCommonData::m_sCenter.x)
-        , static_cast<INT>(CCommonData::m_sCenter.y)
-        , static_cast<INT>(CCommonData::m_sCenter.z)
-        , static_cast<INT>(CCommonData::m_sCenter.w));
-    sRet = sRet + tab + sCenter;
     return sRet;
 }
 

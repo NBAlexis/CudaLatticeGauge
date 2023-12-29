@@ -24,7 +24,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAngularMomentumJG(
     const deviceSU3* __restrict__ pDeviceData,
     Real* pBuffer, 
-    SSmallInt4 sCenter,
     Real betaOverN,
     BYTE byFieldId)
 {
@@ -39,7 +38,7 @@ _kernelCalculateAngularMomentumJG(
         //4-chair terms except for the last one
         betaOverN = F(0.125) * betaOverN;
 
-        const Real fX = (sSite4.x - sCenter.x);
+        const Real fX = (sSite4.x - _DC_Centerx);
 
         //===============
         //+x Omega V412
@@ -49,7 +48,7 @@ _kernelCalculateAngularMomentumJG(
         //+x Omega V432
         const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
-        const Real fY = -(sSite4.y - sCenter.y);
+        const Real fY = -(sSite4.y - _DC_Centery);
 
         //===============
         //-y Omega V421
@@ -73,7 +72,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAngularMomentumS2(
     const deviceSU3* __restrict__ pDeviceData,
     Real* pBuffer,
-    SSmallInt4 sCenterSite,
     Real betaOverN,
     BYTE byFieldId)
 {
@@ -85,7 +83,7 @@ _kernelCalculateAngularMomentumS2(
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         const Real betaOverN1over8 = F(0.125) * betaOverN;
-        const Real fXYOmega2 = -(sSite4.x - sCenterSite.x) * (sSite4.y - sCenterSite.y);
+        const Real fXYOmega2 = -(sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery);
 
         //===============
         //-Omega^2 xy V132
@@ -93,9 +91,9 @@ _kernelCalculateAngularMomentumS2(
 
         fRes = fV132 * betaOverN1over8;
 
-        Real fXSq = (sSite4.x - sCenterSite.x);
+        Real fXSq = (sSite4.x - _DC_Centerx);
         fXSq = fXSq * fXSq;
-        Real fYSq = (sSite4.y - sCenterSite.y);
+        Real fYSq = (sSite4.y - _DC_Centery);
         fYSq = fYSq * fYSq;
 
         //======================================================
@@ -124,7 +122,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAngularMomentumJGProjectivePlane(
     const deviceSU3* __restrict__ pDeviceData,
     Real* pBuffer,
-    SSmallInt4 sCenter,
     Real betaOverN,
     BYTE byFieldId)
 {
@@ -139,7 +136,7 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
         //4-chair terms except for the last one
         betaOverN = F(0.125) * betaOverN;
 
-        const Real fX = (sSite4.x - sCenter.x + F(0.5));
+        const Real fX = (sSite4.x - _DC_Centerx + F(0.5));
 
         //===============
         //+x Omega V412
@@ -149,7 +146,7 @@ _kernelCalculateAngularMomentumJGProjectivePlane(
         //+x Omega V432
         const Real fV432 = fX * _deviceChairTerm(pDeviceData, byFieldId, sSite4, 3, 2, 1, uiN);
 
-        const Real fY = -(sSite4.y - sCenter.y + F(0.5));
+        const Real fY = -(sSite4.y - _DC_Centery + F(0.5));
 
         //===============
         //-y Omega V421
@@ -169,7 +166,6 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAngularMomentumS2ProjectivePlane(
     const deviceSU3* __restrict__ pDeviceData,
     Real* pBuffer,
-    SSmallInt4 sCenterSite,
     Real betaOverN,
     BYTE byFieldId)
 {
@@ -181,7 +177,7 @@ _kernelCalculateAngularMomentumS2ProjectivePlane(
     if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         const Real betaOverN1over8 = -F(0.125) * betaOverN;
-        const Real fXYOmega2 = (sSite4.x - sCenterSite.x + F(0.5)) * (sSite4.y - sCenterSite.y + F(0.5));
+        const Real fXYOmega2 = (sSite4.x - _DC_Centerx + F(0.5)) * (sSite4.y - _DC_Centery + F(0.5));
 
         //===============
         //-Omega^2 xy V132
@@ -189,9 +185,9 @@ _kernelCalculateAngularMomentumS2ProjectivePlane(
 
         fRes = fV132 * betaOverN1over8;
 
-        Real fXSq = (sSite4.x - sCenterSite.x + F(0.5));
+        Real fXSq = (sSite4.x - _DC_Centerx + F(0.5));
         fXSq = fXSq * fXSq;
-        Real fYSq = (sSite4.y - sCenterSite.y + F(0.5));
+        Real fYSq = (sSite4.y - _DC_Centery + F(0.5));
         fYSq = fYSq * fYSq;
 
         //======================================================
@@ -241,7 +237,6 @@ _kernelCalculateGaugeSpin(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGSurf(
-    SSmallInt4 sCenter, 
     BYTE byFieldId,
     const deviceSU3* __restrict__ pGauge,
     const deviceSU3* __restrict__ pE,
@@ -258,8 +253,8 @@ _kernelCalculateJGSurf(
     {
         //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
         //const BYTE uiDir2 = uiDir * 2;
-        const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
-        const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery);
+        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
 
         Real fRes = F(0.0);
         for (BYTE dir = 0; dir < 3; ++dir)
@@ -313,7 +308,6 @@ _kernelCalculateJGSurf(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGSurfProjectivePlane(
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     const deviceSU3* __restrict__ pGauge,
     const deviceSU3* __restrict__ pE,
@@ -330,8 +324,8 @@ _kernelCalculateJGSurfProjectivePlane(
     {
         //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
         //const BYTE uiDir2 = uiDir * 2;
-        const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-        const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
+        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
 
         Real fRes = F(0.0);
         #pragma unroll
@@ -386,7 +380,6 @@ _kernelCalculateJGSurfProjectivePlane(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGPot(
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pAphys,
@@ -400,8 +393,8 @@ _kernelCalculateJGPot(
     const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
     if (!site.IsDirichlet())
     {
-        const Real fY = static_cast<Real>(sSite4.y - sCenter.y);
-        const Real fX = static_cast<Real>(sSite4.x - sCenter.x);
+        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery);
+        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
 
         deviceSU3 nablaE(pE[uiNablaE]);
         deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
@@ -419,7 +412,6 @@ _kernelCalculateJGPot(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateJGPotProjectivePlane(
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pAphys,
@@ -433,8 +425,8 @@ _kernelCalculateJGPotProjectivePlane(
     const UINT uiNablaE = _deviceGetLinkIndex(site.m_uiSiteIndex, 3);
     if (!site.IsDirichlet())
     {
-        const Real fY = static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-        const Real fX = static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+        const Real fY = static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
+        const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
 
         deviceSU3 nablaE(pE[uiNablaE]);
         deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
@@ -456,7 +448,6 @@ _kernelMomemtumJGChenApprox(
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pApure,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter,
     Real* pBuffer,
     Real fBetaOverN)
 {
@@ -465,8 +456,8 @@ _kernelMomemtumJGChenApprox(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     CLGComplex res = _zeroc;
     if (!site.IsDirichlet())
@@ -493,7 +484,6 @@ _kernelMomemtumJGChenApprox2(
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pApure,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter,
     Real* pBuffer,
     Real fBetaOverN)
 {
@@ -502,8 +492,8 @@ _kernelMomemtumJGChenApprox2(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
     CLGComplex res = _zeroc;
     if (!site.IsDirichlet())
@@ -567,7 +557,6 @@ _kernelMomentumJGChenDpureA(
     deviceSU3* pXcrossDpureA,
     const deviceSU3* __restrict__ pGauge,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter,
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -575,8 +564,8 @@ _kernelMomentumJGChenDpureA(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x);
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
 
     const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
@@ -639,7 +628,6 @@ _kernelMomentumJGChenDpureAProjectivePlane(
     deviceSU3* pXcrossDpureA,
     const deviceSU3* __restrict__ pGauge,
     const deviceSU3* __restrict__ pAphys,
-    SSmallInt4 sCenter,
     BYTE byFieldId)
 {
     intokernalInt4;
@@ -647,8 +635,8 @@ _kernelMomentumJGChenDpureAProjectivePlane(
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
-    const Real fmY = -static_cast<Real>(sSite4.y - sCenter.y + F(0.5));
-    const Real fmX = -static_cast<Real>(sSite4.x - sCenter.x + F(0.5));
+    const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery + F(0.5));
+    const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
 
 
     const SSmallInt4 x_p_x_site = _deviceSmallInt4OffsetC(sSite4, 1);
@@ -824,7 +812,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         _kernelCalculateAngularMomentumJGProjectivePlane << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            CCommonData::m_sCenter,
             fBetaOverN,
             m_byFieldId);
     }
@@ -833,7 +820,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         _kernelCalculateAngularMomentumJG << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            CCommonData::m_sCenter,
             fBetaOverN,
             m_byFieldId);
     }
@@ -867,7 +853,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
 
     if (m_bShowResult)
     {
-        appDetailed(_T(" === Angular Momentum JG of site y=%d ======\n"), CCommonData::m_sCenter.y);
+        appDetailed(_T(" === Angular Momentum JG of site y=%d ======\n"), _HC_Centery);
     }
     for (UINT i = 1; i < _HC_Ly; ++i)
     {
@@ -883,8 +869,8 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         {
             appDetailed(_T("(%d,%d)=%1.6f  "), 
                 i, 
-                CCommonData::m_sCenter.y, 
-                m_pHostDataBuffer[i * _HC_Ly + CCommonData::m_sCenter.y]);
+                _HC_Centery, 
+                m_pHostDataBuffer[i * _HC_Ly + _HC_Centery]);
         }
     }
     if (m_bShowResult)
@@ -901,7 +887,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         _kernelCalculateAngularMomentumS2ProjectivePlane << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            CCommonData::m_sCenter,
             fBetaOverN,
             m_byFieldId);
     }
@@ -910,7 +895,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
         _kernelCalculateAngularMomentumS2 << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            CCommonData::m_sCenter,
             fBetaOverN,
             m_byFieldId);
     }
@@ -1000,8 +984,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             _ZeroXYPlane(m_pDeviceDataBuffer);
             if (m_bProjectivePlane)
             {
-                _kernelCalculateJGSurf << <block, threads >> > (
-                    CCommonData::m_sCenter,
+                _kernelCalculateJGSurfProjectivePlane << <block, threads >> > (
                     m_byFieldId,
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
@@ -1012,7 +995,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             else
             {
                 _kernelCalculateJGSurf << <block, threads >> > (
-                    CCommonData::m_sCenter,
                     m_byFieldId,
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
@@ -1059,7 +1041,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     pDpureA->m_pDeviceData,
                     pGaugeSU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
-                    CCommonData::m_sCenter,
                     pAphysSU3->m_byFieldId
                     );
             }
@@ -1069,7 +1050,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     pDpureA->m_pDeviceData,
                     pGaugeSU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
-                    CCommonData::m_sCenter,
                     pAphysSU3->m_byFieldId
                     );
             }
@@ -1120,7 +1100,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bProjectivePlane)
             {
                 _kernelCalculateJGPotProjectivePlane << <block, threads >> > (
-                    CCommonData::m_sCenter,
                     m_byFieldId,
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1130,7 +1109,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             else
             {
                 _kernelCalculateJGPot << <block, threads >> > (
-                    CCommonData::m_sCenter,
                     m_byFieldId,
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1185,7 +1163,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
-                    CCommonData::m_sCenter,
                     m_pDeviceDataBuffer,
                     fBetaOverN
                     );
@@ -1225,7 +1202,6 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                     pESU3->m_pDeviceData,
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
-                    CCommonData::m_sCenter,
                     m_pDeviceDataBuffer,
                     fBetaOverN
                     );
@@ -1269,7 +1245,7 @@ void CMeasureAMomentumJG::Report()
     appPushLogDate(FALSE);
 
     appGeneral(_T("\n===================================================\n"));
-    appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), CCommonData::m_sCenter.x);
+    appGeneral(_T("=========== Angular Momentum JG of sites ==========\n"), _HC_Centerx);
     appGeneral(_T("===================================================\n"));
 
     ReportDistributionXY_R(m_uiConfigurationCount, m_lstRes);
@@ -1277,7 +1253,7 @@ void CMeasureAMomentumJG::Report()
     appGeneral(_T("===================================================\n"));
 
     appGeneral(_T("\n===================================================\n"));
-    appGeneral(_T("=========== Angular Momentum S2 of sites ==========\n"), CCommonData::m_sCenter.x);
+    appGeneral(_T("=========== Angular Momentum S2 of sites ==========\n"), _HC_Centerx);
     appGeneral(_T("===================================================\n"));
 
     ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS2);
@@ -1285,25 +1261,25 @@ void CMeasureAMomentumJG::Report()
     if (m_bMeasureSpin)
     {
         appGeneral(_T("\n===================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JGS of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("=========== Angular Momentum JGS of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGS);
 
         appGeneral(_T("\n===================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JGSurf of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("=========== Angular Momentum JGSurf of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGSurf);
 
         appGeneral(_T("\n===================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JG Chen of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("=========== Angular Momentum JG Chen of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChen);
 
         appGeneral(_T("\n===================================================\n"));
-        appGeneral(_T("=========== Angular Momentum JGPot of sites ==========\n"), CCommonData::m_sCenter.x);
+        appGeneral(_T("=========== Angular Momentum JGPot of sites ==========\n"), _HC_Centerx);
         appGeneral(_T("===================================================\n"));
 
         ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGPot);
@@ -1311,13 +1287,13 @@ void CMeasureAMomentumJG::Report()
         if (m_bMeasureApprox)
         {
             appGeneral(_T("\n========================================================\n"));
-            appGeneral(_T("=========== Angular Momentum JG Chen Approx of sites ==========\n"), CCommonData::m_sCenter.x);
+            appGeneral(_T("=========== Angular Momentum JG Chen Approx of sites ==========\n"), _HC_Centerx);
             appGeneral(_T("========================================================\n"));
 
             ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox);
 
             appGeneral(_T("\n========================================================\n"));
-            appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), CCommonData::m_sCenter.x);
+            appGeneral(_T("=========== Angular Momentum JG Chen Approx 2 of sites ==========\n"), _HC_Centerx);
             appGeneral(_T("========================================================\n"));
 
             ReportDistributionXY_R(m_uiConfigurationCount, m_lstResJGChenApprox2);

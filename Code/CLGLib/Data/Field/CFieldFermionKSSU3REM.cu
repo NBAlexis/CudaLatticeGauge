@@ -424,7 +424,7 @@ _kernelDFermionKSForce_PREM_XYTerm(
     Real fOmega,
 #endif
     Real fCharge,
-    SSmallInt4 sCenter, BYTE byMu, INT iTau,
+    BYTE byMu, INT iTau,
     INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
     INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
     BYTE byContribution)
@@ -447,8 +447,8 @@ _kernelDFermionKSForce_PREM_XYTerm(
     site_n1 = __deviceSiteIndexToInt4(smiddle.m_uiSiteIndex);
     //y Dx and -x Dy
     const Real fNv = (0 == byMu)
-        ? static_cast<Real>(site_n1.y - sCenter.y + F(0.5))
-        : static_cast<Real>(sCenter.x - site_n1.x - F(0.5));
+        ? static_cast<Real>(site_n1.y - _DC_Centery + F(0.5))
+        : static_cast<Real>(_DC_Centerx - site_n1.x - F(0.5));
 
     //=================================
     // 2. Find V(n,n1), V(n,n2)
@@ -798,7 +798,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         1,
         CCommonData::m_fOmega,
         m_fQ,
-        CCommonData::m_sCenter,
+        _HC_Center,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -905,7 +905,6 @@ void CFieldFermionKSSU3REM::DerivateD0(
                     m_byFieldId,
                     CCommonData::m_fOmega,
                     m_fQ,
-                    CCommonData::m_sCenter,
                     static_cast<BYTE>(imu), iTau[pathidx],
                     L[0], L[1], L[2], LLength,
                     R[0], R[1], R[2], RLength,

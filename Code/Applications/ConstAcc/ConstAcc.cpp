@@ -45,6 +45,18 @@ int main(int argc, char * argv[])
         res = Measurement(workingParam);
     }
     break;
+    case EAJ_SimulateQMidCenter:
+    {
+        CParameters workingParam = params.GetParameter(_T("JobSimulateQMidCenter"));
+        res = SimulateAcc(workingParam);
+    }
+    break;
+    case EAJ_MeasureMidCenter:
+    {
+        CParameters workingParam = params.GetParameter(_T("JobMeasureMidCenter"));
+        res = Measurement(workingParam);
+    }
+    break;
     }
 
     return res;

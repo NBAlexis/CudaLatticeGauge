@@ -108,9 +108,9 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
             {
                 SSmallInt4 sourceSite;
                 sourceSite.x = static_cast<SBYTE>(x);
-                sourceSite.y = CCommonData::m_sCenter.y;
-                sourceSite.z = CCommonData::m_sCenter.z;
-                sourceSite.w = CCommonData::m_sCenter.w;
+                sourceSite.y = static_cast<SBYTE>(_HC_Centery);
+                sourceSite.z = static_cast<SBYTE>(_HC_Centerz);
+                sourceSite.w = static_cast<SBYTE>(_HC_Centert);
 
                 CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
                 TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(

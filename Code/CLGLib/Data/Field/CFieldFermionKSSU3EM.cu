@@ -42,7 +42,6 @@ _kernelDFermionKSEM_Simple(
     Real fam,
     Real fqEz,
     Real fqBz,
-    SSmallInt4 sCenter,
     BYTE byFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
@@ -54,10 +53,10 @@ _kernelDFermionKSEM_Simple(
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
     pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
 
-    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
-    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
-    const Real fT1 = static_cast<Real>(sSite4.w - sCenter.w);
+    const Real fX1 = static_cast<Real>(sSite4.x - _DC_Centerx);
+    const Real fY1 = static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fZ1 = static_cast<Real>(sSite4.z - _DC_Centerz);
+    const Real fT1 = static_cast<Real>(sSite4.w - _DC_Centert);
 
     Real u1pX = F(0.0);
     const Real u1pY = fX1 * fqBz;
@@ -88,10 +87,10 @@ _kernelDFermionKSEM_Simple(
         const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
         const Real eta_mu2 = (1 == ((pEtaTable[x_m_mu_Fermion.m_uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
 
-        const Real fX2 = static_cast<Real>(x_m_site.x - sCenter.x);
-        const Real fY2 = static_cast<Real>(x_m_site.y - sCenter.y);
-        const Real fZ2 = static_cast<Real>(x_m_site.z - sCenter.z);
-        const Real fT2 = static_cast<Real>(x_m_site.w - sCenter.w);
+        const Real fX2 = static_cast<Real>(x_m_site.x - _DC_Centerx);
+        const Real fY2 = static_cast<Real>(x_m_site.y - _DC_Centery);
+        const Real fZ2 = static_cast<Real>(x_m_site.z - _DC_Centerz);
+        const Real fT2 = static_cast<Real>(x_m_site.w - _DC_Centert);
 
         Real u1mX = F(0.0);
         const Real u1mY = fX2 * fqBz;
@@ -217,15 +216,14 @@ _kernelDFermionKSForceEM_Simple(
     UINT uiRational,
     Real fqEz,
     Real fqBz,
-    SSmallInt4 sCenter,
     BYTE byFieldId)
 {
     intokernalInt4;
 
-    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
-    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
-    const Real fT1 = static_cast<Real>(sSite4.w - sCenter.w);
+    const Real fX1 = static_cast<Real>(sSite4.x - _DC_Centerx);
+    const Real fY1 = static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fZ1 = static_cast<Real>(sSite4.z - _DC_Centerz);
+    const Real fT1 = static_cast<Real>(sSite4.w - _DC_Centert);
 
     Real u1pX = F(0.0);
     const Real u1pY = fX1 * fqBz;
@@ -318,7 +316,6 @@ _kernelKSApplyGammaEM(
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
     const BYTE* __restrict__ pEtaTable,
-    SSmallInt4 sCenter,
     Real fqEz, 
     Real fqBz,
     BYTE byDir)
@@ -333,10 +330,10 @@ _kernelKSApplyGammaEM(
     deviceSU3 x_Gauge_element = pGauge[linkIndex];
     deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, byDir)];
 
-    const Real fX1 = static_cast<Real>(sSite4.x - sCenter.x);
-    const Real fY1 = static_cast<Real>(sSite4.y - sCenter.y);
-    const Real fZ1 = static_cast<Real>(sSite4.z - sCenter.z);
-    const Real fT1 = static_cast<Real>(sSite4.w - sCenter.w);
+    const Real fX1 = static_cast<Real>(sSite4.x - _DC_Centerx);
+    const Real fY1 = static_cast<Real>(sSite4.y - _DC_Centery);
+    const Real fZ1 = static_cast<Real>(sSite4.z - _DC_Centerz);
+    const Real fT1 = static_cast<Real>(sSite4.w - _DC_Centert);
 
     Real u1pX = F(0.0);
     const Real u1pY = fX1 * fqBz;
@@ -352,10 +349,10 @@ _kernelKSApplyGammaEM(
     }
 
     const SSmallInt4 x_m_site = __deviceSiteIndexToInt4(x_m_mu_Fermion.m_uiSiteIndex);
-    const Real fX2 = static_cast<Real>(x_m_site.x - sCenter.x);
-    const Real fY2 = static_cast<Real>(x_m_site.y - sCenter.y);
-    const Real fZ2 = static_cast<Real>(x_m_site.z - sCenter.z);
-    const Real fT2 = static_cast<Real>(x_m_site.w - sCenter.w);
+    const Real fX2 = static_cast<Real>(x_m_site.x - _DC_Centerx);
+    const Real fY2 = static_cast<Real>(x_m_site.y - _DC_Centery);
+    const Real fZ2 = static_cast<Real>(x_m_site.z - _DC_Centerz);
+    const Real fT2 = static_cast<Real>(x_m_site.w - _DC_Centert);
 
     Real u1mX = F(0.0);
     const Real u1mY = fX2 * fqBz;
@@ -451,7 +448,6 @@ void CFieldFermionKSSU3EM::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         f2am,
         CCommonData::m_fEz * m_fQ,
         CCommonData::m_fBz * m_fQ,
-        CCommonData::m_sCenter,
         m_byFieldId,
         bDagger,
         eOCT,
@@ -474,7 +470,6 @@ void CFieldFermionKSSU3EM::DerivateD0(
         m_rMD.m_uiDegree,
         CCommonData::m_fEz * m_fQ,
         CCommonData::m_fBz * m_fQ,
-        CCommonData::m_sCenter,
         m_byFieldId);
 }
 
@@ -545,7 +540,6 @@ void CFieldFermionKSSU3EM::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix 
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
-            CCommonData::m_sCenter,
             CCommonData::m_fEz * m_fQ,
             CCommonData::m_fBz * m_fQ,
             static_cast<BYTE>(iDir));
