@@ -29,6 +29,8 @@ namespace CLGMakeWriter
 
         //turn it off, we have sign problem here
         public bool m_bHasConstAcc = true;
+
+        public bool m_bHasStaggeredSpectrum = false;
         
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };
         readonly static string[] ArchNames = 
@@ -193,7 +195,11 @@ set_target_properties( CLGLib
                 sContent += AddApplication(excutables["ConstAcc"]);
             }
 
-            sContent += AddApplication(excutables["StaggeredSpectrum"]);
+            if (m_bHasStaggeredSpectrum)
+            {
+                sContent += AddApplication(excutables["StaggeredSpectrum"]);
+            }
+            
             sContent += AddApplication(excutables["StaggeredRotation"]);
             sContent += AddApplication(excutables["BetaGradient"]);
             sContent += AddApplication(excutables["ElectricChemical"]);

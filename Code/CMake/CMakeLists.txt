@@ -359,20 +359,19 @@ target_link_libraries(CLGTest CLGLib)
 
 
 # ==================== 
-# StaggeredSpectrum 
+# ConstAcc 
 # =================
 
-include_directories(${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum)
-add_executable(StaggeredSpectrum 
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.h
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/GaugeFixing.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Measurement.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/StaggeredSpectrum.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredSpectrum/Simulate.cpp
+include_directories(${PROJECT_SOURCE_DIR}/Applications/ConstAcc)
+add_executable(ConstAcc 
+    ${PROJECT_SOURCE_DIR}/Applications/ConstAcc/ConstAcc.h
+    ${PROJECT_SOURCE_DIR}/Applications/ConstAcc/ConstAcc.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ConstAcc/Measure.cpp
+    ${PROJECT_SOURCE_DIR}/Applications/ConstAcc/Simulate.cpp
     )
 
-target_compile_features(StaggeredSpectrum PUBLIC cxx_std_14)
-target_link_libraries(StaggeredSpectrum CLGLib)
+target_compile_features(ConstAcc PUBLIC cxx_std_14)
+target_link_libraries(ConstAcc CLGLib)
 
 
 
