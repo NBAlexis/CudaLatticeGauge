@@ -79,15 +79,15 @@ INT SimulateStaggeredBeta(CParameters& params)
     appGeneral(_T("file: %s, |p| : %f\n"), sFileName.c_str(), fOldPolyakov);
 
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    TArray<TArray<CLGComplex>> polykovX_nx;
+    //TArray<TArray<CLGComplex>> polykovX_nx;
     TArray<CLGComplex> polykov;
     TArray<Real> polykovphase;
-    for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
-    {
-        TArray<CLGComplex> a;
-        TArray<Real> b;
-        polykovX_nx.AddItem(a);
-    }
+    //for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
+    //{
+    //    TArray<CLGComplex> a;
+    //    TArray<Real> b;
+    //    polykovX_nx.AddItem(a);
+    //}
 
     CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
     CCString sHeader;
@@ -238,16 +238,16 @@ INT SimulateStaggeredBeta(CParameters& params)
 
         //===================== Polyakov loop =====================
         assert(pPL->m_lstLoop.Num() == static_cast<INT>(iEquib - iEquibSkip));
-        assert(pPL->m_lstAverageLoopDensity.Num()
-            == static_cast<INT>(CCommonData::m_sCenter.x));
+        //assert(pPL->m_lstAverageLoopDensity.Num()
+        //    == static_cast<INT>(CCommonData::m_sCenter.x));
 
         //============= polyakov gather =============
         polykov.AddItem(pPL->m_cAverageLoop);
         polykovphase.AddItem(__cuCargf(pPL->m_cAverageLoop));
-        for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
-        {
-            polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
-        }
+        //for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
+        //{
+        //    polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
+        //}
 
 #pragma endregion
 
@@ -275,19 +275,19 @@ INT SimulateStaggeredBeta(CParameters& params)
             polykovphase[i]);
     }
 
-    for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
-    {
-        appGeneral(_T("Polyakov[x=%d]={\n"), x);
-        for (INT i = 0; i < lstBeta.Num(); ++i)
-        {
-            appGeneral((i == (lstBeta.Num() - 1)) ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
-                polykovX_nx[x][i].x,
-                polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
-                appAbs(polykovX_nx[x][i].y)
-            );
-        }
-        appGeneral(_T("}\n\n"));
-    }
+    //for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
+    //{
+    //    appGeneral(_T("Polyakov[x=%d]={\n"), x);
+    //    for (INT i = 0; i < lstBeta.Num(); ++i)
+    //    {
+    //        appGeneral((i == (lstBeta.Num() - 1)) ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
+    //            polykovX_nx[x][i].x,
+    //            polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
+    //            appAbs(polykovX_nx[x][i].y)
+    //        );
+    //    }
+    //    appGeneral(_T("}\n\n"));
+    //}
 
     appPopLogDate();
 

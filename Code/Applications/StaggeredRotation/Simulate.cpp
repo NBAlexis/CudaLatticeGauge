@@ -319,19 +319,19 @@ INT SimulateStaggeredRotation(CParameters& params)
                 polykovphase[i]);
         }
 
-        for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
-        {
-            appGeneral(_T("Polyakov[x=%d]={\n"), x);
-            for (UINT i = 0; i <= iAfterEquib; ++i)
-            {
-                appGeneral(i == iAfterEquib ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
-                    polykovX_nx[x][i].x,
-                    polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
-                    appAbs(polykovX_nx[x][i].y)
-                );
-            }
-            appGeneral(_T("}\n\n"));
-        }
+        //for (UINT x = 0; x < static_cast<UINT>(CCommonData::m_sCenter.x); ++x)
+        //{
+        //    appGeneral(_T("Polyakov[x=%d]={\n"), x);
+        //    for (UINT i = 0; i <= iAfterEquib; ++i)
+        //    {
+        //        appGeneral(i == iAfterEquib ? _T("%2.10f %s %2.10f I\n") : _T("%2.10f %s %2.10f I,\n"),
+        //            polykovX_nx[x][i].x,
+        //            polykovX_nx[x][i].y < F(0.0) ? _T("-") : _T("+"),
+        //            appAbs(polykovX_nx[x][i].y)
+        //        );
+        //    }
+        //    appGeneral(_T("}\n\n"));
+        //}
 
         appPopLogDate();
 

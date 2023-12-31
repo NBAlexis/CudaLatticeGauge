@@ -28,7 +28,7 @@ namespace CLGMakeWriter
         public bool m_bHasCompresser = false;
 
         //turn it off, we have sign problem here
-        public bool m_bHasConstAcc = false;
+        public bool m_bHasConstAcc = true;
         
         readonly static string[] FileSurfix = { "_DebugMSVC.txt", "_ReleaseMSVC.txt", "_DebugGCC.txt", "_ReleaseGCC.txt" };
         readonly static string[] ArchNames = 

@@ -78,15 +78,15 @@ INT Simulate(CParameters& params)
     }
 
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    TArray<TArray<CLGComplex>> polykovX_nx;
+    //TArray<TArray<CLGComplex>> polykovX_nx;
     TArray<CLGComplex> polykov;
     TArray<Real> polykovphase;
-    for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
-    {
-        TArray<CLGComplex> a;
-        TArray<Real> b;
-        polykovX_nx.AddItem(a);
-    }
+    //for (UINT uiX = 0; uiX < static_cast<UINT>(CCommonData::m_sCenter.x); ++uiX)
+    //{
+    //    TArray<CLGComplex> a;
+    //    TArray<Real> b;
+    //    polykovX_nx.AddItem(a);
+    //}
 
     CFieldFermionKSSU3GammaEM* pU = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetFieldById(2));
     CFieldFermionKSSU3GammaEM* pD = dynamic_cast<CFieldFermionKSSU3GammaEM*>(appGetLattice()->GetFieldById(3));
@@ -239,16 +239,16 @@ INT Simulate(CParameters& params)
 
         //===================== Polyakov loop =====================
         assert(pPL->m_lstLoop.Num() == static_cast<INT>(iEquib - iEquibSkip));
-        assert(pPL->m_lstAverageLoopDensity.Num()
-            == static_cast<INT>(CCommonData::m_sCenter.x));
+        //assert(pPL->m_lstAverageLoopDensity.Num()
+        //    == static_cast<INT>(CCommonData::m_sCenter.x));
 
         //============= polyakov gather =============
         polykov.AddItem(pPL->m_cAverageLoop);
         polykovphase.AddItem(__cuCargf(pPL->m_cAverageLoop));
-        for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
-        {
-            polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
-        }
+        //for (UINT iX = 0; iX < static_cast<UINT>(CCommonData::m_sCenter.x); ++iX)
+        //{
+        //    polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
+        //}
 
 #pragma endregion
 
