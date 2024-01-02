@@ -138,13 +138,13 @@ INT Measurement(CParameters& params)
     //CFieldFermionKSSU3* pF2Heavy = NULL;
 
 
-    //if (EBSMJ_Chiral == eJob)
-    //{
-        //pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
-        //pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+    if (EAMJ_Chiral == eJob)
+    {
+        pF1Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
+        pF2Light = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(2));
         //pF1Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
         //pF2Heavy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(3));
-    //}
+    }
 
     appPushLogDate(FALSE);
 
@@ -222,7 +222,6 @@ INT Measurement(CParameters& params)
                 break;
                 case EAMJ_Chiral:
                 {
-                    /*
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (bZ4)
@@ -267,7 +266,6 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
 
                     }
-                    */
                 }
                 break;
                 default:
@@ -327,14 +325,14 @@ INT Measurement(CParameters& params)
             break;
             case EAMJ_Chiral:
             {
-                //_CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
-                //if (pCCLight->m_bMeasureConnect)
-                //{
-                //    _CLG_EXPORT_CHIRAL(pCCLight, ConnectSusp);
-                //}
-                //
-                //_CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
-                //_CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+                _CLG_EXPORT_CHIRAL(pCCLight, ChiralKS);
+                
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma3);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma4);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma5);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma53);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSGamma54);
+                _CLG_EXPORT_CHIRAL(pCCLight, CMTKSSigma34);
 
             }
             break;
@@ -353,8 +351,6 @@ INT Measurement(CParameters& params)
     {
         pF1Light->Return();
         pF2Light->Return();
-        //pF1Heavy->Return();
-        //pF2Heavy->Return();
     }
 
     appSafeDelete(pStaple);

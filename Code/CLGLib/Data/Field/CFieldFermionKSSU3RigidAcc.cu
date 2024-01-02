@@ -295,12 +295,24 @@ void CFieldFermionKSSU3RigidAcc::CopyTo(CField* U) const
     CFieldFermionKSSU3::CopyTo(U);
 }
 
+void CFieldFermionKSSU3RigidAcc::InitialOtherParameters(CParameters& params)
+{
+    CFieldFermionKSSU3::InitialOtherParameters(params);
+
+    INT iImGamma3 = 1;
+    if (params.FetchValueINT(_T("ImaginaryGamma3"), iImGamma3))
+    {
+        m_bUseImaginaryGamma3 = (0 != iImGamma3);
+    }
+}
+
 CCString CFieldFermionKSSU3RigidAcc::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3RigidAcc\n");
     sRet = sRet + tab + _T("Mass (2am) : ") + appFloatToString(m_f2am) + _T("\n");
     sRet = sRet + tab + _T("MD Rational (c) : ") + appFloatToString(m_rMD.m_fC) + _T("\n");
     sRet = sRet + tab + _T("MC Rational (c) : ") + appFloatToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("Imaginary Gamma3 : ") + appIntToString(m_bUseImaginaryGamma3) + _T("\n");
     sRet = sRet + tab + _T("G : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }
