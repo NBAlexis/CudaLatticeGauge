@@ -1,5 +1,5 @@
 # EAJ_Simulate, EAJ_SimulateQ, EAJ_Measure, EAJ_SimulateQMidCenter, EAJ_MeasureMidCenter
-AccJob : EAJ_Measure
+AccJob : EAJ_MeasureMidCenter
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -607,12 +607,12 @@ JobMeasureMidCenter:
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : ./Acc/60
+    SubFolderPrefix : G:\ConstAccM\65
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ACCQ60_
-    CSVSavePrefix : ACCQ60_
+    SavePrefix : ACCQM65_
+    CSVSavePrefix : ACCQM65_
 
     Dim : 4
     Dir : 4

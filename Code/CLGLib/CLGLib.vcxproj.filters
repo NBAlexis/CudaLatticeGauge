@@ -55,6 +55,18 @@
     <Filter Include="GaugeFixing">
       <UniqueIdentifier>{74273227-39c8-4451-b296-142591257ab3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Field\WilsonDirac">
+      <UniqueIdentifier>{655623d0-17fb-4b3b-9d18-e2270dd7d576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Field\Staggered">
+      <UniqueIdentifier>{95b9ba7e-c8c5-413a-877d-2b1a041711f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Field\Boson">
+      <UniqueIdentifier>{4a80778c-09c9-489e-a118-7ff979e5042e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Field\Gauge">
+      <UniqueIdentifier>{1a189ba2-2b8b-4d50-8ae9-bc87319eaa68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tools\Timer.h">
@@ -93,15 +105,6 @@
       <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Data\Field\CFieldFermion.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGauge.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeSU3.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeZ2.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Data\Field\CFieldSpin.h">
@@ -184,9 +187,6 @@
     </ClInclude>
     <ClInclude Include="Tools\Math\Vectors.h">
       <Filter>Tools\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3.h">
-      <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Measurement\CMeasurementManager.h">
       <Filter>Measurement</Filter>
@@ -281,15 +281,6 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeSU3D.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3D.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DR.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h">
       <Filter>Measurement</Filter>
     </ClInclude>
@@ -329,9 +320,6 @@
     <ClInclude Include="GaugeFixing\CGaugeFixingRandom.h">
       <Filter>GaugeFixing</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Math\CRationalApproximation.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
@@ -359,20 +347,11 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteAcceleration.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBoost.h">
       <Filter>Data\Action</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.h">
-      <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.h">
       <Filter>Update\Continous</Filter>
@@ -386,15 +365,6 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h">
       <Filter>Data\Boundary</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3DR.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3D.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3R.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureWilsonLoop.h">
       <Filter>Measurement</Filter>
     </ClInclude>
@@ -404,20 +374,8 @@
     <ClInclude Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeSU3TreeImproved.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3EM.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="SparseLinearAlgebra\CMultiShiftNested.h">
       <Filter>SparseLinearAlgebra</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3P4.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeU1.h">
-      <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Measurement\CMeasureBerryPhase.h">
       <Filter>Measurement</Filter>
@@ -431,14 +389,8 @@
     <ClInclude Include="Measurement\CMeasureWilsonLoopWithPath.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldGaugeU1Real.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureWilsonLoopXY.h">
       <Filter>Measurement</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSU1.h">
-      <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h">
       <Filter>Data\Action</Filter>
@@ -446,23 +398,8 @@
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.h">
       <Filter>Data\Field\BoundaryField</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSU1R.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKS.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3REM.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h">
       <Filter>Data\Action</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3Gamma.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3GammaEM.h">
-      <Filter>Data\Field</Filter>
     </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h">
       <Filter>Data\Action</Filter>
@@ -497,14 +434,92 @@
     <ClInclude Include="Measurement\CMeasureAMomentumJG.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.h">
-      <Filter>Data\Field</Filter>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKS.h">
+      <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3Acc.h">
-      <Filter>Data\Field</Filter>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3.h">
+      <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldFermionKSSU3RigidAcc.h">
-      <Filter>Data\Field</Filter>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3D.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3DR.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3EM.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3P4.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3R.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3REM.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1R.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGauge.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3D.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1Real.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeZ2.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3D.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DR.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DRigidAcc.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Gamma.h">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquettePolar.h">
+      <Filter>Data\Action</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -616,9 +631,6 @@
     <Text Include="FileTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Data\Field\CFieldGaugeSU3.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Lattice\CIndexSquare.cu">
       <Filter>Data\Lattice</Filter>
     </CudaCompile>
@@ -631,14 +643,8 @@
     <CudaCompile Include="Core\CudaHelper.cu">
       <Filter>Core</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <Filter>Data\Lattice</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldGauge.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureMesonCorrelator.cu">
       <Filter>Measurement</Filter>
@@ -666,15 +672,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldGaugeSU3D.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3D.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DR.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureChargeAndCurrents.cu">
       <Filter>Measurement</Filter>
@@ -715,38 +712,17 @@
     <CudaCompile Include="Measurement\CMeasure.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteAcceleration.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Acc.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3DRigidAcc.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBoost.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Boost.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu">
       <Filter>Data\Boundary</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3DR.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3D.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3R.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureWilsonLoop.cu">
       <Filter>Measurement</Filter>
@@ -757,20 +733,8 @@
     <CudaCompile Include="Measurement\CMeasureConnectedChiralSusceptibilityKS.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldGaugeSU3TreeImproved.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Measurement\GaugeSmearing\CGaugeSmearing.cu">
       <Filter>Measurement\GaugeSmearing</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3EM.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3P4.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldGaugeU1.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <Filter>Measurement</Filter>
@@ -781,14 +745,8 @@
     <CudaCompile Include="Measurement\CMeasureWilsonLoopWithPath.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldGaugeU1Real.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Measurement\CMeasureWilsonLoopXY.cu">
       <Filter>Measurement</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSU1.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu">
       <Filter>Data\Action</Filter>
@@ -796,20 +754,8 @@
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu">
       <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSU1R.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3REM.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3Gamma.cu">
-      <Filter>Data\Field</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3GammaEM.cu">
-      <Filter>Data\Field</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu">
       <Filter>Data\Action</Filter>
@@ -844,14 +790,86 @@
     <CudaCompile Include="Measurement\CMeasureAMomentumJG.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionWilsonSquareSU3Gamma.cu">
-      <Filter>Data\Field</Filter>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3.cu">
+      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3Acc.cu">
-      <Filter>Data\Field</Filter>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.cu">
+      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\CFieldFermionKSSU3RigidAcc.cu">
-      <Filter>Data\Field</Filter>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3D.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3DR.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3EM.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3P4.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3R.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3REM.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1R.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3D.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1Real.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3D.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DR.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3DRigidAcc.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Gamma.cu">
+      <Filter>Data\Field\WilsonDirac</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu">
+      <Filter>Data\Action</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
