@@ -142,6 +142,8 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
         appCrucial(_T("CMeasureDiagnal::ExportDiagnalStaggeredSU3 only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
         return;
     }
+    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pF1->GetCopy());
 
     UINT uiSiteCount = pF1->GetSiteCount();
     deviceSU3Vector* hostv = (deviceSU3Vector*)malloc(sizeof(deviceSU3Vector) * uiSiteCount);
@@ -218,6 +220,18 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
                     pF1->ApplyGammaKS(pGauge, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
                 }
                 break;
+            case EMD_Oribital:
+                {
+                    pF1->CopyTo(pF2);
+                    CMeasureAngularMomentumKS::ApplyOrbitalMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId);
+                }
+                break;
+            case EMD_Spin:
+                {
+                    pF1->CopyTo(pF2);
+                    CMeasureAngularMomentumKS::ApplySpinMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId);
+                }
+                break;
             default:
                 {
                     appCrucial(_T("eType not implemented for ExportDiagnalWilsonSU3: %s"), __ENUM_TO_STRING(EMeasureDiagnal, eType).c_str());
@@ -238,8 +252,9 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
         }
     }
 
-    WriteComplexArray2(sFileName, rets);
+    WriteComplexArray2Simple(sFileName, rets);
     appSafeFree(hostv);
+    appSafeDelete(pF2);
 }
 
 __END_NAMESPACE

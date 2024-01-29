@@ -338,13 +338,13 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    FreeFermion : 0
-    GaugeBate : 4.87
-    OmegaRange : 0.14
-    StartOmega : 0
-    EndOmega : 20
+    FreeFermion : 1
+    GaugeBate : 4.94
+    OmegaRange : 0.128
+    StartOmega : 1
+    EndOmega : 8
     StartN : 101
-    EndN : 12000
+    EndN : 200
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./F494235047_
@@ -358,29 +358,28 @@ JobMeasure:
     ## EDJKS_Polyakov, EDJKS_Chiral, EDJKS_ChiralAndFermionMomentum, 
     ## EDJKS_CheckMD5, EDJKS_AngularMomentum, EDJKS_VR
     ## EDJKS_DoubleToFloat, EDJKS_Taylor, EDJKS_AngularMomentumDiagnal
-    DistributionJob : EDJKS_Polyakov
+    DistributionJob : EDJKS_ChiralAndFermionMomentum
     FermionMomentum : 0
-    StochasticFieldCount : 10
-    StochasticGaussian : 1
+    StochasticFieldCount : 100
     CheckGaugeFixing : 0
     UseZ4 : 1
     UseLogADefinition : 0
     SubFolder : 1
-    SubFolderPrefix : G:\configs\newresf\48716\Nt3
+    SubFolderPrefix : G:\SRFloat\486295059\GFNt4
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
     
     # R for most cases, Rotate for only configurations
-    MiddleString : Rotate
-    SavePrefix : NC48716_
-    CSVSavePrefix : ./NC48716_
+    MiddleString : R
+    SavePrefix : GFSRF494235047_
+    CSVSavePrefix : ./FFP494235047_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 3]
+    LatticeLength : [12, 12, 12, 6]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
-    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    # LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -392,10 +391,10 @@ JobMeasure:
 
     Gauge:
 
-        FieldName : CFieldGaugeSU3D
+        FieldName : CFieldGaugeSU3
         FieldInitialType : EFIT_Random
 
-        Period : [0, 0, 1, 1]
+        Period : [1, 1, 1, 1]
 
     GaugeBoundary:
 
@@ -410,13 +409,14 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.295
+        Mass : 0.235
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 1
+        ShiftCenter : 1
         Period : [1, 1, 1, -1]
 
-        # RealRotation : 0
+        RealRotation : 0
 
         # MC is to prepare
         # This is x^{1/16}
@@ -443,13 +443,14 @@ JobMeasure:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.059
+        Mass : 0.047
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
+        ShiftCenter : 1
         Period : [1, 1, 1, -1]
 
-        # RealRotation : 0
+        RealRotation : 0
 
         # MC is to prepare
         # This is x^{1/16}
@@ -545,7 +546,7 @@ JobMeasure:
         ShowResult : 0
         MeasureDist : 1
         MeasureZ : 0
-        ShiftCenter : 0
+        ShiftCenter : 1
 
     Measure2:
 

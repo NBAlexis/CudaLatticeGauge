@@ -144,6 +144,7 @@ UINT TestFermionMatrixKS(CParameters& param)
     CFieldFermionKSSU3* pFermion = static_cast<CFieldFermionKSSU3*>(appGetLattice()->GetFieldById(2));
     CFieldGaugeSU3* pGauge = static_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
     CCString sFile = _T("KS_");
+    param.FetchStringValue(_T("SaveHead"), sFile);
     CCString sFile2 = _T(".csv");
 
     for (INT i = 0; i < static_cast<INT>(EMD_Max); ++i)

@@ -245,6 +245,9 @@ __DEFINE_ENUM(EMeasureDiagnal,
     EMD_Gamma53,
     EMD_Gamma54,
 
+    EMD_Oribital,
+    EMD_Spin,
+
     EMD_Max,
     )
 

@@ -745,6 +745,75 @@ inline void WriteComplexArray2(const CCString& sFileName, const TArray<TArray<CL
     file.close();
 }
 
+inline void WriteComplexArray2Simple(const CCString& sFileName, const TArray<TArray<CLGComplex>>& lst, UBOOL bAppend = FALSE)
+{
+    const INT iDigital = 8;
+    std::ofstream file;
+    if (!bAppend)
+    {
+        file.open(sFileName.c_str(), std::ios::out);
+    }
+    else
+    {
+        file.open(sFileName.c_str(), std::ios::app | std::ios::out);
+    }
+
+    if (file.fail())
+    {
+        static TCHAR errorMsg[256];
+        strerror_s(errorMsg, 256, errno);
+        appCrucial(_T("Saving %s failed! Because %s\n"), sFileName.c_str(), errorMsg);
+    }
+
+    TCHAR str[50];
+    for (INT i = 0; i < lst.GetCount(); ++i)
+    {
+        for (INT j = 0; j < lst[i].GetCount(); ++j)
+        {
+            _gcvt_s(str, 50, lst[i][j].x, iDigital);
+            CCString sReal = CCString(str);
+            sReal = sReal.Replace(_T("e"), _T("*^"));
+
+            file << _T(" ");
+            file << sReal;
+
+            if (abs(lst[i][j].y) > F(0.0001) * lst[i][j].x)
+            {
+                _gcvt_s(str, 50, lst[i][j].y, iDigital);
+                CCString sImg = CCString(str);
+                sImg = sImg.Replace(_T("e"), _T("*^"));
+                CCString sMid = _T(" + ");
+                if (sImg.Left(1) == _T("-"))
+                {
+                    sImg = sImg.Right(sImg.GetLength() - 1);
+                    sMid = _T(" - ");
+                }
+
+                file << sMid;
+                file << sImg;
+                if (j == lst[i].GetCount() - 1)
+                {
+                    file << _T(" I");
+                }
+                else
+                {
+                    file << _T(" I,");
+                }
+            }
+            else
+            {
+                if (j != lst[i].GetCount() - 1)
+                {
+                    file << _T(",");
+                }
+            }
+        }
+        file << _T("\n");
+    }
+    file.flush();
+    file.close();
+}
+
 __END_NAMESPACE
 
 #endif //#ifndef _CMEASURE_H_

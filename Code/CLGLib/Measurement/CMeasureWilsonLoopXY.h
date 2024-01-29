@@ -2,8 +2,8 @@
 // FILENAME : CMeasureWilsonLoopXY.h
 // 
 // DESCRIPTION:
-// This is measurement for Polyakov loop and static quark potential
-// Suitable for translational invarient case
+// 
+// 
 //
 // REVISION:
 //  [09/24/2021 nbale]
