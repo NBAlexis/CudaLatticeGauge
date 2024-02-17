@@ -104,18 +104,18 @@ INT SimulateStaggeredRotation(CParameters& params)
             appCrucial(_T("Initial Failed!\n"));
             return 1;
         }
-        UINT uiHalf = (_HC_Lx + 1) / 2;
+        //UINT uiHalf = (_HC_Lx + 1) / 2;
 
         CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-        TArray<TArray<CLGComplex>> polykovX_nx;
+        //TArray<TArray<CLGComplex>> polykovX_nx;
         TArray<CLGComplex> polykov;
         TArray<Real> polykovphase;
-        for (UINT uiX = 0; uiX < uiHalf; ++uiX)
-        {
-            TArray<CLGComplex> a;
-            TArray<Real> b;
-            polykovX_nx.AddItem(a);
-        }
+        //for (UINT uiX = 0; uiX < uiHalf; ++uiX)
+        //{
+        //    TArray<CLGComplex> a;
+        //    TArray<Real> b;
+        //    polykovX_nx.AddItem(a);
+        //}
 
         CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
         //CActionGaugePlaquette* pGaugeNoRotation = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
@@ -282,16 +282,16 @@ INT SimulateStaggeredRotation(CParameters& params)
 
             //===================== Polyakov loop =====================
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iEquib - iEquibSkip));
-            assert(pPL->m_lstAverageLoopDensity.Num()
-                == static_cast<INT>(uiHalf));
+            //assert(pPL->m_lstAverageLoopDensity.Num()
+            //    == static_cast<INT>(uiHalf));
 
             //============= polyakov gather =============
             polykov.AddItem(pPL->m_cAverageLoop);
             polykovphase.AddItem(__cuCargf(pPL->m_cAverageLoop));
-            for (UINT iX = 0; iX < uiHalf; ++iX)
-            {
-                polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
-            }
+            //for (UINT iX = 0; iX < uiHalf; ++iX)
+            //{
+            //    polykovX_nx[iX].AddItem(pPL->m_lstAverageLoopDensity[iX]);
+            //}
 
 #pragma endregion
 
