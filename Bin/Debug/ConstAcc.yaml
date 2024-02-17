@@ -1,5 +1,5 @@
 # EAJ_Simulate, EAJ_SimulateQ, EAJ_Measure, EAJ_SimulateQMidCenter, EAJ_MeasureMidCenter
-AccJob : EAJ_MeasureMidCenter
+AccJob : EAJ_SimulateQ
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -258,19 +258,19 @@ JobSimulateQ:
     VerboseOutput : datetime
     ShowDeviceInformation : 0
     ShowParameterContent : 0
-    BeforeEquvibStep : 2000
+    BeforeEquvibStep : 20
     EquvibSkip : 0
-    EquvibStep : 10000
+    EquvibStep : 100
     SaveStartIndex : 0
 
     ListStart : 0
-    ListEnd : 17
-    AccList : [-0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08]
-    PrefixList : [m08, m07, m06, m05, m04, m03, m02, m01, 00, 01, 02, 03, 04, 05, 06, 07, 08]
+    ListEnd : 6
+    AccList : [-0.04, -0.035, -0.03, -0.025, -0.02, -0.015, -0.01, -0.005, 0, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04]
+    PrefixList : [m40, m35, m30, m25, m20, m15, m10, m05, 00, 05, 10, 15, 20, 25, 30, 35, 40]
 
     MinNt : 6
     MaxNt : 6
-    SavePrefix : ./ACC/60/ACCQ60_
+    SavePrefix : ./ACC57/ACCQ57_
     Additive : 0
 
     # 53551575Nt4 Omega60 
@@ -332,7 +332,7 @@ JobSimulateQ:
     Action1:
    
         ActionName : CActionGaugePlaquetteRigidAcc
-        Beta : 6.0
+        Beta : 5.7
         AccG : 0.1
         Dirichlet : 0
         
@@ -589,9 +589,9 @@ JobMeasureMidCenter:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 17
-    AccList : [-0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01, 0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08]
-    PrefixList : [m08, m07, m06, m05, m04, m03, m02, m01, 00, 01, 02, 03, 04, 05, 06, 07, 08]
+    ListEnd : 9
+    AccList : [0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16]
+    PrefixList : [00, 02, 04, 06, 08, 10, 12, 14, 16]
     StartN : 101
     EndN : 10000
     SaveFermionFile : 0
@@ -607,12 +607,12 @@ JobMeasureMidCenter:
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : G:\ConstAccM\65
+    SubFolderPrefix : H:\ConstAccM\58
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : ACCQM65_
-    CSVSavePrefix : ACCQM65_
+    SavePrefix : ACCQM58_
+    CSVSavePrefix : ACCQM58_
 
     Dim : 4
     Dir : 4

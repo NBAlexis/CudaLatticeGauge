@@ -1,6 +1,6 @@
 # EBGJ_Simulate, EBGJ_Measure, EBGJ_Simulate2, EBGJ_Measure2, 
 # EBGJ_SimulateScanBeta, EBGJ_MeasureScanBeta, EBGJ_GaugeFixing, EBGJ_SimulateQ, EBGJ_SimulateScanQ
-WorkJob : EBGJ_SimulateScanQ
+WorkJob : EBGJ_MeasureScanBeta
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -841,11 +841,11 @@ JobMeasureBetaScan:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 10
-    BetaList : [5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5]
-    PrefixList : [56, 57, 58, 59, 60, 61, 62, 63, 64, 65]
+    ListEnd : 9
+    BetaList : [5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3]
+    PrefixList : [55, 56, 57, 58, 59, 60, 61, 62, 63]
     StartN : 101
-    EndN : 2300
+    EndN : 1000
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaScan/Fermion/FB02_
@@ -853,22 +853,22 @@ JobMeasureBetaScan:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular
-    DistributionJob : EBSMJ_Angular
+    DistributionJob : EBSMJ_Chiral
     FermionMomentum : 0
-    StochasticFieldCount : 10
+    StochasticFieldCount : 20
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : F:\Builds\FloatBuild-8-21\Release\BSQ
+    SubFolderPrefix : G:\MesonMassElectric\BS01
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : BSQ_
-    CSVSavePrefix : BSQ_
+    SavePrefix : BS01_
+    CSVSavePrefix : BS01_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [24, 24, 24, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -899,7 +899,7 @@ JobMeasureBetaScan:
         FieldInitialType : EFIT_RandomGaussian
 
         # 2am
-        Mass : 0.2
+        Mass : 0.1
         FieldId : 2
         PoolNumber : 15
         EachSiteEta : 0

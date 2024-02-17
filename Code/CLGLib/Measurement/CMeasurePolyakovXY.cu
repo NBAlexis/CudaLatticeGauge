@@ -344,10 +344,10 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             m_lstPZSliceAbs.AddItem(m_pZHostLoopDensityAbs [i] / fFactor);
         }
     }
-    for (UINT i = _HC_Centerx; i < _HC_Lx; ++i)
-    {
-        m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + _HC_Centery]);
-    }
+    //for (UINT i = _HC_Centerx; i < _HC_Lx; ++i)
+    //{
+    //    m_lstLoopDensity.AddItem(m_pXYHostLoopDensity[i * _HC_Ly + _HC_Centery]);
+    //}
 
     TransformFromXYDataToRDataOnce_C(
         m_bShiftCenter,
@@ -485,12 +485,12 @@ void CMeasurePolyakovXY::Report()
 {
     UINT uiHalf = (_HC_Lx + 1) / 2;
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
-    assert(static_cast<UINT>(m_uiConfigurationCount * uiHalf)
-        == static_cast<UINT>(m_lstLoopDensity.Num()));
+    //assert(static_cast<UINT>(m_uiConfigurationCount * uiHalf)
+    //    == static_cast<UINT>(m_lstLoopDensity.Num()));
 
     appPushLogDate(FALSE);
     CLGComplex tmpChargeSum = _make_cuComplex(F(0.0), F(0.0));
-    m_lstAverageLoopDensity.RemoveAll();
+    //m_lstAverageLoopDensity.RemoveAll();
 
     appGeneral(_T("\n\n==========================================================================\n"));
     appGeneral(_T("==================== Polyakov Loop (%d con)============================\n"), m_uiConfigurationCount);
@@ -511,34 +511,34 @@ void CMeasurePolyakovXY::Report()
     m_cAverageLoop = tmpChargeSum;
     appGeneral(_T("\n ----------- average Loop |<P>| = %2.12f arg(P) = %2.12f ------------- \n"), _cuCabsf(tmpChargeSum), __cuCargf(tmpChargeSum));
 
-    appGeneral(_T("\n ----------- Loop density ------------- \n"));
+    //appGeneral(_T("\n ----------- Loop density ------------- \n"));
 
-    appGeneral(_T("{\n"));
-    for (UINT k = 0; k < m_uiConfigurationCount; ++k)
-    {
-        appGeneral(_T("{"));
-        for (UINT i = 0; i < uiHalf; ++i)
-        {
-            LogGeneralComplex(m_lstLoopDensity[k * uiHalf + i]);
+    //appGeneral(_T("{\n"));
+    //for (UINT k = 0; k < m_uiConfigurationCount; ++k)
+    //{
+    //    //appGeneral(_T("{"));
+    //    for (UINT i = 0; i < uiHalf; ++i)
+    //    {
+    //        //LogGeneralComplex(m_lstLoopDensity[k * uiHalf + i]);
 
-            if (0 == k)
-            {
-                m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * uiHalf + i]);
-            }
-            else
-            {
-                m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * uiHalf + i]);
-            }
+    //        //if (0 == k)
+    //        //{
+    //        //    m_lstAverageLoopDensity.AddItem(m_lstLoopDensity[k * uiHalf + i]);
+    //        //}
+    //        //else
+    //        //{
+    //        //    m_lstAverageLoopDensity[i] = _cuCaddf(m_lstAverageLoopDensity[i], m_lstLoopDensity[k * uiHalf + i]);
+    //        //}
 
-            if (k == m_uiConfigurationCount - 1)
-            {
-                m_lstAverageLoopDensity[i].x = m_lstAverageLoopDensity[i].x / m_uiConfigurationCount;
-                m_lstAverageLoopDensity[i].y = m_lstAverageLoopDensity[i].y / m_uiConfigurationCount;
-            }
-        }
-        appGeneral(_T("}\n"));
-    }
-    appGeneral(_T("}\n"));
+    //        if (k == m_uiConfigurationCount - 1)
+    //        {
+    //            m_lstAverageLoopDensity[i].x = m_lstAverageLoopDensity[i].x / m_uiConfigurationCount;
+    //            m_lstAverageLoopDensity[i].y = m_lstAverageLoopDensity[i].y / m_uiConfigurationCount;
+    //        }
+    //    }
+    //    //appGeneral(_T("}\n"));
+    //}
+    //appGeneral(_T("}\n"));
 
     appGeneral(_T("\n==========================================================================\n"));
     appGeneral(_T("==========================================================================\n\n"));
@@ -552,7 +552,7 @@ void CMeasurePolyakovXY::Reset()
     m_lstLoopInner.RemoveAll();
     m_lstLoopAbs.RemoveAll();
     m_lstLoopAbsInner.RemoveAll();
-    m_lstLoopDensity.RemoveAll();
+    //m_lstLoopDensity.RemoveAll();
     m_lstLoopZ.RemoveAll();
     m_lstLoopZInner.RemoveAll();
     m_lstLoopZDensity.RemoveAll();

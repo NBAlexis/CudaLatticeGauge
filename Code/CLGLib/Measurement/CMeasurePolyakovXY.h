@@ -121,7 +121,7 @@ public:
     TArray<Real> m_lstLoopAbsInner;
 
     //not using
-    TArray<CLGComplex> m_lstLoopDensity;
+    //TArray<CLGComplex> m_lstLoopDensity;
 
     //all
     TArray<CLGComplex> m_lstLoopZ;
@@ -135,7 +135,7 @@ public:
     TArray<CLGComplex> m_lstLoopZDensity;
 
     CLGComplex m_cAverageLoop;
-    TArray<CLGComplex> m_lstAverageLoopDensity;
+    //TArray<CLGComplex> m_lstAverageLoopDensity;
 
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstP;
