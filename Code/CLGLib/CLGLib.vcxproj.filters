@@ -521,6 +521,12 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquettePolar.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\CFieldBoson.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Boson\CFieldBosonU1NoGauge.h">
+      <Filter>Data\Field\Boson</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -624,6 +630,9 @@
       <Filter>SparseLinearAlgebra</Filter>
     </ClCompile>
     <ClCompile Include="Data\Field\CFieldFermion.cpp">
+      <Filter>Data\Field</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\CFieldBoson.cpp">
       <Filter>Data\Field</Filter>
     </ClCompile>
   </ItemGroup>
@@ -870,6 +879,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu">
       <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1NoGauge.cu">
+      <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

@@ -283,7 +283,7 @@ extern INT Simulate(CParameters& params);
 extern INT Measurement(CParameters& params);
 extern INT SimulateBetaScan(CParameters& params);
 extern INT MeasurementBetaScan(CParameters& params);
-
+extern INT GaugeFixing(CParameters& params);
 
 //=============================================================================
 // END OF FILE

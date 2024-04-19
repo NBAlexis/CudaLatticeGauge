@@ -1,27 +1,17 @@
 //=============================================================================
-// FILENAME : CFieldSpin.h
+// FILENAME : CFieldBosn.cpp
 // 
 // DESCRIPTION:
-// This is the class for the spin fields
+// This is the class for all fermion fields
 //
 // REVISION:
-//  [12/3/2018 nbale]
+//  [3/31/2024 nbale]
 //=============================================================================
-
-#ifndef _CFIELDSPIN_H_
-#define _CFIELDSPIN_H_
+#include "CLGLib_Private.h"
 
 __BEGIN_NAMESPACE
 
-class CLGAPI CFieldSpin : public CField
-{
-public:
-
-};
-
 __END_NAMESPACE
-
-#endif //#ifndef _CFIELDSPIN_H_
 
 //=============================================================================
 // END OF FILE

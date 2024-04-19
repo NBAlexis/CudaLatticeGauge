@@ -162,6 +162,7 @@ public:
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return FALSE; }
     virtual UBOOL IsEvenField() const { return FALSE; }
+    virtual UBOOL IsBosonField() const { return FALSE; }
 
 #pragma endregion
 

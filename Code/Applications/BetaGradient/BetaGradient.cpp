@@ -78,7 +78,7 @@ int main(int argc, char * argv[])
     case EBGJ_GaugeFixing:
         {
             CParameters workingParam1 = params.GetParameter(_T("JobGaugeFixing"));
-            appCrucial(_T("Gauge fixing not implemented yet!\n"));
+            res = GaugeFixing(workingParam1);
         }
         break;
     default:

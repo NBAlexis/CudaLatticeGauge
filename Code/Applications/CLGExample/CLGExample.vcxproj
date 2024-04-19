@@ -19,29 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GaugeFixingJob.cpp" />
-    <ClCompile Include="Measure.cpp" />
-    <ClCompile Include="BetaGradient.cpp">
+    <ClCompile Include="CLGExample.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="MeasureBetaScan.cpp" />
-    <ClCompile Include="Simulate.cpp" />
-    <ClCompile Include="SimulateBetaScan.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BetaGradient.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Bin\Debug\BetaGradient.yaml" />
+    <None Include="..\..\..\Bin\Debug\CLGExample.yaml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{923A79D4-C470-4D72-BDC4-F04658E5FDE0}</ProjectGuid>
+    <ProjectGuid>{CC47F828-1808-4DED-88E6-869F5B973B52}</ProjectGuid>
     <RootNamespace>CudaLatticeGauge</RootNamespace>
-    <ProjectName>BetaGradient</ProjectName>
+    <ProjectName>CLGExample</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -90,14 +82,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)Applications\BetaGradient\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
+    <IncludePath>$(SolutionDir)Applications\CLGExample\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Applications\BetaGradient\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
+    <IncludePath>$(SolutionDir)Applications\CLGExample\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
@@ -106,10 +98,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Applications\BetaGradient\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
+    <IncludePath>$(SolutionDir)Applications\CLGExample\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)Applications\BetaGradient\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
+    <IncludePath>$(SolutionDir)Applications\CLGExample\;$(SolutionDir)CLGLib\;$(ProjectDir);$(IncludePath);$(CUDA_PATH)\include</IncludePath>
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Temp\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -120,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);DEBUG=1</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>BetaGradient.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>ConstAcc.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -135,8 +127,9 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions);DEBUG=1</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>BetaGradient.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -160,7 +153,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>BetaGradient.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>ConstAcc.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -185,8 +178,9 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>BetaGradient.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
     </ClCompile>
     <Link>

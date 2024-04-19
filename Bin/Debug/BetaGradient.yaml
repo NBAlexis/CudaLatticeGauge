@@ -638,7 +638,8 @@ JobGaugeFixing:
     SubFolder : 1
     SubFolderPrefix : H:\EW\54002\Nt6\EM
     LoadPrefix : SRF540_02EM_
-    Middle : EM
+    FileList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
+    FolderList : [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
     CheckSubFolder : 0
     CheckSubFolderPrefix : G:\configs\Extrapolation\535161Nt6\GF
     SavePrefix : H:\EW\54002\GF\GFSRF540_02EM_
@@ -652,9 +653,9 @@ JobGaugeFixing:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [12, 12, 12, 6]
+    LatticeLength : [12, 12, 12, 48]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
@@ -841,11 +842,11 @@ JobMeasureBetaScan:
     ShowParameterContent : 0
 
     ListStart : 0
-    ListEnd : 9
-    BetaList : [5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3]
-    PrefixList : [55, 56, 57, 58, 59, 60, 61, 62, 63]
+    ListEnd : 12
+    BetaList : [5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3]
+    PrefixList : [52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
     StartN : 101
-    EndN : 1000
+    EndN : 900
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaScan/Fermion/FB02_
@@ -853,13 +854,13 @@ JobMeasureBetaScan:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular
-    DistributionJob : EBSMJ_Chiral
+    DistributionJob : EBSMJ_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 20
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : G:\MesonMassElectric\BS01
+    SubFolderPrefix : I:\MesonMassElectric\BS01
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 

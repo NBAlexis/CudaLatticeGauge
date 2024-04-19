@@ -47,11 +47,13 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonU1NoGauge.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CField.h" />
+    <ClInclude Include="Data\Field\CFieldBoson.h" />
     <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
@@ -182,6 +184,7 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1NoGauge.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
@@ -226,6 +229,7 @@
       <FileType>Document</FileType>
     </CudaCompile>
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
+    <ClCompile Include="Data\Field\CFieldBoson.cpp" />
     <ClCompile Include="Data\Field\CFieldFermion.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">

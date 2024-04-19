@@ -37,7 +37,7 @@
 #if _CLG_DEBUG
 #define _CLG_DOUBLEFLOAT 0
 #else
-#define _CLG_DOUBLEFLOAT 0
+#define _CLG_DOUBLEFLOAT 1
 #endif
 #endif
 

@@ -70,11 +70,13 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/CCommonData.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1NoGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundary.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
@@ -203,6 +205,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1NoGauge.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.cu
@@ -275,6 +278,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
@@ -414,6 +418,7 @@ target_link_libraries(StaggeredRotation CLGLib)
 include_directories(${PROJECT_SOURCE_DIR}/Applications/BetaGradient)
 add_executable(BetaGradient 
     ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/BetaGradient.h
+    ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/BetaGradient.cpp
     ${PROJECT_SOURCE_DIR}/Applications/BetaGradient/MeasureBetaScan.cpp

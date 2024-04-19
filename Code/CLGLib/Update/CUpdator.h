@@ -43,6 +43,7 @@ public:
     }
 
     virtual UINT Update(UINT iSteps, UBOOL bMeasure) = 0;
+    virtual void UpdateUntileAccept(UINT iSteps, UBOOL bMeasure);
     virtual Real CalculateEnergy() = 0;
 
     virtual EUpdatorType GetUpdatorType() const { return EUT_Max; }
