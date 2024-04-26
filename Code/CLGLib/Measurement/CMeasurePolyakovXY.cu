@@ -483,7 +483,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
 
 void CMeasurePolyakovXY::Report()
 {
-    UINT uiHalf = (_HC_Lx + 1) / 2;
+    //UINT uiHalf = (_HC_Lx + 1) / 2;
     assert(m_uiConfigurationCount == static_cast<UINT>(m_lstLoop.Num()));
     //assert(static_cast<UINT>(m_uiConfigurationCount * uiHalf)
     //    == static_cast<UINT>(m_lstLoopDensity.Num()));

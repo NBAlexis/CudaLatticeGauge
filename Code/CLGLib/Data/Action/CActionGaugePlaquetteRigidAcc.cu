@@ -252,38 +252,24 @@ _kernelAddForce4PlaqutteTermSU3_RigidAcc(
 
 CActionGaugePlaquetteRigidAcc::CActionGaugePlaquetteRigidAcc()
     : CAction()
-    , m_fLastEnergy(F(0.0))
-    , m_fNewEnergy(F(0.0))
-    , m_fBetaOverN(F(0.1))
     , m_uiPlaqutteCount(0)
     , m_bDirichlet(FALSE)
 {
 }
 
-void CActionGaugePlaquetteRigidAcc::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+void CActionGaugePlaquetteRigidAcc::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
 {
     if (0 == uiUpdateIterate)
     {
-        m_fLastEnergy = Energy(FALSE, pGauge, NULL);
-    }
-}
-
-void CActionGaugePlaquetteRigidAcc::OnFinishTrajectory(UBOOL bAccepted)
-{
-    if (bAccepted)
-    {
-        m_fLastEnergy = m_fNewEnergy;
+        m_fLastEnergy = EnergySingleField(FALSE, pGauge, NULL);
     }
 }
 
 void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_byActionId = byId;
-    Real fBeta = 0.1f;
-    param.FetchValueReal(_T("Beta"), fBeta);
-    CCommonData::m_fBeta = static_cast<DOUBLE>(fBeta);
-    m_fBetaOverN = fBeta / static_cast<Real>(_HC_SUN);
+    CAction::Initial(pOwner, param, byId);
+
+    m_fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fG = 0.1f;
@@ -317,7 +303,7 @@ void CActionGaugePlaquetteRigidAcc::SetBeta(Real fBeta)
     m_fBetaOverN = fBeta / static_cast<Real>(_HC_SUN);
 }
 
-UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
+UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
@@ -335,7 +321,7 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGauge(const CFieldGauge * p
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pForceSU3->m_pDeviceData, 
-        m_fBetaOverN, 
+        m_fBetaOverNR,
         CCommonData::m_fG,
         m_bDirichlet,
         pGaugeSU3->m_byFieldId);
@@ -344,11 +330,7 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGauge(const CFieldGauge * p
     return TRUE;
 }
 
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#else
-Real CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#endif
+DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
     if (bBeforeEvolution)
     {
@@ -377,7 +359,7 @@ Real CActionGaugePlaquetteRigidAcc::Energy(UBOOL bBeforeEvolution, const class C
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
-        m_fBetaOverN,
+        m_fBetaOverNR,
         CCommonData::m_fG,
         m_bDirichlet,
         _D_RealThreadBuffer);
@@ -397,9 +379,10 @@ void CActionGaugePlaquetteRigidAcc::SetG(Real fG)
 CCString CActionGaugePlaquetteRigidAcc::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteRigidAcc\n");
-    sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Acc : ") + appFloatToString(CCommonData::m_fG) + _T("\n");
-    sRet = sRet + tab + _T("Dirichlet : ") + appIntToString(m_bDirichlet) + _T("\n");
+    sRet = sRet + CAction::GetInfos(tab);
+    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Acc : ") + appAnyToString(CCommonData::m_fG) + _T("\n");
+    sRet = sRet + tab + _T("Dirichlet : ") + appAnyToString(m_bDirichlet) + _T("\n");
     return sRet;
 }
 

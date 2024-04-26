@@ -31,6 +31,7 @@ public:
         , m_pLatticeData(NULL)
         , m_pFileSystem(NULL)
         , m_pBuffer(NULL)
+        , m_iDeviceId(0)
         , m_InitialCache()
     {
     }
@@ -53,6 +54,8 @@ public:
     class CCudaBuffer* m_pBuffer;
 
     void SetupLog(class CParameters& params);
+
+    INT m_iDeviceId;
 
 protected:
 

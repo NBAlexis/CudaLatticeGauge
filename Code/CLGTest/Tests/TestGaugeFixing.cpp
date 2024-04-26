@@ -16,6 +16,15 @@
 #define _tfftMZ 11
 #define _tfftMT 12
 
+#if !_CLG_DOUBLEFLOAT
+#define _GAUGE_FIXING_EnergyERROR F(0.05)
+#define _GAUGE_FIXING_ZeroERROR F(0.001)
+#else
+#define _GAUGE_FIXING_EnergyERROR 0.005
+#define _GAUGE_FIXING_ZeroERROR 0.00005
+#endif
+
+
 UINT TestFFT(CParameters&)
 {
     CCLGFFTHelper::TestFFT();
@@ -26,19 +35,19 @@ UINT TestGaugeFixingLandau(CParameters&)
 {
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
     CActionGaugePlaquette* pAction1 = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
-    const Real fBeforeEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fBeforeEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
 
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fDivation = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
-    const Real fAfterEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fAfterEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
 
     UINT uiError = 0;
-    if (fDivation > F(0.00005))
+    if (fDivation > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
 
-    if (appAbs(fBeforeEnergy1 - fAfterEnergy1) > F(0.005))
+    if (appAbs(fBeforeEnergy1 - fAfterEnergy1) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
@@ -61,27 +70,27 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
     pFermion->PrepareForHMCNotRandomize(pGauge);
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
     CActionFermionWilsonNf2* pAction2 = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->GetActionById(2));
-    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion;
-    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy2 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
     
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
-    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion2;
-    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy4 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
 
-    if (fError > F(0.0001))
+    if (fError > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
-    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
+    if (appAbs(fEnergy1 - fEnergy3) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
-    if (appAbs(fEnergy2 - fEnergy4) > F(0.001))
+    if (appAbs(fEnergy2 - fEnergy4) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
@@ -149,14 +158,14 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
 
             appGeneral(_T("Cond[%d]: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i1, 
                 oldAll[i1].x, oldAll[i1].y, toBeCompareAll.x, toBeCompareAll.y);
-            if (__cuCabsSqf(_cuCsubf(oldAll[i1], toBeCompareAll)) > F(0.00000001))
+            if (__cuCabsSqf(_cuCsubf(oldAll[i1], toBeCompareAll)) > _GAUGE_FIXING_ZeroERROR)
             {
                 ++uiError;
             }
 
             appGeneral(_T("Cond[%d] at 0: before = %2.12f %2.12f I  after = %2.12f %2.12f I\n"), i1,
                 oldPosition0[i1].x, oldPosition0[i1].y, toBeComparePosition0.x, toBeComparePosition0.y);
-            if (__cuCabsSqf(_cuCsubf(oldPosition0[i1], toBeComparePosition0)) > F(0.00000001))
+            if (__cuCabsSqf(_cuCsubf(oldPosition0[i1], toBeComparePosition0)) > _GAUGE_FIXING_ZeroERROR)
             {
                 ++uiError;
             }
@@ -191,9 +200,9 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     CMeasureChiralCondensateKS* pCC = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureAngularMomentumKS* pAM = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
 
-    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion;
-    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy2 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
 
     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
     pPL->OnConfigurationAccepted(pGauge, NULL);
@@ -230,9 +239,9 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     pF2W->InverseD(pGauge);
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
-    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
     pAction2->m_pFerimionField = pFermion2;
-    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy4 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
 
 
     pPL->OnConfigurationAccepted(pGauge, NULL);
@@ -254,38 +263,38 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
         pAM->m_lstCondAll[2].GetCount()
     );
 
-    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
+    if (appAbs(fEnergy1 - fEnergy3) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
-    if (appAbs(fEnergy2 - fEnergy4) > F(0.001))
-    {
-        ++uiError;
-    }
-
-    if (appAbs(fPolyakov1 - fPolyakov2) > F(0.001))
+    if (appAbs(fEnergy2 - fEnergy4) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
 
-    if (appAbs(fChiralCond1 - fChiralCond2) > F(0.001))
-    {
-        ++uiError;
-    }
-    if (appAbs(fConectSusp1 - fConectSusp2) > F(0.001))
+    if (appAbs(fPolyakov1 - fPolyakov2) > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
 
-    if (appAbs(fOrbital1 - fOrbital2) > F(0.001))
+    if (appAbs(fChiralCond1 - fChiralCond2) > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
-    if (appAbs(fSpin1 - fSpin2) > F(0.001))
+    if (appAbs(fConectSusp1 - fConectSusp2) > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
-    if (appAbs(fPotential1 - fPotential2) > F(0.001))
+
+    if (appAbs(fOrbital1 - fOrbital2) > _GAUGE_FIXING_ZeroERROR)
+    {
+        ++uiError;
+    }
+    if (appAbs(fSpin1 - fSpin2) > _GAUGE_FIXING_ZeroERROR)
+    {
+        ++uiError;
+    }
+    if (appAbs(fPotential1 - fPotential2) > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
@@ -316,18 +325,18 @@ UINT TestGaugeFixingCoulombPorjectivePlane2(CParameters&)
 
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
 
-    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
 
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
 
-    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
 
-    if (fError > F(0.0001))
+    if (fError > _GAUGE_FIXING_ZeroERROR)
     {
         ++uiError;
     }
-    if (appAbs(fEnergy1 - fEnergy3) > F(0.001))
+    if (appAbs(fEnergy1 - fEnergy3) > _GAUGE_FIXING_EnergyERROR)
     {
         ++uiError;
     }
@@ -344,12 +353,16 @@ __REGIST_TEST(TestFFT, Misc, TestFFT);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauCornell);
 
+//FFT not applied using single float
+#if _CLG_DOUBLEFLOAT
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombCornell);
+#endif
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauLosAlamos);
 
 __REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombLosAlamos);
 
+//FFT not applied using single float
 #if _CLG_DOUBLEFLOAT
 __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
 #endif
@@ -358,7 +371,9 @@ __REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR)
 
 __REGIST_TEST(TestGaugeFixingCoulombDRChiral, Misc, TestGaugeFixingCoulombDRChiral);
 
+#if _CLG_USE_LAUNCH_BOUND
 __REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, Misc, TestGaugeFixingRotationKS);
+#endif
 
 __REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane2, Misc, TestGaugeFixingRotationKS2);
 

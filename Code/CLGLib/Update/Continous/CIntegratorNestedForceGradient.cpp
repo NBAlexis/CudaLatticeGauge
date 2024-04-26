@@ -13,16 +13,13 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CIntegratorNestedForceGradient)
 
-CIntegratorNestedForceGradient::~CIntegratorNestedForceGradient()
-{
-    appSafeDelete(m_pUPrime);
-}
 
 void CIntegratorNestedForceGradient::Initial(CHMC* pOwner, CLatticeData* pLattice, const CParameters& params)
 {
     CNestedIntegrator::Initial(pOwner, pLattice, params);
+
+    CreateBackupFields();
     m_fNestedStepLength = F(0.5) * m_fNestedStepLength;
-    m_pUPrime = dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField->GetCopy());
 }
 
 void CIntegratorNestedForceGradient::Evaluate()
@@ -54,22 +51,27 @@ void CIntegratorNestedForceGradient::Evaluate()
         }
 
         // middle step
-        m_pForceField->Zero();
+        ZeroForce();
         checkCudaErrors(cudaDeviceSynchronize());
-        for (INT i = 1; i < m_lstActions.Num(); ++i)
+        for (INT i = 0; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_InTrajectory);
+            if (m_lstActions[i]->IsFermion())
+            {
+                m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_InTrajectory);
+                m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_InTrajectory);
+            }
+
             checkCudaErrors(cudaDeviceSynchronize());
         }
 
-        m_pGaugeField->CopyTo(m_pUPrime);
-        m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
+        PreserveFields();
+        AddForceToFieldDirectly(f1Over24EstepSq);
 
         UpdatePF(f2Over3Estep, ESP_InTrajectory);
 
         //restore U
-        m_pUPrime->CopyTo(m_pGaugeField);
+        RecoverFields();
         
 
         if (uiStep < m_uiStepCount)
@@ -121,17 +123,25 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
         UpdateU(f1Over2EStep);
 
         // middle step
-        m_pForceField->Zero();
+        ZeroForce();
         checkCudaErrors(cudaDeviceSynchronize());
-        m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_Once);
 
-        m_pGaugeField->CopyTo(m_pUPrime);
-        m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
+        for (INT i = 0; i < m_lstActions.Num(); ++i)
+        {
+            if (!m_lstActions[i]->IsFermion())
+            {
+                m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_Once);
+                m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
+            }
+        }
+
+        PreserveFields();
+        AddForceToFieldDirectly(f1Over24EstepSq);
 
         UpdatePG(f2Over3Estep, FALSE);
 
         //restore U
-        m_pUPrime->CopyTo(m_pGaugeField);
+        RecoverFields();
         UpdateU(f1Over2EStep);
 
         if (uiStep < m_uiNestedStep)
@@ -151,10 +161,10 @@ CCString CIntegratorNestedForceGradient::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
     sRet = sTab + _T("Name : Nested Force Gradient\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appFloatToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appIntToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appFloatToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
     sRet = sRet + GetNestedInfo(sTab);
     return sRet;
 }

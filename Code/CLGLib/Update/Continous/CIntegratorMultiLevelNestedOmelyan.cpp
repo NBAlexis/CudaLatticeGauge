@@ -48,12 +48,7 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 
     if (m_bDebugForce)
     {
-#if !_CLG_DOUBLEFLOAT
-        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-        const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-        appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
+        appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
     }
 
     for (UINT uiStep = 1; uiStep < uiStepAll + 1; ++uiStep)
@@ -84,12 +79,7 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 
         if (m_bDebugForce)
         {
-#if !_CLG_DOUBLEFLOAT
-            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
+            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
         }
 
         if (iLevel != m_uiNestedStep.Num())
@@ -123,12 +113,7 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
         }
         if (m_bDebugForce)
         {
-#if !_CLG_DOUBLEFLOAT
-            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
+            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
         }
     }
 }
@@ -136,12 +121,12 @@ void CIntegratorMultiLevelOmelyan::NestedEvaluate(INT iLevel, Real fNestedStepLe
 CCString CIntegratorMultiLevelOmelyan::GetInfos(const CCString& sTab) const
 {
     CCString sRet = sTab + _T("Name : Nested Omelyan\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appFloatToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appIntToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appFloatToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
     sRet = sRet + sTab + _T("##Omelyan2Lambda = 2 x lambda\n");
-    sRet = sRet + sTab + _T("Omelyan2Lambda : ") + appFloatToString(m_f2Lambda) + _T("\n");
+    sRet = sRet + sTab + _T("Omelyan2Lambda : ") + appAnyToString(m_f2Lambda) + _T("\n");
     sRet = sRet + GetNestedInfo(sTab);
     return sRet;
 }

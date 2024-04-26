@@ -24,16 +24,12 @@ public:
 
     CActionGaugePlaquetteRotating();
 
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
-#else
-    Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
-#endif
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
 
-    UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
-    void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
-    void OnFinishTrajectory(UBOOL bAccepted) override;
+    UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
+    void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
 
     void EnergyDirichlet(const class CFieldGaugeSU3* pGauge);
@@ -45,13 +41,8 @@ public:
     void CalculateForceOnGaugeTorus(const class CFieldGaugeSU3* pGauge, class CFieldGaugeSU3* pForce) const;
 
 
-#if !_CLG_DOUBLEFLOAT
     void SetBeta(DOUBLE fBeta);
     void SetOmega(DOUBLE fOmega);
-#else
-    void SetBeta(Real fBeta);
-    void SetOmega(Real fOmega);
-#endif
     //void SetCenter(const SSmallInt4 &newCenter);
     //Real GetEnergyPerPlaqutte() const;
 
@@ -69,16 +60,6 @@ public:
     DOUBLE XYTerm2(const class CFieldGauge* pGauge);
 
 protected:
-
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE m_fLastEnergy;
-    DOUBLE m_fNewEnergy;
-    DOUBLE m_fBetaOverN;
-#else
-    Real m_fLastEnergy;
-    Real m_fNewEnergy;
-    Real m_fBetaOverN;
-#endif
 
     UINT m_uiPlaqutteCount;
 };

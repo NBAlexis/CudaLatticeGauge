@@ -22,7 +22,9 @@ public:
 
     }
 
-    virtual void PrepareForHMC(const CFieldGauge* pGauge) = 0;
+    virtual void MakeRandomMomentum() = 0;
+
+    UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override;
 
     /**
     * Calculate force can fail due to solver
@@ -30,9 +32,9 @@ public:
     //virtual UBOOL CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
 
     virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    //virtual void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
     
-    virtual void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    //virtual void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
 
 #pragma region real operators
 
@@ -47,6 +49,7 @@ public:
      */
     virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
     virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
+    virtual void FieldMultply(const CFieldBoson* x, UBOOL bConj = TRUE) = 0;
 
     UINT GetSiteCount() const { return m_uiSiteCount; }
 

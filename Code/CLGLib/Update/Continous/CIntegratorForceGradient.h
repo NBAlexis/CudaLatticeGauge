@@ -21,8 +21,7 @@ class CLGAPI CIntegratorForceGradient : public CIntegrator
 
 public:
 
-    CIntegratorForceGradient() : CIntegrator(), m_pUPrime(NULL) {}
-    ~CIntegratorForceGradient();
+    CIntegratorForceGradient() : CIntegrator() {}
 
     void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
 
@@ -32,7 +31,7 @@ public:
 
 protected:
 
-    class CFieldGauge * m_pUPrime;
+
 };
 
 __END_NAMESPACE

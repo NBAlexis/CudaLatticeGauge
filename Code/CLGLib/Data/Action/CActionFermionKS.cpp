@@ -22,8 +22,7 @@ CActionFermionKS::CActionFermionKS()
 
 void CActionFermionKS::Initial(CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_byActionId = byId;
+    CAction::Initial(pOwner, param, byId);
 
     //find fermion field
     INT iFieldId = -1;
@@ -35,7 +34,7 @@ void CActionFermionKS::Initial(CLatticeData* pOwner, const CParameters& param, B
     }
 }
 
-void CActionFermionKS::PrepareForHMC(const CFieldGauge* pGauge, UINT )
+void CActionFermionKS::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT )
 {
     m_pFerimionField->PrepareForHMC(pGauge);
 }
@@ -43,16 +42,12 @@ void CActionFermionKS::PrepareForHMC(const CFieldGauge* pGauge, UINT )
 /**
 * To make it constant, we need to build a few temp fields outside this class
 */
-UBOOL CActionFermionKS::CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge * /*staple*/, ESolverPhase ePhase) const
+UBOOL CActionFermionKS::CalculateForceOnGaugeSingleField(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge * /*staple*/, ESolverPhase ePhase) const
 {
     return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
 }
 
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionFermionKS::Energy(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
-#else
-Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGauge* )
-#endif
+DOUBLE CActionFermionKS::EnergySingleField(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
 {
     //[ (DD)^(-1/4) phi ]^2
     
@@ -65,11 +60,7 @@ Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGau
     CFieldFermionKS* pPooled = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
     m_pFerimionField->CopyTo(pPooled);
     pPooled->D_MD(pGauge);
-#if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex res = pPooled->Dot(m_pFerimionField);
-#else
-    const CLGComplex res = pPooled->Dot(m_pFerimionField);
-#endif
 
     appDetailed(_T("CActionFermionKS : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);
 
@@ -80,6 +71,7 @@ Real CActionFermionKS::Energy(UBOOL , const CFieldGauge* pGauge, const CFieldGau
 CCString CActionFermionKS::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
+    sRet = sRet + CAction::GetInfos(tab);
     return sRet;
 }
 

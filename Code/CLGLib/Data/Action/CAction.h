@@ -11,12 +11,26 @@
 #ifndef _CACTION_H_
 #define _CACTION_H_
 
+#define m_fBetaOverNR static_cast<Real>(m_fBetaOverN)
+
 __BEGIN_NAMESPACE
 
 class CLGAPI CAction : public CBase
 {
 public:
-    CAction() : m_pOwner(NULL), m_byActionId(0) { ; }
+    CAction() 
+        : m_pOwner(NULL)
+        , m_byActionId(0) 
+        , m_fLastEnergy(0.0)
+        , m_fNewEnergy(0.0)
+        , m_fBetaOverN(0.1)
+    {  
+    }
+
+    virtual ~CAction()
+    {
+
+    }
 
     /**
     * This is called langevin in Bridge++
@@ -25,16 +39,12 @@ public:
     * bBeforeEvolution is set to be TRUE if call this just after an update (therefore the energy is already calculate for Metroplis of the last step),
     * and will return the last result.
     */
-#if !_CLG_DOUBLEFLOAT
-    virtual DOUBLE Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) = 0;
-#else
-    virtual Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) = 0;
-#endif
+    virtual DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields);
 
     /**
     * Obtain the pointer of the fields
     */
-    virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) = 0;
+    virtual void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId);
 
     /**
     * Calculate the force on gauge fields to update the fields
@@ -42,7 +52,12 @@ public:
     * So the "pGauge" must be a copy of real gauge field, not the orignal one!
     * Can fail due to solver
     */
-    virtual UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const = 0;
+    virtual UBOOL CalculateForceOnGauge(INT num, const CFieldGauge* const * gaugeFields, CFieldGauge* const* forceFields, CFieldGauge* const* stapleFields, ESolverPhase ePhase) const;
+
+    virtual UBOOL CalculateForceOnBoson(INT num, const CFieldBoson* const * bosonFields, CFieldBoson* const* bosonForces, ESolverPhase ePhase) const
+    {
+        return TRUE;
+    }
 
     /**
     * Generate randoms
@@ -50,20 +65,75 @@ public:
     * in latter updates, we just use the calculated energy depend on whether it is accepted.
     * see also OnFinishOneTrajotory
     */
-    virtual void PrepareForHMC(const CFieldGauge* , UINT /* iUpdateIterate */) { ; }
+    virtual void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, UINT iUpdateIterate);
 
-    virtual void OnFinishTrajectory(UBOOL /* bAccepted */) { ; }
+    virtual void OnFinishTrajectory(UBOOL bAccepted)
+    { 
+        if (bAccepted && !IsFermion())
+        {
+            m_fLastEnergy = m_fNewEnergy;
+        }
+    }
 
-    virtual CCString GetInfos(const CCString &tab) const = 0;
+    virtual CCString GetInfos(const CCString &tab) const;
 
     BYTE GetActionId() const { return m_byActionId; }
 
     virtual UBOOL IsFermion() const { return FALSE; }
 
+    static INT GetGaugeFieldIndexById(INT num, const CFieldGauge* const* gaugeFields, BYTE byFieldId)
+    {
+        for (INT i = 0; i < num; ++i)
+        {
+            if (gaugeFields[i]->m_byFieldId == byFieldId)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static INT GetBosonFieldIndexById(INT num, const CFieldBoson* const* bosonFields, BYTE byFieldId)
+    {
+        for (INT i = 0; i < num; ++i)
+        {
+            if (bosonFields[i]->m_byFieldId == byFieldId)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // After measurement is done, change this to protected
+    virtual UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const
+    {
+        appCrucial(_T("CalculateForceOnGauge not implemented\n"));
+        return FALSE;
+    }
+
+    virtual void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+    {
+        appCrucial(_T("PrepareForHMC not implemented\n"));
+    }
+
+    virtual DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
+    {
+        appCrucial(_T("Energy not implemented\n"));
+        return 0.0;
+    }
+
 protected:
 
     class CLatticeData* m_pOwner;
     BYTE m_byActionId;
+
+    DOUBLE m_fLastEnergy;
+    DOUBLE m_fNewEnergy;
+    DOUBLE m_fBetaOverN;
+
+    TArray<BYTE> m_byGaugeFieldIds;
+    TArray<BYTE> m_byBosonFieldIds;
 };
 
 __END_NAMESPACE

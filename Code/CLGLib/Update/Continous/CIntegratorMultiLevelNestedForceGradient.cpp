@@ -13,15 +13,11 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CIntegratorMultiLevelNestedForceGradient)
 
-CIntegratorMultiLevelNestedForceGradient::~CIntegratorMultiLevelNestedForceGradient()
-{
-    appSafeDelete(m_pUPrime);
-}
-
 void CIntegratorMultiLevelNestedForceGradient::Initial(CHMC* pOwner, CLatticeData* pLattice, const CParameters& params)
 {
     CMultiLevelNestedIntegrator::Initial(pOwner, pLattice, params);
-    m_pUPrime = dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField->GetCopy());
+    
+    CreateBackupFields();
 }
 
 void CIntegratorMultiLevelNestedForceGradient::Evaluate()
@@ -55,12 +51,7 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
 
     if (m_bDebugForce)
     {
-#if !_CLG_DOUBLEFLOAT
-        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-        const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-        appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
+        appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
     }
 
     for (UINT uiStep = 1; uiStep < uiStepAll + 1; ++uiStep)
@@ -98,21 +89,16 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
             FALSE,
             FALSE);
 
-        m_pGaugeField->CopyTo(m_pUPrime);
-        m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
+        PreserveFields();
+        AddForceToFieldDirectly(f1Over24EstepSq);
 
         UpdateP(f2Over3Estep, iLevel, ESP_InTrajectory, FALSE, TRUE);
         if (m_bDebugForce)
         {
-#if !_CLG_DOUBLEFLOAT
-            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-            appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
+            appGeneral(_T(" ------ Force (%d) = %f\n"), iLevel, CalcForce());
         }
         //restore U
-        m_pUPrime->CopyTo(m_pGaugeField);
+        RecoverFields();
 
         if (iLevel != m_uiNestedStep.Num())
         {
@@ -146,12 +132,7 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
         }
         if (m_bDebugForce)
         {
-#if !_CLG_DOUBLEFLOAT
-            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-            appGeneral(_T(" ------ Force (%d) = %f + %f I\n"), iLevel, force.x, force.y);
+            appGeneral(_T(" ------ Force (%d) = %f\n"), iLevel, CalcForce());
         }
     }
 }
@@ -159,10 +140,10 @@ void CIntegratorMultiLevelNestedForceGradient::NestedEvaluate(INT iLevel, Real f
 CCString CIntegratorMultiLevelNestedForceGradient::GetInfos(const CCString& sTab) const
 {
     CCString sRet = sTab + _T("Name : Nested Force Gradient\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appFloatToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appIntToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appFloatToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
     sRet = sRet + GetNestedInfo(sTab);
     return sRet;
 }

@@ -13,16 +13,11 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CIntegratorForceGradient)
 
-CIntegratorForceGradient::~CIntegratorForceGradient()
-{
-    appSafeDelete(m_pUPrime);
-}
-
 void CIntegratorForceGradient::Initial(CHMC* pOwner, CLatticeData* pLattice, const CParameters& params)
 {
     CIntegrator::Initial(pOwner, pLattice, params);
     
-    m_pUPrime = dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField->GetCopy());
+    CreateBackupFields();
 }
 
 void CIntegratorForceGradient::Evaluate()
@@ -41,22 +36,23 @@ void CIntegratorForceGradient::Evaluate()
         UpdateU(f1Over2EStep);
 
         // middle step
-        m_pForceField->Zero();
+        ZeroForce();
         checkCudaErrors(cudaDeviceSynchronize());
         for (INT i = 0; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ESP_InTrajectory);
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_InTrajectory);
+            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_InTrajectory);
             checkCudaErrors(cudaDeviceSynchronize());
         }
 
-        m_pGaugeField->CopyTo(m_pUPrime);
-        m_pForceField->ExpMult(f1Over24EstepSq, m_pGaugeField);
+        PreserveFields();
+        AddForceToFieldDirectly(f1Over24EstepSq);
 
         UpdateP(f2Over3Estep, FALSE, ESP_InTrajectory);
 
         //restore U
-        m_pUPrime->CopyTo(m_pGaugeField);
+        RecoverFields();
         UpdateU(f1Over2EStep);
 
         if (uiStep < m_uiStepCount)
@@ -78,10 +74,10 @@ CCString CIntegratorForceGradient::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
     sRet = sTab + _T("Name : Force Gradient\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appFloatToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appIntToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appFloatToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
     return sRet;
 }
 

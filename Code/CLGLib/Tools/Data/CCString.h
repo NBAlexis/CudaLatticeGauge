@@ -10,6 +10,20 @@
 #ifndef _CCSTRING_H_
 #define _CCSTRING_H_
 
+#define defineStrToINT(type) \
+inline type appStrTo##type(const TCHAR* s) \
+{ \
+    return static_cast<type>(appStrToINT(s)); \
+}
+
+
+#define defineAnyToStr(type) \
+template<> \
+inline CCString appAnyToString(const type& content) \
+{ \
+    return CCString(std::to_string(content).c_str()); \
+}
+
 __BEGIN_NAMESPACE
 
 inline void appStrTrimLeft(TCHAR* &InStr)
@@ -41,6 +55,8 @@ inline UINT appStrToUINT(const TCHAR* s)
         base = 10;
     return appStoUI(p, base);
 }
+
+defineStrToINT(BYTE)
 
 inline Real appStrToReal(const TCHAR* s)
 {
@@ -652,44 +668,83 @@ inline void CCString::Init()
     m_pchData = __EmptyString.m_pchData; 
 }
 
-/**
-* Did I write this many many years ago?
-*/
-inline CCString appIntToString(INT inInta)
+template<class T>
+inline CCString appAnyToString(const T& content)
 {
-    return CCString(std::to_string(inInta).c_str());
+    CCString res;
+    res.Format(_T("%d"), content);
+    return res;
 }
 
-/**
-*
-*/
-inline CCString appIntToString(SQWORD inInta)
+defineAnyToStr(INT)
+defineAnyToStr(UINT)
+defineAnyToStr(WORD)
+defineAnyToStr(SWORD)
+defineAnyToStr(BYTE)
+defineAnyToStr(SBYTE)
+defineAnyToStr(LONGLONG)
+defineAnyToStr(ULONGLONG)
+
+defineAnyToStr(Real)
+#if _CLG_DOUBLEFLOAT
+defineAnyToStr(FLOAT)
+#else
+defineAnyToStr(DOUBLE)
+#endif
+
+template<>
+inline CCString appAnyToString(const CLGComplex& content)
 {
-    return CCString(std::to_string(inInta).c_str());
+    CCString sret;
+    sret.Format(_T("%2.12f %s %2.12f I"),
+        content.x,
+        content.y < F(0.0) ? _T("-") : _T("+"),
+        appAbs(content.y));
+    return sret;
 }
 
-/**
-*
-*/
-inline CCString appIntToString(QWORD inInta)
+#if _CLG_DOUBLEFLOAT
+template<>
+inline CCString appAnyToString(const cuComplex& content)
 {
-    return CCString(std::to_string(inInta).c_str());
+    CCString sret;
+    sret.Format(_T("%2.12f %s %2.12f I"),
+        content.x,
+        content.y < F(0.0) ? _T("-") : _T("+"),
+        appAbs(content.y));
+    return sret;
 }
-
-/**
-*
-*/
-inline CCString appFloatToString(Real inFloata)
+#else
+template<>
+inline CCString appAnyToString(const cuDoubleComplex& content)
 {
-    return CCString(std::to_string(inFloata).c_str());
-}
-
-#if !_CLG_DOUBLEFLOAT
-inline CCString appFloatToString(DOUBLE inFloata)
-{
-    return CCString(std::to_string(inFloata).c_str());
+    CCString sret;
+    sret.Format(_T("%2.12f %s %2.12f I"),
+        content.x,
+        content.y < F(0.0) ? _T("-") : _T("+"),
+        appAbs(content.y));
+    return sret;
 }
 #endif
+
+template <class T>
+inline CCString appAnyToString(const TArray<T>& arr)
+{
+    CCString sret = _T("[");
+    for (INT i = 0; i < arr.Num(); ++i)
+    {
+        if (i == arr.Num() - 1)
+        {
+            sret = sret + appAnyToString(arr[i]);
+        }
+        else
+        {
+            sret = sret + appAnyToString(arr[i]) + _T(", ");
+        }
+    }
+    sret = sret + _T("]");
+    return sret;
+}
 
 /**
 * The thing is, since we don't have custum types (like vector, rotation or so) to sprint

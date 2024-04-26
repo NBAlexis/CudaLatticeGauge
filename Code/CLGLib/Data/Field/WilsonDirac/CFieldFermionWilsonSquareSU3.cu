@@ -1296,7 +1296,7 @@ TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(co
 CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3\n");
-    sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
+    sRet = sRet + tab + _T("Hopping : ") + appAnyToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }
 

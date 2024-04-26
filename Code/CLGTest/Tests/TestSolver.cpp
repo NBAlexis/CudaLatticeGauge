@@ -101,25 +101,18 @@ UINT TestSolver(CParameters& params)
     return uiError;
 }
 
+#if _CLG_USE_LAUNCH_BOUND
 __REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab);
-
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRES);
-
-__REGIST_TEST(TestSolver, Solver, TestSolverGCR);
-
+//__REGIST_TEST(TestSolver, Solver, TestSolverGCR); //slow solver not used
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODR);
-
-__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR);
-
-
+//__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR); //slow solver not used
 __REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
-
 __REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode);
+#endif
 
 #if _CLG_DOUBLEFLOAT
-
 __REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
-
 #endif
 
 __REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab);

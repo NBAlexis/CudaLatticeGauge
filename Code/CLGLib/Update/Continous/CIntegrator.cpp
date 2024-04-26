@@ -13,10 +13,34 @@ __BEGIN_NAMESPACE
 
 CIntegrator::~CIntegrator()
 {
-    appSafeDelete(m_pGaugeField);
-    appSafeDelete(m_pForceField);
-    appSafeDelete(m_pMomentumField);
-    appSafeDelete(m_pStapleField);
+    for (INT i = 0; i < m_pGaugeField.Num(); ++i)
+    {
+        appSafeDelete(m_pGaugeField[i]);
+        appSafeDelete(m_pForceField[i]);
+        appSafeDelete(m_pMomentumField[i]);
+    }
+
+    for (INT i = 0; i < m_pStapleField.Num(); ++i)
+    {
+        appSafeDelete(m_pStapleField[i]);
+    }
+
+    for (INT i = 0; i < m_pBosonFields.Num(); ++i)
+    {
+        appSafeDelete(m_pBosonFields[i]);
+        appSafeDelete(m_pBosonForceFields[i]);
+        appSafeDelete(m_pBosonMomentumFields[i]);
+    }
+
+    for (INT i = 0; i < m_pUPrime.Num(); ++i)
+    {
+        appSafeDelete(m_pUPrime[i]);
+    }
+
+    for (INT i = 0; i < m_pPhiPrime.Num(); ++i)
+    {
+        appSafeDelete(m_pPhiPrime[i]);
+    }
 }
 
 /**
@@ -44,27 +68,23 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     params.FetchValueINT(_T("BindDir"), iBindDir);
     m_byBindDir = static_cast<BYTE>(iBindDir);
 
-    m_pGaugeField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
-    m_pGaugeField->m_pOwner = pLattice;
-    m_pGaugeField->InitialField(EFIT_Zero);
+    m_pGaugeField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
+    m_pGaugeField[0]->m_pOwner = pLattice;
+    m_pGaugeField[0]->InitialField(EFIT_Zero);
 
-    m_pForceField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
-    m_pForceField->m_pOwner = pLattice;
-    m_pForceField->InitialField(EFIT_Zero);
+    m_pForceField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
+    m_pForceField[0]->m_pOwner = pLattice;
+    m_pForceField[0]->InitialField(EFIT_Zero);
 
-    m_pMomentumField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
-    m_pMomentumField->m_pOwner = pLattice;
-    m_pMomentumField->InitialField(EFIT_Zero);
+    m_pMomentumField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
+    m_pMomentumField[0]->m_pOwner = pLattice;
+    m_pMomentumField[0]->InitialField(EFIT_Zero);
 
     if (CCommonData::m_bStoreStaple)
     {
-        m_pStapleField = dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName()));
-        m_pStapleField->m_pOwner = pLattice;
-        m_pStapleField->InitialField(EFIT_Zero);
-    }
-    else
-    {
-        m_pStapleField = NULL;
+        m_pStapleField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
+        m_pStapleField[0]->m_pOwner = pLattice;
+        m_pStapleField[0]->InitialField(EFIT_Zero);
     }
 }
 
@@ -73,20 +93,19 @@ void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
     //we may not accept the evaluation, so we need to copy it first
     if (!bLastAccepted || 0 == uiStep)
     {
-        m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField);
-        m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+        m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField[0]);
+        m_pGaugeField[0]->SetOneDirectionUnity(m_byBindDir);
         m_bStapleCached = FALSE;
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
-        m_lstActions[i]->PrepareForHMC(m_pGaugeField, uiStep);
+        m_lstActions[i]->PrepareForHMC(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), uiStep);
     }
 
     //generate a random momentum field to start
-    m_pMomentumField->MakeRandomGenerator();
-    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+    InitialMomentumNoise();
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
@@ -94,7 +113,7 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
 {
     if (bAccepted)
     {
-        m_pGaugeField->CopyTo(m_pLattice->m_pGaugeField);
+        m_pGaugeField[0]->CopyTo(m_pLattice->m_pGaugeField);
     }
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
@@ -105,12 +124,20 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
 
 void CIntegrator::UpdateU(Real fStep) const
 {
-    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+    for (INT i = 0; i < m_pGaugeField.Num(); ++i)
+    {
+        m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
 
-    //U(k) = exp (i e P) U(k-1)
-    m_pMomentumField->ExpMult(fStep, m_pGaugeField);
+        //U(k) = exp (i e P) U(k-1)
+        m_pMomentumField[i]->ExpMult(fStep, m_pGaugeField[i]);
 
-    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+        m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+    }
+
+    for (INT i = 0; i < m_pBosonFields.Num(); ++i)
+    {
+        m_pBosonFields[i]->Axpy(fStep, m_pBosonMomentumFields[i]);
+    }
 
     checkCudaErrors(cudaDeviceSynchronize());
 }
@@ -118,73 +145,59 @@ void CIntegrator::UpdateU(Real fStep) const
 void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
 {
     // recalc force
-    m_pForceField->Zero();
+    ZeroForce();
     checkCudaErrors(cudaDeviceSynchronize());
 
-    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+    SetOneDirOne(m_pGaugeField, m_byBindDir);
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, (0 == i && bCacheStaple) ? m_pStapleField : NULL, ePhase);
+        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), (0 == i && bCacheStaple) ? m_pStapleField.GetData() : NULL, ePhase);
+        m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
-    m_pForceField->SetOneDirectionZero(m_byBindDir);
+    SetOneDirZero(m_pForceField, m_byBindDir);
     
     //P = P + e F
     m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
-    m_pMomentumField->Axpy(fStep, m_pForceField);
-    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
+    AddForce(fStep, TRUE);
 
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
 void CIntegrator::FinishEvaluate() const
 {
-    m_pGaugeField->ElementNormalize();
-    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
+    for (INT i = 0; i < m_pGaugeField.Num(); ++i)
+    {
+        m_pGaugeField[i]->ElementNormalize();
+        m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+    }
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
-#else
-Real CIntegrator::GetEnergy(UBOOL bBeforeEvolution) const
-#endif
 {
-    m_pMomentumField->SetOneDirectionZero(m_byBindDir);
-    m_pGaugeField->SetOneDirectionUnity(m_byBindDir);
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE retv = m_pMomentumField->CalculateKinematicEnergy();
-#else
-    Real retv = m_pMomentumField->CalculateKinematicEnergy();
-#endif
+    SetOneDirZero(m_pMomentumField, m_byBindDir);
+    SetOneDirOne(m_pGaugeField, m_byBindDir);
 
-#if 1
+    DOUBLE retv = CalcMomentumEnery();
+
     CCString sLog = _T("");
     sLog.Format(_T("kin:%f, "), retv);
-#endif
 
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-#if 1
-#if !_CLG_DOUBLEFLOAT
-        DOUBLE fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
-#else
-        Real fActionEnergy = m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
-#endif
+        DOUBLE fActionEnergy = m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_bStapleCached ? m_pStapleField.GetData() : NULL);
+
         CCString sThisActionInfo = _T("");
         sThisActionInfo.Format(_T(" Action%d:%f, "), i + 1, fActionEnergy);
         sLog += sThisActionInfo;
         retv += fActionEnergy;
-#else
-        retv += m_bStapleCached ? m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField, m_pStapleField) : m_lstActions[i]->Energy(bBeforeEvolution, m_pGaugeField);
-#endif
     }
-#if 1
+
     appDetailed(_T("H (%s) = %s \n"), bBeforeEvolution ? "before" : "after" , sLog.c_str());
-#endif
     return retv;
 }
 
@@ -208,60 +221,62 @@ void CNestedIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice
 
 CCString CNestedIntegrator::GetNestedInfo(const CCString & sTab) const
 {
-    return sTab + _T("Nested : ") + appIntToString(static_cast<INT>(m_uiNestedStep)) + _T("\n")
+    return sTab + _T("Nested : ") + appAnyToString(static_cast<INT>(m_uiNestedStep)) + _T("\n")
          + sTab + _T("InnerLeapFrog : ") + (m_bInnerLeapFrog ? _T("1") : _T("0")) + _T("\n");
 }
 
 void CNestedIntegrator::UpdatePF(Real fStep, ESolverPhase ePhase)
 {
     // recalc force
-    m_pForceField->Zero();
+    ZeroForce();
     checkCudaErrors(cudaDeviceSynchronize());
 
-    for (INT i = 1; i < m_lstActions.Num(); ++i)
+    for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ePhase);
+        if (m_lstActions[i]->IsFermion())
+        {
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ePhase);
+            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
+        }
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
     //P = P + e F
-    m_pMomentumField->Axpy(fStep, m_pForceField);
+    AddForce(fStep, FALSE);
     checkCudaErrors(cudaDeviceSynchronize());
 
     if (m_bDebugForce)
     {
-#if !_CLG_DOUBLEFLOAT
-        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-        const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-        appGeneral(_T(" ------ Fermion Force= %f \n"), force.x);
+        appGeneral(_T(" ------ Fermion Force= %f \n"), CalcForce());
     }
 }
 
 void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
 {
     // recalc force
-    m_pForceField->Zero();
+    ZeroForce();
     checkCudaErrors(cudaDeviceSynchronize());
 
-    m_lstActions[0]->CalculateForceOnGauge(m_pGaugeField, m_pForceField, bCacheStaple ? m_pStapleField : NULL, ESP_Once);
-    checkCudaErrors(cudaDeviceSynchronize());
+    for (INT i = 0; i < m_lstActions.Num(); ++i)
+    {
+        //this is accumulate
+        if (!m_lstActions[i]->IsFermion())
+        {
+            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
+            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
+        }
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
 
     //P = P + e F
     m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
-    m_pMomentumField->Axpy(fStep, m_pForceField);
+    AddForce(fStep, FALSE);
     checkCudaErrors(cudaDeviceSynchronize());
 
     if (m_bDebugForce)
     {
-#if !_CLG_DOUBLEFLOAT
-        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-        const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-        appGeneral(_T(" ------ Gauge Force= %f \n"), force.x);
+        appGeneral(_T(" ------ Fermion Force= %f \n"), CalcForce());
     }
 }
 
@@ -324,7 +339,7 @@ void CMultiLevelNestedIntegrator::Initial(class CHMC* pOwner, class CLatticeData
     for (INT i = 0; i <= nestedSteps.Num(); ++i)
     {
         TArray<UINT> actionlist;
-        params.FetchValueArrayUINT(_T("NestedActionList") + appIntToString(i), actionlist);
+        params.FetchValueArrayUINT(_T("NestedActionList") + appAnyToString(i), actionlist);
         if (actionlist.Num() < 1)
         {
             appCrucial(_T("NestedActionList.Num must >= 1, but set to be 0!\n"));
@@ -356,7 +371,7 @@ CCString CMultiLevelNestedIntegrator::GetNestedInfo(const CCString& sTab) const
         CCString sActionList = _T("[");
         for (INT j = 0; j < m_iNestedActionId[i].Num(); ++j)
         {
-            sActionList = sActionList + appIntToString(static_cast<INT>(m_iNestedActionId[i][j]));
+            sActionList = sActionList + appAnyToString(static_cast<INT>(m_iNestedActionId[i][j]));
             if (j != m_iNestedActionId[i].Num() - 1)
             {
                 sActionList = sActionList + _T(", ");
@@ -367,10 +382,10 @@ CCString CMultiLevelNestedIntegrator::GetNestedInfo(const CCString& sTab) const
         CCString sStepDetail = _T("");
         if (0 != i)
         {
-            sStepDetail = appIntToString(static_cast<INT>(m_uiStepCount));
+            sStepDetail = appAnyToString(static_cast<INT>(m_uiStepCount));
             for (INT j = 1; j <= i; ++j)
             {
-                sStepDetail = sStepDetail + _T(" x ") + appIntToString(static_cast<INT>(m_uiNestedStep[j - 1]));
+                sStepDetail = sStepDetail + _T(" x ") + appAnyToString(static_cast<INT>(m_uiNestedStep[j - 1]));
             }
             sStepDetail = _T("(") + sStepDetail + _T(")");
         }
@@ -385,7 +400,7 @@ CCString CMultiLevelNestedIntegrator::GetNestedInfo(const CCString& sTab) const
 
 void CMultiLevelNestedIntegrator::UpdateP(Real fStep, TArray<UINT> actionList, ESolverPhase ePhase, UBOOL bCacheStaple, UBOOL bUpdateP)
 {
-    m_pForceField->Zero();
+    ZeroForce();
     checkCudaErrors(cudaDeviceSynchronize());
 
     for (INT i = 0; i < actionList.Num(); ++i)
@@ -394,11 +409,13 @@ void CMultiLevelNestedIntegrator::UpdateP(Real fStep, TArray<UINT> actionList, E
         const CAction* pAction = m_lstActions[actionList[i]];
         if (pAction->IsFermion())
         {
-            pAction->CalculateForceOnGauge(m_pGaugeField, m_pForceField, NULL, ePhase);
+            pAction->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ePhase);
+            pAction->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
         }
         else
         {
-            pAction->CalculateForceOnGauge(m_pGaugeField, m_pForceField, bCacheStaple ? m_pStapleField : NULL, ESP_Once);
+            pAction->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
+            pAction->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
             m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
         }
         
@@ -408,7 +425,7 @@ void CMultiLevelNestedIntegrator::UpdateP(Real fStep, TArray<UINT> actionList, E
     //P = P + e F
     if (bUpdateP)
     {
-        m_pMomentumField->Axpy(fStep, m_pForceField);
+        AddForce(fStep, FALSE);
     }
     checkCudaErrors(cudaDeviceSynchronize());
 }
@@ -428,12 +445,7 @@ void CMultiLevelNestedIntegrator::NestedEvaluateLeapfrog(INT iLevel, Real fNeste
 
     if (m_bDebugForce)
     {
-#if !_CLG_DOUBLEFLOAT
-        const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-        const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-        appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
+        appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
     }
 
     for (UINT uiStep = 1; uiStep < uiStepAll + 1; ++uiStep)
@@ -464,12 +476,7 @@ void CMultiLevelNestedIntegrator::NestedEvaluateLeapfrog(INT iLevel, Real fNeste
 
         if (m_bDebugForce)
         {
-#if !_CLG_DOUBLEFLOAT
-            const CLGComplex force = _cToFloat(m_pForceField->Dot(m_pForceField));
-#else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
-#endif
-            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, force.x);
+            appGeneral(_T(" ------ Force (%d) = %f \n"), iLevel, CalcForce());
         }
     }
 }

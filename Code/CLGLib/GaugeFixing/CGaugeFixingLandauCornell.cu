@@ -880,7 +880,7 @@ CCString CGaugeFixingLandauCornell::GetInfos(const CCString& tab) const
 {
     CCString sRet;
     sRet = sRet + tab + _T("Name : CGaugeFixingLandauCornell\n");
-    sRet = sRet + tab + _T("accuray : ") + appFloatToString(m_fAccuracy) + _T("\n");
+    sRet = sRet + tab + _T("accuray : ") + appAnyToString(m_fAccuracy) + _T("\n");
     return sRet;
 }
 

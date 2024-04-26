@@ -257,7 +257,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/Staggered/CFieldFermionKSSU3REM.h"
 
 #include "Data/Field/CFieldBoson.h"
-#include "Data/Field/Boson/CFieldBosonU1NoGauge.h"
+#include "Data/Field/Boson/CFieldBosonU1.h"
 
 //=====================================================
 

@@ -224,8 +224,6 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 CActionGaugePlaquetteGradient::CActionGaugePlaquetteGradient()
     : CAction()
     , m_pDeviceBetaArray(NULL)
-    , m_fLastEnergy(F(0.0))
-    , m_fNewEnergy(F(0.0))
     , m_uiPlaqutteCount(0)
 {
 }
@@ -267,7 +265,7 @@ void CActionGaugePlaquetteGradient::CalculateForceAndStaple(const CFieldGaugeSU3
         m_pDeviceBetaArray);
 }
 
-void CActionGaugePlaquetteGradient::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+void CActionGaugePlaquetteGradient::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
 {
     if (0 == uiUpdateIterate)
     {
@@ -283,18 +281,10 @@ void CActionGaugePlaquetteGradient::PrepareForHMC(const CFieldGauge* pGauge, UIN
     }
 }
 
-void CActionGaugePlaquetteGradient::OnFinishTrajectory(UBOOL bAccepted)
-{
-    if (bAccepted)
-    {
-        m_fLastEnergy = m_fNewEnergy;
-    }
-}
-
 void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_byActionId = byId;
+    CAction::Initial(pOwner, param, byId);
+
 #if !_CLG_DOUBLEFLOAT
     param.FetchValueArrayDOUBLE(_T("Beta"), m_fBetaArray);
     for (INT i = 0; i < _HC_Lzi; ++i)
@@ -349,11 +339,7 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
 
 }
 
-#if !_CLG_DOUBLEFLOAT
 void CActionGaugePlaquetteGradient::SetBeta(const TArray<DOUBLE>& fBeta)
-#else
-void CActionGaugePlaquetteGradient::SetBeta(const TArray <Real>& fBeta)
-#endif
 {
     m_fBetaArray = fBeta;
 #if !_CLG_DOUBLEFLOAT
@@ -400,7 +386,7 @@ void CActionGaugePlaquetteGradient::SetBeta(const TArray <Real>& fBeta)
 
 }
 
-UBOOL CActionGaugePlaquetteGradient::CalculateForceOnGauge(const CFieldGauge * pGauge, CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
+UBOOL CActionGaugePlaquetteGradient::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
@@ -418,11 +404,7 @@ UBOOL CActionGaugePlaquetteGradient::CalculateForceOnGauge(const CFieldGauge * p
 /**
 * The implementation depends on the type of gauge field
 */
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionGaugePlaquetteGradient::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#else
-Real CActionGaugePlaquetteGradient::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#endif
+DOUBLE CActionGaugePlaquetteGradient::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
     if (bBeforeEvolution)
     {
@@ -443,10 +425,11 @@ CCString CActionGaugePlaquetteGradient::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CActionGaugePlaquetteGradient\n");
+    sRet = sRet + CAction::GetInfos(tab);
     sRet = sRet + tab + _T("Beta : ");
     for (INT i = 0; i < _HC_Lzi; ++i)
     {
-        sRet = sRet + appFloatToString(m_fBetaArray[i]) + _T(", ");
+        sRet = sRet + appAnyToString(m_fBetaArray[i]) + _T(", ");
     }
     sRet = sRet + _T("\n");
     return sRet;

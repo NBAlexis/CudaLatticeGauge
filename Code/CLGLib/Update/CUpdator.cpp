@@ -30,9 +30,9 @@ void CUpdator::SaveConfiguration(UINT uiUpdateStep) const
 
     if (NULL != appGetLattice()->m_pGaugeField)
     {
-        CCString sConf;
-        sConf.Format(_T("%s_%d.con"), m_sConfigurationPrefix.c_str(), m_iAcceptedConfigurationCount);
-        appGetLattice()->m_pGaugeField->SaveToFile(sConf);
+        CCString sConf2;
+        sConf2.Format(_T("%s_%d.con"), m_sConfigurationPrefix.c_str(), m_iAcceptedConfigurationCount);
+        appGetLattice()->m_pGaugeField->SaveToFile(sConf2);
     }
 }
 

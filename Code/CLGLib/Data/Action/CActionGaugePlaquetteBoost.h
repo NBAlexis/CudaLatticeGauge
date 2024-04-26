@@ -23,16 +23,12 @@ public:
 
     CActionGaugePlaquetteBoost();
 
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
-#else
-    Real Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
-#endif
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
 
-    UBOOL CalculateForceOnGauge(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
-    void PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
-    void OnFinishTrajectory(UBOOL bAccepted) override;
+    UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
+    void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
 
     void SetBeta(Real fBeta);
@@ -42,14 +38,7 @@ public:
 
 protected:
 
-#if !_CLG_DOUBLEFLOAT
-    DOUBLE m_fLastEnergy;
-    DOUBLE m_fNewEnergy;
-#else
-    Real m_fLastEnergy;
-    Real m_fNewEnergy;
-#endif
-    Real m_fBetaOverN;
+
     UINT m_uiPlaqutteCount;
 };
 

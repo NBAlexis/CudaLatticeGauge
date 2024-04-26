@@ -26,7 +26,7 @@
 #ifdef  __GVERSION_S
 #undef  __GVERSION_S
 #endif
-#define __GVERSION_S    (2)
+#define __GVERSION_S    (3)
 
 #ifdef  __BEGIN_NAMESPACE
 #undef  __BEGIN_NAMESPACE

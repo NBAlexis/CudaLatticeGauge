@@ -479,9 +479,9 @@ INT Measurement(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Light->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Omega: ") + appAnyToString(CCommonData::m_fOmega) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appAnyToString(pF1Light->m_f2am) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }
@@ -546,9 +546,9 @@ INT Measurement(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appFloatToString(CCommonData::m_fOmega) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appFloatToString(pF1Heavy->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Omega: ") + appAnyToString(CCommonData::m_fOmega) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appAnyToString(pF1Heavy->m_f2am) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }

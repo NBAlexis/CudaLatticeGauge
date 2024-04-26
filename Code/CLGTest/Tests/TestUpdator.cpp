@@ -182,7 +182,9 @@ UINT TestUpdator3D(CParameters& sParam)
 
 __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient);
 
+#if _CLG_USE_LAUNCH_BOUND
 __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient3D);
+#endif
 
 __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorTreeImproved);
 

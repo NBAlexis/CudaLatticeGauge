@@ -853,7 +853,7 @@ JobMeasureBetaScan:
     LoadFermion : 0
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
-    ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular
+    ## EBSMJ_Polyakov, EBSMJ_Chiral, EBSMJ_Wilson, EBSMJ_Angular, EBSMJ_Meson, EBSMJ_MesonSimple
     DistributionJob : EBSMJ_Polyakov
     FermionMomentum : 0
     StochasticFieldCount : 20
@@ -876,7 +876,7 @@ JobMeasureBetaScan:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 1
-    MeasureListLength : 4
+    MeasureListLength : 6
     CacheStaple : 0
     AlsoCheckMD5 : 0
 
@@ -971,6 +971,19 @@ JobMeasureBetaScan:
         MeasureApprox : 0
         ProjectivePlane : 0
         NaiveNabla : 0
+
+    Measure5:
+
+        MeasureName : CMeasureMesonCorrelatorStaggered
+        ShowResult : 0
+        GaugeFixing : 0
+        FieldId : 2
+
+    Measure6:
+
+        MeasureName : CMeasureMesonCorrelatorStaggeredSimple
+        ShowResult : 0
+        FieldId : 2
 
     GaugeSmearing:
 

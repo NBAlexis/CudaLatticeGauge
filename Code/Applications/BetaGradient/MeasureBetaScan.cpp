@@ -14,6 +14,8 @@ __DEFINE_ENUM(EBetaScanMeasureJob,
     EBSMJ_Chiral,
     EBSMJ_Wilson,
     EBSMJ_Angular,
+    EBSMJ_Meson,
+    EBSMJ_MesonSimple,
     EBSMJ_DoubleToFloat,
     )
 
@@ -136,6 +138,9 @@ INT MeasurementBetaScan(CParameters& params)
 
     CActionGaugePlaquette* pAG = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
 
+    CMeasureMesonCorrelatorStaggered* pMC = dynamic_cast<CMeasureMesonCorrelatorStaggered*>(appGetLattice()->m_pMeasurements->GetMeasureById(5));
+    CMeasureMesonCorrelatorStaggeredSimple* pMCSimple = dynamic_cast<CMeasureMesonCorrelatorStaggeredSimple*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
+
     CFieldFermionKSSU3* pF1Light = NULL;
     CFieldFermionKSSU3* pF2Light = NULL;
     //CFieldFermionKSSU3* pF1Heavy = NULL;
@@ -171,6 +176,9 @@ INT MeasurementBetaScan(CParameters& params)
 
         pCCLight->SetFieldCount(iFieldCount);
         //pCCHeavy->SetFieldCount(iFieldCount);
+
+        pMC->Reset();
+        pMCSimple->Reset();
 
 #pragma region Measure
 
@@ -344,6 +352,17 @@ INT MeasurementBetaScan(CParameters& params)
                         pAMJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
                     }
                     break;
+
+                case EBSMJ_Meson:
+                    {
+                        pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    }
+                    break;
+                case EBSMJ_MesonSimple:
+                    {
+                        pMCSimple->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -452,6 +471,62 @@ INT MeasurementBetaScan(CParameters& params)
                     _CLG_EXPORT_ANGULAR(pAMJG, JGPot, uiOmega, O);
                 }
                 break;
+            case EBSMJ_Meson:
+            {
+                for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggered::_kMesonCorrelatorType; ++ty)
+                {
+                    CCString sCSVFile;
+                    sCSVFile.Format(_T("%s_meson%d.csv"), sCSVSavePrefix.c_str(), ty);
+#if !_CLG_DOUBLEFLOAT
+                    TArray<TArray<DOUBLE>> res;
+#else
+                    TArray<TArray<Real>> res;
+#endif
+                    for (INT conf = 0; conf < pMC->m_lstResults.Num(); ++conf)
+                    {
+#if !_CLG_DOUBLEFLOAT
+                        TArray<DOUBLE> oneConf;
+#else
+                        TArray<Real> oneConf;
+#endif
+                        for (INT t = 0; t < _HC_Lti - 1; ++t)
+                        {
+                            oneConf.AddItem(pMC->m_lstResults[conf][ty][t].x);
+                        }
+                        res.AddItem(oneConf);
+                    }
+                    WriteStringFileRealArray2(sCSVFile, res);
+                }
+            }
+            break;
+            case EBSMJ_MesonSimple:
+            {
+                for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+                {
+                    CCString sCSVFile;
+                    sCSVFile.Format(_T("%s_mesonsimple%d.csv"), sCSVSavePrefix.c_str(), ty);
+#if !_CLG_DOUBLEFLOAT
+                    TArray<TArray<DOUBLE>> res;
+#else
+                    TArray<TArray<Real>> res;
+#endif
+                    for (INT conf = 0; conf < pMCSimple->m_lstResults.Num(); ++conf)
+                    {
+#if !_CLG_DOUBLEFLOAT
+                        TArray<DOUBLE> oneConf;
+#else
+                        TArray<Real> oneConf;
+#endif
+                        for (INT t = 0; t < _HC_Lti - 1; ++t)
+                        {
+                            oneConf.AddItem(pMCSimple->m_lstResults[conf][ty][t]);
+                        }
+                        res.AddItem(oneConf);
+                    }
+                    WriteStringFileRealArray2(sCSVFile, res);
+                }
+            }
+            break;
             default:
                 break;
         }

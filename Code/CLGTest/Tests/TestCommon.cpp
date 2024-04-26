@@ -263,7 +263,7 @@ UINT TestGaugeInvarience(CParameters&)
     TArray<Real> beforeGaugeTransform;
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL));
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->EnergySingleField(FALSE, appGetLattice()->m_pGaugeField, NULL));
         beforeGaugeTransform.AddItem(fEnergy);
     }
 
@@ -286,7 +286,7 @@ UINT TestGaugeInvarience(CParameters&)
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, appGetLattice()->m_pGaugeField, NULL));
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->EnergySingleField(FALSE, appGetLattice()->m_pGaugeField, NULL));
         appGeneral(_T("Action%d, Before:%2.20f, After:%2.20f\n"), i, beforeGaugeTransform[i], fEnergy);
         if (appAbs(beforeGaugeTransform[i] - fEnergy) > F(0.0000001))
         {

@@ -117,9 +117,9 @@ CCString CGaugeSmearingAPEStout::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = sRet + tab + _T("Name : CGaugeSmearingAPEStout\n");
-    sRet = sRet + tab + _T("Rhos : ") + appFloatToString(m_fRho) + _T("\n");
+    sRet = sRet + tab + _T("Rhos : ") + appAnyToString(m_fRho) + _T("\n");
     sRet = sRet + tab + _T("HasT : ") + (m_bHasT ? _T("1\n") : _T("0\n"));
-    sRet = sRet + tab + _T("Iterate : ") + appIntToString(static_cast<INT>(m_uiIterate)) + _T("\n");
+    sRet = sRet + tab + _T("Iterate : ") + appAnyToString(static_cast<INT>(m_uiIterate)) + _T("\n");
     return sRet;
 }
 

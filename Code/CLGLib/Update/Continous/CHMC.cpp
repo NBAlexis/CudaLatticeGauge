@@ -178,7 +178,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             m_pOwner->FixAllFieldBoundary();
             m_pOwner->OnUpdatorConfigurationAccepted(
                 appGetLattice()->m_pGaugeField,
-                bAccepted ? m_pIntegrator->m_pStapleField : NULL);
+                (bAccepted && m_pIntegrator->m_pStapleField.Num() > 0) ? m_pIntegrator->m_pStapleField[0] : NULL);
         }
 
         if (m_bSaveConfigurations && (bAccepted || 0 == i))

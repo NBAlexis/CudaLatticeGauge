@@ -256,8 +256,6 @@ _kernelAddForce4PlaqutteTermSU3_Polar(
 
 CActionGaugePlaquettePolar::CActionGaugePlaquettePolar()
     : CAction()
-    , m_fLastEnergy(F(0.0))
-    , m_fNewEnergy(F(0.0))
     , m_uiPlaqutteCount(0)
     , m_bDirichlet(FALSE)
     , m_fRIn(F(1.0))
@@ -280,26 +278,17 @@ CActionGaugePlaquettePolar::~CActionGaugePlaquettePolar()
     checkCudaErrors(cudaFree(m_deviceBetaList));
 }
 
-void CActionGaugePlaquettePolar::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+void CActionGaugePlaquettePolar::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
 {
     if (0 == uiUpdateIterate)
     {
-        m_fLastEnergy = Energy(FALSE, pGauge, NULL);
-    }
-}
-
-void CActionGaugePlaquettePolar::OnFinishTrajectory(UBOOL bAccepted)
-{
-    if (bAccepted)
-    {
-        m_fLastEnergy = m_fNewEnergy;
+        m_fLastEnergy = EnergySingleField(FALSE, pGauge, NULL);
     }
 }
 
 void CActionGaugePlaquettePolar::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_byActionId = byId;
+    CAction::Initial(pOwner, param, byId);
 
     m_lstBeta.RemoveAll();
     param.FetchValueArrayReal(_T("BetaList"), m_lstBeta);
@@ -342,7 +331,7 @@ void CActionGaugePlaquettePolar::Initial(class CLatticeData* pOwner, const CPara
     m_bDirichlet = (0 != iVaule);
 }
 
-UBOOL CActionGaugePlaquettePolar::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
+UBOOL CActionGaugePlaquettePolar::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
@@ -370,11 +359,7 @@ UBOOL CActionGaugePlaquettePolar::CalculateForceOnGauge(const CFieldGauge * pGau
     return TRUE;
 }
 
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionGaugePlaquettePolar::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#else
-Real CActionGaugePlaquettePolar::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#endif
+DOUBLE CActionGaugePlaquettePolar::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
     if (bBeforeEvolution)
     {
@@ -460,21 +445,21 @@ void CActionGaugePlaquettePolar::SetR(Real fIn, Real fOut)
 CCString CActionGaugePlaquettePolar::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteRigidAcc\n");
-
+    sRet = sRet + CAction::GetInfos(tab);
 
     sRet = sRet + tab + _T("Beta : [") +  + _T("]\n");
     for (UINT i = 0; i < _HC_Lx; ++i)
     {
-        sRet = sRet + appFloatToString(m_lstBeta[i] * _HC_SUN) + _T(", ");
+        sRet = sRet + appAnyToString(m_lstBeta[i] * _HC_SUN) + _T(", ");
     }
     sRet = sRet + _T("]\n");
     sRet = sRet + tab + _T("R : [");
     for (UINT i = 0; i < _HC_Lx; ++i)
     {
-        sRet = sRet + appFloatToString(m_fRIn + i * m_fDeltaR) + _T(", ");
+        sRet = sRet + appAnyToString(m_fRIn + i * m_fDeltaR) + _T(", ");
     }
     sRet = sRet + _T("]\n");
-    sRet = sRet + tab + _T("Dirichlet : ") + appIntToString(m_bDirichlet) + _T("\n");
+    sRet = sRet + tab + _T("Dirichlet : ") + appAnyToString(m_bDirichlet) + _T("\n");
     return sRet;
 }
 

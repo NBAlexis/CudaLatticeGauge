@@ -21,8 +21,7 @@ class CLGAPI CIntegratorMultiLevelNestedForceGradient : public CMultiLevelNested
 
 public:
 
-    CIntegratorMultiLevelNestedForceGradient() : CMultiLevelNestedIntegrator(), m_pUPrime(NULL) {}
-    ~CIntegratorMultiLevelNestedForceGradient();
+    CIntegratorMultiLevelNestedForceGradient() : CMultiLevelNestedIntegrator() {}
 
     void Initial(class CHMC* pOwner, class CLatticeData* pLattice, const CParameters& params) override;
 
@@ -33,7 +32,6 @@ protected:
 
     void NestedEvaluate(INT iLevel, Real fNestedStep, UBOOL bFirst, UBOOL bLast);
 
-    class CFieldGauge * m_pUPrime;
 };
 
 __END_NAMESPACE

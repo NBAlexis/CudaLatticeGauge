@@ -547,7 +547,7 @@ CCString CGaugeFixingLandauLosAlamos::GetInfos(const CCString& tab) const
 {
     CCString sRet;
     sRet = sRet + tab + _T("Name : CGaugeFixingLandauLosAlamos\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
     return sRet;
 }
 

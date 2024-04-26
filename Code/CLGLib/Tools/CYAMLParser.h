@@ -115,6 +115,8 @@ public:
 
     _FetchFunctionArray(INT)
 
+    _FetchFunctionArray(BYTE)
+
     _FetchFunctionArray(UINT)
 
     _FetchFunctionArray(Real)

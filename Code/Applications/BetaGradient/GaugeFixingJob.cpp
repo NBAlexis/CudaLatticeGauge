@@ -104,11 +104,11 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 if (!bCheckSubFolder)
                 {
-                    sSaveFile.Format(_T("%s_%s_%d.con"), sSavePrefix.c_str(), FileList[uiOmega], uiIndex);
+                    sSaveFile.Format(_T("%s_%s_%d.con"), sSavePrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 }
                 else
                 {
-                    sSaveFile.Format(_T("%s/%s/%s_%s_%d.con"), sCheckSubFolderPrefix.c_str(), FolderList[uiOmega], sSavePrefix.c_str(), FileList[uiOmega], uiIndex);
+                    sSaveFile.Format(_T("%s/%s/%s_%s_%d.con"), sCheckSubFolderPrefix.c_str(), FolderList[uiOmega].c_str(), sSavePrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 }
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, eLoadType);
 #if !_CLG_DOUBLEFLOAT
@@ -145,11 +145,11 @@ INT GaugeFixing(CParameters& params)
                         CCString sLoadFile;
                         if (bSubFolder)
                         {
-                            sLoadFile.Format(_T("%s/%s/%s_%s_%d.con"), sSubFolderPrefix.c_str(), FolderList[uiOmega], sLoadPrefix.c_str(), FileList[uiOmega], uiIndex);
+                            sLoadFile.Format(_T("%s/%s/%s_%s_%d.con"), sSubFolderPrefix.c_str(), FolderList[uiOmega].c_str(), sLoadPrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                         }
                         else
                         {
-                            sLoadFile.Format(_T("%s_%s_%d.con"), sLoadPrefix.c_str(), FileList[uiOmega], uiIndex);
+                            sLoadFile.Format(_T("%s_%s_%d.con"), sLoadPrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                         }
                         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                         appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
@@ -174,14 +174,14 @@ INT GaugeFixing(CParameters& params)
                 CCString sSaveFile;
                 if (bSubFolder)
                 {
-                    sLoadFile.Format(_T("%s/%s/%s_%s_%d.con"), sSubFolderPrefix.c_str(), FolderList[uiOmega], sLoadPrefix.c_str(), FileList[uiOmega], uiIndex);
+                    sLoadFile.Format(_T("%s/%s/%s_%s_%d.con"), sSubFolderPrefix.c_str(), FolderList[uiOmega].c_str(), sLoadPrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 }
                 else
                 {
-                    sLoadFile.Format(_T("%s_%s_%d.con"), sLoadPrefix.c_str(), FileList[uiOmega], uiIndex);
+                    sLoadFile.Format(_T("%s_%s_%d.con"), sLoadPrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 }
-                sSaveFile.Format(_T("%s_%s_%d.con"), sSavePrefix.c_str(), FileList[uiOmega], uiIndex);
-                appGeneral(_T("Fixing %s : %d \n"), FileList[uiOmega], uiIndex);
+                sSaveFile.Format(_T("%s_%s_%d.con"), sSavePrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
+                appGeneral(_T("Fixing %s : %d \n"), FileList[uiOmega].c_str(), uiIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
                 appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
                 appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);

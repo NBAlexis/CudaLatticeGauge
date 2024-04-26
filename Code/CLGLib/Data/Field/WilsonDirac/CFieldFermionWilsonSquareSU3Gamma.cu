@@ -767,26 +767,26 @@ void CFieldFermionWilsonSquareSU3Gamma::CopyTo(CField* U) const
 CCString CFieldFermionWilsonSquareSU3Gamma::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3Gamma\n");
-    sRet = sRet + tab + _T("kappa : ") + appFloatToString(m_fKai) + _T("\n");
+    sRet = sRet + tab + _T("kappa : ") + appAnyToString(m_fKai) + _T("\n");
     sRet = sRet + tab + _T("ExpGamma : ") + (m_bExpGamma ? _T("1") : _T("0")) + _T("\n");
 
-    sRet = sRet + tab + _T("Gamma1 : ") + appFloatToString(m_fCoeffGamma1) + _T("\n");
-    sRet = sRet + tab + _T("Gamma2 : ") + appFloatToString(m_fCoeffGamma2) + _T("\n");
-    sRet = sRet + tab + _T("Gamma3 : ") + appFloatToString(m_fCoeffGamma3) + _T("\n");
-    sRet = sRet + tab + _T("Gamma4 : ") + appFloatToString(m_fCoeffGamma4) + _T("\n");
-    sRet = sRet + tab + _T("Gamma5 : ") + appFloatToString(m_fCoeffGamma5) + _T("\n");
+    sRet = sRet + tab + _T("Gamma1 : ") + appAnyToString(m_fCoeffGamma1) + _T("\n");
+    sRet = sRet + tab + _T("Gamma2 : ") + appAnyToString(m_fCoeffGamma2) + _T("\n");
+    sRet = sRet + tab + _T("Gamma3 : ") + appAnyToString(m_fCoeffGamma3) + _T("\n");
+    sRet = sRet + tab + _T("Gamma4 : ") + appAnyToString(m_fCoeffGamma4) + _T("\n");
+    sRet = sRet + tab + _T("Gamma5 : ") + appAnyToString(m_fCoeffGamma5) + _T("\n");
 
-    sRet = sRet + tab + _T("Gamma51 : ") + appFloatToString(m_fCoeffGamma51) + _T("\n");
-    sRet = sRet + tab + _T("Gamma52 : ") + appFloatToString(m_fCoeffGamma52) + _T("\n");
-    sRet = sRet + tab + _T("Gamma53 : ") + appFloatToString(m_fCoeffGamma53) + _T("\n");
-    sRet = sRet + tab + _T("Gamma54 : ") + appFloatToString(m_fCoeffGamma54) + _T("\n");
+    sRet = sRet + tab + _T("Gamma51 : ") + appAnyToString(m_fCoeffGamma51) + _T("\n");
+    sRet = sRet + tab + _T("Gamma52 : ") + appAnyToString(m_fCoeffGamma52) + _T("\n");
+    sRet = sRet + tab + _T("Gamma53 : ") + appAnyToString(m_fCoeffGamma53) + _T("\n");
+    sRet = sRet + tab + _T("Gamma54 : ") + appAnyToString(m_fCoeffGamma54) + _T("\n");
 
-    sRet = sRet + tab + _T("Sigma12 : ") + appFloatToString(m_fCoeffSigma12) + _T("\n");
-    sRet = sRet + tab + _T("Sigma13 : ") + appFloatToString(m_fCoeffSigma13) + _T("\n");
-    sRet = sRet + tab + _T("Sigma14 : ") + appFloatToString(m_fCoeffSigma14) + _T("\n");
-    sRet = sRet + tab + _T("Sigma23 : ") + appFloatToString(m_fCoeffSigma23) + _T("\n");
-    sRet = sRet + tab + _T("Sigma24 : ") + appFloatToString(m_fCoeffSigma24) + _T("\n");
-    sRet = sRet + tab + _T("Sigma34 : ") + appFloatToString(m_fCoeffSigma34) + _T("\n");
+    sRet = sRet + tab + _T("Sigma12 : ") + appAnyToString(m_fCoeffSigma12) + _T("\n");
+    sRet = sRet + tab + _T("Sigma13 : ") + appAnyToString(m_fCoeffSigma13) + _T("\n");
+    sRet = sRet + tab + _T("Sigma14 : ") + appAnyToString(m_fCoeffSigma14) + _T("\n");
+    sRet = sRet + tab + _T("Sigma23 : ") + appAnyToString(m_fCoeffSigma23) + _T("\n");
+    sRet = sRet + tab + _T("Sigma24 : ") + appAnyToString(m_fCoeffSigma24) + _T("\n");
+    sRet = sRet + tab + _T("Sigma34 : ") + appAnyToString(m_fCoeffSigma34) + _T("\n");
 
     return sRet;
 }

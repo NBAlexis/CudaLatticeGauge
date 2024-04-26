@@ -524,7 +524,7 @@
     <ClInclude Include="Data\Field\CFieldBoson.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Boson\CFieldBosonU1NoGauge.h">
+    <ClInclude Include="Data\Field\Boson\CFieldBosonU1.h">
       <Filter>Data\Field\Boson</Filter>
     </ClInclude>
   </ItemGroup>
@@ -634,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="Data\Field\CFieldBoson.cpp">
       <Filter>Data\Field</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Action\CAction.cpp">
+      <Filter>Data\Action</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -880,7 +883,7 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1NoGauge.cu">
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1.cu">
       <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
   </ItemGroup>

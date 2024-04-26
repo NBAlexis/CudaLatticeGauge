@@ -858,14 +858,15 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     //==================================
     // set device
     //==================================
-    INT iDeviceIndex = 0;
-    if (params.FetchValueINT(_T("DeviceIndex"), iDeviceIndex))
+    m_iDeviceId = 0;
+    if (params.FetchValueINT(_T("DeviceIndex"), m_iDeviceId))
     {
-        checkCudaErrors(cudaSetDevice(iDeviceIndex));
+        checkCudaErrors(cudaSetDevice(m_iDeviceId));
+        //checkCudaErrors(cudaInitDevice(m_iDeviceId));
 
         cudaDeviceProp deviceProp;
-        cudaGetDeviceProperties(&deviceProp, iDeviceIndex);
-        appGeneral("\nDevice %d: \"%s\"\n", iDeviceIndex, deviceProp.name);
+        cudaGetDeviceProperties(&deviceProp, m_iDeviceId);
+        appGeneral("\nDevice %d: \"%s\"\n", m_iDeviceId, deviceProp.name);
     }
 
     //==================================
@@ -963,7 +964,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     }
     for (INT i = 0; i < kMaxFieldCount; ++i)
     {
-        CCString sSolverName = _T("Solver") + appIntToString(i);
+        CCString sSolverName = _T("Solver") + appAnyToString(i);
         if (params.Exist(sSolverName))
         {
             CParameters solver = params.GetParameter(sSolverName);
@@ -978,7 +979,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     }
     for (INT i = 0; i < kMaxFieldCount; ++i)
     {
-        CCString sSolverName = _T("MSSolver") + appIntToString(i);
+        CCString sSolverName = _T("MSSolver") + appAnyToString(i);
         if (params.Exist(sSolverName))
         {
             CParameters solver = params.GetParameter(sSolverName);
@@ -1036,13 +1037,8 @@ void CCLGLibManager::Quit()
     appSafeDelete(m_pFileSystem);
     appSafeDelete(m_pBuffer);
 
-    INT devCount;
-    cudaGetDeviceCount(&devCount);
-    for (INT i = 0; i < devCount; ++i)
-    {
-        cudaSetDevice(i);
-        cudaDeviceReset();
-    }
+    //checkCudaErrors(cudaSetDevice(m_iDeviceId));
+    checkCudaErrors(cudaDeviceReset());
 }
 
 UBOOL CLGAPI appInitialCLG(const TCHAR* paramFileName)

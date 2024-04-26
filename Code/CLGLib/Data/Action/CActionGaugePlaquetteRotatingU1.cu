@@ -570,38 +570,25 @@ CActionGaugePlaquetteRotatingU1::CActionGaugePlaquetteRotatingU1()
     , m_fOmega(F(0.0))
     , m_bCloverEnergy(FALSE)
     , m_bShiftHalfCoord(FALSE)
-    , m_fLastEnergy(F(0.0))
-    , m_fNewEnergy(F(0.0))
-    , m_fBetaOverN(F(0.1))
     , m_uiPlaqutteCount(0)
 {
 }
 
-void CActionGaugePlaquetteRotatingU1::PrepareForHMC(const CFieldGauge* pGauge, UINT uiUpdateIterate)
+void CActionGaugePlaquetteRotatingU1::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
 {
     if (0 == uiUpdateIterate)
     {
-        m_fLastEnergy = Energy(FALSE, pGauge, NULL);
-    }
-}
-
-void CActionGaugePlaquetteRotatingU1::OnFinishTrajectory(UBOOL bAccepted)
-{
-    if (bAccepted)
-    {
-        m_fLastEnergy = m_fNewEnergy;
+        m_fLastEnergy = EnergySingleField(FALSE, pGauge, NULL);
     }
 }
 
 void CActionGaugePlaquetteRotatingU1::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId)
 {
-    m_pOwner = pOwner;
-    m_byActionId = byId;
+    CAction::Initial(pOwner, param, byId);
+
+    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(_HC_SUN);
+
 #if !_CLG_DOUBLEFLOAT
-    DOUBLE fBeta = 0.1;
-    param.FetchValueDOUBLE(_T("Beta"), fBeta);
-    CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     DOUBLE fOmega = 0.1;
@@ -609,10 +596,6 @@ void CActionGaugePlaquetteRotatingU1::Initial(class CLatticeData* pOwner, const 
     m_fOmega = fOmega;
     CCommonData::m_fOmega = fOmega;
 #else
-    Real fBeta = F(0.1);
-    param.FetchValueReal(_T("Beta"), fBeta);
-    CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fOmega = F(0.1);
@@ -648,17 +631,13 @@ void CActionGaugePlaquetteRotatingU1::Initial(class CLatticeData* pOwner, const 
     m_bShiftHalfCoord = (0 != iShiftCoord);
 }
 
-#if !_CLG_DOUBLEFLOAT
 void CActionGaugePlaquetteRotatingU1::SetBeta(DOUBLE fBeta)
-#else
-void CActionGaugePlaquetteRotatingU1::SetBeta(Real fBeta)
-#endif
 {
     CCommonData::m_fBeta = fBeta;
     m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
 }
 
-UBOOL CActionGaugePlaquetteRotatingU1::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
+UBOOL CActionGaugePlaquetteRotatingU1::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
 #if !_CLG_DOUBLEFLOAT
     pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(m_fBetaOverN));
@@ -711,11 +690,7 @@ UBOOL CActionGaugePlaquetteRotatingU1::CalculateForceOnGauge(const CFieldGauge *
 /**
 * The implementation depends on the type of gauge field
 */
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#else
-Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#endif
+DOUBLE CActionGaugePlaquetteRotatingU1::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
     if (bBeforeEvolution)
     {
@@ -828,11 +803,7 @@ Real CActionGaugePlaquetteRotatingU1::Energy(UBOOL bBeforeEvolution, const class
 //{
 //    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 //}
-#if !_CLG_DOUBLEFLOAT
 void CActionGaugePlaquetteRotatingU1::SetOmega(DOUBLE fOmega)
-#else
-void CActionGaugePlaquetteRotatingU1::SetOmega(Real fOmega)
-#endif
 { 
     m_fOmega = fOmega; 
     CCommonData::m_fOmega = fOmega;
@@ -847,8 +818,9 @@ CCString CActionGaugePlaquetteRotatingU1::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CActionGaugePlaquetteRotatingU1\n");
-    sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
+    sRet = sRet + CAction::GetInfos(tab);
+    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
     return sRet;
 }
 

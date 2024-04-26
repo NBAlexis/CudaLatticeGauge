@@ -279,7 +279,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     CCString sRealByte;
     for (UINT i = 0; i < 8; ++i)
     {
-        sRealByte += appIntToString(realByte[i]) + _T(", ");
+        sRealByte += appAnyToString(realByte[i]) + _T(", ");
     }
 
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
@@ -335,14 +335,14 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pOtherFields.Num(); ++i)
     {
-        sRet = sRet + sTab + _T("OtherField") + appIntToString(i) + _T(" : \n");
+        sRet = sRet + sTab + _T("OtherField") + appAnyToString(i) + _T(" : \n");
         sRet = sRet + m_pOtherFields[i]->GetInfos(sTab + _T("    "));
     }
     sInfos.Format(_T("ActionCount : %d\n"), m_pActionList.Num());
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pActionList.Num(); ++i)
     {
-        sRet = sRet + sTab + _T("Action") + appIntToString(i) + _T(" : \n");
+        sRet = sRet + sTab + _T("Action") + appAnyToString(i) + _T(" : \n");
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
     }
 

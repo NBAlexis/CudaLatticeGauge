@@ -292,7 +292,7 @@ CCString CFieldFermionWilsonSquareSU3Acc::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3Acc\n");
-    sRet = sRet + tab + _T("Hopping : ") + appFloatToString(CCommonData::m_fKai) + _T("\n");
+    sRet = sRet + tab + _T("Hopping : ") + appAnyToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }
 

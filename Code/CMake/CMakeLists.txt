@@ -70,7 +70,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/CCommonData.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1NoGauge.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundary.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h
@@ -205,7 +205,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1NoGauge.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.cu
@@ -277,6 +277,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp

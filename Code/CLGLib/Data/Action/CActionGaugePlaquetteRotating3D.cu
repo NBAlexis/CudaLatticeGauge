@@ -844,7 +844,7 @@ CActionGaugePlaquetteRotating3D::CActionGaugePlaquetteRotating3D()
 {
 }
 
-UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGauge(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
+UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
 #if !_CLG_DOUBLEFLOAT
     pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(m_fBetaOverN));
@@ -900,11 +900,7 @@ UBOOL CActionGaugePlaquetteRotating3D::CalculateForceOnGauge(const CFieldGauge *
 /**
 * The implementation depends on the type of gauge field
 */
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CActionGaugePlaquetteRotating3D::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#else
-Real CActionGaugePlaquetteRotating3D::Energy(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
-#endif
+DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable)
 {
     if (bBeforeEvolution)
     {
@@ -1002,8 +998,9 @@ CCString CActionGaugePlaquetteRotating3D::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CActionGaugePlaquetteRotating3D\n");
-    sRet = sRet + tab + _T("Beta : ") + appFloatToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appFloatToString(m_fOmega) + _T("\n");
+    sRet = sRet + CAction::GetInfos(tab);
+    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
     return sRet;
 }
 

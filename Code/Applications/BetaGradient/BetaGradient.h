@@ -123,7 +123,8 @@ void WriteStringFileRealArray(const CCString& sFileName, const TArray<T>& lst, U
     file.close();
 }
 
-inline void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<Real>>& lst, UBOOL bAppend = FALSE)
+template <class T>
+inline void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TArray<T>>& lst, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     std::ofstream file;
@@ -148,7 +149,7 @@ inline void WriteStringFileRealArray2(const CCString& sFileName, const TArray<TA
     {
         for (INT j = 0; j < lst[i].GetCount(); ++j)
         {
-            _gcvt_s(str, 50, lst[i][j], iDigital);
+            _gcvt_s(str, 50, static_cast<DOUBLE>(lst[i][j]), iDigital);
             CCString sReal = CCString(str);
             sReal = sReal.Replace(_T("e"), _T("*^"));
             file << _T(" ");
