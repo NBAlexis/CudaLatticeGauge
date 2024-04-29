@@ -25,15 +25,13 @@ public:
         : CMeasure()
         , m_pXYHostDensity(NULL)
         , m_pXYDeviceDensity(NULL)
-        , m_bShowResult(TRUE)
     {
     }
 
     ~CMeasureTopologicChargeXY();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
     void Reset() override;
 
@@ -45,7 +43,6 @@ protected:
     Real* m_pXYHostDensity;
     Real* m_pXYDeviceDensity;
     
-    UBOOL m_bShowResult;
     TArray<Real> m_lstXYDensity;
 };
 

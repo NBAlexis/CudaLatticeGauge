@@ -55,7 +55,6 @@ public:
           , m_uiMaxR(1)
           , m_uiEdgeR(1)
           , m_bMeasureDistribution(FALSE)
-          , m_bShowResult(TRUE)
           , m_bMeasureLoopZ(FALSE)
           , m_bMeasureZSlice(FALSE)
           , m_bShiftCenter(FALSE)
@@ -66,8 +65,7 @@ public:
     ~CMeasurePolyakovU1XY();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
     void Reset() override;
 
@@ -102,7 +100,6 @@ protected:
     UINT m_uiMaxR;
     UINT m_uiEdgeR;
     UBOOL m_bMeasureDistribution;
-    UBOOL m_bShowResult;
 
 public:
 

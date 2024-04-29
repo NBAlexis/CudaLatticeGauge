@@ -63,6 +63,8 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
 {
     UINT uiError = 0;
     CFieldGaugeSU3D* pGauge = dynamic_cast<CFieldGaugeSU3D*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    TArray<CFieldGauge*> gaugefields;
+    gaugefields.AddItem(pGauge);
     CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
     pFermion->PrepareForHMCOnlyRandomize();
 
@@ -70,17 +72,17 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
     pFermion->PrepareForHMCNotRandomize(pGauge);
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
     CActionFermionWilsonNf2* pAction2 = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->GetActionById(2));
-    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
     pAction2->m_pFerimionField = pFermion;
-    const Real fEnergy2 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
     
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
-    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
     pAction2->m_pFerimionField = pFermion2;
-    const Real fEnergy4 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
 
     if (fError > _GAUGE_FIXING_ZeroERROR)
     {
@@ -110,6 +112,8 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
 {
     UINT uiError = 0;
     CFieldGaugeSU3D* pGauge = dynamic_cast<CFieldGaugeSU3D*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    TArray<CFieldGauge*> gaugeFields;
+    gaugeFields.AddItem(pGauge);
     CGaugeFixingRandom* pRandom = new CGaugeFixingRandom();
     appGetLattice()->m_pGaugeField->FixBoundary();
     pRandom->Initial(appGetLattice(), sParam);
@@ -123,7 +127,7 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
     pFermion2->FixBoundary();
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     pCC->Reset();
-    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
+    pCC->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pFermion, pFermion2, TRUE, TRUE);
 
     //pGauge->DebugPrintMe();
 
@@ -148,7 +152,7 @@ UINT TestGaugeFixingCoulombDRChiral(CParameters& sParam)
         pFermion2->InverseD(pGauge);
         pFermion2->FixBoundary();
         pCC->Reset();
-        pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pFermion, pFermion2, TRUE, TRUE);
+        pCC->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pFermion, pFermion2, TRUE, TRUE);
 
         for (UINT i1 = 0; i1 < CMeasureChiralCondensate::_kCondMeasureCount; ++i1)
         {
@@ -183,6 +187,8 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
 {
     UINT uiError = 0;
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    TArray<CFieldGauge*> gaugeFields;
+    gaugeFields.AddItem(pGauge);
     CFieldFermionKSSU3R* pFermion = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(2));
     pFermion->PrepareForHMCOnlyRandomize();
 
@@ -200,17 +206,17 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     CMeasureChiralCondensateKS* pCC = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     CMeasureAngularMomentumKS* pAM = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
 
-    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
     pAction2->m_pFerimionField = pFermion;
-    const Real fEnergy2 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-    pPL->OnConfigurationAccepted(pGauge, NULL);
+    pPL->OnConfigurationAccepted(1, 0, gaugeFields.GetData(), NULL, NULL);
     const Real fPolyakov1 = _cuCabsf(pPL->m_lstLoop[0]);
-    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    pCC->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pF1W, pF2W, TRUE, TRUE);
     const Real fChiralCond1 = _cuCabsf(pCC->m_lstCondAll[0][0]);
     const Real fConectSusp1 = _cuCabsf(pCC->m_lstCondAll[1][0]);
-    pAM->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    pAM->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pF1W, pF2W, TRUE, TRUE);
     const Real fOrbital1 = _cuCabsf(pAM->m_lstCondAll[0][0]);
     const Real fSpin1 = _cuCabsf(pAM->m_lstCondAll[1][0]);
     const Real fPotential1 = _cuCabsf(pAM->m_lstCondAll[2][0]);
@@ -239,17 +245,17 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     pF2W->InverseD(pGauge);
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
-    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
     pAction2->m_pFerimionField = pFermion2;
-    const Real fEnergy4 = static_cast<Real>(pAction2->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
 
-    pPL->OnConfigurationAccepted(pGauge, NULL);
+    pPL->OnConfigurationAccepted(1, 0, gaugeFields.GetData(), NULL, NULL);
     const Real fPolyakov2 = _cuCabsf(pPL->m_lstLoop[0]);
-    pCC->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    pCC->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pF1W, pF2W, TRUE, TRUE);
     const Real fChiralCond2 = _cuCabsf(pCC->m_lstCondAll[0][0]);
     const Real fConectSusp2 = _cuCabsf(pCC->m_lstCondAll[1][0]);
-    pAM->OnConfigurationAcceptedZ4(pGauge, NULL, pF1W, pF2W, TRUE, TRUE);
+    pAM->OnConfigurationAcceptedZ4(1, 0, gaugeFields.GetData(), NULL, NULL, pF1W, pF2W, TRUE, TRUE);
     const Real fOrbital2 = _cuCabsf(pAM->m_lstCondAll[0][0]);
     const Real fSpin2 = _cuCabsf(pAM->m_lstCondAll[1][0]);
     const Real fPotential2 = _cuCabsf(pAM->m_lstCondAll[2][0]);
@@ -322,15 +328,16 @@ UINT TestGaugeFixingCoulombPorjectivePlane2(CParameters&)
 {
     UINT uiError = 0;
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
-
+    TArray<CFieldGauge*> gaugeFields;
+    gaugeFields.AddItem(pGauge);
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
 
-    const Real fEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fError = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
 
-    const Real fEnergy3 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
     if (fError > _GAUGE_FIXING_ZeroERROR)
     {

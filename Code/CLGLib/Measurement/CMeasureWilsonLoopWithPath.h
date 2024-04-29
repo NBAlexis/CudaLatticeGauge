@@ -24,8 +24,6 @@ public:
     CMeasureWilsonLoopWithPath()
         : CMeasure()
         , m_bAllPoint(TRUE)
-        , m_bShowResult(FALSE)
-
         , m_pTmpDeviceRes(NULL)
         , m_pDevicePath(NULL)
     {
@@ -35,8 +33,7 @@ public:
     ~CMeasureWilsonLoopWithPath();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
@@ -47,7 +44,6 @@ protected:
     TArray<INT> m_lstPath;
     SSmallInt4 m_sPoint;
     UBOOL m_bAllPoint;
-    UBOOL m_bShowResult;
     CLGComplex* m_pTmpDeviceRes;
     INT* m_pDevicePath;
 

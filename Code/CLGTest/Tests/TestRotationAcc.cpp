@@ -13,6 +13,8 @@ UINT TestBoost(CParameters& sParam)
 {
     Real fExpected = F(0.38);
 
+#if !_CLG_DEBUG
+
     INT iVaule = 2;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     const UINT iBeforeEquib = static_cast<UINT>(iVaule);
@@ -20,8 +22,8 @@ UINT TestBoost(CParameters& sParam)
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
     const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
-#if !_CLG_DEBUG
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+
 #endif
 
     //we calculate staple energy from beta = 1 - 6
@@ -101,6 +103,7 @@ UINT TestEMSimple(CParameters& sParam)
 {
     Real fExpected = F(0.38);
 
+#if !_CLG_DEBUG
     INT iVaule = 2;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     const UINT iBeforeEquib = static_cast<UINT>(iVaule);
@@ -108,7 +111,6 @@ UINT TestEMSimple(CParameters& sParam)
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
     const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
-#if !_CLG_DEBUG
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 #endif
 
@@ -189,6 +191,7 @@ UINT TestBetaGradient(CParameters& sParam)
 {
     Real fExpected = F(0.048);
 
+#if !_CLG_DEBUG
     INT iVaule = 2;
     sParam.FetchValueINT(_T("BeforeEquvibStep"), iVaule);
     const UINT iBeforeEquib = static_cast<UINT>(iVaule);
@@ -196,7 +199,6 @@ UINT TestBetaGradient(CParameters& sParam)
     sParam.FetchValueINT(_T("EquvibStep"), iVaule);
     const UINT iAfterEquib = static_cast<UINT>(iVaule);
 
-#if !_CLG_DEBUG
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 #endif
 

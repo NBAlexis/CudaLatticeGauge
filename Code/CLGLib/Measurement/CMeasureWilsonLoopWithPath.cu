@@ -82,11 +82,7 @@ void CMeasureWilsonLoopWithPath::Initial(CMeasurementManager* pOwner, CLatticeDa
         return;
     }
 
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("OnePoint"), iValue);
     m_bAllPoint = (0 == iValue);
 
@@ -115,13 +111,9 @@ void CMeasureWilsonLoopWithPath::Initial(CMeasurementManager* pOwner, CLatticeDa
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * m_lstPath.Num(), cudaMemcpyHostToDevice));
 
     Reset();
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
-void CMeasureWilsonLoopWithPath::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
+void CMeasureWilsonLoopWithPath::OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pAcceptGauge || EFT_GaugeSU3 != pAcceptGauge->GetFieldType())
     {
@@ -140,7 +132,7 @@ void CMeasureWilsonLoopWithPath::OnConfigurationAccepted(const class CFieldGauge
         CLGComplex hostRes[1];
         _kernelWilsonLoopWithPathPoint << <1, 1 >> > (pGaugeSU3->m_pDeviceData, m_sPoint, m_pDevicePath, 
             static_cast<BYTE>(m_lstPath.Num()), 
-            m_byFieldId, m_pTmpDeviceRes);
+            pAcceptGauge->m_byFieldId, m_pTmpDeviceRes);
         checkCudaErrors(cudaMemcpy(hostRes, m_pTmpDeviceRes, sizeof(CLGComplex), cudaMemcpyDeviceToHost));
         UpdateComplexResult(hostRes[0]);
 
@@ -161,7 +153,7 @@ void CMeasureWilsonLoopWithPath::OnConfigurationAccepted(const class CFieldGauge
     _kernelWilsonLoopWithPath<< <block, threads>> > (
         pGaugeSU3->m_pDeviceData, m_pDevicePath, 
         static_cast<BYTE>(m_lstPath.Num()), 
-        m_byFieldId, _D_ComplexThreadBuffer);
+        pAcceptGauge->m_byFieldId, _D_ComplexThreadBuffer);
 
 #if _CLG_DOUBLEFLOAT
     CLGComplex sum = appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);

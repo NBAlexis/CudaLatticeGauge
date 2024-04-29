@@ -26,15 +26,13 @@ public:
     CMeasureMesonCorrelatorStaggeredSimple() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)
-        , m_bShowResult(FALSE)
     {
         
     }
     ~CMeasureMesonCorrelatorStaggeredSimple();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void Report() override;
     void Reset() override;
 
@@ -65,7 +63,6 @@ public:
     //m_lstResults[conf][type][t]
     TArray<TArray<TArray<Real>>> m_lstResults;
 #endif
-    UBOOL m_bShowResult;
 };
 
 #pragma region device functions

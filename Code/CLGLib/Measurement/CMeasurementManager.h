@@ -24,7 +24,7 @@ public:
     {
     }
 
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple);
+    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple);
     void OnUpdateFinished(UBOOL bReport = TRUE);
     void Reset();
     void Report();

@@ -24,7 +24,7 @@ public:
 
     void CreateFermionSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
     void CreateMultiShiftSolver(const CCString& sSolver, const CParameters& param, const class CField* pFermionField, BYTE byFieldId);
-    void OnUpdatorConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) const;
+    void OnUpdatorConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple) const;
     void OnUpdatorFinished(UBOOL bMeasured, UBOOL bReport) const;
     //void GetPlaquetteLengthCount(BYTE& plaqLength, BYTE& countPerSite, BYTE& countPerLink);
     void CreateFieldPool(BYTE byFieldId, UINT uiCount);
@@ -94,6 +94,9 @@ public:
     class CField* GetPooledFieldById(BYTE byId);
     void ReCopyPooled() const;
     void ReCopyPooled(BYTE byId) const;
+
+    static INT GetGaugeFieldIndexById(INT num, const class CFieldGauge* const* gaugeFields, BYTE byFieldId);
+    static INT GetBosonFieldIndexById(INT num, const class CFieldBoson* const* bosonFields, BYTE byFieldId);
 };
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);

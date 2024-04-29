@@ -405,7 +405,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
 void CMeasureBerryPhase::AllocateBuffers()
 {
     m_pU1Field = new CFieldGaugeU1();
-    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetGaugeFieldIdSingleField()));
 }
 
 CMeasureBerryPhase::~CMeasureBerryPhase()
@@ -418,26 +418,11 @@ CMeasureBerryPhase::~CMeasureBerryPhase()
 void CMeasureBerryPhase::Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
-    INT iValue = 1;
-    param.FetchValueINT(_T("WilsonDirac"), iValue);
-    m_bWilsonDirac = (0 != iValue);
-
-    iValue = 0;
-    param.FetchValueINT(_T("DoGaugeFixing"), iValue);
-    m_bGuageFixing = (0 != iValue);
-
-    iValue = 0;
-    param.FetchValueINT(_T("ShowRes"), iValue);
-    m_bShowRes = (0 != iValue);
-
-    iValue = 2;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
 
     AllocateBuffers();
 }
 
-void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* )
+void CMeasureBerryPhase::OnConfigurationAcceptedSingleField(const CFieldGauge* pAcceptGauge, const CFieldGauge* )
 {
     if (m_bGuageFixing)
     {
@@ -482,14 +467,14 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
     CalculateBerryPhase(pAcceptGauge->m_byFieldId);
 
     //Gather result
-    if (m_bShowRes)
+    if (m_bShowResult)
     {
         appPushLogDate(FALSE);
         appGeneral(_T("Berry phase: {"));
 
         for (INT t = 0; t < _HC_Lti; ++t)
         {
-            if (m_bShowRes)
+            if (m_bShowResult)
             {
                 appGeneral(_T("%2.18f%s"),
                     m_lstData[m_uiConfigurationCount][t],
@@ -504,7 +489,7 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
 
         for (INT t = 0; t < _HC_Lti; ++t)
         {
-            if (m_bShowRes)
+            if (m_bShowResult)
             {
                 appGeneral(_T("%2.18f%s"),
                     m_lstDataXY[m_uiConfigurationCount][t],
@@ -519,7 +504,7 @@ void CMeasureBerryPhase::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge
 
         for (INT t = 0; t < _HC_Lti; ++t)
         {
-            if (m_bShowRes)
+            if (m_bShowResult)
             {
                 appGeneral(_T("%2.18f%s"),
                     m_lstDataZT[m_uiConfigurationCount][t],

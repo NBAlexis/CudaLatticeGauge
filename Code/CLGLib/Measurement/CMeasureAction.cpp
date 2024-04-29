@@ -22,36 +22,26 @@ void CMeasureAction::Initial(class CMeasurementManager* pOwner, class CLatticeDa
     m_iFermionFieldCount = iValue > 1 ? iValue : 1;
 }
 
-void CMeasureAction::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* )
+void CMeasureAction::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
 {
-#if !_CLG_DOUBLEFLOAT
     DOUBLE plaqutteEneregy = 0.0;
-#else
-    Real plaqutteEneregy = F(0.0);
-#endif
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
         if (appGetLattice()->m_pActionList[i]->IsFermion())
         {
-            //appGeneral(_T("field count:%d\n"), m_iFermionFieldCount);
-#if !_CLG_DOUBLEFLOAT
             DOUBLE fToBeAdd = 0.0;
-#else
-            Real fToBeAdd = F(0.0);
-#endif
             for (UINT j = 0; j < m_iFermionFieldCount; ++j)
             {
-                appGetLattice()->m_pActionList[i]->PrepareForHMCSingleField(pAcceptGauge, 0);
-                fToBeAdd += appGetLattice()->m_pActionList[i]->EnergySingleField(FALSE, pAcceptGauge, NULL);
+                appGetLattice()->m_pActionList[i]->PrepareForHMC(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, 0);
+                fToBeAdd += appGetLattice()->m_pActionList[i]->Energy(FALSE, gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, NULL);
             }
             plaqutteEneregy += (fToBeAdd / m_iFermionFieldCount);
         }
         else
         {
-            plaqutteEneregy += appGetLattice()->m_pActionList[i]->EnergySingleField(FALSE, pAcceptGauge, NULL);
+            plaqutteEneregy += appGetLattice()->m_pActionList[i]->Energy(FALSE, gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, NULL);
         }
-        
     }
 
 #if !_CLG_DOUBLEFLOAT

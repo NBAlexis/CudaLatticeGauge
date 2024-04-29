@@ -172,13 +172,6 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
 
     //find the fermion field id and gamma
-    INT iValue = 0;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    if (iValue < 1 || iValue >= kMaxFieldCount)
-    {
-        appCrucial(_T("CMeasureMesonCorrelator: must give a fermion field id, but fetch %d"), iValue);
-    }
-    m_byFieldId = static_cast<BYTE>(iValue);
     TArray<CCString> allGammas;
     param.FetchStringVectorValue(_T("GammaMatrix"), allGammas);
     if (0 == allGammas.Num())
@@ -208,7 +201,7 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     m_uiConfigurationCount = 0;
 }
 
-void CMeasureMesonCorrelator::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelator::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
     CalculateCorrelator(pGaugeField, pStapleField);
 }
@@ -299,7 +292,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
     CFieldFermionWilsonSquareSU3* pFermionSources[12];
     for (UINT i = 0; i < 12; ++i)
     {
-        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        pFermionSources[i] = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
         if (NULL == pFermionSources[i])
         {
             appCrucial(_T("Meson correlator only implemented with Wilson SU3\n"));
@@ -323,7 +316,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
             
             pFermionSources[s * 3 + c]->InitialAsSource(sourceData);
 
-            if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
+            if (NULL != appGetFermionSolver(GetFermionFieldId()) && !appGetFermionSolver(GetFermionFieldId())->IsAbsoluteAccuracy())
             {
                 pFermionSources[s * 3 + c]->m_fLength = pFermionSources[s * 3 + c]->Dot(pFermionSources[s * 3 + c]).x;
             }

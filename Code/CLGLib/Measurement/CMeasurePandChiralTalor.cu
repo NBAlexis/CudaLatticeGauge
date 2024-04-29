@@ -366,14 +366,9 @@ CMeasurePandChiralTalor::~CMeasurePandChiralTalor()
 void CMeasurePandChiralTalor::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
     CMeasureStochastic::Initial(pOwner, pLatticeData, param, byId);
-    Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
-void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
+void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge,
     const class CFieldGauge* pCorrespondingStaple,
     const class CFieldFermion* pZ4,
@@ -416,9 +411,9 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
         pF2W->m_pDeviceData,
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_byFieldId
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF2W->m_byFieldId],
+        pF2W->m_byFieldId
         );
 
 
@@ -447,9 +442,9 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
         pF2W->m_pDeviceData,
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-        m_byFieldId
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF2W->m_byFieldId],
+        pF2W->m_byFieldId
         );
 
 
@@ -496,7 +491,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4(
     }
 }
 
-void CMeasurePandChiralTalor::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {

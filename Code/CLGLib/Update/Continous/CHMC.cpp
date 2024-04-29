@@ -175,10 +175,25 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         //If rejected, just accept the old configuration and trigger the measure
         if (bMeasure && bAccepted)
         {
+            //In 'OnFinishTrajectory', the field is already copy to 'CLatticeData'
+            TArray<const CFieldGauge*> gauges;
+            TArray<const CFieldBoson*> bosons;
+            for (INT j = 0; j < m_pIntegrator->m_pGaugeField.Num(); ++j)
+            {
+                gauges.AddItem(m_pIntegrator->m_pGaugeField[j]);
+            }
+            for (INT j = 0; j < m_pIntegrator->m_pBosonFields.Num(); ++j)
+            {
+                bosons.AddItem(m_pIntegrator->m_pBosonFields[j]);
+            }
+
             m_pOwner->FixAllFieldBoundary();
             m_pOwner->OnUpdatorConfigurationAccepted(
-                appGetLattice()->m_pGaugeField,
-                (bAccepted && m_pIntegrator->m_pStapleField.Num() > 0) ? m_pIntegrator->m_pStapleField[0] : NULL);
+                gauges.Num(),
+                bosons.Num(),
+                gauges.GetData(),
+                bosons.GetData(),
+                (bAccepted && m_pIntegrator->m_pStapleField.Num() > 0) ? m_pIntegrator->m_pStapleField.GetData() : NULL);
         }
 
         if (m_bSaveConfigurations && (bAccepted || 0 == i))

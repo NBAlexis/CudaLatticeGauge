@@ -210,6 +210,8 @@ UINT TestWilsonLoop(CParameters& sParam)
 
     CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
     CFieldGauge* pStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
+    TArray<CFieldGauge*> gaugeFields;
+    gaugeFields.AddItem(pGauge);
 
     //Equilibration
     //appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
@@ -236,7 +238,7 @@ UINT TestWilsonLoop(CParameters& sParam)
             appGetLattice()->m_pGaugeField->CopyTo(pGauge);
             pGauge->CalculateOnlyStaple(pStaple);
             appGetLattice()->m_pGaugeSmearing->GaugeSmearing(pGauge, pStaple);
-            pMeasure->OnConfigurationAccepted(pGauge, NULL);
+            pMeasure->OnConfigurationAccepted(1, 0, gaugeFields.GetData(), NULL, NULL);
             iAccepted = newCount;
         }
     }

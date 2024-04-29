@@ -324,11 +324,7 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
 
     Reset();
 
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("ShiftCenter"), iValue);
     m_bShiftCenter = iValue != 0;
 
@@ -370,7 +366,7 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
         pGauge,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
-        m_byFieldId,
+        GetFermionFieldId(),
         1,
         _HC_Center);
 }
@@ -401,7 +397,7 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(
         pInverseZ4,
         pGauge,
         pAppliedBuffer,
-        m_byFieldId,
+        GetFermionFieldId(),
         1);
 }
 
@@ -431,14 +427,14 @@ void CMeasureAngularMomentumKS::ApplyPotentialMatrix(
         pAppliedBuffer,
         pInverseZ4,
         pGauge,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[GetFermionFieldId()],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[GetFermionFieldId()],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAphys->m_pDeviceData);
 }
 
 
-void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
+void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge, 
     const class CFieldGauge* pCorrespondingStaple, 
     const class CFieldFermion* pZ4, 
@@ -466,7 +462,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
     //const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
     const CFieldFermionKSSU3 * pF1W = dynamic_cast<const CFieldFermionKSSU3*>(pZ4);
     const CFieldFermionKSSU3* pF2W = dynamic_cast<const CFieldFermionKSSU3*>(pInverseZ4);
-    CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermionKSSU3* pAfterApplied = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     const CFieldGaugeSU3* pAcceptGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
 
 #pragma region Dot
@@ -523,7 +519,7 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
             m_bShiftCenter,
             m_uiMaxR,
             m_uiEdge,
-            m_byFieldId,
+            GetFermionFieldId(),
             m_uiFieldCount,
             EAngularMeasureMax,
             m_uiConfigurationCount,
@@ -554,11 +550,6 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4(
 
         ++m_uiConfigurationCount;
     }
-}
-
-void CMeasureAngularMomentumKS::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
-{
-
 }
 
 void CMeasureAngularMomentumKS::Report()

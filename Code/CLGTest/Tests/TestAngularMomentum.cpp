@@ -60,8 +60,10 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGetLattice()->m_pMeasurements->Reset();
     pF1->CopyTo(pF2);
     pF2->InverseD(appGetLattice()->m_pGaugeField);
-    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-    pJF->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF1, pF2, TRUE, TRUE);
+    TArray<CFieldGauge*> gaugefields;
+    gaugefields.AddItem(appGetLattice()->m_pGaugeField);
+    pJG->OnConfigurationAccepted(1, 0, gaugefields.GetData(), NULL, NULL);
+    pJF->OnConfigurationAcceptedZ4(1, 0, gaugefields.GetData(), NULL, NULL, pF1, pF2, TRUE, TRUE);
     appGetLattice()->m_pMeasurements->Report();
     fJG1 = pJG->m_lstJGAll[0];
     fJGS1 = pJG->m_lstJGSAll[0];
@@ -99,8 +101,8 @@ UINT TestAngularMomentum(CParameters& sParam)
     appGetLattice()->m_pMeasurements->Reset();
     pF1->CopyTo(pF2);
     pF2->InverseD(appGetLattice()->m_pGaugeField);
-    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-    pJF->OnConfigurationAcceptedZ4(appGetLattice()->m_pGaugeField, NULL, pF1, pF2, TRUE, TRUE);
+    pJG->OnConfigurationAccepted(1, 0, gaugefields.GetData(), NULL, NULL);
+    pJF->OnConfigurationAcceptedZ4(1, 0, gaugefields.GetData(), NULL, NULL, pF1, pF2, TRUE, TRUE);
     appGetLattice()->m_pMeasurements->Report();
 
     fJG2 = pJG->m_lstJGAll[0];
@@ -142,7 +144,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     pRandom->AlsoFixingAphys(appGetLattice()->m_pAphys);
     appGeneral(_T("After gauge fixing to random!\n"));
     appGetLattice()->m_pMeasurements->Reset();
-    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+    pJG->OnConfigurationAccepted(1, 0, gaugefields.GetData(), NULL, NULL);
     fJGChen3 = pJG->m_lstJGChenAll[0];
     fJGChenApprox3 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 
@@ -150,7 +152,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     pRandom->AlsoFixingAphys(appGetLattice()->m_pAphys);
     appGeneral(_T("After gauge fixing to random!\n"));
     appGetLattice()->m_pMeasurements->Reset();
-    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+    pJG->OnConfigurationAccepted(1, 0, gaugefields.GetData(), NULL, NULL);
     fJGChen4 = pJG->m_lstJGChenAll[0];
     fJGChenApprox4 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 
@@ -158,7 +160,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     pRandom->AlsoFixingAphys(appGetLattice()->m_pAphys);
     appGeneral(_T("After gauge fixing to random!\n"));
     appGetLattice()->m_pMeasurements->Reset();
-    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+    pJG->OnConfigurationAccepted(1, 0, gaugefields.GetData(), NULL, NULL);
     fJGChen5 = pJG->m_lstJGChenAll[0];
     fJGChenApprox5 = pJG->m_bMeasureApprox ? pJG->m_lstJGChenApproxAll[0] : F(0.0);
 

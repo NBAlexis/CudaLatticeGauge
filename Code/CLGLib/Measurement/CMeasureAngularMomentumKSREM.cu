@@ -228,7 +228,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
     const deviceSU3Vector* pInverseZ4,
     const deviceSU3* pGauge) const
 {
-    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
     if (NULL == pFieldREM)
@@ -244,7 +244,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
         pU1->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
-        m_byFieldId,
+        GetFermionFieldId(),
         1,
         _HC_Center,
         pFieldREM->m_fQ);
@@ -255,7 +255,7 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
     const deviceSU3Vector* pInverseZ4, 
     const deviceSU3* pGauge) const
 {
-    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
     if (NULL == pFieldREM)
@@ -270,14 +270,14 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
         pGauge,
         pU1->m_pDeviceData,
         pAppliedBuffer,
-        m_byFieldId,
+        GetFermionFieldId(),
         1,
         pFieldREM->m_fQ);
 }
 
 void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const
 {
-    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(m_byFieldId));
+    const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
 
     const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
@@ -291,8 +291,8 @@ void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pApplie
         pInverseZ4,
         pGauge,
         pU1->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[GetFermionFieldId()],
+        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[GetFermionFieldId()],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAphys->m_pDeviceData,
         pFieldREM->m_fQ);

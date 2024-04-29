@@ -21,8 +21,7 @@ class CLGAPI CMeasurePlaqutteEnergy : public CMeasure
 public:
     CMeasurePlaqutteEnergy() : CMeasure() {}
 
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }

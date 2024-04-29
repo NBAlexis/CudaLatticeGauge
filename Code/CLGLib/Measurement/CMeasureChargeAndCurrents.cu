@@ -162,7 +162,6 @@ CMeasureChargeAndCurrents::CMeasureChargeAndCurrents()
     , m_pHostDataBuffer(NULL)
     , m_pDeviceDataBuffer(NULL)
     , m_pOperatorData(NULL)
-    , m_bShowResult(TRUE)
 {
     ////see: https://stackoverflow.com/questions/9000388/device-function-pointers
     //_deviceMeasureFunc* ph_ptr = (_deviceMeasureFunc*)malloc(_kGammaInInterests * sizeof(_deviceMeasureFunc));
@@ -204,17 +203,9 @@ void CMeasureChargeAndCurrents::Initial(CMeasurementManager* pOwner, CLatticeDat
     checkCudaErrors(cudaMalloc((void**)&m_pOperatorData, sizeof(deviceWilsonVectorSU3) * _HC_Lx * _kGammaInInterests));
 
     Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
-void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& sourceSite)
+void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge* pGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& sourceSite)
 {
     if (12 != sources.Num())
     {
@@ -242,7 +233,7 @@ void CMeasureChargeAndCurrents::SourceSanning(const class CFieldGauge* pGauge, c
         CCommonData::m_fKai,
         static_cast<Real>(CCommonData::m_fOmega),
         static_cast<BYTE>(sourceSite.x), //array idx
-        m_byFieldId,
+        GetFermionFieldId(),
         //m_pMeasureFunctions,
         m_pOperatorData
         );

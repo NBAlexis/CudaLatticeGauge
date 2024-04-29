@@ -20,18 +20,10 @@ CMeasureConnectedSusceptibilityKS::~CMeasureConnectedSusceptibilityKS()
 
 }
 
-void CMeasureConnectedSusceptibilityKS::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
+void CMeasureConnectedSusceptibilityKS::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
-    CMeasure::Initial(pOwner, pLatticeData, param, byId);
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-}
-
-void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
-{
-    m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-    CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+    CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     SFermionSource sour;
     sour.m_byColorIndex = 0;
     sour.m_eSourceType = EFS_Point;

@@ -214,10 +214,6 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
     Reset();
 
     INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 1;
     param.FetchValueINT(_T("MeasureDist"), iValue);
     m_bMeasureDistribution = iValue != 0;
 
@@ -235,7 +231,7 @@ void CMeasureChiralCondensate::Initial(CMeasurementManager* pOwner, CLatticeData
     }
 }
 
-void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
+void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge, 
     const class CFieldGauge* pCorrespondingStaple, 
     const class CFieldFermion* pZ4, 
@@ -252,7 +248,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
         }
     }
 
-    const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[GetFermionFieldId()];
     const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
     const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
     
@@ -298,7 +294,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
                 _kernelChiralCondensateMeasureDist << <block2, threads2 >> > (
                     m_pDeviceXYBuffer[i],
                     m_uiMaxR,
-                    m_byFieldId,
+                    pF1W->m_byFieldId,
                     0 == i,
                     m_pDistributionR,
                     m_pDistribution
@@ -378,11 +374,6 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4(
 
         ++m_uiConfigurationCount;
     }
-}
-
-void CMeasureChiralCondensate::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
-{
-
 }
 
 void CMeasureChiralCondensate::Report()

@@ -164,11 +164,7 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
 
     Reset();
 
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("ShiftCenter"), iValue);
     m_bShiftCenter = iValue != 0;
 
@@ -209,7 +205,7 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
 }
 
-void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
+void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge, 
     const class CFieldGauge* pCorrespondingStaple, 
     const class CFieldFermion* pZ4, 
@@ -238,10 +234,10 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
     }
 
     // oneOuiVolume is only used in debug deviation, "-1" is for <qbar M q> = -tr[MD^{-1}]
-    const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[m_byFieldId];
+    const Real oneOuiVolume = F(-1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[GetFermionFieldId()];
     const CFieldFermionKS * pF1W = dynamic_cast<const CFieldFermionKS*>(pZ4);
     const CFieldFermionKS* pF2W = dynamic_cast<const CFieldFermionKS*>(pInverseZ4);
-    CFieldFermionKS* pAfterApplied = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermionKS* pAfterApplied = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
 
 #pragma region Dot
 
@@ -392,7 +388,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
             m_bShiftCenter,
             m_uiMaxR,
             m_uiEdge,
-            m_byFieldId,
+            GetFermionFieldId(),
             m_uiFieldCount,
             ChiralKSMax,
             m_uiConfigurationCount,
@@ -425,11 +421,6 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
         UpdateComplexResult(m_lstCondAll[0][m_uiConfigurationCount], FALSE);
         ++m_uiConfigurationCount;
     }
-}
-
-void CMeasureChiralCondensateKS::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
-{
-
 }
 
 void CMeasureChiralCondensateKS::Report()

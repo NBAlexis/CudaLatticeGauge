@@ -37,48 +37,63 @@ public:
         , m_pLatticeData(NULL)
         , m_bNeedSmearing(FALSE)
         , m_byId(0)
-        , m_byFieldId(0)
+        , m_byFermionFieldId(0)
+        , m_bShowResult(FALSE)
         , m_uiConfigurationCount(0)
         , m_fAverageRealRes(F(0.0))
     {
         m_cAverageCmpRes = _zeroc;
     }
 
-    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
-    {
-        m_pOwner = pOwner;
-        m_pLatticeData = pLatticeData;
-        m_byId = byId;
+    virtual void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId);
 
-        INT iNeedGaugeSmearing = 0;
-        param.FetchValueINT(_T("GaugeSmearing"), iNeedGaugeSmearing);
-        m_bNeedSmearing = 0 != iNeedGaugeSmearing;
-
-        INT iValue = 0;
-        param.FetchValueINT(_T("FieldId"), iValue);
-        m_byFieldId = static_cast<BYTE>(iValue);
-    }
 
     /**
     * Accept gauge can be smoothed.
     * pCorrespondingStaple Might be NULL.
     */
-    virtual void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) = 0;
+    virtual void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple);
 
 
     /**
     * NOTE: sources will be passed to multiple measures, do NOT change the content!
     * NOTE: site.x start from 1 to Lx - 1, 0 is not included
     */
-    virtual void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) = 0;
+    virtual void SourceSanning(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site);
 
     /**
     * Z4 Source
     */
-    virtual void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd)
+    virtual void OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd);
+
+protected:
+
+
+    /**
+    * For single field case
+    */
+    virtual void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
     {
-        appCrucial(_T("OnConfigurationAcceptedZ4 not implemented"));
+        appCrucial(_T("Single field case OnConfigurationAccepted not implemented!\n"));
     }
+
+    /**
+    * For single field case
+    */
+    virtual void SourceSanningSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site)
+    {
+        appCrucial(_T("Single field case SourceSanning not implemented!\n"));
+    }
+
+    /**
+    * For single field case
+    */
+    virtual void OnConfigurationAcceptedZ4SingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd)
+    {
+        appCrucial(_T("Single field case OnConfigurationAcceptedZ4 not implemented!\n"));
+    }
+
+public:
 
     virtual void Average();
     virtual void Report() = 0;
@@ -94,7 +109,8 @@ public:
     virtual UBOOL IsZ4Source() const { return FALSE; }
     virtual UBOOL NeedGaugeSmearing() const { return m_bNeedSmearing; }
 
-    BYTE GetFieldId() const { return m_byFieldId; }
+    BYTE GetFermionFieldId() const { return m_byFermionFieldId; }
+    BYTE GetGaugeFieldIdSingleField() const { return m_lstGaugeFieldIds[0]; }
 
 #if !_CLG_DOUBLEFLOAT
     static void LogGeneralComplex(const cuDoubleComplex& cmp, UBOOL bHasComma = TRUE)
@@ -364,7 +380,10 @@ protected:
     class CLatticeData* m_pLatticeData;
     UBOOL m_bNeedSmearing;
     BYTE m_byId;
-    BYTE m_byFieldId;
+    BYTE m_byFermionFieldId;
+    UBOOL m_bShowResult;
+    TArray<BYTE> m_lstGaugeFieldIds;
+    TArray<BYTE> m_lstBosonFieldIds;
 
 public:
     //============================================================
@@ -466,18 +485,6 @@ public:
         m_bDebugDivation = 0 != iValue;
     }
 
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override
-    {
-        appCrucial(_T("Should not use SourceSanning\n"));
-    }
-
-    /**
-    * Z4 Source
-    */
-    void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override
-    {
-        appCrucial(_T("OnConfigurationAcceptedZ4 not implemented\n"));
-    }
 
     UBOOL IsGaugeMeasurement() const override = 0;
     UBOOL IsSourceScanning() const override { return FALSE; }

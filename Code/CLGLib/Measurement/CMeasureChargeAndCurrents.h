@@ -40,8 +40,8 @@ public:
     ~CMeasureChargeAndCurrents();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override {}
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override;
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override {}
+    void SourceSanningSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override;
     void Report() override;
     void Reset() override;
 
@@ -54,7 +54,6 @@ protected:
     CLGComplex * m_pDeviceDataBuffer;
     deviceWilsonVectorSU3* m_pOperatorData;
     
-    UBOOL m_bShowResult;
     //_deviceMeasureFunc * m_pMeasureFunctions;
 
 public:

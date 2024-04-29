@@ -738,10 +738,6 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     Reset();
 
     INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
     param.FetchValueINT(_T("ShowResult"), iValue);
     m_bShowResult = iValue != 0;
 
@@ -767,8 +763,8 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
 
     if (m_bMeasureSpin)
     {
-        m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(m_byFieldId)->GetCopy());
-        m_pDpureA = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(m_byFieldId)->GetCopy());
+        m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(GetGaugeFieldIdSingleField())->GetCopy());
+        m_pDpureA = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(GetGaugeFieldIdSingleField())->GetCopy());
     }
 
     if (m_bMeasureDistribution)
@@ -788,7 +784,7 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     }
 }
 
-void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -813,7 +809,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             fBetaOverN,
-            m_byFieldId);
+            GetGaugeFieldIdSingleField());
     }
     else
     {
@@ -821,7 +817,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             fBetaOverN,
-            m_byFieldId);
+            GetGaugeFieldIdSingleField());
     }
 
     _AverageXYPlane(m_pDeviceDataBuffer);
@@ -831,7 +827,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     if (m_bMeasureDistribution)
     {
         XYDataToRdistri_R(m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-            m_uiMaxR, TRUE, m_byFieldId);
+            m_uiMaxR, TRUE, GetGaugeFieldIdSingleField());
 
         checkCudaErrors(cudaGetLastError());
 
@@ -888,7 +884,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             fBetaOverN,
-            m_byFieldId);
+            GetGaugeFieldIdSingleField());
     }
     else
     {
@@ -896,7 +892,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
             fBetaOverN,
-            m_byFieldId);
+            GetGaugeFieldIdSingleField());
     }
 
     _AverageXYPlane(m_pDeviceDataBuffer);
@@ -915,7 +911,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
     {
         XYDataToRdistri_R(
             m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-            m_uiMaxR, FALSE, m_byFieldId);
+            m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         FillDataWithR_R(
@@ -967,7 +963,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             {
                 XYDataToRdistri_R(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                    m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
                 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
                 FillDataWithR_R(
@@ -985,7 +981,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bProjectivePlane)
             {
                 _kernelCalculateJGSurfProjectivePlane << <block, threads >> > (
-                    m_byFieldId,
+                    GetGaugeFieldIdSingleField(),
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -995,7 +991,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             else
             {
                 _kernelCalculateJGSurf << <block, threads >> > (
-                    m_byFieldId,
+                    GetGaugeFieldIdSingleField(),
                     pGaugeSU3->m_pDeviceData,
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
@@ -1019,7 +1015,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             {
                 XYDataToRdistri_R(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                    m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
                 FillDataWithR_R(
@@ -1076,7 +1072,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             {
                 XYDataToRdistri_R(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                    m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 //extract res
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -1100,7 +1096,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             if (m_bProjectivePlane)
             {
                 _kernelCalculateJGPotProjectivePlane << <block, threads >> > (
-                    m_byFieldId,
+                    GetGaugeFieldIdSingleField(),
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
@@ -1109,7 +1105,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             else
             {
                 _kernelCalculateJGPot << <block, threads >> > (
-                    m_byFieldId,
+                    GetGaugeFieldIdSingleField(),
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
@@ -1132,7 +1128,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
             {
                 XYDataToRdistri_R(
                     m_bProjectivePlane, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                    m_uiMaxR, FALSE, m_byFieldId);
+                    m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                 checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
                 FillDataWithR_R(
@@ -1183,7 +1179,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 {
                     XYDataToRdistri_R(
                         FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                        m_uiMaxR, FALSE, m_byFieldId);
+                        m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                     //extract res
                     checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
@@ -1222,7 +1218,7 @@ void CMeasureAMomentumJG::OnConfigurationAccepted(const CFieldGauge* pGauge, con
                 {
                     XYDataToRdistri_R(
                         FALSE, m_pDeviceDataBuffer, m_pDistributionR, m_pDistributionJG,
-                        m_uiMaxR, FALSE, m_byFieldId);
+                        m_uiMaxR, FALSE, GetGaugeFieldIdSingleField());
 
                     //extract res
                     checkCudaErrors(cudaMemcpy(m_pHostDistributionJG, m_pDistributionJG, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));

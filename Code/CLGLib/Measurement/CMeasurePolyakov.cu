@@ -192,17 +192,9 @@ void CMeasurePolyakov::Initial(CMeasurementManager* pOwner, CLatticeData* pLatti
     m_pHostCorrelatorCounter = (UINT*)(malloc(sizeof(UINT) * m_uiMaxLengthSq));
 
     Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
-void CMeasurePolyakov::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
+void CMeasurePolyakov::OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pAcceptGauge || EFT_GaugeSU3 != pAcceptGauge->GetFieldType())
     {

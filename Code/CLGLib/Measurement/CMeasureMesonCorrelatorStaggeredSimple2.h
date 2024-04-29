@@ -25,7 +25,6 @@ public:
     CMeasureMesonCorrelatorStaggeredSimple2() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)
-        , m_bShowResult(FALSE)
         , m_bWallSource(TRUE)
         , m_byFieldID2(0)
     {
@@ -34,8 +33,7 @@ public:
     ~CMeasureMesonCorrelatorStaggeredSimple2();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void Report() override;
     void Reset() override;
 
@@ -43,7 +41,7 @@ public:
     UBOOL IsSourceScanning() const override { return FALSE; }
     UBOOL HasOtherField() const
     {
-        return m_byFieldID2 > 0 && m_byFieldID2 != m_byFieldId;
+        return m_byFieldID2 > 0 && m_byFieldID2 != GetFermionFieldId();
     }
 
 protected:
@@ -77,7 +75,6 @@ public:
     //m_lstResults[conf][type][t]
     TArray<TArray<TArray<Real>>> m_lstResults;
 #endif
-    UBOOL m_bShowResult;
     UBOOL m_bWallSource;
     BYTE m_byFieldID2;
 };

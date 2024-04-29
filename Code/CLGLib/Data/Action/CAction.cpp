@@ -39,7 +39,7 @@ DOUBLE CAction::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const
 {
     if (1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
     {
-        INT idx = GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
         return EnergySingleField(bBeforeEvolution, gaugeFields[idx], (NULL == stableFields) ? NULL : stableFields[idx]);
     }
     return 0.0;
@@ -49,7 +49,7 @@ UBOOL CAction::CalculateForceOnGauge(INT num, const CFieldGauge* const* gaugeFie
 {
     if (1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
     {
-        INT idx = GetGaugeFieldIndexById(num, gaugeFields, m_byGaugeFieldIds[0]);
+        INT idx = CLatticeData::GetGaugeFieldIndexById(num, gaugeFields, m_byGaugeFieldIds[0]);
         return CalculateForceOnGaugeSingleField(gaugeFields[idx], forceFields[idx], (NULL == stapleFields) ? NULL : stapleFields[idx], ePhase);
     }
     return FALSE;
@@ -59,7 +59,7 @@ void CAction::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const
 {
     if (1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
     {
-        INT idx = GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
         PrepareForHMCSingleField(gaugeFields[idx], iUpdateIterate);
     }
 }

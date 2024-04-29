@@ -260,15 +260,7 @@ void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
     checkCudaErrors(cudaMalloc((void**)&m_pTmpLoop, sizeof(deviceSU3) * _HC_Lx * _HC_Ly * _HC_Lz));
     Reset();
 
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("MeasureZ"), iValue);
     m_bMeasureLoopZ = iValue != 0;
 
@@ -305,7 +297,7 @@ void CMeasurePolyakovXY::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
     }
 }
 
-void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
+void CMeasurePolyakovXY::OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pAcceptGauge || EFT_GaugeSU3 != pAcceptGauge->GetFieldType())
     {
@@ -359,7 +351,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
         m_uiMaxR,
         m_uiEdgeR,
         TRUE,
-        m_byFieldId,
+        GetGaugeFieldIdSingleField(),
         m_lstP,
         &m_lstLoopInner,
         m_lstLoop,
@@ -378,7 +370,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
         m_uiMaxR,
         m_uiEdgeR,
         FALSE,
-        m_byFieldId,
+        GetGaugeFieldIdSingleField(),
         m_lstPAbs,
         &m_lstLoopAbsInner,
         m_lstLoopAbs,
@@ -453,7 +445,7 @@ void CMeasurePolyakovXY::OnConfigurationAccepted(const class CFieldGauge* pAccep
             m_uiMaxR,
             m_uiEdgeR,
             FALSE,
-            m_byFieldId,
+            GetGaugeFieldIdSingleField(),
             m_lstPZ,
             &m_lstLoopZInner,
             m_lstLoopZ,

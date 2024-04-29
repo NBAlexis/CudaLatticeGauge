@@ -81,31 +81,8 @@ public:
 
     virtual UBOOL IsFermion() const { return FALSE; }
 
-    static INT GetGaugeFieldIndexById(INT num, const CFieldGauge* const* gaugeFields, BYTE byFieldId)
-    {
-        for (INT i = 0; i < num; ++i)
-        {
-            if (gaugeFields[i]->m_byFieldId == byFieldId)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
+protected:
 
-    static INT GetBosonFieldIndexById(INT num, const CFieldBoson* const* bosonFields, BYTE byFieldId)
-    {
-        for (INT i = 0; i < num; ++i)
-        {
-            if (bosonFields[i]->m_byFieldId == byFieldId)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    // After measurement is done, change this to protected
     virtual UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const
     {
         appCrucial(_T("CalculateForceOnGauge not implemented\n"));
@@ -122,8 +99,6 @@ public:
         appCrucial(_T("Energy not implemented\n"));
         return 0.0;
     }
-
-protected:
 
     class CLatticeData* m_pOwner;
     BYTE m_byActionId;

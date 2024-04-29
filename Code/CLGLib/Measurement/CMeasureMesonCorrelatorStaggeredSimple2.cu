@@ -94,11 +94,7 @@ CMeasureMesonCorrelatorStaggeredSimple2::~CMeasureMesonCorrelatorStaggeredSimple
 void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("FieldId2"), iValue);
     m_byFieldID2 = static_cast<BYTE>(iValue);
 
@@ -125,7 +121,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwne
     m_bWallSource = iValue != 0;
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
     BuildSource();
     IniverseSource(pGaugeField);
@@ -335,7 +331,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::BuildSource()
 
     for (BYTE color = 0; color < 3; ++color)
     {
-        CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
         assert(NULL != pFermion);
         SFermionSource source;
         source.m_byColorIndex = color;

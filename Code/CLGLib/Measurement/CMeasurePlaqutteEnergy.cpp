@@ -14,7 +14,7 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CMeasurePlaqutteEnergy)
 
-void CMeasurePlaqutteEnergy::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasurePlaqutteEnergy::OnConfigurationAcceptedSingleField(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
 {
 #if !_CLG_DOUBLEFLOAT
     DOUBLE plaqutteEneregy = 0.0;

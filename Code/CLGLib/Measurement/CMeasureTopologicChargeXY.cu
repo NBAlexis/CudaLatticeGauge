@@ -86,17 +86,9 @@ void CMeasureTopologicChargeXY::Initial(CMeasurementManager* pOwner, CLatticeDat
     checkCudaErrors(cudaMalloc((void**)&m_pXYDeviceDensity, sizeof(Real) * _HC_Lx * _HC_Ly));
 
     Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
-void CMeasureTopologicChargeXY::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasureTopologicChargeXY::OnConfigurationAcceptedSingleField(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {

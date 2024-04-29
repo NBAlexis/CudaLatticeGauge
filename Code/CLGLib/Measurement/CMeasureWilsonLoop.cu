@@ -224,14 +224,6 @@ void CMeasureWilsonLoop::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
     m_pHostCorrelatorCounter = (UINT*)malloc(sizeof(UINT) * m_uiMaxLengthSq);
 
     Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 }
 
 //=================================
@@ -240,7 +232,7 @@ void CMeasureWilsonLoop::Initial(CMeasurementManager* pOwner, CLatticeData* pLat
 //This is W(R,t)
 //(3) For each (n1,t from 2), we calculate log(W(R,t) / W(R,t+1)), store it in V(R)=(R, 0)
 //(4) Then we calculate V(|R|) = average(V(R))
-void CMeasureWilsonLoop::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
+void CMeasureWilsonLoop::OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pAcceptGauge || EFT_GaugeSU3 != pAcceptGauge->GetFieldType())
     {

@@ -59,7 +59,6 @@ public:
         , m_bShiftCenter(FALSE)
         , m_bMeasureSigma12(FALSE)
         
-        , m_bShowResult(FALSE)
         , m_bMeasureConnect(FALSE)
         , m_bMeasureZSlice(FALSE)
     {
@@ -69,9 +68,7 @@ public:
     ~CMeasureChiralCondensateKS();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedZ4SingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
     void Report() override;
     void Reset() override;
 
@@ -96,7 +93,6 @@ protected:
     UINT m_uiEdge;
     UBOOL m_bShiftCenter;
     UBOOL m_bMeasureSigma12;
-    UBOOL m_bShowResult;
 
 public:
 

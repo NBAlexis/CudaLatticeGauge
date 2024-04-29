@@ -442,17 +442,7 @@ _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq(
 #pragma endregion
 
 
-void CMeasurePandChiralTalorKS::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
-{
-    CMeasureStochastic::Initial(pOwner, pLatticeData, param, byId);
-    Reset();
-
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-}
-
-void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4(
+void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge,
     const class CFieldGauge* pCorrespondingStaple,
     const class CFieldFermion* pZ4,
@@ -559,7 +549,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4(
     }
 }
 
-void CMeasurePandChiralTalorKS::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {

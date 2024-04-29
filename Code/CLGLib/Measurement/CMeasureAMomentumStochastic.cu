@@ -873,10 +873,6 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
     Reset();
 
     iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 1;
     param.FetchValueINT(_T("Exponential"), iValue);
     m_bExponential = iValue != 0;
 
@@ -909,7 +905,7 @@ void CMeasureAMomentumStochastic::Initial(CMeasurementManager* pOwner, CLatticeD
     }
 }
 
-void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
+void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
     const class CFieldGauge* pAcceptGauge, 
     const class CFieldGauge* pCorrespondingStaple, 
     const class CFieldFermion* pZ4, 
@@ -945,9 +941,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             pF2W->m_pDeviceData,
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-            m_byFieldId,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            pF1W->m_byFieldId,
             m_pDeviceXYBufferJL
             );
     }
@@ -957,9 +953,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             pF2W->m_pDeviceData,
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-            m_byFieldId,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            pF1W->m_byFieldId,
             FALSE,
             m_pDeviceXYBufferJL
             );
@@ -973,9 +969,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
             pF2W->m_pDeviceData,
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-            m_byFieldId,
+            appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            pF1W->m_byFieldId,
             m_pDeviceXYBufferJS
             );
     }
@@ -984,7 +980,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         _kernelDotAndGatherXYAMomentumJS << <block, threads >> >(
             pF2W->m_pDeviceData,
             pF1W->m_pDeviceData,
-            m_byFieldId,
+            pF1W->m_byFieldId,
             m_pDeviceXYBufferJS
             );
     }
@@ -1000,7 +996,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         pF2W->m_pDeviceData,
         pF1W->m_pDeviceData,
         pAphys->m_pDeviceData,
-        m_byFieldId,
+        pF1W->m_byFieldId,
         m_pDeviceXYBufferJPot
         );
 
@@ -1021,9 +1017,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 pF1W->m_pDeviceData,
                 pGaugeSU3->m_pDeviceData,
                 pAphys->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                m_byFieldId,
+                appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+                pF1W->m_byFieldId,
                 m_pDeviceXYBufferJLPure
                 );
 
@@ -1031,8 +1027,8 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
                 pF2W->m_pDeviceData,
                 pF1W->m_pDeviceData,
                 pAphys->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
-                m_byFieldId,
+                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+                pF1W->m_byFieldId,
                 m_pDeviceXYBufferJLJM
                 );
         }
@@ -1045,9 +1041,9 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         //2.0 is for the flavour, "-1" is because bar{q} M q = -tr[M D^{-1}]
         const Real fDivider = -F(2.0) * CCommonData::m_fKai / (m_uiFieldCount * _HC_Lz * _HC_Lt);
 
-        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, m_byFieldId);
-        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJS, m_pDistributionR, m_pDistributionJS, m_uiMaxR, FALSE, m_byFieldId);
-        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, m_byFieldId);
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJL, m_pDistributionR, m_pDistributionJL, m_uiMaxR, TRUE, GetFermionFieldId());
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJS, m_pDistributionR, m_pDistributionJS, m_uiMaxR, FALSE, GetFermionFieldId());
+        XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJPot, m_pDistributionR, m_pDistributionJPot, m_uiMaxR, FALSE, GetFermionFieldId());
 
         checkCudaErrors(cudaMemcpy(m_pHostDistributionR, m_pDistributionR, sizeof(UINT) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
         checkCudaErrors(cudaMemcpy(m_pHostDistributionJL, m_pDistributionJL, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));        
@@ -1058,8 +1054,8 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
 
         if (m_bMeasureJLPure)
         {
-            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLPure, m_pDistributionR, m_pDistributionJLPure, m_uiMaxR, FALSE, m_byFieldId);
-            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLJM, m_pDistributionR, m_pDistributionJLJM, m_uiMaxR, FALSE, m_byFieldId);
+            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLPure, m_pDistributionR, m_pDistributionJLPure, m_uiMaxR, FALSE, GetFermionFieldId());
+            XYDataToRdistri_R(FALSE, m_pDeviceXYBufferJLJM, m_pDistributionR, m_pDistributionJLJM, m_uiMaxR, FALSE, GetFermionFieldId());
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLPure, m_pDistributionJLPure, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaMemcpy(m_pHostDistributionJLJM, m_pDistributionJLJM, sizeof(Real) * (m_uiMaxR + 1), cudaMemcpyDeviceToHost));
             checkCudaErrors(cudaGetLastError());
@@ -1237,11 +1233,6 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4(
         }
         ++m_uiConfigurationCount;
     }
-}
-
-void CMeasureAMomentumStochastic::OnConfigurationAccepted(const CFieldGauge* pGauge, const CFieldGauge* pCorrespondingStaple)
-{
-    //do nothing, we use OnConfigurationAcceptedZ4 instead
 }
 
 void CMeasureAMomentumStochastic::Report()

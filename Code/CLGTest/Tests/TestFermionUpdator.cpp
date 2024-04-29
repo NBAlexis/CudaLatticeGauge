@@ -310,7 +310,8 @@ UINT TestBerryPhase(CParameters& sParam)
     //pMeasure->m_bGuageFixing = FALSE;
     //pMeasure->OnConfigurationAccepted(appGetLattice()->m_pGaugeField);
 
-#if 1
+    TArray<CFieldGauge*> gauge;
+    gauge.AddItem(appGetLattice()->m_pGaugeField);
 
 #if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(10, FALSE);
@@ -332,13 +333,13 @@ UINT TestBerryPhase(CParameters& sParam)
         const INT newCount = appGetLattice()->m_pUpdator->Update(1, FALSE);
         if (newCount != iAccepted)
         {
-            pMeasure->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pMeasure->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             iAccepted = newCount;
         }
     }
 
     pMeasure->Report();
-#endif
+
     return 0;
 }
 

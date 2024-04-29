@@ -488,7 +488,7 @@ void CMeasureMesonCorrelatorStaggered::CalculatePropogators()
             m_pDeviceSignTable,
             m_pDeviceDeltaTable,
             static_cast<BYTE>(i),
-            m_byFieldId,
+            GetFermionFieldId(),
             m_pDevicePropogators);
 
 
@@ -519,7 +519,7 @@ void CMeasureMesonCorrelatorStaggered::SimplerVersion()
     CFieldFermionKSSU3* sinks[24];
     for (BYTE i = 0; i < 24; ++i)
     {
-        sinks[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        sinks[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     }
 
     for (INT i = 0; i < _kMesonCorrelatorType; ++i)
@@ -618,10 +618,6 @@ void CMeasureMesonCorrelatorStaggered::Initial(CMeasurementManager* pOwner, CLat
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
     INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 1;
     param.FetchValueINT(_T("GaugeFixing"), iValue);
     m_bGaugeFixing = iValue != 0;
 
@@ -633,12 +629,12 @@ void CMeasureMesonCorrelatorStaggered::Initial(CMeasurementManager* pOwner, CLat
     InitialSignTable();
 }
 
-void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggered::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
     for (BYTE i = 0; i < 24; ++i)
     {
-        m_pW1[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-        m_pW2[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+        m_pW1[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
+        m_pW2[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     }
 
     if (m_bGaugeFixing)

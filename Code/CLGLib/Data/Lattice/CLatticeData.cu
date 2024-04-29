@@ -192,12 +192,12 @@ void CLatticeData::ReCopyPooled(BYTE byId) const
     pool->ReCopyAll();
 }
 
-void CLatticeData::OnUpdatorConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple) const
+void CLatticeData::OnUpdatorConfigurationAccepted(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pAcceptGauge, const CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pCorrespondingStaple) const
 {
     //accept gauge already copy to m_pGaugeField in Updator, maybe change this behavour in the furture.
     if (NULL != m_pMeasurements)
     {
-        m_pMeasurements->OnConfigurationAccepted(pAcceptGauge, pCorrespondingStaple);
+        m_pMeasurements->OnConfigurationAccepted(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, pCorrespondingStaple);
     }
 }
 
@@ -358,6 +358,30 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
         sRet = sRet + m_pGaugeFixing->GetInfos(sTab + _T("    "));
     }
     return sRet;
+}
+
+INT CLatticeData::GetGaugeFieldIndexById(INT num, const CFieldGauge* const* gaugeFields, BYTE byFieldId)
+{
+    for (INT i = 0; i < num; ++i)
+    {
+        if (gaugeFields[i]->m_byFieldId == byFieldId)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+INT CLatticeData::GetBosonFieldIndexById(INT num, const CFieldBoson* const* bosonFields, BYTE byFieldId)
+{
+    for (INT i = 0; i < num; ++i)
+    {
+        if (bosonFields[i]->m_byFieldId == byFieldId)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 __END_NAMESPACE

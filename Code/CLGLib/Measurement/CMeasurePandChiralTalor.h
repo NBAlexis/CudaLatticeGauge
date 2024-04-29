@@ -33,25 +33,19 @@ class CLGAPI CMeasurePandChiralTalor : public CMeasureStochastic
 public:
     CMeasurePandChiralTalor()
         : CMeasureStochastic()
-        , m_bShowResult(TRUE)
     {
     }
 
     ~CMeasurePandChiralTalor();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAcceptedZ4(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedZ4SingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
     void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
-
-protected:
-    
-    UBOOL m_bShowResult;
 
 public:
 

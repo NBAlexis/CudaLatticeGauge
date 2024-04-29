@@ -12,7 +12,7 @@
 
 __BEGIN_NAMESPACE
 
-void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGauge, const CFieldGauge* pCorrespondingStaple)
+void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
 {
     if (!m_bEverResetted && 0 == m_iAcceptedConfigurationCount)
     {
@@ -21,22 +21,29 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
 
     ++m_iAcceptedConfigurationCount;
 
-    CFieldGauge* pSmearing = NULL;
-    CFieldGauge* pSmearingStaple = NULL;
+    TArray<const CFieldGauge*> allGauges;
+    TArray<const CFieldGauge*> allStaples;
     if (m_bNeedGaugeSmearing && NULL != appGetGaugeSmearing())
     {
-        //for smearing, we have to use staple
-        pSmearing = dynamic_cast<CFieldGauge*>(pAcceptGauge->GetCopy());
-        if (NULL != pCorrespondingStaple)
+        CFieldGauge* pSmearing = NULL;
+        CFieldGauge* pSmearingStaple = NULL;
+        for (INT i = 0; i < gaugeNum; ++i)
         {
-            pSmearingStaple = dynamic_cast<CFieldGauge*>(pCorrespondingStaple->GetCopy());
+            //for smearing, we have to use staple
+            pSmearing = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
+            if (NULL != pCorrespondingStaple)
+            {
+                pSmearingStaple = dynamic_cast<CFieldGauge*>(pCorrespondingStaple[i]->GetCopy());
+            }
+            else
+            {
+                pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
+                pAcceptGauge[i]->CalculateOnlyStaple(pSmearingStaple);
+            }
+            appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
+            allGauges.AddItem(pSmearing);
+            allStaples.AddItem(pSmearingStaple);
         }
-        else
-        {
-            pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge->GetCopy());
-            pAcceptGauge->CalculateOnlyStaple(pSmearingStaple);
-        }
-        appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
     }
 
     //gauge measurement
@@ -45,8 +52,11 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
         if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsGaugeMeasurement())
         {
             m_lstAllMeasures[i]->OnConfigurationAccepted(
-                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple);
+                gaugeNum,
+                bosonNum,
+                m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
+                pAcceptBoson,
+                m_lstAllMeasures[i]->NeedGaugeSmearing() ? allStaples.GetData() : pCorrespondingStaple);
         }
     }
 
@@ -77,13 +87,16 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
                 }
                 pF1->FixBoundary();
                 pF1->CopyTo(pF2);
-                pF1->InverseD(pAcceptGauge);
+                pF1->InverseD(pAcceptGauge[0]);
 
                 for (INT k = 0; k < measures.GetCount(); ++k)
                 {
                     measures[k]->OnConfigurationAcceptedZ4(
-                        measures[k]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                        measures[k]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
+                        gaugeNum,
+                        bosonNum,
+                        measures[k]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
+                        pAcceptBoson,
+                        measures[k]->NeedGaugeSmearing() ? allStaples.GetData() : pCorrespondingStaple,
                         pF2, pF1,
                         0 == j, uiFieldCount == j + 1);
                 }
@@ -114,14 +127,17 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
 
                 CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
                 TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
-                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
+                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges[0] : pAcceptGauge[0],
                     sourceSite);
 
                 for (INT j = 0; j < measures.Num(); ++j)
                 {
                     measures[j]->SourceSanning(
-                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearing : pAcceptGauge,
-                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? pSmearingStaple : pCorrespondingStaple,
+                        gaugeNum,
+                        bosonNum,
+                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
+                        pAcceptBoson,
+                        m_lstAllMeasures[i]->NeedGaugeSmearing() ? allStaples.GetData() : pCorrespondingStaple,
                         sources,
                         sourceSite);
                 }
@@ -134,8 +150,12 @@ void CMeasurementManager::OnConfigurationAccepted(const CFieldGauge* pAcceptGaug
         }
     }
 
-    appSafeDelete(pSmearing);
-    appSafeDelete(pSmearingStaple);
+    INT iCreated = allGauges.Num();
+    for (INT i = 0; i < iCreated; ++i)
+    {
+        appSafeDelete(allGauges[i]);
+        appSafeDelete(allStaples[i]);
+    }
 }
 
 void CMeasurementManager::OnUpdateFinished(UBOOL bReport)
@@ -199,7 +219,7 @@ THashMap<BYTE, TArray<CMeasure*>> CMeasurementManager::HasSourceScanning(UBOOL& 
         if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsSourceScanning())
         {
             bHasSourceScanning = TRUE;
-            BYTE byFieldId = m_lstAllMeasures[i]->GetFieldId();
+            BYTE byFieldId = m_lstAllMeasures[i]->GetFermionFieldId();
             if (ret.Exist(byFieldId))
             {
                 TArray<CMeasure*> lst = ret.GetAt(byFieldId);
@@ -226,7 +246,7 @@ THashMap<BYTE, TArray<CMeasureStochastic*>> CMeasurementManager::HasZ4(UINT &uiF
         CMeasureStochastic* pStoch = dynamic_cast<CMeasureStochastic*>(m_lstAllMeasures[i]);
         if (NULL != pStoch && pStoch->IsZ4Source())
         {
-            BYTE byFieldId = m_lstAllMeasures[i]->GetFieldId();
+            BYTE byFieldId = m_lstAllMeasures[i]->GetFermionFieldId();
             if (ret.Exist(byFieldId))
             {
                 TArray<CMeasureStochastic*> lst = ret.GetAt(byFieldId);

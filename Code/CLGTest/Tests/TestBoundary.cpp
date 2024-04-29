@@ -78,12 +78,15 @@ UINT TestBoundaryMapping(CParameters& sParam)
     const Real fExpE3 = F(1167.37873127234047387901);
     const Real fExpE4 = F(14498.55613259701931383461);
 
-    const Real fEnergy1 = static_cast<Real>(appGetLattice()->m_pActionList[0]->EnergySingleField(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
-    const Real fEnergy2 = static_cast<Real>(appGetLattice()->m_pActionList[1]->EnergySingleField(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
-    const Real fEnergy3 = static_cast<Real>(appGetLattice()->m_pActionList[2]->EnergySingleField(
-        FALSE, appGetLattice()->m_pGaugeField, NULL));
+    TArray<CFieldGauge*> gaugefields;
+    gaugefields.AddItem(appGetLattice()->m_pGaugeField);
+
+    const Real fEnergy1 = static_cast<Real>(appGetLattice()->m_pActionList[0]->Energy(
+        FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
+    const Real fEnergy2 = static_cast<Real>(appGetLattice()->m_pActionList[1]->Energy(
+        FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
+    const Real fEnergy3 = static_cast<Real>(appGetLattice()->m_pActionList[2]->Energy(
+        FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
 
     CFieldGauge* pStape = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
     appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStape);

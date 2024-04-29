@@ -22,15 +22,12 @@ public:
 
     CMeasureConnectedSusceptibilityKS() : CMeasure()
         , m_pSourceZero(NULL)
-        , m_bShowResult(FALSE)
     {
         
     }
     ~CMeasureConnectedSusceptibilityKS();
-    void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
     void Report() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
@@ -40,9 +37,6 @@ protected:
 
     CFieldFermion* m_pSourceZero;
 
-public:
-
-    UBOOL m_bShowResult;
 };
 
 __END_NAMESPACE

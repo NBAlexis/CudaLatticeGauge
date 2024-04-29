@@ -159,15 +159,7 @@ void CMeasurePolyakovXY3D::Initial(CMeasurementManager* pOwner, CLatticeData* pL
     checkCudaErrors(cudaMalloc((void**)&m_pXYDeviceLoopDensityAbs, sizeof(Real) * _HC_Lx * _HC_Ly));
     Reset();
 
-    INT iValue = 1;
-    param.FetchValueINT(_T("FieldId"), iValue);
-    m_byFieldId = static_cast<BYTE>(iValue);
-
-    iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
-
-    iValue = 0;
+    INT iValue = 0;
     param.FetchValueINT(_T("U1"), iValue);
     m_bU1 = iValue != 0;
 
@@ -189,7 +181,7 @@ void CMeasurePolyakovXY3D::Initial(CMeasurementManager* pOwner, CLatticeData* pL
 
 }
 
-void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
+void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple)
 {
 
     if (!m_bU1)
@@ -234,7 +226,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
         m_uiMaxR,
         m_uiEdgeR,
         TRUE,
-        m_byFieldId,
+        GetGaugeFieldIdSingleField(),
         m_lstP,
         &m_lstLoopInner,
         m_lstLoop,
@@ -253,7 +245,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAccepted(const class CFieldGauge* pAcc
         m_uiMaxR,
         m_uiEdgeR,
         FALSE,
-        m_byFieldId,
+        GetGaugeFieldIdSingleField(),
         m_lstPAbs,
         &m_lstLoopAbsInner,
         m_lstLoopAbs,

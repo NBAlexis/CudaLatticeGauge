@@ -53,7 +53,6 @@ public:
         : CMeasure()
         , m_pHostDataBuffer(NULL)
         , m_pDeviceDataBuffer(NULL)
-        , m_byFieldId(1)
 
         , m_pDistributionR(NULL)
         , m_pDistributionJG(NULL)
@@ -78,8 +77,7 @@ public:
     ~CMeasureAMomentumJG();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
     void Reset() override;
 
@@ -90,8 +88,6 @@ protected:
 
     Real * m_pHostDataBuffer;
     Real * m_pDeviceDataBuffer;
-
-    BYTE m_byFieldId;
 
     UINT* m_pDistributionR;
     Real* m_pDistributionJG;

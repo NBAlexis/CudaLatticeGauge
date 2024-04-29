@@ -214,6 +214,60 @@ void CMeasure::WriteCmpListToFile(const CCString& sFileName) const
     WriteComplexArray(sFileName, m_lstComplexResults);
 }
 
+void CMeasure::Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
+{
+    m_pOwner = pOwner;
+    m_pLatticeData = pLatticeData;
+    m_byId = byId;
+
+    INT iNeedGaugeSmearing = 0;
+    param.FetchValueINT(_T("GaugeSmearing"), iNeedGaugeSmearing);
+    m_bNeedSmearing = 0 != iNeedGaugeSmearing;
+
+    INT iValue = 0;
+    param.FetchValueINT(_T("FieldId"), iValue);
+    m_byFermionFieldId = static_cast<BYTE>(iValue);
+
+    iValue = 1;
+    param.FetchValueINT(_T("ShowResult"), iValue);
+    m_bShowResult = iValue != 0;
+
+    param.FetchValueArrayBYTE(_T("GaugeFields"), m_lstGaugeFieldIds);
+    param.FetchValueArrayBYTE(_T("BosonFields"), m_lstBosonFieldIds);
+
+    if (0 == m_lstGaugeFieldIds.Num() && 0 == m_lstBosonFieldIds.Num())
+    {
+        m_lstGaugeFieldIds.AddItem(1);
+    }
+}
+
+void CMeasure::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
+{
+    if (1 == m_lstGaugeFieldIds.Num() && 0 == m_lstBosonFieldIds.Num())
+    {
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
+        OnConfigurationAcceptedSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx]);
+    }
+}
+
+void CMeasure::SourceSanning(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site)
+{
+    if (1 == m_lstGaugeFieldIds.Num() && 0 == m_lstBosonFieldIds.Num())
+    {
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
+        SourceSanningSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], sources, site);
+    }
+}
+
+void CMeasure::OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd)
+{
+    if (1 == m_lstGaugeFieldIds.Num() && 0 == m_lstBosonFieldIds.Num())
+    {
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
+        OnConfigurationAcceptedZ4SingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], pZ4, pInverseZ4, bStart, bEnd);
+    }
+}
+
 void CMeasure::FillDataWithR_R(
     TArray<Real>& arrData,
     TArray<Real>* arrInner,

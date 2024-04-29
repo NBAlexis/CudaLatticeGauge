@@ -77,9 +77,6 @@ CMeasureMesonCorrelatorStaggeredSimple::~CMeasureMesonCorrelatorStaggeredSimple(
 void CMeasureMesonCorrelatorStaggeredSimple::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
-    INT iValue = 1;
-    param.FetchValueINT(_T("ShowResult"), iValue);
-    m_bShowResult = iValue != 0;
 
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(Real) * _HC_Volume * _kMesonCorrelatorTypeSimple));
 #if !_CLG_DOUBLEFLOAT
@@ -89,9 +86,9 @@ void CMeasureMesonCorrelatorStaggeredSimple::Initial(CMeasurementManager* pOwner
 #endif
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
 {
-    CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     assert(NULL != pFermion);
     SFermionSource pointSource;
     pointSource.m_byColorIndex = 4;

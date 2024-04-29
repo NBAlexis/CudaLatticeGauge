@@ -23,7 +23,6 @@ public:
         : CMeasure()
         , m_bWilsonDirac(TRUE)
         , m_bGuageFixing(FALSE)
-        , m_bShowRes(FALSE)
         , m_pMomentumField(NULL)
         , m_pU1Field(NULL)
         , m_pGaugeFixing(NULL)
@@ -34,8 +33,7 @@ public:
     ~CMeasureBerryPhase();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAccepted(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple = NULL) override;
-    void SourceSanning(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site) override {}
+    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple = NULL) override;
     void Report() override;
     void Reset() override;
 
@@ -72,7 +70,6 @@ public:
 
     UBOOL m_bWilsonDirac;
     UBOOL m_bGuageFixing;
-    UBOOL m_bShowRes;
 
     CFieldFermion* m_pMomentumField;
     CFieldGaugeU1* m_pU1Field;
