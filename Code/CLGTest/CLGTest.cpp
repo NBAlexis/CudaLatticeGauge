@@ -11,7 +11,7 @@
 
 TestList* _testSuits;
 
-UINT RunTest(CParameters&params, TestList* pTest)
+UINT RunTest(CParameters&params, const TestList* pTest)
 {
     appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
     CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
@@ -39,25 +39,40 @@ UINT RunTest(CParameters&params, TestList* pTest)
 void ListAllTests(const THashMap<CCString, TArray<TestList*>*>& category)
 {
     TArray<CCString> sKeys = category.GetAllKeys();
+    UINT uiIdx = 0;
     for (INT k = 0; k < sKeys.Num(); ++k)
     {
         COUT << _T("============== ") << sKeys[k] << _T(" ==============\n");
         TArray<TestList*>* lst = category.GetAt(sKeys[k]); //category[] only work with non-const THashMap
         for (INT i = 0; i <= lst->Num() / 3; ++i)
         {
-            for (INT j = 0; j < 3; ++j)
+            for (INT j = 0; j < 4; ++j)
             {
-                const INT indexOfTest = i * 3 + j;
+                const INT indexOfTest = i * 4 + j;
                 if (indexOfTest < lst->Num())
                 {
                     TCHAR names[256];
-                    appSprintf(names, 256, _T("%d - %s,    "), lst->GetAt(indexOfTest)->m_uiIndex, lst->GetAt(indexOfTest)->m_sParamName);
+                    ++uiIdx;
+                    lst->GetAt(indexOfTest)->m_uiIndex = uiIdx;
+                    appSprintf(names, 256, _T("%d - %s"), uiIdx, appStrWithLen(lst->GetAt(indexOfTest)->GetName(), 25).c_str());
                     COUT << names;
                 }
             }
             COUT << std::endl;
         }
     }
+}
+
+TestList* GetTest(const TArray<TestList*>& alltest, UINT idx)
+{
+    for (INT i = 0; i < alltest.Num(); ++i)
+    {
+        if (idx == alltest[i]->m_uiIndex)
+        {
+            return alltest[i];
+        }
+    }
+    return NULL;
 }
 
 void DeleteAllLists(THashMap<CCString, TArray<TestList*>*>& category)
@@ -120,13 +135,13 @@ int main(int argc, char * argv[])
     
     TArray<TestList*> allTests;
     THashMap<CCString, TArray<TestList*>*> category;
-    UINT uiIndex = 0;
+    //UINT uiIndex = 0;
     for (TestList* pTest = _testSuits; NULL != pTest; pTest = pTest->m_pNext)
     {
         if (params.Exist(pTest->m_sParamName))
         {
-            pTest->m_uiIndex = uiIndex;
-            ++uiIndex;
+            //pTest->m_uiIndex = uiIndex;
+            //++uiIndex;
             allTests.AddItem(pTest);
             CCString sCategory = pTest->m_sCatogary;
             if (category.Exist(sCategory))
@@ -172,10 +187,44 @@ int main(int argc, char * argv[])
         }
         else if (appAnyToString(number) == sRes)
         {
-            if (number >= 0 && number < allTests.Num())
+            if (number > 0 && number <= allTests.Num())
             {
-                RunTest(params, allTests[number]);
-                bExcuted = TRUE;
+                TestList* pTest = GetTest(allTests, static_cast<UINT>(number));
+                UBOOL bPass = FALSE;
+#if _CLG_DEBUG
+                if (pTest->OnlyRelease())
+                {
+                    bPass = TRUE;
+                    appGeneral(_T("Cannot run this test in DEBUG mode\n"));
+                }
+#endif
+
+#if !_CLG_USE_LAUNCH_BOUND
+                if (pTest->OnlyBound())
+                {
+                    bPass = TRUE;
+                    appGeneral(_T("Can ONLY run this test in BOUND mode\n"));
+                }
+#endif
+
+#if !_CLG_DOUBLEFLOAT
+                if (pTest->OnlyDouble())
+                {
+                    bPass = TRUE;
+                    appGeneral(_T("Can ONLY this test in DOUBLE mode\n"));
+                }
+#else
+                if (pTest->OnlySingle())
+                {
+                    bPass = TRUE;
+                    appGeneral(_T("Can ONLY this test in FLOAT mode\n"));
+                }
+#endif
+                if (!bPass)
+                {
+                    RunTest(params, pTest);
+                    bExcuted = TRUE;
+                }
             }
         }
         else if (sRes == _T("r"))
@@ -228,7 +277,26 @@ int main(int argc, char * argv[])
                     TArray<CCString> unpassed;
                     for (INT j = 0; j < category[keys[i]]->Num(); ++j)
                     {
-                        UINT uiThisError = RunTest(params, category[keys[i]]->GetAt(j));
+                        const TestList* pTest = category[keys[i]]->GetAt(j);
+#if _CLG_DEBUG
+                        if (pTest->OnlyRelease())
+                            continue;
+#endif
+
+#if !_CLG_USE_LAUNCH_BOUND
+                        if (pTest->OnlyBound())
+                            continue;
+#endif
+
+#if !_CLG_DOUBLEFLOAT
+                        if (pTest->OnlyDouble())
+                            continue;
+#else
+                        if (pTest->OnlySingle())
+                            continue;
+#endif
+
+                        UINT uiThisError = RunTest(params, pTest);
                         if (0 == uiThisError)
                         {
                             ++uiPassed;

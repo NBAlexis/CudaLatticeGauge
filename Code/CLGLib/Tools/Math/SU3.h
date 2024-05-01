@@ -77,9 +77,12 @@ extern "C" {
             memcpy(m_me, other, sizeof(CLGComplex) * 9);
         }
 
-        __device__ void DebugPrint() const
+        __device__ void DebugPrint(const char* header = NULL) const
         {
-            printf("={{%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I}};\n",
+            printf("%s%s{{%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I},\n {%1.7f%s%1.7f I, %1.7f%s%1.7f I, %1.7f%s%1.7f I}};\n",
+                NULL == header ? "" : header,
+                NULL == header ? "" : "=",
+
                 m_me[0].x,
                 m_me[0].y < 0 ? "" : "+",
                 m_me[0].y,
@@ -1685,8 +1688,13 @@ extern "C" {
         /**
          * Eigen values of any 3x3 matrix
          */
+        //__device__ __inline__ void CalculateEigenValues(CLGComplex& c1, CLGComplex& c2, CLGComplex& c3, UBOOL bDebug = FALSE) const
         __device__ __inline__ void CalculateEigenValues(CLGComplex& c1, CLGComplex& c2, CLGComplex& c3) const
         {
+            //if (bDebug)
+            //{
+            //    DebugPrint("CalculateEigenValuesMe");
+            //}
             const Real fUpperTraingle = __cuCabsSqf(m_me[1]) + __cuCabsSqf(m_me[2]) + __cuCabsSqf(m_me[5]);
             const Real fDownTraingle = __cuCabsSqf(m_me[3]) + __cuCabsSqf(m_me[6]) + __cuCabsSqf(m_me[7]);
 
@@ -1696,6 +1704,14 @@ extern "C" {
                 c1 = m_me[0];
                 c2 = m_me[4];
                 c3 = m_me[8];
+
+                //if (bDebug)
+                //{
+                //    printf("be1 = %f, %f\n", c1.x, c1.y);
+                //    printf("be2 = %f, %f\n", c2.x, c2.y);
+                //    printf("be3 = %f, %f\n", c3.x, c3.y);
+                //}
+
                 return;
             }
 
@@ -1703,8 +1719,17 @@ extern "C" {
             const CLGComplex fQ = cuCmulf_cr(Tr(), F(0.33333333333333333333333));
             deviceSU3 cpy = SubCompC(fQ);
             const CLGComplex fP = __cuCsqrtf(cuCmulf_cr((cpy.MulC(cpy)).Tr(), F(0.1666666666666666666667)));
+            //if (bDebug)
+            //{
+            //    printf("fP = %f, %f\n", fP.x, fP.y);
+            //}
             cpy.DivComp(fP);          
             CLGComplex fDet = Determinent(cpy.m_me);
+            //if (bDebug)
+            //{
+            //    printf("fQ = %f, %f\n", fQ.x, fQ.y);
+            //    printf("fDet1 = %f, %f\n", fDet.x, fDet.y);
+            //}
 
             //[ r+sqrt(r^2-4) ] ^(1/3)
             fDet = __cuCpowerf(_cuCaddf(fDet, 
@@ -1731,6 +1756,18 @@ extern "C" {
             c3 = _cuCsubf(fQ, _cuCmulf(fP,
                 _cuCaddf(_cuCdivf(fDet, _m1over2Power13), _cuCdivf(_m1over2Power13, fDet))
             ));
+
+            //if (bDebug)
+            //{
+            //    printf("_m1over2Power13Star = %f, %f\n", _m1over2Power13Star.x, _m1over2Power13Star.y);
+            //    printf("_1over2Power13 = %f, %f\n", _1over2Power13.x, _1over2Power13.y);
+            //    printf("_m1over2Power13 = %f, %f\n", _m1over2Power13.x, _m1over2Power13.y);
+            //    printf("fDet2 = %f, %f\n", fDet.x, fDet.y);
+
+            //    printf("ce1 = %f, %f\n", c1.x, c1.y);
+            //    printf("ce2 = %f, %f\n", c2.x, c2.y);
+            //    printf("ce3 = %f, %f\n", c3.x, c3.y);
+            //}
         }
 
         __device__ __inline__ deviceSU3 EigenVectors(
@@ -1930,6 +1967,7 @@ extern "C" {
             return ret;
         }
 
+        //__device__ __inline__ deviceSU3 StrictExp(UBOOL bDebug = FALSE) const
         __device__ __inline__ deviceSU3 StrictExp() const
         {
             const Real fAbsAll = 
@@ -1947,6 +1985,13 @@ extern "C" {
             CLGComplex c2;
             CLGComplex c3;
             CalculateEigenValues(c1, c2, c3);
+            //CalculateEigenValues(c1, c2, c3, bDebug);
+            //if (bDebug)
+            //{
+            //    printf("e1 = %f, %f\n", c1.x, c1.y);
+            //    printf("e2 = %f, %f\n", c2.x, c2.y);
+            //    printf("e3 = %f, %f\n", c3.x, c3.y);
+            //}
             const deviceSU3 diagonal = EigenVectors(c1, c2, c3);
 
             deviceSU3 ret;

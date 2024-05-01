@@ -232,12 +232,14 @@ INT MeasurementEM(CParameters& params)
             }
             //appGeneral(_T("checking %s ..."), sFileName);            
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
+
             switch (eJob)
             {
                 case EDJKSEM_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKSEM_Chiral:
@@ -300,7 +302,7 @@ INT MeasurementEM(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -308,7 +310,7 @@ INT MeasurementEM(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFALight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -370,7 +372,7 @@ INT MeasurementEM(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -378,7 +380,7 @@ INT MeasurementEM(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFAHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -390,13 +392,13 @@ INT MeasurementEM(CParameters& params)
                 break;
                 case EDJKSEM_BerryPhase:
                 {
-                    pBPu->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                    pBPd->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pBPu->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pBPd->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKSEM_Meson:
                 {
-                    pMeson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pMeson->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
 #if NotYet

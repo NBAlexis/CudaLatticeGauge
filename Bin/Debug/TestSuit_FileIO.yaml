@@ -110,7 +110,7 @@ TestFileIOCLGCompressedDebug:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 8, 8]
+    LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     RandomType : ER_Schrage

@@ -180,13 +180,11 @@ UINT TestUpdator3D(CParameters& sParam)
 
 //__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorOmelyan);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient);
+__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient, ForceGradient);
 
-#if _CLG_USE_LAUNCH_BOUND
-__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient3D);
-#endif
+___REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient3D, ForceGradient3D, _TEST_BOUND);
 
-__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorTreeImproved);
+__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorTreeImproved, TreeImproved);
 
 
 UINT TestWilsonLoop(CParameters& sParam)
@@ -248,7 +246,7 @@ UINT TestWilsonLoop(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestWilsonLoop, Updator, TestWilsonLoop);
+__REGIST_TEST(TestWilsonLoop, Updator, TestWilsonLoop, WilsonLoop);
 
 //=============================================================================
 // END OF FILE

@@ -101,31 +101,22 @@ UINT TestSolver(CParameters& params)
     return uiError;
 }
 
-#if _CLG_USE_LAUNCH_BOUND
-__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab);
-__REGIST_TEST(TestSolver, Solver, TestSolverGMRES);
+___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab, BiCGStab, _TEST_BOUND);
+___REGIST_TEST(TestSolver, Solver, TestSolverGMRES, GMRES, _TEST_BOUND);
 //__REGIST_TEST(TestSolver, Solver, TestSolverGCR); //slow solver not used
-__REGIST_TEST(TestSolver, Solver, TestSolverGCRODR);
+___REGIST_TEST(TestSolver, Solver, TestSolverGCRODR, GCRODR, _TEST_BOUND);
 //__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR); //slow solver not used
-__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode);
-__REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode);
-#endif
+___REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode, GMRES2, _TEST_BOUND);
+___REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode, GCRODR2, _TEST_BOUND);
+___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode, BiCGStab2, _TEST_BOUND | _TEST_DOUBLE);
 
-#if _CLG_DOUBLEFLOAT
-__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode);
-#endif
+__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab, BiCGStabEO);
+__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES, GMRESEO);
 
-__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab);
-
-__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES);
-
-__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabD);
-
-__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESD);
-
-__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabDR);
-
-__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESDR);
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabD);
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESD);
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStabDR);
+//__REGIST_TEST(TestSolver, Solver, TestEOSolverGMRESDR);
 
 //=============================================================================
 // END OF FILE

@@ -24,12 +24,7 @@ public:
 
     CActionGaugePlaquetteRotatingU1();
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
-
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
-
-    UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const override;
-    void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
     CCString GetInfos(const CCString &tab) const override;
 
     void SetBeta(DOUBLE fBeta);
@@ -50,6 +45,10 @@ public:
     //DOUBLE XYTerm2(const class CFieldGauge* pGauge);
 
 protected:
+
+    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;
+    UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
+    void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
 
     UINT m_uiPlaqutteCount;
 };

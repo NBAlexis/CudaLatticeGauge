@@ -290,12 +290,14 @@ INT Measurement3D(CParameters& params)
             }
 #endif
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
                 case EDJKS3D_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
 #if 0

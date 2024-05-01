@@ -188,13 +188,13 @@ UINT TestALogDefinition(CParameters&)
     return 0;
 }
 
-__REGIST_TEST(TestSmallMatrix, Misc, TestSmallMatrix);
+__REGIST_TEST(TestSmallMatrix, Verify, TestSmallMatrix, SmallMatrix);
 
-__REGIST_TEST(TestOperators, Misc, TestOperators);
+__REGIST_TEST(TestOperators, Misc, TestOperators, Operators);
 
 //__REGIST_TEST(TestQuickAxpy, Misc, TestQuickAxpy);
 
-__REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition);
+__REGIST_TEST(TestALogDefinition, Misc, TestALogDefinition, ALog);
 
 //__REGIST_TEST(TestDirichletDOperator, Misc, TestRotationOperator);
 
@@ -246,16 +246,16 @@ UINT TestAnitiHermiticity(CParameters&)
 
 UINT TestDebugFunction(CParameters&)
 {
-    //CCudaHelper::DebugFunction();
-    CIndexData::DebugLinkDirichletOrDagger(1);
+    CCudaHelper::DebugFunction();
+    //CIndexData::DebugLinkDirichletOrDagger(1);
     return 0;
 }
 
-__REGIST_TEST(TestGamma5Hermiticity, Misc, TestGamm5Hermiticity);
+__REGIST_TEST(TestGamma5Hermiticity, Tools, TestGamm5Hermiticity, Gamm5Hermiticity);
 
-__REGIST_TEST(TestAnitiHermiticity, Misc, TestAnitiHermiticity);
+__REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticity, AnitiHermiticity);
 
-__REGIST_TEST(TestDebugFunction, Misc, TestDebug);
+__REGIST_TEST(TestDebugFunction, Tools, TestDebug, Debug);
 
 UINT TestGaugeInvarience(CParameters&)
 {
@@ -300,7 +300,7 @@ UINT TestGaugeInvarience(CParameters&)
     return 0;
 }
 
-__REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience);
+__REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience, GaugeInvarience);
 
 UINT TestBackgroundField(CParameters&)
 {
@@ -344,7 +344,7 @@ UINT TestBackgroundField(CParameters&)
     return 0;
 }
 
-__REGIST_TEST(TestBackgroundField, Misc, TestBackgroundField);
+__REGIST_TEST(TestBackgroundField, Tools, TestBackgroundField, PrintBackgroundField);
 
 UINT TestPlaqutteTable(CParameters&)
 {
@@ -353,7 +353,7 @@ UINT TestPlaqutteTable(CParameters&)
     return 0;
 }
 
-__REGIST_TEST(TestPlaqutteTable, Misc, TestPlaqutteTable);
+__REGIST_TEST(TestPlaqutteTable, Tools, TestPlaqutteTable, PlaqutteTable);
 
 
 //=============================================================================

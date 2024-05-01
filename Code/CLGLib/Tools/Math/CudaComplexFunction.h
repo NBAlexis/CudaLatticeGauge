@@ -82,8 +82,10 @@ extern "C" {
         const Real fRadius = _cuCabsf(c);
         const Real fCosA = __div(c.x, fRadius);
         CLGComplex out;
-        out.x = _sqrt(F(0.5) * fRadius * (fCosA + F(1.0)));
-        out.y = _sqrt(F(0.5) * fRadius * (F(1.0) - fCosA));
+        const Real beforesqrtx = F(0.5) * fRadius * (fCosA + F(1.0));
+        const Real beforesqrty = F(0.5) * fRadius * (F(1.0) - fCosA);
+        out.x = beforesqrtx > _CLG_FLT_MIN ? _sqrt(beforesqrtx) : beforesqrtx;
+        out.y = beforesqrty > _CLG_FLT_MIN ? _sqrt(beforesqrty) : beforesqrty;
         // signbit should be false if x.y is negative
         //if (signbit(c.y))
         //    out.y *= -F(1.0);

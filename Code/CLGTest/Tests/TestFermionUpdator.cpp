@@ -64,27 +64,27 @@ UINT TestFermionUpdator(CParameters& sParam)
 #endif
 }
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator, FermionUpdator);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGCRODR);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGCRODR, FermionOmelyanGCRODR);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGMRESMDR);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGMRESMDR, FermionOmelyanGMRESMDR);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan, FermionOmelyan);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorForceGradient);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorForceGradient, FermionForceGradient);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog, FermionNestedLeapFrog);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedOmelyan);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedOmelyan, FermionNestedOmelyan);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedForceGradient);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedForceGradient, FermionNestedForceGradient);
 
 //#if !_CLG_DEBUG
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma1);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma1, FermionWilsonDiracGamma1);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma2);
+__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma2, FermionWilsonDiracGamma2);
 
 //#endif
 
@@ -143,16 +143,16 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 }
 
 #if _CLG_DEBUG
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelator);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelator, FermionMesonCorrelator);
 #else
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelatorRelease);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestFermionUpdatorWithMesonCorrelatorRelease, FermionMesonCorrelator);
 #endif
 
 //Why I cannot find 'TestGaugeSmearingAPEProj'?
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEProj);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEProj, GaugeSmearingAPEProj);
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEStout);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelator, Updator, TestGaugeSmearingAPEStout, GaugeSmearingAPEStout);
 
 UINT TestFermionUpdatorL(CParameters& sParam)
 {
@@ -199,12 +199,8 @@ UINT TestFermionUpdatorL(CParameters& sParam)
     return uiError;
 }
 
-#if !_CLG_DEBUG
-__REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale);
-#if !_CLG_DOUBLEFLOAT
-__REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScaleFloat);
-#endif
-#endif
+___REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScale, LargeScale, _TEST_RELEASE);
+___REGIST_TEST(TestFermionUpdatorL, Updator, TestFermionUpdatorLargeScaleFloat, LargeScaleFloat, _TEST_RELEASE | _TEST_SINGLE);
 
 UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
 {
@@ -293,7 +289,7 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, UpdatorKS, TestFermionUpdatorWithMesonCorrelatorStaggered);
+__REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, UpdatorKS, TestFermionUpdatorWithMesonCorrelatorStaggered, FermionMesonCorrelatorStaggered);
 
 UINT TestBerryPhase(CParameters& sParam)
 {
@@ -343,7 +339,7 @@ UINT TestBerryPhase(CParameters& sParam)
     return 0;
 }
 
-__REGIST_TEST(TestBerryPhase, Updator, TestBerryPhase);
+__REGIST_TEST(TestBerryPhase, Updator, TestBerryPhase, BerryPhase);
 
 //=============================================================================
 // END OF FILE

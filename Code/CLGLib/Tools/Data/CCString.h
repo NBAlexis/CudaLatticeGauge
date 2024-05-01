@@ -770,6 +770,16 @@ inline CCString appStringFormat(const TCHAR * lpszFormat, ...)
     return outString;
 }
 
+inline CCString appStrWithLen(const CCString& sContent, INT len)
+{
+    CCString sRet = sContent;
+    if (sContent.GetLength() < len)
+    {
+        sRet = sRet + CCString(' ', len - sContent.GetLength());
+    }
+    return sRet;
+}
+
 /**
 *
 */

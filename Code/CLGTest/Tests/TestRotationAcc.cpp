@@ -268,50 +268,50 @@ UINT TestBetaGradient(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracDirichlet);
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracTorus);
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracProjectivePlane);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracDirichlet, RotationWilsonDiracDirichlet);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracTorus, RotationWilsonDiracTorus);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationWilsonDiracProjectivePlane, RotationWilsonDiracProjectivePlane);
 
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSDirichlet);
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSTorus);
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSProjectivePlane);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSDirichlet, RotationKSDirichlet);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSTorus, RotationKSTorus);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationKSProjectivePlane, RotationKSProjectivePlane);
 
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationEMProjectivePlane);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationEMProjectivePlane, RotationEMProjectivePlane);
 
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationProjectivePlaneU1);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationProjectivePlaneU1, RotationProjectivePlaneU1);
 
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenched3D);
-__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchedU13D);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenched3D, RotationQuenched3D);
+__REGIST_TEST(TestUpdateCommon, Rotation, TestRotationQuenchedU13D, RotationQuenchedU13D);
 
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorus);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorus, AccelerationTorus);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletQ, AccelerationDirichletQ);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusMidCenterQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusMidCenterQ, AccelerationTorusMidCenterQ);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletMidCenterQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletMidCenterQ, AccelerationDirichletMidCenterQ);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusQ);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusQ, AccelerationTorusQ);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc, RigidAccTorusKS);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter);
+__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, RigidAccTorusKSMidCenter);
 
 //__REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 
 //This has sign problem..
 //__REGIST_TEST(TestRigidAcceleration, Updator, TestRigidAcceleration);
 
-__REGIST_TEST(TestBoost, Updator, TestBoost);
+__REGIST_TEST(TestBoost, Updator, TestBoost, Boost);
 
-__REGIST_TEST(TestEMSimple, Updator, TestEMSimple);
+__REGIST_TEST(TestEMSimple, Updator, TestEMSimple, EMSimple);
 
 //This is well tested
 //__REGIST_TEST(TestRotation, Rotation, TestRotationProjectivePlane);
 
 //Special cases
-__REGIST_TEST(TestBetaGradient, Updator, TestBetaGradient);
+__REGIST_TEST(TestBetaGradient, Updator, TestBetaGradient, BetaGradient);
 
 //=============================================================================
 // END OF FILE

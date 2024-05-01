@@ -54,6 +54,8 @@ protected:
     UBOOL m_bShiftHalfCoord;
     UBOOL m_bTorus;
 
+public:
+
     //===== test functions ======
     DOUBLE XYTerm1(const class CFieldGauge* pGauge);
     DOUBLE XYTerm2(const class CFieldGauge* pGauge);

@@ -118,7 +118,9 @@ INT SimulateStaggeredRotationU1(CParameters& params)
         if (!bAdditive && !sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
-            pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt];
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
@@ -157,7 +159,9 @@ INT SimulateStaggeredRotationU1(CParameters& params)
                 if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
                 {
                     uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                    pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    TArray<CFieldGauge*> gauge;
+                    gauge.AddItem(appGetLattice()->m_pGaugeField);
+                    pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
             }
             assert(pPE->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
@@ -198,7 +202,9 @@ INT SimulateStaggeredRotationU1(CParameters& params)
                 appGetLattice()->m_pMeasurements->Reset();
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-                pPE->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                TArray<CFieldGauge*> gauge;
+                gauge.AddItem(appGetLattice()->m_pGaugeField);
+                pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fPlaqOld;
 #if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))

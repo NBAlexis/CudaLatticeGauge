@@ -157,7 +157,7 @@ UINT TestFermionMatrixKS(CParameters& param)
     return 0;
 }
 
-__REGIST_TEST(TestFermionMatrixKS, Misc, TestFermionMatrixKS);
+__REGIST_TEST(TestFermionMatrixKS, Tools, TestFermionMatrixKS, ExportFermionMatrix);
 
 //=============================================================================
 // END OF FILE

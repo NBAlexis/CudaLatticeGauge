@@ -258,10 +258,12 @@ int main(int argc, char * argv[])
                 appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
                 appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
             }
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             if (bMeasureFermion)
             {
-                pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
                 {
                     pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
@@ -310,7 +312,7 @@ int main(int argc, char * argv[])
                         pF1->FixBoundary();
 
                         pCC->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2,
                             pF1,
@@ -329,12 +331,12 @@ int main(int argc, char * argv[])
             {
                 if (NULL != pPL && !bMeasureTrace)
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 
                 if (bMeasureTrace && NULL != pTalor)
                 {
-                    pTalor->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pTalor->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     const UINT iFieldCount = pTalor->GetFieldCount();
@@ -354,7 +356,7 @@ int main(int argc, char * argv[])
                         //pF1->FixBoundary();
 
                         pTalor->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2,
                             pF1,

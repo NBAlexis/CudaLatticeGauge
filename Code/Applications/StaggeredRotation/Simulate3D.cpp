@@ -127,7 +127,9 @@ INT SimulateStaggeredRotation3D(CParameters& params)
         if (!bAdditive && !sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
-            pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
@@ -173,7 +175,9 @@ INT SimulateStaggeredRotation3D(CParameters& params)
                 if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
                 {
                     uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    TArray<CFieldGauge*> gauge;
+                    gauge.AddItem(appGetLattice()->m_pGaugeField);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
             }
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
@@ -222,7 +226,9 @@ INT SimulateStaggeredRotation3D(CParameters& params)
                 appGetLattice()->m_pMeasurements->Reset();
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex);
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                TArray<CFieldGauge*> gauge;
+                gauge.AddItem(appGetLattice()->m_pGaugeField);
+                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
 #if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))

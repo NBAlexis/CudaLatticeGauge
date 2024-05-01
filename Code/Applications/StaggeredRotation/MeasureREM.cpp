@@ -78,7 +78,7 @@ __DEFINE_ENUM(EDistributionJobKSREM,
     } \
  \
 pCC##ftype->OnConfigurationAcceptedZ4( \
-    appGetLattice()->m_pGaugeField, \
+    1, 0, gauge.GetData(), NULL, \
     NULL, \
     pF2##ftype, \
     pF1##ftype, \
@@ -86,7 +86,7 @@ pCC##ftype->OnConfigurationAcceptedZ4( \
     iFieldCount == i + 1); \
 \
 pFA##ftype->OnConfigurationAcceptedZ4( \
-    appGetLattice()->m_pGaugeField, \
+    1, 0, gauge.GetData(), NULL, \
     NULL, \
     pF2##ftype, \
     pF1##ftype, \
@@ -353,12 +353,14 @@ INT MeasurementREM(CParameters& params)
             }
             
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
                 case EDJKSR_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKSR_Chiral:
@@ -369,13 +371,13 @@ INT MeasurementREM(CParameters& params)
                 case EDJKSR_AngularMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKSR_ChiralAndFermionMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         //if (0 == (1 & uiLoadFermion))

@@ -230,19 +230,21 @@ INT MeasurementBetaScan(CParameters& params)
             }
             
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
                 case EBSMJ_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EBSMJ_Wilson:
                 {
                     appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
                     appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-                    pWL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pWL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     if (uiN == iStartN)
                     {
                         TArray<Real> lstRadius;
@@ -294,7 +296,7 @@ INT MeasurementBetaScan(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -349,18 +351,18 @@ INT MeasurementBetaScan(CParameters& params)
                 case EBSMJ_Angular:
                     {
                         appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                        pAMJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pAMJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     }
                     break;
 
                 case EBSMJ_Meson:
                     {
-                        pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     }
                     break;
                 case EBSMJ_MesonSimple:
                     {
-                        pMCSimple->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pMCSimple->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     }
                     break;
                 default:

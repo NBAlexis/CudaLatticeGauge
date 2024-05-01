@@ -317,12 +317,14 @@ INT Measurement(CParameters& params)
             {
                 appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
             }
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
                 case EDJKS_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKS_Chiral:
@@ -363,7 +365,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -412,7 +414,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -430,21 +432,21 @@ INT Measurement(CParameters& params)
 
                     if (bMeasureCCS)
                     {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pCCSLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pCCSHeavy->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     }
                 }
                 break;
                 case EDJKS_AngularMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                 }
                 break;
                 case EDJKS_ChiralAndFermionMomentum:
                 {
                     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (0 == (1 & uiLoadFermion))
@@ -499,7 +501,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -507,7 +509,7 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFALight->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -566,7 +568,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -574,7 +576,7 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFAHeavy->OnConfigurationAcceptedZ4(
-                            appGetLattice()->m_pGaugeField,
+                            1, 0, gauge.GetData(), NULL,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -584,8 +586,8 @@ INT Measurement(CParameters& params)
 
                     if (bMeasureCCS)
                     {
-                        pCCSLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pCCSLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pCCSHeavy->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     }
                 }
                 break;
@@ -598,7 +600,7 @@ INT Measurement(CParameters& params)
                     {
                         appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
                         appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-                        pWilson->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                        pWilson->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                         if (uiN == iStartN)
                         {
                             TArray<Real> lstRadius;
@@ -622,7 +624,7 @@ INT Measurement(CParameters& params)
                 case EDJKS_Taylor:
                 {
                     //appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pTaylorLight->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                    pTaylorLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
                     //for (UINT i = 0; i < iFieldCount; ++i)
                     //{
                     //    if (0 == (1 & uiLoadFermion))

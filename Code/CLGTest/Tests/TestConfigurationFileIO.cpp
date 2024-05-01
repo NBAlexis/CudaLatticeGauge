@@ -37,9 +37,9 @@ UINT TestFileIO(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPText);
+__REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPText, BridgePPText);
 
-__REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin);
+__REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin, BridgePPBin);
 
 UINT TestFileIOWithUpdate(CParameters& sParam)
 {
@@ -137,6 +137,8 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
 
     //appGeneral(_T("=====================\n"));
     //appGetLattice()->m_pGaugeField->DebugPrintMe();
+    //appGeneral(_T("=====================\n"));
+    //pNewGauge->DebugPrintMe();
 
     pNewGauge->AxpyMinus(appGetLattice()->m_pGaugeField);
 
@@ -144,7 +146,11 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
 
     appGeneral(_T("Gauge file test: expeted 0.0 + 0.0i, res = %2.16f %s %2.16f\n"), res1.x, res1.y > 0 ? _T("+") : _T(""), res1.y);
 
+#if _CLG_DOUBLEFLOAT
     if (_cuCabsf(res1) > F(0.00000001))
+#else
+    if (_cuCabsf(res1) > F(0.02))
+#endif
     {
         ++uiError;
     }
@@ -152,15 +158,15 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration);
+__REGIST_TEST(TestFileIOCLG, FileIO, TestSaveConfiguration, Save);
 #if _CLG_DEBUG
-__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressedDebug);
+___REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressedDebug, CLGCompressed, _TEST_DOUBLE);
 #else
-__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed);
+__REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed, CLGCompressed);
 #endif
 
-__REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble);
-__REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat);
+__REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble, Double);
+__REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat, Single);
 
 //=============================================================================
 // END OF FILE

@@ -34,12 +34,14 @@ UINT TestFFT(CParameters&)
 UINT TestGaugeFixingLandau(CParameters&)
 {
     CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1)->GetCopy());
+    TArray<CFieldGauge*> gauge;
+    gauge.AddItem(pGauge);
     CActionGaugePlaquette* pAction1 = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
-    const Real fBeforeEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fBeforeEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gauge.GetData(), NULL, NULL));
 
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
     const Real fDivation = static_cast<Real>(appGetLattice()->m_pGaugeFixing->CheckRes(pGauge));
-    const Real fAfterEnergy1 = static_cast<Real>(pAction1->EnergySingleField(FALSE, pGauge, NULL));
+    const Real fAfterEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gauge.GetData(), NULL, NULL));
 
     UINT uiError = 0;
     if (fDivation > _GAUGE_FIXING_ZeroERROR)
@@ -73,7 +75,7 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
     CActionGaugePlaquetteRotating* pAction1 = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
     CActionFermionWilsonNf2* pAction2 = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->GetActionById(2));
     const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
-    pAction2->m_pFerimionField = pFermion;
+    pAction2->SetFermionFieldTest(pFermion);
     const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
     
     appGetLattice()->m_pGaugeFixing->GaugeFixing(pGauge);
@@ -81,7 +83,7 @@ UINT TestGaugeFixingCoulombDR(CParameters&)
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
     const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
-    pAction2->m_pFerimionField = pFermion2;
+    pAction2->SetFermionFieldTest(pFermion2);
     const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
 
     if (fError > _GAUGE_FIXING_ZeroERROR)
@@ -207,7 +209,7 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
     CMeasureAngularMomentumKS* pAM = dynamic_cast<CMeasureAngularMomentumKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
 
     const Real fEnergy1 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
-    pAction2->m_pFerimionField = pFermion;
+    pAction2->SetFermionFieldTest(pFermion);
     const Real fEnergy2 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
     appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
@@ -246,7 +248,7 @@ UINT TestGaugeFixingCoulombPorjectivePlane(CParameters&)
 
     pFermion2->PrepareForHMCNotRandomize(pGauge);
     const Real fEnergy3 = static_cast<Real>(pAction1->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
-    pAction2->m_pFerimionField = pFermion2;
+    pAction2->SetFermionFieldTest(pFermion2);
     const Real fEnergy4 = static_cast<Real>(pAction2->Energy(FALSE, 1, 0, gaugeFields.GetData(), NULL, NULL));
 
 
@@ -356,33 +358,27 @@ UINT TestGaugeFixingCoulombPorjectivePlane2(CParameters&)
     return uiError;
 }
 
-__REGIST_TEST(TestFFT, Misc, TestFFT);
+__REGIST_TEST(TestFFT, Verify, TestFFT, FFT);
 
-__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauCornell);
-
-//FFT not applied using single float
-#if _CLG_DOUBLEFLOAT
-__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombCornell);
-#endif
-
-__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingLandauLosAlamos);
-
-__REGIST_TEST(TestGaugeFixingLandau, Misc, TestGaugeFixingCoulombLosAlamos);
+__REGIST_TEST(TestGaugeFixingLandau, GaugeFixing, TestGaugeFixingLandauCornell, LandauCornell);
 
 //FFT not applied using single float
-#if _CLG_DOUBLEFLOAT
-__REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombCornellDR);
-#endif
+___REGIST_TEST(TestGaugeFixingLandau, GaugeFixing, TestGaugeFixingCoulombCornell, CoulombCornell, _TEST_DOUBLE);
 
-__REGIST_TEST(TestGaugeFixingCoulombDR, Misc, TestGaugeFixingCoulombLosAlamosDR);
+__REGIST_TEST(TestGaugeFixingLandau, GaugeFixing, TestGaugeFixingLandauLosAlamos, LandauLosAlamos);
 
-__REGIST_TEST(TestGaugeFixingCoulombDRChiral, Misc, TestGaugeFixingCoulombDRChiral);
+__REGIST_TEST(TestGaugeFixingLandau, GaugeFixing, TestGaugeFixingCoulombLosAlamos, CoulombLosAlamos);
 
-#if _CLG_USE_LAUNCH_BOUND
-__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, Misc, TestGaugeFixingRotationKS);
-#endif
+//FFT not applied using single float
+___REGIST_TEST(TestGaugeFixingCoulombDR, GaugeFixing, TestGaugeFixingCoulombCornellDR, CoulombCornellDR, _TEST_DOUBLE);
 
-__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane2, Misc, TestGaugeFixingRotationKS2);
+__REGIST_TEST(TestGaugeFixingCoulombDR, GaugeFixing, TestGaugeFixingCoulombLosAlamosDR, CoulombLosAlamosDR);
+
+__REGIST_TEST(TestGaugeFixingCoulombDRChiral, GaugeFixing, TestGaugeFixingCoulombDRChiral, CoulombDRChiral);
+
+___REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, GaugeFixing, TestGaugeFixingRotationKS, RotationKS, _TEST_BOUND);
+
+__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane2, GaugeFixing, TestGaugeFixingRotationKS2, RotationKS2);
 
 
 //=============================================================================

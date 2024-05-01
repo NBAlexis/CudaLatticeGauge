@@ -325,7 +325,7 @@ UINT TestAngularMomentum(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestAngularMomentum, Misc, TestAngularMomentum);
+__REGIST_TEST(TestAngularMomentum, Misc, TestAngularMomentum, AngularMomentum);
 
 
 //=============================================================================

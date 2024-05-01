@@ -37,7 +37,7 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(3, TRUE);
     appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
 
-    pMeasure->Reset();
+    appGetLattice()->m_pMeasurements->Reset();
 #if !_CLG_DEBUG
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
     appGetLattice()->m_pUpdator->Update(40, TRUE);
@@ -87,21 +87,19 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 #endif
 }
 
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKS);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradient);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKS, Normal);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradient, NestedForceGradient);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1, NestedForceGradientNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1, NestedOmelyanNf2p1);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField, NestedOmelyanNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField, NestedForceGradientNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField, Nested11StageNf2p1MultiField);
+__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4, P4);
 
-#if !_CLG_DEBUG
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGamma);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaProj);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEM);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEMProj);
-#endif
+___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma, _TEST_RELEASE);
+___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj, _TEST_RELEASE);
+___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEM, KSGammaEM, _TEST_RELEASE);
+___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEMProj, KSGammaEMProj, _TEST_RELEASE);
 
 
 

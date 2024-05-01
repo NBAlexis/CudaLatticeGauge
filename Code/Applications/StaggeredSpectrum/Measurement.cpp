@@ -560,12 +560,14 @@ INT Measurement(CParameters& params)
         CCString sFileName;
         sFileName.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiN);
         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, bLoadDouble ? EFFT_CLGBinDouble : EFFT_CLGBin);
+        TArray<CFieldGauge*> gauge;
+        gauge.AddItem(appGetLattice()->m_pGaugeField);
 
         switch (eJob)
         {
         case ESSM_Polyakov:
         {
-            pPXY->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pPXY->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
         }
         break;
         case ESSM_Wilson:
@@ -576,7 +578,7 @@ INT Measurement(CParameters& params)
                 appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
             }
 
-            pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             if (uiN == iStartN)
             {
                 TArray<Real> lstRadius;
@@ -592,12 +594,12 @@ INT Measurement(CParameters& params)
         break;
         case ESSM_Correlator:
         {
-            pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
         }
         break;
         case ESSM_CorrelatorSimple:
         {
-            pMCSimple->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pMCSimple->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
         }
         break;
         case ESSM_Chiral:
@@ -620,7 +622,7 @@ INT Measurement(CParameters& params)
                     pF1Light->FixBoundary();
 
                     pCCLight->OnConfigurationAcceptedZ4(
-                        appGetLattice()->m_pGaugeField,
+                        1, 0, gauge.GetData(), NULL,
                         NULL,
                         pF2Light,
                         pF1Light,
@@ -644,7 +646,7 @@ INT Measurement(CParameters& params)
                     pF1Heavy->FixBoundary();
 
                     pCCHeavy->OnConfigurationAcceptedZ4(
-                        appGetLattice()->m_pGaugeField,
+                        1, 0, gauge.GetData(), NULL,
                         NULL,
                         pF2Heavy,
                         pF1Heavy,
@@ -656,8 +658,8 @@ INT Measurement(CParameters& params)
         break;
         case ESSM_All:
         {
-            pMC->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
-            pMCSimple->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+            pMCSimple->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
 
             for (UINT i = 0; i < iFieldCount; ++i)
             {
@@ -675,7 +677,7 @@ INT Measurement(CParameters& params)
                 pF1Light->FixBoundary();
 
                 pCCLight->OnConfigurationAcceptedZ4(
-                    appGetLattice()->m_pGaugeField,
+                    1, 0, gauge.GetData(), NULL,
                     NULL,
                     pF2Light,
                     pF1Light,
@@ -696,7 +698,7 @@ INT Measurement(CParameters& params)
                 pF1Heavy->FixBoundary();
 
                 pCCHeavy->OnConfigurationAcceptedZ4(
-                    appGetLattice()->m_pGaugeField,
+                    1, 0, gauge.GetData(), NULL,
                     NULL,
                     pF2Heavy,
                     pF1Heavy,
@@ -710,7 +712,7 @@ INT Measurement(CParameters& params)
                 appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
             }
 
-            pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             if (uiN == iStartN)
             {
                 TArray<Real> lstRadius;

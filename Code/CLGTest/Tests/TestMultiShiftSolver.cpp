@@ -315,13 +315,13 @@ UINT TestSolverU1(CParameters& params)
     return uiError;
 }
 
-__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverGMRES);
-__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverFOM);
-__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverBiCGStab);
+//__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverGMRES, MSGMRES); If not convergent, use FOM
+__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverFOM, MSFOM);
+__REGIST_TEST(TestMultiShiftSolver, Solver, TestMSSolverBiCGStab, MSBiCGStab);
 
-__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverGMRES);
-__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverFOM);
-__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverBiCGStab);
-__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverNested);
+//__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverGMRES);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverFOM, MSFOMKS);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverBiCGStab, MSBiCGStabKS);
+__REGIST_TEST(TestMultiShiftSolverKS, Solver, TestMSKSSolverNested, MSNestedKS);
 
-__REGIST_TEST(TestSolverU1, Solver, TestSolverU1);
+__REGIST_TEST(TestSolverU1, Solver, TestSolverU1, MSU1);

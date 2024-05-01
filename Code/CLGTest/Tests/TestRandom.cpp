@@ -56,9 +56,9 @@ UINT TestRandom(CParameters& sParam)
 // debug mode: TestRandomSchrage > TestRandomScrambledSOBOL32 > TestRandomXORWOW
 //=====================================================================================
 
-__REGIST_TEST(TestRandom, Random, TestRandomSchrage);
+__REGIST_TEST(TestRandom, Random, TestRandomSchrage, Schrage);
 
-__REGIST_TEST(TestRandom, Random, TestRandomXORWOW);
+__REGIST_TEST(TestRandom, Random, TestRandomXORWOW, XORWOW);
 
 //__REGIST_TEST(TestRandom, Random, TestRandomMRG32K3A);
 
@@ -66,7 +66,7 @@ __REGIST_TEST(TestRandom, Random, TestRandomXORWOW);
 
 //__REGIST_TEST(TestRandom, Random, TestRandomSOBOL32);
 
-__REGIST_TEST(TestRandom, Random, TestRandomScrambledSOBOL32);
+__REGIST_TEST(TestRandom, Random, TestRandomScrambledSOBOL32, ScrambledSOBOL32);
 
 
 
@@ -135,9 +135,9 @@ UINT TestSU3Generator(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorSchrage);
+__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorSchrage, GeneratorSchrage);
 
-__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorXORWOW);
+__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorXORWOW, GeneratorXORWOW);
 
 //__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorPhilox);
 
@@ -145,7 +145,7 @@ __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorXORWOW);
 
 //__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorSOBOL32);
 
-__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorScrambledSOBOL32);
+__REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorScrambledSOBOL32, GeneratorScrambledSOBOL32);
 
 
 //=============================================================================

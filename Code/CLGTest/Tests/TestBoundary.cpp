@@ -181,13 +181,13 @@ UINT TestEtaShift(CParameters& sParam)
     return uiError;
 }
 
-__REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary);
+__REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary, Dirichlet);
 
-__REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary);
+__REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary, ProjectivePlane);
 
-__REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping);
+__REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping, BoundaryMapping);
 
-__REGIST_TEST(TestEtaShift, Misc, TestEtaShift);
+__REGIST_TEST(TestEtaShift, Misc, TestEtaShift, EtaShift);
 
 
 //=============================================================================

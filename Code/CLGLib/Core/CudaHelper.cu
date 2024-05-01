@@ -61,11 +61,24 @@ _kernelDebugFunction()
     //printf("testres %d\n", ((SIndex*)&test[2])->m_uiSiteIndex);
     //printf("testres %lld\n", ((SIndex*)&test[2])->m_ullData);
     //__idx->DebugPrintWalkingTable();
-    for (UINT i = 0; i < EGM_MAX; ++i)
-    {
-        printf("gammamatrix is %d\n", i);
-        __chiralGamma[i].Print();
-    }
+    
+    //for (UINT i = 0; i < EGM_MAX; ++i)
+    //{
+    //    printf("gammamatrix is %d\n", i);
+    //    __chiralGamma[i].Print();
+    //}
+
+    deviceSU3 s = deviceSU3::makeSU3Random(0);
+    s.DebugPrint("a");
+
+    s = s.Log();
+
+    s.DebugPrint("b");
+
+    s = s.StrictExp();
+
+    s.DebugPrint("c");
+    
 }
 
 __global__ void
@@ -464,8 +477,8 @@ void CCudaHelper::MemoryQuery()
 
 void CCudaHelper::DebugFunction()
 {
-    appGeneral(_T("mult: %d, %d, %d\n"), _HC_MultX, _HC_MultY, _HC_MultZ);
-    appGeneral(_T("l: %d, %d, %d, %d\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
+    //appGeneral(_T("mult: %d, %d, %d\n"), _HC_MultX, _HC_MultY, _HC_MultZ);
+    //appGeneral(_T("l: %d, %d, %d, %d\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
 
     _kernelDebugFunction << <1,1 >> > ();
 

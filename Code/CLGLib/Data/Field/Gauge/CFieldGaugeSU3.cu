@@ -603,10 +603,19 @@ _kernelTransformToIALog(
 {
     intokernaldir;
 
+    //printf("I should have be in here\n");
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        //if (52 == uiLinkIndex)
+        //{
+        //    pDeviceData[uiLinkIndex].DebugPrint("a");
+        //}
         pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].Log();
+        //if (52 == uiLinkIndex)
+        //{
+        //    pDeviceData[uiLinkIndex].DebugPrint("b");
+        //}
     }
 }
 
@@ -834,6 +843,15 @@ _kernelTransformToULog(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        //if (1023 == uiLinkIndex)
+        //{
+        //    pDeviceData[uiLinkIndex].DebugPrint("a");
+        //}
+        //pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].StrictExp(1023 == uiLinkIndex);
+        //if (1023 == uiLinkIndex)
+        //{
+        //    pDeviceData[uiLinkIndex].DebugPrint("b");
+        //}
         pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].StrictExp();
     }
 }
@@ -1173,9 +1191,13 @@ void CFieldGaugeSU3::InitialWithByteCompressed(BYTE* byData)
     checkCudaErrors(cudaDeviceSynchronize());
     free(readData);
 
+    //DebugPrintMe();
+
     preparethread;
     _kernelTransformToULog << <block, threads >> > (m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
+
+    //DebugPrintMe();
 }
 
 void CFieldGaugeSU3::SetByArray(Real* array)
@@ -1585,9 +1607,12 @@ void CFieldGaugeSU3::DebugPrintMe() const
 CCString CFieldGaugeSU3::SaveToCompressedFile(const CCString& fileName) const
 {
     CFieldGaugeSU3* pPooledGauge = dynamic_cast<CFieldGaugeSU3*>(GetCopy());
+    //pPooledGauge->DebugPrintMe();
 
     preparethread;
     _kernelTransformToIALog << <block, threads >> > (pPooledGauge->m_pDeviceData);
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
 
     deviceSU3* toSave = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
     checkCudaErrors(cudaMemcpy(toSave, pPooledGauge->m_pDeviceData, sizeof(deviceSU3)* m_uiLinkeCount, cudaMemcpyDeviceToHost));

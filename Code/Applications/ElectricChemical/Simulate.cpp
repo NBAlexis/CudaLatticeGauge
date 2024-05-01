@@ -96,7 +96,9 @@ INT Simulate(CParameters& params)
     if (!bAdditive && bHasOldFile)
     {
         appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileName, EFFT_CLGBin);
-        pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+        TArray<CFieldGauge*> gauge;
+        gauge.AddItem(appGetLattice()->m_pGaugeField);
+        pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
         Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldPolyakov);
 #if _CLG_DOUBLEFLOAT
         if (fError < F(1E-07))
@@ -135,7 +137,9 @@ INT Simulate(CParameters& params)
             if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
             {
                 uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                TArray<CFieldGauge*> gauge;
+                gauge.AddItem(appGetLattice()->m_pGaugeField);
+                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             }
         }
         assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
@@ -182,7 +186,9 @@ INT Simulate(CParameters& params)
             appGetLattice()->m_pMeasurements->Reset();
             sFileName.Format(_T("%sEC_%d_%d.con"), sSavePrefix.c_str(), uiOmega, iSaveStartIndex);
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-            pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))

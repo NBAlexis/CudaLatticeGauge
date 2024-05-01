@@ -150,7 +150,7 @@ protected:
 #if !_CLG_DOUBLEFLOAT
             const CLGComplex force = _cToFloat(m_pForceField[i]->Dot(m_pForceField[i]));
 #else
-            const CLGComplex force = m_pForceField->Dot(m_pForceField);
+            const CLGComplex force = m_pForceField[i]->Dot(m_pForceField[i]);
 #endif
             fRet += force.x;
         }
@@ -160,7 +160,7 @@ protected:
 #if !_CLG_DOUBLEFLOAT
             const CLGComplex force = _cToFloat(m_pBosonFields[i]->Dot(m_pBosonFields[i]));
 #else
-            const CLGComplex force = m_pBosonFields->Dot(m_pBosonFields);
+            const CLGComplex force = m_pBosonFields[i]->Dot(m_pBosonFields[i]);
 #endif
             fRet += force.x;
         }

@@ -396,12 +396,14 @@ INT Measurement(CParameters& params)
             }
 
             appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+            TArray<CFieldGauge*> gauge;
+            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
             case EGMJ_Polyakov:
             {
-                pPL->OnConfigurationAccepted(appGetLattice()->m_pGaugeField, NULL);
+                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
             }
             break;
             case EGMJ_Chiral:
@@ -442,7 +444,7 @@ INT Measurement(CParameters& params)
                     }
 
                     pCCLight->OnConfigurationAcceptedZ4(
-                        appGetLattice()->m_pGaugeField,
+                        1, 0, gauge.GetData(), NULL,
                         NULL,
                         pF2Light,
                         pF1Light,
