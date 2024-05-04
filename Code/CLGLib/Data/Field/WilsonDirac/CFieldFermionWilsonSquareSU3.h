@@ -69,65 +69,62 @@ public:
     //void ScalarMultply1(Real a);
     //CLGComplex Dot1(const CField* other) const;
 
+
+protected:
+
     //pGauge must be gauge SU3
-    void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
 
-    void DWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    void DWithMassS(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
     {
         appCrucial(_T("Not supported for Wilson direct fermion!\n"));
     }
 
-    void DdaggerWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    void DdaggerWithMassS(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
     {
         appCrucial(_T("Not supported for Wilson direct fermion!\n"));
     }
 
-    void DDdaggerWithMass(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
+    void DDdaggerWithMassS(const CField* , Real , EOperatorCoefficientType , Real , Real ) override
     {
         appCrucial(_T("Not supported for Wilson direct fermion!\n"));
     }
 
-    void DDWithMass(const CField*, Real, EOperatorCoefficientType, Real, Real) override
+    void DDWithMassS(const CField*, Real, EOperatorCoefficientType, Real, Real) override
     {
         appCrucial(_T("Not supported for Wilson direct fermion!\n"));
     }
 
-    UBOOL InverseD(const CField* pGauge) override;
-    UBOOL InverseDdagger(const CField* pGauge) override;
-    UBOOL InverseDD(const CField* pGauge) override;
-    UBOOL InverseDDdagger(const CField* pGauge) override;
+    void PrepareForHMCS(const CFieldGauge* pGauge) override;
+    UBOOL CalculateForceS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+
+public:
+
     void ApplyGamma(EGammaMatrix eGamma) override;
-    void PrepareForHMC(const CFieldGauge* pGauge) override;
+    TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const override;
 
-    UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
     void InitialAsSource(const SFermionSource& sourceData) override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-    TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
+    
     CCString GetInfos(const CCString &tab) const override;
 
     void SetKai(Real fKai);
     UINT TestGamma5Hermitian(const CFieldGauge* pGauge, UBOOL bTestGamma5 = FALSE) const;
 
-    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
-    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
+    deviceWilsonVectorSU3* m_pDeviceData;
 
-    deviceWilsonVectorSU3 * m_pDeviceData;
+    _GetData
 
 protected:
 
-#if Discard_Even_odd_decomposition
-
-    UBOOL InverseD_eo(const CField*) override;
-    UBOOL InverseDdagger_eo(const CField*) override;
-    UBOOL InverseDDdagger_eo(const CField*) override;
-
-#endif
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
 
     Real m_fKai;
 

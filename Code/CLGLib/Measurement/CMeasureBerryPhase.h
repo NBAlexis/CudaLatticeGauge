@@ -25,7 +25,6 @@ public:
         , m_bGuageFixing(FALSE)
         , m_pMomentumField(NULL)
         , m_pU1Field(NULL)
-        , m_pGaugeFixing(NULL)
     {
         
     }
@@ -33,24 +32,23 @@ public:
     ~CMeasureBerryPhase();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple = NULL) override;
+    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const class CFieldGauge* const* pCorrespondingStaple = NULL) override;
     void Report() override;
     void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
-    void CalculateMomentumSpacePhiWilsonDiracForPoint(const SSmallInt4& xprime, const CFieldGaugeSU3* pGauge);
-    void CalculateMomentumSpacePhiWilsonDirac(const CFieldGaugeSU3* pGauge);
+    void CalculateMomentumSpacePhiWilsonDiracForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields);
+    void CalculateMomentumSpacePhiWilsonDirac(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields);
     void CalculateU1FieldWilsonDirac();
-    void CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& xprime, const CFieldGaugeSU3* pGauge);
-    void CalculateMomentumSpacePhiKS(const CFieldGaugeSU3* pGauge);
+    void CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields);
+    void CalculateMomentumSpacePhiKS(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields);
     void CalculateU1FieldKS();
 
-    void CalculateBerryPhase(BYTE byGaugeFieldId);
+    void CalculateBerryPhase();
     void AllocateBuffers();
 
-#if !_CLG_DOUBLEFLOAT
     TArray<TArray<DOUBLE>> m_lstData;
     TArray<TArray<DOUBLE>> m_lstDataXY;
     TArray<TArray<DOUBLE>> m_lstDataXZ;
@@ -58,22 +56,12 @@ public:
     TArray<TArray<DOUBLE>> m_lstDataYZ;
     TArray<TArray<DOUBLE>> m_lstDataYT;
     TArray<TArray<DOUBLE>> m_lstDataZT;
-#else
-    TArray<TArray<Real>> m_lstData;
-    TArray<TArray<Real>> m_lstDataXY;
-    TArray<TArray<Real>> m_lstDataXZ;
-    TArray<TArray<Real>> m_lstDataXT;
-    TArray<TArray<Real>> m_lstDataYZ;
-    TArray<TArray<Real>> m_lstDataYT;
-    TArray<TArray<Real>> m_lstDataZT;
-#endif
 
     UBOOL m_bWilsonDirac;
     UBOOL m_bGuageFixing;
 
     CFieldFermion* m_pMomentumField;
     CFieldGaugeU1* m_pU1Field;
-    CFieldGaugeSU3* m_pGaugeFixing;
 };
 
 __END_NAMESPACE

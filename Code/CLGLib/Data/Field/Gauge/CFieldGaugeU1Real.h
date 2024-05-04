@@ -117,6 +117,8 @@ public:
     Real* m_pDeviceData;
     EFieldInitialType m_eInitialType;
 
+    _GetData
+
     /**
      * Note!!!
      * Do not check the conflicts, assume you know

@@ -27,7 +27,8 @@ public:
     void Configurate(const CParameters& param) override;
     void AllocateBuffers(const CField* pField) override;
     virtual void ReleaseBuffers();
-    UBOOL Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, 
+    UBOOL Solve(CField* pFieldX, const CField* pFieldB, 
+        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
     //Old version, for compare

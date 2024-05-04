@@ -39,19 +39,54 @@ public:
         appCrucial(_T("Not supported for CFieldFermionKS!"));
     }
 
-    virtual void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) = 0;
+    virtual void ApplyGammaKS(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EGammaMatrix eGamma)
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            ApplyGammaKSS(pGauge, eGamma);
+            return;
+        }
+        appCrucial(_T("ApplyGammaKS not implemented\n"));
+    }
 
     //================= test anti-hermitian =========
-    virtual UINT TestAntiHermitian(const CFieldGauge* pGauge) const = 0;
+    virtual UINT TestAntiHermitian(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) const
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            return TestAntiHermitianS(pGauge);
+        }
+        appCrucial(_T("TestAntiHermitian not implemented\n"));
+        return 1;
+    }
 
     //These are truely D or InverseD etc.
 
     /**
      * Use to calculate action, it is (D^+D)^{-1/4}
      */
-    virtual void D_MD(const CField* pGauge) = 0;
-    virtual void D0(const CField* pGauge) = 0;
-    virtual void D_MC(const CField* pGauge) = 0;
+    virtual void D_MD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
+    {
+        RationalApproximation(EFO_F_DDdagger, gaugeNum, bosonNum, gaugeFields, pBoson, &m_rMD);
+    }
+
+    virtual void D0(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            D0S(pGauge);
+            return;
+        }
+        appCrucial(_T("D0 not implemented\n"));
+    }
+
+    virtual void D_MC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
+    {
+        RationalApproximation(EFO_F_DDdagger, gaugeNum, bosonNum, gaugeFields, pBoson, &m_rMC);
+    }
 
     void SetMass(Real f2am)
     {
@@ -71,45 +106,46 @@ public:
         pField->m_bEachSiteEta = m_bEachSiteEta;
     }
 
-    //============================
-    //Override these two functions for KS
-    virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const = 0;
-    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;
-    //============================
-
-    /**
-     * Do not override me
-     */
-    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
-    {
-        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
-    }
-
-    /**
-     * DerivateDOperator not implemented for KS
-     */
-    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override
-    {
-        appCrucial(_T("Do not call KS DerivateDOperator!"));
-        _FAIL_EXIT;
-    }
+public:
 
     #pragma region Help functions to implement higher orders
 
     virtual void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) = 0;
-    virtual void OneLink(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
+
+    virtual void OneLink(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, void* pTarget, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx, 
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) = 0;
-    virtual void OneLinkForce(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
-        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const = 0;
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            OneLinkS(pGauge->GetData(), pGauge->m_byFieldId, pTarget, fCoefficient, pDevicePath, pathLength, byEtaIdx, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+            return;
+        }
+        appCrucial(_T("OneLink not implemented\n"));
+    }
+
+    virtual void OneLinkForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, CFieldGauge* const* pGaugeForce, CFieldBoson* const* pBosonForce, Real fCoefficient,
+        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
+    {
+        if (SingleField())
+        {
+            INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+            const CFieldGauge* pGauge = gaugeFields[idx];
+            CFieldGauge* pForce = pGaugeForce[idx];
+            OneLinkForceS(pGauge->GetData(), pGauge->m_byFieldId, pForce->GetData(), fCoefficient, pDevicePath, pathLength, byEtaIdx);
+            return;
+        }
+        appCrucial(_T("OneLinkForce not implemented\n"));
+    }
 
     #pragma endregion
 
     //For test use only!
     void TestSetEtaShift(UBOOL bShift) { m_bEachSiteEta = bShift; }
     UBOOL TestIsEtaShift() const { return m_bEachSiteEta; }
+    virtual void PrepareForHMCOnlyRandomize() = 0;
+    virtual void PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) = 0;
 
     //For some strange boundary condition
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
@@ -121,6 +157,69 @@ public:
     UBOOL m_bDiagonalMass;
 
 protected:
+
+#pragma region single field case
+
+    virtual void ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+    {
+        appCrucial(_T("ApplyGammaKSS not implemented\n"));
+    }
+
+    //================= test anti-hermitian =========
+    virtual UINT TestAntiHermitianS(const CFieldGauge* pGauge) const
+    {
+        appCrucial(_T("TestAntiHermitianS not implemented\n"));
+        return 1;
+    }
+
+    //These are truely D or InverseD etc.
+
+    /**
+     * Use to calculate action, it is (D^+D)^{-1/4}
+     */
+    virtual void D0S(const CField* pGauge)
+    {
+        appCrucial(_T("D0S not implemented\n"));
+    }
+
+    //============================
+    //Override these two functions for KS
+    virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const
+    {
+        appCrucial(_T("DerivateD0 not implemented\n"));
+    }
+
+    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
+    {
+        appCrucial(_T("DOperatorKS not implemented\n"));
+    }
+
+    //============================
+
+    /**
+     * Do not override me
+     */
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
+    {
+        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    }
+
+    virtual void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
+        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+    {
+        appCrucial(_T("OneLinkS not implemented\n"));
+    }
+
+    virtual void OneLinkForceS(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
+        const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const
+    {
+        appCrucial(_T("OneLinkForceS not implemented\n"));
+    }
+
+#pragma endregion
 
     // r(x) = x^{1/4} use to prepare for Nf=2
     // r(x) = x^{3/8} use as s quark for Nf=2+1

@@ -28,11 +28,11 @@ void CUpdator::SaveConfiguration(UINT uiUpdateStep) const
     sInfo = sInfo + appGetLattice()->GetInfos(_T(""));
     appGetFileSystem()->WriteAllText(sConf, sInfo);
 
-    if (NULL != appGetLattice()->m_pGaugeField)
+    if (appGetLattice()->m_pGaugeField.Num() > 0)
     {
         CCString sConf2;
         sConf2.Format(_T("%s_%d.con"), m_sConfigurationPrefix.c_str(), m_iAcceptedConfigurationCount);
-        appGetLattice()->m_pGaugeField->SaveToFile(sConf2);
+        appGetLattice()->m_pGaugeField[0]->SaveToFile(sConf2);
     }
 }
 

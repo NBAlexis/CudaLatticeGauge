@@ -86,7 +86,7 @@ void CMeasureMesonCorrelatorStaggeredSimple::Initial(CMeasurementManager* pOwner
 #endif
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* pStapleField)
 {
     CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     assert(NULL != pFermion);
@@ -95,7 +95,7 @@ void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAcceptedSingleField(
     pointSource.m_eSourceType = EFS_Point;
     pointSource.m_sSourcePoint = SSmallInt4(0, 0, 0, 0);
     pFermion->InitialAsSource(pointSource);
-    pFermion->InverseD(pGaugeField);
+    pFermion->InverseD(gn, bn, gs, bs);
 
     preparethread;
     dim3 block1 = dim3(block.x, block.y, 1);

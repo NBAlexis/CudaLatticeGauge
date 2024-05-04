@@ -707,10 +707,10 @@ void CFieldFermionKSU1R::CopyTo(CField* U) const
 CCString CFieldFermionKSU1R::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSU1R\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appAnyToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appAnyToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appAnyToString(m_rMC.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appAnyToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(CCommonData::m_fOmega) + _T("\n");
     return sRet;
 }
 

@@ -71,7 +71,6 @@ CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) cons
 
 CFieldFermion::CFieldFermion()
 : CField()
-, m_byEvenFieldId(-1)
 {
     m_uiLinkeCount = _HC_Volume * _HC_Dir;
     m_uiSiteCount = _HC_Volume;
@@ -88,15 +87,8 @@ CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
     return NULL;
 }
 
-UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGauge, const class CRatinalApproximation* pRational)
+UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const class CRatinalApproximation* pRational)
 {
-    if (NULL == pGauge)
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge !"));
-        return FALSE;
-    }
-
-    const CFieldGauge* pFieldGauge = dynamic_cast<const CFieldGauge*>(pGauge);
     if (NULL == pRational)
     {
         return FALSE;
@@ -119,7 +111,7 @@ UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, const CField* pGau
         shifts.AddItem(_make_cuComplex(pRational->m_lstB[i], F(0.0)));
     }
 
-    solver->Solve(solutions, shifts, this, pFieldGauge, op);
+    solver->Solve(solutions, shifts, this, gaugeNum, bosonNum, gaugeFields, pBoson, op);
 
     ScalarMultply(pRational->m_fC);
 

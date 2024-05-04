@@ -448,11 +448,11 @@ void CFieldFermionWilsonSquareSU3DRigidAcc::CopyTo(CField* U) const
 CCString CFieldFermionWilsonSquareSU3DRigidAcc::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DRigidAcc\n");
-    sRet = sRet + tab + _T("Hopping : ") + appAnyToString(CCommonData::m_fKai) + _T("\n");
-    sRet = sRet + tab + _T("G2 : ") + appAnyToString(m_fG2) + _T("\n");
+    sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
+    sRet = sRet + tab + _T("G2 : ") + appToString(m_fG2) + _T("\n");
 
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
-    sRet = sRet + tab + _T("boundary : [") + appAnyToString(boundary.x) + _T(", ") + appAnyToString(boundary.y) + _T(", ") + appAnyToString(boundary.z) + _T(", ") + appAnyToString(boundary.w) + _T("]\n");
+    sRet = sRet + tab + _T("boundary : [") + appToString(boundary.x) + _T(", ") + appToString(boundary.y) + _T(", ") + appToString(boundary.z) + _T(", ") + appToString(boundary.w) + _T("]\n");
 
     return sRet;
 }

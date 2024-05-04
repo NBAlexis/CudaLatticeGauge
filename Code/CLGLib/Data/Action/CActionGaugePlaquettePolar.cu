@@ -450,16 +450,16 @@ CCString CActionGaugePlaquettePolar::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Beta : [") +  + _T("]\n");
     for (UINT i = 0; i < _HC_Lx; ++i)
     {
-        sRet = sRet + appAnyToString(m_lstBeta[i] * _HC_SUN) + _T(", ");
+        sRet = sRet + appToString(m_lstBeta[i] * _HC_SUN) + _T(", ");
     }
     sRet = sRet + _T("]\n");
     sRet = sRet + tab + _T("R : [");
     for (UINT i = 0; i < _HC_Lx; ++i)
     {
-        sRet = sRet + appAnyToString(m_fRIn + i * m_fDeltaR) + _T(", ");
+        sRet = sRet + appToString(m_fRIn + i * m_fDeltaR) + _T(", ");
     }
     sRet = sRet + _T("]\n");
-    sRet = sRet + tab + _T("Dirichlet : ") + appAnyToString(m_bDirichlet) + _T("\n");
+    sRet = sRet + tab + _T("Dirichlet : ") + appToString(m_bDirichlet) + _T("\n");
     return sRet;
 }
 

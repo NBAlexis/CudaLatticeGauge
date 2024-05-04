@@ -55,12 +55,12 @@ __DEFINE_ENUM(EDistributionJobKSREM,
             } \
             sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n"); \
             sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n"); \
-            sFileContent = sFileContent + _T("Beta: ") + appAnyToString(CCommonData::m_fBeta) + _T("\n"); \
-            sFileContent = sFileContent + _T("Omega: ") + appAnyToString(CCommonData::m_fOmega) + _T("\n"); \
-            sFileContent = sFileContent + _T("Magnetic: ") + appAnyToString(pU1->m_feBz) + _T("\n"); \
+            sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n"); \
+            sFileContent = sFileContent + _T("Omega: ") + appToString(CCommonData::m_fOmega) + _T("\n"); \
+            sFileContent = sFileContent + _T("Magnetic: ") + appToString(pU1->m_feBz) + _T("\n"); \
             sFileContent = sFileContent + _T("MagneticType: ") + __ENUM_TO_STRING(EU1RealType, pU1->m_eB) + _T("\n"); \
-            sFileContent = sFileContent + _T("Mass: ") + appAnyToString(pF1##ftype->m_f2am) + _T("\n"); \
-            sFileContent = sFileContent + _T("Chage: ") + appAnyToString(pF1##ftype->m_fQ) + _T("\n"); \
+            sFileContent = sFileContent + _T("Mass: ") + appToString(pF1##ftype->m_f2am) + _T("\n"); \
+            sFileContent = sFileContent + _T("Chage: ") + appToString(pF1##ftype->m_fQ) + _T("\n"); \
             sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1##ftype->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n"); \
             appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent); \
         } \

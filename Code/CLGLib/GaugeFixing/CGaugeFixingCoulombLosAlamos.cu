@@ -756,7 +756,7 @@ CCString CGaugeFixingCoulombLosAlamos::GetInfos(const CCString& tab) const
 {
     CCString sRet;
     sRet = sRet + tab + _T("Name : CGaugeFixingCoulombLosAlamos\n");
-    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
     return sRet;
 }
 

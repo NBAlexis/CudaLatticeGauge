@@ -78,8 +78,10 @@ _kernelDBoson(
 
 #pragma endregion
 
-void CFieldBosonU1::D(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldBosonU1::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
+    const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+
     if (NULL != pGauge && EFT_GaugeU1 != pGauge->GetFieldType())
     {
         appCrucial(_T("CFieldBosonU1 can only play with gauge U1!"));
@@ -468,11 +470,7 @@ void CFieldBosonU1::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
-#if !_CLG_DOUBLEFLOAT
 cuDoubleComplex CFieldBosonU1::Dot(const CField* x) const
-#else
-CLGComplex CFieldBosonU1::Dot(const CField* x) const
-#endif
 {
     if (NULL == x || EFT_BosonU1 != x->GetFieldType())
     {

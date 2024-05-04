@@ -65,7 +65,9 @@ void CMultiShiftNested::AllocateBuffers(const CField*)
 
 }
 
-UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase , const CField* )
+UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase , const CField* )
 {
     appPushLogDate(FALSE);
 #if _CLG_DEBUG
@@ -135,7 +137,7 @@ UBOOL CMultiShiftNested::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex
         }
 
         CCommonData::m_fShiftedMass = fShiftedMass;
-        m_pNestedSolver->Solve(pFieldKS, pFieldB, pGaugeFeild, toSolve, ESP_Once, NULL);
+        m_pNestedSolver->Solve(pFieldKS, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, toSolve, ESP_Once, NULL);
     }
     appPopLogDate();
     return TRUE;

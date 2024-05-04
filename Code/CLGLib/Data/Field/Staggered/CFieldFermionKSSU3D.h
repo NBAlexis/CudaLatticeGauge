@@ -22,15 +22,17 @@ class CLGAPI CFieldFermionKSSU3D : public CFieldFermionKSSU3
 {
     __CLGDECLARE_FIELD(CFieldFermionKSSU3D)
 
-public:
+protected:
 
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
     void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
 
+public:
 
+    void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) override;
     void FixBoundary() override;
-    void PrepareForHMC(const CFieldGauge* pGauge) override;
+    
 
     CCString GetInfos(const CCString& tab) const override;
 

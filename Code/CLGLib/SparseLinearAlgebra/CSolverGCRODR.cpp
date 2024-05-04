@@ -124,12 +124,6 @@ void CSLASolverGCRODR::Configurate(const CParameters& param)
 */
 void CSLASolverGCRODR::AllocateBuffers(const CField* pFieldB)
 {
-    if (pFieldB->IsEvenField())
-    {
-        appCrucial(_T("Even field not supported yet...\n"));
-        _FAIL_EXIT;
-    }
-
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceHm, sizeof(CLGComplex) * m_uiMDim * m_uiMDim));
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceEigenValue, sizeof(CLGComplex) * m_uiKDim));
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePk, sizeof(CLGComplex) * m_uiKDim * m_uiMDim));
@@ -198,7 +192,9 @@ void CSLASolverGCRODR::ReleaseBuffers()
     }
 }
 
-UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pFieldGauge, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     //use it to estimate relative error
     Real fBLength = F(1.0);
@@ -230,11 +226,11 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
     //Is it the first time of trajectory? (Do we have Yk?)
     if (ESP_InTrajectory == ePhase || ESP_EndTrajectory == ePhase)
     {
-        GenerateCUFirstTime(pX, pR, pFieldB, pFieldGauge, uiM);
+        GenerateCUFirstTime(pX, pR, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
     }
     else
     {
-        FirstTimeGMERESSolve(pX, pW, pFieldB, pFieldGauge, uiM);
+        FirstTimeGMERESSolve(pX, pW, pFieldB, gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
 
         //We have m_pHostHmGm set
         //No matter whether converge, we need Yk for next time solve
@@ -279,7 +275,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
             CField* vjp1 = GetW(j + 1);
             vj->CopyTo(pW);
             //w = A v[j]
-            pW->ApplyOperator(uiM, pFieldGauge);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
             pW->CopyTo(vjp1);
             for (UINT k = 0; k < m_uiKDim; ++k)
             {
@@ -345,7 +341,7 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
         {
             //============== This is the accurate result, though, slower and not stable =================
             pX->CopyTo(pW);
-            pW->ApplyOperator(uiM, pFieldGauge, EOCT_Minus); //x0 = -A x0
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
             pW->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
             m_cLastDiviation = _cToFloat(pW->Dot(pW));
@@ -400,7 +396,9 @@ UBOOL CSLASolverGCRODR::Solve(CField* pFieldX, const CField* pFieldB, const CFie
     return FALSE;
 }
 
-void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM)
+void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM)
 {
     appParanoiac(_T("-- GCRODR::Solve operator: %s-- Fisrt GMRES step ----\n"), __ENUM_TO_STRING(EFieldOperator, uiM).c_str());
 
@@ -410,7 +408,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
 
     CField* v0 = GetW(0);
     pX->CopyTo(v0); //x0 need to be preserved
-    v0->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
+    v0->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
     v0->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
     m_fBeta = static_cast<Real>(_hostsqrtd(v0->Dot(v0).x));
@@ -427,7 +425,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
         CField* vjp1 = GetW(j + 1);
         vj->CopyTo(vjp1);
         //w = A v[j]
-        vjp1->ApplyOperator(uiM, pGaugeFeild);
+        vjp1->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
         
         for (UINT k = 0; k <= j; ++k)
         {
@@ -486,7 +484,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
     else
     {
         pX->CopyTo(pR);
-        pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
         m_cLastDiviation = _cToFloat(pR->Dot(pR));
@@ -499,7 +497,7 @@ void CSLASolverGCRODR::FirstTimeGMERESSolve(CField* pX, CField* pR, const CField
     appParanoiac(_T("-- GCRODR::Solve operator: After Fisrt GMRES step |residue|=%1.12f ----\n"), m_fDiviation);
 }
 
-void CSLASolverGCRODR::QRFactorAY(const CFieldGauge* pGaugeField, EFieldOperator uiM)
+void CSLASolverGCRODR::QRFactorAY(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, EFieldOperator uiM)
 {
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
@@ -510,7 +508,7 @@ void CSLASolverGCRODR::QRFactorAY(const CFieldGauge* pGaugeField, EFieldOperator
 
         //transform Y to AY
         m_lstU[i]->CopyTo(m_lstC[i]);
-        m_lstC[i]->ApplyOperator(uiM, pGaugeField);
+        m_lstC[i]->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
     }
 
     //QR of AY
@@ -815,9 +813,11 @@ void CSLASolverGCRODR::GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES)
 /**
 * We have Yk, (which is Uk), QR is QR of AYk
 */
-void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM)
+void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM)
 {
-    QRFactorAY(pGaugeField, uiM);
+    QRFactorAY(gaugeNum, bosonNum, gaugeFields, bosonFields, uiM);
 
     //Uk = Uk R-1
     FieldSolveY(m_lstU, m_pHostTmpR, m_uiKDim);
@@ -825,7 +825,7 @@ void CSLASolverGCRODR::GenerateCUFirstTime(CField* pX, CField* pR, const CField*
     //CField* v0 = m_lstV[0];
 
     pX->CopyTo(pR);
-    pR->ApplyOperator(uiM, pGaugeField, EOCT_Minus); //r0 = -A x0
+    pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //r0 = -A x0
     pR->AxpyPlus(pFieldB); //r0 = b-Ax0
 
 #if !_CLG_DOUBLEFLOAT

@@ -41,8 +41,7 @@ void CIntegratorForceGradient::Evaluate()
         for (INT i = 0; i < m_lstActions.Num(); ++i)
         {
             //this is accumulate
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_InTrajectory);
-            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_InTrajectory);
+            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ESP_InTrajectory);
             checkCudaErrors(cudaDeviceSynchronize());
         }
 
@@ -74,10 +73,10 @@ CCString CIntegratorForceGradient::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
     sRet = sTab + _T("Name : Force Gradient\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appToString(m_fEStep * m_uiStepCount) + _T("\n");
     return sRet;
 }
 

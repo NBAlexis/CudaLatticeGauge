@@ -11,12 +11,14 @@
 
 __BEGIN_NAMESPACE
 
-void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, const CFieldGauge* pGauge, const CFieldFermionWilsonSquareSU3* pFermion)
+void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    const CFieldFermionWilsonSquareSU3* pFermion)
 {
     UBOOL bOnlyRed = TRUE;
     TArray <TArray<CLGComplex>> rets;
     CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId));
-    if (NULL == pF1 || NULL == pGauge)
+    if (NULL == pF1)
     {
         appCrucial(_T("CMeasureDiagnal::ExportDiagnalStaggeredSU3 only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
         return;
@@ -45,12 +47,12 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, co
                 {
                 case EMD_D:
                     {
-                        pF1->D(pGauge);
+                        pF1->D(gaugeNum, bosonNum, gaugeFields, pBoson);
                     }
                     break;
                 case EMD_InverseD:
                     {
-                        pF1->InverseD(pGauge);
+                        pF1->InverseD(gaugeNum, bosonNum, gaugeFields, pBoson);
                     }
                     break;
                 case EMD_Gamma1:
@@ -132,17 +134,19 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, co
     appSafeFree(hostv);
 }
 
-void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, const CFieldGauge* pGauge, const CFieldFermionKSSU3* pFermion)
+void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    const CFieldFermionKSSU3* pFermion)
 {
     UBOOL bOnlyRed = TRUE;
     TArray <TArray<CLGComplex>> rets;
     CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pFermion->m_byFieldId));
-    if (NULL == pF1 || NULL == pGauge)
+    if (NULL == pF1)
     {
         appCrucial(_T("CMeasureDiagnal::ExportDiagnalStaggeredSU3 only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
         return;
     }
-    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
+    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(gaugeFields[0]);
     CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pF1->GetCopy());
 
     UINT uiSiteCount = pF1->GetSiteCount();
@@ -165,12 +169,12 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             {
             case EMD_D:
                 {
-                    pF1->D(pGauge);
+                    pF1->D(gaugeNum, bosonNum, gaugeFields, pBoson);
                 }
                 break;
             case EMD_InverseD:
                 {
-                    pF1->InverseD(pGauge);
+                    pF1->InverseD(gaugeNum, bosonNum, gaugeFields, pBoson);
                 }
                 break;
             case EMD_Gamma1:
@@ -179,37 +183,37 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Gamma4:
             case EMD_Gamma5:
                 {
-                    pF1->ApplyGammaKS(pGauge, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA1) + static_cast<INT>(eType - EMD_Gamma1)));
                 }
                 break;
             case EMD_Sigma12:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA12);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA12);
                 }
                 break;
             case EMD_Sigma13:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA31);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA31);
                 }
                 break;
             case EMD_Sigma14:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA41);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA41);
                 }
                 break;
             case EMD_Sigma23:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA23);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA23);
                 }
                 break;
             case EMD_Sigma24:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA42);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA42);
                 }
                 break;
             case EMD_Sigma34:
                 {
-                    pF1->ApplyGammaKS(pGauge, SIGMA43);
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, SIGMA43);
                 }
                 break;
             case EMD_Gamma51:
@@ -217,7 +221,7 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Gamma53:
             case EMD_Gamma54:
                 {
-                    pF1->ApplyGammaKS(pGauge, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
+                    pF1->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, pBoson, static_cast<EGammaMatrix>(static_cast<INT>(GAMMA51) + static_cast<INT>(eType - EMD_Gamma51)));
                 }
                 break;
             case EMD_Oribital:
@@ -255,6 +259,30 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
     WriteComplexArray2Simple(sFileName, rets);
     appSafeFree(hostv);
     appSafeDelete(pF2);
+}
+
+UBOOL CFieldFermion::InverseD(INT gaugeNum, INT bosonNum,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_D);
+}
+
+UBOOL CFieldFermion::InverseDdagger(INT gaugeNum, INT bosonNum,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_Ddagger);
+}
+
+UBOOL CFieldFermion::InverseDDdagger(INT gaugeNum, INT bosonNum,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_DDdagger);
+}
+
+UBOOL CFieldFermion::InverseDD(INT gaugeNum, INT bosonNum,
+    const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
+{
+    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_DD);
 }
 
 __END_NAMESPACE

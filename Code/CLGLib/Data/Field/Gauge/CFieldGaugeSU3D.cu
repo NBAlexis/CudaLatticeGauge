@@ -593,7 +593,7 @@ CCString CFieldGaugeSU3D::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldGaugeSU3 Dirichlet\n");
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
-    sRet = sRet + tab + _T("boundary : [") + appAnyToString(boundary.x) + _T(", ") + appAnyToString(boundary.y) + _T(", ") + appAnyToString(boundary.z) + _T(", ") + appAnyToString(boundary.w) + _T("]\n");
+    sRet = sRet + tab + _T("boundary : [") + appToString(boundary.x) + _T(", ") + appToString(boundary.y) + _T(", ") + appToString(boundary.z) + _T(", ") + appToString(boundary.w) + _T("]\n");
 
     return sRet;
 }

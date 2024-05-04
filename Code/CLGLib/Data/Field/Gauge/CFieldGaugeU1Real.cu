@@ -1498,9 +1498,9 @@ CCString CFieldGaugeU1Real::GetInfos(const CCString &tab) const
     CCString sRet = tab + _T("Name : CFieldGaugeU1Real\n");
     sRet = sRet + tab + _T("Initialed : ") + __ENUM_TO_STRING(EFieldInitialType, m_eInitialType) + _T("\n");
 
-    sRet = sRet + tab + _T("Chemical : ") + __ENUM_TO_STRING(EU1RealType, m_eChemical) + _T(" , v = ") + appAnyToString(m_fChemical) + _T("\n");
-    sRet = sRet + tab + _T("Electric : ") + __ENUM_TO_STRING(EU1RealType, m_eE) + _T(" , v = ") + appAnyToString(m_feEz) + _T("\n");
-    sRet = sRet + tab + _T("Magnetic : ") + __ENUM_TO_STRING(EU1RealType, m_eB) + _T(" , v = ") + appAnyToString(m_feBz) + _T("\n");
+    sRet = sRet + tab + _T("Chemical : ") + __ENUM_TO_STRING(EU1RealType, m_eChemical) + _T(" , v = ") + appToString(m_fChemical) + _T("\n");
+    sRet = sRet + tab + _T("Electric : ") + __ENUM_TO_STRING(EU1RealType, m_eE) + _T(" , v = ") + appToString(m_feEz) + _T("\n");
+    sRet = sRet + tab + _T("Magnetic : ") + __ENUM_TO_STRING(EU1RealType, m_eB) + _T(" , v = ") + appToString(m_feBz) + _T("\n");
 
     return sRet;
 }

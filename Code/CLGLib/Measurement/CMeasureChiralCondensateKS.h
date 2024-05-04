@@ -68,14 +68,16 @@ public:
     ~CMeasureChiralCondensateKS();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
-    void OnConfigurationAcceptedZ4SingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
+
+    void OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd) override;
+
     void Report() override;
     void Reset() override;
 
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }    
 
-    TArray<TArray<CLGComplex>> ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;
+    TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;
 
 protected:
     

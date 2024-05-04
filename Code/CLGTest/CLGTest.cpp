@@ -129,7 +129,7 @@ int main(int argc, char * argv[])
     CCString sRealByte;
     for (UINT i = 0; i < 8; ++i)
     {
-        sRealByte += appAnyToString(realByte[i]) + _T(", ");
+        sRealByte += appToString(realByte[i]) + _T(", ");
     }
     appGeneral(_T(" \n ================= sizeof(Real) : %d and -1.2345 is %s =============\n"), sizeof(Real), sRealByte.c_str());
     
@@ -185,7 +185,7 @@ int main(int argc, char * argv[])
             CCudaHelper::DeviceQuery();
             bExcuted = TRUE;
         }
-        else if (appAnyToString(number) == sRes)
+        else if (appToString(number) == sRes)
         {
             if (number > 0 && number <= allTests.Num())
             {

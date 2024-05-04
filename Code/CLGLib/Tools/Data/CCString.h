@@ -17,9 +17,9 @@ inline type appStrTo##type(const TCHAR* s) \
 }
 
 
-#define defineAnyToStr(type) \
+#define defineToStr(type) \
 template<> \
-inline CCString appAnyToString(const type& content) \
+inline CCString appToString(const type& content) \
 { \
     return CCString(std::to_string(content).c_str()); \
 }
@@ -669,31 +669,37 @@ inline void CCString::Init()
 }
 
 template<class T>
-inline CCString appAnyToString(const T& content)
+inline CCString appToString(const T& content)
 {
     CCString res;
     res.Format(_T("%d"), content);
     return res;
 }
 
-defineAnyToStr(INT)
-defineAnyToStr(UINT)
-defineAnyToStr(WORD)
-defineAnyToStr(SWORD)
-defineAnyToStr(BYTE)
-defineAnyToStr(SBYTE)
-defineAnyToStr(LONGLONG)
-defineAnyToStr(ULONGLONG)
+defineToStr(INT)
+defineToStr(UINT)
+defineToStr(WORD)
+defineToStr(SWORD)
+defineToStr(BYTE)
+defineToStr(SBYTE)
+defineToStr(LONGLONG)
+defineToStr(ULONGLONG)
 
-defineAnyToStr(Real)
+defineToStr(Real)
 #if _CLG_DOUBLEFLOAT
-defineAnyToStr(FLOAT)
+defineToStr(FLOAT)
 #else
-defineAnyToStr(DOUBLE)
+defineToStr(DOUBLE)
 #endif
 
 template<>
-inline CCString appAnyToString(const CLGComplex& content)
+inline CCString appToString(const CCString& content)
+{
+    return content;
+}
+
+template<>
+inline CCString appToString(const CLGComplex& content)
 {
     CCString sret;
     sret.Format(_T("%2.12f %s %2.12f I"),
@@ -705,7 +711,7 @@ inline CCString appAnyToString(const CLGComplex& content)
 
 #if _CLG_DOUBLEFLOAT
 template<>
-inline CCString appAnyToString(const cuComplex& content)
+inline CCString appToString(const cuComplex& content)
 {
     CCString sret;
     sret.Format(_T("%2.12f %s %2.12f I"),
@@ -716,7 +722,7 @@ inline CCString appAnyToString(const cuComplex& content)
 }
 #else
 template<>
-inline CCString appAnyToString(const cuDoubleComplex& content)
+inline CCString appToString(const cuDoubleComplex& content)
 {
     CCString sret;
     sret.Format(_T("%2.12f %s %2.12f I"),
@@ -728,21 +734,21 @@ inline CCString appAnyToString(const cuDoubleComplex& content)
 #endif
 
 template <class T>
-inline CCString appAnyToString(const TArray<T>& arr)
+inline CCString appToString(const TArray<T>& arr)
 {
-    CCString sret = _T("[");
+    CCString sret = _T("{");
     for (INT i = 0; i < arr.Num(); ++i)
     {
         if (i == arr.Num() - 1)
         {
-            sret = sret + appAnyToString(arr[i]);
+            sret = sret + appToString(arr[i]);
         }
         else
         {
-            sret = sret + appAnyToString(arr[i]) + _T(", ");
+            sret = sret + appToString(arr[i]) + _T(", ");
         }
     }
-    sret = sret + _T("]");
+    sret = sret + _T("}");
     return sret;
 }
 

@@ -68,23 +68,34 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
     params.FetchValueINT(_T("BindDir"), iBindDir);
     m_byBindDir = static_cast<BYTE>(iBindDir);
 
-    m_pGaugeField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
-    m_pGaugeField[0]->m_pOwner = pLattice;
-    m_pGaugeField[0]->InitialField(EFIT_Zero);
-
-    m_pForceField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
-    m_pForceField[0]->m_pOwner = pLattice;
-    m_pForceField[0]->InitialField(EFIT_Zero);
-
-    m_pMomentumField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
-    m_pMomentumField[0]->m_pOwner = pLattice;
-    m_pMomentumField[0]->InitialField(EFIT_Zero);
-
-    if (CCommonData::m_bStoreStaple)
+    for (INT i = 0; i < pLattice->m_pGaugeField.Num(); ++i)
     {
-        m_pStapleField.AddItem(dynamic_cast<CFieldGauge*>(appCreate(pLattice->m_pGaugeField->GetClass()->GetName())));
-        m_pStapleField[0]->m_pOwner = pLattice;
-        m_pStapleField[0]->InitialField(EFIT_Zero);
+        m_pGaugeField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+        m_pGaugeField[i]->InitialField(EFIT_Zero);
+
+        m_pForceField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+        m_pForceField[i]->InitialField(EFIT_Zero);
+
+        m_pMomentumField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+        m_pMomentumField[i]->InitialField(EFIT_Zero);
+
+        if (CCommonData::m_bStoreStaple)
+        {
+            m_pStapleField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+            m_pStapleField[i]->InitialField(EFIT_Zero);
+        }
+    }
+
+    for (INT i = 0; i < pLattice->m_pBosonField.Num(); ++i)
+    {
+        m_pBosonFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+        m_pBosonFields[i]->InitialField(EFIT_Zero);
+
+        m_pBosonForceFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+        m_pBosonForceFields[i]->InitialField(EFIT_Zero);
+
+        m_pBosonMomentumFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+        m_pBosonMomentumFields[i]->InitialField(EFIT_Zero);
     }
 }
 
@@ -93,8 +104,16 @@ void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
     //we may not accept the evaluation, so we need to copy it first
     if (!bLastAccepted || 0 == uiStep)
     {
-        m_pLattice->m_pGaugeField->CopyTo(m_pGaugeField[0]);
-        m_pGaugeField[0]->SetOneDirectionUnity(m_byBindDir);
+        for (INT i = 0; i < m_pLattice->m_pGaugeField.Num(); ++i)
+        {
+            m_pLattice->m_pGaugeField[i]->CopyTo(m_pGaugeField[i]);
+            m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+        }
+        for (INT i = 0; i < m_pLattice->m_pBosonField.Num(); ++i)
+        {
+            m_pLattice->m_pBosonField[i]->CopyTo(m_pBosonFields[i]);
+        }
+
         m_bStapleCached = FALSE;
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -113,7 +132,14 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
 {
     if (bAccepted)
     {
-        m_pGaugeField[0]->CopyTo(m_pLattice->m_pGaugeField);
+        for (INT i = 0; i < m_pLattice->m_pGaugeField.Num(); ++i)
+        {
+            m_pGaugeField[i]->CopyTo(m_pLattice->m_pGaugeField[i]);
+        }
+        for (INT i = 0; i < m_pLattice->m_pBosonField.Num(); ++i)
+        {
+            m_pBosonFields[i]->CopyTo(m_pLattice->m_pBosonField[i]);
+        }
     }
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
@@ -153,8 +179,7 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), (0 == i && bCacheStaple) ? m_pStapleField.GetData() : NULL, ePhase);
-        m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
+        m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), (0 == i && bCacheStaple) ? m_pStapleField.GetData() : NULL, ePhase);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
@@ -221,7 +246,7 @@ void CNestedIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice
 
 CCString CNestedIntegrator::GetNestedInfo(const CCString & sTab) const
 {
-    return sTab + _T("Nested : ") + appAnyToString(static_cast<INT>(m_uiNestedStep)) + _T("\n")
+    return sTab + _T("Nested : ") + appToString(static_cast<INT>(m_uiNestedStep)) + _T("\n")
          + sTab + _T("InnerLeapFrog : ") + (m_bInnerLeapFrog ? _T("1") : _T("0")) + _T("\n");
 }
 
@@ -236,8 +261,7 @@ void CNestedIntegrator::UpdatePF(Real fStep, ESolverPhase ePhase)
         //this is accumulate
         if (m_lstActions[i]->IsFermion())
         {
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ePhase);
-            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
+            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ePhase);
         }
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -263,8 +287,7 @@ void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
         //this is accumulate
         if (!m_lstActions[i]->IsFermion())
         {
-            m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
-            m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
+            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
         }
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -339,7 +362,7 @@ void CMultiLevelNestedIntegrator::Initial(class CHMC* pOwner, class CLatticeData
     for (INT i = 0; i <= nestedSteps.Num(); ++i)
     {
         TArray<UINT> actionlist;
-        params.FetchValueArrayUINT(_T("NestedActionList") + appAnyToString(i), actionlist);
+        params.FetchValueArrayUINT(_T("NestedActionList") + appToString(i), actionlist);
         if (actionlist.Num() < 1)
         {
             appCrucial(_T("NestedActionList.Num must >= 1, but set to be 0!\n"));
@@ -371,7 +394,7 @@ CCString CMultiLevelNestedIntegrator::GetNestedInfo(const CCString& sTab) const
         CCString sActionList = _T("[");
         for (INT j = 0; j < m_iNestedActionId[i].Num(); ++j)
         {
-            sActionList = sActionList + appAnyToString(static_cast<INT>(m_iNestedActionId[i][j]));
+            sActionList = sActionList + appToString(static_cast<INT>(m_iNestedActionId[i][j]));
             if (j != m_iNestedActionId[i].Num() - 1)
             {
                 sActionList = sActionList + _T(", ");
@@ -382,10 +405,10 @@ CCString CMultiLevelNestedIntegrator::GetNestedInfo(const CCString& sTab) const
         CCString sStepDetail = _T("");
         if (0 != i)
         {
-            sStepDetail = appAnyToString(static_cast<INT>(m_uiStepCount));
+            sStepDetail = appToString(static_cast<INT>(m_uiStepCount));
             for (INT j = 1; j <= i; ++j)
             {
-                sStepDetail = sStepDetail + _T(" x ") + appAnyToString(static_cast<INT>(m_uiNestedStep[j - 1]));
+                sStepDetail = sStepDetail + _T(" x ") + appToString(static_cast<INT>(m_uiNestedStep[j - 1]));
             }
             sStepDetail = _T("(") + sStepDetail + _T(")");
         }
@@ -409,13 +432,11 @@ void CMultiLevelNestedIntegrator::UpdateP(Real fStep, TArray<UINT> actionList, E
         const CAction* pAction = m_lstActions[actionList[i]];
         if (pAction->IsFermion())
         {
-            pAction->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ePhase);
-            pAction->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ePhase);
+            pAction->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ePhase);
         }
         else
         {
-            pAction->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
-            pAction->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
+            pAction->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
             m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
         }
         

@@ -33,7 +33,7 @@ public:
     ~CMeasureMesonCorrelatorStaggeredSimple2();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
+    void OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* stp) override;
     void Report() override;
     void Reset() override;
 
@@ -47,7 +47,7 @@ public:
 protected:
 
     void BuildSource();
-    void IniverseSource(const CFieldGauge* pGaugeField);
+    void IniverseSource(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs);
     void ReleaseSource();
 
     TArray<CFieldFermionKSSU3*> m_pSources;

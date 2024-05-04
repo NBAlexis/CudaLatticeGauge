@@ -58,8 +58,7 @@ void CIntegratorNestedForceGradient::Evaluate()
             //this is accumulate
             if (m_lstActions[i]->IsFermion())
             {
-                m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_InTrajectory);
-                m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_InTrajectory);
+                m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ESP_InTrajectory);
             }
 
             checkCudaErrors(cudaDeviceSynchronize());
@@ -130,8 +129,7 @@ void CIntegratorNestedForceGradient::NestedEvaluate(UBOOL bLast)
         {
             if (!m_lstActions[i]->IsFermion())
             {
-                m_lstActions[i]->CalculateForceOnGauge(m_pGaugeField.Num(), m_pGaugeField.GetData(), m_pForceField.GetData(), NULL, ESP_Once);
-                m_lstActions[i]->CalculateForceOnBoson(m_pBosonFields.Num(), m_pBosonFields.GetData(), m_pBosonForceFields.GetData(), ESP_Once);
+                m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), NULL, ESP_Once);
             }
         }
 
@@ -161,10 +159,10 @@ CCString CIntegratorNestedForceGradient::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
     sRet = sTab + _T("Name : Nested Force Gradient\n");
-    sRet = sRet + sTab + _T("Epsilon : ") + appAnyToString(m_fEStep) + _T("\n");
-    sRet = sRet + sTab + _T("Step : ") + appAnyToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
+    sRet = sRet + sTab + _T("Epsilon : ") + appToString(m_fEStep) + _T("\n");
+    sRet = sRet + sTab + _T("Step : ") + appToString(static_cast<INT>(m_uiStepCount)) + _T("\n");
     sRet = sRet + sTab + _T("##Tau is trajectory length = Epsilon x Step\n");
-    sRet = sRet + sTab + _T("Tau : ") + appAnyToString(m_fEStep * m_uiStepCount) + _T("\n");
+    sRet = sRet + sTab + _T("Tau : ") + appToString(m_fEStep * m_uiStepCount) + _T("\n");
     sRet = sRet + GetNestedInfo(sTab);
     return sRet;
 }

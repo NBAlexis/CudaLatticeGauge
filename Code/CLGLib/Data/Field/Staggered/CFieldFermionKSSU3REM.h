@@ -31,14 +31,17 @@ public:
     CFieldFermionKSSU3REM();
     ~CFieldFermionKSSU3REM();
 
+protected:
+
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
     void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+    void ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
+
+public:
 
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;
-
-    void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
     //BYTE m_byGaugeType;
     //UBOOL m_bTwistedBoundary;

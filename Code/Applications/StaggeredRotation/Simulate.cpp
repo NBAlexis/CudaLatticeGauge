@@ -93,10 +93,10 @@ INT SimulateStaggeredRotation(CParameters& params)
         params.FetchValueArrayINT(_T("LatticeLength"), latticeDecomp);
         latticeDecomp[3] = uiNt;
         TArray<CCString> sLatticeDecomp;
-        sLatticeDecomp.AddItem(appAnyToString(latticeDecomp[0]));
-        sLatticeDecomp.AddItem(appAnyToString(latticeDecomp[1]));
-        sLatticeDecomp.AddItem(appAnyToString(latticeDecomp[2]));
-        sLatticeDecomp.AddItem(appAnyToString(latticeDecomp[3]));
+        sLatticeDecomp.AddItem(appToString(latticeDecomp[0]));
+        sLatticeDecomp.AddItem(appToString(latticeDecomp[1]));
+        sLatticeDecomp.AddItem(appToString(latticeDecomp[2]));
+        sLatticeDecomp.AddItem(appToString(latticeDecomp[3]));
         params.SetStringVectorVaule(_T("LatticeLength"), sLatticeDecomp);
 
         if (!appInitialCLG(params))

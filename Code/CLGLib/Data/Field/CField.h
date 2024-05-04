@@ -11,6 +11,16 @@
 #ifndef _CFIELD_H_
 #define _CFIELD_H_
 
+#define _GetData \
+const void* GetData() const override \
+{ \
+    return (const void*)m_pDeviceData; \
+} \
+void* GetData() override \
+{ \
+    return (void*)m_pDeviceData; \
+}
+
 __BEGIN_NAMESPACE
 
 __DEFINE_ENUM(EFieldInitialType,
@@ -86,9 +96,25 @@ public:
     virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
     virtual void InitialWithByte(BYTE* byData) = 0;
     virtual void InitialWithByteCompressed(BYTE* ) { appCrucial(_T("Not implemented compressed file format!\n")); }
-    virtual void InitialOtherParameters(CParameters& ) {}
+    virtual void InitialOtherParameters(CParameters& param) 
+    {
+        param.FetchValueArrayBYTE(_T("GaugeFields"), m_byGaugeFieldIds);
+        param.FetchValueArrayBYTE(_T("BosonFields"), m_byBosonFieldIds);
+
+        if (0 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
+        {
+            m_byGaugeFieldIds.AddItem(1);
+        }
+    }
+
+    UBOOL SingleField() const
+    {
+        return 1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds[0];
+    }
 
     virtual void DebugPrintMe() const = 0;
+    virtual const void* GetData() const = 0;
+    virtual void* GetData() = 0;
 
 #pragma region BLAS
     //what is BLAS? see: https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms
@@ -114,11 +140,8 @@ public:
     virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
     virtual void Dagger() = 0;
 
-#if !_CLG_DOUBLEFLOAT
     DOUBLE GetLength() const { return m_fLength; }
-#else
-    Real GetLength() const { return m_fLength; }
-#endif
+
     //This is a * me
     virtual void ScalarMultply(const CLGComplex& a) = 0;
     virtual void ScalarMultply(Real a) = 0;
@@ -141,19 +164,11 @@ public:
     * Using pDeviceBuffer, we make sure Dot function is a constant function as it should be.
     * The final result of dot, should be sum of pDeviceBuffer
     */
-#if !_CLG_DOUBLEFLOAT
     virtual cuDoubleComplex Dot(const CField* other) const = 0;
     virtual CLGComplex DotReal(const CField* other) const
     {
         return _cToFloat(Dot(other));
     }
-#else
-    virtual CLGComplex Dot(const CField* other) const = 0;
-    virtual CLGComplex DotReal(const CField* other) const
-    {
-        return Dot(other);
-    }
-#endif
 
     virtual void CopyTo(CField* U) const
     {
@@ -161,30 +176,41 @@ public:
         U->m_pOwner = m_pOwner;
         U->m_byFieldId = m_byFieldId;
         U->m_fLength = m_fLength;
+
+        U->m_byGaugeFieldIds = m_byGaugeFieldIds;
+        U->m_byBosonFieldIds = m_byBosonFieldIds;
     }
 
     virtual CField* GetCopy() const = 0;
 
-    virtual UBOOL ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* otherParameter = NULL) = 0;
+    virtual UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType uiCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* otherParameter = NULL) = 0;
 
     virtual UBOOL IsGaugeField() const { return FALSE; }
     virtual UBOOL IsFermionField() const { return FALSE; }
-    virtual UBOOL IsEvenField() const { return FALSE; }
     virtual UBOOL IsBosonField() const { return FALSE; }
+    virtual UBOOL IsSpinField() const { return FALSE; }
 
 #pragma endregion
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE m_fLength;
-#else
-    Real m_fLength;
-#endif
 
     void Return();
 
+    friend class CFieldPool;
+
+protected:
+
+    const CFieldGauge* GetDefaultGauge(INT gaugeNum, const CFieldGauge* const* gaugeFields) const
+    {
+        return gaugeFields[CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0])];
+    }
+
     class CFieldPool* m_pPool;
+
+    TArray<BYTE> m_byGaugeFieldIds;
+    TArray<BYTE> m_byBosonFieldIds;
 };
 
 class CLGAPI CFieldPool

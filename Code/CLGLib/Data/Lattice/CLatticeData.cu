@@ -39,7 +39,6 @@ CLatticeData::CLatticeData()
     , m_uiRandomType(0)
     , m_uiRandomSeed(0)
 
-    , m_pGaugeField(NULL)
     , m_pAphys(NULL)
     , m_pUpure(NULL)
     , m_pFieldCache(NULL)
@@ -98,7 +97,6 @@ CLatticeData::~CLatticeData()
     }
 
     appSafeDelete(m_pFieldCache);
-    appSafeDelete(m_pGaugeField);
     appSafeDelete(m_pAphys);
     appSafeDelete(m_pUpure);
     appSafeDelete(m_pIndexCache);
@@ -171,6 +169,16 @@ CField* CLatticeData::GetPooledFieldById(BYTE byId)
     }
 
     return m_pFieldPoolMap[byId]->GetOne();
+}
+
+CField* CLatticeData::GetPooledCopy(const CField* pField)
+{
+    CField* pooled = GetPooledFieldById(pField->m_byFieldId);
+    if (NULL != pooled)
+    {
+        pField->CopyTo(pooled);
+    }
+    return pooled;
 }
 
 void CLatticeData::ReCopyPooled() const
@@ -279,7 +287,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     CCString sRealByte;
     for (UINT i = 0; i < 8; ++i)
     {
-        sRealByte += appAnyToString(realByte[i]) + _T(", ");
+        sRealByte += appToString(realByte[i]) + _T(", ");
     }
 
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
@@ -326,23 +334,18 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
         sRet = sRet + m_pUpdator->GetInfos(sTab + _T("    "));
     }
 
-    if (NULL != m_pGaugeField)
-    {
-        sRet = sRet + sTab + _T("GaugeField : \n");
-        sRet = sRet + m_pGaugeField->GetInfos(sTab + _T("    "));
-    }
-    sInfos.Format(_T("OtherFieldCount : %d\n"), m_pOtherFields.Num());
+    sInfos.Format(_T("All Field Count : %d\n"), m_pOtherFields.Num());
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pOtherFields.Num(); ++i)
     {
-        sRet = sRet + sTab + _T("OtherField") + appAnyToString(i) + _T(" : \n");
+        sRet = sRet + sTab + _T("Field") + appToString(i) + _T(" : \n");
         sRet = sRet + m_pOtherFields[i]->GetInfos(sTab + _T("    "));
     }
     sInfos.Format(_T("ActionCount : %d\n"), m_pActionList.Num());
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pActionList.Num(); ++i)
     {
-        sRet = sRet + sTab + _T("Action") + appAnyToString(i) + _T(" : \n");
+        sRet = sRet + sTab + _T("Action") + appToString(i) + _T(" : \n");
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
     }
 

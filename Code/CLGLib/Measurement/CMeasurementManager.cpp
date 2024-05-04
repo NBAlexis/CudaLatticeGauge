@@ -87,7 +87,7 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
                 }
                 pF1->FixBoundary();
                 pF1->CopyTo(pF2);
-                pF1->InverseD(pAcceptGauge[0]);
+                pF1->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
 
                 for (INT k = 0; k < measures.GetCount(); ++k)
                 {
@@ -127,7 +127,9 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
 
                 CFieldFermion* pFermion = dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(byFieldId));
                 TArray<CFieldFermion*> sources = pFermion->GetSourcesAtSiteFromPool(
-                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges[0] : pAcceptGauge[0],
+                    gaugeNum, bosonNum,
+                    m_lstAllMeasures[i]->NeedGaugeSmearing() ? allGauges.GetData() : pAcceptGauge,
+                    pAcceptBoson,
                     sourceSite);
 
                 for (INT j = 0; j < measures.Num(); ++j)

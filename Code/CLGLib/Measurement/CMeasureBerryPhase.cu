@@ -219,7 +219,7 @@ _kernelBerryCurvatureU1XY(
 
 __CLGIMPLEMENT_CLASS(CMeasureBerryPhase)
 
-void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSmallInt4& xprime, const CFieldGaugeSU3* pGauge)
+void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
     SFermionSource source;
     source.m_eSourceType = EFS_Point;
@@ -231,7 +231,7 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSma
     CFieldFermionWilsonSquareSU3* sourcefield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId));
     CFieldFermionWilsonSquareSU3* momentumfield = dynamic_cast<CFieldFermionWilsonSquareSU3*>(m_pMomentumField);
     sourcefield->InitialAsSource(source);
-    sourcefield->InverseD(pGauge);
+    sourcefield->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
 
     _kernelMomentumFieldWilsonDiracSU3 << <block, threads >> > (
         sourcefield->m_pDeviceData,
@@ -242,13 +242,13 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSma
     sourcefield->Return();
 }
 
-void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDirac(const CFieldGaugeSU3* pGauge)
+void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDirac(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
     m_pMomentumField->InitialField(EFIT_Zero);
 
     //Use transilational invarience, we only calculate xprime = 0 (otherwise, we will have run over x')
     SSmallInt4 xprime(0, 0, 0, 0);
-    CalculateMomentumSpacePhiWilsonDiracForPoint(xprime, pGauge);
+    CalculateMomentumSpacePhiWilsonDiracForPoint(xprime, gaugeNum, bosonNum, gaugeFields, bosonFields);
 }
 
 void CMeasureBerryPhase::CalculateU1FieldWilsonDirac()
@@ -265,7 +265,7 @@ void CMeasureBerryPhase::CalculateU1FieldWilsonDirac()
 }
 
 
-void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& xprime, const CFieldGaugeSU3* pGauge)
+void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
     SFermionSource source;
     source.m_eSourceType = EFS_Point;
@@ -277,7 +277,7 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& x
     CFieldFermionKSSU3* sourcefield = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_pMomentumField->m_byFieldId));
     CFieldFermionKSSU3* momentumfield = dynamic_cast<CFieldFermionKSSU3*>(m_pMomentumField);
     sourcefield->InitialAsSource(source);
-    sourcefield->InverseD(pGauge);
+    sourcefield->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
 
     _kernelMomentumFieldKSSU3 << <block, threads >> > (
         sourcefield->m_pDeviceData,
@@ -288,13 +288,13 @@ void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& x
     sourcefield->Return();
 }
 
-void CMeasureBerryPhase::CalculateMomentumSpacePhiKS(const CFieldGaugeSU3* pGauge)
+void CMeasureBerryPhase::CalculateMomentumSpacePhiKS(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
     m_pMomentumField->InitialField(EFIT_Zero);
 
     //Use transilational invarience, we only calculate xprime = 0 (otherwise, we will have run over x')
     SSmallInt4 xprime(0, 0, 0, 0);
-    CalculateMomentumSpacePhiKSForPoint(xprime, pGauge);
+    CalculateMomentumSpacePhiKSForPoint(xprime, gaugeNum, bosonNum, gaugeFields, bosonFields);
 }
 
 void CMeasureBerryPhase::CalculateU1FieldKS()
@@ -308,7 +308,7 @@ void CMeasureBerryPhase::CalculateU1FieldKS()
         m_pU1Field->m_pDeviceData);
 }
 
-void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
+void CMeasureBerryPhase::CalculateBerryPhase()
 {
     const dim3 block(_HC_DecompX, _HC_DecompY, 1); 
     const dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
@@ -324,7 +324,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
     for (BYTE byT = 0; byT < _HC_Lt; ++byT)
     {
         _kernelBerryCurvatureU1 << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             _D_RealThreadBuffer
@@ -333,7 +333,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         res.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             1, 2,
@@ -343,7 +343,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         resXY.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             1, 3,
@@ -353,7 +353,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         resXZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             1, 4,
@@ -363,7 +363,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         resXT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             2, 3,
@@ -373,7 +373,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         resYZ.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             2, 4,
@@ -383,7 +383,7 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
         resYT.AddItem(appGetCudaHelper()->ReduceReal(_D_RealThreadBuffer, _HC_Volume_xyz));
 
         _kernelBerryCurvatureU1XY << <block, threads >> > (
-            byGaugeFieldId,
+            m_pU1Field->m_byFieldId,
             m_pU1Field->m_pDeviceData,
             byT,
             3, 4,
@@ -405,13 +405,15 @@ void CMeasureBerryPhase::CalculateBerryPhase(BYTE byGaugeFieldId)
 void CMeasureBerryPhase::AllocateBuffers()
 {
     m_pU1Field = new CFieldGaugeU1();
+
+    //TODO: Not create boundary condition for U1, use the one as same as the default gauge
+    m_pU1Field->m_byFieldId = 1;
     m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetGaugeFieldIdSingleField()));
 }
 
 CMeasureBerryPhase::~CMeasureBerryPhase()
 {
     appSafeDelete(m_pU1Field);
-    appSafeDelete(m_pGaugeFixing);
     m_pMomentumField->Return();
 }
 
@@ -422,49 +424,49 @@ void CMeasureBerryPhase::Initial(class CMeasurementManager* pOwner, class CLatti
     AllocateBuffers();
 }
 
-void CMeasureBerryPhase::OnConfigurationAcceptedSingleField(const CFieldGauge* pAcceptGauge, const CFieldGauge* )
+void CMeasureBerryPhase::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const*)
 {
-    if (m_bGuageFixing)
+    if (m_bGuageFixing && NULL != appGetLattice()->m_pGaugeFixing)
     {
-        if (NULL == m_pGaugeFixing)
+        TArray<CFieldGauge*> fixedgauges;
+        for (INT i = 0; i < gaugeNum; ++i)
         {
-            m_pGaugeFixing = dynamic_cast<CFieldGaugeSU3*>(pAcceptGauge->GetCopy());
-        }
-        else
-        {
-            pAcceptGauge->CopyTo(m_pGaugeFixing);
-        }
-        if (NULL != appGetLattice()->m_pGaugeFixing)
-        {
-            appGetLattice()->m_pGaugeFixing->GaugeFixing(m_pGaugeFixing);
+            CFieldGauge* fixedgauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(gaugeFields[i]));
+            appGetLattice()->m_pGaugeFixing->GaugeFixing(fixedgauge);
+            fixedgauges.AddItem(fixedgauge);
         }
 
         if (m_bWilsonDirac)
         {
-            CalculateMomentumSpacePhiWilsonDirac(m_pGaugeFixing);
+            CalculateMomentumSpacePhiWilsonDirac(gaugeNum, bosonNum, fixedgauges.GetData(), bosonFields);
             CalculateU1FieldWilsonDirac();
         }
         else
         {
-            CalculateMomentumSpacePhiKS(m_pGaugeFixing);
+            CalculateMomentumSpacePhiKS(gaugeNum, bosonNum, fixedgauges.GetData(), bosonFields);
             CalculateU1FieldKS();
+        }
+
+        for (INT i = 0; i < gaugeNum; ++i)
+        {
+            fixedgauges[i]->Return();
         }
     }
     else
     {
         if (m_bWilsonDirac)
         {
-            CalculateMomentumSpacePhiWilsonDirac(dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge));
+            CalculateMomentumSpacePhiWilsonDirac(gaugeNum, bosonNum, gaugeFields, bosonFields);
             CalculateU1FieldWilsonDirac();
         }
         else
         {
-            CalculateMomentumSpacePhiKS(dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge));
+            CalculateMomentumSpacePhiKS(gaugeNum, bosonNum, gaugeFields, bosonFields);
             CalculateU1FieldKS();
         }
     }
 
-    CalculateBerryPhase(pAcceptGauge->m_byFieldId);
+    CalculateBerryPhase();
 
     //Gather result
     if (m_bShowResult)

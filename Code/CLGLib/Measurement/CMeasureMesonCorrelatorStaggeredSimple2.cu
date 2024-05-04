@@ -121,10 +121,10 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwne
     m_bWallSource = iValue != 0;
 }
 
-void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* pStapleField)
 {
     BuildSource();
-    IniverseSource(pGaugeField);
+    IniverseSource(gn, bn, gs, bs);
 
     preparethread;
     if (HasOtherField())
@@ -365,12 +365,12 @@ void CMeasureMesonCorrelatorStaggeredSimple2::BuildSource()
  * if nf=2, the first three is D^{-1}s, the next three is Ddagger^{-1}s
  * if nf=1+1, the first 6 is D^{-1}(u,d), the next three is Ddagger^{-1}(u,d)s
  */
-void CMeasureMesonCorrelatorStaggeredSimple2::IniverseSource(const CFieldGauge* pGaugeField)
+void CMeasureMesonCorrelatorStaggeredSimple2::IniverseSource(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs)
 {
     INT totalNumOfSource = m_pSources.Num();
     for (INT color = 0; color < totalNumOfSource; ++color)
     {
-        m_pSources[color]->InverseDDdagger(pGaugeField);
+        m_pSources[color]->InverseDDdagger(gn, bn, gs, bs);
         //appGeneral(_T("byfield id: %d\n"), m_pSources[color]->m_byFieldId);
     }
 
@@ -378,13 +378,13 @@ void CMeasureMesonCorrelatorStaggeredSimple2::IniverseSource(const CFieldGauge* 
     {
         CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_pSources[color]->m_byFieldId));
         m_pSources[color]->CopyTo(pFermion);
-        pFermion->D(pGaugeField);
+        pFermion->D(gn, bn, gs, bs);
         m_pSources.AddItem(pFermion);
     }
 
     for (INT color = 0; color < totalNumOfSource; ++color)
     {
-        m_pSources[color]->Ddagger(pGaugeField);
+        m_pSources[color]->Ddagger(gn, bn, gs, bs);
     }
 }
 

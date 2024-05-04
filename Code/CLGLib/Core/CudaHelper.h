@@ -103,6 +103,8 @@ enum EConstIntId
     ECI_SummationDecompose,
     ECI_UseLogADefinition, // A = U.TA() ? or A = Log(U)
     ECI_OtherGaugeField,
+    ECI_GaugeFieldCount,
+    ECI_BosonFieldCount,
 
     ECI_Center,
 

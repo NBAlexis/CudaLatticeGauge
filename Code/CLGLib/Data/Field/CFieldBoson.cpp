@@ -11,12 +11,12 @@
 
 __BEGIN_NAMESPACE
 
-UBOOL CFieldBoson::ApplyOperator(EFieldOperator op, const CField* otherfield, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg, void* pOtherParameters)
+UBOOL CFieldBoson::ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg, void* pOtherParameters)
 {
     switch (op)
     {
     case EFO_F_D:
-        D(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+        D(gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
         return TRUE;
 
     default:

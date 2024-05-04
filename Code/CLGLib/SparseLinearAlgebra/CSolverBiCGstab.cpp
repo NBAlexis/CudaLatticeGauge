@@ -399,7 +399,9 @@ UBOOL CSLASolverBiCGStab::Solve1(CField* pFieldX, const CField* pFieldB, const C
 #endif
 
 //It is tested this is better, the main difference is to let p0 = r0, and rho = r0^* by Yousef Saad.
-UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     //CField* pB = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
@@ -447,7 +449,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
     {
         //appGeneral(_T(" ============================ pR ===================\n"));
         //pR->DebugPrintMe();
-        pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //-A x_0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //-A x_0
         //appGeneral(_T(" ============================ pR2 ===================\n"));
         //pR->DebugPrintMe();
         pR->AxpyPlus(pFieldB); //pR->AxpyPlus(pB); //b - A x_0
@@ -497,7 +499,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
             //Before this step, there is precondition for p
             //v(i) = A p(i)
             pP->CopyTo(pV);
-            pV->ApplyOperator(uiM, pGaugeFeild);
+            pV->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
 #if !_CLG_DOUBLEFLOAT
             alpha = cuCdiv(rho, pRh->Dot(pV));//alpha = rho / (rh dot v(i))
 #else
@@ -537,7 +539,7 @@ UBOOL CSLASolverBiCGStab::Solve(CField* pFieldX, const CField* pFieldB, const CF
 
             //t=As
             pS->CopyTo(pT);
-            pT->ApplyOperator(uiM, pGaugeFeild);
+            pT->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
 
 #if !_CLG_DOUBLEFLOAT
             omega = cuCdivf_cd_host(pS->Dot(pT), pT->Dot(pT).x);//omega = ts / tt

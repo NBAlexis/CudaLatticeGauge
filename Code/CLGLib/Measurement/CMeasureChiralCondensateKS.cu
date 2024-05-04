@@ -205,9 +205,12 @@ void CMeasureChiralCondensateKS::Initial(CMeasurementManager* pOwner, CLatticeDa
     m_pHostDistribution = (CLGComplex*)malloc(sizeof(CLGComplex) * (m_uiMaxR + 1));
 }
 
-void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4SingleField(
-    const class CFieldGauge* pAcceptGauge, 
-    const class CFieldGauge* pCorrespondingStaple, 
+void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4(
+    INT gaugeNum,
+    INT bosonNum,
+    const class CFieldGauge* const* pAcceptGauge, 
+    const class CFieldBoson* const* pAcceptBoson,
+    const class CFieldGauge* const* pCorrespondingStaple, 
     const class CFieldFermion* pZ4, 
     const class CFieldFermion* pInverseZ4, 
     UBOOL bStart, 
@@ -264,7 +267,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4SingleField(
         case CMTKSGamma54:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, (EGammaMatrix)(i - 1));
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, (EGammaMatrix)(i - 1));
             }
             break;
         case CMTKSSigma12:
@@ -272,38 +275,38 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4SingleField(
                 pF2W->CopyTo(pAfterApplied);
                 if (m_bMeasureSigma12)
                 {
-                    pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA12);
+                    pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA12);
                 }
             }
             break;
         case CMTKSSigma13:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA31);
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA31);
             }
             break;
         case CMTKSSigma14:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA41);
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA41);
             }
             break;
         case CMTKSSigma23:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA23);
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA23);
             }
             break;
         case CMTKSSigma24:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA42);
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA42);
             }
             break;
         case CMTKSSigma34:
             {
                 pF2W->CopyTo(pAfterApplied);
-                pAfterApplied->ApplyGammaKS(pAcceptGauge, SIGMA43);
+                pAfterApplied->ApplyGammaKS(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, SIGMA43);
             }
             break;
         case ConnectSusp:
@@ -311,7 +314,7 @@ void CMeasureChiralCondensateKS::OnConfigurationAcceptedZ4SingleField(
                 pF2W->CopyTo(pAfterApplied);
                 if (m_bMeasureConnect)
                 {
-                    pAfterApplied->InverseD(pAcceptGauge);
+                    pAfterApplied->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
                 }
             }
             break;
@@ -480,12 +483,12 @@ void CMeasureChiralCondensateKS::Reset()
     m_lstR.RemoveAll();
 }
 
-TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* gaugeFields, const class CFieldBoson* const* bosonFields, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
 {
     TArray<TArray<CLGComplex>> ret;
     CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(pooled1);
     CFieldFermionKS* pF2 = dynamic_cast<CFieldFermionKS*>(pooled2);
-    if (NULL == pF1 || NULL == pF2 || NULL == pAcceptGauge)
+    if (NULL == pF1 || NULL == pF2)
     {
         appCrucial(_T("CMeasureChiralCondensateKS only work with CFieldFermionKS"));
         return ret;
@@ -513,7 +516,7 @@ TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class
             source.m_byColorIndex = c;
             source.m_sSourcePoint = __hostSiteIndexToInt4(x);
             pF1->InitialAsSource(source);
-            pF1->InverseD(appGetLattice()->m_pGaugeField);
+            pF1->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
 
             for (BYTE i = 0; i < ChiralKSMax; ++i)
             {
@@ -530,7 +533,7 @@ TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class
                 case CMTKSGamma54:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, (EGammaMatrix)(i - 1));
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, (EGammaMatrix)(i - 1));
                     }
                     break;
                 case CMTKSSigma12:
@@ -538,38 +541,38 @@ TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class
                         pF1->CopyTo(pF2);
                         if (m_bMeasureSigma12)
                         {
-                            pF2->ApplyGammaKS(pAcceptGauge, SIGMA12);
+                            pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA12);
                         }
                     }
                     break;
                 case CMTKSSigma13:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA31);
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA31);
                     }
                     break;
                 case CMTKSSigma14:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA41);
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA41);
                     }
                     break;
                 case CMTKSSigma23:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA23);
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA23);
                     }
                     break;
                 case CMTKSSigma24:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA42);
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA42);
                     }
                     break;
                 case CMTKSSigma34:
                     {
                         pF1->CopyTo(pF2);
-                        pF2->ApplyGammaKS(pAcceptGauge, SIGMA43);
+                        pF2->ApplyGammaKS(gaugeNum, bosonNum, gaugeFields, bosonFields, SIGMA43);
                     }
                     break;
                 case ConnectSusp:
@@ -577,7 +580,7 @@ TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(const class
                         pF1->CopyTo(pF2);
                         if (m_bMeasureConnect)
                         {
-                            pF2->InverseD(pAcceptGauge);
+                            pF2->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
                         }
                     }
                     break;

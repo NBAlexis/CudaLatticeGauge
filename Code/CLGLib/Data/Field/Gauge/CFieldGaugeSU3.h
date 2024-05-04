@@ -113,6 +113,8 @@ public:
 
     deviceSU3* m_pDeviceData;
 
+    _GetData
+
 protected:
 
     void SetByArray(Real* array);

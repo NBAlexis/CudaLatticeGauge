@@ -11,6 +11,8 @@
 #ifndef _CLATTICEDATA_H_
 #define _CLATTICEDATA_H_
 
+#define _FIELDS appGetLattice()->m_pGaugeField.Num(), appGetLattice()->m_pBosonField.Num(), appGetLattice()->m_pGaugeField.GetData(), appGetLattice()->m_pBosonField.GetData()
+
 __BEGIN_NAMESPACE
 
 class CLGAPI CLatticeData
@@ -47,7 +49,8 @@ public:
     UINT m_uiRandomType;
     UINT m_uiRandomSeed;
 
-    class CFieldGauge* m_pGaugeField;
+    TArray<class CFieldGauge*> m_pGaugeField;
+    TArray<class CFieldBoson*> m_pBosonField;
     class CFieldGauge* m_pAphys;
     class CFieldGauge* m_pUpure;
 
@@ -92,6 +95,7 @@ public:
     class CFieldBoundary* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.Exist(byId) ? m_pActionMap.GetAt(byId) : NULL; }
     class CField* GetPooledFieldById(BYTE byId);
+    class CField* GetPooledCopy(const CField* pField);
     void ReCopyPooled() const;
     void ReCopyPooled(BYTE byId) const;
 

@@ -490,8 +490,9 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
 #endif
 
     //======= DMD =========
-
-    pF2W->InverseD(pAcceptGauge);
+    TArray<const CFieldGauge*> gauges;
+    gauges.AddItem(pAcceptGauge);
+    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
 
 
 #if _CLG_DOUBLEFLOAT
@@ -514,7 +515,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedZ4SingleField(
 
     //======= DMDMD =========
 
-    pF2W->InverseD(pAcceptGauge);
+    pF2W->InverseD(1, 0, gauges.GetData(), NULL);
 
 
 #if _CLG_DOUBLEFLOAT

@@ -69,7 +69,9 @@ void CSolverTFQMR::ReleaseBuffers()
 
 }
 
-UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     CField* pX = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
     CField* pD = appGetLattice()->GetPooledFieldById(pFieldB->m_byFieldId);
@@ -110,14 +112,14 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
     UBOOL bDone = FALSE;
     for (UINT i = 0; i < m_uiReTry; ++i)
     {
-        pV->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //-A x_0
+        pV->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //-A x_0
         pV->AxpyPlus(pFieldB); //pR->AxpyPlus(pB); //b - A x_0
         pV->CopyTo(pRh);
         pRh->Dagger();
 
         pV->CopyTo(pU);
         pV->CopyTo(pW);
-        pV->ApplyOperator(uiM, pGaugeFeild); //v0 = A u0
+        pV->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields); //v0 = A u0
         pV->CopyTo(pAU);
 
         Real thetaSq = F(0.0);
@@ -197,7 +199,7 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
                 pV->ScalarMultply(beta); //v = beta (Au(m) + beta v(m))
 
                 pU->CopyTo(pAU);
-                pAU->ApplyOperator(uiM, pGaugeFeild);
+                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
                 pV->AxpyPlus(pAU); //v = Au(m+1) + beta (Au(m) + beta v(m))
 
             }
@@ -205,7 +207,7 @@ UBOOL CSolverTFQMR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGa
             {
                 pU->Axpy(_make_cuComplex(-alpha.x, -alpha.y), pV);
                 pU->CopyTo(pAU);
-                pAU->ApplyOperator(uiM, pGaugeFeild);
+                pAU->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
             }
 
             if (0 == (j + 1) % m_uiDevationCheck)

@@ -451,10 +451,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
             {
                 INT path[3] = { j + 1, i + 1, -j - 1 };
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fFatFactor,
                     m_pDevicePathBuffer,
                     3,
@@ -463,10 +463,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
 
                 path[0] = - j - 1; path[2] = j + 1;
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fFatFactor,
                     m_pDevicePathBuffer,
                     3,
@@ -477,10 +477,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 //c12 terms
                 path[0] = i + 1; path[1] = j + 1; path[2] = j + 1;
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
                     3,
@@ -489,10 +489,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
 
                 path[0] = j + 1; path[1] = j + 1; path[2] = i + 1;
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
                     3,
@@ -501,10 +501,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
 
                 path[0] = i + 1; path[1] = -j - 1; path[2] = -j - 1;
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
                     3,
@@ -513,10 +513,10 @@ void CFieldFermionKSSU3P4::DerivateD0(
 
                 path[0] = -j - 1; path[1] = -j - 1; path[2] = i + 1;
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
-                OneLinkForce(
-                    (const deviceSU3*)pGaugeBuffer,
+                OneLinkForceS(
+                    pGaugeBuffer,
                     1,
-                    (deviceSU3*)pForce,
+                    pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
                     3,
@@ -558,12 +558,12 @@ void CFieldFermionKSSU3P4::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3P4::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3R\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appAnyToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appAnyToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appAnyToString(m_rMC.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("omega : ") + appAnyToString(m_fomega) + _T("\n");
-    sRet = sRet + tab + _T("c10 : ") + appAnyToString(m_fc10) + _T("\n");
-    sRet = sRet + tab + _T("c12 : ") + appAnyToString(m_fc12) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("omega : ") + appToString(m_fomega) + _T("\n");
+    sRet = sRet + tab + _T("c10 : ") + appToString(m_fc10) + _T("\n");
+    sRet = sRet + tab + _T("c12 : ") + appToString(m_fc12) + _T("\n");
     return sRet;
 }
 

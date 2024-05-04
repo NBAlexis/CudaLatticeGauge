@@ -26,7 +26,6 @@ public:
         , m_bSimpleVersion(FALSE)
         , m_pDeviceW1(NULL)
         , m_pDeviceW2(NULL)
-        , m_pGaugeFixing(NULL)
         , m_pDeviceSignTable(NULL)
         , m_pDeviceDeltaTable(NULL)
         , m_pDevicePropogators(NULL)
@@ -39,7 +38,7 @@ public:
     ~CMeasureMesonCorrelatorStaggered();
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
+    void OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* stp) override;
     void Report() override;
     void Reset() override;
 
@@ -59,10 +58,9 @@ protected:
     CFieldFermionKSSU3* m_pW2[24];
     deviceSU3Vector** m_pDeviceW1;
     deviceSU3Vector** m_pDeviceW2;
-    void CalculateSources(const CFieldGauge* pGauge);
+    void CalculateSources(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs);
 
     //uiSite
-    CFieldGauge* m_pGaugeFixing;
     void CalculatePropogators();
     void SimplerVersion();
 

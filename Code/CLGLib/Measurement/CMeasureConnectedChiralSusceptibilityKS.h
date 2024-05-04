@@ -27,7 +27,7 @@ public:
     }
     ~CMeasureConnectedSusceptibilityKS();
 
-    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
+    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField) override;
     void Report() override;
 
     UBOOL IsGaugeMeasurement() const override { return TRUE; }

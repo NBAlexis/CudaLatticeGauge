@@ -280,11 +280,11 @@ INT MeasurementEM(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Electric: ") + appAnyToString(CCommonData::m_fEz) + _T("\n");
-                                sFileContent = sFileContent + _T("Magnetic: ") + appAnyToString(CCommonData::m_fBz) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appAnyToString(pF1Light->m_f2am) + _T("\n");
-                                sFileContent = sFileContent + _T("Chage: ") + appAnyToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Light)->GetQ()) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Electric: ") + appToString(CCommonData::m_fEz) + _T("\n");
+                                sFileContent = sFileContent + _T("Magnetic: ") + appToString(CCommonData::m_fBz) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appToString(pF1Light->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Chage: ") + appToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Light)->GetQ()) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }
@@ -350,11 +350,11 @@ INT MeasurementEM(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Electric: ") + appAnyToString(CCommonData::m_fEz) + _T("\n");
-                                sFileContent = sFileContent + _T("Magnetic: ") + appAnyToString(CCommonData::m_fBz) + _T("\n");
-                                sFileContent = sFileContent + _T("Mass: ") + appAnyToString(pF1Heavy->m_f2am) + _T("\n");
-                                sFileContent = sFileContent + _T("Chage: ") + appAnyToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Heavy)->GetQ()) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Electric: ") + appToString(CCommonData::m_fEz) + _T("\n");
+                                sFileContent = sFileContent + _T("Magnetic: ") + appToString(CCommonData::m_fBz) + _T("\n");
+                                sFileContent = sFileContent + _T("Mass: ") + appToString(pF1Heavy->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Chage: ") + appToString(dynamic_cast<CFieldFermionKSSU3EM*>(pF1Heavy)->GetQ()) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }

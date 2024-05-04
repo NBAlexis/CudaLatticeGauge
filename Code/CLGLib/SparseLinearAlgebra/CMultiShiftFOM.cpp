@@ -93,7 +93,9 @@ void CMultiShiftFOM::ReleaseBuffers()
     }
 }
 
-UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     appPushLogDate(FALSE);
     assert(0 == m_lstVectors.Num());
@@ -162,7 +164,7 @@ UBOOL CMultiShiftFOM::Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& 
         {
             //w = A v[j]
             m_lstVectors[j]->CopyTo(pW);
-            pW->ApplyOperator(uiM, pGaugeFeild);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
             for (UINT k = 0; k <= j; ++k)
             {
 #if !_CLG_DOUBLEFLOAT

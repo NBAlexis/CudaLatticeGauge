@@ -28,7 +28,7 @@ public:
     */
     void MakeRandomMomentum() override;
 
-    void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     //void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     //void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
 
@@ -55,11 +55,7 @@ public:
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
     void FieldMultply(const CFieldBoson* x, UBOOL bConj = TRUE) override;
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex Dot(const CField* other) const override;
-#else
-    CLGComplex Dot(const CField* other) const override;
-#endif
 
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
@@ -67,6 +63,8 @@ public:
     CCString GetInfos(const CCString& tab) const override;
 
     CLGComplex* m_pDeviceData;
+
+    _GetData
 
 };
 

@@ -38,28 +38,46 @@ class CLGAPI CFieldFermion : public CField
 public:
     CFieldFermion();
 
-    virtual void PrepareForHMC(const CFieldGauge* pGauge) = 0;
+    virtual void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            PrepareForHMCS(pGauge);
+            return;
+        }
+        appCrucial(_T("PrepareForHMC not implemented\n"));
+    }
 
     /**
     * Calculate force can fail due to solver
     */
-    virtual UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
+    virtual UBOOL CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, CFieldGauge* const* pGaugeForce, CFieldBoson* const* pBosonForce, ESolverPhase ePhase) const
+    {
+        if (SingleField())
+        {
+            INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+            return CalculateForceS(gaugeFields[idx], pGaugeForce[idx], ePhase);
+        }
+        appCrucial(_T("CalculateForce not implemented\n"));
+        return FALSE;
+    }
 
-    UBOOL ApplyOperator(EFieldOperator op, const CField * otherfield, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override
+    UBOOL ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override
     {
         switch (op)
         {
         case EFO_F_D:
-            D(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+            D(gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
         case EFO_F_Ddagger:
-            Ddagger(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+            Ddagger(gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
         case EFO_F_DD:
-            DD(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+            DD(gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
         case EFO_F_DDdagger:
-            DDdagger(otherfield, eCoeffType, fCoeffReal, fCoeffImg);
+            DDdagger(gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
             return TRUE;
         case EFO_F_InverseD:
             if (EOCT_None != eCoeffType)
@@ -67,28 +85,28 @@ public:
                 appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
                 return FALSE;
             }
-            return InverseD(otherfield);
+            return InverseD(gaugeNum, bosonNum, pGauge, pBoson);
         case EFO_F_InverseDdagger:
             if (EOCT_None != eCoeffType)
             {
                 appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
                 return FALSE;
             }
-            return InverseDdagger(otherfield);
+            return InverseDdagger(gaugeNum, bosonNum, pGauge, pBoson);
         case EFO_F_InverseDDdagger:
             if (EOCT_None != eCoeffType)
             {
                 appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
                 return FALSE;
             }
-            return InverseDDdagger(otherfield);
+            return InverseDDdagger(gaugeNum, bosonNum, pGauge, pBoson);
         case EFO_F_InverseDD:
             if (EOCT_None != eCoeffType)
             {
                 appCrucial(_T("ApplyOperator, the operator %s with coefficient is not implimented yet.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
                 return FALSE;
             }
-            return InverseDDdagger(otherfield);
+            return InverseDDdagger(gaugeNum, bosonNum, pGauge, pBoson);
         case EFO_F_RationalD:
             {
                 class CRatinalApproximation* pRA = (class CRatinalApproximation*)(pOtherParameters);
@@ -97,18 +115,18 @@ public:
                     appCrucial(_T("ApplyOperator, the operator %s with CRatinalApproximation null.\n"), __ENUM_TO_STRING(EFieldOperator, op).c_str());
                     return FALSE;
                 }
-                return RationalApproximation(EFO_F_D, otherfield, pRA);
+                return RationalApproximation(EFO_F_D, gaugeNum, bosonNum, pGauge, pBoson, pRA);
             }
         case EFO_F_D_WithMass:
             {
                 Real* fMass = (Real*)pOtherParameters;
                 if (NULL == fMass)
                 {
-                    DWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DWithMass(gaugeNum, bosonNum, pGauge, pBoson, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
                 else
                 {
-                    DWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DWithMass(gaugeNum, bosonNum, pGauge, pBoson, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
             }
             return TRUE;
@@ -117,11 +135,11 @@ public:
                 Real* fMass = (Real*)pOtherParameters;
                 if (NULL == fMass)
                 {
-                    DdaggerWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DdaggerWithMass(gaugeNum, bosonNum, pGauge, pBoson, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
                 else
                 {
-                    DdaggerWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DdaggerWithMass(gaugeNum, bosonNum, pGauge, pBoson, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
             }
             return TRUE;
@@ -130,11 +148,11 @@ public:
                 Real* fMass = (Real*)pOtherParameters;
                 if (NULL == fMass)
                 {
-                    DDWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DDWithMass(gaugeNum, bosonNum, pGauge, pBoson, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
                 else
                 {
-                    DDWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DDWithMass(gaugeNum, bosonNum, pGauge, pBoson, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
             }
             return TRUE;
@@ -143,11 +161,11 @@ public:
                 Real* fMass = (Real*)pOtherParameters;
                 if (NULL == fMass)
                 {
-                    DDdaggerWithMass(otherfield, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DDdaggerWithMass(gaugeNum, bosonNum, pGauge, pBoson, CCommonData::m_fShiftedMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
                 else
                 {
-                    DDdaggerWithMass(otherfield, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
+                    DDdaggerWithMass(gaugeNum, bosonNum, pGauge, pBoson, *fMass, eCoeffType, fCoeffReal, fCoeffImg);
                 }
             }
             return TRUE;
@@ -159,70 +177,171 @@ public:
 
     virtual void ApplyGamma(EGammaMatrix eGamma) = 0;
 
-    virtual void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DDWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
-    virtual void DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) = 0;
+    virtual void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DS(pGauge, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("D not implemented\n"));
+    }
 
-    virtual UBOOL InverseD(const CField* pGauge) = 0;
-    virtual UBOOL InverseDdagger(const CField* pGauge) = 0;
-    virtual UBOOL InverseDD(const CField* pGauge) = 0;
-    virtual UBOOL InverseDDdagger(const CField* pGauge) = 0;
+    virtual void Ddagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DdaggerS(pGauge, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("Ddagger not implemented\n"));
+    }
+
+    virtual void DDdagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DDdaggerS(pGauge, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DDdagger not implemented\n"));
+    }
+    virtual void DD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DDS(pGauge, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DD not implemented\n"));
+    }
+    virtual void DWithMass(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DWithMassS(pGauge, fMass, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DWithMass not implemented\n"));
+    }
+    virtual void DdaggerWithMass(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DdaggerWithMassS(pGauge, fMass, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DdaggerWithMass not implemented\n"));
+    }
+    virtual void DDWithMass(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DDWithMassS(pGauge, fMass, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DDWithMass not implemented\n"));
+    }
+    virtual void DDdaggerWithMass(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        if (SingleField())
+        {
+            const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
+            DDdaggerWithMassS(pGauge, fMass, eCoeffType, fCoeffReal, fCoeffImg);
+            return;
+        }
+        appCrucial(_T("DDdaggerWithMass not implemented\n"));
+    }
+
+    virtual UBOOL InverseD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
+    virtual UBOOL InverseDdagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
+    virtual UBOOL InverseDD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
+    virtual UBOOL InverseDDdagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
     virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
-    virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const = 0;
 
-    virtual UBOOL RationalApproximation(EFieldOperator op, const CField* pGauge, const class CRatinalApproximation* pRational);
+    virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const = 0;
+    virtual UBOOL RationalApproximation(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const class CRatinalApproximation* pRational);
 
-#pragma region real operators
-
-    /**
-    * It seems no need to create a "Foprt" class like Bridge++
-    * TODO: this only support single gauge field...
-    */
-    virtual void DOperator(void* pTargetBuffer, const void * pBuffer, const void * pGaugeBuffer,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const = 0;
-    virtual void DerivateDOperator(void* pForce, const void * pDphi, const void * pDDphi, const void * pGaugeBuffer) const = 0;
-
-#pragma endregion
-
-    UBOOL IsGaugeField() const override { return FALSE; }
     UBOOL IsFermionField() const override { return TRUE; }
-
-    /**
-     * For even odd preconditioner
-     */
-    virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
-    virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
-
     UINT GetSiteCount() const { return m_uiSiteCount; }
 
 protected:
 
-    virtual UBOOL InverseD_eo(const CField*)
+#pragma region single field case
+
+    virtual void PrepareForHMCS(const CFieldGauge* pGauge)
     {
-        appCrucial(_T("Not implemented.\n"));
+        appCrucial(_T("PrepareForHMCS not implemented\n"));
+    }
+
+    virtual UBOOL CalculateForceS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const
+    {
+        appCrucial(_T("CalculateForceS not implemented\n"));
         return FALSE;
     }
 
-    virtual UBOOL InverseDdagger_eo(const CField*)
+    virtual void DS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
     {
-        appCrucial(_T("Not implemented.\n"));
-        return FALSE;
+        appCrucial(_T("DS not implemented\n"));
     }
 
-    virtual UBOOL InverseDDdagger_eo(const CField*)
+    virtual void DdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
     {
-        appCrucial(_T("Not implemented.\n"));
-        return FALSE;
+        appCrucial(_T("DdaggerS not implemented\n"));
     }
+
+    virtual void DDdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DDdaggerS not implemented\n"));
+    }
+
+    virtual void DDS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DDS not implemented\n"));
+    }
+
+    virtual void DWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DWithMassS not implemented\n"));
+    }
+
+    virtual void DdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DdaggerWithMassS not implemented\n"));
+    }
+
+    virtual void DDWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DDWithMassS not implemented\n"));
+    }
+
+    virtual void DDdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0))
+    {
+        appCrucial(_T("DDdaggerWithMassS not implemented\n"));
+    }
+
+    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
+    {
+        appCrucial(_T("DOperator not implemented\n"));
+    }
+
+    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+    {
+        appCrucial(_T("DerivateDOperator not implemented\n"));
+    }
+
+#pragma endregion
 
     UINT m_uiLinkeCount;
     UINT m_uiSiteCount;
-    SBYTE m_byEvenFieldId;
 };
 
 
@@ -251,9 +370,14 @@ __DEFINE_ENUM(EMeasureDiagnal,
     EMD_Max,
     )
 
-extern CLGAPI void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, const class CFieldGauge* pGauge, const class CFieldFermionWilsonSquareSU3* pFermion);
+extern CLGAPI void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    const class CFieldFermionWilsonSquareSU3* pFermion);
 
-extern CLGAPI void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, const class CFieldGauge* pGauge, const class CFieldFermionKSSU3* pFermion);
+extern CLGAPI void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson,
+    const class CFieldFermionKSSU3* pFermion);
+
 
 __END_NAMESPACE
 

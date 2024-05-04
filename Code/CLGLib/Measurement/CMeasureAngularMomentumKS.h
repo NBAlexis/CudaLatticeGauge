@@ -61,7 +61,7 @@ public:
     UBOOL IsGaugeMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
 
-    TArray<TArray<CLGComplex>> ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;
+    TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;
 
     static void ApplyOrbitalMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId);
     static void ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId);

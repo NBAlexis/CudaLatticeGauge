@@ -30,9 +30,13 @@ public:
 
     }
 
+protected:
+
     void DerivateD0(void* pForce, const void* pGaugeBuffer) const override;
     void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
+
+public:
 
     void InitialOtherParameters(CParameters& params) override;
     CCString GetInfos(const CCString& tab) const override;

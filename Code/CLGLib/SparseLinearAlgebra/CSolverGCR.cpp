@@ -82,7 +82,9 @@ void CSLASolverGCR::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     TArray<CField*> pP;
     TArray<CField*> pAP;
@@ -128,7 +130,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
     {
         //r = b - A x0, p0 = r
         pX->CopyTo(pR); 
-        pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //r = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //r = -A x0
         pR->AxpyPlus(pFieldB); //r = b-Ax0
         pR->CopyTo(pP[0]);
 
@@ -137,7 +139,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
             const UINT j = jj % m_uiMaxDim;
 
             pP[j]->CopyTo(pAP[j]);
-            pAP[j]->ApplyOperator(uiM, pGaugeFeild);
+            pAP[j]->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
             //appParanoiac(_T("length p = %f ap = %f r = %f\n"), pP[j]->Dot(pP[j]).x, length_AP[j], pR->Dot(pR).x);
 #if !_CLG_DOUBLEFLOAT
             length_AP[j] = static_cast<Real>(pAP[j]->Dot(pAP[j]).x);
@@ -180,7 +182,7 @@ UBOOL CSLASolverGCR::Solve(CField* pFieldX, const CField* pFieldB, const CFieldG
                 const UINT nextPjIndex = (jj + 1) % m_uiMaxDim;
                 pAP[j]->CopyTo(pP[nextPjIndex]);
                 pAP[j]->CopyTo(pAAP);
-                pAAP->ApplyOperator(uiM, pGaugeFeild);
+                pAAP->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
 
                 for (UINT k = 0; k < appMin(jj, m_uiMaxDim); ++k)
                 {

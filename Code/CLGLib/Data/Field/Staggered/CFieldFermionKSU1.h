@@ -53,48 +53,54 @@ public:
     CLGComplex Dot(const CField* other) const override;
 #endif
 
+protected:
+
     //pGauge must be gauge SU3
     //These are for Sparse linear algebra
-    void D(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DDWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    UBOOL InverseD(const CField* pGauge) override;
-    UBOOL InverseDdagger(const CField* pGauge) override;
-    UBOOL InverseDD(const CField* pGauge) override;
-    UBOOL InverseDDdagger(const CField* pGauge) override;
+    void DS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void DDdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+
+public:
+
     void ApplyGamma(EGammaMatrix eGamma) override;
-    void ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
+    TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const override;
+    void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) override;
+
+protected:
+
+    void ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma) override;
 
     //================= test anti-hermitian =========
-    UINT TestAntiHermitian(const CFieldGauge* pGauge) const override;
+    UINT TestAntiHermitianS(const CFieldGauge* pGauge) const override;
 
     //These are truely D or InverseD etc.
 
     /**
      * Use to calculate action, it is (D^+D)^{-1/4}
      */
-    void D_MD(const CField* pGauge) override;
-    void D0(const CField* pGauge) override;
-    void D_MC(const CField* pGauge) override;
+    void D0S(const CField* pGauge) override;
+    UBOOL CalculateForceS(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
 
-    void PrepareForHMC(const CFieldGauge* pGauge) override;
-    UBOOL CalculateForce(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const override;
+public:
 
     //For test only
-    void PrepareForHMCOnlyRandomize();
-    void PrepareForHMCNotRandomize(const CFieldGauge* pGauge);
+    void PrepareForHMCOnlyRandomize() override;
+    void PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) override;
 
     void InitialAsSource(const SFermionSource& sourceData) override;
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-    TArray<CFieldFermion*> GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const override;
+    
     CCString GetInfos(const CCString& tab) const override;
+
+protected:
 
     //============================
     //Override these two functions for KS
@@ -103,18 +109,25 @@ public:
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
     //============================
 
+public:
+
     /**
      * Do not override me
      */
     CLGComplex* m_pDeviceData;
 
+    _GetData
+
     #pragma region Help functions to implement higher orders
 
     void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) override;
-    void OneLink(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
+
+protected:
+
+    void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx, 
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) override;
-    void OneLinkForce(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
+    void OneLinkForceS(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const override;
 
     #pragma endregion

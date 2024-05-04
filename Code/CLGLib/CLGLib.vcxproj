@@ -54,7 +54,6 @@
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldBoson.h" />
-    <ClInclude Include="Data\Field\CFieldScalar.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGauge.h" />

@@ -34,26 +34,28 @@ void CActionFermionWilsonNf2::Initial(CLatticeData* pOwner, const CParameters& p
     }
 }
 
-void CActionFermionWilsonNf2::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT )
+void CActionFermionWilsonNf2::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, UINT iUpdateIterate)
 {
-    m_pFerimionField->PrepareForHMC(pGauge);
+    m_pFerimionField->PrepareForHMC(gaugeNum, bosonNum, gaugeFields, bosonFields);
 }
 
 /**
 * To make it constant, we need to build a few temp fields outside this class
 */
-UBOOL CActionFermionWilsonNf2::CalculateForceOnGaugeSingleField(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge * /*staple*/, ESolverPhase ePhase) const
+UBOOL CActionFermionWilsonNf2::CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
+    CFieldGauge* const* stapleFields, ESolverPhase ePhase) const
 {
-    return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
+    return m_pFerimionField->CalculateForce(gaugeNum, bosonNum, gaugeFields, bosonFields, gaugeForces, bosonForces, ePhase);
 }
 
-DOUBLE CActionFermionWilsonNf2::EnergySingleField(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
+DOUBLE CActionFermionWilsonNf2::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields)
 {
     //(D^-1 phi)^2
     CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
     assert(NULL != pPooled);
     m_pFerimionField->CopyTo(pPooled);
-    pPooled->InverseD(pGauge);
+    pPooled->InverseD(gaugeNum, bosonNum, gaugeFields, bosonFields);
     const cuDoubleComplex res = pPooled->Dot(pPooled);
 
     //pPooled->InverseDDdagger(pGauge);

@@ -38,7 +38,10 @@ public:
     virtual UBOOL Solve(TArray<CField*>& pFieldX,
         const TArray<CLGComplex>& cn,
         const CField* pFieldB,
-        const CFieldGauge* pGaugeFeild,
+        INT gaugeNum,
+        INT bosonNum,
+        const CFieldGauge* const* gaugeFields,
+        const CFieldBoson* const* bosonFields,
         EFieldOperator uiM,
         ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) = 0;

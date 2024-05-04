@@ -32,7 +32,8 @@ public:
 
     void Configurate(const CParameters& param) override;
     void AllocateBuffers(const CField* pField) override;
-    UBOOL Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, const CFieldGauge* pGaugeFeild,
+    UBOOL Solve(TArray<CField*>& pFieldX, const TArray<CLGComplex>& cn, const CField* pFieldB, 
+        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
         EFieldOperator uiM, ESolverPhase ePhase = ESP_Once, const CField* pStart = NULL) override;
 
 protected:

@@ -13,7 +13,9 @@ __BEGIN_NAMESPACE
 
 __CLGIMPLEMENT_CLASS(CSLASolverGMRESMDR)
 
-void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM)
+void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM)
 {
     QRFactorizationOfUk();
 
@@ -21,7 +23,7 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
     for (UINT i = 0; i < m_uiKDim; ++i)
     {
         m_lstU[i]->CopyTo(m_lstC[i]);
-        m_lstC[i]->ApplyOperator(uiM, pGaugeField);
+        m_lstC[i]->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
     }
 
     //m_pHostHmGm
@@ -120,7 +122,7 @@ void CSLASolverGMRESMDR::GenerateCUFirstTime(CField* pX, CField* pR, const CFiel
 
     //Initial X and R
     pX->CopyTo(pR);
-    pR->ApplyOperator(uiM, pGaugeField, EOCT_Minus); //r0 = -A x0
+    pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //r0 = -A x0
     pR->AxpyPlus(pFieldB); //r0 = b-Ax0
 
 #if !_CLG_DOUBLEFLOAT

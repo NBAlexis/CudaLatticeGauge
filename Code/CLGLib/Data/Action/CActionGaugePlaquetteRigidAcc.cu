@@ -380,9 +380,9 @@ CCString CActionGaugePlaquetteRigidAcc::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CActionGaugePlaquetteRigidAcc\n");
     sRet = sRet + CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Acc : ") + appAnyToString(CCommonData::m_fG) + _T("\n");
-    sRet = sRet + tab + _T("Dirichlet : ") + appAnyToString(m_bDirichlet) + _T("\n");
+    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Acc : ") + appToString(CCommonData::m_fG) + _T("\n");
+    sRet = sRet + tab + _T("Dirichlet : ") + appToString(m_bDirichlet) + _T("\n");
     return sRet;
 }
 

@@ -248,6 +248,7 @@ void CMeasure::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class C
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         OnConfigurationAcceptedSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx]);
     }
+    appCrucial(_T("OnConfigurationAccepted not implemented!\n"));
 }
 
 void CMeasure::SourceSanning(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const TArray<CFieldFermion*>& sources, const SSmallInt4& site)
@@ -257,6 +258,7 @@ void CMeasure::SourceSanning(INT gaugeNum, INT bosonNum, const class CFieldGauge
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         SourceSanningSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], sources, site);
     }
+    appCrucial(_T("SourceSanning not implemented!\n"));
 }
 
 void CMeasure::OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple, const class CFieldFermion* pZ4, const class CFieldFermion* pInverseZ4, UBOOL bStart, UBOOL bEnd)
@@ -266,6 +268,7 @@ void CMeasure::OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         OnConfigurationAcceptedZ4SingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], pZ4, pInverseZ4, bStart, bEnd);
     }
+    appCrucial(_T("OnConfigurationAcceptedZ4 not implemented!\n"));
 }
 
 void CMeasure::FillDataWithR_R(

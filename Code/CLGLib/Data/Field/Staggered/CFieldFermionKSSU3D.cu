@@ -266,11 +266,11 @@ void CFieldFermionKSSU3D::FixBoundary()
     _kernelDFermionKS_FixBoundary << <block, threads >> > (m_pDeviceData, m_byFieldId);
 }
 
-void CFieldFermionKSSU3D::PrepareForHMC(const CFieldGauge* pGauge)
+void CFieldFermionKSSU3D::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
 {
     InitialField(EFIT_RandomGaussian);
     FixBoundary();
-    D_MC(pGauge);
+    D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
     FixBoundary();
 
     if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
@@ -288,12 +288,12 @@ void CFieldFermionKSSU3D::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3D::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3D\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appAnyToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appAnyToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appAnyToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
 
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
-    sRet = sRet + tab + _T("boundary : [") + appAnyToString(boundary.x) + _T(", ") + appAnyToString(boundary.y) + _T(", ") + appAnyToString(boundary.z) + _T(", ") + appAnyToString(boundary.w) + _T("]\n");
+    sRet = sRet + tab + _T("boundary : [") + appToString(boundary.x) + _T(", ") + appToString(boundary.y) + _T(", ") + appToString(boundary.z) + _T(", ") + appToString(boundary.w) + _T("]\n");
     return sRet;
 }
 

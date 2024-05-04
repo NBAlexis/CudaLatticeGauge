@@ -107,7 +107,9 @@ void CSLASolverGMRES::ReleaseBuffers()
 
 }
 
-UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
+UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, 
+    INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    EFieldOperator uiM, ESolverPhase ePhase, const CField* pStart)
 {
     assert(0 == m_lstVectors.Num());
     for (UINT i = 0; i < m_uiMaxDim; ++i)
@@ -153,7 +155,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         //v[0] = r.normalize
         //s = x0
         pX->CopyTo(pR); //x0 need to be preserved
-        pR->ApplyOperator(uiM, pGaugeFeild, EOCT_Minus); //x0 = -A x0
+        pR->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields, EOCT_Minus); //x0 = -A x0
         pR->AxpyPlus(pFieldB); //x0 = b-Ax0
 #if !_CLG_DOUBLEFLOAT
         m_fBeta = _sqrtd(m_lstVectors[0]->Dot(m_lstVectors[0]).x);
@@ -167,7 +169,7 @@ UBOOL CSLASolverGMRES::Solve(CField* pFieldX, const CField* pFieldB, const CFiel
         {
             //w = A v[j]
             m_lstVectors[j]->CopyTo(pW);
-            pW->ApplyOperator(uiM, pGaugeFeild);
+            pW->ApplyOperator(uiM, gaugeNum, bosonNum, gaugeFields, bosonFields);
             for (UINT k = 0; k <= j; ++k)
             {
 #if !_CLG_DOUBLEFLOAT

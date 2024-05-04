@@ -2245,8 +2245,8 @@ CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
     CCString sRet;
     sRet = tab + _T("Name : CActionGaugePlaquetteRotating\n");
     sRet = sRet + CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
 
     sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0"));
     sRet = sRet + tab + _T("Clover : ") + (m_bCloverEnergy ? _T("1") : _T("0"));

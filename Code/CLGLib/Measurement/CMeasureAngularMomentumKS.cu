@@ -610,13 +610,13 @@ void CMeasureAngularMomentumKS::Reset()
     m_lstR.RemoveAll();
 }
 
-TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
 {
     TArray<TArray<CLGComplex>> ret;
     CFieldFermionKSSU3* pF1 = dynamic_cast<CFieldFermionKSSU3*>(pooled1);
     CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pooled2);
-    const CFieldGaugeSU3* pAcceptGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
-    if (NULL == pF1 || NULL == pF2 || NULL == pAcceptGauge)
+    const CFieldGaugeSU3* pAcceptGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(gs[0]);
+    if (NULL == pF1 || NULL == pF2 || NULL == pAcceptGaugeSU3)
     {
         appCrucial(_T("CMeasureAngularMomentumKS only work with CFieldFermionKSSU3 and CFieldGaugeSU3"));
         return ret;
@@ -635,7 +635,7 @@ TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(const class 
             source.m_byColorIndex = c;
             source.m_sSourcePoint = __hostSiteIndexToInt4(x);
             pF1->InitialAsSource(source);
-            pF1->InverseD(appGetLattice()->m_pGaugeField);
+            pF1->InverseD(gn, bn, gs, bs);
             
             for (BYTE i = 0; i < EAngularMeasureMax; ++i)
             {

@@ -999,8 +999,8 @@ CCString CActionGaugePlaquetteRotating3D::GetInfos(const CCString &tab) const
     CCString sRet;
     sRet = tab + _T("Name : CActionGaugePlaquetteRotating3D\n");
     sRet = sRet + CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appAnyToString(CCommonData::m_fBeta) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appAnyToString(m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
     return sRet;
 }
 

@@ -69,12 +69,14 @@ protected:
     void InitialRandom(class CParameters& params);
 
     //Optional
-    void CreateGaugeField(class CParameters& params) const;
-    void CreateGaugeBoundaryField(class CParameters& params) const;
+    void CreateGaugeFields(class CParameters& params) const;
     void CreateFermionFields(class CParameters& params) const;
-    void CreateFermionBoundaryField(class CParameters& params) const;
+    void CreateBosonFields(class CParameters& params) const;
+
+    //other gauge fields is to be removed...
     void CreateOtherGaugeFields(class CParameters& params) const;
-    void CreateOtherGaugeBoundaryFields(class CParameters& params) const;
+
+    void CreateBoundaryFields(class CParameters& params, const CCString& sDefaultName) const;
     void CreateIndexAndBoundary(class CParameters& params) const;
     void CreateActionList(class CParameters& params);
     void CreateUpdator(class CParameters& params) const;

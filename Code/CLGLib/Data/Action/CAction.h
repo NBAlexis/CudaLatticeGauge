@@ -52,12 +52,9 @@ public:
     * So the "pGauge" must be a copy of real gauge field, not the orignal one!
     * Can fail due to solver
     */
-    virtual UBOOL CalculateForceOnGauge(INT num, const CFieldGauge* const * gaugeFields, CFieldGauge* const* forceFields, CFieldGauge* const* stapleFields, ESolverPhase ePhase) const;
-
-    virtual UBOOL CalculateForceOnBoson(INT num, const CFieldBoson* const * bosonFields, CFieldBoson* const* bosonForces, ESolverPhase ePhase) const
-    {
-        return TRUE;
-    }
+    virtual UBOOL CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, 
+        CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
+        CFieldGauge* const* stapleFields, ESolverPhase ePhase) const;
 
     /**
     * Generate randoms

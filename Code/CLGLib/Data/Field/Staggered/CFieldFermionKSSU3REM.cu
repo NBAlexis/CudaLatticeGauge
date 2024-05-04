@@ -1036,7 +1036,7 @@ void CFieldFermionKSSU3REM::InitialOtherParameters(CParameters& params)
     }
 }
 
-void CFieldFermionKSSU3REM::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+void CFieldFermionKSSU3REM::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
 {
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(m_byEMFieldID));
     if (NULL == pU1)
@@ -1093,12 +1093,12 @@ void CFieldFermionKSSU3REM::CopyTo(CField* U) const
 CCString CFieldFermionKSSU3REM::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3REM\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appAnyToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appAnyToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appAnyToString(m_rMC.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("Omega : ") + appAnyToString(CCommonData::m_fOmega) + _T("\n");
-    sRet = sRet + tab + _T("Background Field ID : ") + appAnyToString(m_byEMFieldID) + _T("\n");
-    sRet = sRet + tab + _T("fQ : ") + appAnyToString(m_fQ) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Background Field ID : ") + appToString(m_byEMFieldID) + _T("\n");
+    sRet = sRet + tab + _T("fQ : ") + appToString(m_fQ) + _T("\n");
     return sRet;
 }
 

@@ -42,16 +42,20 @@ DOUBLE CAction::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
         return EnergySingleField(bBeforeEvolution, gaugeFields[idx], (NULL == stableFields) ? NULL : stableFields[idx]);
     }
+    appCrucial(_T("Energy not implemented!\n"));
     return 0.0;
 }
 
-UBOOL CAction::CalculateForceOnGauge(INT num, const CFieldGauge* const* gaugeFields, CFieldGauge* const* forceFields, CFieldGauge* const* stapleFields, ESolverPhase ePhase) const
+UBOOL CAction::CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
+    CFieldGauge* const* stapleFields, ESolverPhase ePhase) const
 {
     if (1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num())
     {
-        INT idx = CLatticeData::GetGaugeFieldIndexById(num, gaugeFields, m_byGaugeFieldIds[0]);
-        return CalculateForceOnGaugeSingleField(gaugeFields[idx], forceFields[idx], (NULL == stapleFields) ? NULL : stapleFields[idx], ePhase);
+        INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+        return CalculateForceOnGaugeSingleField(gaugeFields[idx], gaugeForces[idx], (NULL == stapleFields) ? NULL : stapleFields[idx], ePhase);
     }
+    appCrucial(_T("CalculateForce not implemented!\n"));
     return FALSE;
 }
 
@@ -62,12 +66,13 @@ void CAction::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
         PrepareForHMCSingleField(gaugeFields[idx], iUpdateIterate);
     }
+    appCrucial(_T("PrepareForHMC not implemented!\n"));
 }
 
 CCString CAction::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("GaugeFields : ") + appAnyToString(m_byGaugeFieldIds) + _T("\n");
-    sRet = sRet + tab + _T("BosonFields : ") + appAnyToString(m_byBosonFieldIds) + _T("\n");
+    CCString sRet = tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
+    sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;
 }
 

@@ -22,7 +22,7 @@ public:
     CMeasureMesonCorrelator() : CMeasure() {}
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
 
-    void OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField) override;
+    void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField) override;
     void Report() override;
     void Reset() override;
 
@@ -31,7 +31,7 @@ public:
 
 protected:
 
-    void CalculateCorrelator(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField);
+    void CalculateCorrelator(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField);
 
 public:
 

@@ -429,7 +429,7 @@ CCString CActionGaugePlaquetteGradient::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Beta : ");
     for (INT i = 0; i < _HC_Lzi; ++i)
     {
-        sRet = sRet + appAnyToString(m_fBetaArray[i]) + _T(", ");
+        sRet = sRet + appToString(m_fBetaArray[i]) + _T(", ");
     }
     sRet = sRet + _T("\n");
     return sRet;

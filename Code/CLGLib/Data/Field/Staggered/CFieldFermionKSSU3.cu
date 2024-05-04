@@ -370,16 +370,6 @@ _kernelInitialFermionKS(deviceSU3Vector* pDevicePtr, BYTE byFieldId, EFieldIniti
 }
 
 
-void CFieldFermionKSSU3::D_MD(const CField* pGauge)
-{
-    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rMD);
-}
-
-void CFieldFermionKSSU3::D_MC(const CField* pGauge)
-{
-    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rMC);
-}
-
 //void CFieldFermionKSSU3::D_EN(const CField* pGauge)
 //{
 //    RationalApproximation(EFO_F_DDdagger, pGauge, &m_rEN);
@@ -389,7 +379,7 @@ void CFieldFermionKSSU3::D_MC(const CField* pGauge)
 * generate phi by gaussian random.
 * phi = (D^+D)^{1/4} phi
 */
-void CFieldFermionKSSU3::PrepareForHMC(const CFieldGauge* pGauge)
+void CFieldFermionKSSU3::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
 {
     preparethread;
     _kernelInitialFermionKS << <block, threads >> > (
@@ -397,7 +387,7 @@ void CFieldFermionKSSU3::PrepareForHMC(const CFieldGauge* pGauge)
         m_byFieldId,
         EFIT_RandomGaussian);
 
-    D_MC(pGauge);
+    D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
 
     if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
     {
@@ -410,7 +400,7 @@ void CFieldFermionKSSU3::PrepareForHMC(const CFieldGauge* pGauge)
 /**
  * Use \sqrt{a} and b of rational A^{-1/2}
  */
-UBOOL CFieldFermionKSSU3::CalculateForce(
+UBOOL CFieldFermionKSSU3::CalculateForceS(
     const CFieldGauge* pGauge,
     CFieldGauge* pForce,
     ESolverPhase ePhase) const
@@ -448,7 +438,9 @@ UBOOL CFieldFermionKSSU3::CalculateForce(
     {
         shifts.AddItem(_make_cuComplex(m_rMD.m_lstB[i], F(0.0)));
     }
-    solver->Solve(phii, shifts, this, pGauge, EFO_F_DDdagger);
+    TArray<const CFieldGauge*> gaues;
+    gaues.AddItem(pGauge);
+    solver->Solve(phii, shifts, this, 1, 0, gaues.GetData(), NULL, EFO_F_DDdagger);
 
     const UINT uiBufferSize = sizeof(deviceSU3Vector*) * 2 * m_rMD.m_uiDegree;
     deviceSU3Vector** hostPointers = (deviceSU3Vector**)appAlloca(uiBufferSize);
@@ -458,11 +450,11 @@ UBOOL CFieldFermionKSSU3::CalculateForce(
         phi_ks->CopyTo(phiid[i]);
         if (m_bDiagonalMass)
         {
-            phiid[i]->D(pGauge);
+            phiid[i]->DS(pGauge);
         }
         else
         {
-            phiid[i]->D0(pGauge);
+            phiid[i]->D0S(pGauge);
         }
 
         hostPointers[i] = phi_ks->m_pDeviceData;
@@ -948,7 +940,7 @@ void CFieldFermionKSSU3::OnlyMass(void* pTarget, Real fm, EOperatorCoefficientTy
         );
 }
 
-void CFieldFermionKSSU3::OneLink(
+void CFieldFermionKSSU3::OneLinkS(
     const void* pGuage, 
     BYTE byGaugeFieldId, 
     void* pTarget,
@@ -981,7 +973,7 @@ void CFieldFermionKSSU3::OneLink(
         );
 }
 
-void CFieldFermionKSSU3::OneLinkForce(
+void CFieldFermionKSSU3::OneLinkForceS(
     const void* pGuage, 
     BYTE byGaugeFieldId, 
     void* pForce,
@@ -1259,11 +1251,7 @@ void CFieldFermionKSSU3::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexFermionKS << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
-#if !_CLG_DOUBLEFLOAT
 cuDoubleComplex CFieldFermionKSSU3::Dot(const CField* x) const
-#else
-CLGComplex CFieldFermionKSSU3::Dot(const CField* x) const
-#endif
 {
     if (NULL == x || EFT_FermionStaggeredSU3 != x->GetFieldType())
     {
@@ -1294,7 +1282,7 @@ void CFieldFermionKSSU3::ApplyGamma(EGammaMatrix eGamma)
     appCrucial(_T("Not implemented yet...\n"));
 }
 
-void CFieldFermionKSSU3::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
+void CFieldFermionKSSU3::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eGamma)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1330,7 +1318,7 @@ void CFieldFermionKSSU3::ApplyGammaKS(const CFieldGauge* pGauge, EGammaMatrix eG
 
 
 //Kai should be part of D operator
-void CFieldFermionKSSU3::D(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DS(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1356,7 +1344,7 @@ void CFieldFermionKSSU3::D(const CField* pGauge, EOperatorCoefficientType eCoeff
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1387,7 +1375,7 @@ void CFieldFermionKSSU3::DWithMass(const CField* pGauge, Real fMass, EOperatorCo
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::D0(const CField* pGauge)
+void CFieldFermionKSSU3::D0S(const CField* pGauge)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1410,7 +1398,7 @@ void CFieldFermionKSSU3::D0(const CField* pGauge)
     pPooled->Return();
 }
 
-UINT CFieldFermionKSSU3::TestAntiHermitian(const CFieldGauge* pGauge) const
+UINT CFieldFermionKSSU3::TestAntiHermitianS(const CFieldGauge* pGauge) const
 {
     const UINT uiVolume = _HC_Volume;
     const UINT uiRealVolume = 3 * uiVolume;
@@ -1428,7 +1416,7 @@ UINT CFieldFermionKSSU3::TestAntiHermitian(const CFieldGauge* pGauge) const
             source.m_eSourceType = EFS_Point;
             source.m_sSourcePoint = point;
             v->InitialAsSource(source);
-            v->D0(pGauge);
+            v->D0S(pGauge);
 
             checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceSU3Vector) * uiVolume, cudaMemcpyDeviceToHost));
 
@@ -1479,7 +1467,7 @@ UINT CFieldFermionKSSU3::TestAntiHermitian(const CFieldGauge* pGauge) const
 }
 
 //Kai should be part of D operator
-void CFieldFermionKSSU3::Ddagger(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1505,7 +1493,7 @@ void CFieldFermionKSSU3::Ddagger(const CField* pGauge, EOperatorCoefficientType 
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1536,7 +1524,7 @@ void CFieldFermionKSSU3::DdaggerWithMass(const CField* pGauge, Real fMass, EOper
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DDdagger(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DDdaggerS(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1563,7 +1551,7 @@ void CFieldFermionKSSU3::DDdagger(const CField* pGauge, EOperatorCoefficientType
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DD(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DDS(const CField* pGauge, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1590,7 +1578,7 @@ void CFieldFermionKSSU3::DD(const CField* pGauge, EOperatorCoefficientType eCoef
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DDdaggerWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DDdaggerWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1622,7 +1610,7 @@ void CFieldFermionKSSU3::DDdaggerWithMass(const CField* pGauge, Real fMass, EOpe
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::DDWithMass(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+void CFieldFermionKSSU3::DDWithMassS(const CField* pGauge, Real fMass, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -1647,58 +1635,6 @@ void CFieldFermionKSSU3::DDWithMass(const CField* pGauge, Real fMass, EOperatorC
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
-}
-
-UBOOL CFieldFermionKSSU3::InverseD(const CField* pGauge)
-{
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
-        return FALSE;
-    }
-    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    //Find a solver to solve me.
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_D);
-}
-
-UBOOL CFieldFermionKSSU3::InverseDdagger(const CField* pGauge)
-{
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
-        return FALSE;
-    }
-    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    //Find a solver to solve me.
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_Ddagger);
-}
-
-UBOOL CFieldFermionKSSU3::InverseDDdagger(const CField* pGauge)
-{
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
-        return FALSE;
-    }
-    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    //Find a solver to solve me.
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DDdagger);
-}
-
-UBOOL CFieldFermionKSSU3::InverseDD(const CField* pGauge)
-{
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-    {
-        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only play with gauge SU3!"));
-        return FALSE;
-    }
-    const CFieldGaugeSU3* pFieldSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-
-    //Find a solver to solve me.
-    return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, pFieldSU3, EFO_F_DD);
 }
 
 void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
@@ -1806,7 +1742,7 @@ BYTE* CFieldFermionKSSU3::CopyDataOutDouble(UINT& uiSize) const
     return saveData;
 }
 
-TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(const class CFieldGauge* pGauge, const SSmallInt4& site) const
+TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const
 {
     TArray<CFieldFermion*> ret;
     for (UINT j = 0; j < 3; ++j)
@@ -1833,7 +1769,8 @@ TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(const class 
         {
             ret[c]->m_fLength = ret[c]->Dot(ret[c]).x;
         }
-        ret[c]->InverseD(pGauge);
+
+        ret[c]->InverseD(gaugeNum, bosonNum, gaugeFields, pBoson);
     }
     return ret;
 }
@@ -1841,10 +1778,10 @@ TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(const class 
 CCString CFieldFermionKSSU3::GetInfos(const CCString& tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
-    sRet = sRet + tab + _T("Mass (2am) : ") + appAnyToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("Diagonal Mass : ") + appAnyToString(m_bDiagonalMass) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appAnyToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appAnyToString(m_rMC.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("Diagonal Mass : ") + appToString(m_bDiagonalMass) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
     return sRet;
 }
 
@@ -1857,9 +1794,9 @@ void CFieldFermionKSSU3::PrepareForHMCOnlyRandomize()
         EFIT_RandomGaussian);
 }
 
-void CFieldFermionKSSU3::PrepareForHMCNotRandomize(const CFieldGauge* pGauge)
+void CFieldFermionKSSU3::PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
 {
-    D_MC(pGauge);
+    D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
 }
 
 __END_NAMESPACE

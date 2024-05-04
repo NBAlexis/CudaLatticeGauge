@@ -20,7 +20,7 @@ CMeasureConnectedSusceptibilityKS::~CMeasureConnectedSusceptibilityKS()
 
 }
 
-void CMeasureConnectedSusceptibilityKS::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField)
 {
     m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
@@ -32,8 +32,8 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAcceptedSingleField(const
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->FixBoundary();
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(pGaugeField);
-    m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color1 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
@@ -42,8 +42,8 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAcceptedSingleField(const
     sour.m_byColorIndex = 1;
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(pGaugeField);
-    m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color2 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else
@@ -53,8 +53,8 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAcceptedSingleField(const
     sour.m_byColorIndex = 2;
     m_pSourceZero->InitialAsSource(sour);
     m_pSourceZero->CopyTo(pSourceZeroCopy);
-    m_pSourceZero->InverseD(pGaugeField);
-    m_pSourceZero->InverseD(pGaugeField);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+    m_pSourceZero->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
 #if !_CLG_DOUBLEFLOAT
     const cuDoubleComplex color3 = pSourceZeroCopy->Dot(m_pSourceZero);
 #else

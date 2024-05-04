@@ -34,11 +34,13 @@ public:
     //Use in test only
     void SetFermionFieldTest(CFieldFermionKS* pField) { m_pFerimionField = pField; }
 
-protected:
+    DOUBLE Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields) override;
+    UBOOL CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
+        CFieldGauge* const* stapleFields, ESolverPhase ePhase) const override;
+    void PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, UINT iUpdateIterate) override;
 
-    DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable) override;
-    UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const override;
-    void PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate) override;
+protected:
 
     class CFieldFermionKS* m_pFerimionField;
 };

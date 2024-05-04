@@ -492,7 +492,7 @@ public:
     UINT GetFieldCount() const { return m_uiFieldCount; }
     void SetFieldCount(UINT uiFieldCount) { m_uiFieldCount = uiFieldCount; }
 
-    virtual TArray<TArray<CLGComplex>> ExportDiagnal(const class CFieldGauge* pAcceptGauge, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
+    virtual TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, class CFieldFermion* pooled1, class CFieldFermion* pooled2)
     {
         TArray<TArray<CLGComplex>> ret;
         appCrucial(_T("ExportDiagnal not implemented\n"));

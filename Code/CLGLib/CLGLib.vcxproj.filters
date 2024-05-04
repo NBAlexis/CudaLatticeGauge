@@ -221,9 +221,6 @@
     <ClInclude Include="Core\CCudaBuffer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\CFieldScalar.h">
-      <Filter>Data\Field</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasureMesonCorrelator.h">
       <Filter>Measurement</Filter>
     </ClInclude>

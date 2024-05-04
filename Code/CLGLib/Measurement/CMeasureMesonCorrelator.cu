@@ -201,9 +201,9 @@ void CMeasureMesonCorrelator::Initial(CMeasurementManager* pOwner, CLatticeData*
     m_uiConfigurationCount = 0;
 }
 
-void CMeasureMesonCorrelator::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelator::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStaples)
 {
-    CalculateCorrelator(pGaugeField, pStapleField);
+    CalculateCorrelator(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson, pStaples);
 }
 
 void CMeasureMesonCorrelator::Report()
@@ -266,27 +266,39 @@ void CMeasureMesonCorrelator::Reset()
     m_lstResultsLastConf.RemoveAll();
 }
 
-void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, const CFieldGauge* pStaple)
+void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStaple)
 {
-    if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
-    {
-        appCrucial(_T("CMeasureMesonCorrelator only implemented with gauge SU3!\n"));
-        return;
-    }
-
-    CFieldGauge* pCopyGauge = NULL;
-    const CFieldGauge* pGaugeField = NULL;
+    //CFieldGauge* pCopyGauge = NULL;
+    //const CFieldGauge* pGaugeField = NULL;
+    TArray<const CFieldGauge*> gauges;
+    TArray<CFieldGauge*> returngauges;
     if (m_bNeedSmearing && NULL != appGetGaugeSmearing())
     {
-        pCopyGauge = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
-        CFieldGaugeSU3* pCopyStaple = dynamic_cast<CFieldGaugeSU3*>(pStaple->GetCopy());
-        appGetGaugeSmearing()->GaugeSmearing(pCopyGauge, pCopyStaple);
-        appSafeDelete(pCopyStaple);
-        pGaugeField = pCopyGauge;
+        for (INT i = 0; i < gaugeNum; ++i)
+        {
+            CFieldGauge* pCopyGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pAcceptGauge[i]));
+            returngauges.AddItem(pCopyGauge);
+            CFieldGauge* pCopyStaple = NULL;
+            if (NULL != pStaple)
+            {
+                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(pStaple[i]));
+            }
+            else
+            {
+                pCopyStaple = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledFieldById(pStaple[i]->m_byFieldId));
+                pCopyGauge->CalculateOnlyStaple(pCopyStaple);
+            }
+            appGetGaugeSmearing()->GaugeSmearing(pCopyGauge, pCopyStaple);
+            gauges.AddItem(pCopyGauge);
+            pCopyStaple->Return();
+        }
     }
     else
     {
-        pGaugeField = pGauge;
+        for (INT i = 0; i < gaugeNum; ++i)
+        {
+            gauges.AddItem(pAcceptGauge[i]);
+        }
     }
 
     CFieldFermionWilsonSquareSU3* pFermionSources[12];
@@ -320,7 +332,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
             {
                 pFermionSources[s * 3 + c]->m_fLength = pFermionSources[s * 3 + c]->Dot(pFermionSources[s * 3 + c]).x;
             }
-            pFermionSources[s * 3 + c]->InverseD(pGaugeField);
+            pFermionSources[s * 3 + c]->InverseD(gaugeNum, bosonNum, gauges.GetData(), pAcceptBoson);
             pDevicePtr[s * 3 + c] = pFermionSources[s * 3 + c]->m_pDeviceData;
         }
     }
@@ -401,7 +413,10 @@ void CMeasureMesonCorrelator::CalculateCorrelator(const CFieldGauge* pGauge, con
     }
     checkCudaErrors(cudaFree(ppDevicePtr));
 
-    appSafeDelete(pCopyGauge);
+    for (INT i = 0; i < returngauges.Num(); ++i)
+    {
+        returngauges[i]->Return();
+    }
 }
 
 

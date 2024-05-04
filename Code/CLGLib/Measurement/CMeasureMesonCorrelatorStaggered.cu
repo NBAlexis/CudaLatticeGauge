@@ -439,7 +439,7 @@ void CMeasureMesonCorrelatorStaggered::InitialSignTable()
     checkCudaErrors(cudaMemcpy(m_pDeviceDeltaTable, m_pDeltaTable, sizeof(BYTE) * 20, cudaMemcpyHostToDevice));
 }
 
-void CMeasureMesonCorrelatorStaggered::CalculateSources(const CFieldGauge* pGauge)
+void CMeasureMesonCorrelatorStaggered::CalculateSources(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs)
 {
     for (BYTE shift = 0; shift < 8; ++shift)
     {
@@ -453,11 +453,11 @@ void CMeasureMesonCorrelatorStaggered::CalculateSources(const CFieldGauge* pGaug
             source.m_sSourcePoint = SSmallInt4(0, 0, 0, 0);
             m_pW1[idx]->InitialAsSource(source);
             appParanoiac(_T("generating source(%d)...\n"), idx);
-            m_pW1[idx]->InverseDDdagger(pGauge);
+            m_pW1[idx]->InverseDDdagger(gn, bn, gs, bs);
             m_pW1[idx]->CopyTo(m_pW2[idx]);
 
-            m_pW1[idx]->Ddagger(pGauge);
-            m_pW2[idx]->D(pGauge);
+            m_pW1[idx]->Ddagger(gn, bn, gs, bs);
+            m_pW2[idx]->D(gn, bn, gs, bs);
         }
     }
 }
@@ -611,7 +611,6 @@ CMeasureMesonCorrelatorStaggered::~CMeasureMesonCorrelatorStaggered()
     checkCudaErrors(cudaFree(m_pDevicePropogatorsEveryTimeSlice));
 
     appSafeFree(m_pResPropogators);
-    appSafeDelete(m_pGaugeFixing);
 }
 
 void CMeasureMesonCorrelatorStaggered::Initial(CMeasurementManager* pOwner, CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
@@ -629,7 +628,7 @@ void CMeasureMesonCorrelatorStaggered::Initial(CMeasurementManager* pOwner, CLat
     InitialSignTable();
 }
 
-void CMeasureMesonCorrelatorStaggered::OnConfigurationAcceptedSingleField(const CFieldGauge* pGaugeField, const CFieldGauge* pStapleField)
+void CMeasureMesonCorrelatorStaggered::OnConfigurationAccepted(INT gn, INT bn, const CFieldGauge* const* gs, const CFieldBoson* const* bs, const CFieldGauge* const* stp)
 {
     for (BYTE i = 0; i < 24; ++i)
     {
@@ -637,21 +636,23 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAcceptedSingleField(const 
         m_pW2[i] = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     }
 
-    if (m_bGaugeFixing)
+    if (m_bGaugeFixing && NULL != appGetLattice()->m_pGaugeFixing)
     {
-        if (NULL == m_pGaugeFixing)
+        TArray<CFieldGauge*> fixedgauges;
+        for (INT i = 0; i < gn; ++i)
         {
-            m_pGaugeFixing = dynamic_cast<CFieldGauge*>(pGaugeField->GetCopy());
+            CFieldGauge* fixedgauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(gs[i]));
+            appGetLattice()->m_pGaugeFixing->GaugeFixing(fixedgauge);
+            fixedgauges.AddItem(fixedgauge);
         }
-        else
+
+        CalculateSources(gn, bn, fixedgauges.GetData(), bs);
+
+        for (INT i = 0; i < gn; ++i)
         {
-            pGaugeField->CopyTo(m_pGaugeFixing);
+            fixedgauges[i]->Return();
         }
-        if (NULL != appGetLattice()->m_pGaugeFixing)
-        {
-            appGetLattice()->m_pGaugeFixing->GaugeFixing(m_pGaugeFixing);
-        }
-        CalculateSources(m_pGaugeFixing);
+
         if (m_bSimpleVersion)
         {
             SimplerVersion();
@@ -663,7 +664,7 @@ void CMeasureMesonCorrelatorStaggered::OnConfigurationAcceptedSingleField(const 
     }
     else
     {
-        CalculateSources(pGaugeField);
+        CalculateSources(gn, bn, gs, bs);
         if (m_bSimpleVersion)
         {
             SimplerVersion();

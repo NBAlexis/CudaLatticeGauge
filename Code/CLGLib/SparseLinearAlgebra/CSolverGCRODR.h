@@ -39,7 +39,7 @@ public:
     UBOOL Solve(
         CField* pFieldX, 
         const CField* pFieldB, 
-        const CFieldGauge* pGaugeFeild, 
+        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
         EFieldOperator uiM, 
         ESolverPhase ePhase = ESP_Once,
         const CField* pStart = NULL) override;
@@ -48,13 +48,15 @@ protected:
 
     void FieldSolveY(TArray<class CField*>& resultY, const CLGComplex* R, UINT uiDim);
 
-    void QRFactorAY(const class CFieldGauge* pGaugeField, EFieldOperator uiM);
+    void QRFactorAY(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, EFieldOperator uiM);
 
     void FindPk1() const;
 
     void FindPk2();
 
-    virtual void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeField, EFieldOperator uiM);
+    virtual void GenerateCUFirstTime(CField* pX, CField* pR, const CField* pFieldB, 
+        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        EFieldOperator uiM);
     void GenerateCU(UBOOL bUpdateCk, UBOOL bJustAfterGMRES);
     void NormUkAndSetD();
     void OrthognalXR(CField* pX, CField* pR, CField* pTmp);
@@ -65,7 +67,9 @@ protected:
     /**
     * m_pHostHmGm set
     */
-    void FirstTimeGMERESSolve(CField* pFieldX, CField* pR, const CField* pFieldB, const CFieldGauge* pGaugeFeild, EFieldOperator uiM);
+    void FirstTimeGMERESSolve(CField* pFieldX, CField* pR, const CField* pFieldB, 
+        INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+        EFieldOperator uiM);
 
     class CLinearAlgebraHelper* m_pHelper;
 

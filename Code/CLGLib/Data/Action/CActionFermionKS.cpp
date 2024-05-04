@@ -34,20 +34,22 @@ void CActionFermionKS::Initial(CLatticeData* pOwner, const CParameters& param, B
     }
 }
 
-void CActionFermionKS::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT )
+void CActionFermionKS::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, UINT iUpdateIterate)
 {
-    m_pFerimionField->PrepareForHMC(pGauge);
+    m_pFerimionField->PrepareForHMC(gaugeNum, bosonNum, gaugeFields, bosonFields);
 }
 
 /**
 * To make it constant, we need to build a few temp fields outside this class
 */
-UBOOL CActionFermionKS::CalculateForceOnGaugeSingleField(const CFieldGauge* pGauge, CFieldGauge* pForce, CFieldGauge * /*staple*/, ESolverPhase ePhase) const
+UBOOL CActionFermionKS::CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields,
+    CFieldGauge* const* gaugeForces, CFieldBoson* const* bosonForces,
+    CFieldGauge* const* stapleFields, ESolverPhase ePhase) const
 {
-    return m_pFerimionField->CalculateForce(pGauge, pForce, ePhase);
+    return m_pFerimionField->CalculateForce(gaugeNum, bosonNum, gaugeFields, bosonFields, gaugeForces, bosonForces, ePhase);
 }
 
-DOUBLE CActionFermionKS::EnergySingleField(UBOOL, const CFieldGauge* pGauge, const CFieldGauge*)
+DOUBLE CActionFermionKS::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields, const CFieldGauge* const* stableFields)
 {
     //[ (DD)^(-1/4) phi ]^2
     
@@ -59,7 +61,7 @@ DOUBLE CActionFermionKS::EnergySingleField(UBOOL, const CFieldGauge* pGauge, con
 
     CFieldFermionKS* pPooled = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(static_cast<BYTE>(m_pFerimionField->m_byFieldId)));
     m_pFerimionField->CopyTo(pPooled);
-    pPooled->D_MD(pGauge);
+    pPooled->D_MD(gaugeNum, bosonNum, gaugeFields, bosonFields);
     const cuDoubleComplex res = pPooled->Dot(m_pFerimionField);
 
     appDetailed(_T("CActionFermionKS : Energy = %f%s%fi\n"), res.x, res.y > 0 ? "+" : " ", res.y);

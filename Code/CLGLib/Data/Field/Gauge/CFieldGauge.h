@@ -96,7 +96,7 @@ public:
 #pragma endregion
 
 
-    UBOOL ApplyOperator(EFieldOperator , const CField*, EOperatorCoefficientType , Real , Real, void* otherParameter = NULL) override
+    UBOOL ApplyOperator(EFieldOperator , INT , INT , const CFieldGauge* const* , const CFieldBoson* const* , EOperatorCoefficientType , Real , Real , void* ) override
     {
         appCrucial("CFieldGauge: Do Operator implimented yet");
         return FALSE;
