@@ -125,7 +125,7 @@ INT Measurement(CParameters& params)
 
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
 
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     //CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
@@ -211,15 +211,13 @@ INT Measurement(CParameters& params)
                 }
             }
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
                 case EAMJ_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EAMJ_Chiral:
@@ -236,7 +234,7 @@ INT Measurement(CParameters& params)
                         }
                         pF1Light->FixBoundary();
                         pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Light->InverseD(_FIELDS);
                         pF1Light->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -260,7 +258,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,

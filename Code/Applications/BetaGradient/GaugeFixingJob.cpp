@@ -110,9 +110,9 @@ INT GaugeFixing(CParameters& params)
                 {
                     sSaveFile.Format(_T("%s/%s/%s_%s_%d.con"), sCheckSubFolderPrefix.c_str(), FolderList[uiOmega].c_str(), sSavePrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 }
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, eLoadType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sSaveFile, eLoadType);
 #if !_CLG_DOUBLEFLOAT
-                const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                 if (fRes >= 0.0 && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
 #else
                 const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
@@ -136,8 +136,8 @@ INT GaugeFixing(CParameters& params)
                     if (fRes >= F(0.0) && fRes < F(0.01))
                     {
                         appGeneral(_T("\nNot good enough %d : %d \n"), uiOmega, uiIndex);
-                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                        appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                        appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                     }
                     else
                     {
@@ -151,9 +151,9 @@ INT GaugeFixing(CParameters& params)
                         {
                             sLoadFile.Format(_T("%s_%s_%d.con"), sLoadPrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                         }
-                        appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
-                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                        appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                        appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
+                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                        appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                     }
                 }
                 else
@@ -182,9 +182,9 @@ INT GaugeFixing(CParameters& params)
                 }
                 sSaveFile.Format(_T("%s_%s_%d.con"), sSavePrefix.c_str(), FileList[uiOmega].c_str(), uiIndex);
                 appGeneral(_T("Fixing %s : %d \n"), FileList[uiOmega].c_str(), uiIndex);
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
-                appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
+                appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
             }
         }
     }

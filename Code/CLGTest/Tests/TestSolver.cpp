@@ -19,9 +19,9 @@ UINT TestSolver(CParameters& params)
     CFieldFermionWilsonSquareSU3* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pField);
     CFieldFermionWilsonSquareSU3* pResult1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
     const Real fLengthOfPhi = pResult1->DotReal(pResult1).x;
-    pResult1->D(appGetLattice()->m_pGaugeField);
+    pResult1->D(_FIELDS);
     const Real fLengthOfDPhi = pResult1->DotReal(pResult1).x;
-    pResult1->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
+    pResult1->ApplyOperator(EFO_F_InverseD, _FIELDS);
     pResult1->AxpyMinus(pFermion);
     const Real fError1 = _cuCabsf(pResult1->DotReal(pResult1));
     appGeneral(_T("| phi |^2 = %8.18f;  | D phi |^2 = %8.18f\n"), fLengthOfPhi, fLengthOfDPhi);
@@ -33,8 +33,8 @@ UINT TestSolver(CParameters& params)
     
     CFieldFermionWilsonSquareSU3* pResult2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
-    pResult2->ApplyOperator(EFO_F_InverseD, appGetLattice()->m_pGaugeField);
-    pResult2->D(appGetLattice()->m_pGaugeField);
+    pResult2->ApplyOperator(EFO_F_InverseD, _FIELDS);
+    pResult2->D(_FIELDS);
     pResult2->AxpyMinus(pFermion);
     const Real fError2 = _cuCabsf(pResult2->DotReal(pResult2));
     appGeneral(_T("| phi |^2 = %8.18f;  | D phi |^2 = %8.18f\n"), fLengthOfPhi, fLengthOfDPhi);
@@ -46,9 +46,9 @@ UINT TestSolver(CParameters& params)
 
     CFieldFermionWilsonSquareSU3* pResult3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
-    pResult3->Ddagger(appGetLattice()->m_pGaugeField);
+    pResult3->Ddagger(_FIELDS);
     const Real fLengthOfDdaggerPhi = pResult1->DotReal(pResult1).x;
-    pResult3->ApplyOperator(EFO_F_InverseDdagger, appGetLattice()->m_pGaugeField);
+    pResult3->ApplyOperator(EFO_F_InverseDdagger, _FIELDS);
     pResult3->AxpyMinus(pFermion);
     const Real fError3 = _cuCabsf(pResult3->DotReal(pResult3));
     appGeneral(_T("| phi |^2 = %8.18f;  | D+ phi |^2 = %8.18f\n"), fLengthOfPhi, fLengthOfDdaggerPhi);
@@ -60,8 +60,8 @@ UINT TestSolver(CParameters& params)
 
     CFieldFermionWilsonSquareSU3* pResult4 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
-    pResult4->ApplyOperator(EFO_F_InverseDdagger, appGetLattice()->m_pGaugeField);
-    pResult4->Ddagger(appGetLattice()->m_pGaugeField);
+    pResult4->ApplyOperator(EFO_F_InverseDdagger, _FIELDS);
+    pResult4->Ddagger(_FIELDS);
     pResult4->AxpyMinus(pFermion);
     const Real fError4 = _cuCabsf(pResult4->DotReal(pResult4));
     appGeneral(_T("| phi |^2 = %8.18f;  | D+ phi |^2 = %8.18f\n"), fLengthOfPhi, fLengthOfDdaggerPhi);
@@ -73,9 +73,9 @@ UINT TestSolver(CParameters& params)
 
     CFieldFermionWilsonSquareSU3* pResult5 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
-    pResult5->DDdagger(appGetLattice()->m_pGaugeField);
+    pResult5->DDdagger(_FIELDS);
     const Real fDDdaggerPhi = pResult5->DotReal(pResult5).x;
-    pResult5->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
+    pResult5->ApplyOperator(EFO_F_InverseDDdagger, _FIELDS);
     pResult5->AxpyMinus(pFermion);
     const Real fError5 = _cuCabsf(pResult5->DotReal(pResult5));
     appGeneral(_T("| phi |^2 = %8.18f;  | DD+ phi |^2 = %8.18f\n"), fLengthOfPhi, fDDdaggerPhi);
@@ -87,8 +87,8 @@ UINT TestSolver(CParameters& params)
 
     CFieldFermionWilsonSquareSU3* pResult6 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(pFermion->GetCopy());
 
-    pResult6->ApplyOperator(EFO_F_InverseDDdagger, appGetLattice()->m_pGaugeField);
-    pResult6->DDdagger(appGetLattice()->m_pGaugeField);
+    pResult6->ApplyOperator(EFO_F_InverseDDdagger, _FIELDS);
+    pResult6->DDdagger(_FIELDS);
     pResult6->AxpyMinus(pFermion);
     const Real fError6 = _cuCabsf(pResult6->DotReal(pResult6));
     appGeneral(_T("| phi |^2 = %8.18f;  | DD+ phi |^2 = %8.18f\n"), fLengthOfPhi, fDDdaggerPhi);

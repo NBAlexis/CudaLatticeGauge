@@ -202,20 +202,18 @@ INT MeasureRW(CParameters& params)
 
             if (bFreeFermion)
             {
-                appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+                appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Identity);
             }
             else
             {
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
             }
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
             case EGMJRW_Polyakov:
             {
-                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                pPL->OnConfigurationAccepted(_FIELDS, NULL);
             }
             break;
             case EGMJRW_Chiral:
@@ -232,7 +230,7 @@ INT MeasureRW(CParameters& params)
                     }
                     pF1Light->FixBoundary();
                     pF1Light->CopyTo(pF2Light);
-                    pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                    pF1Light->InverseD(_FIELDS);
                     pF1Light->FixBoundary();
                     if (bSaveFermion)
                     {
@@ -256,7 +254,7 @@ INT MeasureRW(CParameters& params)
                     }
 
                     pCCLight->OnConfigurationAcceptedZ4(
-                        1, 0, gauge.GetData(), NULL,
+                        _FIELDS,
                         NULL,
                         pF2Light,
                         pF1Light,
@@ -272,7 +270,7 @@ INT MeasureRW(CParameters& params)
                     //appGeneral(_T("debug gamma4 : %f, %f\n"), pF1Light->m_fCoeffGamma4, pF2Light->m_fCoeffGamma4);
                     CCString sFileDiagnal;
                     sFileDiagnal.Format(_T("%s_diagnal_Nt%d_IC%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                    TArray<TArray<CLGComplex>> lightdiagnal = pCCLight->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Light, pF2Light);
+                    TArray<TArray<CLGComplex>> lightdiagnal = pCCLight->ExportDiagnal(_FIELDS, pF1Light, pF2Light);
                     WriteStringFileComplexArray2(sFileDiagnal, lightdiagnal);
                 }
                 break;

@@ -104,9 +104,9 @@ INT GaugeFixing(CParameters& params)
                 {
                     sSaveFile.Format(_T("%s/O%d/%sRotate_Nt%d_O%d_%d.con"), sCheckSubFolderPrefix.c_str(), uiOmega, sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 }
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, eLoadType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sSaveFile, eLoadType);
 #if !_CLG_DOUBLEFLOAT
-                const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                 if (fRes >= 0.0 && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
 #else
                 const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
@@ -130,8 +130,8 @@ INT GaugeFixing(CParameters& params)
                     if (fRes >= F(0.0) && fRes < F(0.01))
                     {
                         appGeneral(_T("\nNot good enough O%d : %d \n"), uiOmega, uiIndex);
-                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                        appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                        appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                     }
                     else
                     {
@@ -145,9 +145,9 @@ INT GaugeFixing(CParameters& params)
                         {
                             sLoadFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sLoadPrefix.c_str(), uiNt, uiOmega, uiIndex);
                         }
-                        appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
-                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                        appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                        appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
+                        appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                        appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
                     }
                 }
                 else
@@ -176,9 +176,9 @@ INT GaugeFixing(CParameters& params)
                 }
                 sSaveFile.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, uiIndex);
                 appGeneral(_T("Fixing O%d : %d \n"), uiOmega, uiIndex);
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, eLoadType);
-                appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile, eSaveType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, eLoadType);
+                appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile, eSaveType);
             }
         }
     }

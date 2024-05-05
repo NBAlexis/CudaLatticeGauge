@@ -43,7 +43,7 @@ INT TestAngularMomentum(CParameters& params)
         const Real omega = F(0.02) * i;
         appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
         pGauageAction->SetOmega(omega);
-        appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+        appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);
         while (appGetLattice()->m_pUpdator->GetConfigurationCount() < iBeforeEquib)
@@ -79,7 +79,7 @@ INT TestAngularMomentum(CParameters& params)
 
                 //=================================
                 //Save config
-                appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
 
 
                 uiLastAccept = uiAcce;

@@ -451,20 +451,18 @@ INT MeasurePolyakovDist(CParameters& params)
 
             if (bFreeFermion)
             {
-                appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+                appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Identity);
             }
             else
             {
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
             }
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
             
             switch (eJob)
             {
                 case EDJ_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJ_Chiral:
@@ -481,11 +479,11 @@ INT MeasurePolyakovDist(CParameters& params)
                         }
                         pF1->FixBoundary();
                         pF1->CopyTo(pF2);
-                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1->InverseD(_FIELDS);
                         pF1->FixBoundary();
 
                         pCC->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2,
                             pF1,
@@ -499,7 +497,7 @@ INT MeasurePolyakovDist(CParameters& params)
                     if (bCheckGaugeFixing && NULL != appGetLattice()->m_pGaugeFixing)
                     {
 #if !_CLG_DOUBLEFLOAT
-                        DOUBLE fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                        DOUBLE fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                         if (appAbs(fError) > F(0.000001))
 #else
                         Real fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
@@ -509,8 +507,8 @@ INT MeasurePolyakovDist(CParameters& params)
                             appGeneral(_T("Bad Gauge Fixing\n"));
                         }
                     }
-                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
+                    pJG->OnConfigurationAccepted(_FIELDS, NULL);
                     if (bJF)
                     {
                         for (UINT i = 0; i < iFieldCount; ++i)
@@ -525,10 +523,10 @@ INT MeasurePolyakovDist(CParameters& params)
                             }
                             pF1->FixBoundary();
                             pF1->CopyTo(pF2);
-                            pF1->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1->InverseD(_FIELDS);
 
                             pJF->OnConfigurationAcceptedZ4(
-                                1, 0, gauge.GetData(), NULL,
+                                _FIELDS,
                                 NULL, 
                                 pF2, 
                                 pF1, 
@@ -540,8 +538,8 @@ INT MeasurePolyakovDist(CParameters& params)
                 break;
                 case EDJ_ChiralAndFermionMomentum:
                 {
-                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
+                    pJG->OnConfigurationAccepted(_FIELDS, NULL);
                     if (NULL != pJF && NULL != pCC)
                     {
                         for (UINT i = 0; i < iFieldCount; ++i)
@@ -556,11 +554,11 @@ INT MeasurePolyakovDist(CParameters& params)
                             }
                             pF1->FixBoundary();
                             pF1->CopyTo(pF2);
-                            pF1->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1->InverseD(_FIELDS);
 
 
                             pJF->OnConfigurationAcceptedZ4(
-                                1, 0, gauge.GetData(), NULL,
+                                _FIELDS,
                                 NULL,
                                 pF2,
                                 pF1,
@@ -568,7 +566,7 @@ INT MeasurePolyakovDist(CParameters& params)
                                 iFieldCount == i + 1);
 
                             pCC->OnConfigurationAcceptedZ4(
-                                1, 0, gauge.GetData(), NULL,
+                                _FIELDS,
                                 NULL,
                                 pF2,
                                 pF1,
@@ -580,7 +578,7 @@ INT MeasurePolyakovDist(CParameters& params)
                 break;
                 case EDJ_PlaqutteEnergy:
                 {
-                    pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPE->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 default:

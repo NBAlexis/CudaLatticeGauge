@@ -124,7 +124,7 @@ int main(int argc, char * argv[])
     CFieldGaugeSU3* pStaple = NULL;
     if (bDoSmearing)
     {
-        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
     }
 
     //Themalization
@@ -216,11 +216,11 @@ int main(int argc, char * argv[])
                 CCString sMD5;
                 if (bCompressedFile)
                 {
-                    sMD5 = appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileName + _T(".cco"));
+                    sMD5 = appGetLattice()->m_pGaugeField[0]->SaveToCompressedFile(sFileName + _T(".cco"));
                 }
                 else
                 {
-                    sMD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                    sMD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
                 }
 
                 //=================================
@@ -246,24 +246,22 @@ int main(int argc, char * argv[])
 
             if (bCompressedFile)
             {
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName + _T(".cco"), EFFT_CLGBinCompressed);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName + _T(".cco"), EFFT_CLGBinCompressed);
             }
             else
             {
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName + _T(".con"), EFFT_CLGBin);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName + _T(".con"), EFFT_CLGBin);
             }
             
             if (bDoSmearing)
             {
-                appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
+                appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
+                appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
             }
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             if (bMeasureFermion)
             {
-                pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                pMC->OnConfigurationAccepted(_FIELDS, NULL);
                 for (UINT uiLt = 0; uiLt < _HC_Lt; ++uiLt)
                 {
                     pionCorrelator.AddItem(pMC->m_lstResultsLastConf[0][uiLt]);
@@ -290,7 +288,7 @@ int main(int argc, char * argv[])
                 {
                     if (bTestZero)
                     {
-                        appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+                        appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Identity);
                     }
 
                     CFieldFermionWilsonSquareSU3*  pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -308,11 +306,11 @@ int main(int argc, char * argv[])
                         }
                         pF1->FixBoundary();
                         pF1->CopyTo(pF2);
-                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1->InverseD(_FIELDS);
                         pF1->FixBoundary();
 
                         pCC->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2,
                             pF1,
@@ -331,12 +329,12 @@ int main(int argc, char * argv[])
             {
                 if (NULL != pPL && !bMeasureTrace)
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 
                 if (bMeasureTrace && NULL != pTalor)
                 {
-                    pTalor->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pTalor->OnConfigurationAccepted(_FIELDS, NULL);
                     CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
                     const UINT iFieldCount = pTalor->GetFieldCount();
@@ -352,11 +350,11 @@ int main(int argc, char * argv[])
                         }
                         //pF1->FixBoundary();
                         pF1->CopyTo(pF2);
-                        pF1->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1->InverseD(_FIELDS);
                         //pF1->FixBoundary();
 
                         pTalor->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2,
                             pF1,

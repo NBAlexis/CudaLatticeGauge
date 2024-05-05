@@ -208,7 +208,7 @@ INT Measurement(CParameters& params)
     CFieldGaugeSU3* pStaple = NULL;
     if (EDJKS_VR == eJob)
     {
-        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+        pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
     }
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
@@ -311,20 +311,18 @@ INT Measurement(CParameters& params)
             
             if (bFreeFermion)
             {
-                appGetLattice()->m_pGaugeField->InitialField(EFIT_Identity);
+                appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Identity);
             }
             else
             {
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
             }
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
 
             switch (eJob)
             {
                 case EDJKS_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJKS_Chiral:
@@ -341,7 +339,7 @@ INT Measurement(CParameters& params)
                         }
                         pF1Light->FixBoundary();
                         pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Light->InverseD(_FIELDS);
                         pF1Light->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -365,7 +363,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -390,7 +388,7 @@ INT Measurement(CParameters& params)
                         }
                         pF1Heavy->FixBoundary();
                         pF1Heavy->CopyTo(pF2Heavy);
-                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Heavy->InverseD(_FIELDS);
                         pF1Heavy->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -414,7 +412,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -432,21 +430,21 @@ INT Measurement(CParameters& params)
 
                     if (bMeasureCCS)
                     {
-                        pCCSLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pCCSLight->OnConfigurationAccepted(_FIELDS, NULL);
+                        pCCSHeavy->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                 }
                 break;
                 case EDJKS_AngularMomentum:
                 {
-                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
+                    pJG->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJKS_ChiralAndFermionMomentum:
                 {
-                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
+                    pJG->OnConfigurationAccepted(_FIELDS, NULL);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (0 == (1 & uiLoadFermion))
@@ -461,7 +459,7 @@ INT Measurement(CParameters& params)
                             }
                             pF1Light->FixBoundary();
                             pF1Light->CopyTo(pF2Light);
-                            pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Light->InverseD(_FIELDS);
                             pF1Light->FixBoundary();
                             if (bSaveFermion)
                             {
@@ -501,7 +499,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -509,7 +507,7 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFALight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -528,7 +526,7 @@ INT Measurement(CParameters& params)
                             }
                             pF1Heavy->FixBoundary();
                             pF1Heavy->CopyTo(pF2Heavy);
-                            pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Heavy->InverseD(_FIELDS);
                             pF1Heavy->FixBoundary();
                             if (bSaveFermion)
                             {
@@ -568,7 +566,7 @@ INT Measurement(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -576,7 +574,7 @@ INT Measurement(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFAHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -586,8 +584,8 @@ INT Measurement(CParameters& params)
 
                     if (bMeasureCCS)
                     {
-                        pCCSLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
-                        pCCSHeavy->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pCCSLight->OnConfigurationAccepted(_FIELDS, NULL);
+                        pCCSHeavy->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                 }
                 break;
@@ -598,9 +596,9 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_VR:
                     {
-                        appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-                        pWilson->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
+                        appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                        pWilson->OnConfigurationAccepted(_FIELDS, NULL);
                         if (uiN == iStartN)
                         {
                             TArray<Real> lstRadius;
@@ -618,13 +616,13 @@ INT Measurement(CParameters& params)
                     {
                         CCString sSaveFileName;
                         sSaveFileName.Format(_T("%s/%sR_Nt%d_O%d_%d.con"), sCSVSavePrefix.c_str(), sSavePrefix.c_str(), _HC_Lt, uiOmega, uiN);
-                        appGeneral(appGetLattice()->m_pGaugeField->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
+                        appGeneral(appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFileName, EFFT_CLGBinFloat) + _T("\n"));
                     }
                     break;
                 case EDJKS_Taylor:
                 {
                     //appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                    pTaylorLight->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pTaylorLight->OnConfigurationAccepted(_FIELDS, NULL);
                     //for (UINT i = 0; i < iFieldCount; ++i)
                     //{
                     //    if (0 == (1 & uiLoadFermion))
@@ -758,13 +756,13 @@ INT Measurement(CParameters& params)
                 break;
                 case EDJKS_AngularMomentumDiagnal:
                     {
-                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
                         CCString sFileLightDiagnal;
                         CCString sFileHeavyDiagnal;
                         sFileLightDiagnal.Format(_T("%s_diagnallight_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
                         sFileHeavyDiagnal.Format(_T("%s_diagnalheavy_Nt%d_O%d.csv"), sCSVSavePrefix.c_str(), _HC_Lt, uiOmega);
-                        TArray<TArray<CLGComplex>> lightdiagnal = pFALight->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Light, pF2Light);
-                        TArray<TArray<CLGComplex>> heavydiagnal = pFAHeavy->ExportDiagnal(appGetLattice()->m_pGaugeField, pF1Heavy, pF2Heavy);
+                        TArray<TArray<CLGComplex>> lightdiagnal = pFALight->ExportDiagnal(_FIELDS, pF1Light, pF2Light);
+                        TArray<TArray<CLGComplex>> heavydiagnal = pFAHeavy->ExportDiagnal(_FIELDS, pF1Heavy, pF2Heavy);
                         WriteStringFileComplexArray2(sFileLightDiagnal, lightdiagnal);
                         WriteStringFileComplexArray2(sFileHeavyDiagnal, heavydiagnal);
                     }

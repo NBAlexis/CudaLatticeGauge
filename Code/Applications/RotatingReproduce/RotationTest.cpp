@@ -11,7 +11,7 @@
 
 void TestPlaqutteEnergy()
 {
-    const CFieldGaugeSU3* pGuageField = dynamic_cast<const CFieldGaugeSU3 * >(appGetLattice()->m_pGaugeField);
+    const CFieldGaugeSU3* pGuageField = dynamic_cast<const CFieldGaugeSU3 * >(appGetLattice()->m_pGaugeField[0]);
     CFieldGaugeSU3* pCopy = dynamic_cast<CFieldGaugeSU3*>(pGuageField->GetCopy());
 
     pGuageField->CalculateOnlyStaple(pCopy);
@@ -30,8 +30,8 @@ void TestPlaqutteEnergy()
 void TestXYTerm()
 {
     CActionGaugePlaquetteRotating* pActionR = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList[0]);
-    const DOUBLE fXY1 = pActionR->XYTerm1(appGetLattice()->m_pGaugeField);
-    const DOUBLE fXY2 = pActionR->XYTerm2(appGetLattice()->m_pGaugeField);
+    const DOUBLE fXY1 = pActionR->XYTerm1(appGetLattice()->m_pGaugeField[0]);
+    const DOUBLE fXY2 = pActionR->XYTerm2(appGetLattice()->m_pGaugeField[0]);
 
     appGeneral(_T("================= TestXYTerm ==============\n"));
     appGeneral(_T("E1: %f, E2: %f\n"), fXY1, fXY2);

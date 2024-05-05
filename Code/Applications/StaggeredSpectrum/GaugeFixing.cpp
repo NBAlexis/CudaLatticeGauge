@@ -51,10 +51,10 @@ INT StaggeredGaugeFixing(CParameters& params)
         {
             CCString sSaveFile;
             sSaveFile.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiIndex);
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sSaveFile, EFFT_CLGBin);
 
 #if !_CLG_DOUBLEFLOAT
-            const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+            const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
             if (fRes >= 0.0 && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
 #else
             const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
@@ -78,17 +78,17 @@ INT StaggeredGaugeFixing(CParameters& params)
                 if (fRes >= F(0.0) && fRes < F(0.01))
                 {
                     appGeneral(_T("\nNot good enough : %d \n"), uiIndex);
-                    appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                    appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile);
+                    appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
                 }
                 else
                 {
                     appGeneral(_T("\nBad : %d \n"), uiIndex);
                     CCString sLoadFile;
                     sLoadFile.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), uiIndex);
-                    appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
-                    appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-                    appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile);
+                    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
+                    appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+                    appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
                 }
             }
             else
@@ -107,9 +107,9 @@ INT StaggeredGaugeFixing(CParameters& params)
             sLoadFile.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), uiIndex);
             sSaveFile.Format(_T("%sMatching_%d.con"), sSavePrefix.c_str(), uiIndex);
             appGeneral(_T("Fixing : %d \n"), uiIndex);
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
-            appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField);
-            appGetLattice()->m_pGaugeField->SaveToFile(sSaveFile);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sLoadFile, EFFT_CLGBin);
+            appGetLattice()->m_pGaugeFixing->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+            appGetLattice()->m_pGaugeField[0]->SaveToFile(sSaveFile);
         }
     }
 

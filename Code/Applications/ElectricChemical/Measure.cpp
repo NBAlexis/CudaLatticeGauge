@@ -218,15 +218,13 @@ INT Measurement(CParameters& params)
                 }
             }
 
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
             case EGMJ_Polyakov:
             {
-                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                pPL->OnConfigurationAccepted(_FIELDS, NULL);
             }
             break;
             case EGMJ_Chiral:
@@ -243,7 +241,7 @@ INT Measurement(CParameters& params)
                     }
                     pF1Light->FixBoundary();
                     pF1Light->CopyTo(pF2Light);
-                    pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                    pF1Light->InverseD(_FIELDS);
                     pF1Light->FixBoundary();
                     if (bSaveFermion)
                     {
@@ -267,7 +265,7 @@ INT Measurement(CParameters& params)
                     }
 
                     pCCLight->OnConfigurationAcceptedZ4(
-                        1, 0, gauge.GetData(), NULL,
+                        _FIELDS,
                         NULL,
                         pF2Light,
                         pF1Light,
@@ -285,7 +283,7 @@ INT Measurement(CParameters& params)
                     }
                     pF1Heavy->FixBoundary();
                     pF1Heavy->CopyTo(pF2Heavy);
-                    pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                    pF1Heavy->InverseD(_FIELDS);
                     pF1Heavy->FixBoundary();
                     if (bSaveFermion)
                     {
@@ -309,7 +307,7 @@ INT Measurement(CParameters& params)
                     }
 
                     pCCHeavy->OnConfigurationAcceptedZ4(
-                        1, 0, gauge.GetData(), NULL,
+                        _FIELDS,
                         NULL,
                         pF2Heavy,
                         pF1Heavy,
@@ -321,7 +319,7 @@ INT Measurement(CParameters& params)
             break;
             case EGMJ_Meson:
                 {
-                    pMeson->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pMeson->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
             default:

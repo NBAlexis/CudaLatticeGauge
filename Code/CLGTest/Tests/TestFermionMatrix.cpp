@@ -20,7 +20,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
     CLGComplex* toprint = (CLGComplex*)malloc(sizeof(CLGComplex) * uiSiteCount * uiSiteCount);
     CFieldFermionKSSU3* pFieldCopy = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(pField->m_byFieldId));
 
-    CFieldGaugeSU3* pSU3Gauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    //CFieldGaugeSU3* pSU3Gauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
 
     for (UINT i = 0; i < uiSiteCount; ++i)
     {
@@ -30,7 +30,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
         source.m_sSourcePoint = __hostSiteIndexToInt4(i);
         pField->InitialAsSource(source);
         CCommonData::m_fOmega = F(0.2);
-        pField->D(pSU3Gauge);
+        pField->D(_FIELDS);
         //pField->InverseD(appGetLattice()->m_pGaugeField);
         //pField->ApplyGammaKS(appGetLattice()->m_pGaugeField, GAMMA53);
 
@@ -142,7 +142,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
 UINT TestFermionMatrixKS(CParameters& param)
 {
     CFieldFermionKSSU3* pFermion = static_cast<CFieldFermionKSSU3*>(appGetLattice()->GetFieldById(2));
-    CFieldGaugeSU3* pGauge = static_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    //CFieldGaugeSU3* pGauge = static_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
     CCString sFile = _T("KS_");
     param.FetchStringValue(_T("SaveHead"), sFile);
     CCString sFile2 = _T(".csv");
@@ -151,7 +151,7 @@ UINT TestFermionMatrixKS(CParameters& param)
     {
         CCString enumName = __ENUM_TO_STRING(EMeasureDiagnal, static_cast<EMeasureDiagnal>(i));
         appGeneral(_T("Working on %s ... \n"), enumName.c_str());
-        ExportDiagnalStaggeredSU3(sFile + enumName + sFile2, static_cast<EMeasureDiagnal>(i), pGauge, pFermion);
+        ExportDiagnalStaggeredSU3(sFile + enumName + sFile2, static_cast<EMeasureDiagnal>(i), _FIELDS, pFermion);
     }
 
     return 0;

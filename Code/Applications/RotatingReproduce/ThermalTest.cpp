@@ -122,10 +122,8 @@ INT TestThermal(CParameters& params)
         UBOOL bNeedBake = TRUE;
         if (!bAdditive && !sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
-            pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
+            pPL->OnConfigurationAccepted(_FIELDS, NULL);
             Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt]);
             if (fError < F(1E-05))
             {
@@ -151,7 +149,7 @@ INT TestThermal(CParameters& params)
             {
                 pGauageAction->SetOmega(F(0.0));
             }
-            appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+            appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
             appGetLattice()->m_pMeasurements->Reset();
@@ -162,9 +160,7 @@ INT TestThermal(CParameters& params)
                 if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
                 {
                     uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                    TArray<CFieldGauge*> gauge;
-                    gauge.AddItem(appGetLattice()->m_pGaugeField);
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
             }
             assert(pPL->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
@@ -208,10 +204,8 @@ INT TestThermal(CParameters& params)
 
                 appGetLattice()->m_pMeasurements->Reset();
                 sFileName.Format(_T("%sRotate_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex - 1);
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-                TArray<CFieldGauge*> gauge;
-                gauge.AddItem(appGetLattice()->m_pGaugeField);
-                pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+                pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 Real fError = appAbs(_cuCabsf(pPL->m_lstLoop[0]) - fPolyaOld);
                 if (fError < F(1E-05))
                 {
@@ -241,7 +235,7 @@ INT TestThermal(CParameters& params)
 
                     //=================================
                     //Save config
-                    const CCString MD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                    const CCString MD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
 
                     //=================================
                     //Save info

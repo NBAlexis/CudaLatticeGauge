@@ -271,15 +271,13 @@ INT MeasurementU1(CParameters& params)
             //    }
             //}
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
                 case EDJKSU1_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJKSU1_Chiral:
@@ -296,7 +294,7 @@ INT MeasurementU1(CParameters& params)
                         }
                         pF1Light->FixBoundary();
                         pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Light->InverseD(_FIELDS);
                         pF1Light->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -320,7 +318,7 @@ INT MeasurementU1(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -345,7 +343,7 @@ INT MeasurementU1(CParameters& params)
                         }
                         pF1Heavy->FixBoundary();
                         pF1Heavy->CopyTo(pF2Heavy);
-                        pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Heavy->InverseD(_FIELDS);
                         pF1Heavy->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -369,7 +367,7 @@ INT MeasurementU1(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,

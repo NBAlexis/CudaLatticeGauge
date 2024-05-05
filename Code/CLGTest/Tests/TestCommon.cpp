@@ -16,7 +16,7 @@ UINT TestOperators(CParameters& )
     UINT uiErrors = 0;
 
     //test Ddagger
-    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    //CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
     CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
     CFieldFermionWilsonSquareSU3* pF2 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
     CFieldFermionWilsonSquareSU3* pF3 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
@@ -65,9 +65,9 @@ UINT TestOperators(CParameters& )
     }
 
     pF1->CopyTo(pF3);
-    pF3->D(pGauge);
+    pF3->D(_FIELDS);
     pF2->CopyTo(pF4);
-    pF4->Ddagger(pGauge);
+    pF4->Ddagger(_FIELDS);
     const CLGComplex dot5 = pF2->DotReal(pF3);
     const CLGComplex dot6 = pF4->DotReal(pF1);
     appGeneral(_T("DDagger f2.(D.f1) = (%f %f); (D+.f2).f1 = (%f %f);\n"),
@@ -172,7 +172,7 @@ UINT TestDirichletDOperator(CParameters&)
 UINT TestALogDefinition(CParameters&)
 {
     //create a random field
-    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
 
     CFieldGaugeSU3* pTestGauge = dynamic_cast<CFieldGaugeSU3*>(pGauge->GetCopy());
     pGauge->TransformToIA();
@@ -219,7 +219,7 @@ UINT TestGamma5Hermiticity(CParameters& param)
     INT iG5 = 0;
     param.FetchValueINT(_T("GAMM5Test"), iG5);
 
-    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField);
+    CFieldGaugeSU3* pGauge = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]);
     CFieldFermionWilsonSquareSU3* pF1 = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(2));
     UINT uiErrors = pF1->TestGamma5Hermitian(pGauge, 0 != iG5);
     //CCudaHelper::DebugFunction();
@@ -232,9 +232,9 @@ UINT TestAnitiHermiticity(CParameters&)
 {
     //test Ddagger
     appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
-    CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
+    //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
     CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2));
-    UINT uiErrors = pF1->TestAntiHermitian(pGauge);
+    UINT uiErrors = pF1->TestAntiHermitian(_FIELDS);
     appGeneral(_T("=== Tested Fermion: \n %s \n"), pF1->GetInfos(_T("     ")).c_str());
     pF1->Return();
 
@@ -261,25 +261,25 @@ UINT TestGaugeInvarience(CParameters&)
 {
     UINT uiError = 0;
     TArray<Real> beforeGaugeTransform;
-    TArray<CFieldGauge*> gaugefields;
-    gaugefields.AddItem(appGetLattice()->m_pGaugeField);
+    //TArray<CFieldGauge*> gaugefields;
+    //gaugefields.AddItem(appGetLattice()->m_pGaugeField);
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, _FIELDS, NULL));
         beforeGaugeTransform.AddItem(fEnergy);
     }
 
     CGaugeFixingRandom* pRandom = dynamic_cast<CGaugeFixingRandom*>(appGetLattice()->m_pGaugeFixing);
 
     //make sure the gauge field is really changed
-    CFieldGauge* pGaugeCopy = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField->GetCopy());
-    pRandom->GaugeFixing(appGetLattice()->m_pGaugeField);
-    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField);
+    CFieldGauge* pGaugeCopy = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
+    pRandom->GaugeFixing(appGetLattice()->m_pGaugeField[0]);
+    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField[0]);
     CMeasure::LogGeneralComplex(pGaugeCopy->Dot(pGaugeCopy));
 
-    appGetLattice()->m_pGaugeField->CopyTo(pGaugeCopy);
-    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField);
+    appGetLattice()->m_pGaugeField[0]->CopyTo(pGaugeCopy);
+    pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField[0]);
     CMeasure::LogGeneralComplex(pGaugeCopy->Dot(pGaugeCopy));
     
     for (INT j = 0; j < appGetLattice()->m_pOtherFields.Num(); ++j)
@@ -289,7 +289,7 @@ UINT TestGaugeInvarience(CParameters&)
 
     for (INT i = 0; i < appGetLattice()->m_pActionList.Num(); ++i)
     {
-        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, 1, 0, gaugefields.GetData(), NULL, NULL));
+        Real fEnergy = static_cast<Real>(appGetLattice()->GetActionById(static_cast<BYTE>(i + 1))->Energy(FALSE, _FIELDS, NULL));
         appGeneral(_T("Action%d, Before:%2.20f, After:%2.20f\n"), i, beforeGaugeTransform[i], fEnergy);
         if (appAbs(beforeGaugeTransform[i] - fEnergy) > F(0.0000001))
         {

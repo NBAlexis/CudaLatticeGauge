@@ -15,13 +15,13 @@ UINT TestFileIO(CParameters& sParam)
     Real fExpected = F(0.625129946974942);
     sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
 
-    const Real fPlaqutteEneregy = static_cast<Real>(appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume));
+    const Real fPlaqutteEneregy = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergy(F(1.0) / F(3.0)) / (6 * _HC_Volume));
 
     CFieldGaugeSU3* pStable = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     CFieldGaugeSU3* pForce = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
 
-    appGetLattice()->m_pGaugeField->CalculateForceAndStaple(pForce, pStable, F(1.0) / F(3.0));
-    const Real fPlaqutteEneregy2 = static_cast<Real>(appGetLattice()->m_pGaugeField->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume));
+    appGetLattice()->m_pGaugeField[0]->CalculateForceAndStaple(pForce, pStable, F(1.0) / F(3.0));
+    const Real fPlaqutteEneregy2 = static_cast<Real>(appGetLattice()->m_pGaugeField[0]->CalculatePlaqutteEnergyUsingStable(F(1.0) / F(3.0), pStable) / (6 * _HC_Volume));
 
     appGeneral(_T("Plaqutte Energy (expected:0.625129946974942)= %1.10f and %1.10f\n"), F(1.0) - fPlaqutteEneregy, F(1.0) - fPlaqutteEneregy2);
 
@@ -52,7 +52,7 @@ UINT TestFileIOWithUpdate(CParameters& sParam)
 UINT TestFileIOCLG(CParameters& sParam)
 {
     UINT uiError = 0;
-    const CCString MD51 = appGetLattice()->m_pGaugeField->SaveToFile(_T("testGauge.con"));
+    const CCString MD51 = appGetLattice()->m_pGaugeField[0]->SaveToFile(_T("testGauge.con"));
     const CCString MD52 = appGetLattice()->GetFieldById(2)->SaveToFile(_T("testFermion.con"));
 
     CFieldGaugeSU3* pNewGauge = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
@@ -60,7 +60,7 @@ UINT TestFileIOCLG(CParameters& sParam)
     CFieldFermionWilsonSquareSU3* pNewFermion = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appCreate(_T("CFieldFermionWilsonSquareSU3")));
     pNewFermion->InitialFieldWithFile(_T("testFermion.con"), EFFT_CLGBin);
 
-    const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField), __div(F(1.0), _HC_Volume * _HC_Dir));
+    const CLGComplex res1 = cuCmulf_cr(pNewGauge->DotReal(appGetLattice()->m_pGaugeField[0]), __div(F(1.0), _HC_Volume * _HC_Dir));
     //const CLGComplex res3 = pNewGauge->DotReal(pNewGauge);
     //appGeneral(_T("dot res:%2.20f\n"), res3.x);
     //appGeneral(_T("dot res:%2.20f\n"), res3.y);
@@ -98,8 +98,8 @@ UINT TestFileDOUBLE(CParameters&)
 #if !_CLG_DEBUG
     sFile = _T("../Debug/") + sFile;
 #endif
-    appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinDouble);
-    const DOUBLE res = appGetLattice()->m_pGaugeField->Dot(appGetLattice()->m_pGaugeField).x;
+    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinDouble);
+    const DOUBLE res = appGetLattice()->m_pGaugeField[0]->Dot(appGetLattice()->m_pGaugeField[0]).x;
 
     appGeneral(_T("load:%2.10f, expect:%2.10f, delta:%2.10f\n"), res, expectedres, appAbs(res - expectedres));
     if (appAbs(res - expectedres) > F(0.000001))
@@ -116,8 +116,8 @@ UINT TestFileFloat(CParameters&)
 #if !_CLG_DEBUG
     sFile = _T("../Debug/") + sFile;
 #endif
-    appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinFloat);
-    const DOUBLE res = appGetLattice()->m_pGaugeField->Dot(appGetLattice()->m_pGaugeField).x;
+    appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFile.c_str(), EFFT_CLGBinFloat);
+    const DOUBLE res = appGetLattice()->m_pGaugeField[0]->Dot(appGetLattice()->m_pGaugeField[0]).x;
 
     appGeneral(_T("load:%2.10f, expect:%2.10f, delta:%2.10f\n"), res, expectedres, appAbs(res - expectedres));
     if (appAbs(res - expectedres) > F(0.000001))
@@ -131,7 +131,7 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
 {
     UINT uiError = 0;
 
-    appGetLattice()->m_pGaugeField->SaveToCompressedFile(_T("testGaugeCompressed.con"));
+    appGetLattice()->m_pGaugeField[0]->SaveToCompressedFile(_T("testGaugeCompressed.con"));
     CFieldGaugeSU3* pNewGauge = dynamic_cast<CFieldGaugeSU3*>(appCreate(_T("CFieldGaugeSU3")));
     pNewGauge->InitialFieldWithFile(_T("testGaugeCompressed.con"), EFFT_CLGBinCompressed);
 
@@ -140,7 +140,7 @@ UINT TestFileIOCLGCompressed(CParameters& sParam)
     //appGeneral(_T("=====================\n"));
     //pNewGauge->DebugPrintMe();
 
-    pNewGauge->AxpyMinus(appGetLattice()->m_pGaugeField);
+    pNewGauge->AxpyMinus(appGetLattice()->m_pGaugeField[0]);
 
     const CLGComplex res1 = pNewGauge->DotReal(pNewGauge);
 

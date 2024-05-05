@@ -231,20 +231,18 @@ INT MeasurementEM(CParameters& params)
                 sTxtFileName.Format(_T("%sR_Nt%d_EM%d_%d.txt"), sSavePrefix.c_str(), _HC_Lt, uiEM, uiN);
             }
             //appGeneral(_T("checking %s ..."), sFileName);            
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
                 case EDJKSEM_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJKSEM_Chiral:
                 {
-                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
+                    appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
                     for (UINT i = 0; i < iFieldCount; ++i)
                     {
                         if (0 == (1 & uiLoadFermion))
@@ -259,7 +257,7 @@ INT MeasurementEM(CParameters& params)
                             }
                             pF1Light->FixBoundary();
                             pF1Light->CopyTo(pF2Light);
-                            pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Light->InverseD(_FIELDS);
                             pF1Light->FixBoundary();
 
                             if (bSaveFermion)
@@ -302,7 +300,7 @@ INT MeasurementEM(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -310,7 +308,7 @@ INT MeasurementEM(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFALight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -329,7 +327,7 @@ INT MeasurementEM(CParameters& params)
                             }
                             pF1Heavy->FixBoundary();
                             pF1Heavy->CopyTo(pF2Heavy);
-                            pF1Heavy->InverseD(appGetLattice()->m_pGaugeField);
+                            pF1Heavy->InverseD(_FIELDS);
                             pF1Heavy->FixBoundary();
 
                             if (bSaveFermion)
@@ -372,7 +370,7 @@ INT MeasurementEM(CParameters& params)
                         }
 
                         pCCHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -380,7 +378,7 @@ INT MeasurementEM(CParameters& params)
                             iFieldCount == i + 1);
 
                         pFAHeavy->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Heavy,
                             pF1Heavy,
@@ -392,13 +390,13 @@ INT MeasurementEM(CParameters& params)
                 break;
                 case EDJKSEM_BerryPhase:
                 {
-                    pBPu->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
-                    pBPd->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pBPu->OnConfigurationAccepted(_FIELDS, NULL);
+                    pBPd->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EDJKSEM_Meson:
                 {
-                    pMeson->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pMeson->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
 #if NotYet

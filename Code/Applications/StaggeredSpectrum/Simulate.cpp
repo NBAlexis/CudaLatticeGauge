@@ -83,11 +83,11 @@ INT SimulateStaggered(CParameters& params)
             CCString sMD5;
             if (bCompressedFile)
             {
-                sMD5 = appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileName + _T(".cco"));
+                sMD5 = appGetLattice()->m_pGaugeField[0]->SaveToCompressedFile(sFileName + _T(".cco"));
             }
             else
             {
-                sMD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                sMD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
             }
 
             //=================================

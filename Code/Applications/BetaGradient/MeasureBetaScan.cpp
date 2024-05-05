@@ -131,7 +131,7 @@ INT MeasurementBetaScan(CParameters& params)
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureWilsonLoop* pWL = dynamic_cast<CMeasureWilsonLoop*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureAMomentumJG* pAMJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
-    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField->GetCopy());
+    CFieldGaugeSU3* pStaple = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->m_pGaugeField[0]->GetCopy());
 
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
     //CMeasureChiralCondensateKS* pCCHeavy = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
@@ -229,22 +229,20 @@ INT MeasurementBetaScan(CParameters& params)
                 }
             }
             
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, eLoadType);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, eLoadType);
 
             switch (eJob)
             {
                 case EBSMJ_Polyakov:
                 {
-                    pPL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPL->OnConfigurationAccepted(_FIELDS, NULL);
                 }
                 break;
                 case EBSMJ_Wilson:
                 {
-                    appGetLattice()->m_pGaugeField->CalculateOnlyStaple(pStaple);
-                    appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField, pStaple);
-                    pWL->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    appGetLattice()->m_pGaugeField[0]->CalculateOnlyStaple(pStaple);
+                    appGetLattice()->m_pGaugeSmearing->GaugeSmearing(appGetLattice()->m_pGaugeField[0], pStaple);
+                    pWL->OnConfigurationAccepted(_FIELDS, NULL);
                     if (uiN == iStartN)
                     {
                         TArray<Real> lstRadius;
@@ -272,7 +270,7 @@ INT MeasurementBetaScan(CParameters& params)
                         }
                         pF1Light->FixBoundary();
                         pF1Light->CopyTo(pF2Light);
-                        pF1Light->InverseD(appGetLattice()->m_pGaugeField);
+                        pF1Light->InverseD(_FIELDS);
                         pF1Light->FixBoundary();
                         if (bSaveFermion)
                         {
@@ -296,7 +294,7 @@ INT MeasurementBetaScan(CParameters& params)
                         }
 
                         pCCLight->OnConfigurationAcceptedZ4(
-                            1, 0, gauge.GetData(), NULL,
+                            _FIELDS,
                             NULL,
                             pF2Light,
                             pF1Light,
@@ -350,19 +348,19 @@ INT MeasurementBetaScan(CParameters& params)
                 break;
                 case EBSMJ_Angular:
                     {
-                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField);
-                        pAMJG->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        appGetLattice()->SetAPhys(appGetLattice()->m_pGaugeField[0]);
+                        pAMJG->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                     break;
 
                 case EBSMJ_Meson:
                     {
-                        pMC->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pMC->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                     break;
                 case EBSMJ_MesonSimple:
                     {
-                        pMCSimple->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                        pMCSimple->OnConfigurationAccepted(_FIELDS, NULL);
                     }
                     break;
                 default:

@@ -77,7 +77,6 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldScalar.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.h

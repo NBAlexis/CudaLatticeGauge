@@ -66,8 +66,8 @@ int main(int argc, char * argv[])
             sFileNameLoad.Format(_T("%sMatching_%d.con"), sLoadPrefix.c_str(), iIndex);
             sFileNameSave.Format(_T("%sMatching_%d.cco"), sSavePrefix.c_str(), iIndex);
 
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileNameLoad, EFFT_CLGBin);
-            appGetLattice()->m_pGaugeField->SaveToCompressedFile(sFileNameSave);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileNameLoad, EFFT_CLGBin);
+            appGetLattice()->m_pGaugeField[0]->SaveToCompressedFile(sFileNameSave);
             appGeneral(_T("=%s"), 0 == (iIndex % 50) ? _T("\n") : _T(""));
         }
         appPopLogDate();

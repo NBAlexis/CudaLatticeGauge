@@ -35,12 +35,12 @@ UINT TestMultiShiftSolver(CParameters& params)
     }
 
     //Result = (D + cn)^{-1} pField
-    pSolver->Solve(resultFields, constants, pFermion, appGetLattice()->m_pGaugeField, EFO_F_D);
+    pSolver->Solve(resultFields, constants, pFermion, _FIELDS, EFO_F_D);
     for (INT i = 0; i < constants.Num(); ++i)
     {
         // Result = (D + cn) Result
         resultFields[i]->CopyTo(pTemp);
-        resultFields[i]->ApplyOperator(EFO_F_D, appGetLattice()->m_pGaugeField);
+        resultFields[i]->ApplyOperator(EFO_F_D, _FIELDS);
         pTemp->ScalarMultply(constants[i]);
         resultFields[i]->AxpyPlus(pTemp);
     }
@@ -57,12 +57,12 @@ UINT TestMultiShiftSolver(CParameters& params)
     }
 
 
-    pSolver->Solve(resultFields, constants, pFermion, appGetLattice()->m_pGaugeField, EFO_F_Ddagger);
+    pSolver->Solve(resultFields, constants, pFermion, _FIELDS, EFO_F_Ddagger);
     for (INT i = 0; i < constants.Num(); ++i)
     {
         // Result = (D + cn) Result
         resultFields[i]->CopyTo(pTemp);
-        resultFields[i]->ApplyOperator(EFO_F_Ddagger, appGetLattice()->m_pGaugeField);
+        resultFields[i]->ApplyOperator(EFO_F_Ddagger, _FIELDS);
         pTemp->ScalarMultply(constants[i]);
         resultFields[i]->AxpyPlus(pTemp);
     }
@@ -79,12 +79,12 @@ UINT TestMultiShiftSolver(CParameters& params)
     }
 
 
-    pSolver->Solve(resultFields, constants, pFermion, appGetLattice()->m_pGaugeField, EFO_F_DDdagger);
+    pSolver->Solve(resultFields, constants, pFermion, _FIELDS, EFO_F_DDdagger);
     for (INT i = 0; i < constants.Num(); ++i)
     {
         // Result = (D + cn) Result
         resultFields[i]->CopyTo(pTemp);
-        resultFields[i]->ApplyOperator(EFO_F_DDdagger, appGetLattice()->m_pGaugeField);
+        resultFields[i]->ApplyOperator(EFO_F_DDdagger, _FIELDS);
         pTemp->ScalarMultply(constants[i]);
         resultFields[i]->AxpyPlus(pTemp);
     }
@@ -130,13 +130,13 @@ UINT TestMultiShiftSolverKS(CParameters& params)
     CRatinalApproximation R_1Over4(_oneOver4);
 
     const CField* pField = appGetLattice()->GetFieldById(2);
-    const CField* pGauge = appGetLattice()->m_pGaugeField;
+    //const CField* pGauge = appGetLattice()->m_pGaugeField;
     const Real fLengthOfPhi = pField->DotReal(pField).x;
     CFieldFermion* pFieldCopy = dynamic_cast<CFieldFermion*>(pField->GetCopy());
 
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R1Over2);
     Real fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R_1Over2);
     pFieldCopy->AxpyMinus(pField);
     Real fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     UINT uiError = 0;
@@ -148,9 +148,9 @@ UINT TestMultiShiftSolverKS(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R1Over4);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R_1Over4);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -161,9 +161,9 @@ UINT TestMultiShiftSolverKS(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R1Over2);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R_1Over2);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -174,9 +174,9 @@ UINT TestMultiShiftSolverKS(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R1Over4);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R_1Over4);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -226,13 +226,13 @@ UINT TestSolverU1(CParameters& params)
     CRatinalApproximation R_1Over4(_oneOver4);
 
     const CField* pField = appGetLattice()->GetFieldById(2);
-    const CField* pGauge = appGetLattice()->m_pGaugeField;
+    //const CField* pGauge = appGetLattice()->m_pGaugeField;
     const Real fLengthOfPhi = pField->DotReal(pField).x;
     CFieldFermion* pFieldCopy = dynamic_cast<CFieldFermion*>(pField->GetCopy());
 
-    pFieldCopy->InverseD(pGauge);
+    pFieldCopy->InverseD(_FIELDS);
     Real fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->D(pGauge);
+    pFieldCopy->D(_FIELDS);
     pFieldCopy->AxpyMinus(pField);
     Real fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     UINT uiError = 0;
@@ -244,9 +244,9 @@ UINT TestSolverU1(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R1Over2);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R_1Over2);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -257,9 +257,9 @@ UINT TestSolverU1(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R1Over4);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_D, pGauge, &R_1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_D, _FIELDS, &R_1Over4);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -270,9 +270,9 @@ UINT TestSolverU1(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R1Over2);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over2);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R_1Over2);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)
@@ -283,9 +283,9 @@ UINT TestSolverU1(CParameters& params)
 
     pField->CopyTo(pFieldCopy);
 
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R1Over4);
     fLength2 = pFieldCopy->DotReal(pFieldCopy).x;
-    pFieldCopy->RationalApproximation(EFO_F_DDdagger, pGauge, &R_1Over4);
+    pFieldCopy->RationalApproximation(EFO_F_DDdagger, _FIELDS, &R_1Over4);
     pFieldCopy->AxpyMinus(pField);
     fLength3 = pFieldCopy->DotReal(pFieldCopy).x;
     if (fLength3 > fMaxError)

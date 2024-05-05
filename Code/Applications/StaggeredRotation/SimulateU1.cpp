@@ -117,10 +117,8 @@ INT SimulateStaggeredRotationU1(CParameters& params)
         UBOOL bNeedBake = TRUE;
         if (!bAdditive && !sOldFileNames[uiNt - iMinNt].IsEmpty())
         {
-            appGetLattice()->m_pGaugeField->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
-            TArray<CFieldGauge*> gauge;
-            gauge.AddItem(appGetLattice()->m_pGaugeField);
-            pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+            appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sOldFileNames[uiNt - iMinNt], EFFT_CLGBin);
+            pPE->OnConfigurationAccepted(_FIELDS, NULL);
             const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fOldFilePolyakov[uiNt - iMinNt];
 #if _CLG_DOUBLEFLOAT
             if (fError < F(1E-07))
@@ -148,7 +146,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
             pGaugeRotation->SetOmega(F(0.0));
 
-            appGetLattice()->m_pGaugeField->InitialField(EFIT_Random);
+            appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
             appGetLattice()->m_pUpdator->SetConfigurationCount(0);
             appGetLattice()->m_pMeasurements->Reset();
@@ -159,9 +157,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
                 if (uiAccepCountBeforeE != uiAccepCountBeforeE2)
                 {
                     uiAccepCountBeforeE = uiAccepCountBeforeE2;
-                    TArray<CFieldGauge*> gauge;
-                    gauge.AddItem(appGetLattice()->m_pGaugeField);
-                    pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                    pPE->OnConfigurationAccepted(_FIELDS, NULL);
                 }
             }
             assert(pPE->m_lstLoop.Num() == static_cast<INT>(iBeforeEquib));
@@ -201,10 +197,8 @@ INT SimulateStaggeredRotationU1(CParameters& params)
 
                 appGetLattice()->m_pMeasurements->Reset();
                 sFileName.Format(_T("%sR_Nt%d_O%d_%d.con"), sSavePrefix.c_str(), uiNt, uiOmega, iSaveStartIndex);
-                appGetLattice()->m_pGaugeField->InitialFieldWithFile(sFileName, EFFT_CLGBin);
-                TArray<CFieldGauge*> gauge;
-                gauge.AddItem(appGetLattice()->m_pGaugeField);
-                pPE->OnConfigurationAccepted(1, 0, gauge.GetData(), NULL, NULL);
+                appGetLattice()->m_pGaugeField[0]->InitialFieldWithFile(sFileName, EFFT_CLGBin);
+                pPE->OnConfigurationAccepted(_FIELDS, NULL);
                 const Real fError = _cuCabsf(pPE->m_lstLoop[0]) - fPlaqOld;
 #if _CLG_DOUBLEFLOAT
                 if (fError < F(1E-07))
@@ -238,7 +232,7 @@ INT SimulateStaggeredRotationU1(CParameters& params)
 
                     //=================================
                     //Save config
-                    const CCString MD5 = appGetLattice()->m_pGaugeField->SaveToFile(sFileName + _T(".con"));
+                    const CCString MD5 = appGetLattice()->m_pGaugeField[0]->SaveToFile(sFileName + _T(".con"));
 
                     //=================================
                     //Save info
