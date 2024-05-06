@@ -285,6 +285,17 @@ UBOOL CFieldFermion::InverseDD(INT gaugeNum, INT bosonNum,
     return appGetFermionSolver(m_byFieldId)->Solve(this, /*this is const*/this, gaugeNum, bosonNum, gaugeFields, bosonFields, EFO_F_DD);
 }
 
+CCString CFieldFermionKS::GetInfos(const CCString& tab) const
+{
+    CCString sRet = CFieldFermion::GetInfos(tab);
+    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
+    sRet = sRet + tab + _T("Diagonal Mass : ") + appToString(m_bDiagonalMass) + _T("\n");
+    sRet = sRet + tab + _T("Each site eta : ") + appToString(m_bEachSiteEta) + _T("\n");
+    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
+    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    return sRet;
+}
+
 __END_NAMESPACE
 
 //=============================================================================

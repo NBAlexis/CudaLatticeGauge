@@ -41,7 +41,6 @@ public:
     }
 
     void InitialField(CParameters& param) override;
-    CCString GetInfos(const CCString &tab) const override;
 
     deviceWilsonVectorSU3* m_pDeviceData;
 };

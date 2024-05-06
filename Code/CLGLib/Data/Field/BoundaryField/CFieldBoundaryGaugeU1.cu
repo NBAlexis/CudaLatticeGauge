@@ -36,20 +36,16 @@ CFieldBoundaryGaugeU1::CFieldBoundaryGaugeU1()
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(CLGComplex) * 8 * _HC_Dir));
 }
 
-void CFieldBoundaryGaugeU1::InitialField(CParameters& )
+void CFieldBoundaryGaugeU1::InitialField(CParameters& param)
 {
+    CFieldBoundary::InitialField(param);
+
     //we currently, only support identity
     dim3 block(1, 1, 1);
     dim3 thread(8, _HC_Dir, 1);
     _kernelInitialU1Feield_Identity << <block, thread >> > (m_pDeviceData);
 }
 
-CCString CFieldBoundaryGaugeU1::GetInfos(const CCString &tab) const
-{
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldBoundaryGaugeU1\n");
-    return sRet;
-}
 
 __END_NAMESPACE
 

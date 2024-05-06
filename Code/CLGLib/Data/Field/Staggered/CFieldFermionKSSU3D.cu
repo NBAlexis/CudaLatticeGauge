@@ -287,11 +287,7 @@ void CFieldFermionKSSU3D::CopyTo(CField* U) const
 
 CCString CFieldFermionKSSU3D::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("Name : CFieldFermionKSSU3D\n");
-    sRet = sRet + CFieldFermionKS::GetInfos(tab);
-    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
+    CCString sRet = CFieldFermionKSSU3::GetInfos(tab);
 
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
     sRet = sRet + tab +appToString(boundary) + _T("\n");

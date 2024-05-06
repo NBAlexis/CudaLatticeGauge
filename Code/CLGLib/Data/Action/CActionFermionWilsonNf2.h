@@ -26,7 +26,6 @@ public:
     CActionFermionWilsonNf2();
 
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
-    CCString GetInfos(const CCString &tab) const override;
     UBOOL IsFermion() const override { return TRUE; }
 
     //Use in test only

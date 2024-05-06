@@ -66,13 +66,6 @@ DOUBLE CActionFermionWilsonNf2::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT
     return res.x;
 }
 
-CCString CActionFermionWilsonNf2::GetInfos(const CCString &tab) const
-{
-    CCString sRet;
-    sRet = tab + _T("Name : CActionFermionWilsonNf2\n");
-    sRet = sRet + CAction::GetInfos(tab);
-    return sRet;
-}
 
 __END_NAMESPACE
 

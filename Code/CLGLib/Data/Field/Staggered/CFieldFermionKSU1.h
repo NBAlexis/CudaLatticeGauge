@@ -97,8 +97,6 @@ public:
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-    
-    CCString GetInfos(const CCString& tab) const override;
 
 protected:
 

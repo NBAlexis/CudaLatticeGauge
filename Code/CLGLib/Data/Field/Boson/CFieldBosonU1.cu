@@ -536,12 +536,6 @@ void CFieldBosonU1::CopyTo(CField* U) const
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(CLGComplex) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 }
 
-CCString CFieldBosonU1::GetInfos(const CCString& tab) const
-{
-    CCString sRet = tab + _T("Name : CFieldBosonU1\n");
-    return sRet;
-}
-
 void CFieldBosonU1::MakeRandomMomentum()
 {
     preparethread;

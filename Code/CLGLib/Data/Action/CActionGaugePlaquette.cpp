@@ -100,10 +100,9 @@ DOUBLE CActionGaugePlaquette::EnergySingleField(UBOOL bBeforeEvolution, const cl
 
 CCString CActionGaugePlaquette::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CActionGaugePlaquette\n");
-    sRet = sRet + CAction::GetInfos(tab);
+    CCString sRet = CAction::GetInfos(tab);
     sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
+    sRet = sRet + tab + _T("Clover : ") + appToString(m_bCloverEnergy) + _T("\n");
     return sRet;
 }
 

@@ -93,6 +93,10 @@ public:
     CBase() { }
     virtual ~CBase() { }
     virtual const CClass* GetClass() const { return NULL; }
+    virtual CCString GetInfos(const CCString& tab) const
+    {
+        return tab + _T("Name : ") + GetClass()->GetName() + _T("\n");
+    }
 };
 
 class CLGAPI CClassGather

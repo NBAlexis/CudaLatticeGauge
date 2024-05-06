@@ -147,6 +147,8 @@ public:
     virtual void PrepareForHMCOnlyRandomize() = 0;
     virtual void PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) = 0;
 
+    CCString GetInfos(const CCString& tab) const override;
+
     //For some strange boundary condition
     //Normally, eta_{\mu}(n+\mu)=eta_{\mu}, so set this = FALSE
     UBOOL m_bEachSiteEta;

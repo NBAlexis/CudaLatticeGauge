@@ -766,9 +766,8 @@ void CFieldFermionWilsonSquareSU3Gamma::CopyTo(CField* U) const
 
 CCString CFieldFermionWilsonSquareSU3Gamma::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3Gamma\n");
-    sRet = sRet + CFieldFermion::GetInfos(tab);
-    sRet = sRet + tab + _T("kappa : ") + appToString(m_fKai) + _T("\n");
+    CCString sRet = CFieldFermionWilsonSquareSU3::GetInfos(tab);
+
     sRet = sRet + tab + _T("ExpGamma : ") + (m_bExpGamma ? _T("1") : _T("0")) + _T("\n");
 
     sRet = sRet + tab + _T("Gamma1 : ") + appToString(m_fCoeffGamma1) + _T("\n");

@@ -72,7 +72,7 @@ public:
         }
     }
 
-    virtual CCString GetInfos(const CCString &tab) const;
+    CCString GetInfos(const CCString &tab) const override;
 
     BYTE GetActionId() const { return m_byActionId; }
 

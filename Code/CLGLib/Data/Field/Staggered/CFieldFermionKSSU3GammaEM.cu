@@ -2189,34 +2189,9 @@ void CFieldFermionKSSU3GammaEM::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaM
 
 CCString CFieldFermionKSSU3GammaEM::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("Name : CFieldFermionKSSU3GammaEM\n");
-    sRet = sRet + CFieldFermionKS::GetInfos(tab);
-    sRet = sRet + tab + _T("Mass (2am) : ") + appToString(m_f2am) + _T("\n");
-    sRet = sRet + tab + _T("MD Rational (c) : ") + appToString(m_rMD.m_fC) + _T("\n");
-    sRet = sRet + tab + _T("MC Rational (c) : ") + appToString(m_rMC.m_fC) + _T("\n");
-
-    sRet = sRet + tab + _T("shifted corrdinate : ") + (m_bEachSiteEta ? _T("1") : _T("0")) + _T("\n");
-
-    sRet = sRet + tab + _T("Gamma1 : ") + appToString(m_fCoeffGamma1) + _T("\n");
-    sRet = sRet + tab + _T("Gamma2 : ") + appToString(m_fCoeffGamma2) + _T("\n");
-    sRet = sRet + tab + _T("Gamma3 : ") + appToString(m_fCoeffGamma3) + _T("\n");
-    sRet = sRet + tab + _T("Gamma4 : ") + appToString(m_fCoeffGamma4) + _T("\n");
-    sRet = sRet + tab + _T("Gamma5 : ") + appToString(m_fCoeffGamma5) + _T("\n");
-
-    sRet = sRet + tab + _T("Gamma51 : ") + appToString(m_fCoeffGamma51) + _T("\n");
-    sRet = sRet + tab + _T("Gamma52 : ") + appToString(m_fCoeffGamma52) + _T("\n");
-    sRet = sRet + tab + _T("Gamma53 : ") + appToString(m_fCoeffGamma53) + _T("\n");
-    sRet = sRet + tab + _T("Gamma54 : ") + appToString(m_fCoeffGamma54) + _T("\n");
-
-    sRet = sRet + tab + _T("Sigma12 : ") + appToString(m_fCoeffSigma12) + _T("\n");
-    sRet = sRet + tab + _T("Sigma13 : ") + appToString(m_fCoeffSigma13) + _T("\n");
-    sRet = sRet + tab + _T("Sigma14 : ") + appToString(m_fCoeffSigma14) + _T("\n");
-    sRet = sRet + tab + _T("Sigma23 : ") + appToString(m_fCoeffSigma23) + _T("\n");
-    sRet = sRet + tab + _T("Sigma24 : ") + appToString(m_fCoeffSigma24) + _T("\n");
-    sRet = sRet + tab + _T("Sigma34 : ") + appToString(m_fCoeffSigma34) + _T("\n");
+    CCString sRet = CFieldFermionKSSU3Gamma::GetInfos(tab);
 
     sRet = sRet + tab + _T("Charge : ") + appToString(m_fCharge) + _T("\n");
-
     sRet = sRet + tab + _T("EMField ID : ") + appToString(m_byEMFieldID) + _T("\n");
 
     return sRet;

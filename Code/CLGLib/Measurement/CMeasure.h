@@ -432,6 +432,17 @@ public:
     void WriteRealListToFile(const CCString& sFileName) const;
     void WriteCmpListToFile(const CCString& sFileName) const;
 
+    CCString GetInfos(const CCString& tab) const override
+    {
+        CCString sRet = CBase::GetInfos(tab);
+        sRet = sRet + tab + _T("MeasureId : ") + appToString(m_byId) + _T("\n");
+        sRet = sRet + tab + _T("Smearing : ") + appToString(m_bNeedSmearing) + _T("\n");
+        sRet = sRet + tab + _T("FermionFieldId : ") + appToString(m_byFermionFieldId) + _T("\n");
+        sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_lstGaugeFieldIds) + _T("\n");
+        sRet = sRet + tab + _T("BosonFields : ") + appToString(m_lstBosonFieldIds) + _T("\n");
+        return sRet;
+    }
+
 protected:
 
     void UpdateRealResult(Real fResult, UBOOL bUpdateConfigurationCount = TRUE)
@@ -497,6 +508,13 @@ public:
         TArray<TArray<CLGComplex>> ret;
         appCrucial(_T("ExportDiagnal not implemented\n"));
         return ret;
+    }
+
+    CCString GetInfos(const CCString& tab) const override
+    {
+        CCString sRet = CMeasure::GetInfos(tab);
+        sRet = sRet + tab + _T("FieldCount : ") + appToString(m_uiFieldCount) + _T("\n");
+        return sRet;
     }
 
 protected:

@@ -444,8 +444,7 @@ void CActionGaugePlaquettePolar::SetR(Real fIn, Real fOut)
 
 CCString CActionGaugePlaquettePolar::GetInfos(const CCString &tab) const
 {
-    CCString sRet = tab + _T("Name : CActionGaugePlaquetteRigidAcc\n");
-    sRet = sRet + CAction::GetInfos(tab);
+    CCString sRet = CAction::GetInfos(tab);
 
     sRet = sRet + tab + _T("Beta : [") +  + _T("]\n");
     for (UINT i = 0; i < _HC_Lx; ++i)

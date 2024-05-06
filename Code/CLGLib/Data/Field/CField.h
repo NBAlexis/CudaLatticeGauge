@@ -152,7 +152,7 @@ public:
     virtual BYTE* CopyDataOut(UINT &uiSize) const = 0;
     virtual BYTE* CopyDataOutFloat(UINT& uiSize) const = 0;
     virtual BYTE* CopyDataOutDouble(UINT& uiSize) const = 0;
-    virtual CCString GetInfos(const CCString &tab) const;
+    CCString GetInfos(const CCString &tab) const override;
 
 #pragma endregion
 

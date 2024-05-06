@@ -70,12 +70,6 @@ DOUBLE CActionFermionKS::Energy(UBOOL bBeforeEvolution, INT gaugeNum, INT bosonN
     return res.x;
 }
 
-CCString CActionFermionKS::GetInfos(const CCString &tab) const
-{
-    CCString sRet = tab + _T("Name : CFieldFermionKSSU3\n");
-    sRet = sRet + CAction::GetInfos(tab);
-    return sRet;
-}
 
 __END_NAMESPACE
 

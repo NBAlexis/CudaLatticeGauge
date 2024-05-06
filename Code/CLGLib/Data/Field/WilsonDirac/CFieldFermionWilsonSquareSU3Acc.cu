@@ -290,10 +290,8 @@ void CFieldFermionWilsonSquareSU3Acc::CopyTo(CField* U) const
 
 CCString CFieldFermionWilsonSquareSU3Acc::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3Acc\n");
-    sRet = sRet + CFieldFermion::GetInfos(tab);
-    sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
+    CCString sRet = CFieldFermionWilsonSquareSU3::GetInfos(tab);
+    sRet = sRet + tab + _T("Acc : ") + appToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }
 

@@ -2098,16 +2098,10 @@ void CFieldFermionWilsonSquareSU3DR::CopyTo(CField* U) const
 
 CCString CFieldFermionWilsonSquareSU3DR::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DR\n");
-    sRet = sRet + CFieldFermion::GetInfos(tab);
-    sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
-    sRet = sRet + tab + _T("Naive : ") + (m_bNaive ? _T("1") : _T("0"));
-    sRet = sRet + tab + _T("Exponential : ") + (m_bExponential ? _T("1") : _T("0"));
-    sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftCenter ? _T("1") : _T("0"));
-
-    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
-    sRet = sRet + tab + _T("boundary : [") + appToString(boundary.x) + _T(", ") + appToString(boundary.y) + _T(", ") + appToString(boundary.z) + _T(", ") + appToString(boundary.w) + _T("]\n");
+    CCString sRet = CFieldFermionWilsonSquareSU3D::GetInfos(tab);
+    sRet = sRet + tab + _T("Naive : ") + appToString(m_bNaive) + _T("\n");
+    sRet = sRet + tab + _T("Exponential : ") + appToString(m_bExponential) + _T("\n");
+    sRet = sRet + tab + _T("ShiftCenter : ") + appToString(m_bShiftCenter) + _T("\n");
 
     return sRet;
 }

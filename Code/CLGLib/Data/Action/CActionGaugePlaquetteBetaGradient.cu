@@ -423,9 +423,7 @@ DOUBLE CActionGaugePlaquetteGradient::EnergySingleField(UBOOL bBeforeEvolution, 
 
 CCString CActionGaugePlaquetteGradient::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CActionGaugePlaquetteGradient\n");
-    sRet = sRet + CAction::GetInfos(tab);
+    CCString sRet = CAction::GetInfos(tab);
     sRet = sRet + tab + _T("Beta : ");
     for (INT i = 0; i < _HC_Lzi; ++i)
     {

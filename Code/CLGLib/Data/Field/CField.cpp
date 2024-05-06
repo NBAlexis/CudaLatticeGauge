@@ -71,7 +71,8 @@ CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) cons
 
 CCString CField::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("FieldId : ") + appToString(m_byFieldId) + _T("\n");
+    CCString sRet = CBase::GetInfos(tab);
+    sRet = sRet + tab + _T("FieldId : ") + appToString(m_byFieldId) + _T("\n");
     sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
     sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;

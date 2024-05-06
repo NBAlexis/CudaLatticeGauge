@@ -20,12 +20,25 @@ __BEGIN_NAMESPACE
 class CLGAPI CFieldBoundary : public CBase
 {
 public:
-    CFieldBoundary() {}
+    CFieldBoundary() : m_byFieldId(0) {}
     ~CFieldBoundary() {}
 
     virtual EFieldType GetFieldType() const = 0;
-    virtual void InitialField(CParameters& param) = 0;
-    virtual CCString GetInfos(const CCString &tab) const = 0;
+    virtual void InitialField(CParameters& param)
+    {
+        INT iValue = 1;
+        param.FetchValueINT(_T("FieldId"), iValue);
+        m_byFieldId = static_cast<BYTE>(iValue);
+    }
+
+    CCString GetInfos(const CCString& tab) const override
+    {
+        CCString ret = CBase::GetInfos(tab);
+        ret = ret + tab + _T("FieldId : ") + appToString(m_byFieldId) + _T("\n");
+        return ret;
+    }
+
+    BYTE m_byFieldId;
 };
 
 __END_NAMESPACE

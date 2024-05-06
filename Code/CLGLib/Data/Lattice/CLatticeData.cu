@@ -349,6 +349,14 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
     }
 
+    sInfos.Format(_T("Measure : %d\n"), m_pMeasurements->m_lstAllMeasures.Num());
+    sRet = sRet + sTab + sInfos;
+    for (INT i = 0; i < m_pMeasurements->m_lstAllMeasures.Num(); ++i)
+    {
+        sRet = sRet + sTab + _T("Measure") + appToString(i) + _T(" : \n");
+        sRet = sRet + m_pMeasurements->m_lstAllMeasures[i]->GetInfos(sTab + _T("    "));
+    }
+
     if (NULL != m_pGaugeSmearing)
     {
         sRet = sRet + sTab + _T("Gauge Smearing : \n");
