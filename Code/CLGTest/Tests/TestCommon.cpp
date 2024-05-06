@@ -282,7 +282,7 @@ UINT TestGaugeInvarience(CParameters&)
     pGaugeCopy->AxpyMinus(appGetLattice()->m_pGaugeField[0]);
     CMeasure::LogGeneralComplex(pGaugeCopy->Dot(pGaugeCopy));
     
-    for (INT j = 0; j < appGetLattice()->m_pOtherFields.Num(); ++j)
+    for (INT j = 0; j < appGetLattice()->m_pFermionField.Num(); ++j)
     {
         pRandom->AlsoFixingFermion(dynamic_cast<CFieldFermion*>(appGetLattice()->GetFieldById(static_cast<BYTE>(j + 2))));
     }

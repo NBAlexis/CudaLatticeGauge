@@ -236,6 +236,37 @@ void CRandom::InitialTableSchrage(UINT )
     _kernalAllocateSeedTable << <block, threads >> > (m_pDeviceSeedTable);
 }
 
+UINT CRandom::DebugSeedTable() const
+{
+    UINT* hostseedtable = (UINT*)(malloc(sizeof(UINT) * _HC_Volume * (_HC_Dir + 1)));
+    checkCudaErrors(cudaMemcpy(hostseedtable, m_pDeviceSeedTable, sizeof(UINT) * _HC_Volume * (_HC_Dir + 1), cudaMemcpyDeviceToHost));
+
+    appGeneral(_T("%d, %d, %d, %d\n"), hostseedtable[0], hostseedtable[1], hostseedtable[2], hostseedtable[3]);
+
+    UINT uiError = 0;
+    if (static_cast<INT>(hostseedtable[0]) != 1566952946)
+    {
+        ++uiError;
+    }
+    if (static_cast<INT>(hostseedtable[1]) != -436264799)
+    {
+        ++uiError;
+    }
+    if (static_cast<INT>(hostseedtable[2]) != 846144630)
+    {
+        ++uiError;
+    }
+    if (static_cast<INT>(hostseedtable[3]) != 2128554059)
+    {
+        ++uiError;
+    }
+
+    appSafeFree(hostseedtable);
+    return uiError;
+}
+
+
+
 Real GetRandomReal()
 {
     return appGetLattice()->m_pRandom->GetRandomF();

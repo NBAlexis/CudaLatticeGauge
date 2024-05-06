@@ -69,6 +69,14 @@ CCString CField::SaveToFile(const CCString& fileName, EFieldFileType eType) cons
     return _T("Not supported");
 }
 
+CCString CField::GetInfos(const CCString& tab) const
+{
+    CCString sRet = tab + _T("FieldId : ") + appToString(m_byFieldId) + _T("\n");
+    sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
+    sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
+    return sRet;
+}
+
 CFieldFermion::CFieldFermion()
 : CField()
 {
@@ -125,6 +133,8 @@ UBOOL CFieldFermion::RationalApproximation(EFieldOperator op, INT gaugeNum, INT 
 
 void CFieldFermionKS::InitialOtherParameters(CParameters& params)
 {
+    CFieldFermion::InitialOtherParameters(params);
+
     params.FetchValueReal(_T("Mass"), m_f2am);
     if (m_f2am < F(0.00000001))
     {

@@ -635,6 +635,9 @@
     <ClCompile Include="Data\Action\CAction.cpp">
       <Filter>Data\Action</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\Math\HostRandom.cpp">
+      <Filter>Tools\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

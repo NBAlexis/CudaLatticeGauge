@@ -13,6 +13,8 @@ TestList* _testSuits;
 
 UINT RunTest(CParameters&params, const TestList* pTest)
 {
+    appQuitCLG();
+
     appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
     CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
     appGeneral(_T("============= Parameters =============\n"));
@@ -31,7 +33,7 @@ UINT RunTest(CParameters&params, const TestList* pTest)
     appGeneral(_T("=========== Finished %s, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), pTest->m_sParamName, uiErrors, timer.Elapsed());
 
     //Final
-    appQuitCLG();
+    //appQuitCLG();
 
     return uiErrors;
 }
@@ -161,7 +163,7 @@ int main(int argc, char * argv[])
     ListAllTests(category);
     while (TRUE)
     {
-        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  p - Print Device info\n");
+        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info\n");
         //ListAllTests(category);
         //inputNumber = -1;
         std::string name;
@@ -180,9 +182,14 @@ int main(int argc, char * argv[])
             ListAllTests(category);
             bExcuted = TRUE;
         }
-        else if (sRes == _T("p"))
+        else if (sRes == _T("d"))
         {
             CCudaHelper::DeviceQuery();
+            bExcuted = TRUE;
+        }
+        else if (sRes == _T("i"))
+        {
+            appGeneral(_T("\n=======================================\n") + appGetLattice()->GetInfos(_T("")) + _T("\n=======================================\n"));
             bExcuted = TRUE;
         }
         else if (appToString(number) == sRes)
@@ -249,6 +256,39 @@ int main(int argc, char * argv[])
             }
             timer.Stop();
             appGeneral(_T("\nRun all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, allTests.Num(), uiError, timer.Elapsed() * 0.001f);
+            for (INT i = 0; i < problemTest.Num(); ++i)
+            {
+                appGeneral(_T("problem test suits: %s\n"), problemTest[i].c_str());
+            }
+            bExcuted = TRUE;
+        }
+        else if (sRes == _T("c"))
+        {
+            CTimer timer;
+            timer.Start();
+            UINT uiError = 0;
+            UINT uiPassed = 0;
+            UINT uiTotal = 0;
+            TArray<CCString> problemTest;
+            for (INT i = 0; i < allTests.Num(); ++i)
+            {
+                if (allTests[i]->IsCheck())
+                {
+                    ++uiTotal;
+                    UINT uiThisError = RunTest(params, allTests[i]);
+                    if (0 == uiThisError)
+                    {
+                        ++uiPassed;
+                    }
+                    else
+                    {
+                        uiError += uiThisError;
+                        problemTest.AddItem(allTests[i]->m_sParamName);
+                    }
+                }
+            }
+            timer.Stop();
+            appGeneral(_T("\nRun all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, uiTotal, uiError, timer.Elapsed() * 0.001f);
             for (INT i = 0; i < problemTest.Num(); ++i)
             {
                 appGeneral(_T("problem test suits: %s\n"), problemTest[i].c_str());
@@ -327,6 +367,8 @@ int main(int argc, char * argv[])
         }
     }
     DeleteAllLists(category);
+    appQuitCLG();
+
     return 0;
 }
 

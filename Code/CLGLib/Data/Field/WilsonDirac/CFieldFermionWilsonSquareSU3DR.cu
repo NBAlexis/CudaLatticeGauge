@@ -2100,6 +2100,7 @@ CCString CFieldFermionWilsonSquareSU3DR::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3DR\n");
+    sRet = sRet + CFieldFermion::GetInfos(tab);
     sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
     sRet = sRet + tab + _T("Naive : ") + (m_bNaive ? _T("1") : _T("0"));
     sRet = sRet + tab + _T("Exponential : ") + (m_bExponential ? _T("1") : _T("0"));

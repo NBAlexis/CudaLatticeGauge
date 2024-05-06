@@ -51,6 +51,7 @@ public:
 
     TArray<class CFieldGauge*> m_pGaugeField;
     TArray<class CFieldBoson*> m_pBosonField;
+    TArray<class CFieldFermion*> m_pFermionField;
     class CFieldGauge* m_pAphys;
     class CFieldGauge* m_pUpure;
 
@@ -60,7 +61,7 @@ public:
     */
     //class CFieldGauge* m_pGaugeBoundary;
 
-    TArray<class CField*> m_pOtherFields; //only for delete
+    
     THashMap<BYTE, class CField*> m_pFieldMap;
     TArray<class CFieldBoundary*> m_pAllBoundaryFields; //only for delete
     THashMap<BYTE, class CFieldBoundary*> m_pBoundaryFieldMap;
@@ -101,6 +102,12 @@ public:
 
     static INT GetGaugeFieldIndexById(INT num, const class CFieldGauge* const* gaugeFields, BYTE byFieldId);
     static INT GetBosonFieldIndexById(INT num, const class CFieldBoson* const* bosonFields, BYTE byFieldId);
+
+    friend class CCLGLibManager;
+
+protected:
+
+    TArray<class CField*> m_pOtherFields; //only for delete
 };
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);

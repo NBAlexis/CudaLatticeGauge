@@ -109,7 +109,7 @@ public:
 
     UBOOL SingleField() const
     {
-        return 1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds[0];
+        return 1 == m_byGaugeFieldIds.Num() && 0 == m_byBosonFieldIds.Num();
     }
 
     virtual void DebugPrintMe() const = 0;
@@ -152,7 +152,7 @@ public:
     virtual BYTE* CopyDataOut(UINT &uiSize) const = 0;
     virtual BYTE* CopyDataOutFloat(UINT& uiSize) const = 0;
     virtual BYTE* CopyDataOutDouble(UINT& uiSize) const = 0;
-    virtual CCString GetInfos(const CCString &tab) const = 0;
+    virtual CCString GetInfos(const CCString &tab) const;
 
 #pragma endregion
 
@@ -165,9 +165,14 @@ public:
     * The final result of dot, should be sum of pDeviceBuffer
     */
     virtual cuDoubleComplex Dot(const CField* other) const = 0;
+
     virtual CLGComplex DotReal(const CField* other) const
     {
+#if _CLG_DOUBLEFLOAT
+        return Dot(other);
+#else
         return _cToFloat(Dot(other));
+#endif
     }
 
     virtual void CopyTo(CField* U) const

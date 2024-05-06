@@ -46,7 +46,7 @@ public:
             PrepareForHMCS(pGauge);
             return;
         }
-        appCrucial(_T("PrepareForHMC not implemented\n"));
+        appCrucial(_T("CFieldFermion PrepareForHMC not implemented\n"));
     }
 
     /**

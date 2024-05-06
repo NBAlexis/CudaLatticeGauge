@@ -1496,6 +1496,7 @@ BYTE* CFieldGaugeU1Real::CopyDataOutDouble(UINT& uiSize) const
 CCString CFieldGaugeU1Real::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldGaugeU1Real\n");
+    sRet = sRet + CFieldGauge::GetInfos(tab);
     sRet = sRet + tab + _T("Initialed : ") + __ENUM_TO_STRING(EFieldInitialType, m_eInitialType) + _T("\n");
 
     sRet = sRet + tab + _T("Chemical : ") + __ENUM_TO_STRING(EU1RealType, m_eChemical) + _T(" , v = ") + appToString(m_fChemical) + _T("\n");

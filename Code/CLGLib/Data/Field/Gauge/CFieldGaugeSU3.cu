@@ -1715,8 +1715,8 @@ BYTE* CFieldGaugeSU3::CopyDataOutDouble(UINT& uiSize) const
 
 CCString CFieldGaugeSU3::GetInfos(const CCString &tab) const
 {
-    CCString sRet;
-    sRet = tab + _T("Name : CFieldGaugeSU3\n");
+    CCString sRet = tab + _T("Name : CFieldGaugeSU3\n");
+    sRet = sRet + CFieldGauge::GetInfos(tab);
     return sRet;
 }
 

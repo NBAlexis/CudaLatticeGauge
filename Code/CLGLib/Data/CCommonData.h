@@ -253,6 +253,18 @@ __DEFINE_ENUM(ESolverPhase,
 }
 #endif /* __cplusplus */
 
+template<>
+inline CCString appToString(const SSmallInt4& content)
+{
+    CCString sret;
+    sret.Format(_T("[%d, %d, %d, %d]"),
+        static_cast<INT>(content.x),
+        static_cast<INT>(content.y),
+        static_cast<INT>(content.z),
+        static_cast<INT>(content.w));
+    return sret;
+}
+
 //====================================================
 // Some common structures
 //====================================================

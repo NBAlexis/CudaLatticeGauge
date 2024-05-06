@@ -148,10 +148,12 @@ UINT TestEtaShift(CParameters& sParam)
     CFieldFermionKSU1* pF4 = dynamic_cast<CFieldFermionKSU1*>(pF3->GetCopy());
     CFieldGaugeSU3* pSU3 = new CFieldGaugeSU3();
     pSU3->InitialField(EFIT_Random);
+    pSU3->m_byFieldId = 1;
     TArray<CFieldGauge*> su3;
     su3.AddItem(pSU3);
     CFieldGaugeU1* pU1 = new CFieldGaugeU1();
     pU1->InitialField(EFIT_Random);
+    pU1->m_byFieldId = 1;
     TArray<CFieldGauge*> u1;
     u1.AddItem(pU1);
     pF1->TestSetEtaShift(TRUE);

@@ -247,6 +247,7 @@ void CMeasure::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class C
     {
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         OnConfigurationAcceptedSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx]);
+        return;
     }
     appCrucial(_T("OnConfigurationAccepted not implemented!\n"));
 }
@@ -257,6 +258,7 @@ void CMeasure::SourceSanning(INT gaugeNum, INT bosonNum, const class CFieldGauge
     {
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         SourceSanningSingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], sources, site);
+        return;
     }
     appCrucial(_T("SourceSanning not implemented!\n"));
 }
@@ -267,6 +269,7 @@ void CMeasure::OnConfigurationAcceptedZ4(INT gaugeNum, INT bosonNum, const class
     {
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pAcceptGauge, m_lstGaugeFieldIds[0]);
         OnConfigurationAcceptedZ4SingleField(pAcceptGauge[idx], (NULL == pCorrespondingStaple) ? NULL : pCorrespondingStaple[idx], pZ4, pInverseZ4, bStart, bEnd);
+        return;
     }
     appCrucial(_T("OnConfigurationAcceptedZ4 not implemented!\n"));
 }

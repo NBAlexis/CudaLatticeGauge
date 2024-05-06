@@ -35,6 +35,7 @@ enum
     _TEST_DOUBLE = 0x02,
     _TEST_RELEASE = 0x04,
     _TEST_SINGLE = 0x08,
+    _TEST_CHECK = 0x10,
 };
 
 struct STestSuits
@@ -64,6 +65,11 @@ struct STestSuits
     UBOOL OnlySingle() const
     {
         return 0 != (m_uiTag & static_cast<UINT>(_TEST_SINGLE));
+    }
+
+    UBOOL IsCheck() const
+    {
+        return 0 != (m_uiTag & static_cast<UINT>(_TEST_CHECK));
     }
 
     CCString GetName() const

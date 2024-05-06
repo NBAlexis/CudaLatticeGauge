@@ -616,6 +616,8 @@ void CFieldFermionWilsonSquareSU3::InitialWithByte(BYTE* byData)
 
 void CFieldFermionWilsonSquareSU3::InitialOtherParameters(CParameters& params)
 {
+    CFieldFermion::InitialOtherParameters(params);
+
     params.FetchValueReal(_T("Hopping"), m_fKai);
     if (m_fKai < F(0.00000001))
     {
@@ -1221,6 +1223,7 @@ TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(IN
 CCString CFieldFermionWilsonSquareSU3::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3\n");
+    sRet = sRet + CFieldFermion::GetInfos(tab);
     sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
     return sRet;
 }

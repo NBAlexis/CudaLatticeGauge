@@ -241,6 +241,7 @@
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftNested.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverGMRESMDR.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CSolverTFQMR.cpp" />
+    <ClCompile Include="Tools\Math\HostRandom.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedForceGradient.cpp" />
     <ClCompile Include="Update\Continous\CIntegratorMultiLevelNestedOmelyan.cpp" />

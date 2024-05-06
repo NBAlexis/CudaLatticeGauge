@@ -148,6 +148,13 @@ __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorXORWOW, GeneratorXORWOW)
 __REGIST_TEST(TestSU3Generator, Random, TestSU3GeneratorScrambledSOBOL32, GeneratorScrambledSOBOL32);
 
 
+UINT TestSeed(CParameters& sParam)
+{
+    return appGetLattice()->m_pRandom->DebugSeedTable();
+}
+
+___REGIST_TEST(TestSeed, Random, TestSeed, Seeds, _TEST_CHECK);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

@@ -544,6 +544,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
     pFermion->InitialField(eFieldInitial);
     pFermion->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
+    m_pLatticeData->m_pFermionField.AddItem(pFermion);
     m_pLatticeData->m_pOtherFields.AddItem(pFermion);
     TArray<INT> periodic;
     if (params.FetchValueArrayINT(_T("Period"), periodic))
@@ -581,8 +582,12 @@ void CCLGLibManager::CreateBoundaryFields(class CParameters& params, const CCStr
         appCrucial(_T("Unable to create the boundary fermion field! with name %s!"), sFieldClassName.c_str());
     }
     pBC->InitialField(params);
-
-    __FetchIntWithDefault(_T("FieldId"), -1);
+    INT defaultId = -1;
+    if (params.GetName() == _T("GaugeBoundary"))
+    {
+        defaultId = 1;
+    }
+    __FetchIntWithDefault(_T("FieldId"), defaultId);
     const BYTE byFieldId = static_cast<BYTE>(iVaules);
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
     appGeneral(_T("Create the boundary fermion field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
@@ -1096,8 +1101,14 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     // at last, fill the field pointers
     // and copy the index data to device
     InitialIndexBuffer();
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
     m_pCudaHelper->SetFieldPointers();
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
     m_pLatticeData->FixAllFieldBoundary();
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
 
     if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
     {

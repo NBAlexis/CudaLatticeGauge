@@ -47,6 +47,7 @@ __DEFINE_ENUM (ERandomSeedType,
     ERST_ForceDWORD = 0x7fffffff,
     )
 
+
 class CLGAPI CRandom
 {
 public:
@@ -209,6 +210,8 @@ public:
         return _make_cuComplex(F(0.0), -F(1.0));
     }
 
+    static Real HostRandomF();
+
     __host__ __inline__ Real GetRandomF()
     {
         if (ER_Schrage == m_eRandomType)
@@ -216,9 +219,11 @@ public:
             return AM * GetRandomUISchrage();
         }
 
-        curandGenerateUniform(m_HGen, m_deviceBuffer, 1);
-        checkCudaErrors(cudaMemcpy(m_hostBuffer, m_deviceBuffer, sizeof(FLOAT), cudaMemcpyDeviceToHost));
-        return (Real)m_hostBuffer[0];
+        return HostRandomF();
+
+        //curandGenerateUniform(m_HGen, m_deviceBuffer, 1);
+        //checkCudaErrors(cudaMemcpy(m_hostBuffer, m_deviceBuffer, sizeof(FLOAT), cudaMemcpyDeviceToHost));
+        //return (Real)m_hostBuffer[0];
     }
 
     FLOAT* m_deviceBuffer;
@@ -250,12 +255,14 @@ public:
 
     UINT* m_pDeviceSeedTable;
 
+    UINT DebugSeedTable() const;
+
     /**
     * run on device, parally set the table
     */
     __device__ __inline__ static void _deviceAsignSeeds(UINT* devicePtr, UINT uiSeed, UINT uiFatIndex)
     {
-        devicePtr[uiFatIndex] = (1664525UL * (uiFatIndex + uiSeed) + 1013904223UL) & 0xffffffff;
+        devicePtr[uiFatIndex] = (1664525UL * (uiFatIndex + uiSeed) + 1013904223UL) & 0xffffffffUL;
     }
 
 protected:
@@ -264,13 +271,13 @@ protected:
 
     __device__ __inline__ UINT _deviceRandomUISchrage(UINT fatIndex) const
     {
-        m_pDeviceSeedTable[fatIndex] = ((1664525UL * m_pDeviceSeedTable[fatIndex] + 1013904223UL) & 0xffffffff);
+        m_pDeviceSeedTable[fatIndex] = ((1664525UL * m_pDeviceSeedTable[fatIndex] + 1013904223UL) & 0xffffffffUL);
         return m_pDeviceSeedTable[fatIndex];
     }
 
     __host__ __inline__ UINT GetRandomUISchrage()
     {
-        m_uiHostSeed = (1664525UL * m_uiHostSeed + 1013904223UL) & 0xffffffff;
+        m_uiHostSeed = (1664525UL * m_uiHostSeed + 1013904223UL) & 0xffffffffUL;
         return m_uiHostSeed;
     }
 

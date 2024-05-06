@@ -2248,9 +2248,9 @@ CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
 
-    sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0"));
-    sRet = sRet + tab + _T("Clover : ") + (m_bCloverEnergy ? _T("1") : _T("0"));
-    sRet = sRet + tab + _T("Torus : ") + (m_bTorus ? _T("1") : _T("0"));
+    sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0")) + _T("\n");
+    sRet = sRet + tab + _T("Clover : ") + (m_bCloverEnergy ? _T("1") : _T("0")) + _T("\n");
+    sRet = sRet + tab + _T("Torus : ") + (m_bTorus ? _T("1") : _T("0")) + _T("\n");
 
     return sRet;
 }

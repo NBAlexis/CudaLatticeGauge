@@ -424,6 +424,7 @@ CCString CFieldFermionWilsonSquareSU3D::GetInfos(const CCString &tab) const
 {
     CCString sRet;
     sRet = tab + _T("Name : CFieldFermionWilsonSquareSU3D\n");
+    sRet = sRet + CFieldFermion::GetInfos(tab);
     sRet = sRet + tab + _T("Hopping : ") + appToString(CCommonData::m_fKai) + _T("\n");
 
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);

@@ -65,13 +65,15 @@ void CAction::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const
     {
         INT idx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
         PrepareForHMCSingleField(gaugeFields[idx], iUpdateIterate);
+        return;
     }
-    appCrucial(_T("PrepareForHMC not implemented!\n"));
+    appCrucial(_T("CAction PrepareForHMC not implemented!\n"));
 }
 
 CCString CAction::GetInfos(const CCString& tab) const
 {
-    CCString sRet = tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
+    CCString sRet = tab + _T("ActionId : ") + appToString(m_byActionId) + _T("\n");
+    sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
     sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;
 }

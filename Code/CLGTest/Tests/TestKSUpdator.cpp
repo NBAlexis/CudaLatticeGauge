@@ -96,10 +96,10 @@ __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGr
 __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField, Nested11StageNf2p1MultiField);
 __REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4, P4);
 
-___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma, _TEST_RELEASE);
-___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj, _TEST_RELEASE);
-___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEM, KSGammaEM, _TEST_RELEASE);
-___REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSGammaEMProj, KSGammaEMProj, _TEST_RELEASE);
+___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma, _TEST_RELEASE);
+___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj, _TEST_RELEASE);
+___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEM, KSGammaEM, _TEST_RELEASE);
+___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaEMProj, KSGammaEMProj, _TEST_RELEASE);
 
 
 

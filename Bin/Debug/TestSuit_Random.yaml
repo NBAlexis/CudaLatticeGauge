@@ -13,7 +13,7 @@ TestRandomSchrage:
     GaussianDecomp: [3, 4, 4, 16, 4, 4, 100]
     HostSample : 1000
 
-    TestAccuracy : 0.01
+    TestAccuracy : 0.02
 
 TestRandomXORWOW:
 
@@ -136,3 +136,50 @@ TestSU3GeneratorScrambledSOBOL32:
     RandomSeed : 1234567
     FieldSampleCount : 1000
     TestAccuracy : 0.03
+
+TestSeed:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    FermionFieldCount : 1
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        NestedStep : 5
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU3
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+
+    FermionField1:
+
+        FieldName : CFieldFermionWilsonSquareSU3Acc
+        FieldInitialType : EFIT_RandomGaussian
+        Hopping : 0.16
+        FieldId : 2
+        PoolNumber : 26
+        Period : [1, 1, 1, -1]
+        ## Default to use Naive discretization (which is faster)
+

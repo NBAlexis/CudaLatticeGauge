@@ -287,6 +287,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftNested.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverGMRESMDR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CSolverTFQMR.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/HostRandom.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedForceGradient.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CIntegratorMultiLevelNestedOmelyan.cpp

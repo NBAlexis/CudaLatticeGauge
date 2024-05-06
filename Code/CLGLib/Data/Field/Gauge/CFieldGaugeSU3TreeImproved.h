@@ -51,6 +51,9 @@ public:
     Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
     Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
 #endif
+
+    CCString GetInfos(const CCString& tab) const override;
+
     Real m_fRectOverPlaq;
 
 #pragma endregion

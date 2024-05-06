@@ -1277,6 +1277,13 @@ TestFermionUpdatorKSGamma:
     ExpectedResDebug : 0.24
     ExpectedRes : 0.209288
 
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
+
     Updator:
 
         ## UpdatorType = { CHMC }
@@ -1383,6 +1390,13 @@ TestFermionUpdatorKSGammaProj:
     MeasureListLength : 1
     ExpectedResDebug : 0.24
     ExpectedRes : 0.209288
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -1492,6 +1506,13 @@ TestFermionUpdatorKSGammaEM:
     MeasureListLength : 1
     ExpectedResDebug : 0.24
     ExpectedRes : 0.209288
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -1614,6 +1635,13 @@ TestFermionUpdatorKSGammaEMProj:
     MeasureListLength : 1
     ExpectedResDebug : 0.24
     ExpectedRes : 0.210473
+
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 12
+    MetropolisDebug : 4
+    ExpectMiss : 2
+    ExpectMissDebug : 1
 
     Updator:
 

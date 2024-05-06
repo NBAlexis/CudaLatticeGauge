@@ -592,8 +592,9 @@ void CFieldGaugeSU3D::CopyTo(CField* pTarget) const
 CCString CFieldGaugeSU3D::GetInfos(const CCString &tab) const
 {
     CCString sRet = tab + _T("Name : CFieldGaugeSU3 Dirichlet\n");
+    sRet = sRet + CFieldGauge::GetInfos(tab);
     SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
-    sRet = sRet + tab + _T("boundary : [") + appToString(boundary.x) + _T(", ") + appToString(boundary.y) + _T(", ") + appToString(boundary.z) + _T(", ") + appToString(boundary.w) + _T("]\n");
+    sRet = sRet + tab + appToString(boundary) + _T("\n");
 
     return sRet;
 }

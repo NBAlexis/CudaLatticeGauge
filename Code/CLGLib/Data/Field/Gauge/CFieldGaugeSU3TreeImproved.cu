@@ -294,6 +294,14 @@ Real CFieldGaugeSU3TreeImproved::CalculatePlaqutteEnergyUsingStable(Real betaOve
     return fPlaqTerm;
 }
 
+CCString CFieldGaugeSU3TreeImproved::GetInfos(const CCString& tab) const
+{
+    CCString sRet = tab + _T("Name : CFieldGaugeSU3TreeImproved\n");
+    sRet = sRet + CFieldGauge::GetInfos(tab);
+    sRet = sRet + appToString(m_fRectOverPlaq) + _T("\n");
+    return sRet;
+}
+
 __END_NAMESPACE
 
 
