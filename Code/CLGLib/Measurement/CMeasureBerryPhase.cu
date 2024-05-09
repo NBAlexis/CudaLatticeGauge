@@ -408,7 +408,7 @@ void CMeasureBerryPhase::AllocateBuffers()
 
     //TODO: Not create boundary condition for U1, use the one as same as the default gauge
     m_pU1Field->m_byFieldId = 1;
-    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetGaugeFieldIdSingleField()));
+    m_pMomentumField = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
 }
 
 CMeasureBerryPhase::~CMeasureBerryPhase()
@@ -420,6 +420,14 @@ CMeasureBerryPhase::~CMeasureBerryPhase()
 void CMeasureBerryPhase::Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters& param, BYTE byId)
 {
     CMeasure::Initial(pOwner, pLatticeData, param, byId);
+
+    INT iValue = 1;
+    param.FetchValueINT(_T("WilsonDirac"), iValue);
+    m_bWilsonDirac = (0 != iValue);
+
+    iValue = 0;
+    param.FetchValueINT(_T("DoGaugeFixing"), iValue);
+    m_bGuageFixing = (0 != iValue);
 
     AllocateBuffers();
 }

@@ -300,6 +300,20 @@ int main(int argc, char * argv[])
             GClassGather.TraceAllClass();
             appGeneral(_T("\n================================\n"));
         }
+        else if (0 == sRes.Find(_T("print ")) && sRes.GetLength() > 6)
+        {
+            CCString sfieldid = sRes.Right(sRes.GetLength() - 6);
+            BYTE byNum = appStrToBYTE(sfieldid);
+            CField* field = appGetLattice()->GetFieldById(byNum);
+            if (NULL != field)
+            {
+                field->DebugPrintMe();
+            }
+            else
+            {
+                appGeneral(_T("Print field, but field not found, the command was: %s\n"), sRes);
+            }
+        }
         else
         {
             TArray<CCString> keys = category.GetAllKeys();

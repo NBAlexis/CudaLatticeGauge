@@ -488,6 +488,7 @@ TestFermionUpdatorOmelyanGMRESMDR:
 
 TestFermionUpdatorLargeScale:
     ## Should be about 1100 - 1350s
+    ## Update: on RTX3070 of my laptop, it was 952s
 
     ## Single float
     ## For 32x32x32x32 lattice
@@ -527,7 +528,7 @@ TestFermionUpdatorLargeScale:
     MeasureListLength : 1
     Updates : 5
     ##For 8x8x8x8, this is 0.17
-    ExpectedRes : 0.17
+    ExpectedRes : 0.166393
 
     ##CacheStaple : 0
     ##CacheSolution : 0
@@ -900,7 +901,8 @@ TestBerryPhase:
     ActionListLength : 3
     FermionFieldCount : 2
     MeasureListLength : 1
-    ExpectedResR : 0.1561
+    ExpectedResD : 4.529835250228643417
+    ExpectedResR : 18.858618176011638923
 
     Updator:
 

@@ -107,7 +107,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(20, TRUE);
 
     TArray<Real> lstRes;
-    appGeneral(_T("res = expected vs test: "));
+    appGeneral(_T("res = expected vs test: \n"));
     
     for (UINT i = 1; i < _HC_Lt; ++i)
     {
@@ -116,7 +116,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
 #else
         Real fRes = static_cast<Real>(_hostlog10d(pMeasure->m_lstResults[0][i] / pMeasure->m_lstResults[0][0]));
 #endif
-        appGeneral(_T("%f : %f, "), lstResExpected[i - 1], fRes);
+        appGeneral(_T("%f : %f \n"), lstResExpected[i - 1], fRes);
         if (appAbs(fRes - lstResExpected[i - 1]) > F(0.2))
         {
             ++uiError;
@@ -132,7 +132,7 @@ UINT TestFermionUpdatorWithMesonCorrelator(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(50, TRUE);
 
     const DOUBLE fRes = pMeasure->m_lstResults[0][0];
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
+    appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
     if (appAbs(fRes - fExpected) > F(0.005))
     {
         return 1;
@@ -182,19 +182,35 @@ UINT TestFermionUpdatorL(CParameters& sParam)
     const Real fHDiff = appGetLattice()->m_pUpdator->GetHDiff();
     const Real fH = appGetLattice()->m_pUpdator->GetHValue();
 
-    appGeneral(_T("res : expected=%f res=%f\n"), fExpected, fRes);
+#if _CLG_DOUBLEFLOAT
+    appGeneral(_T("res : expected=%f res=%f |r-e| should be < 0.00001\n"), fExpected, fRes);
+    UINT uiError = 0;
+    if (appAbs(fRes - fExpected) > F(0.00001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("H = %f, HDiff = %1.8f : expected < 1E-8 H (which is %f)\n"), fH, F(0.00000001) * fH, fHDiff);
+
+    if (fHDiff > F(0.00000001) * fH)
+    {
+        ++uiError;
+    }
+#else
+    appGeneral(_T("res : expected=%f res=%f |r-e| should be < 0.01\n"), fExpected, fRes);
     UINT uiError = 0;
     if (appAbs(fRes - fExpected) > F(0.01))
     {
         ++uiError;
     }
 
-    appGeneral(_T("H = %f, HDiff = %1.8f : expected < 3E-7 H\nThe error can be 1E-7 H, which > 1, so here we do NOT use 0.3 to judge.\n"), fH, fHDiff);
+    appGeneral(_T("H = %f, HDiff = %1.8f : expected < 3E-7 H (which is %f)\nThe error can be 1E-7 H, which > 1, so here we do NOT use 0.3 to judge.\n"), fH, F(0.0000003) * fH, fHDiff);
 
     if (fHDiff > F(0.0000003) * fH)
     {
         ++uiError;
     }
+#endif
 
     return uiError;
 }
@@ -218,13 +234,20 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
 
     UINT uiError = 0;
     Real fExpected1 = F(9.0);
-    sParam.FetchValueReal(_T("ExpectedRes1"), fExpected1);
     Real fExpected2 = F(-24.0);
-    sParam.FetchValueReal(_T("ExpectedRes2"), fExpected2);
     Real fExpected3 = F(9.0);
-    sParam.FetchValueReal(_T("ExpectedRes3"), fExpected3);
     Real fExpected4 = F(-24.0);
-    sParam.FetchValueReal(_T("ExpectedRes4"), fExpected4);
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedRes1D"), fExpected1);
+    sParam.FetchValueReal(_T("ExpectedRes2D"), fExpected2);
+    sParam.FetchValueReal(_T("ExpectedRes3D"), fExpected3);
+    sParam.FetchValueReal(_T("ExpectedRes4D"), fExpected4);
+#else
+    sParam.FetchValueReal(_T("ExpectedRes1R"), fExpected1);
+    sParam.FetchValueReal(_T("ExpectedRes2R"), fExpected2);
+    sParam.FetchValueReal(_T("ExpectedRes3R"), fExpected3);
+    sParam.FetchValueReal(_T("ExpectedRes4R"), fExpected4);
+#endif
 
 #if _CLG_DEBUG
 
@@ -233,10 +256,6 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     //assert(static_cast<UINT>(lstResExpected.Num()) == _HC_Lt - 1);
     appGetLattice()->m_pUpdator->Update(1, FALSE);
     appGetLattice()->m_pUpdator->Update(8, TRUE);
-    appGeneral(_T("res1=%f\n"), pMeasure->m_lstAverageResults[0][0]);
-    appGeneral(_T("res2=%f\n"), pMeasure->m_lstAverageResults[1][1]);
-    appGeneral(_T("res3=%f\n"), pMeasuresimple->m_lstAverageResults[0][0]);
-    appGeneral(_T("res4=%f\n"), pMeasuresimple->m_lstAverageResults[1][1]);
     //TArray<Real> lstRes;
     //appGeneral(_T("res = expected vs test: "));
 
@@ -250,11 +269,25 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     //    }
     //}
     //appGeneral(_T("\n"));
+
+    appGeneral(_T("check1 pMeasure m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[0][0], fExpected1);
+    appGeneral(_T("check2 pMeasure m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[1][1], fExpected2);
+    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected3);
+    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected4);
+
     if (appAbs(pMeasure->m_lstAverageResults[0][0] - fExpected1) > F(2.0))
     {
         ++uiError;
     }
     if (appAbs(pMeasure->m_lstAverageResults[1][1] - fExpected2) > F(2.0))
+    {
+        ++uiError;
+    }
+    if (appAbs(pMeasuresimple->m_lstAverageResults[0][0] - fExpected3) > F(2.0))
+    {
+        ++uiError;
+    }
+    if (appAbs(pMeasuresimple->m_lstAverageResults[1][1] - fExpected4) > F(2.0))
     {
         ++uiError;
     }
@@ -276,6 +309,11 @@ UINT TestFermionUpdatorWithMesonCorrelatorStaggered(CParameters& sParam)
     appGetLattice()->m_pUpdator->Update(100, TRUE);
     //appGeneral(_T("res1=%f\n"), pMeasure->m_lstAverageResults[0][0]);
     //appGeneral(_T("res2=%f\n"), pMeasure->m_lstAverageResults[1][1]);
+    appGeneral(_T("check1 pMeasure m_lstAverageResults[0][0] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[0][0], fExpected1);
+    appGeneral(_T("check2 pMeasure m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasure->m_lstAverageResults[1][1], fExpected2);
+    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected3);
+    appGeneral(_T("check2 pMeasuresimple m_lstAverageResults[1][1] = %f, expected: %f\n"), pMeasuresimple->m_lstAverageResults[1][1], fExpected4);
+
     if (appAbs(pMeasure->m_lstAverageResults[0][0] - fExpected1) > F(0.3))
     {
         ++uiError;
@@ -294,7 +332,11 @@ __REGIST_TEST(TestFermionUpdatorWithMesonCorrelatorStaggered, UpdatorKS, TestFer
 UINT TestBerryPhase(CParameters& sParam)
 {
     Real fExpected = F(0.2064);
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedResD"), fExpected);
+#else
+    sParam.FetchValueReal(_T("ExpectedResR"), fExpected);
+#endif
 
     CMeasureBerryPhase* pMeasure = dynamic_cast<CMeasureBerryPhase*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     if (NULL == pMeasure)
@@ -335,6 +377,13 @@ UINT TestBerryPhase(CParameters& sParam)
     }
 
     pMeasure->Report();
+
+    Real fCheck = static_cast<Real>(pMeasure->m_lstData[pMeasure->GetConfigurationCount() - 1][0]);
+    appGeneral(_T("Berry phase of last configuration at t=0, expected: %f, res: %f\n"), fExpected, fCheck);
+    if (abs(fCheck - fExpected) > F(0.0001))
+    {
+        return 1;
+    }
 
     return 0;
 }

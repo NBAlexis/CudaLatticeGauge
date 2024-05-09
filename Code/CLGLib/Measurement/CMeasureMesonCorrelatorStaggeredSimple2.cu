@@ -282,6 +282,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
     //========== extract result ===========
     if (m_bShowResult)
     {
+        appPushLogDate(FALSE);
         appGeneral(_T("==================== correlators ===============\n"));
     }
 #if !_CLG_DOUBLEFLOAT
@@ -321,6 +322,10 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
         }
     }
     m_lstResults.AddItem(thisConf);
+    if (m_bShowResult)
+    {
+        appPopLogDate();
+    }
 
     ++m_uiConfigurationCount;
 }
@@ -399,6 +404,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::ReleaseSource()
 
 void CMeasureMesonCorrelatorStaggeredSimple2::Report()
 {
+    appPushLogDate(FALSE);
     appGeneral(_T(" =====================================================\n"));
     appGeneral(_T(" =================== Staggered Meson =================\n"));
     appGeneral(_T(" =====================================================\n\n"));
@@ -447,6 +453,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Report()
         }
         appGeneral(_T("}%s"), ty == 19 ? _T("\n};\n") : _T(",\n"));
     }
+    appPopLogDate();
 }
 
 void CMeasureMesonCorrelatorStaggeredSimple2::Reset()

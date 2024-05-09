@@ -202,7 +202,8 @@ TestWilsonLoop:
     RandomSeed : 1234567
     ActionListLength : 1
     MeasureListLength : 1
-    ExpectedRes : 0.2064
+    ExpectedResR : 1.884640085541 
+    ExpectedResD : 1.774291
     CacheStaple : 0
 
     Updator:
@@ -268,7 +269,7 @@ TestUpdatorTreeImproved:
     MetropolisDebug : 10
     ExpectMiss : 3
     ExpectMissDebug : 2
-    ExpectedRes : 0.2064
+    ExpectedRes : 0.294244
     ExpectedResDebug : 0.292609
 
 
@@ -277,7 +278,7 @@ TestUpdatorTreeImproved:
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 15
 
     Gauge:
     

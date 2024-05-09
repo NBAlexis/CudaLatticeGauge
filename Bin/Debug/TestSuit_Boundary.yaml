@@ -223,7 +223,7 @@ TestBoundaryMapping:
         FieldId : 3
         PoolNumber : 15
 
-        Period : [1, 1, 1, -1]
+        Period : [1, 1, 0, -1]
 
         # MC is to prepare
         MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
@@ -257,7 +257,8 @@ TestBoundaryMapping:
    
         ActionName : CActionGaugePlaquetteRotating
         Beta : 5
-        Using4Plaqutte : 1
+        # Using4Plaqutte : 1 Using4Plaqutte is discarded, and changed to CloverEnergy
+        CloverEnergy : 1
 
     Action2:
         ActionName : CActionFermionWilsonNf2

@@ -190,7 +190,11 @@ __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorTreeImproved, TreeImproved);
 UINT TestWilsonLoop(CParameters& sParam)
 {
     Real fExpected = F(0.2064);
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+#if _CLG_DEBUG
+    sParam.FetchValueReal(_T("ExpectedResD"), fExpected);
+#else
+    sParam.FetchValueReal(_T("ExpectedResR"), fExpected);
+#endif
 
     //we calculate staple energy from beta = 1 - 6
     CActionGaugePlaquette* pAction = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
@@ -240,8 +244,16 @@ UINT TestWilsonLoop(CParameters& sParam)
             iAccepted = newCount;
         }
     }
-    
+
     pMeasure->Report();
+
+    Real fCheck = pMeasure->m_lstAverageC[0][0].x;
+    appGeneral(_T("Re[averageC(r=1, t=1)] = %f (expected = %f)\n"), fCheck, fExpected);
+
+    if (abs(fCheck - fExpected) > F(0.001))
+    {
+        ++uiError;
+    }
 
     return uiError;
 }

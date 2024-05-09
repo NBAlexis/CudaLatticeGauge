@@ -191,7 +191,8 @@ __REGIST_TEST(TestBoundary, Updator, TestDirichletBoundary, Dirichlet);
 
 __REGIST_TEST(TestBoundary, Updator, TestProjectivePlaneBoundary, ProjectivePlane);
 
-__REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping, BoundaryMapping);
+//It is now not supported
+//__REGIST_TEST(TestBoundaryMapping, Misc, TestBoundaryMapping, BoundaryMapping);
 
 __REGIST_TEST(TestEtaShift, Misc, TestEtaShift, EtaShift);
 

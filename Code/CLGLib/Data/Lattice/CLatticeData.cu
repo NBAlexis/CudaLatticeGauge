@@ -155,6 +155,7 @@ void CLatticeData::CreateFieldPool(BYTE byFieldId, UINT uiCount)
         return;
     }
 
+    appGeneral(_T("Create field pool, with field id: %d and count: %d\n"), byFieldId, uiCount);
     CFieldPool * pFieldPool = new CFieldPool(pField, uiCount);
     m_pFieldPools.AddItem(pFieldPool);
     m_pFieldPoolMap.SetAt(byFieldId, pFieldPool);
@@ -349,7 +350,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
         sRet = sRet + m_pActionList[i]->GetInfos(sTab + _T("    "));
     }
 
-    sInfos.Format(_T("Measure : %d\n"), m_pMeasurements->m_lstAllMeasures.Num());
+    sInfos.Format(_T("MeasureCount : %d\n"), m_pMeasurements->m_lstAllMeasures.Num());
     sRet = sRet + sTab + sInfos;
     for (INT i = 0; i < m_pMeasurements->m_lstAllMeasures.Num(); ++i)
     {

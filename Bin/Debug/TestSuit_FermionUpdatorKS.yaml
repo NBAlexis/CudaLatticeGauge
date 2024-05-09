@@ -1075,10 +1075,14 @@ TestFermionUpdatorWithMesonCorrelatorStaggered:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 2
-    ExpectedRes1 : 9.957547
-    ExpectedRes2 : -24.212927
-    ExpectedRes3 : 9.957547
-    ExpectedRes4 : -24.212927
+    ExpectedRes1D : -6.785034
+    ExpectedRes2D : 12.458732
+    ExpectedRes3D : 0.682366
+    ExpectedRes4D : 0.072341
+    ExpectedRes1R : 9.957547
+    ExpectedRes2R : -24.212927
+    ExpectedRes3R : 9.957547
+    ExpectedRes4R : -24.212927
 
     Updator:
 
