@@ -683,18 +683,34 @@ _kernelInitialAsEz_Type1(Real* pDeviceData, Real fEz)
  * if twisted Ax(Lx) = - q B ny
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type0(Real* pDeviceData, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type0(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bProjectivePlane, UBOOL bShiftCenter)
 {
     intokernalInt4;
     const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-    const Real fX = sSite4.x - _DC_Centerx + F(0.5);
+    const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
     pDeviceData[uiLinkY] = fBz * fX;
 
-    if (bTwisted && sSite4.x == _DC_Lx - 1)
+    if (bProjectivePlane)
     {
         const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
-        const Real fY = sSite4.y - _DC_Centery + F(0.5);
-        pDeviceData[uiLinkX] = -fBz * fY;
+        const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
+        }
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
+        }
+    }
+    else
+    {
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
+            const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
+            pDeviceData[uiLinkX] = -fBz * fY * _DC_Lxi;
+        }
     }
 }
 
@@ -705,18 +721,34 @@ _kernelInitialAsBz_Type0(Real* pDeviceData, Real fBz, UBOOL bTwisted)
  * if twisted Ay(Ly) = q B nx
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bProjectivePlane, UBOOL bShiftCenter)
 {
     intokernalInt4;
     const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
-    const Real fY = sSite4.y - _DC_Centery + F(0.5);
+    const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
     pDeviceData[uiLinkX] = -fBz * fY;
 
-    if (bTwisted && sSite4.y == _DC_Ly - 1)
+    if (bProjectivePlane)
     {
         const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-        const Real fX = sSite4.x - _DC_Centerx + F(0.5);
-        pDeviceData[uiLinkY] = fBz * fX;
+        const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
+        }
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
+        }
+    }
+    else
+    {
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
+            const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
+            pDeviceData[uiLinkY] = fBz * fX * _DC_Lyi;
+        }
     }
 }
 
@@ -731,24 +763,39 @@ _kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted)
  * Ay(Ly) = q B nx
  */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted)
+_kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bProjectivePlane, UBOOL bShiftCenter)
 {
     intokernalInt4;
 
     const UINT uiLinkX = _deviceGetLinkIndex(uiSiteIndex, 0);
     const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
-    const Real fX = sSite4.x - _DC_Centerx + F(0.5);
-    const Real fY = sSite4.y - _DC_Centery + F(0.5);
-    pDeviceData[uiLinkX] = -fBz * fY * F(0.5);
-    pDeviceData[uiLinkY] = fBz * fX * F(0.5);
+    const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
+    const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
+    pDeviceData[uiLinkX] = -fBz * fY * (bShiftCenter ? F(0.5) : F(0.0));
+    pDeviceData[uiLinkY] = fBz * fX * (bShiftCenter ? F(0.5) : F(0.0));
 
-    if (bTwisted && sSite4.x == _DC_Lx - 1)
+    if (bProjectivePlane)
     {
-        pDeviceData[uiLinkX] = -fBz * fY;
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
+        }
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
+        }
     }
-    if (bTwisted && sSite4.y == _DC_Ly - 1)
+    else
     {
-        pDeviceData[uiLinkY] = fBz * fX;
+        //This is not implemented yet
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            pDeviceData[uiLinkX] = -fBz * fY;
+        }
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            pDeviceData[uiLinkY] = fBz * fX;
+        }
     }
 }
 
@@ -883,7 +930,11 @@ void CFieldGaugeU1Real::InitialOtherParameters(CParameters& param)
             }
         }
 
-        InitialU1Real(eChemical, eEz, eBz, fChemical, fEz, fBz);
+        INT iValue = 1;
+        param.FetchValueINT(_T("XYShiftCenter"), iValue);
+        UBOOL bXYShiftCenter = (0 != iValue);
+
+        InitialU1Real(eChemical, eEz, eBz, fChemical, fEz, fBz, bXYShiftCenter);
     }
 }
 
@@ -1028,7 +1079,7 @@ void CFieldGaugeU1Real::InitialWithByte(BYTE* byData)
     free(readData);
 }
 
-void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz)
+void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz, UBOOL bXYShiftCenter)
 {
     m_eChemical = eChemicalType;
     m_eE = eEType;
@@ -1036,6 +1087,9 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
     m_fChemical = fChemical;
     m_feEz = feEz;
     m_feBz = feBz;
+    m_bXYShiftCenter = bXYShiftCenter;
+
+    UBOOL bProjective = (NULL != dynamic_cast<const CBoundaryConditionProjectivePlaneSquare*>(appGetLattice()->m_pIndex->GetBoudanryCondition()));
 
     preparethread;
     _kernelInitialU1RealField << <block, threads >> > (m_pDeviceData, EFIT_Zero);
@@ -1066,22 +1120,26 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
     switch (eBType)
     {
     case EURT_Bp_x:
-        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, TRUE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_y:
-        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, TRUE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_xy:
-        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, TRUE);
+        if (!bProjective)
+        {
+            appCrucial(_T("Torus with EURT_Bp_xy not supported!\n"));
+        }
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, TRUE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_x_notwist:
-        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
+        _kernelInitialAsBz_Type0 << <block, threads >> > (m_pDeviceData, feBz, FALSE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_y_notwist:
-        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
+        _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, FALSE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_xy_notwist:
-        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, FALSE);
+        _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, FALSE, bProjective, bXYShiftCenter);
         break;
     default:
         appParanoiac(_T("No magnetic set\n"));
@@ -1312,6 +1370,7 @@ CFieldGaugeU1Real::CFieldGaugeU1Real()
     , m_fChemical(F(0.0))
     , m_feEz(F(0.0))
     , m_feBz(F(0.0))
+    , m_bXYShiftCenter(TRUE)
 {
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceData, sizeof(Real) * m_uiLinkeCount));
 }
@@ -1366,9 +1425,9 @@ CLGComplex CFieldGaugeU1Real::Dot(const CField* other) const
 
 void CFieldGaugeU1Real::CopyTo(CField* pTarget) const
 {
-    if (NULL == pTarget || EFT_GaugeU1 != pTarget->GetFieldType())
+    if (NULL == pTarget || EFT_GaugeReal != pTarget->GetFieldType())
     {
-        appCrucial("CFieldGaugeSU3: target field is not SU3");
+        appCrucial("CFieldGaugeSU3: target field is not EFT_GaugeReal");
         return;
     }
 
@@ -1501,6 +1560,7 @@ CCString CFieldGaugeU1Real::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Chemical : ") + __ENUM_TO_STRING(EU1RealType, m_eChemical) + _T(" , v = ") + appToString(m_fChemical) + _T("\n");
     sRet = sRet + tab + _T("Electric : ") + __ENUM_TO_STRING(EU1RealType, m_eE) + _T(" , v = ") + appToString(m_feEz) + _T("\n");
     sRet = sRet + tab + _T("Magnetic : ") + __ENUM_TO_STRING(EU1RealType, m_eB) + _T(" , v = ") + appToString(m_feBz) + _T("\n");
+    sRet = sRet + tab + _T("XYShiftCenter : ") + appToString(m_bXYShiftCenter) + _T("\n");
 
     return sRet;
 }

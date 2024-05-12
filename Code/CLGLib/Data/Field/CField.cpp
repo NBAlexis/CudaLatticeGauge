@@ -92,6 +92,11 @@ CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)
         return new CFieldMatrixOperationWilsonSquareSU3();
     }
 
+    if (ef == EFT_FermionStaggeredSU3)
+    {
+        return new CFieldMatrixOperationKSSU3();
+    }
+
     appCrucial(_T("Matrix operation for field type %s not implemented!\n"), __ENUM_TO_STRING(EFieldType, ef).c_str());
     return NULL;
 }

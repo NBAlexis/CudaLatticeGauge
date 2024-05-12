@@ -958,7 +958,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             if (params.Exist(sFermionSubParamName))
             {
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
-                CreateFermionFields(fermionField);
+                CreateGaugeFields(fermionField);
             }
             checkCudaErrors(cudaGetLastError());
             sFermionSubParamName.Format(_T("GaugeBoundary%d"), i);

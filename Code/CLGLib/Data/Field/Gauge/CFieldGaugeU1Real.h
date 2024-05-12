@@ -123,7 +123,7 @@ public:
      * Note!!!
      * Do not check the conflicts, assume you know
      */
-    void InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz);
+    void InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz, UBOOL bXYShiftCenter);
 
     EU1RealType m_eChemical;
     EU1RealType m_eE;
@@ -131,6 +131,7 @@ public:
     Real m_fChemical;
     Real m_feEz;
     Real m_feBz;
+    UBOOL m_bXYShiftCenter;
 
 protected:
 

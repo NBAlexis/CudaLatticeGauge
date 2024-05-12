@@ -310,35 +310,35 @@ UINT TestBackgroundField(CParameters&)
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ EZ 0 ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), F(0.1), F(0.0));
+    pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), F(0.1), F(0.0), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ EZ 1 ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_E_z, EURT_None, F(0.0), F(0.1), F(0.0));
+    pU1->InitialU1Real(EURT_None, EURT_E_z, EURT_None, F(0.0), F(0.1), F(0.0), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 0 ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 0 no twist ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y_notwist, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 1 ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 1 no twist ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x_notwist, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 2 ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     appGeneral(_T("============ BZ 2 no twist ===========\n"));
-    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy_notwist, F(0.0), F(0.0), F(0.1));
+    pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy_notwist, F(0.0), F(0.0), F(0.1), TRUE);
     pU1->DebugPrintMe();
 
     return 0;
@@ -354,6 +354,27 @@ UINT TestPlaqutteTable(CParameters&)
 }
 
 __REGIST_TEST(TestPlaqutteTable, Tools, TestPlaqutteTable, PlaqutteTable);
+
+
+UINT TestVerifyEM(CParameters& param)
+{
+    UINT uiError = 0;
+    const Real fExpE1 = F(5143.066153371858);
+    const Real fExpE2 = F(5140.768535034438);
+    const Real fExpE3 = F(1167.37873127234047387901);
+    const Real fExpE4 = F(14498.55613259701931383461);
+
+    //TArray<CFieldGauge*> gaugefields;
+    //gaugefields.AddItem(appGetLattice()->m_pGaugeField);
+
+    const Real fEnergy1 = static_cast<Real>(appGetLattice()->m_pActionList[1]->Energy(FALSE, _FIELDS, NULL));
+
+    appGeneral(_T("energy = %.12f, expected: = %.12f\n"), fEnergy1, fExpE2);
+
+    return 0;
+}
+
+__REGIST_TEST(TestVerifyEM, Verify, TestEMDifferent, VerifyEM);
 
 
 //=============================================================================

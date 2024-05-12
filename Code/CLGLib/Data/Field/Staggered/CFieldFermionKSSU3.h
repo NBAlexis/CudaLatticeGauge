@@ -149,6 +149,21 @@ protected:
     deviceSU3Vector** m_pRationalFieldPointers;
 };
 
+class CLGAPI CFieldMatrixOperationKSSU3 : public CFieldMatrixOperation
+{
+public:
+    CFieldMatrixOperationKSSU3();
+    ~CFieldMatrixOperationKSSU3();
+
+    //real left = (res,left)
+    void VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY) override;
+
+    deviceSU3Vector** m_pResBuffer;
+    deviceSU3Vector** m_pLeftBuffer;
+    deviceSU3Vector** m_pHostResBuffer;
+    deviceSU3Vector** m_pHostLeftBuffer;
+};
+
 __END_NAMESPACE
 
 #endif //#ifndef _CFIELDFERMIONWILSONSQUARESU3_H_

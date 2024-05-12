@@ -1789,6 +1789,112 @@ void CFieldFermionKSSU3::PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, c
     D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
 }
 
+#pragma region Field Matrix Operation
+
+CFieldMatrixOperationKSSU3::CFieldMatrixOperationKSSU3()
+{
+    m_pHostResBuffer = (deviceSU3Vector**)malloc(sizeof(deviceSU3Vector*) * _kFieldMatrixMaxDim);
+    m_pHostLeftBuffer = (deviceSU3Vector**)malloc(sizeof(deviceSU3Vector*) * _kFieldMatrixMaxDim);
+    checkCudaErrors(cudaMalloc((void**)&m_pResBuffer, sizeof(deviceSU3Vector*) * _kFieldMatrixMaxDim));
+    checkCudaErrors(cudaMalloc((void**)&m_pLeftBuffer, sizeof(deviceSU3Vector*) * _kFieldMatrixMaxDim));
+}
+
+CFieldMatrixOperationKSSU3::~CFieldMatrixOperationKSSU3()
+{
+    free(m_pHostResBuffer);
+    free(m_pHostLeftBuffer);
+
+    checkCudaErrors(cudaFree(m_pResBuffer));
+    checkCudaErrors(cudaFree(m_pLeftBuffer));
+}
+
+/**
+* Assume m >= k
+* V=(vk[0], ... , vk[k - 1])
+* W=(vk[0], ... , vk[k - 1], vmk[0], ..., vmk[m-k-1])
+*
+* V(v1,v2,...,vk) = W(w1,w2,...,wm) (m11, ..., m1k)
+*                                   (..., ..., ...)
+*                                   (mm1, ..., mmk)
+* I think this is expansive... the FLOP of Ax is about 100n, but this has m x k x n
+*/
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMatrixMultiplyKSSU3(
+    deviceSU3Vector** pRes,
+    deviceSU3Vector** pLeft,
+    const CLGComplex* __restrict__ pMatrix,
+    UINT uiDimX, UINT uiDimY) //x=m,y=k
+{
+    intokernalE(3);
+
+    CLGComplex result[CFieldMatrixOperation::_kFieldMatrixMaxDim];
+
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        result[i] = _make_cuComplex(F(0.0), F(0.0));
+        for (UINT j = 0; j < uiDimX; ++j)
+        {
+            result[i] = _cuCaddf(result[i], _cuCmulf(
+                j < uiDimY ?
+                pRes[j][uiSiteIndex].m_ve[elementIdx]
+                : pLeft[j - uiDimY][uiSiteIndex].m_ve[elementIdx],
+                pMatrix[j * uiDimY + i]
+            ));
+        }
+    }
+
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        pRes[i][uiSiteIndex].m_ve[elementIdx] = result[i];
+    }
+}
+
+/**
+* Assume m >= k
+* V=(vk[0], ... , vk[k - 1])
+* W=(vk[0], ... , vk[k - 1], vmk[0], ..., vmk[m-k-1])
+*
+* v1 = (m11, ..., m1m)  w1
+* ..   (..., ..., ...)  ..
+* vk   (mk1, ..., mkm)  wk
+*                       wk+1
+*                       ...
+*                       wm
+*/
+
+void CFieldMatrixOperationKSSU3::VectorMultiplyMatrix(TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY)
+{
+    for (UINT i = 0; i < uiDimY; ++i)
+    {
+        CFieldFermionKSSU3* pF = dynamic_cast<CFieldFermionKSSU3*>(res[i]);
+        if (NULL == pF)
+        {
+            appCrucial(_T("CFieldMatrixOperationKSSU3 only work with CFieldFermionKSSU3!\n"));
+            return;
+        }
+        m_pHostResBuffer[i] = pF->m_pDeviceData;
+    }
+
+    for (UINT i = 0; i < uiDimX - uiDimY; ++i)
+    {
+        const CFieldFermionKSSU3* pF = dynamic_cast<const CFieldFermionKSSU3*>(left[i]);
+        if (NULL == pF)
+        {
+            appCrucial(_T("CFieldMatrixOperationKSSU3 only work with CFieldFermionKSSU3!\n"));
+            return;
+        }
+        m_pHostLeftBuffer[i] = pF->m_pDeviceData;
+    }
+
+    checkCudaErrors(cudaMemcpy(m_pResBuffer, m_pHostResBuffer, sizeof(deviceSU3Vector*) * uiDimY, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(m_pLeftBuffer, m_pHostLeftBuffer, sizeof(deviceSU3Vector*) * (uiDimX - uiDimY), cudaMemcpyHostToDevice));
+
+    preparethreadE(3);
+    _kernelMatrixMultiplyKSSU3 << <block, threads >> > (m_pResBuffer, m_pLeftBuffer, deviceMatrix, uiDimX, uiDimY);
+}
+
+#pragma endregion
+
 __END_NAMESPACE
 
 
