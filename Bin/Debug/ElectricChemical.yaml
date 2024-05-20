@@ -39,8 +39,8 @@ JobSimulate:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     ActionListLength : 3
+    GaugeFieldCount : 2
     FermionFieldCount : 2
-    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
 
@@ -129,7 +129,7 @@ JobSimulate:
         # This is x^{-1/4}
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
 
-    OtherGaugeField1:
+    Gauge2:
 
         FieldName : CFieldGaugeU1Real
         FieldInitialType : EFIT_U1Real
@@ -137,6 +137,7 @@ JobSimulate:
         Period : [1, 1, 1, 1]
         EzType : EURT_E_t
         EzValue : 0.1
+        Dynamic : 0
 
     Action1:
    
@@ -281,8 +282,8 @@ JobMeasure:
     ThreadAutoDecompose : 1
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
+    GaugeFieldCount : 2
     FermionFieldCount : 2
-    OtherGaugeFieldCount : 1
     MeasureListLength : 4
     CacheStaple : 0
     AlsoCheckMD5 : 0
@@ -350,7 +351,7 @@ JobMeasure:
         # This is x^{-1/4}
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
 
-    OtherGaugeField1:
+    Gauge2:
 
         FieldName : CFieldGaugeU1Real
         FieldInitialType : EFIT_U1Real
@@ -358,6 +359,7 @@ JobMeasure:
         Period : [1, 1, 1, 1]
         EzType : EURT_E_t
         EzValue : 0.1
+        Dynamic : 0
 
     Solver:
 
@@ -539,7 +541,6 @@ JobSimulateRW:
     RandomSeedType : ERST_Timestamp
     ActionListLength : 2
     FermionFieldCount : 1
-    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
 
@@ -700,7 +701,6 @@ JobMeasureImageChemical:
     RandomType : ER_XORWOW
     RandomSeedType : ERST_Timestamp
     FermionFieldCount : 1
-    OtherGaugeFieldCount : 1
     MeasureListLength : 2
     CacheStaple : 0
     AlsoCheckMD5 : 0

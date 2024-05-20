@@ -105,6 +105,10 @@ public:
         {
             m_byGaugeFieldIds.AddItem(1);
         }
+
+        INT iDynamic = 1;
+        param.FetchValueINT(_T("Dynamic"), iDynamic);
+        m_bDynamic = (0 != iDynamic);
     }
 
     UBOOL SingleField() const
@@ -154,6 +158,11 @@ public:
     virtual BYTE* CopyDataOutDouble(UINT& uiSize) const = 0;
     CCString GetInfos(const CCString &tab) const override;
 
+    virtual UBOOL IsDynamic() const
+    {
+        return m_bDynamic;
+    }
+
 #pragma endregion
 
 #pragma region Other useful operators
@@ -180,6 +189,7 @@ public:
         assert(NULL != U);
         U->m_pOwner = m_pOwner;
         U->m_byFieldId = m_byFieldId;
+        U->m_bDynamic = m_bDynamic;
         U->m_fLength = m_fLength;
 
         U->m_byGaugeFieldIds = m_byGaugeFieldIds;
@@ -199,6 +209,7 @@ public:
 
     class CLatticeData* m_pOwner;
     BYTE m_byFieldId;
+    UBOOL m_bDynamic;
     DOUBLE m_fLength;
 
     void Return();

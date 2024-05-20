@@ -12,11 +12,9 @@
 
 __DEFINE_ENUM(EStaggeredRotationJob,
     ESR_Simulate,
-    ESR_SimulateEM,
     ESR_SimulateU1,
     ESR_SimulateREM,
     ESR_Measure,
-    ESR_MeasureEM,
     ESR_MeasureU1,
     ESR_MeasureREM,
     ESR_SimulateQuenched,

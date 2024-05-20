@@ -147,6 +147,38 @@ def JacknifeWilsonLoop(vr, pr, halfT, tStart, tEnd, maxR, showProgress="", showF
     return unbaisr0, argsr0, unbaisr1, argsr1, unbaisc0, argsc0
 
 
+class FitPlusMinus:
+
+    def __init__(self, T):
+        self.T = T
+
+    def expPlusMinus(self, t, A, m, Ap, mp):
+        return A * np.exp(-m * t) + A * np.exp(-m * (self.T - t)) \
+            + ((-1) ** t) * Ap * np.exp(-mp * t) + ((-1) ** t) * Ap * np.exp(-mp * (self.T - t))
+
+    def expPlusMinusFig(self, t, A, m, Ap, mp):
+        """
+        (-1)**t does not work with non-integral t, so change it to cos(t*pi)
+        """
+        return A * np.exp(-m * t) + A * np.exp(-m * (self.T - t)) \
+            + np.cos(t*np.pi) * Ap * np.exp(-mp * t) + np.cos(t*np.pi) * Ap * np.exp(-mp * (self.T - t))
+
+def FitStaggeredMeson(pt, T, showFig=False):
+    xdata = [t + 1 for t in range(T-1)]
+    ydata = np.mean(pt, axis=0)
+    print(np.shape(ydata))
+    fitfunction = FitPlusMinus(T)
+    parameters, _ = curve_fit(fitfunction.expPlusMinus, xdata, ydata)
+    if showFig:
+        ttoplot = np.array([0.95 + 0.1 * i for i in range(len(ydata) * 10 - 8)])
+        plt.plot(xdata, ydata, '+')
+        plt.plot(ttoplot, fitfunction.expPlusMinusFig(ttoplot, parameters[0], parameters[1], parameters[2], parameters[3]))
+        plt.show()
+    return parameters[1], parameters[3]
+
+
+
+
 def PrintAsMathematicaArray(arr, header="") -> str:
     ret = str(np.array(arr))
     ret = ret.replace("\n", "")

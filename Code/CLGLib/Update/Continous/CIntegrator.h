@@ -82,12 +82,18 @@ protected:
     {
         for (INT i = 0; i < m_pForceField.Num(); ++i)
         {
-            m_pForceField[i]->Zero();
+            if (NULL != m_pForceField[i])
+            {
+                m_pForceField[i]->Zero();
+            }
         }
 
         for (INT i = 0; i < m_pBosonForceFields.Num(); ++i)
         {
-            m_pBosonForceFields[i]->Zero();
+            if (NULL != m_pBosonForceFields[i])
+            {
+                m_pBosonForceFields[i]->Zero();
+            }
         }
     }
 
@@ -95,16 +101,22 @@ protected:
     {
         for (INT i = 0; i < m_pMomentumField.Num(); ++i)
         {
-            m_pMomentumField[i]->Axpy(fStep, m_pForceField[i]);
-            if (bBind)
+            if (NULL != m_pMomentumField[i])
             {
-                m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
+                m_pMomentumField[i]->Axpy(fStep, m_pForceField[i]);
+                if (bBind)
+                {
+                    m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
+                }
             }
         }
 
         for (INT i = 0; i < m_pBosonMomentumFields.Num(); ++i)
         {
-            m_pBosonMomentumFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
+            if (NULL != m_pBosonMomentumFields[i])
+            {
+                m_pBosonMomentumFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
+            }
         }
     }
 
@@ -116,12 +128,18 @@ protected:
     {
         for (INT i = 0; i < m_pForceField.Num(); ++i)
         {
-            m_pForceField[i]->ExpMult(fStep, m_pGaugeField[i]);
+            if (NULL != m_pForceField[i])
+            {
+                m_pForceField[i]->ExpMult(fStep, m_pGaugeField[i]);
+            }
         }
 
         for (INT i = 0; i < m_pBosonForceFields.Num(); ++i)
         {
-            m_pBosonFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pBosonFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
+            }
         }
     }
 
@@ -129,7 +147,10 @@ protected:
     {
         for (INT i = 0; i < fields.Num(); ++i)
         {
-            fields[i]->SetOneDirectionZero(byDir);
+            if (NULL != fields[i])
+            {
+                fields[i]->SetOneDirectionZero(byDir);
+            }
         }
     }
 
@@ -137,7 +158,10 @@ protected:
     {
         for (INT i = 0; i < fields.Num(); ++i)
         {
-            fields[i]->SetOneDirectionUnity(byDir);
+            if (NULL != fields[i])
+            {
+                fields[i]->SetOneDirectionUnity(byDir);
+            }
         }
     }
 
@@ -147,6 +171,10 @@ protected:
 
         for (INT i = 0; i < m_pForceField.Num(); ++i)
         {
+            if (NULL == m_pForceField[i])
+            {
+                continue;
+            }
 #if !_CLG_DOUBLEFLOAT
             const CLGComplex force = _cToFloat(m_pForceField[i]->Dot(m_pForceField[i]));
 #else
@@ -157,6 +185,10 @@ protected:
 
         for (INT i = 0; i < m_pBosonFields.Num(); ++i)
         {
+            if (NULL == m_pBosonFields[i])
+            {
+                continue;
+            }
 #if !_CLG_DOUBLEFLOAT
             const CLGComplex force = _cToFloat(m_pBosonFields[i]->Dot(m_pBosonFields[i]));
 #else
@@ -172,12 +204,18 @@ protected:
         DOUBLE ret = 0.0;
         for (INT i = 0; i < m_pMomentumField.Num(); ++i)
         {
-            ret += m_pMomentumField[i]->CalculateKinematicEnergy();
+            if (NULL != m_pMomentumField[i])
+            {
+                ret += m_pMomentumField[i]->CalculateKinematicEnergy();
+            }
         }
 
         for (INT i = 0; i < m_pBosonMomentumFields.Num(); ++i)
         {
-            ret += m_pBosonMomentumFields[i]->Dot(m_pBosonMomentumFields[i]).x;
+            if (NULL != m_pBosonMomentumFields[i])
+            {
+                ret += m_pBosonMomentumFields[i]->Dot(m_pBosonMomentumFields[i]).x;
+            }
         }
         return ret;
     }
@@ -186,13 +224,19 @@ protected:
     {
         for (INT i = 0; i < m_pMomentumField.Num(); ++i)
         {
-            m_pMomentumField[i]->MakeRandomGenerator();
-            m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
+            if (NULL != m_pMomentumField[i])
+            {
+                m_pMomentumField[i]->MakeRandomGenerator();
+                m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
+            }
         }
 
         for (INT i = 0; i < m_pBosonMomentumFields.Num(); ++i)
         {
-            m_pBosonMomentumFields[i]->MakeRandomMomentum();
+            if (NULL != m_pBosonMomentumFields[i])
+            {
+                m_pBosonMomentumFields[i]->MakeRandomMomentum();
+            }
         }
     }
 
@@ -200,12 +244,18 @@ protected:
     {
         for (INT i = 0; i < m_pGaugeField.Num(); ++i)
         {
-            m_pGaugeField[i]->CopyTo(m_pUPrime[i]);
+            if (NULL != m_pGaugeField[i])
+            {
+                m_pGaugeField[i]->CopyTo(m_pUPrime[i]);
+            }
         }
 
         for (INT i = 0; i < m_pBosonFields.Num(); ++i)
         {
-            m_pBosonFields[i]->CopyTo(m_pPhiPrime[i]);
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pBosonFields[i]->CopyTo(m_pPhiPrime[i]);
+            }
         }
     }
 
@@ -213,12 +263,18 @@ protected:
     {
         for (INT i = 0; i < m_pGaugeField.Num(); ++i)
         {
-            m_pUPrime[i]->CopyTo(m_pGaugeField[i]);
+            if (NULL != m_pGaugeField[i])
+            {
+                m_pUPrime[i]->CopyTo(m_pGaugeField[i]);
+            }
         }
 
         for (INT i = 0; i < m_pBosonFields.Num(); ++i)
         {
-            m_pPhiPrime[i]->CopyTo(m_pBosonFields[i]);
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pPhiPrime[i]->CopyTo(m_pBosonFields[i]);
+            }
         }
     }
 
@@ -226,12 +282,26 @@ protected:
     {
         for (INT i = 0; i < m_pGaugeField.Num(); ++i)
         {
-            m_pUPrime.AddItem(dynamic_cast<CFieldGauge*>(m_pGaugeField[i]->GetCopy()));
+            if (NULL != m_pGaugeField[i])
+            {
+                m_pUPrime.AddItem(dynamic_cast<CFieldGauge*>(m_pGaugeField[i]->GetCopy()));
+            }
+            else
+            {
+                m_pUPrime.AddItem(NULL);
+            }
         }
 
         for (INT i = 0; i < m_pBosonFields.Num(); ++i)
         {
-            m_pPhiPrime.AddItem(dynamic_cast<CFieldBoson*>(m_pBosonFields[i]->GetCopy()));
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pPhiPrime.AddItem(dynamic_cast<CFieldBoson*>(m_pBosonFields[i]->GetCopy()));
+            }
+            else
+            {
+                m_pPhiPrime.AddItem(NULL);
+            }
         }
     }
 

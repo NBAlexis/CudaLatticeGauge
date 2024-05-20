@@ -70,32 +70,54 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
 
     for (INT i = 0; i < pLattice->m_pGaugeField.Num(); ++i)
     {
-        m_pGaugeField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
-        m_pGaugeField[i]->InitialField(EFIT_Zero);
-
-        m_pForceField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
-        m_pForceField[i]->InitialField(EFIT_Zero);
-
-        m_pMomentumField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
-        m_pMomentumField[i]->InitialField(EFIT_Zero);
-
-        if (CCommonData::m_bStoreStaple)
+        if (pLattice->m_pGaugeField[i]->IsDynamic())
         {
-            m_pStapleField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
-            m_pStapleField[i]->InitialField(EFIT_Zero);
+            m_pGaugeField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+            m_pGaugeField[i]->InitialField(EFIT_Zero);
+
+            m_pForceField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+            m_pForceField[i]->InitialField(EFIT_Zero);
+
+            m_pMomentumField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+            m_pMomentumField[i]->InitialField(EFIT_Zero);
+
+            if (CCommonData::m_bStoreStaple)
+            {
+                m_pStapleField.AddItem(dynamic_cast<CFieldGauge*>(pLattice->m_pGaugeField[i]->GetCopy()));
+                m_pStapleField[i]->InitialField(EFIT_Zero);
+            }
+        }
+        else
+        {
+            m_pGaugeField.AddItem(NULL);
+            m_pForceField.AddItem(NULL);
+            m_pMomentumField.AddItem(NULL);
+            if (CCommonData::m_bStoreStaple)
+            {
+                m_pStapleField.AddItem(NULL);
+            }
         }
     }
 
     for (INT i = 0; i < pLattice->m_pBosonField.Num(); ++i)
     {
-        m_pBosonFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
-        m_pBosonFields[i]->InitialField(EFIT_Zero);
+        if (m_pBosonFields[i]->IsDynamic())
+        {
+            m_pBosonFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+            m_pBosonFields[i]->InitialField(EFIT_Zero);
 
-        m_pBosonForceFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
-        m_pBosonForceFields[i]->InitialField(EFIT_Zero);
+            m_pBosonForceFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+            m_pBosonForceFields[i]->InitialField(EFIT_Zero);
 
-        m_pBosonMomentumFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
-        m_pBosonMomentumFields[i]->InitialField(EFIT_Zero);
+            m_pBosonMomentumFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
+            m_pBosonMomentumFields[i]->InitialField(EFIT_Zero);
+        }
+        else
+        {
+            m_pBosonFields.AddItem(NULL);
+            m_pBosonForceFields.AddItem(NULL);
+            m_pBosonMomentumFields.AddItem(NULL);
+        }
     }
 }
 
@@ -106,12 +128,18 @@ void CIntegrator::Prepare(UBOOL bLastAccepted, UINT uiStep)
     {
         for (INT i = 0; i < m_pLattice->m_pGaugeField.Num(); ++i)
         {
-            m_pLattice->m_pGaugeField[i]->CopyTo(m_pGaugeField[i]);
-            m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+            if (NULL != m_pGaugeField[i])
+            {
+                m_pLattice->m_pGaugeField[i]->CopyTo(m_pGaugeField[i]);
+                m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+            }
         }
         for (INT i = 0; i < m_pLattice->m_pBosonField.Num(); ++i)
         {
-            m_pLattice->m_pBosonField[i]->CopyTo(m_pBosonFields[i]);
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pLattice->m_pBosonField[i]->CopyTo(m_pBosonFields[i]);
+            }
         }
 
         m_bStapleCached = FALSE;
@@ -134,11 +162,17 @@ void CIntegrator::OnFinishTrajectory(UBOOL bAccepted)
     {
         for (INT i = 0; i < m_pLattice->m_pGaugeField.Num(); ++i)
         {
-            m_pGaugeField[i]->CopyTo(m_pLattice->m_pGaugeField[i]);
+            if (NULL != m_pGaugeField[i])
+            {
+                m_pGaugeField[i]->CopyTo(m_pLattice->m_pGaugeField[i]);
+            }
         }
         for (INT i = 0; i < m_pLattice->m_pBosonField.Num(); ++i)
         {
-            m_pBosonFields[i]->CopyTo(m_pLattice->m_pBosonField[i]);
+            if (NULL != m_pBosonFields[i])
+            {
+                m_pBosonFields[i]->CopyTo(m_pLattice->m_pBosonField[i]);
+            }
         }
     }
     for (INT i = 0; i < m_lstActions.Num(); ++i)
@@ -152,17 +186,23 @@ void CIntegrator::UpdateU(Real fStep) const
 {
     for (INT i = 0; i < m_pGaugeField.Num(); ++i)
     {
-        m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
+        if (NULL != m_pGaugeField[i])
+        {
+            m_pMomentumField[i]->SetOneDirectionZero(m_byBindDir);
 
-        //U(k) = exp (i e P) U(k-1)
-        m_pMomentumField[i]->ExpMult(fStep, m_pGaugeField[i]);
+            //U(k) = exp (i e P) U(k-1)
+            m_pMomentumField[i]->ExpMult(fStep, m_pGaugeField[i]);
 
-        m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+            m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+        }
     }
 
     for (INT i = 0; i < m_pBosonFields.Num(); ++i)
     {
-        m_pBosonFields[i]->Axpy(fStep, m_pBosonMomentumFields[i]);
+        if (NULL != m_pBosonFields[i])
+        {
+            m_pBosonFields[i]->Axpy(fStep, m_pBosonMomentumFields[i]);
+        }
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -196,8 +236,11 @@ void CIntegrator::FinishEvaluate() const
 {
     for (INT i = 0; i < m_pGaugeField.Num(); ++i)
     {
-        m_pGaugeField[i]->ElementNormalize();
-        m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+        if (NULL != m_pGaugeField[i])
+        {
+            m_pGaugeField[i]->ElementNormalize();
+            m_pGaugeField[i]->SetOneDirectionUnity(m_byBindDir);
+        }
     }
 }
 

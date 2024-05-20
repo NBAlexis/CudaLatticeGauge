@@ -68,7 +68,6 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3D.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3DR.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3EM.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3P4.h" />
@@ -195,7 +194,6 @@
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3D.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3DR.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3EM.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3GammaEM.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3P4.cu" />

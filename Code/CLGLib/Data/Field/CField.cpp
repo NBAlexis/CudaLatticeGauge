@@ -14,6 +14,7 @@ __BEGIN_NAMESPACE
 CField::CField() 
     : CBase()
     , m_pOwner(NULL)
+    , m_bDynamic(TRUE)
     , m_fLength(F(1.0))
     , m_pPool(NULL)
 {
@@ -73,6 +74,7 @@ CCString CField::GetInfos(const CCString& tab) const
 {
     CCString sRet = CBase::GetInfos(tab);
     sRet = sRet + tab + _T("FieldId : ") + appToString(m_byFieldId) + _T("\n");
+    sRet = sRet + tab + _T("Dynamic : ") + appToString(m_bDynamic) + _T("\n");
     sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
     sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;

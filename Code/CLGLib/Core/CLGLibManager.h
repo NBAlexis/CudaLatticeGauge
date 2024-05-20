@@ -74,7 +74,7 @@ protected:
     void CreateBosonFields(class CParameters& params) const;
 
     //other gauge fields is to be removed...
-    void CreateOtherGaugeFields(class CParameters& params) const;
+    //void CreateOtherGaugeFields(class CParameters& params) const;
 
     void CreateBoundaryFields(class CParameters& params, const CCString& sDefaultName) const;
     void CreateIndexAndBoundary(class CParameters& params) const;

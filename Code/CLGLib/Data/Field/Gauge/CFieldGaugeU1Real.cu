@@ -696,11 +696,11 @@ _kernelInitialAsBz_Type0(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
         const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
         if (bTwisted && sSite4.x == _DC_Lx - 1)
         {
-            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
+            pDeviceData[uiLinkX] = -fBz * fY;
         }
         if (bTwisted && sSite4.y == _DC_Ly - 1)
         {
-            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
+            pDeviceData[uiLinkY] = fBz * fX;
         }
     }
     else
@@ -734,11 +734,11 @@ _kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
         const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
         if (bTwisted && sSite4.x == _DC_Lx - 1)
         {
-            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
+            pDeviceData[uiLinkX] = -fBz * fY;
         }
         if (bTwisted && sSite4.y == _DC_Ly - 1)
         {
-            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
+            pDeviceData[uiLinkY] = fBz * fX;
         }
     }
     else
@@ -761,6 +761,14 @@ _kernelInitialAsBz_Type1(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
  * if twisted
  * Ax(Lx) = - q B ny
  * Ay(Ly) = q B nx
+ * 
+ * Torus:
+ * 
+ * Link x: -y*Bz/2
+ * Link y:  x*Bz/2
+ * Edge x: -(Lx+1)*y*Bz/2
+ * Edge y:  (Ly+1)*x*Bz/2
+ * Corner: -(Lx*Ly-1)*Bz
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bProjectivePlane, UBOOL bShiftCenter)
@@ -771,23 +779,11 @@ _kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
     const UINT uiLinkY = _deviceGetLinkIndex(uiSiteIndex, 1);
     const Real fX = sSite4.x - _DC_Centerx + (bShiftCenter ? F(0.5) : F(0.0));
     const Real fY = sSite4.y - _DC_Centery + (bShiftCenter ? F(0.5) : F(0.0));
-    pDeviceData[uiLinkX] = -fBz * fY * (bShiftCenter ? F(0.5) : F(0.0));
-    pDeviceData[uiLinkY] = fBz * fX * (bShiftCenter ? F(0.5) : F(0.0));
+    pDeviceData[uiLinkX] = -fBz * fY * F(0.5);
+    pDeviceData[uiLinkY] = fBz * fX * F(0.5);
 
     if (bProjectivePlane)
     {
-        if (bTwisted && sSite4.x == _DC_Lx - 1)
-        {
-            pDeviceData[uiLinkX] = -F(2.0) * fBz * fY;
-        }
-        if (bTwisted && sSite4.y == _DC_Ly - 1)
-        {
-            pDeviceData[uiLinkY] = F(2.0) * fBz * fX;
-        }
-    }
-    else
-    {
-        //This is not implemented yet
         if (bTwisted && sSite4.x == _DC_Lx - 1)
         {
             pDeviceData[uiLinkX] = -fBz * fY;
@@ -795,6 +791,17 @@ _kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
         if (bTwisted && sSite4.y == _DC_Ly - 1)
         {
             pDeviceData[uiLinkY] = fBz * fX;
+        }
+    }
+    else
+    {
+        if (bTwisted && sSite4.x == _DC_Lx - 1)
+        {
+            pDeviceData[uiLinkX] = -fBz * fY * (_DC_Lx + 1) * F(0.5);
+        }
+        if (bTwisted && sSite4.y == _DC_Ly - 1)
+        {
+            pDeviceData[uiLinkY] = fBz * fX * (_DC_Ly + 1) * F(0.5);
         }
     }
 }
@@ -1126,10 +1133,6 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
         _kernelInitialAsBz_Type1 << <block, threads >> > (m_pDeviceData, feBz, TRUE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_xy:
-        if (!bProjective)
-        {
-            appCrucial(_T("Torus with EURT_Bp_xy not supported!\n"));
-        }
         _kernelInitialAsBz_Type2 << <block, threads >> > (m_pDeviceData, feBz, TRUE, bProjective, bXYShiftCenter);
         break;
     case EURT_Bp_x_notwist:
@@ -1358,6 +1361,10 @@ void CFieldGaugeU1Real::SetOneDirectionUnity(BYTE byDir)
 
 void CFieldGaugeU1Real::SetOneDirectionZero(BYTE byDir)
 {
+    if (0 == (byDir & 15))
+    {
+        return;
+    }
     appCrucial(_T("U1Real Zero not supported\n"));
 }
 
@@ -1382,9 +1389,9 @@ CFieldGaugeU1Real::~CFieldGaugeU1Real()
 
 void CFieldGaugeU1Real::ExpMult(Real a, CField* U) const
 {
-    if (NULL == U || EFT_GaugeU1 != U->GetFieldType())
+    if (NULL == U || EFT_GaugeReal != U->GetFieldType())
     {
-        appCrucial("CFieldGaugeSU3: U field is not SU3");
+        appCrucial("ExpMult: U field is not EFT_GaugeReal");
         return;
     }
 
@@ -1563,6 +1570,181 @@ CCString CFieldGaugeU1Real::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("XYShiftCenter : ") + appToString(m_bXYShiftCenter) + _T("\n");
 
     return sRet;
+}
+
+Real CFieldGaugeU1Real::CheckSliceSame(BYTE dir1, BYTE dir2) const
+{
+    Real* toCheck = (Real*)malloc(sizeof(Real) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toCheck, m_pDeviceData, sizeof(Real) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    TArray<INT> ext;
+    ext.AddItem(_HC_Lxi);
+    ext.AddItem(_HC_Lyi);
+    ext.AddItem(_HC_Lzi);
+    ext.AddItem(_HC_Lti);
+    TArray<BYTE> otherdir;
+    for (BYTE d = 0; d < 4; ++d)
+    {
+        if (d != dir1 && d != dir2)
+        {
+            otherdir.AddItem(d);
+        }
+    }
+
+    Real fDelta = F(0.0);
+    for (INT iInSliceX = 0; iInSliceX < ext[dir1]; ++iInSliceX)
+    {
+        for (INT iInSliceY = 0; iInSliceY < ext[dir2]; ++iInSliceY)
+        {
+            SSmallInt4 site1;
+            for (SBYTE dr = 0; dr < 4; ++dr)
+            {
+                if (dr == dir1)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceX);
+                }
+                else if (dr == dir2)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceY);
+                }
+                else
+                {
+                    site1.m_byData4[dr] = 0;
+                }
+            }
+            UINT uiSiteIndex = site1._hostToSiteIndex();
+            Real lx1 = toCheck[uiSiteIndex * 4];
+            Real ly1 = toCheck[uiSiteIndex * 4 + 1];
+            Real lz1 = toCheck[uiSiteIndex * 4 + 2];
+            Real lw1 = toCheck[uiSiteIndex * 4 + 3];
+            for (INT iOtherX = 1; iOtherX < otherdir[0]; ++iOtherX)
+            {
+                for (INT iOtherY = 1; iOtherY < otherdir[1]; ++iOtherY)
+                {
+                    SSmallInt4 site2;
+                    for (SBYTE dr2 = 0; dr2 < 4; ++dr2)
+                    {
+                        if (dr2 == dir1)
+                        {
+                            site2.m_byData4[dr2] = static_cast<SBYTE>(iInSliceX);
+                        }
+                        else if (dr2 == dir2)
+                        {
+                            site2.m_byData4[dr2] = static_cast<SBYTE>(iInSliceY);
+                        }
+                        else if (dr2 == otherdir[0])
+                        {
+                            site2.m_byData4[dr2] = static_cast<SBYTE>(iOtherX);
+                        }
+                        else if (dr2 == otherdir[1])
+                        {
+                            site2.m_byData4[dr2] = static_cast<SBYTE>(iOtherY);
+                        }
+                    }
+
+                    UINT uiSiteIndex2 = site2._hostToSiteIndex();
+                    Real lx2 = toCheck[uiSiteIndex2 * 4];
+                    Real ly2 = toCheck[uiSiteIndex2 * 4 + 1];
+                    Real lz2 = toCheck[uiSiteIndex2 * 4 + 2];
+                    Real lw2 = toCheck[uiSiteIndex2 * 4 + 3];
+
+                    fDelta = fDelta + (lx1 - lx2) * (lx1 - lx2) + (ly1 - ly2) * (ly1 - ly2) + (lz1 - lz2) * (lz1 - lz2) + (lw1 - lw2) * (lw1 - lw2);
+                }
+            }
+        }
+    }
+    appSafeFree(toCheck);
+    return fDelta;
+}
+
+Real CFieldGaugeU1Real::CheckZero(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const
+{
+    Real* toCheck = (Real*)malloc(sizeof(Real) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toCheck, m_pDeviceData, sizeof(Real) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    TArray<INT> ext;
+    ext.AddItem(_HC_Lxi);
+    ext.AddItem(_HC_Lyi);
+    ext.AddItem(_HC_Lzi);
+    ext.AddItem(_HC_Lti);
+
+    Real fDelta = F(0.0);
+    for (INT iInSliceX = 0; iInSliceX < ext[dir1]; ++iInSliceX)
+    {
+        for (INT iInSliceY = 0; iInSliceY < ext[dir2]; ++iInSliceY)
+        {
+            SSmallInt4 site1;
+            for (SBYTE dr = 0; dr < 4; ++dr)
+            {
+                if (dr == dir1)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceX);
+                }
+                else if (dr == dir2)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceY);
+                }
+                else
+                {
+                    site1.m_byData4[dr] = 0;
+                }
+            }
+            UINT uiSiteIndex = site1._hostToSiteIndex();
+            for (INT ld = 0; ld < linkdirs.Num(); ++ld)
+            {
+                Real fV = toCheck[uiSiteIndex * 4 + linkdirs[ld]];
+                fDelta = fDelta + fV * fV;
+            }
+        }
+    }
+    appSafeFree(toCheck);
+    return fDelta;
+}
+
+void CFieldGaugeU1Real::DebugPrintSlice(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const
+{
+    appPushLogDate(FALSE);
+    Real* toCheck = (Real*)malloc(sizeof(Real) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toCheck, m_pDeviceData, sizeof(Real) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+    TArray<INT> ext;
+    ext.AddItem(_HC_Lxi);
+    ext.AddItem(_HC_Lyi);
+    ext.AddItem(_HC_Lzi);
+    ext.AddItem(_HC_Lti);
+
+    for (INT iInSliceX = 0; iInSliceX < ext[dir1]; ++iInSliceX)
+    {
+        for (INT iInSliceY = 0; iInSliceY < ext[dir2]; ++iInSliceY)
+        {
+            SSmallInt4 site1;
+            for (SBYTE dr = 0; dr < 4; ++dr)
+            {
+                if (dr == dir1)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceX);
+                }
+                else if (dr == dir2)
+                {
+                    site1.m_byData4[dr] = static_cast<SBYTE>(iInSliceY);
+                }
+                else
+                {
+                    site1.m_byData4[dr] = 0;
+                }
+            }
+            UINT uiSiteIndex = site1._hostToSiteIndex();
+
+            appGeneral(_T("- %s (%s): "), appToString(site1).c_str(), appToString(linkdirs).c_str());
+
+            for (INT ld = 0; ld < linkdirs.Num(); ++ld)
+            {
+                appGeneral(_T("%.8f "), toCheck[uiSiteIndex * 4 + linkdirs[ld]]);
+            }
+
+            appGeneral(_T("\n"));
+        }
+    }
+
+    appPopLogDate();
+    appSafeFree(toCheck);
 }
 
 __END_NAMESPACE

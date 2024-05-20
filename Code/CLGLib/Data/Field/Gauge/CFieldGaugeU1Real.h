@@ -125,6 +125,14 @@ public:
      */
     void InitialU1Real(EU1RealType eChemicalType, EU1RealType eEType, EU1RealType eBType, Real fChemical, Real feEz, Real feBz, UBOOL bXYShiftCenter);
 
+    Real CheckSliceSame(BYTE dir1, BYTE dir2) const;
+
+    /**
+    * check r[d1,d2,0,0].link[linkdirs] = 0, for all index of d1 and d2
+    */
+    Real CheckZero(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const;
+    void DebugPrintSlice(BYTE dir1, BYTE dir2, const TArray<BYTE>& linkdirs) const;
+
     EU1RealType m_eChemical;
     EU1RealType m_eE;
     EU1RealType m_eB;

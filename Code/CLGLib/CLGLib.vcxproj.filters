@@ -446,9 +446,6 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3DR.h">
       <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3EM.h">
-      <Filter>Data\Field\Staggered</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.h">
       <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
@@ -812,9 +809,6 @@
       <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3DR.cu">
-      <Filter>Data\Field\Staggered</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3EM.cu">
       <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Gamma.cu">

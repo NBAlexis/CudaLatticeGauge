@@ -248,6 +248,16 @@ __DEFINE_ENUM(ESolverPhase,
             return ret;
         }
 
+        __device__ __inline__ UINT _deviceToSiteIndex() const
+        {
+            return static_cast<UINT>(((x * _DC_Ly + y) * _DC_Lz + z) * _DC_Lt + w);
+        }
+
+        __host__ __inline__ UINT _hostToSiteIndex() const
+        {
+            return static_cast<UINT>(((x * _HC_Ly + y) * _HC_Lz + z) * _HC_Lt + w);
+        }
+
     };
 #if defined(__cplusplus)
 }

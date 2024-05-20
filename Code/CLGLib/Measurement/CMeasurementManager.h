@@ -3,6 +3,8 @@
 // 
 // DESCRIPTION:
 // This is the class collecting all measurements
+// 
+// NOTE: m_bNeedGaugeSmearing will be infected
 //
 // REVISION:
 //  [01/29/2019 nbale]

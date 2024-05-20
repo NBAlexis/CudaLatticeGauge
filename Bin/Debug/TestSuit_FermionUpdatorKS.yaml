@@ -1498,6 +1498,7 @@ TestFermionUpdatorKSGammaEM:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
+    # Center : [2, 2, 0, 0]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -1505,11 +1506,11 @@ TestFermionUpdatorKSGammaEM:
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
+    GaugeFieldCount : 2
     FermionFieldCount : 1
-    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     ExpectedResDebug : 0.24
-    ExpectedRes : 0.209288
+    ExpectedRes : 0.211636
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
@@ -1575,7 +1576,7 @@ TestFermionUpdatorKSGammaEM:
         MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
         MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
 
-    OtherGaugeField1:
+    Gauge2:
 
         FieldName : CFieldGaugeU1Real
 
@@ -1585,6 +1586,7 @@ TestFermionUpdatorKSGammaEM:
         Period : [1, 1, 1, 1]
         EzType : EURT_E_t
         EzValue : 0.1
+        Dynamic : 0
 
     Solver:
 
@@ -1627,6 +1629,7 @@ TestFermionUpdatorKSGammaEMProj:
     Dim : 4
     Dir : 4
     LatticeLength : [4, 4, 4, 8]
+    # Center : [2, 2, 0, 0]
     LatticeIndex : CIndexSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
@@ -1634,11 +1637,11 @@ TestFermionUpdatorKSGammaEMProj:
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
+    GaugeFieldCount : 2
     FermionFieldCount : 1
-    OtherGaugeFieldCount : 1
     MeasureListLength : 1
     ExpectedResDebug : 0.24
-    ExpectedRes : 0.210473
+    ExpectedRes : 0.209035
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
@@ -1704,7 +1707,7 @@ TestFermionUpdatorKSGammaEMProj:
         MC : [1.5312801946347594, -0.0009470074905847408, -0.022930177968879067, -1.1924853242121976, 0.005144532232063027, 0.07551561111396377, 1.3387944865990085]
         MD : [0.39046039002765764, 0.05110937758016059, 0.14082862345293307, 0.5964845035452038, 0.0012779192856479133, 0.028616544606685487, 0.41059997211142607]
 
-    OtherGaugeField1:
+    Gauge2:
 
         FieldName : CFieldGaugeU1Real
 
@@ -1718,6 +1721,7 @@ TestFermionUpdatorKSGammaEMProj:
         EzValue : 0.1
         BzType : EURT_Bp_xy
         BzValue : 0.1
+        Dynamic : 0
 
     Solver:
 

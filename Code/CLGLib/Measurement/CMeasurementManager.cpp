@@ -29,20 +29,28 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
         CFieldGauge* pSmearingStaple = NULL;
         for (INT i = 0; i < gaugeNum; ++i)
         {
-            //for smearing, we have to use staple
-            pSmearing = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
-            if (NULL != pCorrespondingStaple)
+            if (NULL != pAcceptGauge[i])
             {
-                pSmearingStaple = dynamic_cast<CFieldGauge*>(pCorrespondingStaple[i]->GetCopy());
+                //for smearing, we have to use staple
+                pSmearing = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
+                if (NULL != pCorrespondingStaple)
+                {
+                    pSmearingStaple = dynamic_cast<CFieldGauge*>(pCorrespondingStaple[i]->GetCopy());
+                }
+                else
+                {
+                    pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
+                    pAcceptGauge[i]->CalculateOnlyStaple(pSmearingStaple);
+                }
+                appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
+                allGauges.AddItem(pSmearing);
+                allStaples.AddItem(pSmearingStaple);
             }
             else
             {
-                pSmearingStaple = dynamic_cast<CFieldGauge*>(pAcceptGauge[i]->GetCopy());
-                pAcceptGauge[i]->CalculateOnlyStaple(pSmearingStaple);
+                allGauges.AddItem(NULL);
+                allStaples.AddItem(NULL);
             }
-            appGetGaugeSmearing()->GaugeSmearing(pSmearing, pSmearingStaple);
-            allGauges.AddItem(pSmearing);
-            allStaples.AddItem(pSmearingStaple);
         }
     }
 
@@ -87,7 +95,9 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
                 }
                 pF1->FixBoundary();
                 pF1->CopyTo(pF2);
-                pF1->InverseD(gaugeNum, bosonNum, pAcceptGauge, pAcceptBoson);
+                pF1->InverseD(gaugeNum, bosonNum, 
+                    m_bNeedGaugeSmearing ? allGauges.GetData() : pAcceptGauge,
+                    pAcceptBoson);
 
                 for (INT k = 0; k < measures.GetCount(); ++k)
                 {

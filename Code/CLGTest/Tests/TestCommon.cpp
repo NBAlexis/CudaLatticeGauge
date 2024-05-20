@@ -304,42 +304,242 @@ __REGIST_TEST(TestGaugeInvarience, Misc, TestGaugeInvarience, GaugeInvarience);
 
 UINT TestBackgroundField(CParameters&)
 {
+    UINT uiError = 0;
     CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(2));
 
+    TArray<BYTE> xyz;
+    xyz.AddItem(0);
+    xyz.AddItem(1);
+    xyz.AddItem(2);
+
+    TArray<BYTE> t;
+    t.AddItem(3);
+
+    TArray<BYTE> xy;
+    xy.AddItem(0);
+    xy.AddItem(1);
+
+    TArray<BYTE> zt;
+    zt.AddItem(2);
+    zt.AddItem(3);
+
+    TArray<BYTE> x;
+    x.AddItem(0);
+
+    TArray<BYTE> y;
+    y.AddItem(1);
+
+    TArray<BYTE> xzt;
+    xzt.AddItem(0);
+    xzt.AddItem(2);
+    xzt.AddItem(3);
+
+    TArray<BYTE> yzt;
+    yzt.AddItem(1);
+    yzt.AddItem(2);
+    yzt.AddItem(3);
+
     appGeneral(_T("============ chemical potential ===========\n"));
-    pU1->DebugPrintMe();
+
+    Real fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckSliceSame(2, 3);
+    appGeneral(_T("zt slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, xyz);
+    appGeneral(_T("xy slice[xyz] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(2, 3, xyz);
+    appGeneral(_T("zt slice[xyz] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, t);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ EZ 0 ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), F(0.1), F(0.0), TRUE);
-    pU1->DebugPrintMe();
+    
+    fCheck = pU1->CheckSliceSame(2, 3);
+    appGeneral(_T("zt slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(2, 3, xy);
+    appGeneral(_T("zt slice[xy] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(2, 3, zt);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ EZ 1 ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_E_z, EURT_None, F(0.0), F(0.1), F(0.0), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(2, 3);
+    appGeneral(_T("zt slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(2, 3, xy);
+    appGeneral(_T("zt slice[xy] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(2, 3, zt);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 0 ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, zt);
+    appGeneral(_T("xy slice[zt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, xy);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 0 no twist ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_y_notwist, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, yzt);
+    appGeneral(_T("xy slice[yzt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, x);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 1 ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, zt);
+    appGeneral(_T("xy slice[zt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, xy);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 1 no twist ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_x_notwist, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, xzt);
+    appGeneral(_T("xy slice[xzt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, y);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 2 ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, zt);
+    appGeneral(_T("xy slice[zt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, xy);
+    appGeneral(_T("\n\n"));
 
     appGeneral(_T("============ BZ 2 no twist ===========\n"));
     pU1->InitialU1Real(EURT_None, EURT_None, EURT_Bp_xy_notwist, F(0.0), F(0.0), F(0.1), TRUE);
-    pU1->DebugPrintMe();
+
+    fCheck = pU1->CheckSliceSame(0, 1);
+    appGeneral(_T("xy slice same? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    fCheck = pU1->CheckZero(0, 1, zt);
+    appGeneral(_T("xy slice[zt] zero? %f\n"), fCheck);
+    if (fCheck > F(0.001))
+    {
+        ++uiError;
+    }
+
+    appGeneral(_T("\n\n"));
+    pU1->DebugPrintSlice(0, 1, xy);
+    appGeneral(_T("\n\n"));
 
     return 0;
 }
@@ -355,26 +555,6 @@ UINT TestPlaqutteTable(CParameters&)
 
 __REGIST_TEST(TestPlaqutteTable, Tools, TestPlaqutteTable, PlaqutteTable);
 
-
-UINT TestVerifyEM(CParameters& param)
-{
-    UINT uiError = 0;
-    const Real fExpE1 = F(5143.066153371858);
-    const Real fExpE2 = F(5140.768535034438);
-    const Real fExpE3 = F(1167.37873127234047387901);
-    const Real fExpE4 = F(14498.55613259701931383461);
-
-    //TArray<CFieldGauge*> gaugefields;
-    //gaugefields.AddItem(appGetLattice()->m_pGaugeField);
-
-    const Real fEnergy1 = static_cast<Real>(appGetLattice()->m_pActionList[1]->Energy(FALSE, _FIELDS, NULL));
-
-    appGeneral(_T("energy = %.12f, expected: = %.12f\n"), fEnergy1, fExpE2);
-
-    return 0;
-}
-
-__REGIST_TEST(TestVerifyEM, Verify, TestEMDifferent, VerifyEM);
 
 
 //=============================================================================

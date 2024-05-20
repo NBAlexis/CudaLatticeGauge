@@ -1755,6 +1755,8 @@ void CFieldFermionKSSU3GammaEM::DOperatorKS(void* pTargetBuffer, const void* pBu
         return;
     }
 
+    //pU1->DebugPrintMe();
+
     DOperatorEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, f2am, m_fCharge, 
         m_bEachSiteEta, bDagger, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
 

@@ -311,7 +311,7 @@ int main(int argc, char * argv[])
             }
             else
             {
-                appGeneral(_T("Print field, but field not found, the command was: %s\n"), sRes);
+                appGeneral(_T("Print field, but field not found, the command was: %s\n"), sRes.c_str());
             }
         }
         else
