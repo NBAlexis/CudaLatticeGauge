@@ -22,6 +22,8 @@ class CLGAPI CMeasureMesonCorrelatorStaggeredSimple2 : public CMeasure
     __CLGDECLARE_CLASS(CMeasureMesonCorrelatorStaggeredSimple2)
 public:
 
+    enum { _kMesonCorrelatorTypeSimple2 = 10 };
+
     CMeasureMesonCorrelatorStaggeredSimple2() : CMeasure()
         , m_pDevicePropogators(NULL)
         , m_pResPropogators(NULL)

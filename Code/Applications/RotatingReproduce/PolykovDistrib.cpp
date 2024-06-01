@@ -500,7 +500,7 @@ INT MeasurePolyakovDist(CParameters& params)
                         DOUBLE fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                         if (appAbs(fError) > F(0.000001))
 #else
-                        Real fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                        Real fError = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                         if (appAbs(fError) > F(0.000000000001))
 #endif
                         {

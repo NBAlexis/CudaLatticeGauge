@@ -1,5 +1,5 @@
 # EEC_Simulate, EEC_Measure, EEC_GaugeFixing, EEC_SimulateRW, EEC_MeasureRW
-WorkJob : EEC_MeasureRW
+WorkJob : EEC_Measure
 VerboseLevel : DETAILED
 VerboseOutput : datetime
 
@@ -248,12 +248,12 @@ JobMeasure:
     ShowDeviceInformation : 0
     ShowParameterContent : 0
 
-    ListStart : 1
-    ListEnd : 9
-    Electric : [0, 0.1308996939, 0.2617993878, 0.3926990817, 0.5235987756, 0.6544984695, 0.7853981634, 0.9162978573, 1.047197551]
-    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    ListStart : 0
+    ListEnd : 12
+    Electric : [0, 0.0654498469498, 0.130899693900, 0.196349540849, 0.261799387799, 0.327249234749, 0.392699081699, 0.458148928649, 0.523598775598, 0.589048622548, 0.654498469498, 0.719948316448]
+    Chemical : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     StartN : 101
-    EndN : 3000
+    EndN : 120
     SaveFermionFile : 0
     FermionFileIndexStart : 1
     FermionFileHead : ./BS02/BetaGradient/Fermion/FBG05_
@@ -261,22 +261,22 @@ JobMeasure:
     LoadFermionFile : F4980204_
     LoadFermionHead : G:\SRFloat\4980204\Fermions\A08
     ## EGMJ_Polyakov, EGMJ_Chiral, EGMJ_Meson
-    DistributionJob : EGMJ_Polyakov
+    DistributionJob : EGMJ_Meson
     FermionMomentum : 0
     StochasticFieldCount : 1
     CheckGaugeFixing : 0
     UseZ4 : 1
     SubFolder : 1
-    SubFolderPrefix : G:\EC\Nt6\530\E0
+    SubFolderPrefix : G:\MesonMassElectric\GF49001
     # {EFFT_CLGBin, EFFT_CLGBinFloat, EFFT_CLGBinDouble}
     LoadType : EFFT_CLGBinFloat
 
-    SavePrefix : EC530_Electric0_
-    CSVSavePrefix : G:\EC\Measure\530_E0_Polyakov\EC530_Electric0_
+    SavePrefix : GFEC490_01_
+    CSVSavePrefix : G:\MesonMassElectric\Meson\EC490_01_
 
     Dim : 4
     Dir : 4
-    LatticeLength : [8, 8, 24, 6]
+    LatticeLength : [24, 24, 24, 12]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -307,7 +307,7 @@ JobMeasure:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Mass : 0.2
+        Mass : 0.1
         FieldId : 2
         PoolNumber : 15
 
@@ -333,7 +333,7 @@ JobMeasure:
         ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
 
-        Mass : 0.2
+        Mass : 0.1
         FieldId : 3
         PoolNumber : 15
 

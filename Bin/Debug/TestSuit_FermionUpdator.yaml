@@ -898,6 +898,7 @@ TestBerryPhase:
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
+    GaugeFieldCount : 2
     ActionListLength : 3
     FermionFieldCount : 2
     MeasureListLength : 1
@@ -928,15 +929,31 @@ TestBerryPhase:
         
     FermionField1:
 
-        FieldName : CFieldFermionKSSU3EM
+        # FieldName : CFieldFermionKSSU3EM
+        # FieldInitialType : EFIT_RandomGaussian
+        # Mass : 0.5
+        # FieldId : 2
+        # PoolNumber : 15
+        # EachSiteEta : 1
+
+        # Qa2Ez : 0.0
+        # Qa2Bz : 2.0
+
+
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3GammaEM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
+
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+
         EachSiteEta : 1
 
-        Qa2Ez : 0.0
-        Qa2Bz : 2.0
+        Charge : 0.666666666666
+        EMFieldID : 4
 
         Period : [1, 1, 1, -1]
         # 1/8
@@ -946,21 +963,49 @@ TestBerryPhase:
 
     FermionField2:
 
-        FieldName : CFieldFermionKSSU3EM
+        # FieldName : CFieldFermionKSSU3EM
+        # FieldInitialType : EFIT_RandomGaussian
+        # Mass : 0.5
+        # FieldId : 3
+        # PoolNumber : 15
+        # EachSiteEta : 1
+
+        # Qa2Ez : 0.0
+        # Qa2Bz : -1.0
+
+
+        ## FieldName = {CFieldFermionWilsonSquareSU3}
+        FieldName : CFieldFermionKSSU3GammaEM
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
         FieldInitialType : EFIT_RandomGaussian
+
         Mass : 0.5
         FieldId : 3
         PoolNumber : 15
+
         EachSiteEta : 1
 
-        Qa2Ez : 0.0
-        Qa2Bz : -1.0
+        Charge : -0.33333333333333
+        EMFieldID : 4
 
         Period : [1, 1, 1, -1]
         # 1/8
         MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
         # -1/4
         MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
+
+    Gauge2:
+
+        FieldName : CFieldGaugeU1Real
+
+        ## { EFIT_Zero, EFIT_RandomGaussian }
+        FieldInitialType : EFIT_U1Real
+        FieldId : 4
+        Period : [1, 1, 1, 1]
+        BzType : EURT_Bp_y
+        BzValue : 3.0
+        Dynamic : 0
 
     Solver:
 

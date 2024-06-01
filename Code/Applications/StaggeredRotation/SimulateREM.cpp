@@ -139,7 +139,7 @@ INT SimulateStaggeredRotationEM(CParameters& params)
     {
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
         pGaugeRotation->SetOmega(F(0.0));
-        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), F(0.0));
+        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), F(0.0), TRUE);
 
         appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
@@ -178,7 +178,7 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         appGeneral(_T("\n========= Omega=%f Magnetic=%f ==========\n"), lstOmega[uiListIdx], lstMagnetic[uiListIdx]);
 
         pGaugeRotation->SetOmega(lstOmega[uiListIdx]);
-        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx]);
+        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx], TRUE);
 
         if (bAdditive)
         {

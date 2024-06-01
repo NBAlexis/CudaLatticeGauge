@@ -164,7 +164,7 @@ INT Simulate(CParameters& params)
         pU->UpdatePooledParamters();
         pD->m_fCoeffGamma54 = lstChemical[uiOmega];
         pD->UpdatePooledParamters();
-        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0));
+        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0), FALSE);
 
         //pU1->DebugPrintMe();
 

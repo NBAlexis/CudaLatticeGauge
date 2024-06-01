@@ -30,10 +30,11 @@ _kernelPickPropagatorsSimple2(
     intokernalInt4;
     if (0 == sSite4.w)
     {
-        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + 0] = F(0.0);
-        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + 1] = F(0.0);
-        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + 2] = F(0.0);
-        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + 3] = F(0.0);
+        for (INT i = 0; i < static_cast<INT>(CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2); ++i)
+        {
+            res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2 + i] = F(0.0);
+        }
+
         return;
     }
 
@@ -41,7 +42,7 @@ _kernelPickPropagatorsSimple2(
     const deviceSU3Vector* pf2[3] = { propagatorf2r , propagatorf2g, propagatorf2b };
 
     #pragma unroll
-    for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+    for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2; ++byType)
     {
         //pick propagator with a phase
         CLGComplex sumovercolor = _zeroc;
@@ -56,7 +57,7 @@ _kernelPickPropagatorsSimple2(
         }
 
         const Real fPhase = static_cast<Real>(_deviceStaggeredFermionSimplePhase(sSite4, byType));
-        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + byType] = _cuCabsf(sumovercolor) * fPhase;
+        res[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2 + byType] = _cuCabsf(sumovercolor) * fPhase;
     }
 }
 
@@ -76,7 +77,7 @@ _kernelPickEveryTimeSliceSimple2(
 {
     const UINT uiVolumnIdx = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiSiteIndex = uiVolumnIdx * _DC_Lt + byT;
-    res[uiVolumnIdx] = pAll[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple + byType];
+    res[uiVolumnIdx] = pAll[uiSiteIndex * CMeasureMesonCorrelatorStaggeredSimple2::_kMesonCorrelatorTypeSimple2 + byType];
 }
 
 #pragma endregion
@@ -98,21 +99,21 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Initial(CMeasurementManager* pOwne
     param.FetchValueINT(_T("FieldId2"), iValue);
     m_byFieldID2 = static_cast<BYTE>(iValue);
 
-    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(Real) * _HC_Volume * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple));
+    checkCudaErrors(cudaMalloc((void**)&m_pDevicePropogators, sizeof(Real) * _HC_Volume * _kMesonCorrelatorTypeSimple2));
     if (HasOtherField())
     {
 #if !_CLG_DOUBLEFLOAT
-        m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1) * 4);
+        m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * _kMesonCorrelatorTypeSimple2 * (_HC_Lt - 1) * 4);
 #else
-        m_pResPropogators = (Real*)malloc(sizeof(Real) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1) * 4);
+        m_pResPropogators = (Real*)malloc(sizeof(Real) * _kMesonCorrelatorTypeSimple2 * (_HC_Lt - 1) * 4);
 #endif
     }
     else
     {
 #if !_CLG_DOUBLEFLOAT
-        m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
+        m_pResPropogators = (DOUBLE*)malloc(sizeof(DOUBLE) * _kMesonCorrelatorTypeSimple2 * (_HC_Lt - 1));
 #else
-        m_pResPropogators = (Real*)malloc(sizeof(Real) * CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * (_HC_Lt - 1));
+        m_pResPropogators = (Real*)malloc(sizeof(Real) * _kMesonCorrelatorTypeSimple2 * (_HC_Lt - 1));
 #endif        
     }
 
@@ -142,7 +143,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
 
         dim3 block1 = dim3(block.x, block.y, 1);
         dim3 thread1 = dim3(threads.x, threads.y, 1);
-        for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+        for (BYTE byType = 0; byType < _kMesonCorrelatorTypeSimple2; ++byType)
         {
             for (BYTE byT = 1; byT < _HC_Lt; ++byT)
             {
@@ -170,7 +171,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
             m_pSources[11]->m_pDeviceData,
             m_pDevicePropogators);
 
-        for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+        for (BYTE byType = 0; byType < _kMesonCorrelatorTypeSimple2; ++byType)
         {
             for (BYTE byT = 1; byT < _HC_Lt; ++byT)
             {
@@ -198,7 +199,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
             m_pSources[8]->m_pDeviceData,
             m_pDevicePropogators);
 
-        for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+        for (BYTE byType = 0; byType < _kMesonCorrelatorTypeSimple2; ++byType)
         {
             for (BYTE byT = 1; byT < _HC_Lt; ++byT)
             {
@@ -226,7 +227,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
             m_pSources[11]->m_pDeviceData,
             m_pDevicePropogators);
 
-        for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+        for (BYTE byType = 0; byType < _kMesonCorrelatorTypeSimple2; ++byType)
         {
             for (BYTE byT = 1; byT < _HC_Lt; ++byT)
             {
@@ -258,7 +259,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
 
         dim3 block1 = dim3(block.x, block.y, 1);
         dim3 thread1 = dim3(threads.x, threads.y, 1);
-        for (BYTE byType = 0; byType < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++byType)
+        for (BYTE byType = 0; byType < _kMesonCorrelatorTypeSimple2; ++byType)
         {
             for (BYTE byT = 1; byT < _HC_Lt; ++byT)
             {
@@ -290,7 +291,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::OnConfigurationAccepted(INT gn, IN
 #else
     TArray<TArray<Real>> thisConf;
 #endif
-    const INT totalType = HasOtherField() ? (CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple * 4) : CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple;
+    const INT totalType = HasOtherField() ? (_kMesonCorrelatorTypeSimple2 * 4) : _kMesonCorrelatorTypeSimple2;
     for (INT i = 0; i < totalType; ++i)
     {
         if (m_bShowResult)
@@ -409,7 +410,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Report()
     appGeneral(_T(" =================== Staggered Meson =================\n"));
     appGeneral(_T(" =====================================================\n\n"));
     m_lstAverageResults.RemoveAll();
-    for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+    for (INT ty = 0; ty < _kMesonCorrelatorTypeSimple2; ++ty)
     {
         appGeneral(_T("(* ======================= Type:%d=================*)\ntabres%d={\n"), ty, ty);
 #if !_CLG_DOUBLEFLOAT
@@ -444,7 +445,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::Report()
 
 
     appGeneral(_T("(* ======================= All Type averages =================*)\navr={\n"));
-    for (INT ty = 0; ty < CMeasureMesonCorrelatorStaggeredSimple::_kMesonCorrelatorTypeSimple; ++ty)
+    for (INT ty = 0; ty < _kMesonCorrelatorTypeSimple2; ++ty)
     {
         appGeneral(_T("{"));
         for (INT t = 0; t < _HC_Lti - 1; ++t)

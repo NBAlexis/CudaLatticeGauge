@@ -440,7 +440,10 @@ void CMeasureBerryPhase::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, con
         for (INT i = 0; i < gaugeNum; ++i)
         {
             CFieldGauge* fixedgauge = dynamic_cast<CFieldGauge*>(appGetLattice()->GetPooledCopy(gaugeFields[i]));
-            appGetLattice()->m_pGaugeFixing->GaugeFixing(fixedgauge);
+            if (fixedgauge->IsDynamic())
+            {
+                appGetLattice()->m_pGaugeFixing->GaugeFixing(fixedgauge);
+            }
             fixedgauges.AddItem(fixedgauge);
         }
 

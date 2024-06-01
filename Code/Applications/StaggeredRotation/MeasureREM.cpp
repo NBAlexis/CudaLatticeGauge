@@ -256,7 +256,7 @@ INT MeasurementREM(CParameters& params)
     for (UINT uiListIdx = iListStart; uiListIdx < iListEnd; ++uiListIdx)
     {
         CCommonData::m_fOmega = lstOmega[uiListIdx];
-        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx]);
+        pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx], TRUE);
 
         if (NULL != pAG)
         {

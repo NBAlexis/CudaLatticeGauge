@@ -363,12 +363,10 @@ inline void AppendStringFile(const CCString& sFileName, const CCString& sContent
 extern INT SimulateStaggeredBeta(CParameters& params);
 extern INT SimulateStaggeredRotation(CParameters& params);
 extern INT SimulateStaggeredRotation3D(CParameters& params);
-extern INT SimulateStaggeredEM(CParameters& params);
 extern INT SimulateStaggeredRotationU1(CParameters& params);
 extern INT SimulateStaggeredRotationU13D(CParameters& params);
 extern INT SimulateStaggeredRotationEM(CParameters& params);
 extern INT Measurement(CParameters& params);
-extern INT MeasurementEM(CParameters& params);
 extern INT MeasurementU1(CParameters& params);
 extern INT MeasurementREM(CParameters& params);
 extern INT Measurement3D(CParameters& params);

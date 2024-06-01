@@ -162,7 +162,7 @@ INT Measurement(CParameters& params)
         pU->UpdatePooledParamters();
         pD->m_fCoeffGamma54 = lstChemical[uiOmega];
         pD->UpdatePooledParamters();
-        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0));
+        pU1->InitialU1Real(EURT_None, EURT_E_t, EURT_None, F(0.0), lstElectric[uiOmega], F(0.0), FALSE);
 
         pPL->Reset();
         pCCLight->Reset();
@@ -422,7 +422,7 @@ INT Measurement(CParameters& params)
         break;
         case EGMJ_Meson:
         {
-            static const TCHAR* heads[16] =
+            static const TCHAR* heads[40] =
             {
                 "PSuu",
                 "PSud",
@@ -439,9 +439,35 @@ INT Measurement(CParameters& params)
                 "Suu",
                 "Sud",
                 "Sdu",
-                "Sdd"
+                "Sdd",
+
+                "VTuux",
+                "VTudx",
+                "VTdux",
+                "VTddx",
+                "VTuuy",
+                "VTudy",
+                "VTduy",
+                "VTddy",
+                "VTuuz",
+                "VTudz",
+                "VTduz",
+                "VTddz",
+
+                "PVuuxy",
+                "PVudxy",
+                "PVduxy",
+                "PVddxy",
+                "PVuuyz",
+                "PVudyz",
+                "PVduyz",
+                "PVddyz",
+                "PVuuxz",
+                "PVudxz",
+                "PVduxz",
+                "PVddxz",
             };
-            for (INT i = 0; i < 16; ++i)
+            for (INT i = 0; i < 40; ++i)
             {
                 TArray<TArray<DOUBLE>> onemesonconfig;
                 for (UINT j = 0; j < (iEndN - iStartN + 1); ++j)

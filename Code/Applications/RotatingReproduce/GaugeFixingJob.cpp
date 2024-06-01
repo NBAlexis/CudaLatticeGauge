@@ -109,7 +109,7 @@ INT GaugeFixing(CParameters& params)
                 const DOUBLE fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                 if (fRes >= 0.0 && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
 #else
-                const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField);
+                const Real fRes = appGetLattice()->m_pGaugeFixing->CheckRes(appGetLattice()->m_pGaugeField[0]);
                 if (fRes >= F(0.0) && fRes < appGetLattice()->m_pGaugeFixing->m_fAccuracy)
 #endif
                 {
