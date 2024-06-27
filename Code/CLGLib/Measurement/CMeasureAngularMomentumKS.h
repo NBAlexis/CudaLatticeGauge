@@ -58,7 +58,7 @@ public:
     void Report() override;
     void Reset() override;
 
-    UBOOL IsGaugeMeasurement() const override { return FALSE; }
+    UBOOL IsGaugeOrBosonMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
 
     TArray<TArray<CLGComplex>> ExportDiagnal(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, class CFieldFermion* pooled1, class CFieldFermion* pooled2) override;

@@ -30,7 +30,7 @@ public:
     void OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const CFieldGauge* const* pStapleField) override;
     void Report() override;
 
-    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
 protected:

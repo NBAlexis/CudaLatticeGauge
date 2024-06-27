@@ -398,11 +398,12 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
         _kernelBakePlaqIndexAtSite << <block, threads >> > (
             pData->m_pPlaqutteCache, pData->m_pIndexLinkToSIndex[byFieldId], 
             pData->m_pSmallData, pData->m_pBondInfoTable);
-
+        checkCudaErrors(cudaDeviceSynchronize());
         //bake plaqutte per link
         _kernelBakePlaqIndexAtLink << <block, threads >> > (
             pData->m_pStappleCache, pData->m_pIndexLinkToSIndex[byFieldId], 
             pData->m_pSmallData, pData->m_pBondInfoTable);
+        checkCudaErrors(cudaDeviceSynchronize());
     }
 }
 
@@ -413,13 +414,20 @@ void CIndexSquare::BakeMoveIndex(CIndexData* pData, BYTE byFieldId)
     preparethread;
 
     checkCudaErrors(cudaMalloc((void**)&pData->m_pGaugeMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir));
-    checkCudaErrors(cudaMalloc((void**)&pData->m_pFermionMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir * 2));
+    checkCudaErrors(cudaMalloc((void**)&pData->m_pMoveCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dir * 2));
 
-    _kernelCacheGaugeMove << <block, threads >> > (
-        pData->m_pGaugeMoveCache[byFieldId],
-        pData->m_pIndexLinkToSIndex[1],
-        pData->m_pSmallData);
-    _kernelCacheFermionMove << <block, threads >> > (pData->m_pFermionMoveCache[byFieldId], pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+    const CField* defaultGauge = appGetLattice()->GetFieldById(1);
+    if (NULL != defaultGauge && defaultGauge->IsGaugeField())
+    {
+        _kernelCacheGaugeMove << <block, threads >> > (
+            pData->m_pGaugeMoveCache[byFieldId],
+            pData->m_pIndexLinkToSIndex[1],
+            pData->m_pSmallData);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+
+    _kernelCacheFermionMove << <block, threads >> > (pData->m_pMoveCache[byFieldId], pData->m_pIndexPositionToSIndex[byFieldId], pData->m_pSmallData);
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 void CIndexSquare::BakeEtaMuTable(class CIndexData* pData)

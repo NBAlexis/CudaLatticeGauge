@@ -245,7 +245,7 @@ void CFieldFermionWilsonSquareSU3::DOperator(void* pTargetBuffer, const void* pB
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pTarget, 
         m_fKai, 
         m_byFieldId, 
@@ -268,7 +268,7 @@ void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, const void* p
         pDphiBuffer,
         pDDphiBuffer,
         pGauge,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pForceSU3,
         m_fKai, m_byFieldId);
 }
@@ -345,6 +345,20 @@ _kernelAxpyComplexFermionWilsonSquareSU3(
 {
     intokernal;
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMulFermionWilsonSquareSU3(
+    deviceWilsonVectorSU3* pMe,
+    const deviceWilsonVectorSU3* __restrict__ pOther, UBOOL bConj)
+{
+    intokernal;
+    if (bConj)
+    {
+        pMe[uiSiteIndex].Conjugate();
+    }
+
+    pMe[uiSiteIndex].Mul(pOther[uiSiteIndex]);
 }
 
 //__global__ void _CLG_LAUNCH_BOUND_(_QUICK_AXPY_BLOCK)
@@ -794,6 +808,19 @@ void CFieldFermionWilsonSquareSU3::Axpy(const CLGComplex& a, const CField* x)
 
     preparethread;
     _kernelAxpyComplexFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldFermionWilsonSquareSU3::Mul(const CField* other, UBOOL bDagger)
+{
+    if (NULL == other || EFT_FermionWilsonSquareSU3 != other->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionWilsonSquareSU3 can only copy to CFieldFermionWilsonSquareSU3!"));
+        return;
+    }
+    const CFieldFermionWilsonSquareSU3* pField = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(other);
+
+    preparethread;
+    _kernelMulFermionWilsonSquareSU3 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
 }
 
 cuDoubleComplex CFieldFermionWilsonSquareSU3::Dot(const CField* x) const

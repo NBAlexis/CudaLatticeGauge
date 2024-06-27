@@ -942,7 +942,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
             m_pDeviceXYBufferJL
             );
@@ -954,7 +954,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
             FALSE,
             m_pDeviceXYBufferJL
@@ -970,7 +970,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             pF1W->m_pDeviceData,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
             m_pDeviceXYBufferJS
             );
@@ -1018,7 +1018,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
                 pGaugeSU3->m_pDeviceData,
                 pAphys->m_pDeviceData,
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
                 pF1W->m_byFieldId,
                 m_pDeviceXYBufferJLPure
                 );
@@ -1027,7 +1027,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
                 pF2W->m_pDeviceData,
                 pF1W->m_pDeviceData,
                 pAphys->m_pDeviceData,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF1W->m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
                 pF1W->m_byFieldId,
                 m_pDeviceXYBufferJLJM
                 );

@@ -65,7 +65,7 @@ public:
         memset(m_pIndexLinkToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
 
         memset(m_pGaugeMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
-        memset(m_pFermionMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
+        memset(m_pMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
 
         memset(m_uiSiteNumber, 0, sizeof(UINT) * kMaxFieldCount);
 
@@ -106,10 +106,10 @@ public:
                 checkCudaErrors(cudaFree(m_pGaugeMoveCache[i]));
                 m_pGaugeMoveCache[i] = NULL;
             }
-            if (NULL != m_pFermionMoveCache[i])
+            if (NULL != m_pMoveCache[i])
             {
-                checkCudaErrors(cudaFree(m_pFermionMoveCache[i]));
-                m_pFermionMoveCache[i] = NULL;
+                checkCudaErrors(cudaFree(m_pMoveCache[i]));
+                m_pMoveCache[i] = NULL;
             }
         }
 
@@ -219,7 +219,8 @@ public:
     SIndex* m_pStappleCache;
 
     SIndex* m_pGaugeMoveCache[kMaxFieldCount];
-    SIndex* m_pFermionMoveCache[kMaxFieldCount];
+    SIndex* m_pMoveCache[kMaxFieldCount];
+    SIndex* m_pBosonMoveCache[kMaxFieldCount];
 
     //eta mu table
     BYTE* m_pEtaMu;

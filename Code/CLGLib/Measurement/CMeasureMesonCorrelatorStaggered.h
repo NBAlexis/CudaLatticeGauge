@@ -42,7 +42,7 @@ public:
     void Report() override;
     void Reset() override;
 
-    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
 protected:

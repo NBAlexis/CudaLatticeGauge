@@ -42,6 +42,7 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.h" />
+    <ClInclude Include="Data\Action\CActionPhi4.h" />
     <ClInclude Include="Data\Boundary\CBoundaryCondition.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h" />
@@ -99,6 +100,7 @@
     <ClInclude Include="Measurement\CMeasureAngularMomentumKS.h" />
     <ClInclude Include="Measurement\CMeasureAngularMomentumKSREM.h" />
     <ClInclude Include="Measurement\CMeasureBerryPhase.h" />
+    <ClInclude Include="Measurement\CMeasureBosonCond.h" />
     <ClInclude Include="Measurement\CMeasureChargeAndCurrents.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensate.h" />
     <ClInclude Include="Measurement\CMeasureChiralCondensateKS.h" />
@@ -227,12 +229,14 @@
     </CudaCompile>
     <ClCompile Include="Data\Action\CAction.cpp" />
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
+    <ClCompile Include="Data\Action\CActionPhi4.cpp" />
     <ClCompile Include="Data\Field\CFieldBoson.cpp" />
     <ClCompile Include="Data\Field\CFieldFermion.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="Measurement\CMeasureBosonCond.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftFOM.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftGMRES.cpp" />
     <ClCompile Include="SparseLinearAlgebra\CMultiShiftBiCGStab.cpp" />

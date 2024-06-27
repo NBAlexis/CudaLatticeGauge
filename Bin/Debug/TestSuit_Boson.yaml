@@ -1,0 +1,52 @@
+
+TestBosonU1NoGauge:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    GaugeFieldCount : 0
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.565
+    ##Important, do not calculate energy using staple for Dirichlet
+    CacheStaple : 0 
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorLeapFrog
+        IntegratorStepLength : 1
+        IntegratorStep : 20
+        Omelyan2Lambda : 0.38636665500756728
+
+    BosonField1:
+
+        FieldName : CFieldBosonU1
+        FieldInitialType : EFIT_Zero
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+
+    Action1:
+   
+        ActionName : CActionPhi4
+        Mass : 1.0
+        Lambda : 1.0
+        BosonFields : [2]
+        
+    Measure1:
+
+        MeasureName : CMeasureBosonCond
+        BosonFields : [2]
+

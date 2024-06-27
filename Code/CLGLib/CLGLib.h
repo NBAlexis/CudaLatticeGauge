@@ -275,6 +275,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Action/CActionGaugePlaquetteBetaGradient.h"
 #include "Data/Action/CActionGaugePlaquetteRotating3D.h"
 #include "Data/Action/CActionGaugePlaquetteRotatingU1_3D.h"
+#include "Data/Action/CActionPhi4.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
@@ -315,6 +316,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasurePolyakovU1XY.h"
 #include "Measurement/CMeasurePolyakovXY3D.h"
 #include "Measurement/CMeasurePandChiralTalorKS.h"
+#include "Measurement/CMeasureBosonCond.h"
 
 #include "Measurement/CMeasurementManager.h"
 #include "Measurement/GaugeSmearing/CGaugeSmearing.h"

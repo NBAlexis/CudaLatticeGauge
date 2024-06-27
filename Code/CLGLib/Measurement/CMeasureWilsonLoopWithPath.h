@@ -36,7 +36,7 @@ public:
     void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
     void Report() override;
 
-    UBOOL IsGaugeMeasurement() const override { return TRUE; }
+    UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
 
 protected:

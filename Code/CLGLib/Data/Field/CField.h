@@ -142,6 +142,7 @@ public:
 
     virtual void Axpy(Real a, const CField* x) = 0;
     virtual void Axpy(const CLGComplex& a, const CField* x) = 0;
+    virtual void Mul(const CField* other, UBOOL bDagger = TRUE) = 0;
     virtual void Dagger() = 0;
 
     DOUBLE GetLength() const { return m_fLength; }
@@ -220,6 +221,10 @@ protected:
 
     const CFieldGauge* GetDefaultGauge(INT gaugeNum, const CFieldGauge* const* gaugeFields) const
     {
+        if (0 == gaugeNum || m_byGaugeFieldIds.Num() < 1)
+        {
+            return NULL;
+        }
         return gaugeFields[CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0])];
     }
 

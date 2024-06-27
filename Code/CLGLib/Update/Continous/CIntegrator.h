@@ -93,6 +93,7 @@ protected:
             if (NULL != m_pBosonForceFields[i])
             {
                 m_pBosonForceFields[i]->Zero();
+                //m_pBosonForceFields[i]->DebugPrintMe();
             }
         }
     }

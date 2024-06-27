@@ -279,7 +279,7 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             pSource,
             pGauge,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
             f2am,
@@ -295,7 +295,7 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             pSource,
             pGauge,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
             f2am,
@@ -319,7 +319,7 @@ void CFieldFermionKSSU3::DerivateD0(
     _kernelDFermionKSForce << <block, threads >> > (
         (const deviceSU3*)pGaugeBuffer,
         (deviceSU3*)pForce,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         m_pRationalFieldPointers,
         m_pMDNumerator,
@@ -470,7 +470,7 @@ UBOOL CFieldFermionKSSU3::CalculateForceS(
     //_kernelDFermionKSForce << <block, threads >> > (
     //    pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData,
-    //    appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+    //    appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
     //    appGetLattice()->m_pIndexCache->m_pEtaMu,
     //    m_pRationalFieldPointers,
     //    m_pMDNumerator,
@@ -523,6 +523,17 @@ _kernelAxpyComplexFermionKS(deviceSU3Vector* pMe, const deviceSU3Vector* __restr
 {
     intokernal;
     pMe[uiSiteIndex].Add(pOther[uiSiteIndex].MulCompC(a));
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMulFermionKS(deviceSU3Vector* pMe, const deviceSU3Vector* __restrict__ pOther, UBOOL bConj)
+{
+    intokernal;
+    if (bConj)
+    {
+        pMe[uiSiteIndex].Conjugate();
+    }
+    pMe[uiSiteIndex].Mul(pOther[uiSiteIndex]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -1249,6 +1260,19 @@ void CFieldFermionKSSU3::Axpy(const CLGComplex& a, const CField* x)
 
     preparethread;
     _kernelAxpyComplexFermionKS << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldFermionKSSU3::Mul(const CField* other, UBOOL bDagger)
+{
+    if (NULL == other || EFT_FermionStaggeredSU3 != other->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSSU3 can only copy to CFieldFermionKSSU3!"));
+        return;
+    }
+    const CFieldFermionKSSU3* pField = dynamic_cast<const CFieldFermionKSSU3*>(other);
+
+    preparethread;
+    _kernelMulFermionKS << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
 }
 
 cuDoubleComplex CFieldFermionKSSU3::Dot(const CField* x) const

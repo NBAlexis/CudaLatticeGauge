@@ -171,6 +171,13 @@ extern "C" {
             m_ve[2] = _cuCmulf(m_ve[2], other);
         }
 
+        __device__ __inline__ void Mul(const deviceSU3Vector& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCmulf(m_ve[1], other.m_ve[1]);
+            m_ve[2] = _cuCmulf(m_ve[2], other.m_ve[2]);
+        }
+
         /**
         * v = i^k v
         */
@@ -479,6 +486,14 @@ extern "C" {
             m_d[1].MulReal(other);
             m_d[2].MulReal(other);
             m_d[3].MulReal(other);
+        }
+
+        __device__ __inline__ void Mul(const deviceWilsonVectorSU3& other)
+        {
+            m_d[0].Mul(other.m_d[0]);
+            m_d[1].Mul(other.m_d[1]);
+            m_d[2].Mul(other.m_d[2]);
+            m_d[3].Mul(other.m_d[3]);
         }
 
         __device__ __inline__ void MulComp(const CLGComplex& other)

@@ -521,6 +521,12 @@
     <ClInclude Include="Data\Field\Boson\CFieldBosonU1.h">
       <Filter>Data\Field\Boson</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionPhi4.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasureBosonCond.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -634,6 +640,12 @@
     </ClCompile>
     <ClCompile Include="Tools\Math\HostRandom.cpp">
       <Filter>Tools\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Action\CActionPhi4.cpp">
+      <Filter>Data\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="Measurement\CMeasureBosonCond.cpp">
+      <Filter>Measurement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -29,10 +29,9 @@ public:
     void MakeRandomMomentum() override;
 
     void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
+    void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldGauge** pGaugeForce, const CFieldBoson* const* pBoson) override;
     //void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     //void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-
-public:
 
     EFieldType GetFieldType() const override
     {
@@ -52,6 +51,7 @@ public:
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;
     void Axpy(const CLGComplex& a, const CField* x) override;
+    void Mul(const CField* other, UBOOL bDagger = TRUE) override;
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
     void FieldMultply(const CFieldBoson* x, UBOOL bConj = TRUE) override;

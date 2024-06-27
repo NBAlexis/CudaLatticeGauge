@@ -57,7 +57,7 @@ void CMeasurementManager::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, co
     //gauge measurement
     for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
     {
-        if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsGaugeMeasurement())
+        if (NULL != m_lstAllMeasures[i] && m_lstAllMeasures[i]->IsGaugeOrBosonMeasurement())
         {
             m_lstAllMeasures[i]->OnConfigurationAccepted(
                 gaugeNum,

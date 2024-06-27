@@ -507,7 +507,61 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
 
 void CCLGLibManager::CreateBosonFields(class CParameters& params) const
 {
+    INT iVaules = 0;
+    CCString sValues;
 
+    CCString sBosonClassName;
+    __FetchStringWithDefault(_T("FieldName"), _T("CFieldBosonU1"));
+    sBosonClassName = sValues;
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
+    const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
+
+    CBase* pBosonField = appCreate(sBosonClassName);
+    CFieldBoson* pBoson = (NULL != pBosonField) ? (dynamic_cast<CFieldBoson*>(pBosonField)) : NULL;
+    if (NULL == pBoson)
+    {
+        appCrucial(_T("Unable to create the boson field! with name %s!"), sBosonClassName.c_str());
+        return;
+    }
+
+    __FetchIntWithDefault(_T("FieldId"), -1);
+    const BYTE byFieldId = static_cast<BYTE>(iVaules);
+    assert(byFieldId < kMaxFieldCount && byFieldId > 1);
+    if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
+    {
+        appCrucial(_T("The field Id must > 1 and < %d\n"), kMaxFieldCount);
+        _FAIL_EXIT;
+    }
+    if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
+    {
+        appCrucial(_T("Unable to create the boson field! with wrong field ID %s %d!"), sBosonClassName.c_str(), byFieldId);
+        return;
+    }
+
+    pBoson->m_byFieldId = byFieldId;
+    pBoson->m_pOwner = m_pLatticeData;
+    pBoson->InitialField(eFieldInitial);
+    pBoson->InitialOtherParameters(params);
+    m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pBoson);
+    m_pLatticeData->m_pBosonField.AddItem(pBoson);
+    m_pLatticeData->m_pOtherFields.AddItem(pBoson);
+    TArray<INT> periodic;
+    if (params.FetchValueArrayINT(_T("Period"), periodic))
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = static_cast<SBYTE>(periodic[0]);
+        bc.m_sPeriodic.y = static_cast<SBYTE>(periodic[1]);
+        bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
+        bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+    }
+
+    __FetchIntWithDefault(_T("PoolNumber"), 0);
+    //if (iVaules > 0)
+    //{
+    m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
+    //}
+    appGeneral(_T("Create the boson field %s with id %d and initial: %s\n"), sBosonClassName.c_str(), byFieldId, sValues.c_str());
 }
 
 void CCLGLibManager::CreateFermionFields(class CParameters& params) const
@@ -869,19 +923,22 @@ void CCLGLibManager::InitialIndexBuffer() const
     }
 
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
-    if (m_pLatticeData->m_pGaugeField.Num() > 0)
+    if (m_pLatticeData->m_pOtherFields.Num() > 0)
     {
         UBOOL bHasStaggeredFermion = FALSE;
-        assert(1 == m_pLatticeData->m_pGaugeField[0]->m_byFieldId);
-
-        m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, 1);
-
-        for (BYTE i = 2; i < kMaxFieldCount; ++i)
+        UBOOL bPlaqCached = FALSE;
+        for (BYTE i = 1; i < kMaxFieldCount; ++i)
         {
-            if (NULL != m_pLatticeData->GetFieldById(i))
+            const CField* pf = m_pLatticeData->GetFieldById(i);
+            if (NULL != pf && pf->IsGaugeField() && !bPlaqCached)
+            {
+                m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, i);
+                bPlaqCached = TRUE;
+            }
+            else if (NULL != pf && !pf->IsGaugeField())
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
-                if (NULL != dynamic_cast<CFieldFermionKS*>(m_pLatticeData->GetFieldById(i)))
+                if (NULL != dynamic_cast<const CFieldFermionKS*>(pf))
                 {
                     bHasStaggeredFermion = TRUE;
                 }
@@ -975,7 +1032,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         }
     }
 
-    if (m_InitialCache.constIntegers[ECI_BosonFieldCount] > 1)
+    if (m_InitialCache.constIntegers[ECI_BosonFieldCount] > 0)
     {
         for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_BosonFieldCount]; ++i)
         {

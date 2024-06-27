@@ -412,7 +412,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF2W->m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
         pF2W->m_byFieldId
         );
 
@@ -445,7 +445,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         CCommonData::m_fKai,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[pF2W->m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
         pF2W->m_byFieldId
         );
 

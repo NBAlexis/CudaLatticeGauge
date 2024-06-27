@@ -197,7 +197,7 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         f2am,
@@ -253,7 +253,7 @@ void CFieldFermionKSSU3RigidAcc::DerivateD0(
     _kernelDFermionKSForceRigidAcc << <block, threads >> > (
         (const deviceSU3*)pGaugeBuffer,
         (deviceSU3*)pForce,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         m_pRationalFieldPointers,
         m_pMDNumerator,

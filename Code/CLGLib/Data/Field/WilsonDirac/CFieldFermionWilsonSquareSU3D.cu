@@ -248,7 +248,7 @@ void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* p
         pSource,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pTarget, 
         m_fKai, 
         m_byFieldId, 
@@ -271,7 +271,7 @@ void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, const void* 
         pDphiBuffer,
         pDDphiBuffer,
         pGauge,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pForceSU3,
         m_fKai, m_byFieldId);
 }

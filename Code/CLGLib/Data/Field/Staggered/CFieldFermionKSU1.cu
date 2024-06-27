@@ -299,7 +299,7 @@ void CFieldFermionKSU1::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             pSource,
             pGauge,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
             f2am,
@@ -315,7 +315,7 @@ void CFieldFermionKSU1::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
             pSource,
             pGauge,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
             f2am,
@@ -340,7 +340,7 @@ void CFieldFermionKSU1::DerivateD0(
     _kernelDFermionKSForceU1 << <block, threads >> > (
         (const CLGComplex*)pGaugeBuffer,
         (CLGComplex*)pForce,
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         m_pRationalFieldPointers,
         m_pMDNumerator,
@@ -483,7 +483,7 @@ UBOOL CFieldFermionKSU1::CalculateForceS(
     //_kernelDFermionKSForce << <block, threads >> > (
     //    pGaugeSU3->m_pDeviceData,
     //    pForceSU3->m_pDeviceData,
-    //    appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+    //    appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
     //    appGetLattice()->m_pIndexCache->m_pEtaMu,
     //    m_pRationalFieldPointers,
     //    m_pMDNumerator,
@@ -535,6 +535,17 @@ _kernelAxpyComplexFermionKSU1(CLGComplex* pMe, const CLGComplex* __restrict__ pO
 {
     intokernal;
     pMe[uiSiteIndex] = _cuCaddf(pMe[uiSiteIndex], _cuCmulf(pOther[uiSiteIndex], a));
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMulFermionKSU1(CLGComplex* pMe, const CLGComplex* __restrict__ pOther, UBOOL bConj)
+{
+    intokernal;
+    if (bConj)
+    {
+        pMe[uiSiteIndex].y = -pMe[uiSiteIndex].y;
+    }
+    pMe[uiSiteIndex] = _cuCmulf(pMe[uiSiteIndex], pOther[uiSiteIndex]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -1175,6 +1186,19 @@ void CFieldFermionKSU1::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyComplexFermionKSU1 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
 }
 
+void CFieldFermionKSU1::Mul(const CField* other, UBOOL bDagger)
+{
+    if (NULL == other || EFT_FermionStaggeredU1 != other->GetFieldType())
+    {
+        appCrucial(_T("CFieldFermionKSU1 can only copy to CFieldFermionKSU1!"));
+        return;
+    }
+    const CFieldFermionKSU1* pField = dynamic_cast<const CFieldFermionKSU1*>(other);
+
+    preparethread;
+    _kernelMulFermionKSU1 << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
+}
+
 cuDoubleComplex CFieldFermionKSU1::Dot(const CField* x) const
 {
     if (NULL == x || EFT_FermionStaggeredU1 != x->GetFieldType())
@@ -1255,7 +1279,7 @@ void CFieldFermionKSU1::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eG
                 pPooled->m_pDeviceData,
                 pFieldU1->m_pDeviceData,
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pEtaMu,
                 static_cast<BYTE>(iDir));
         }
@@ -1266,7 +1290,7 @@ void CFieldFermionKSU1::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatrix eG
                 pPooled->m_pDeviceData,
                 pFieldU1->m_pDeviceData,
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pEtaMu,
                 static_cast<BYTE>(iDir));
         }

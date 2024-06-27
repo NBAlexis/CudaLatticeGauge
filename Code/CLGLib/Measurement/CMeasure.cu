@@ -192,7 +192,7 @@ void CMeasure::Average()
     {
         assert(m_uiConfigurationCount == static_cast<UINT>(m_lstComplexResults.Num()));
         m_cAverageCmpRes = _zeroc;
-        for (INT i = 0; i < m_lstRealResults.Num(); ++i)
+        for (INT i = 0; i < m_lstComplexResults.Num(); ++i)
         {
             m_cAverageCmpRes.x += m_lstComplexResults[i].x;
             m_cAverageCmpRes.y += m_lstComplexResults[i].y;

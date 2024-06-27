@@ -428,7 +428,7 @@ void CMeasureAngularMomentumKS::ApplyPotentialMatrix(
         pInverseZ4,
         pGauge,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[GetFermionFieldId()],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[GetFermionFieldId()],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[GetFermionFieldId()],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAphys->m_pDeviceData);
 }

@@ -74,6 +74,7 @@ public:
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;
     void Axpy(const CLGComplex& a, const CField* x) override;
+    void Mul(const CField* other, UBOOL bDagger = TRUE) override;
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
 

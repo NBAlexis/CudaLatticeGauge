@@ -26,6 +26,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Tests\TestAngularMomentum.cpp" />
+    <ClCompile Include="Tests\TestBoson.cpp" />
     <ClCompile Include="Tests\TestBoundary.cpp" />
     <ClCompile Include="Tests\TestConfigurationFileIO.cpp" />
     <ClCompile Include="Tests\TestFermionMatrix.cpp" />
@@ -44,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Bin\Debug\TestSuit.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_Boson.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Boundary.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Common.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_FermionMatrix.yaml" />

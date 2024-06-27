@@ -100,6 +100,21 @@ _kernelAxpyU1A(CLGComplex*pDevicePtr, const CLGComplex* __restrict__ x, CLGCompl
 }
 
 __global__ void _CLG_LAUNCH_BOUND
+_kernelMulU1(CLGComplex* pDevicePtr, const CLGComplex* __restrict__ x, UBOOL bConj)
+{
+    gaugeSU3KernelFuncionStart
+
+    if (bConj)
+    {
+        pDevicePtr[uiLinkIndex].y = -pDevicePtr[uiLinkIndex].y;
+    }
+
+    pDevicePtr[uiLinkIndex] = _cuCmulf(pDevicePtr[uiLinkIndex], x[uiLinkIndex]);
+
+    gaugeSU3KernelFuncionEnd
+}
+
+__global__ void _CLG_LAUNCH_BOUND
 _kernelAxpyU1Real(CLGComplex*pDevicePtr, const CLGComplex* __restrict__ x, Real a)
 {
     gaugeSU3KernelFuncionStart
@@ -776,6 +791,18 @@ void CFieldGaugeU1::Axpy(const CLGComplex& a, const CField* x)
     _kernelAxpyU1A << <block, threads >> > (m_pDeviceData, pSU3x->m_pDeviceData, a);
 }
 
+void CFieldGaugeU1::Mul(const CField* other, UBOOL bDagger)
+{
+    if (NULL == other || EFT_GaugeU1 != other->GetFieldType())
+    {
+        appCrucial("CFieldGaugeSU3: axpy failed because the otherfield is not SU3");
+        return;
+    }
+
+    const CFieldGaugeU1* pSU3x = dynamic_cast<const CFieldGaugeU1*>(other);
+    preparethread;
+    _kernelMulU1 << <block, threads >> > (m_pDeviceData, pSU3x->m_pDeviceData, bDagger);
+}
 
 void CFieldGaugeU1::Zero()
 {

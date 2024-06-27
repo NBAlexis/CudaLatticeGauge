@@ -419,28 +419,28 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer, 
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA1, bDagger, m_bExpGamma, m_fCoeffGamma1, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA2, bDagger, m_bExpGamma, m_fCoeffGamma2, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA3, bDagger, m_bExpGamma, m_fCoeffGamma3, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA4, bDagger, m_bExpGamma, m_fCoeffGamma4, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
 
@@ -448,42 +448,42 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA12, bDagger, m_bExpGamma, m_fCoeffSigma12, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA31, bDagger, m_bExpGamma, m_fCoeffSigma13 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA41, bDagger, m_bExpGamma, m_fCoeffSigma14 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA23, bDagger, m_bExpGamma, m_fCoeffSigma23, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA42, bDagger, m_bExpGamma, m_fCoeffSigma24 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             SIGMA43, bDagger, m_bExpGamma, m_fCoeffSigma34 * F(-1.0), m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
 
@@ -491,28 +491,28 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA51, bDagger, m_bExpGamma, m_fCoeffGamma51, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA52, bDagger, m_bExpGamma, m_fCoeffGamma52, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA53, bDagger, m_bExpGamma, m_fCoeffGamma53, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
     if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA54, bDagger, m_bExpGamma, m_fCoeffGamma54, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
 
@@ -520,7 +520,7 @@ void CFieldFermionWilsonSquareSU3Gamma::DOperator(void* pTargetBuffer, const voi
     {
         appApplyGammaExp(pTargetBuffer, pBuffer, pGaugeBuffer,
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-            appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+            appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             GAMMA5, bDagger, m_bExpGamma, m_fCoeffGamma5, m_fKai, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
     }
 }
@@ -535,105 +535,105 @@ void CFieldFermionWilsonSquareSU3Gamma::DerivateDOperator(void* pForce, const vo
         if (abs(m_fCoeffGamma1) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma1, m_fKai, GAMMA1, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma2, m_fKai, GAMMA2, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma3, m_fKai, GAMMA3, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma4, m_fKai, GAMMA4, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma12) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma12, m_fKai, SIGMA12, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma13 * F(-1.0), m_fKai, SIGMA31, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma14 * F(-1.0), m_fKai, SIGMA41, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma23, m_fKai, SIGMA23, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma24 * F(-1.0), m_fKai, SIGMA42, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffSigma34 * F(-1.0), m_fKai, SIGMA43, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma51) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma51, m_fKai, GAMMA51, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma52, m_fKai, GAMMA52, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma53, m_fKai, GAMMA53, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma54, m_fKai, GAMMA54, m_byFieldId, 1);
         }
 
         if (abs(m_fCoeffGamma5) > _CLG_FLT_EPSILON)
         {
             GammaForceExp(pForce, pGaugeBuffer, pDphi, pDDphi,
-                appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+                appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
                 TRUE, m_fCoeffGamma5, m_fKai, GAMMA5, m_byFieldId, 1);
         }
     }

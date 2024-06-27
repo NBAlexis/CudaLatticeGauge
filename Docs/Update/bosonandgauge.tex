@@ -1,0 +1,100 @@
+\subsection{\label{sec:bosonandgauge}\index{Boson field}The update of boson field and gauge field}
+
+\subsubsection{\label{sec:bosonandgaugeaction}action}
+
+Consider
+\begin{equation}
+\begin{split}
+&S=D_{\mu}\phi D_{\mu}\phi + m \phi^2 + \lambda \phi^4\\
+\end{split}
+\end{equation}
+
+where
+\begin{equation}
+\begin{split}
+&D_{\mu}\phi =\frac{U_{\mu}(n)\phi(n+\mu)-\phi(n)}{a}\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&S=\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)-\phi^{\dagger}(n)}{a}\frac{U_{\mu}(n)\phi(n+\mu)-\phi(n)}{a} \\
+&+ m \sum _n\phi^{\dagger}(n)\phi(n) + \lambda \sum _n\left(\phi^{\dagger}(n)\phi(n)\right)^2\\
+&=-\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)\phi(n)+\phi^{\dagger}(n)U_{\mu}(n)\phi(n+\mu)}{a^2}+\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)\phi(n+\mu)+\phi^{\dagger}(n)\phi(n)}{a^2}\\
+&+ m \sum _n\phi^{\dagger}(n)\phi(n) + \lambda \sum _n\left(\phi^{\dagger}(n)\phi(n)\right)^2\\
+&=\sum _n\left\{-\frac{1}{a^2}\phi^{\dagger}(n) \sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right) + \left(\frac{2D}{a^2} +m\right)\phi^{\dagger}(n)\phi(n) + \lambda \left(\phi^{\dagger}(n)\phi(n)\right)^2\right\}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:bosonandgaugebosonforce}boson force}
+
+Take $\phi$ and $\phi^{\dagger}$ as two different functions of $\phi_r$ and $\phi _i$,
+\begin{equation}
+\begin{split}
+&\frac{\partial S}{\partial \phi_r(n)}=\frac{\partial S}{\partial \phi (\phi_r,\phi_i,n)}+\frac{\partial S}{\partial \phi^{\dagger}(\phi_r,\phi_i,n)}\\
+&-i\frac{\partial S}{\partial \phi_i(n)}=\frac{\partial S}{\partial \phi (\phi_r,\phi_i,n)}-\frac{\partial S}{\partial \phi^{\dagger}(\phi_r,\phi_i,n)}\\
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+&\frac{\partial S}{\partial \phi ^{\dagger}(\phi_r,\phi_i,n)}=\left(\frac{2D}{a^2} +m\right)\phi(n) + 2\lambda \left(\phi^{\dagger}(n)\phi(n)\right)\phi(n)-\frac{1}{a^2}\sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right)\\
+&\frac{\partial S}{\partial \phi (\phi_r,\phi_i,n)}=\left(\frac{\partial S}{\partial \phi ^{\dagger}(n)}\right)^{\dagger}\\
+\end{split}
+\end{equation}
+
+therefor,
+\begin{equation}
+\begin{split}
+&\frac{\partial S}{\partial \phi(n)}=2\left\{\left(\frac{2D}{a^2} +m\right)\phi(n) + 2\lambda \left(\phi^{\dagger}(n)\phi(n)\right)\phi(n)-\frac{1}{a^2}\sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right)\right\}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:bosonandgaugegaugeforce}gauge force}
+
+For one link, there are two contributions,
+\begin{equation}
+\begin{split}
+&S_{link} = -\frac{1}{a^2}\sum _n \sum _{\mu}\left(\phi^{\dagger}(n+\mu) U_{\mu}^{\dagger}(n)\phi(n)+ \phi^{\dagger} (n)U_{\mu}(n)\phi(n+\mu)\right) \\
+\end{split}
+\end{equation}
+
+taking
+\begin{equation}
+\begin{split}
+&U_{\mu}=\exp (i\sum _a \omega _{\mu}^a T^a)U_0,\;\;\frac{\partial U_{\mu}}{\partial \omega_{\mu}^a}=iT^aU_{\mu},\;\;\frac{\partial U^{\dagger}_{\mu}}{\partial \omega_{\mu}^a}=-iU^{\dagger}_{\mu}T^a,\\
+&\left(T^a\right)^{\dagger}=T^a,\;\;\frac{\partial M^{-1}}{\partial \omega _{\mu}^a}=-M^{-1}\frac{\partial M}{\partial \omega _{\mu}^a}M^{-1}\\
+\end{split}
+\end{equation}
+
+so
+\begin{equation}
+\begin{split}
+&\frac{\partial S_{link}}{\partial \omega _a(\mu,n)} = -\frac{1}{a^2} \left(-i\phi^{\dagger}(n+\mu) U_{\mu}^{\dagger}(n)T^a\phi(n)+ i\phi^{\dagger} (n)T^aU_{\mu}(n)\phi(n+\mu)\right) \\
+&=-i\frac{1}{a^2}\left(-{\rm Tr}\left[\phi(n)\left(T^aU_{\mu}(n)\phi(n+\mu)\right)^{\dagger}\right]+ {\rm Tr}\left[T^aU_{\mu}(n)\phi(n+\mu)\phi^{\dagger} (n)\right]\right) \\
+&=2\frac{1}{a^2}{\rm ImTr}\left[T^aU_{\mu}(n)\phi(n+\mu)\phi^{\dagger} (n)\right]\\
+\end{split}
+\end{equation}
+and using
+\begin{equation}
+\begin{split}
+&2i \sum _a T_a {\rm Im tr}[T_a M] = -2 i \sum _a T_a {\rm Re tr}[i T_a M] = \{M\}_{TA}\\
+&2i \sum _a T_a {\rm Im tr}[i T_a M] = 2 i \sum _a T_a {\rm Re tr}[T_a M] = \{i M\}_{TA}\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&\dot{\omega} _a=-\frac{\partial}{\partial \omega _a (\mu,n)}S_{link}\\
+&F_{\mu}(x)=\dot{P}_{\mu}(x)=i\sum \dot{\omega}_a T_a=-i\frac{\partial}{\partial \omega _a (\mu,n)}S_{link} T_a=-\frac{1}{a^2}\{U_{\mu}(n)\phi(n+\mu)\phi^{\dagger} (n)\}_{TA}\\
+\end{split}
+\end{equation}
+
+\subsubsection{\label{sec:bosonandgaugesummary}summary}
+
+The action to implement is,
+\begin{equation}
+\begin{split}
+&S=\sum _n\left\{-\frac{1}{a^2}\phi^{\dagger}(n) \sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right) + \left(\frac{2D}{a^2} +m\right)\phi^{\dagger}(n)\phi(n) + \lambda \left(\phi^{\dagger}(n)\phi(n)\right)^2\right\}\\
+\end{split}
+\end{equation}

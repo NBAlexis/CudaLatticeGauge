@@ -101,7 +101,7 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
 
     for (INT i = 0; i < pLattice->m_pBosonField.Num(); ++i)
     {
-        if (m_pBosonFields[i]->IsDynamic())
+        if (pLattice->m_pBosonField[i]->IsDynamic())
         {
             m_pBosonFields.AddItem(dynamic_cast<CFieldBoson*>(pLattice->m_pBosonField[i]->GetCopy()));
             m_pBosonFields[i]->InitialField(EFIT_Zero);

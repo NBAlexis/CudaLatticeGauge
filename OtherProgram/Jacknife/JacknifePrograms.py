@@ -2,7 +2,7 @@ from io import StringIO
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, fsolve
 
 
 def LoadMathematicaCSV(fileName: str):
@@ -161,10 +161,24 @@ class FitPlusMinus:
         (-1)**t does not work with non-integral t, so change it to cos(t*pi)
         """
         return A * np.exp(-m * t) + A * np.exp(-m * (self.T - t)) \
-            + np.cos(t*np.pi) * Ap * np.exp(-mp * t) + np.cos(t*np.pi) * Ap * np.exp(-mp * (self.T - t))
+            + np.cos(t * np.pi) * Ap * np.exp(-mp * t) + np.cos(t * np.pi) * Ap * np.exp(-mp * (self.T - t))
+
+
+class FitMesonSimple:
+
+    def __init__(self, T, d, t, r):
+        self.T = T
+        self.d = d
+        self.t = t
+        self.r = r
+
+    def expToSolve(self, m):
+        return [self.r - (np.exp(-m[0] * (self.t + self.d)) + np.exp(-m[0] * (self.T - self.t - self.d))) / (
+                    np.exp(-m[0] * self.t) + np.exp(-m[0] * (self.T - self.t)))]
+
 
 def FitStaggeredMeson(pt, T, showFig=False):
-    xdata = [t + 1 for t in range(T-1)]
+    xdata = [t + 1 for t in range(T - 1)]
     ydata = np.mean(pt, axis=0)
     print(np.shape(ydata))
     fitfunction = FitPlusMinus(T)
@@ -172,12 +186,52 @@ def FitStaggeredMeson(pt, T, showFig=False):
     if showFig:
         ttoplot = np.array([0.95 + 0.1 * i for i in range(len(ydata) * 10 - 8)])
         plt.plot(xdata, ydata, '+')
-        plt.plot(ttoplot, fitfunction.expPlusMinusFig(ttoplot, parameters[0], parameters[1], parameters[2], parameters[3]))
+        plt.plot(ttoplot,
+                 fitfunction.expPlusMinusFig(ttoplot, parameters[0], parameters[1], parameters[2], parameters[3]))
         plt.show()
     return parameters[1], parameters[3]
 
 
+def FitStaggeredMesonSimple(pt, T, d):
+    meanpt = np.mean(pt, axis=0)
+    meanpt2 = []
+    for i in range(T//2):
+        if i != (T // 2) - 1:
+            meanpt2.append((meanpt[i] + meanpt[T - 2 - i]) / 2)
+        else:
+            meanpt2.append(meanpt[i])
+    ratios = [meanpt2[t + d] / meanpt2[t] for t in range((T // 2) - d)]
+    roots = []
+    for i in range((T // 2) - d):
+        trystart = 0.1
+        trytimes = 0
+        t = i + 1
+        fitf = FitMesonSimple(T, d, t, ratios[i])
+        root = fsolve(fitf.expToSolve, [trystart])
+        while trytimes < 10 and root[0] < 0:
+            trytimes = trytimes + 1
+            trystart = trystart + 2**trytimes
+            root = fsolve(fitf.expToSolve, [trystart])
+        roots.append(root)
+    return np.mean(roots)
 
+
+def JacknifeMeasonSimple(lst, T, d, progressBarTitle=""):
+    size = len(lst)
+    orignalv = FitStaggeredMesonSimple(lst, T, d)
+    argsv = 0
+    avers = []
+    for i in range(size):
+        subseto = np.delete(lst, i, axis=0)
+        avers.append(FitStaggeredMesonSimple(subseto, T, d))
+        argsv = argsv + (avers[i] - orignalv) ** 2
+        if 0 != len(progressBarTitle):
+            PrintProgressBar(progressBarTitle, i, size)
+    argsv = argsv * (size - 1) / size
+    unbaisv = orignalv + (size - 1) * (orignalv - np.mean(np.array(avers)))
+    if 0 != len(progressBarTitle):
+        PrintProgressBar(progressBarTitle, size, size)
+    return unbaisv, np.sqrt(argsv)
 
 def PrintAsMathematicaArray(arr, header="") -> str:
     ret = str(np.array(arr))

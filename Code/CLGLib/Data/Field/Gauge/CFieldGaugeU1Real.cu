@@ -866,6 +866,11 @@ void CFieldGaugeU1Real::Axpy(const CLGComplex& a, const CField* x)
     _FAIL_EXIT;
 }
 
+void CFieldGaugeU1Real::Mul(const CField* other, UBOOL bDagger)
+{
+    appCrucial(_T("CFieldGaugeU1Real::Mul with complex Not supported yet!\n"));
+    _FAIL_EXIT;
+}
 
 void CFieldGaugeU1Real::Zero()
 {

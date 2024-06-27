@@ -104,7 +104,7 @@ public:
         m_lstComplexResults.RemoveAll();
     }
 
-    virtual UBOOL IsGaugeMeasurement() const = 0;
+    virtual UBOOL IsGaugeOrBosonMeasurement() const = 0;
     virtual UBOOL IsSourceScanning() const = 0;
     virtual UBOOL IsZ4Source() const { return FALSE; }
     virtual UBOOL NeedGaugeSmearing() const { return m_bNeedSmearing; }
@@ -463,6 +463,11 @@ protected:
         m_lstComplexResults.AddItem(fResult);
     }
 
+    void ReportAverageComplexRes() const
+    {
+        LogGeneralComplex(m_cAverageCmpRes);
+    }
+
     UINT m_uiConfigurationCount;
 
 private:
@@ -497,7 +502,7 @@ public:
     }
 
 
-    UBOOL IsGaugeMeasurement() const override = 0;
+    UBOOL IsGaugeOrBosonMeasurement() const override = 0;
     UBOOL IsSourceScanning() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
     UINT GetFieldCount() const { return m_uiFieldCount; }

@@ -16,6 +16,9 @@ __CLGIMPLEMENT_CLASS(CFieldBosonU1)
 
 #pragma region kernel D and force
 
+/**
+* sum_mu (U_mu(n)phi(n+mu) + U_{-mu}(n)phi(n-mu))
+*/
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDBoson(
     const CLGComplex* __restrict__ pDeviceData,
@@ -31,7 +34,6 @@ _kernelDBoson(
     intokernaldir;
 
     CLGComplex result = _zeroc;
-    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -60,7 +62,7 @@ _kernelDBoson(
         CLGComplex u_dagger_phi_x_m_m = _cuCmulf(x_m_mu_Gauge_element, pDeviceData[x_m_mu_Boson.m_uiSiteIndex]);
 
         result = _cuCaddf(result, u_phi_x_p_m);
-        result = _cuCsubf(result, u_dagger_phi_x_m_m);
+        result = _cuCaddf(result, u_dagger_phi_x_m_m);
     }
 
     pResultData[uiSiteIndex] = result;
@@ -73,6 +75,48 @@ _kernelDBoson(
     case EOCT_Complex:
         pResultData[uiSiteIndex] = _cuCmulf(pResultData[uiSiteIndex], cCmpCoeff);
         break;
+    }
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSquareBoson(
+    const CLGComplex* __restrict__ pDeviceData,
+    CLGComplex* pResultData)
+{
+    intokernal;
+    pResultData[uiSiteIndex] = cuCmulf_cr(pDeviceData[uiSiteIndex], __cuCabsSqf(pDeviceData[uiSiteIndex]));
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDBosonForceU1(
+    const CLGComplex* __restrict__ pPhi,
+    const CLGComplex* __restrict__ pGauge,
+    const SIndex* __restrict__ pBosonMove,
+    CLGComplex* pForce,
+    BYTE byFieldId)
+{
+    intokernaldir;
+
+    const CLGComplex& phi_dagger = _cuConjf(pPhi[uiSiteIndex]);
+
+    //idir = mu
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        //x, mu
+        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        const SIndex& x_p_mu_Boson = pBosonMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
+
+        const CLGComplex& phi_p_mu = pPhi[x_p_mu_Boson.m_uiSiteIndex];
+
+        const CLGComplex& x_Gauge_element = pGauge[linkIndex];
+
+        //U phi(n+mu)phi^+(n)
+        CLGComplex forceOfThisLink = _cuCmulf(x_Gauge_element, _cuCmulf(phi_p_mu, phi_dagger));
+
+        //TA
+        //pForce[linkIndex] = _cuCsubf(pForce[linkIndex], _make_cuComplex(F(0.0), forceOfThisLink.x));
+        pForce[linkIndex].y = pForce[linkIndex].y - forceOfThisLink.x;
     }
 }
 
@@ -104,14 +148,20 @@ void CFieldBosonU1::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaug
         pPooled->m_pDeviceData,
         (NULL == pFieldU1) ? NULL : pFieldU1->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pFermionMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         m_pDeviceData,
         eCoeffType,
         fRealCoeff,
         cCompCoeff,
         m_byFieldId);
 
+    checkCudaErrors(cudaDeviceSynchronize());
     pPooled->Return();
+}
+
+void CFieldBosonU1::ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldGauge** pGaugeForce, const CFieldBoson* const* pBoson)
+{
+
 }
 
 #pragma region other kernels
@@ -187,6 +237,17 @@ _kernelAxpyComplexBoson(CLGComplex* pMe, const CLGComplex* __restrict__ pOther, 
 {
     intokernal;
     pMe[uiSiteIndex] = _cuCaddf(pMe[uiSiteIndex], _cuCmulf(pOther[uiSiteIndex], a));
+}
+
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMulComplexBoson(CLGComplex* pMe, const CLGComplex* __restrict__ pOther, UBOOL bConj)
+{
+    intokernal;
+    if (bConj)
+    {
+        pMe[uiSiteIndex].y = -pMe[uiSiteIndex].y;
+    }
+    pMe[uiSiteIndex] = _cuCmulf(pMe[uiSiteIndex], pOther[uiSiteIndex]);
 }
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -468,6 +529,19 @@ void CFieldBosonU1::Axpy(const CLGComplex& a, const CField* x)
 
     preparethread;
     _kernelAxpyComplexBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
+}
+
+void CFieldBosonU1::Mul(const CField* other, UBOOL bDagger)
+{
+    if (NULL == other || EFT_BosonU1 != other->GetFieldType())
+    {
+        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
+        return;
+    }
+    const CFieldBosonU1* pField = dynamic_cast<const CFieldBosonU1*>(other);
+
+    preparethread;
+    _kernelMulComplexBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
 }
 
 cuDoubleComplex CFieldBosonU1::Dot(const CField* x) const
