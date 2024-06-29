@@ -201,6 +201,7 @@ void CIntegrator::UpdateU(Real fStep) const
     {
         if (NULL != m_pBosonFields[i])
         {
+            //m_pBosonMomentumFields[i]->DebugPrintMe();
             m_pBosonFields[i]->Axpy(fStep, m_pBosonMomentumFields[i]);
         }
     }

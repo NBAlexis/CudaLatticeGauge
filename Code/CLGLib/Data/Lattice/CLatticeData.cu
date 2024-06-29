@@ -383,7 +383,7 @@ INT CLatticeData::GetGaugeFieldIndexById(INT num, const CFieldGauge* const* gaug
 {
     for (INT i = 0; i < num; ++i)
     {
-        if (gaugeFields[i]->m_byFieldId == byFieldId)
+        if (NULL != gaugeFields[i] && gaugeFields[i]->m_byFieldId == byFieldId)
         {
             return i;
         }
@@ -395,7 +395,7 @@ INT CLatticeData::GetBosonFieldIndexById(INT num, const CFieldBoson* const* boso
 {
     for (INT i = 0; i < num; ++i)
     {
-        if (bosonFields[i]->m_byFieldId == byFieldId)
+        if (NULL != bosonFields[i] && bosonFields[i]->m_byFieldId == byFieldId)
         {
             return i;
         }

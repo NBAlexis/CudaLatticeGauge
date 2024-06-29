@@ -89,15 +89,16 @@ _kernelSquareBoson(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelDBosonForceU1(
-    const CLGComplex* __restrict__ pPhi,
+    const CLGComplex* __restrict__ pBoson,
     const CLGComplex* __restrict__ pGauge,
     const SIndex* __restrict__ pBosonMove,
-    CLGComplex* pForce,
+    CLGComplex* pGaugeForce,
+    BYTE byGaugeFieldId,
     BYTE byFieldId)
 {
     intokernaldir;
 
-    const CLGComplex& phi_dagger = _cuConjf(pPhi[uiSiteIndex]);
+    const CLGComplex& phi_dagger = _cuConjf(pBoson[uiSiteIndex]);
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -107,18 +108,19 @@ _kernelDBosonForceU1(
 
         const SIndex& x_p_mu_Boson = pBosonMove[linkIndex * 2]; // __idx->_deviceFermionIndexWalk(byFieldId, uiSiteIndex, (idir + 1));
 
-        const CLGComplex& phi_p_mu = pPhi[x_p_mu_Boson.m_uiSiteIndex];
+        const CLGComplex& phi_p_mu = pBoson[x_p_mu_Boson.m_uiSiteIndex];
 
         const CLGComplex& x_Gauge_element = pGauge[linkIndex];
 
         //U phi(n+mu)phi^+(n)
-        CLGComplex forceOfThisLink = _cuCmulf(x_Gauge_element, _cuCmulf(phi_p_mu, phi_dagger));
+        CLGComplex forceOfThisLink = _cuCmulf(_cuCmulf(x_Gauge_element, phi_p_mu), phi_dagger);
 
         //TA
         //pForce[linkIndex] = _cuCsubf(pForce[linkIndex], _make_cuComplex(F(0.0), forceOfThisLink.x));
-        pForce[linkIndex].y = pForce[linkIndex].y - forceOfThisLink.x;
+        pGaugeForce[linkIndex].y = pGaugeForce[linkIndex].y - F(1.0) * forceOfThisLink.y;
     }
 }
+
 
 #pragma endregion
 
@@ -131,6 +133,22 @@ void CFieldBosonU1::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaug
         appCrucial(_T("CFieldBosonU1 can only play with gauge U1!"));
         return;
     }
+
+    //try external gauge field
+    if (NULL == pGauge && m_byGaugeFieldIds.Num() > 0)
+    {
+        const CField* externelfield = appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]);
+        if (NULL != externelfield)
+        {
+            pGauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]));
+            if (pGauge->IsDynamic())
+            {
+                appCrucial(_T("CFieldBosonU1: A dynamic field is configured for this U1, but not for the action!\n"));
+                pGauge = NULL;
+            }
+        }
+    }
+
     const CFieldGaugeU1* pFieldU1 = (NULL == pGauge) ? NULL : dynamic_cast<const CFieldGaugeU1*>(pGauge);
     CFieldBosonU1* pPooled = dynamic_cast<CFieldBosonU1*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(CLGComplex) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
@@ -159,9 +177,50 @@ void CFieldBosonU1::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaug
     pPooled->Return();
 }
 
-void CFieldBosonU1::ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldGauge** pGaugeForce, const CFieldBoson* const* pBoson)
+void CFieldBosonU1::ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const
 {
+    if (m_byGaugeFieldIds.Num() < 1)
+    {
+        appCrucial(_T("CFieldBosonU1 ForceOnGauge: there is no gauge!"));
+        return;
+    }
+    INT gaugeidx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pGauge, m_byGaugeFieldIds[0]);
+    if (gaugeidx < 0 || gaugeidx >= m_byGaugeFieldIds.Num())
+    {
+        appCrucial(_T("CFieldBosonU1 ForceOnGauge: there is no gauge!"));
+        return;
+    }
 
+    const CFieldGauge* gauge = pGauge[gaugeidx];
+    CFieldGauge* gaugeforce = pGaugeForce[gaugeidx];
+
+    if (NULL == gauge || EFT_GaugeU1 != gauge->GetFieldType())
+    {
+        appCrucial(_T("CFieldBosonU1 can only play with gauge U1!"));
+        return;
+    }
+
+    if (NULL == gaugeforce || EFT_GaugeU1 != gaugeforce->GetFieldType())
+    {
+        appCrucial(_T("CFieldBosonU1 can only play with gauge U1!"));
+        return;
+    }
+
+    const CFieldGaugeU1* gaugeu1 = dynamic_cast<const CFieldGaugeU1*>(gauge);
+    CFieldGaugeU1* gaugeforceu1 = dynamic_cast<CFieldGaugeU1*>(gaugeforce);
+
+    preparethread;
+    _kernelDBosonForceU1 << <block, threads >> > (
+        m_pDeviceData,
+        gaugeu1->m_pDeviceData,
+        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
+        gaugeforceu1->m_pDeviceData,
+        gaugeu1->m_byFieldId,
+        m_byFieldId
+        );
+
+    //gaugeu1->DebugPrintMe();
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 #pragma region other kernels
@@ -300,6 +359,7 @@ _kernelBosonConjugate(CLGComplex* pDeviceData)
 
 CFieldBosonU1::CFieldBosonU1()
     : CFieldBoson()
+    //, m_fCharge(F(0.1))
 {
     checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(CLGComplex) * m_uiSiteCount));
 }
@@ -401,10 +461,12 @@ void CFieldBosonU1::InitialWithByte(BYTE* byData)
     free(readData);
 }
 
-void CFieldBosonU1::InitialOtherParameters(CParameters& params)
-{
-    CFieldBoson::InitialOtherParameters(params);
-}
+//void CFieldBosonU1::InitialOtherParameters(CParameters& params)
+//{
+//    CFieldBoson::InitialOtherParameters(params);
+//
+//    params.FetchValueReal(_T("Charge"), m_fCharge);
+//}
 
 BYTE* CFieldBosonU1::CopyDataOut(UINT& uiSize) const
 {
@@ -608,16 +670,31 @@ void CFieldBosonU1::CopyTo(CField* U) const
 
     CFieldBosonU1* pField = dynamic_cast<CFieldBosonU1*>(U);
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(CLGComplex) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+
+    //pField->m_fCharge = m_fCharge;
 }
 
 void CFieldBosonU1::MakeRandomMomentum()
 {
+    if (m_bConstant)
+    {
+        Zero();
+        return;
+    }
+
     preparethread;
     _kernelInitialBoson << <block, threads >> > (
         m_pDeviceData,
         m_byFieldId,
         EFIT_RandomGaussian);
 }
+
+//CCString CFieldBosonU1::GetInfos(const CCString& tab) const
+//{
+//    CCString sRet = CFieldBoson::GetInfos(tab);
+//    sRet = sRet + tab + _T("Charge : ") + appToString(m_fCharge) + _T("\n");
+//    return sRet;
+//}
 
 __END_NAMESPACE
 

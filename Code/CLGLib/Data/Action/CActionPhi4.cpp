@@ -69,25 +69,33 @@ UBOOL CActionPhi4::CalculateForce(INT gaugeNum, INT bosonNum, const CFieldGauge*
     //Boson force
     INT ibosonidx = CLatticeData::GetBosonFieldIndexById(bosonNum, bosonFields, m_byBosonFieldIds[0]);
     const CFieldBoson* bosonfield = bosonFields[ibosonidx];
-    //bosonfield->DebugPrintMe();
     CFieldBoson* dboson = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(bosonfield));
-    dboson->D(gaugeNum, bosonNum, gaugeFields, bosonFields);
-    checkCudaErrors(cudaDeviceSynchronize());
-    
-    bosonForces[ibosonidx]->Axpy(_make_cuComplex(F(1.0), F(0.0)), dboson);
-    checkCudaErrors(cudaDeviceSynchronize());
-    bosonForces[ibosonidx]->Axpy(_make_cuComplex(-F(1.0) * (F(8.0) + m_fM), F(0.0)), bosonfield);
-    checkCudaErrors(cudaDeviceSynchronize());
-    bosonfield->CopyTo(dboson);
-    dboson->Mul(bosonfield);
-    checkCudaErrors(cudaDeviceSynchronize());
-    dboson->Mul(bosonfield, FALSE);
-    checkCudaErrors(cudaDeviceSynchronize());
-    bosonForces[ibosonidx]->Axpy(_make_cuComplex(-F(2.0) * m_fLambda, F(0.0)), dboson);
-    checkCudaErrors(cudaDeviceSynchronize());
-    dboson->Return();
+    if (!bosonfield->m_bConstant)
+    {
+        dboson->D(gaugeNum, bosonNum, gaugeFields, bosonFields);
+        checkCudaErrors(cudaDeviceSynchronize());
+
+        bosonForces[ibosonidx]->Axpy(_make_cuComplex(F(1.0), F(0.0)), dboson);
+        checkCudaErrors(cudaDeviceSynchronize());
+        bosonForces[ibosonidx]->Axpy(_make_cuComplex(-F(1.0) * (F(8.0) + m_fM), F(0.0)), bosonfield);
+        checkCudaErrors(cudaDeviceSynchronize());
+        bosonfield->CopyTo(dboson);
+        dboson->Mul(bosonfield);
+        checkCudaErrors(cudaDeviceSynchronize());
+        dboson->Mul(bosonfield, FALSE);
+        checkCudaErrors(cudaDeviceSynchronize());
+        bosonForces[ibosonidx]->Axpy(_make_cuComplex(-F(2.0) * m_fLambda, F(0.0)), dboson);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+
     //Gauge force
-    //bosonfield->DebugPrintMe();
+    if (gaugeNum > 0 && m_byGaugeFieldIds.Num() > 0)
+    {
+        bosonfield->ForceOnGauge(gaugeNum, bosonNum, gaugeFields, gaugeForces, bosonFields);
+    }
+
+    dboson->Return();
+
     return TRUE;
 }
 

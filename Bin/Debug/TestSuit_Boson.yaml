@@ -3,7 +3,7 @@ TestBosonU1NoGauge:
 
     Dim : 4
     Dir : 4
-    LatticeLength : [4, 4, 4, 8]
+    LatticeLength : [8, 8, 8, 8]
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
@@ -26,15 +26,16 @@ TestBosonU1NoGauge:
         Metropolis : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorLeapFrog
+        IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 20
+        IntegratorStep : 12
         Omelyan2Lambda : 0.38636665500756728
 
     BosonField1:
 
         FieldName : CFieldBosonU1
-        FieldInitialType : EFIT_Zero
+        # EFIT_Zero, EFIT_RandomGaussian
+        FieldInitialType : EFIT_RandomGaussian
         FieldId : 2
         Period : [1, 1, 1, 1]
 
@@ -50,3 +51,136 @@ TestBosonU1NoGauge:
         MeasureName : CMeasureBosonCond
         BosonFields : [2]
 
+
+TestBosonU1:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 2
+    GaugeFieldCount : 1
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.565
+    ##Important, do not calculate energy using staple for Dirichlet
+    CacheStaple : 0 
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 12
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeU1
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        FieldId : 1
+
+    BosonField1:
+
+        FieldName : CFieldBosonU1
+        FieldInitialType : EFIT_Zero
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+        GaugeFields : [1]
+        # Constant : 1
+
+    Action2:
+
+        ActionName : CActionGaugePlaquette
+        GaugeFields : [1]
+        Beta : 1.0
+
+    Action1:
+   
+        ActionName : CActionPhi4
+        Mass : 1.0
+        Lambda : 1.0
+        GaugeFields : [1]
+        BosonFields : [2]
+        
+    Measure1:
+
+        MeasureName : CMeasureBosonCond
+        BosonFields : [2]
+
+TestBosonU1ExternalGaugeField:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 1
+    GaugeFieldCount : 1
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 1
+    ExpectedRes : 0.565
+    ##Important, do not calculate energy using staple for Dirichlet
+    CacheStaple : 0 
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 6
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeU1
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        FieldId : 1
+        Dynamic : 0
+
+    BosonField1:
+
+        FieldName : CFieldBosonU1
+        FieldInitialType : EFIT_Zero
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+        GaugeFields : [1]
+
+    Action1:
+   
+        ActionName : CActionPhi4
+        Mass : 1.0
+        Lambda : 1.0
+        BosonFields : [2]
+        
+    Measure1:
+
+        MeasureName : CMeasureBosonCond
+        BosonFields : [2]

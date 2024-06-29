@@ -29,7 +29,7 @@ public:
     void MakeRandomMomentum() override;
 
     void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldGauge** pGaugeForce, const CFieldBoson* const* pBoson) override;
+    void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const override;
     //void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     //void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
 
@@ -41,7 +41,7 @@ public:
     void InitialField(EFieldInitialType eInitialType) override;
     void InitialFieldWithFile(const CCString&, EFieldFileType) override;
     void InitialWithByte(BYTE* byData) override;
-    void InitialOtherParameters(CParameters& params) override;
+    //void InitialOtherParameters(CParameters& params) override;
     void DebugPrintMe() const override;
 
     void Dagger() override;
@@ -64,6 +64,9 @@ public:
     CLGComplex* m_pDeviceData;
 
     _GetData
+
+    //CCString GetInfos(const CCString& tab) const override;
+    //Real m_fCharge;
 
 };
 

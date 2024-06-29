@@ -225,7 +225,16 @@ protected:
         {
             return NULL;
         }
-        return gaugeFields[CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0])];
+        if (NULL == gaugeFields)
+        {
+            return NULL;
+        }
+        INT gaugeIdx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, gaugeFields, m_byGaugeFieldIds[0]);
+        if (gaugeIdx < 0 || gaugeIdx >= gaugeNum)
+        {
+            return NULL;
+        }
+        return gaugeFields[gaugeIdx];
     }
 
     class CFieldPool* m_pPool;
