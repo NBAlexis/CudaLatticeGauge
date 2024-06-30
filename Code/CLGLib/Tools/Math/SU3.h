@@ -243,7 +243,7 @@ extern "C" {
         __device__ __inline__ static deviceSU3 makeSU3Generator(UINT uiGenerator)
         {
             deviceSU3 ret = makeSU3Zero();
-            const Real half = F(0.5);
+            const Real half = F(1.0);
             switch (uiGenerator)
             {
             case 0:

@@ -527,6 +527,9 @@
     <ClInclude Include="Measurement\CMeasureBosonCond.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\SUN.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">

@@ -67,18 +67,16 @@ _kernelDebugFunction()
     //    printf("gammamatrix is %d\n", i);
     //    __chiralGamma[i].Print();
     //}
+    //printf("here1?\n");
 
-    deviceSU3 s = deviceSU3::makeSU3Random(0);
-    s.DebugPrint("a");
+    deviceSU4 a = deviceSU4::makeSUNRandomAny(0);
+    deviceSU4 b(a);
+    a.DebugPrint("A");
+    a.Norm();
+    b.Proj();
 
-    s = s.Log();
-
-    s.DebugPrint("b");
-
-    s = s.StrictExp();
-
-    s.DebugPrint("c");
-    
+    a.DebugPrint("B");
+    b.DebugPrint("C");
 }
 
 __global__ void
@@ -481,9 +479,11 @@ void CCudaHelper::DebugFunction()
     //appGeneral(_T("l: %d, %d, %d, %d\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
 
     _kernelDebugFunction << <1,1 >> > ();
+    checkCudaErrors(cudaDeviceSynchronize());
 
     preparethread;
     _kernelDebugFunctionForSites << <block, threads >> > ();
+    checkCudaErrors(cudaDeviceSynchronize());
 
     
 }
