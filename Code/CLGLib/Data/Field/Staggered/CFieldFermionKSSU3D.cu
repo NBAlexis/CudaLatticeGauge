@@ -31,6 +31,7 @@ _kernelDFermionKS_D(
     deviceSU3Vector* pResultData,
     Real f2am,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -64,7 +65,7 @@ _kernelDFermionKS_D(
         //UBOOL btestpf = FALSE;
         if (!x_p_mu_Fermion.IsDirichlet())
         {
-            const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIndex, idir);
+            const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIndex, idir);
             //U(x,mu) phi(x+ mu)
             res = x_Gauge_element.MulVector(pDeviceData[x_p_mu_Fermion.m_uiSiteIndex]);
             if (x_p_mu_Fermion.NeedToOpposite())
@@ -196,7 +197,7 @@ _kernelDFermionKSForce_D(
 
 
 void CFieldFermionKSSU3D::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -214,6 +215,7 @@ void CFieldFermionKSSU3D::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         f2am,
         m_byFieldId,
+        byGaugeFieldId,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -226,7 +228,8 @@ void CFieldFermionKSSU3D::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
  */
 void CFieldFermionKSSU3D::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer,
+    BYTE byGaugeFieldId) const
 {
     preparethread;
     _kernelDFermionKSForce_D << <block, threads >> > (

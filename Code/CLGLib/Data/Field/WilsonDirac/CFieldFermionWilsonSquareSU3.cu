@@ -232,7 +232,7 @@ _kernelDWilsonForceSU3(
 #pragma endregion
 
 void CFieldFermionWilsonSquareSU3::DOperator(void* pTargetBuffer, const void* pBuffer, 
-    const void* pGaugeBuffer, 
+    const void* pGaugeBuffer, BYTE byGaugeFieldId,
     UBOOL bDagger, EOperatorCoefficientType eOCT, 
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -256,7 +256,7 @@ void CFieldFermionWilsonSquareSU3::DOperator(void* pTargetBuffer, const void* pB
 
 }
 
-void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
@@ -873,7 +873,7 @@ void CFieldFermionWilsonSquareSU3::PrepareForHMCS(const CFieldGauge* pGauge)
         m_byFieldId,
         EFIT_RandomGaussian);
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, 
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
 
     pPooled->Return();
@@ -920,7 +920,7 @@ void CFieldFermionWilsonSquareSU3::DS(const CField* pGauge, EOperatorCoefficient
         fRealCoeff = F(-1.0);
     }
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, 
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -946,7 +946,7 @@ void CFieldFermionWilsonSquareSU3::DdaggerS(const CField* pGauge, EOperatorCoeff
         fRealCoeff = F(-1.0);
     }
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         TRUE, eCoeffType, fRealCoeff, cCompCoeff);
 
 
@@ -971,10 +971,10 @@ void CFieldFermionWilsonSquareSU3::DDdaggerS(const CField* pGauge, EOperatorCoef
     }
     CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -998,10 +998,10 @@ void CFieldFermionWilsonSquareSU3::DDS(const CField* pGauge, EOperatorCoefficien
     }
     CFieldFermionWilsonSquareSU3* pPooled = dynamic_cast<CFieldFermionWilsonSquareSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1084,7 +1084,8 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForceS(
         pForceSU3->m_pDeviceData, 
         pDPhiWilson->m_pDeviceData, 
         pDDaggerPhiWilson->m_pDeviceData, 
-        pGaugeSU3->m_pDeviceData);
+        pGaugeSU3->m_pDeviceData,
+        pGaugeSU3->m_byFieldId);
 
     pDDaggerPhi->Return();
     pDPhi->Return();

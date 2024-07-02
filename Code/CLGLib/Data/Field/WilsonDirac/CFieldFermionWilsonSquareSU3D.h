@@ -37,9 +37,9 @@ public:
 protected:
 
     void PrepareForHMCS(const CFieldGauge* pGauge) override;
-    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, 
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
-    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const override;
+    void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const override;
 
     
 

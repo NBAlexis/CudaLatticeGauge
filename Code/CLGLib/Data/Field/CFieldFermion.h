@@ -327,13 +327,13 @@ protected:
         appCrucial(_T("DDdaggerWithMassS not implemented\n"));
     }
 
-    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+    virtual void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         appCrucial(_T("DOperator not implemented\n"));
     }
 
-    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+    virtual void DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
     {
         appCrucial(_T("DerivateDOperator not implemented\n"));
     }

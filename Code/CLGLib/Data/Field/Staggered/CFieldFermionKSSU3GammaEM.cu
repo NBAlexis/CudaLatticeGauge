@@ -1744,7 +1744,7 @@ void CFieldFermionKSSU3GammaEM::KSForceEM(
 
 
 void CFieldFermionKSSU3GammaEM::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -1758,85 +1758,85 @@ void CFieldFermionKSSU3GammaEM::DOperatorKS(void* pTargetBuffer, const void* pBu
     //pU1->DebugPrintMe();
 
     DOperatorEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, f2am, m_fCharge, 
-        m_bEachSiteEta, bDagger, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+        m_bEachSiteEta, bDagger, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
 
     if (abs(m_fCoeffGamma1) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA1, m_bEachSiteEta, bDagger, m_fCoeffGamma1, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA1, m_bEachSiteEta, bDagger, m_fCoeffGamma1, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA2, m_bEachSiteEta, bDagger, m_fCoeffGamma2, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA2, m_bEachSiteEta, bDagger, m_fCoeffGamma2, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA3, m_bEachSiteEta, bDagger, m_fCoeffGamma3, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA3, m_bEachSiteEta, bDagger, m_fCoeffGamma3, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA4, m_bEachSiteEta, bDagger, m_fCoeffGamma4, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA4, m_bEachSiteEta, bDagger, m_fCoeffGamma4, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma12) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA12, m_bEachSiteEta, bDagger, m_fCoeffSigma12, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA12, m_bEachSiteEta, bDagger, m_fCoeffSigma12, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA31, m_bEachSiteEta, bDagger, m_fCoeffSigma13, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA31, m_bEachSiteEta, bDagger, m_fCoeffSigma13, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA41, m_bEachSiteEta, bDagger, m_fCoeffSigma14, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA41, m_bEachSiteEta, bDagger, m_fCoeffSigma14, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA23, m_bEachSiteEta, bDagger, m_fCoeffSigma23, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA23, m_bEachSiteEta, bDagger, m_fCoeffSigma23, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA42, m_bEachSiteEta, bDagger, m_fCoeffSigma24, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA42, m_bEachSiteEta, bDagger, m_fCoeffSigma24, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            SIGMA43, m_bEachSiteEta, bDagger, m_fCoeffSigma34, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            SIGMA43, m_bEachSiteEta, bDagger, m_fCoeffSigma34, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma51) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA51, m_bEachSiteEta, bDagger, m_fCoeffGamma51, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA51, m_bEachSiteEta, bDagger, m_fCoeffGamma51, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA52, m_bEachSiteEta, bDagger, m_fCoeffGamma52, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA52, m_bEachSiteEta, bDagger, m_fCoeffGamma52, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA53, m_bEachSiteEta, bDagger, m_fCoeffGamma53, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA53, m_bEachSiteEta, bDagger, m_fCoeffGamma53, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA54, m_bEachSiteEta, bDagger, m_fCoeffGamma54, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA54, m_bEachSiteEta, bDagger, m_fCoeffGamma54, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma5) > _CLG_FLT_EPSILON)
     {
         appApplyGammaKSEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, m_fCharge,
-            GAMMA5, m_bEachSiteEta, bDagger, m_fCoeffGamma5, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            GAMMA5, m_bEachSiteEta, bDagger, m_fCoeffGamma5, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
 }
 
@@ -1846,7 +1846,7 @@ void CFieldFermionKSSU3GammaEM::DOperatorKS(void* pTargetBuffer, const void* pBu
  */
 void CFieldFermionKSSU3GammaEM::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(m_byEMFieldID));
     if (NULL == pU1)
@@ -1875,7 +1875,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA1,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma2) > _CLG_FLT_EPSILON)
@@ -1891,7 +1891,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA2,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma3) > _CLG_FLT_EPSILON)
@@ -1907,7 +1907,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA3,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma4) > _CLG_FLT_EPSILON)
@@ -1923,7 +1923,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA4,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma12) > _CLG_FLT_EPSILON)
@@ -1939,7 +1939,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA12,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma13) > _CLG_FLT_EPSILON)
@@ -1955,7 +1955,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA31,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma14) > _CLG_FLT_EPSILON)
@@ -1971,7 +1971,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA41,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma23) > _CLG_FLT_EPSILON)
@@ -1987,7 +1987,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA23,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma24) > _CLG_FLT_EPSILON)
@@ -2003,7 +2003,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA42,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffSigma34) > _CLG_FLT_EPSILON)
@@ -2019,7 +2019,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             SIGMA43,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma51) > _CLG_FLT_EPSILON)
@@ -2035,7 +2035,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA51,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma52) > _CLG_FLT_EPSILON)
@@ -2051,7 +2051,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA52,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma53) > _CLG_FLT_EPSILON)
@@ -2067,7 +2067,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA53,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma54) > _CLG_FLT_EPSILON)
@@ -2083,7 +2083,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA54,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 
     if (abs(m_fCoeffGamma5) > _CLG_FLT_EPSILON)
@@ -2099,7 +2099,7 @@ void CFieldFermionKSSU3GammaEM::DerivateD0(
             GAMMA5,
             m_pDevicePathBuffer,
             m_byFieldId,
-            1);
+            byGaugeFieldId);
     }
 }
 
@@ -2184,7 +2184,7 @@ void CFieldFermionKSSU3GammaEM::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaM
         F(1.0),
         bImag ? _make_cuComplex(F(0.0), -F(1.0)) : _onec,
         m_byFieldId,
-        1);
+        pGauge->m_byFieldId);
 
     pPooled->Return();
 }

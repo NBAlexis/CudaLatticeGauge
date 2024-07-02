@@ -236,7 +236,7 @@ _kernelDWilsonForceSU3_Boost(
 * To avoid it, we use slower method, split it into two functions.
 */
 void CFieldFermionWilsonSquareSU3Boost::DOperator(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, 
+    const void* pGaugeBuffer, BYTE byGaugeFieldId,
     UBOOL bDagger, EOperatorCoefficientType eOCT, 
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -260,7 +260,7 @@ void CFieldFermionWilsonSquareSU3Boost::DOperator(void* pTargetBuffer, const voi
         cCmpCoeff);
 }
 
-void CFieldFermionWilsonSquareSU3Boost::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3Boost::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;

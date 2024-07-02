@@ -12,9 +12,9 @@ TestSU4:
     ExponentialPrecision : 10
     CacheStaple : 0
 
-    ActionListLength : 3
-    GaugeFieldCount : 3
-    MeasureListLength : 3
+    ActionListLength : 6
+    GaugeFieldCount : 6
+    MeasureListLength : 6
     FermionFieldCount : 0
 
     Updator:
@@ -27,10 +27,11 @@ TestSU4:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
-    ## For D operator, we must have a gauge field
+        ReportMeasure : 0
+
     Gauge:
     
         ## FieldName = {CFieldGaugeSU3}
@@ -58,20 +59,62 @@ TestSU4:
         FieldInitialType : EFIT_Random
         FieldId : 3
 
+    Gauge4:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU7
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 4
+
+    Gauge5:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU8
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 5
+
+    Gauge6:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 6
+
     Measure1:
 
-        MeasureName : CMeasurePolyakovSU4
+        MeasureName : CMeasurePolyakov2
         GaugeFields : [1]
 
     Measure2:
 
-        MeasureName : CMeasurePolyakovSU5
+        MeasureName : CMeasurePolyakov2
         GaugeFields : [2]
 
     Measure3:
 
-        MeasureName : CMeasurePolyakovSU6
+        MeasureName : CMeasurePolyakov2
         GaugeFields : [3]
+
+    Measure4:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [4]
+
+    Measure5:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [5]
+
+    Measure6:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [6]
 
     Action1:
 
@@ -90,4 +133,22 @@ TestSU4:
         ActionName : CActionGaugePlaquette
         Beta : 5.0
         GaugeFields : [3]
+
+    Action4:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [4]
+
+    Action5:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [5]
+
+    Action6:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [6]
 

@@ -27,7 +27,8 @@ _kernelTraceApplyM(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId)
+    BYTE byFieldId,
+    BYTE byGaugeFieldId)
 {
     intokernalInt4;
 
@@ -59,8 +60,8 @@ _kernelTraceApplyM(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -271,11 +272,7 @@ _kernelActionTalorOmegaSq(
     BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
-#if !_CLG_DOUBLEFLOAT
     const DOUBLE betaOverN, DOUBLE* results
-#else
-    const Real betaOverN, Real* results
-#endif
 )
 {
     intokernalInt4;
@@ -284,11 +281,8 @@ _kernelActionTalorOmegaSq(
     const UINT plaqLength = __idx->m_pSmallData[CIndexData::kPlaqLengthIdx];
     const UINT plaqCountAll = __idx->m_pSmallData[CIndexData::kPlaqPerSiteIdx] * plaqLength;
 
-#if !_CLG_DOUBLEFLOAT
     DOUBLE res = 0.0;
-#else
-    Real res = F(0.0);
-#endif
+
     #pragma unroll
     for (BYTE idx0 = 0; idx0 < 3; ++idx0)
     {
@@ -307,7 +301,7 @@ _kernelActionTalorOmegaSq(
         //========================================
         //find plaqutte 1-4, or 2-4, or 3-4
         SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
@@ -315,7 +309,7 @@ _kernelActionTalorOmegaSq(
         for (BYTE j = 1; j < plaqLength; ++j)
         {
             first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -413,7 +407,8 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
-        pF2W->m_byFieldId
+        pF2W->m_byFieldId,
+        pGaugeSU3->m_byFieldId
         );
 
 
@@ -446,7 +441,8 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF2W->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pMoveCache[pF2W->m_byFieldId],
-        pF2W->m_byFieldId
+        pF2W->m_byFieldId,
+        pGaugeSU3->m_byFieldId
         );
 
 

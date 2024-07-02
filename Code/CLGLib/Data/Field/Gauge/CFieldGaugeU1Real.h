@@ -116,6 +116,8 @@ public:
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
     CCString GetInfos(const CCString &tab) const override;
 
+    void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
+
     Real* m_pDeviceData;
     EFieldInitialType m_eInitialType;
 

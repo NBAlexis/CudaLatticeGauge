@@ -542,6 +542,15 @@
     <ClInclude Include="Measurement\CMeasurePolyakovSUN.h">
       <Filter>Measurement</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU2.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.h">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -912,6 +921,15 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
       <Filter>Measurement</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.cu">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.cu">
+      <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

@@ -14,17 +14,16 @@
 
 __BEGIN_NAMESPACE
 
+__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakov2)
 
-template <INT N, INT NoE>
-class __DLL_EXPORT CMeasurePolyakovSUN : public CMeasure
+class CLGAPI CMeasurePolyakov2 : public CMeasure
 {
+    __CLGDECLARE_CLASS(CMeasurePolyakov2)
 public:
 
-    CMeasurePolyakovSUN()
+    CMeasurePolyakov2()
         : CMeasure()
-        , m_pTmpLoop(NULL)
         , m_pTraceRes(NULL)
-        , m_pTmpDeviceSum(NULL)
 
         , m_pCorrelator(NULL)
         , m_pCorrelatorCounter(NULL)
@@ -35,7 +34,7 @@ public:
 
     }
 
-    ~CMeasurePolyakovSUN();
+    ~CMeasurePolyakov2();
 
     void Initial(class CMeasurementManager* pOwner, class CLatticeData* pLatticeData, const CParameters&, BYTE byId) override;
     void OnConfigurationAcceptedSingleField(const class CFieldGauge* pAcceptGauge, const class CFieldGauge* pCorrespondingStaple) override;
@@ -47,9 +46,7 @@ public:
 
 protected:
 
-    deviceSUN<N, NoE>* m_pTmpLoop;
-    CLGComplex* m_pTraceRes;
-    CLGComplex* m_pTmpDeviceSum;
+    cuDoubleComplex* m_pTraceRes;
     
     CLGComplex* m_pCorrelator;
     UINT* m_pCorrelatorCounter;
@@ -63,33 +60,6 @@ public:
     TArray<UINT> m_lstR;
     TArray<CLGComplex> m_lstC;
     TArray<CLGComplex> m_lstAverageC;
-};
-
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovSU4)
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovSU5)
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovSU6)
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovSU7)
-__CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovSU8)
-
-class CLGAPI CMeasurePolyakovSU4 : public CMeasurePolyakovSUN<4, 16>
-{
-    __CLGDECLARE_CLASS(CMeasurePolyakovSU4)
-};
-class CLGAPI CMeasurePolyakovSU5 : public CMeasurePolyakovSUN<5, 32>
-{
-    __CLGDECLARE_CLASS(CMeasurePolyakovSU5)
-};
-class CLGAPI CMeasurePolyakovSU6 : public CMeasurePolyakovSUN<6, 64>
-{
-    __CLGDECLARE_CLASS(CMeasurePolyakovSU6)
-};
-class CLGAPI CMeasurePolyakovSU7 : public CMeasurePolyakovSUN<7, 64>
-{
-    __CLGDECLARE_CLASS(CMeasurePolyakovSU7)
-};
-class CLGAPI CMeasurePolyakovSU8 : public CMeasurePolyakovSUN<8, 64>
-{
-    __CLGDECLARE_CLASS(CMeasurePolyakovSU8)
 };
 
 __END_NAMESPACE

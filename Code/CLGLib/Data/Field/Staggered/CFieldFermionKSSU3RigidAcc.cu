@@ -184,7 +184,7 @@ _kernelDFermionKSForceRigidAcc(
 
 
 void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -237,7 +237,7 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
         }
         CFieldFermionKSSU3Gamma::appApplyGammaKS(pTarget, pSource, pGauge,
             GAMMA3, FALSE, bDagger, F(1.0),
-            EOCT_Complex, F(1.0), toMul, m_byFieldId, 1);
+            EOCT_Complex, F(1.0), toMul, m_byFieldId, byGaugeFieldId);
     }
 }
 
@@ -247,7 +247,7 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
  */
 void CFieldFermionKSSU3RigidAcc::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     preparethread;
     _kernelDFermionKSForceRigidAcc << <block, threads >> > (
@@ -270,7 +270,7 @@ void CFieldFermionKSSU3RigidAcc::DerivateD0(
         GAMMA3,
         m_pDevicePathBuffer,
         m_byFieldId,
-        1);
+        byGaugeFieldId);
 }
 
 #pragma endregion

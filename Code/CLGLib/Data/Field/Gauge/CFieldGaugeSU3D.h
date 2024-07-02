@@ -93,11 +93,12 @@ public:
 * If it is a "new SIndex" instead, remember to set the m_byTag
 */
 static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pBuffer,
     const SIndex& idx)
 {
     return idx.IsDirichlet() ?
-        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -108,36 +109,39 @@ static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3(
 * else, return the element
 */
 static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3Dir(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
         ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
 }
 
 static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirOne(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
         deviceSU3::makeSU3Id()
-        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
 static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
         deviceSU3::makeSU3Zero()
-        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
 
@@ -211,12 +215,12 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu(
     const UINT uiSiteBig_m_mu = __idx->_deviceGetBigIndex(
         _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1));
 
-    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu); //Apure _mu
-    deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu); //A _nu
+    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
+    deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(byFieldId, piA, uiBigIdx, byNu); //A _nu
     res2.Mul(res); //A _nu Apure _mu
-    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu)); //Apure _mu A _nu
+    res.Mul(_deviceGetGaugeBCSU3DirZero(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
     res.Sub(res2); //[Apure, A]
-    res.Add(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu));
+    res.Add(_deviceGetGaugeBCSU3DirZero(byFieldId, piA, uiBigIdx, byNu));
     res.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(piA, 
         __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]));
     return res;
@@ -240,10 +244,10 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu2(
     const UINT uiSiteBig_p_mu = __idx->_deviceGetBigIndex(
         _deviceSmallInt4OffsetC(sSite4, byMu + 1));
 
-    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(piApure, uiBigIdx, byMu); //Apure _mu
-    deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu); //A _nu
+    deviceSU3 res = _deviceGetGaugeBCSU3DirZero(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
+    deviceSU3 res2 = _deviceGetGaugeBCSU3DirZero(byFieldId, piA, uiBigIdx, byNu); //A _nu
     res2.Mul(res); //A _nu Apure _mu
-    res.Mul(_deviceGetGaugeBCSU3DirZero(piA, uiBigIdx, byNu)); //Apure _mu A _nu
+    res.Mul(_deviceGetGaugeBCSU3DirZero(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
     res.Sub(res2); //[Apure, A]
     res.Add(_deviceGetGaugeBCSU3DirZeroSIndex(piA, 
         __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_p_mu * _DC_Dir + byNu]).MulRealC(F(0.5)));
@@ -254,6 +258,7 @@ static __device__ __inline__ deviceSU3 _deviceDPureMu2(
 
 
 static __device__ __inline__ deviceSU3 _devicePlaqutte(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     UINT uiSiteIndex,
@@ -263,7 +268,7 @@ static __device__ __inline__ deviceSU3 _devicePlaqutte(
     )
 {
     SIndex first = pCachedPlaqutte[plaqIdx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+    deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
@@ -271,7 +276,7 @@ static __device__ __inline__ deviceSU3 _devicePlaqutte(
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[plaqIdx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);

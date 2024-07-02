@@ -264,7 +264,7 @@ _kernelDFermionKSForce(
 #pragma endregion
 
 void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
-    const void * pGaugeBuffer, Real f2am,
+    const void * pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -313,7 +313,8 @@ void CFieldFermionKSSU3::DOperatorKS(void* pTargetBuffer, const void * pBuffer,
  */
 void CFieldFermionKSSU3::DerivateD0(
     void* pForce, 
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer,
+    BYTE byGaugeFieldId) const
 {
     preparethread;
     _kernelDFermionKSForce << <block, threads >> > (
@@ -465,7 +466,7 @@ UBOOL CFieldFermionKSSU3::CalculateForceS(
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     CFieldGaugeSU3* pForceSU3 = dynamic_cast<CFieldGaugeSU3*>(pForce);
 
-    DerivateD0(pForceSU3->m_pDeviceData, pGaugeSU3->m_pDeviceData);
+    DerivateD0(pForceSU3->m_pDeviceData, pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId);
     //preparethread;
     //_kernelDFermionKSForce << <block, threads >> > (
     //    pGaugeSU3->m_pDeviceData,
@@ -1362,7 +1363,7 @@ void CFieldFermionKSSU3::DS(const CField* pGauge, EOperatorCoefficientType eCoef
         fRealCoeff = F(-1.0);
     }
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1393,7 +1394,7 @@ void CFieldFermionKSSU3::DWithMassS(const CField* pGauge, Real fMass, EOperatorC
         fRealCoeff = F(-1.0);
     }
 
-    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1416,7 +1417,7 @@ void CFieldFermionKSSU3::D0S(const CField* pGauge)
 
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
-    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, F(0.0),
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, F(0.0),
         FALSE, EOCT_None, F(1.0), _onec);
 
     pPooled->Return();
@@ -1510,7 +1511,7 @@ void CFieldFermionKSSU3::DdaggerS(const CField* pGauge, EOperatorCoefficientType
         fRealCoeff = F(-1.0);
     }
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         TRUE, eCoeffType, fRealCoeff, cCompCoeff);
 
 
@@ -1541,7 +1542,7 @@ void CFieldFermionKSSU3::DdaggerWithMassS(const CField* pGauge, Real fMass, EOpe
         fRealCoeff = F(-1.0);
     }
 
-    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         TRUE, eCoeffType, fRealCoeff, cCompCoeff);
 
 
@@ -1566,10 +1567,10 @@ void CFieldFermionKSSU3::DDdaggerS(const CField* pGauge, EOperatorCoefficientTyp
     }
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1593,10 +1594,10 @@ void CFieldFermionKSSU3::DDS(const CField* pGauge, EOperatorCoefficientType eCoe
     }
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1625,10 +1626,10 @@ void CFieldFermionKSSU3::DDdaggerWithMassS(const CField* pGauge, Real fMass, EOp
     }
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperatorKS(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         TRUE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();
@@ -1652,10 +1653,10 @@ void CFieldFermionKSSU3::DDWithMassS(const CField* pGauge, Real fMass, EOperator
     }
     CFieldFermionKSSU3* pPooled = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
 
-    DOperatorKS(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(pPooled->m_pDeviceData, m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
     //why only apply coeff in the next step?
-    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, fMass,
+    DOperatorKS(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId, fMass,
         FALSE, eCoeffType, fRealCoeff, cCompCoeff);
 
     pPooled->Return();

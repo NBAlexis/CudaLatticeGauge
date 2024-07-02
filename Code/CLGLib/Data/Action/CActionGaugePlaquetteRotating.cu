@@ -74,13 +74,8 @@ _kernelAdd4PlaqutteTermSU3(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
-#else
-    Real betaOverN, Real fOmegaSq,
-    Real* results
-#endif
 )
 {
     intokernalInt4;
@@ -112,7 +107,7 @@ _kernelAdd4PlaqutteTermSU3(
         //========================================
         //find plaqutte 1-4, or 2-4, or 3-4
         SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
@@ -120,7 +115,7 @@ _kernelAdd4PlaqutteTermSU3(
         for (BYTE j = 1; j < plaqLength; ++j)
         {
             first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -136,11 +131,7 @@ _kernelAdd4PlaqutteTermSU3(
         const BYTE mushift = (idx0 / 2);
         //y z z
         const BYTE nushift = ((idx0 + 1) / 2) + 1;
-#if !_CLG_DOUBLEFLOAT
         res += static_cast<DOUBLE>(betaOverN * fOmegaSq * (3.0 - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, uiN, idx0, mushift, nushift));
-#else
-        res += betaOverN * fOmegaSq * (F(3.0) - toAdd.ReTr()) * _deviceFi(byFieldId, sSite4, uiN, idx0, mushift, nushift);
-#endif
     }
 
     results[uiSiteIndex] = res;
@@ -156,13 +147,8 @@ _kernelAddForce4PlaqutteTermSU3_XY(
     UBOOL bTorus,
     const deviceSU3* __restrict__ pDeviceData,
     deviceSU3* pForceData,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE fOmegaSq
-#else
-    Real betaOverN,
-    Real fOmegaSq
-#endif
 )
 {
     intokernalInt4;

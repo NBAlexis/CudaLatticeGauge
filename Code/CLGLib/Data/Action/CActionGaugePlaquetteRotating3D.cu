@@ -26,13 +26,8 @@ _kernelAdd4PlaqutteTermSU33D(
     BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN, DOUBLE fOmegaSq,
     DOUBLE* results
-#else
-    Real betaOverN, Real fOmegaSq,
-    Real* results
-#endif
 )
 {
     intokernalInt4;
@@ -59,7 +54,7 @@ _kernelAdd4PlaqutteTermSU33D(
         //========================================
         //find plaqutte 1-3, or 2-3
         SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.Dagger();
@@ -67,7 +62,7 @@ _kernelAdd4PlaqutteTermSU33D(
         for (BYTE j = 1; j < plaqLength; ++j)
         {
             first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);

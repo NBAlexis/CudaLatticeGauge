@@ -44,6 +44,7 @@ _kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr)
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelStapleAtSiteSU3CacheIndex_D(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
@@ -73,7 +74,7 @@ _kernelStapleAtSiteSU3CacheIndex_D(
                 ++diricCount;
             }
             //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
 
             if (first.NeedToDagger())
             {
@@ -88,7 +89,7 @@ _kernelStapleAtSiteSU3CacheIndex_D(
                     ++diricCount;
                 }
                 //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -125,16 +126,12 @@ _kernelStapleAtSiteSU3CacheIndex_D(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPlaqutteEnergySU3CacheIndex_D(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE betaOverN,
     DOUBLE* results
-#else
-    Real betaOverN,
-    Real* results
-#endif
 )
 {
     intokernal;
@@ -145,7 +142,7 @@ _kernelPlaqutteEnergySU3CacheIndex_D(
     {
         SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
         //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
 
         if (first.NeedToDagger())
         {
@@ -156,7 +153,7 @@ _kernelPlaqutteEnergySU3CacheIndex_D(
         {
             first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
             //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -184,6 +181,7 @@ _kernelPlaqutteEnergySU3CacheIndex_D(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateOnlyStaple_D(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex * __restrict__ pCachedIndex,
     UINT plaqLength, UINT plaqCount,
@@ -205,7 +203,7 @@ _kernelCalculateOnlyStaple_D(
         {
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             //deviceSU3 toAdd(pDeviceData[_deviceGetLinkIndex(first.m_uiSiteIndex, first.m_byDir)]);
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
 
             if (first.NeedToDagger())
             {
@@ -216,7 +214,7 @@ _kernelCalculateOnlyStaple_D(
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
                 //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -466,6 +464,7 @@ void CFieldGaugeSU3D::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* 
     assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
 
     _kernelStapleAtSiteSU3CacheIndex_D << <block, threads >> > (
+        m_byFieldId,
         m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
@@ -475,16 +474,13 @@ void CFieldGaugeSU3D::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* 
         betaOverN);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeSU3D::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
-#else
-Real CFieldGaugeSU3D::CalculatePlaqutteEnergy(Real betaOverN) const
-#endif
 {
     assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
 
     preparethread;
     _kernelPlaqutteEnergySU3CacheIndex_D << <block, threads >> > (
+        m_byFieldId,
         m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
@@ -517,6 +513,7 @@ void CFieldGaugeSU3D::CalculateOnlyStaple(CFieldGauge* pStaple) const
 
     preparethread;
     _kernelCalculateOnlyStaple_D << <block, threads >> > (
+        m_byFieldId,
         m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,

@@ -33,12 +33,9 @@ _kernelDFermionWilsonSquareSU3_DR(
     deviceWilsonVectorSU3* pResultData,
     UBOOL bShiftCenter,
     Real kai,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
-#else
-    Real fOmega,
-#endif
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
     EOperatorCoefficientType eCoeff,
@@ -97,8 +94,8 @@ _kernelDFermionWilsonSquareSU3_DR(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -348,12 +345,9 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     deviceWilsonVectorSU3* pResultData,
     UBOOL bShiftCenter,
     Real kai,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
-#else
-    Real fOmega,
-#endif
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
     EOperatorCoefficientType eCoeff,
@@ -388,8 +382,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_X(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 0);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, 0);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -516,12 +510,9 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     deviceWilsonVectorSU3* pResultData,
     UBOOL bShiftCenter,
     Real kai,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
-#else
-    Real fOmega,
-#endif
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
     EOperatorCoefficientType eCoeff,
@@ -559,8 +550,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Y(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 1);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, 1);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -671,6 +662,7 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     deviceWilsonVectorSU3* pResultData,
     Real kai,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -701,8 +693,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_Z(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 2);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, 2);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -783,12 +775,9 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     const SIndex* __restrict__ pFermionMove,
     deviceWilsonVectorSU3* pResultData,
     Real kai,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
-#else
-    Real fOmega,
-#endif
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     UBOOL bNaive,
     EOperatorCoefficientType eCoeff,
@@ -825,8 +814,8 @@ _kernelDFermionWilsonSquareSU3_DR_Exponential_T(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, 3);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    const deviceSU3& x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, 3);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -1776,7 +1765,7 @@ _kernelDWilsonForceSU3_DR_T(
 * To avoid it, we use slower method, split it into two functions.
 */
 void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, 
+    const void* pGaugeBuffer, BYTE byGaugeFieldId,
     UBOOL bDagger, EOperatorCoefficientType eOCT, 
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -1818,6 +1807,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_fKai,
             CCommonData::m_fOmega,
             m_byFieldId,
+            byGaugeFieldId,
             bDagger,
             m_bNaive,
             eOCT,
@@ -1834,6 +1824,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_fKai,
             CCommonData::m_fOmega,
             m_byFieldId,
+            byGaugeFieldId,
             bDagger,
             m_bNaive,
             eOCT,
@@ -1848,6 +1839,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             pTarget,
             m_fKai,
             m_byFieldId,
+            byGaugeFieldId,
             bDagger,
             eOCT,
             fRealCoeff,
@@ -1863,6 +1855,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             CCommonData::m_fOmega,
             //F(0.0),
             m_byFieldId,
+            byGaugeFieldId,
             bDagger,
             m_bNaive,
             eOCT,
@@ -1871,7 +1864,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
     }
     else
     {
-        CFieldFermionWilsonSquareSU3D::DOperator(pTargetBuffer, pBuffer, pGaugeBuffer, bDagger,
+        CFieldFermionWilsonSquareSU3D::DOperator(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, bDagger,
             eOCT, fRealCoeff, cCmpCoeff);
 
         _kernelDFermionWilsonSquareSU3_DR << <block, threads >> > (
@@ -1884,6 +1877,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             m_fKai,
             CCommonData::m_fOmega,
             m_byFieldId,
+            byGaugeFieldId,
             bDagger,
             m_bNaive,
             eOCT,
@@ -1990,9 +1984,9 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
 #endif
 }
 
-void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
-    CFieldFermionWilsonSquareSU3D::DerivateDOperator(pForce, pDphi, pDDphi, pGaugeBuffer);
+    CFieldFermionWilsonSquareSU3D::DerivateDOperator(pForce, pDphi, pDDphi, pGaugeBuffer, byGaugeFieldId);
 
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;

@@ -823,6 +823,7 @@ extern "C" {
             return tmp;
         }
 
+#if discard
         __device__ __inline__ deviceSU2 ExpReal(Real a, BYTE uiPrecision) const
         {
             CLGComplex tmp[4];
@@ -855,6 +856,7 @@ extern "C" {
             }
             return deviceSU2(tmp);
         }
+#endif
 
         /**
         * For anti hermitian matrix only,

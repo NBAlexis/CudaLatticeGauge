@@ -23,6 +23,7 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteAcceleration)
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAdd4PlaqutteTermSU3_Acc(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     Real betaOverN, Real fGsq,
@@ -52,7 +53,7 @@ _kernelAdd4PlaqutteTermSU3_Acc(
     //========================================
     //find plaqutte 1-3, or 2-3
     SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+    deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
@@ -60,7 +61,7 @@ _kernelAdd4PlaqutteTermSU3_Acc(
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -78,7 +79,7 @@ _kernelAdd4PlaqutteTermSU3_Acc(
 
     idx = 3;
     first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    toAdd = _deviceGetGaugeBCSU3(pDeviceData, first);
+    toAdd = _deviceGetGaugeBCSU3(byFieldId, pDeviceData, first);
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
@@ -86,7 +87,7 @@ _kernelAdd4PlaqutteTermSU3_Acc(
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -177,7 +178,7 @@ _kernelAddForce4PlaqutteTermSU3_Acc(
             SIndex first = pCachedIndex[i * plaqLengthm1 + linkIndex * plaqCountAll];
             const BYTE nu = first.m_byDir;
 
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             Real fFactorG = F(1.0);
 
             if (
@@ -198,7 +199,7 @@ _kernelAddForce4PlaqutteTermSU3_Acc(
             for (BYTE j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -416,6 +417,7 @@ DOUBLE CActionGaugePlaquetteAcceleration::EnergySingleField(UBOOL bBeforeEvoluti
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
     _kernelAdd4PlaqutteTermSU3_Acc << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
             m_fBetaOverNR,

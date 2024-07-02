@@ -186,12 +186,12 @@ protected:
 
     //============================
     //Override these two functions for KS
-    virtual void DerivateD0(void* pForce, const void* pGaugeBuffer) const
+    virtual void DerivateD0(void* pForce, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
     {
         appCrucial(_T("DerivateD0 not implemented\n"));
     }
 
-    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, Real f2am,
+    virtual void DOperatorKS(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         appCrucial(_T("DOperatorKS not implemented\n"));
@@ -202,10 +202,10 @@ protected:
     /**
      * Do not override me
      */
-    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer,
+    void DOperator(void* pTargetBuffer, const void* pBuffer, const void* pGaugeBuffer, BYTE byGaugeFieldId,
         UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override
     {
-        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+        DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, m_f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
     }
 
     virtual void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,

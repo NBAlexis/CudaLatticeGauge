@@ -227,13 +227,13 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
             case EMD_Oribital:
                 {
                     pF1->CopyTo(pF2);
-                    CMeasureAngularMomentumKS::ApplyOrbitalMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId);
+                    CMeasureAngularMomentumKS::ApplyOrbitalMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId, pGaugeSU3->m_byFieldId);
                 }
                 break;
             case EMD_Spin:
                 {
                     pF1->CopyTo(pF2);
-                    CMeasureAngularMomentumKS::ApplySpinMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId);
+                    CMeasureAngularMomentumKS::ApplySpinMatrix(pF1->m_pDeviceData, pF2->m_pDeviceData, pGaugeSU3->m_pDeviceData, pF1->m_byFieldId, pGaugeSU3->m_byFieldId);
                 }
                 break;
             default:

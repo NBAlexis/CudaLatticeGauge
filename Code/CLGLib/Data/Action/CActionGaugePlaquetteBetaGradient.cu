@@ -110,7 +110,7 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
             {
                 ++diricCount;
             }
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
 
             const SSmallInt4 firstn = __deviceSiteIndexToInt4(first.m_uiSiteIndex);
             z1 = firstn.z;
@@ -133,7 +133,7 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
                     ++diricCount;
                 }
                 //deviceSU3 toMul(pDeviceData[_deviceGetLinkIndex(nextlink.m_uiSiteIndex, nextlink.m_byDir)]);
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {

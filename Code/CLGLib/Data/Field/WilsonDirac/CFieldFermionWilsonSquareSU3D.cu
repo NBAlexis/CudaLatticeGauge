@@ -36,6 +36,7 @@ _kernelDFermionWilsonSquareSU3_D(
     deviceWilsonVectorSU3* pResultData,
     Real kai,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bDDagger,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -77,9 +78,9 @@ _kernelDFermionWilsonSquareSU3_D(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
         //deviceSU3 x_m_mu_Gauge_element = pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -235,7 +236,7 @@ _kernelDWilsonForceSU3_D(
 #pragma endregion
 
 void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* pBuffer, 
-    const void* pGaugeBuffer, 
+    const void* pGaugeBuffer, BYTE byGaugeFieldId,
     UBOOL bDagger, EOperatorCoefficientType eOCT, 
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -252,6 +253,7 @@ void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* p
         pTarget, 
         m_fKai, 
         m_byFieldId, 
+        byGaugeFieldId,
         bDagger,
         eOCT,
         fRealCoeff, 
@@ -259,7 +261,7 @@ void CFieldFermionWilsonSquareSU3D::DOperator(void* pTargetBuffer, const void* p
 
 }
 
-void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer) const
+void CFieldFermionWilsonSquareSU3D::DerivateDOperator(void* pForce, const void* pDphi, const void* pDDphi, const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     deviceSU3* pForceSU3 = (deviceSU3*)pForce;
     const deviceSU3* pGauge = (const deviceSU3*)pGaugeBuffer;
@@ -335,7 +337,7 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCS(const CFieldGauge* pGauge)
         pPooled->m_pDeviceData,
         m_byFieldId);
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, 
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
 
     pPooled->Return();
@@ -381,7 +383,7 @@ void CFieldFermionWilsonSquareSU3D::PrepareForHMCNotRandomize(const CFieldGauge*
     preparethread;
     checkCudaErrors(cudaMemcpy(pPooled->m_pDeviceData, m_pDeviceData, sizeof(deviceWilsonVectorSU3) * _HC_Volume, cudaMemcpyDeviceToDevice));
 
-    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData,
+    DOperator(m_pDeviceData, pPooled->m_pDeviceData, pFieldSU3->m_pDeviceData, pFieldSU3->m_byFieldId,
         FALSE, EOCT_None, F(1.0), _make_cuComplex(F(1.0), F(0.0)));
 
     pPooled->Return();

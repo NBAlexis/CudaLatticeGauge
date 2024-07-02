@@ -23,6 +23,7 @@ __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteBoost)
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelAdd4PlaqutteTermSU3_Boost(
+    BYTE byFieldId,
     const deviceSU3 * __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     Real betaOverN, Real fGsq,
@@ -52,7 +53,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     //========================================
     //find plaqutte 1-4, or 2-4
     SIndex first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+    deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
@@ -60,7 +61,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -70,15 +71,11 @@ _kernelAdd4PlaqutteTermSU3_Boost(
             toAdd.Mul(toMul);
         }
     }
-#if !_CLG_DOUBLEFLOAT
     results[uiSiteIndex] = static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * fGsq);
-#else
-    results[uiSiteIndex] = betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq;
-#endif
 
     idx = 4;
     first = pCachedPlaqutte[idx * plaqLength + uiSiteIndex * plaqCountAll];
-    toAdd = _deviceGetGaugeBCSU3(pDeviceData, first);
+    toAdd = _deviceGetGaugeBCSU3(byFieldId, pDeviceData, first);
     if (first.NeedToDagger())
     {
         toAdd.Dagger();
@@ -86,7 +83,7 @@ _kernelAdd4PlaqutteTermSU3_Boost(
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[idx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -97,11 +94,8 @@ _kernelAdd4PlaqutteTermSU3_Boost(
         }
     }
 
-#if !_CLG_DOUBLEFLOAT
     results[uiSiteIndex] += static_cast<DOUBLE>(betaOverN * (3.0 - toAdd.ReTr()) * fGsq);
-#else
-    results[uiSiteIndex] += betaOverN * (F(3.0) - toAdd.ReTr()) * fGsq;
-#endif
+
 }
 
 
@@ -463,6 +457,7 @@ DOUBLE CActionGaugePlaquetteBoost::EnergySingleField(UBOOL bBeforeEvolution, con
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
     _kernelAdd4PlaqutteTermSU3_Boost << <block, threads >> > (
+            pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData, 
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
             m_fBetaOverNR,

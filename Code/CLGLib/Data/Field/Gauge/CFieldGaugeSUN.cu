@@ -722,6 +722,40 @@ _kernelSetOneDirZeroPointSUN(deviceSUN<N, NofE>* pDeviceData, UINT uiSiteIndex, 
     }
 }
 
+template<INT N, INT NoE>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPolyakovLoopOfSiteSUN(
+    const deviceSUN<N, NoE>* __restrict__ pDeviceBuffer,
+    cuDoubleComplex* res)
+{
+    UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
+    const UINT uiSiteIndex = uiXYZ * _DC_Lt;
+    UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, _DC_Dir - 1);
+    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+    deviceSUN<N, NoE> tmp = deviceSUN<N, NoE>::makeSUNZero();
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+    {
+        tmp = pDeviceBuffer[uiLinkIdx];
+    }
+
+    for (UINT uiT = 1; uiT < _DC_Lt; ++uiT)
+    {
+        UINT newSiteIndex = uiSiteIndex + uiT;
+        uiLinkIdx = _deviceGetLinkIndex(newSiteIndex, _DC_Dir - 1);
+        site4 = __deviceSiteIndexToInt4(newSiteIndex);
+        uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        {
+            tmp.Mul(pDeviceBuffer[uiLinkIdx]);
+        }
+    }
+
+    res[uiXYZ] = _cToDouble(tmp.Tr());
+}
+
 #pragma endregion
 
 template<INT N, INT NoE>
@@ -1270,6 +1304,14 @@ BYTE* CFieldGaugeSUN<N, NoE>::CopyDataOutDouble(UINT& uiSize) const
     free(toSave);
 
     return byToSave;
+}
+
+template<INT N, INT NoE>
+void CFieldGaugeSUN<N, NoE>::PolyakovOnSpatialSite(cuDoubleComplex* buffer) const
+{
+    dim3 block(_HC_DecompX, _HC_DecompY, 1);
+    dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
+    _kernelPolyakovLoopOfSiteSUN << <block, threads >> > (m_pDeviceData, buffer);
 }
 
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU4)

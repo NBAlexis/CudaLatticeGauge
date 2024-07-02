@@ -148,6 +148,7 @@ _kernelDFermionKS_PR_XYTau_TermCopyREM(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelKSApplyGammaEtaCopyREM(
+    BYTE byGaugeFieldId,
     deviceSU3Vector* pMe,
     const deviceSU3Vector* __restrict__ pOther,
     const deviceSU3* __restrict__ pGauge,
@@ -212,8 +213,8 @@ _kernelKSApplyGammaEtaCopyREM(
     const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
-    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
-    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0);
+    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 0);
     midY.MulReal(fX);
     midX.MulReal(fY);
     midY.Sub(midX);
@@ -226,7 +227,7 @@ _kernelKSApplyGammaEtaCopyREM(
 void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4,
-    const deviceSU3* pGauge) const
+    const deviceSU3* pGauge, BYTE byGaugeFieldId) const
 {
     const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
@@ -245,7 +246,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
         GetFermionFieldId(),
-        1,
+        byGaugeFieldId,
         _HC_Center,
         pFieldREM->m_fQ);
 }
@@ -253,7 +254,7 @@ void CMeasureAngularMomentumKSREM::ApplyOrbitalMatrix(
 void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4, 
-    const deviceSU3* pGauge) const
+    const deviceSU3* pGauge, BYTE byGaugeFieldId) const
 {
     const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
@@ -271,11 +272,11 @@ void CMeasureAngularMomentumKSREM::ApplySpinMatrix(
         pU1->m_pDeviceData,
         pAppliedBuffer,
         GetFermionFieldId(),
-        1,
+        byGaugeFieldId,
         pFieldREM->m_fQ);
 }
 
-void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge) const
+void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE byGaugeFieldId) const
 {
     const CFieldFermionKSSU3REM* pFieldREM = dynamic_cast<const CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(GetFermionFieldId()));
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(pFieldREM->m_byEMFieldID));
@@ -287,6 +288,7 @@ void CMeasureAngularMomentumKSREM::ApplyPotentialMatrix(deviceSU3Vector* pApplie
     }
     preparethread;
     _kernelKSApplyGammaEtaCopyREM << <block, threads >> > (
+        byGaugeFieldId,
         pAppliedBuffer,
         pInverseZ4,
         pGauge,

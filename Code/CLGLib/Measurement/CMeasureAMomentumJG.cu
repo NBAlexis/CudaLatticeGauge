@@ -268,14 +268,14 @@ _kernelCalculateJGSurf(
             //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
             //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
             //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
-            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, dir));
+            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, dir));
             deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
             a.MulDagger(u);
             u.Mul(a);
             //E_i (x p_i A_y  - y p_i A_x)
-            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(u);
             fRes += u.ReTr();
 
             //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
@@ -290,10 +290,10 @@ _kernelCalculateJGSurf(
             u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
             fRes -= u.ReTr();
             */
-            a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
+            a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1);
             a.MulReal(fX);
-            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
-            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(a);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(a);
             fRes -= u.ReTr();
         }
 
@@ -340,14 +340,14 @@ _kernelCalculateJGSurfProjectivePlane(
             //x p_i A_y : U_i(n) A_y(n+i) U_i^+(n)
             //- y p_i A_x : U_i(n) A_x(n+i) U_i^+(n)
             //U_i(n) [x A_y(n+i) - y A_x(n+i)] U_i^+(n)
-            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, dir));
+            deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, dir));
             deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_y_idx));
             a.MulReal(fX);
             a.Sub(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_i_x_idx).MulRealC(fY));
             a.MulDagger(u);
             u.Mul(a);
             //E_i (x p_i A_y  - y p_i A_x)
-            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
+            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(u);
             fRes += u.ReTr();
 
             //x p_i A_y : -U_i^+(n-i) A_y(n-i) U_i(n-i)
@@ -362,10 +362,10 @@ _kernelCalculateJGSurfProjectivePlane(
             u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(u);
             fRes -= u.ReTr();
             */
-            a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
+            a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1);
             a.MulReal(fX);
-            a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
-            u = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(a);
+            a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
+            u = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(a);
             fRes -= u.ReTr();
         }
 
@@ -397,9 +397,9 @@ _kernelCalculateJGPot(
         const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
 
         deviceSU3 nablaE(pE[uiNablaE]);
-        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
+        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1));
         a.MulReal(fX);
-        a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
+        a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
         nablaE.Mul(a);
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
@@ -429,9 +429,9 @@ _kernelCalculateJGPotProjectivePlane(
         const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
 
         deviceSU3 nablaE(pE[uiNablaE]);
-        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1));
+        deviceSU3 a(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 1));
         a.MulReal(fX);
-        a.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0).MulRealC(fY));
+        a.Sub(_deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, 0).MulRealC(fY));
         nablaE.Mul(a);
 
         //atomicAdd(&pBuffer[sSite4.x * _DC_Ly + sSite4.y], -fRes * fBetaOverN * F(0.5));
@@ -470,7 +470,7 @@ _kernelMomemtumJGChenApprox(
             deviceSU3 DyAphys = _deviceDPureMu(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
-            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys).Tr());
+            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
         }
 
         res = cuCmulf_cr(res, -fBetaOverN);
@@ -506,7 +506,7 @@ _kernelMomemtumJGChenApprox2(
             deviceSU3 DyAphys = _deviceDPureMu2(pAphys, pApure, sSite4, uiBigIdx, 1, dir, byFieldId);
             DyAphys.MulReal(fmX);
             DyAphys.Sub(DxAphys);
-            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir).MulC(DyAphys).Tr());
+            res = _cuCaddf(res, _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir).MulC(DyAphys).Tr());
         }
 
         res = cuCmulf_cr(res, -fBetaOverN);
@@ -519,6 +519,7 @@ _kernelMomemtumJGChenApprox2(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelMomemtumJGChen(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pE,
     const deviceSU3* __restrict__ pXcrossDpureA,
     Real* pBuffer,
@@ -537,7 +538,7 @@ _kernelMomemtumJGChen(
         #pragma unroll
         for (BYTE dir = 0; dir < 3; ++dir)
         {
-            deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(pE, uiBigIdx, dir);
+            deviceSU3 beforeTrace = _deviceGetGaugeBCSU3DirZero(byFieldId, pE, uiBigIdx, dir);
             beforeTrace.Mul(pXcrossDpureA[_deviceGetLinkIndex(uiSiteIndex, dir)]);
             res += beforeTrace.ReTr(); // _cuCaddf(res, beforeTrace.Tr());
         }
@@ -584,7 +585,7 @@ _kernelMomentumJGChenDpureA(
         const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
 
         //U_x(n) A_dir(n+x)U_x^+(n)
-        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 0));
+        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 0));
         deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
         a.MulDagger(u);
         u.Mul(a);
@@ -598,12 +599,12 @@ _kernelMomentumJGChenDpureA(
         //u.DaggerMul(a);
         //u.MulReal(fmY);
         //pXcrossDpureA[uiLinkIndex].Sub(u);
-        a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir);
+        a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, idir);
         a.MulReal(fmY - fmX);
         pXcrossDpureA[uiLinkIndex].Sub(a);
 
         //U_y(n) A_dir(n+y)U_y^+(n)
-        u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
+        u = _deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 1);
         a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
         a.MulDagger(u);
         u.Mul(a);
@@ -656,7 +657,7 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         const SIndex& x_p_y_idir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][x_p_y_bi4 + idir];
 
         //U_x(n) A_dir(n+x)U_x^+(n)
-        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 0));
+        deviceSU3 u(_deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 0));
         deviceSU3 a(_deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_x_idir));
         a.MulDagger(u);
         u.Mul(a);
@@ -670,12 +671,12 @@ _kernelMomentumJGChenDpureAProjectivePlane(
         //u.DaggerMul(a);
         //u.MulReal(fmY);
         //pXcrossDpureA[uiLinkIndex].Sub(u);
-        a = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir);
+        a = _deviceGetGaugeBCSU3DirZero(byFieldId, pAphys, uiBigIdx, idir);
         a.MulReal(fmY - fmX);
         pXcrossDpureA[uiLinkIndex].Sub(a); //this is (y-x)A_j
 
         //U_y(n) A_dir(n+y)U_y^+(n)
-        u = _deviceGetGaugeBCSU3DirOne(pGauge, uiBigIdx, 1);
+        u = _deviceGetGaugeBCSU3DirOne(byFieldId, pGauge, uiBigIdx, 1);
         a = _deviceGetGaugeBCSU3DirZeroSIndex(pAphys, x_p_y_idir);
         a.MulDagger(u);
         u.Mul(a);
@@ -1051,6 +1052,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
             }
 
             _kernelMomemtumJGChen << <block, threads >> > (
+                pGaugeSU3->m_byFieldId,
                 pESU3->m_pDeviceData,
                 pDpureA->m_pDeviceData,
                 m_pDeviceDataBuffer,

@@ -1,11 +1,11 @@
 //=============================================================================
-// FILENAME : CFieldBoundaryGaugeSU3.cu
+// FILENAME : CFieldBoundaryGaugeSU2.cu
 // 
 // DESCRIPTION:
 // This is the class for index on square lattice
 //
 // REVISION:
-//  [04/20/2019 nbale]
+//  [07/03/2024 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
 
@@ -17,33 +17,33 @@ __BEGIN_NAMESPACE
 * Initial SU3 Field with a value
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialSU3Feield_Identity(deviceSU3 *pDevicePtr)
+_kernelInitialSU2Feield_Identity(deviceSU2 *pDevicePtr)
 {
     const UINT uiSiteIndex = threadIdx.x;
     const UINT uiBoundIndex = threadIdx.y;
 
-    pDevicePtr[uiSiteIndex * _DC_Dir + uiBoundIndex] = deviceSU3::makeSU3Id();
+    pDevicePtr[uiSiteIndex * _DC_Dir + uiBoundIndex] = deviceSU2::makeSU2Id();
 }
 
 
 #pragma endregion
 
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU3)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU2)
 
-CFieldBoundaryGaugeSU3::CFieldBoundaryGaugeSU3() : CFieldBoundary()
+CFieldBoundaryGaugeSU2::CFieldBoundaryGaugeSU2() : CFieldBoundary()
 {
     //8 faces and 4 directions
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceSU3) * 8 * _HC_Dir));
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceSU2) * 8 * _HC_Dir));
 }
 
-void CFieldBoundaryGaugeSU3::InitialField(CParameters& param)
+void CFieldBoundaryGaugeSU2::InitialField(CParameters& param)
 {
     CFieldBoundary::InitialField(param);
 
     //we currently, only support identity
     dim3 block(1, 1, 1);
     dim3 thread(8, _HC_Dir, 1);
-    _kernelInitialSU3Feield_Identity << <block, thread >> > (m_pDeviceData);
+    _kernelInitialSU2Feield_Identity << <block, thread >> > (m_pDeviceData);
 }
 
 

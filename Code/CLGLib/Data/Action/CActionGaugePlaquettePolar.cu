@@ -61,6 +61,7 @@ _kernelEnergy_Polar(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelEnergy_Polar_Simplified(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedIndex,
     BYTE plaqLength, BYTE plaqCount,
@@ -87,7 +88,7 @@ _kernelEnergy_Polar_Simplified(
     {
         SIndex first = pCachedIndex[i * plaqLength + uiSiteIndex * plaqCountAll];
         const BYTE mu = first.m_byDir;
-        deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
 
         if (first.NeedToDagger())
         {
@@ -96,7 +97,7 @@ _kernelEnergy_Polar_Simplified(
 
         first = pCachedIndex[i * plaqLength + 1 + uiSiteIndex * plaqCountAll];
         const BYTE nu = first.m_byDir;
-        deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, first));
+        deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
         if (first.NeedToDagger())
         {
             toAdd.MulDagger(toMul);
@@ -109,7 +110,7 @@ _kernelEnergy_Polar_Simplified(
         for (BYTE j = 2; j < plaqLength; ++j)
         {
             first = pCachedIndex[i * plaqLength + j + uiSiteIndex * plaqCountAll];
-            toMul = _deviceGetGaugeBCSU3(pDeviceData, first);
+            toMul = _deviceGetGaugeBCSU3(byFieldId, pDeviceData, first);
             if (first.NeedToDagger())
             {
                 toAdd.MulDagger(toMul);
@@ -189,7 +190,7 @@ _kernelAddForce4PlaqutteTermSU3_Polar(
             //    continue;
             //}
 
-            deviceSU3 toAdd(_deviceGetGaugeBCSU3(pDeviceData, first));
+            deviceSU3 toAdd(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, first));
             Real fFactorG = F(0.0);
             if (first.NeedToDagger())
             {
@@ -223,7 +224,7 @@ _kernelAddForce4PlaqutteTermSU3_Polar(
             for (BYTE j = 1; j < plaqLengthm1; ++j)
             {
                 SIndex nextlink = pCachedIndex[i * plaqLengthm1 + j + linkIndex * plaqCountAll];
-                deviceSU3 toMul(_deviceGetGaugeBCSU3(pDeviceData, nextlink));
+                deviceSU3 toMul(_deviceGetGaugeBCSU3(byFieldId, pDeviceData, nextlink));
 
                 if (nextlink.NeedToDagger())
                 {
@@ -385,6 +386,7 @@ DOUBLE CActionGaugePlaquettePolar::EnergySingleField(UBOOL bBeforeEvolution, con
     Real fEnergy2 = static_cast<Real>(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
 
     _kernelEnergy_Polar_Simplified << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,

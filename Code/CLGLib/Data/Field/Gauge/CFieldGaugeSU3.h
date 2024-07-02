@@ -112,6 +112,8 @@ public:
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
 
+    void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
+
     deviceSU3* m_pDeviceData;
 
     _GetData

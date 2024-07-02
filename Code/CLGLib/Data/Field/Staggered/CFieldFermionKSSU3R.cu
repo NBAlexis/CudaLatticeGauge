@@ -679,11 +679,11 @@ _giveupkernelDFermionKSForce_PR_XYTau_Term2(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
-    CFieldFermionKSSU3::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    CFieldFermionKSSU3::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
 
     deviceSU3Vector* pTarget = (deviceSU3Vector*)pTargetBuffer;
     const deviceSU3Vector* pSource = (const deviceSU3Vector*)pBuffer;
@@ -704,7 +704,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
             m_byFieldId,
-            1,
+            byGaugeFieldId,
             CCommonData::m_fOmega,
             _HC_Center,
             eOCT,
@@ -716,7 +716,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
             pGauge,
             pTarget,
             m_byFieldId,
-            1,
+            byGaugeFieldId,
             CCommonData::m_fOmega,
             eOCT,
             fRealCoeff,
@@ -731,7 +731,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         _HC_Center,
         bDagger,
@@ -746,7 +746,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pGauge,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         bDagger,
         eOCT,
@@ -760,9 +760,9 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
 
 void CFieldFermionKSSU3R::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
-    CFieldFermionKSSU3::DerivateD0(pForce, pGaugeBuffer);
+    CFieldFermionKSSU3::DerivateD0(pForce, pGaugeBuffer, byGaugeFieldId);
 
     if (m_bRealRotation)
     {

@@ -58,6 +58,8 @@ public:
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
 
+    void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
+
     deviceSUN<N, NofE>* m_pDeviceData;
 
     _GetData
@@ -117,14 +119,14 @@ public:
 */
 template<INT N, INT NofE>
 static __device__ __inline__ const deviceSUN<N, NofE>& _deviceGetGaugeBCSUN(
+    BYTE byFieldId,
     const deviceSUN<N, NofE>* __restrict__ pBuffer,
     const SIndex& idx)
 {
     return idx.IsDirichlet() ?
-        //((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
-        //    __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
-        //]
-        (deviceSUN<N, NofE>::makeSUNId())
+        ((CFieldBoundaryGaugeSUN<N, NofE>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+        ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
 }
 
@@ -134,39 +136,41 @@ static __device__ __inline__ const deviceSUN<N, NofE>& _deviceGetGaugeBCSUN(
 */
 template<INT N, INT NofE>
 static __device__ __inline__ const deviceSUN<N, NofE>& _deviceGetGaugeBCSUNDir(
+    BYTE byFieldId,
     const deviceSUN<N, NofE>* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        //((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData[
-        //    __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
-        //]
-        (deviceSUN<N, NofE>::makeSUNId())
+        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
+        ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
 }
 
 template<INT N, INT NofE>
 static __device__ __inline__ deviceSUN<N, NofE> _deviceGetGaugeBCSUNDirOne(
+    BYTE byFieldId,
     const deviceSUN<N, NofE>* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
         deviceSUN<N, NofE>::makeSUNId()
-        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
 template<INT N, INT NofE>
 static __device__ __inline__ deviceSUN<N, NofE> _deviceGetGaugeBCSUNDirZero(
+    BYTE byFieldId,
     const deviceSUN<N, NofE>* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
         deviceSUN<N, NofE>::makeSUNZero()
-        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx].m_uiSiteIndex, byDir)];
+        : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
 template<INT N, INT NofE>
@@ -176,16 +180,16 @@ static __device__ __inline__ deviceSUN<N, NofE> _deviceGetGaugeBCSUNDirSIndex(
     BYTE byFieldId)
 {
     deviceSUN<N, NofE> ret = idx.IsDirichlet() ?
-        //((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
-        //    __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
-        //]
-        (deviceSUN<N, NofE>::makeSUNId())
+        ((CFieldBoundaryGaugeSUN<N, NofE>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+            __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
+        ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
-            if (idx.NeedToDagger())
-            {
-                ret.Dagger();
-            }
-            return ret;
+
+    if (idx.NeedToDagger())
+    {
+        ret.Dagger();
+    }
+    return ret;
 }
 
 template<INT N, INT NofE>

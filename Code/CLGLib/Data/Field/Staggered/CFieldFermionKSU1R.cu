@@ -502,11 +502,11 @@ _giveupkernelDFermionKSForce_PR_XYTau_Term2(
 #pragma region D and derivate
 
 void CFieldFermionKSU1R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
-    CFieldFermionKSU1::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    CFieldFermionKSU1::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
 
     CLGComplex* pTarget = (CLGComplex*)pTargetBuffer;
     const CLGComplex* pSource = (const CLGComplex*)pBuffer;
@@ -520,7 +520,7 @@ void CFieldFermionKSU1R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         _HC_Center,
         bDagger,
@@ -535,7 +535,7 @@ void CFieldFermionKSU1R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pGauge,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         bDagger,
         eOCT,
@@ -547,9 +547,10 @@ void CFieldFermionKSU1R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
 
 void CFieldFermionKSU1R::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, 
+    BYTE byGaugeFieldId) const
 {
-    CFieldFermionKSU1::DerivateD0(pForce, pGaugeBuffer);
+    CFieldFermionKSU1::DerivateD0(pForce, pGaugeBuffer, byGaugeFieldId);
 
 
     preparethread;

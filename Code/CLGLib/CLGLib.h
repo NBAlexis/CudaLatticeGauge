@@ -221,6 +221,8 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/Gauge/CFieldGauge.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU2.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSUN.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3D.h"
 #include "Data/Field/Gauge/CFieldGaugeU1.h"
@@ -228,6 +230,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/Gauge/CFieldGaugeZ2.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3TreeImproved.h"
 #include "Data/Field/Gauge/CFieldGaugeSUN.h"
+#include "Data/Field/Gauge/CFieldGaugeSU2.h"
 
 //#include "Data/Field/CFieldBoson.h"
 

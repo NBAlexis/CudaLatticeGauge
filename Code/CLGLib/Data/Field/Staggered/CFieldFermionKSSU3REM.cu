@@ -767,7 +767,7 @@ _kernelKSApplyGammaREM(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -783,7 +783,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
     }
 
     CFieldFermionKSSU3GammaEM::DOperatorEM(pTargetBuffer, pBuffer, pGaugeBuffer, pU1->m_pDeviceData, f2am, m_fQ,
-        m_bEachSiteEta, bDagger, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+        m_bEachSiteEta, bDagger, eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
 
     preparethread;
 
@@ -795,7 +795,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         m_fQ,
         _HC_Center,
@@ -814,7 +814,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         pU1->m_pDeviceData,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         m_fQ,
         bDagger,
@@ -827,7 +827,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
 
 void CFieldFermionKSSU3REM::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     const CFieldGaugeU1Real* pU1 = dynamic_cast<const CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(m_byEMFieldID));
     if (NULL == pU1)

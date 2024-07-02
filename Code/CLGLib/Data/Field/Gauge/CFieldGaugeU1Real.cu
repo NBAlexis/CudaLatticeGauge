@@ -806,6 +806,39 @@ _kernelInitialAsBz_Type2(Real* pDeviceData, Real fBz, UBOOL bTwisted, UBOOL bPro
     }
 }
 
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPolyakovLoopOfSiteU1Real(
+    const Real *__restrict__ pDeviceBuffer,
+    cuDoubleComplex* res)
+{
+    UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
+    const UINT uiSiteIndex = uiXYZ * _DC_Lt;
+    UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, _DC_Dir - 1);
+    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+    Real tmp = F(0.0);
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+    {
+        tmp = pDeviceBuffer[uiLinkIdx];
+    }
+
+    for (UINT uiT = 1; uiT < _DC_Lt; ++uiT)
+    {
+        UINT newSiteIndex = uiSiteIndex + uiT;
+        uiLinkIdx = _deviceGetLinkIndex(newSiteIndex, _DC_Dir - 1);
+        site4 = __deviceSiteIndexToInt4(newSiteIndex);
+        uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        {
+            tmp = tmp + pDeviceBuffer[uiLinkIdx];
+        }
+    }
+
+    res[uiXYZ] = make_cuDoubleComplex(_cos(tmp), _sin(tmp));
+}
+
 #pragma endregion
 
 void CFieldGaugeU1Real::AxpyPlus(const CField* x)
@@ -1750,6 +1783,13 @@ void CFieldGaugeU1Real::DebugPrintSlice(BYTE dir1, BYTE dir2, const TArray<BYTE>
 
     appPopLogDate();
     appSafeFree(toCheck);
+}
+
+void CFieldGaugeU1Real::PolyakovOnSpatialSite(cuDoubleComplex* buffer) const
+{
+    dim3 block(_HC_DecompX, _HC_DecompY, 1);
+    dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
+    _kernelPolyakovLoopOfSiteU1Real << <block, threads >> > (m_pDeviceData, buffer);
 }
 
 __END_NAMESPACE

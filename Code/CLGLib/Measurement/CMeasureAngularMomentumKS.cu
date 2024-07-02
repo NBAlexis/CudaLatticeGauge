@@ -149,6 +149,7 @@ _kernelDFermionKS_PR_XYTau_TermCopy(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelKSApplyGammaEtaCopy(
+    BYTE byGaugeFieldId,
     deviceSU3Vector* pMe,
     const deviceSU3Vector* __restrict__ pOther,
     const deviceSU3* __restrict__ pGauge,
@@ -205,8 +206,8 @@ _kernelKSApplyGammaEtaCopy(
     const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx + F(0.5));
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     //x ay - y ax
-    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
-    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0);
+    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 0);
     midY.MulReal(fX);
     midX.MulReal(fY);
     midY.Sub(midX);
@@ -358,7 +359,8 @@ void CMeasureAngularMomentumKS::Initial(CMeasurementManager* pOwner, CLatticeDat
 void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4,
-    const deviceSU3* pGauge) const
+    const deviceSU3* pGauge,
+    BYTE byGaugeFieldId) const
 {
     preparethread;
     _kernelDFermionKS_PR_XYTermCopy << <block, threads >> > (
@@ -367,14 +369,14 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
         GetFermionFieldId(),
-        1,
+        byGaugeFieldId,
         _HC_Center);
 }
 
 void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
     deviceSU3Vector* pAppliedBuffer,
     const deviceSU3Vector* pInverseZ4,
-    const deviceSU3* pGauge, BYTE byFieldId)
+    const deviceSU3* pGauge, BYTE byFieldId, BYTE byGaugeFieldId)
 {
     preparethread;
     _kernelDFermionKS_PR_XYTermCopy << <block, threads >> > (
@@ -383,14 +385,15 @@ void CMeasureAngularMomentumKS::ApplyOrbitalMatrix(
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pAppliedBuffer,
         byFieldId,
-        1,
+        byGaugeFieldId,
         _HC_Center);
 }
 
 void CMeasureAngularMomentumKS::ApplySpinMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4, 
-    const deviceSU3* pGauge) const
+    const deviceSU3* pGauge,
+    BYTE byGaugeFieldId) const
 {
     preparethread;
     _kernelDFermionKS_PR_XYTau_TermCopy << <block, threads >> > (
@@ -398,10 +401,10 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(
         pGauge,
         pAppliedBuffer,
         GetFermionFieldId(),
-        1);
+        byGaugeFieldId);
 }
 
-void CMeasureAngularMomentumKS::ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId)
+void CMeasureAngularMomentumKS::ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer, const deviceSU3Vector* pInverseZ4, const deviceSU3* pGauge, BYTE fieldId, BYTE byGaugeFieldId)
 {
     preparethread;
     _kernelDFermionKS_PR_XYTau_TermCopy << <block, threads >> > (
@@ -409,13 +412,14 @@ void CMeasureAngularMomentumKS::ApplySpinMatrix(deviceSU3Vector* pAppliedBuffer,
         pGauge,
         pAppliedBuffer,
         fieldId,
-        1);
+        byGaugeFieldId);
 }
 
 void CMeasureAngularMomentumKS::ApplyPotentialMatrix(
     deviceSU3Vector* pAppliedBuffer, 
     const deviceSU3Vector* pInverseZ4, 
-    const deviceSU3* pGauge) const
+    const deviceSU3* pGauge,
+    BYTE byGaugeFieldId) const
 {
     const CFieldGaugeSU3* pAphys = dynamic_cast<const CFieldGaugeSU3*>(appGetLattice()->m_pAphys);
     if (NULL == pAphys)
@@ -424,6 +428,7 @@ void CMeasureAngularMomentumKS::ApplyPotentialMatrix(
     }
     preparethread;
     _kernelKSApplyGammaEtaCopy << <block, threads >> > (
+        byGaugeFieldId,
         pAppliedBuffer,
         pInverseZ4,
         pGauge,
@@ -474,17 +479,17 @@ void CMeasureAngularMomentumKS::OnConfigurationAcceptedZ4SingleField(
         {
         case OrbitalKS:
             {
-                ApplyOrbitalMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                ApplyOrbitalMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
             }
             break;
         case SpinKS:
             {
-                ApplySpinMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                ApplySpinMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
             }
             break;
         case PotentialKS:
             {
-                ApplyPotentialMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                ApplyPotentialMatrix(pAfterApplied->m_pDeviceData, pF2W->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
             }
             break;
         }
@@ -644,17 +649,17 @@ TArray<TArray<CLGComplex>> CMeasureAngularMomentumKS::ExportDiagnal(INT gn, INT 
                 {
                 case OrbitalKS:
                 {
-                    ApplyOrbitalMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                    ApplyOrbitalMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
                 }
                 break;
                 case SpinKS:
                 {
-                    ApplySpinMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                    ApplySpinMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
                 }
                 break;
                 case PotentialKS:
                 {
-                    ApplyPotentialMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData);
+                    ApplyPotentialMatrix(pF2->m_pDeviceData, pF1->m_pDeviceData, pAcceptGaugeSU3->m_pDeviceData, pAcceptGaugeSU3->m_byFieldId);
                 }
                 break;
                 }

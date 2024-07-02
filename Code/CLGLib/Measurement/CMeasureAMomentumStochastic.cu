@@ -28,7 +28,9 @@ _kernelDotAndGatherXYAMomentumJL(
     const deviceSU3* __restrict__ pGauge,
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
-    BYTE byFieldId, UBOOL bNaive,
+    BYTE byFieldId, 
+    BYTE byGaugeFieldId,
+    UBOOL bNaive,
     Real * resultXYPlaneJL)
 {
     intokernalInt4;
@@ -60,8 +62,8 @@ _kernelDotAndGatherXYAMomentumJL(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -197,6 +199,7 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     Real* resultXYPlaneJL)
 {
     intokernalInt4;
@@ -232,8 +235,8 @@ _kernelDotAndGatherXYAMomentumJL_Simple(
         //Assuming periodic
         //get U(x,mu), U^{dagger}(x-mu), 
         //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -337,6 +340,7 @@ _kernelDotAndGatherXYAMomentumJPure(
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
     BYTE byFieldId, 
+    BYTE byGaugeFieldId,
     Real* resultXYPlaneJL)
 {
     intokernalInt4;
@@ -373,7 +377,7 @@ _kernelDotAndGatherXYAMomentumJPure(
         //hopping terms
 
         //U(x,mu) phi(x+ mu)
-        deviceWilsonVectorSU3 phi_right = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir).MulWilsonVector(_deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId));
+        deviceWilsonVectorSU3 phi_right = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir).MulWilsonVector(_deviceGetFermionBCWilsonSU3(pRight, x_p_mu_Fermion, byFieldId));
         if (x_p_mu_Fermion.NeedToOpposite())
         {
             if (0 == idir)
@@ -407,7 +411,7 @@ _kernelDotAndGatherXYAMomentumJPure(
             }
         }
 
-        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+        deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
         if (x_m_mu_Gauge.NeedToDagger())
         {
             x_m_mu_Gauge_element.Dagger();
@@ -455,13 +459,13 @@ _kernelDotAndGatherXYAMomentumJPure(
         {
             // - y A_x gamma4 phi(x)
             phi_right = gamma4.MulWilsonC(x_Fermion_element.MulRealC(fmY * F(2.0)));
-            jl.Add(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
+            jl.Add(_deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
         }
         else if (1 == idir)
         {
             // + x A_y gamma4 phi(x)
             phi_right = gamma4.MulWilsonC(x_Fermion_element.MulRealC(fmX * F(2.0)));
-            jl.Sub(_deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
+            jl.Sub(_deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, idir).MulWilsonVector(phi_right));
         }
     }
 
@@ -672,6 +676,7 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     const SIndex* __restrict__ pGaugeMove,
     const SIndex* __restrict__ pFermionMove,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     Real * resultXYPlaneJS)
 {
     intokernalInt4;
@@ -698,8 +703,8 @@ _kernelDotAndGatherXYAMomentumJS_Exp(
     //Assuming periodic
     //get U(x,mu), U^{dagger}(x-mu), 
     //deviceSU3 x_Gauge_element = pGauge[linkIndex];
-    const deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIdx, idir);
-    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(pGauge, x_m_mu_Gauge);
+    const deviceSU3 x_Gauge_element = _deviceGetGaugeBCSU3Dir(byGaugeFieldId, pGauge, uiBigIdx, idir);
+    deviceSU3 x_m_mu_Gauge_element = _deviceGetGaugeBCSU3(byGaugeFieldId, pGauge, x_m_mu_Gauge);
     if (x_m_mu_Gauge.NeedToDagger())
     {
         x_m_mu_Gauge_element.Dagger();
@@ -768,6 +773,7 @@ _kernelDotAndGatherXYAMomentumJPot(
     const deviceWilsonVectorSU3* __restrict__ pRight,
     const deviceSU3* __restrict__ pAphys,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     Real* resultXYPlaneJPot)
 {
     intokernalInt4;
@@ -784,8 +790,8 @@ _kernelDotAndGatherXYAMomentumJPot(
     const Real fX = static_cast<Real>(sSite4.x - _DC_Centerx);
 
     //x ay - y ax
-    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 1);
-    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(pAphys, uiBigIdx, 0);
+    deviceSU3 midY = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 1);
+    deviceSU3 midX = _deviceGetGaugeBCSU3DirZero(byGaugeFieldId, pAphys, uiBigIdx, 0);
     midY.MulReal(fX);
     midX.MulReal(fY);
     midY.Sub(midX);
@@ -944,6 +950,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
+            pGaugeSU3->m_byFieldId,
             m_pDeviceXYBufferJL
             );
     }
@@ -956,6 +963,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
+            pGaugeSU3->m_byFieldId,
             FALSE,
             m_pDeviceXYBufferJL
             );
@@ -972,6 +980,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
             appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
             appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
             pF1W->m_byFieldId,
+            pGaugeSU3->m_byFieldId,
             m_pDeviceXYBufferJS
             );
     }
@@ -997,6 +1006,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
         pF1W->m_pDeviceData,
         pAphys->m_pDeviceData,
         pF1W->m_byFieldId,
+        pGaugeSU3->m_byFieldId,
         m_pDeviceXYBufferJPot
         );
 
@@ -1020,6 +1030,7 @@ void CMeasureAMomentumStochastic::OnConfigurationAcceptedZ4SingleField(
                 appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[pF1W->m_byFieldId],
                 appGetLattice()->m_pIndexCache->m_pMoveCache[pF1W->m_byFieldId],
                 pF1W->m_byFieldId,
+                pGaugeSU3->m_byFieldId,
                 m_pDeviceXYBufferJLPure
                 );
 

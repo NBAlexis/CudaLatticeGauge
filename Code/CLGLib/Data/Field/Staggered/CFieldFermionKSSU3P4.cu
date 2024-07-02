@@ -377,7 +377,7 @@ _kernelDFermionKS_P4_C12(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
@@ -399,7 +399,7 @@ void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         fUFactor,
         fFatFactor,
         f2am * F(0.5),
@@ -414,7 +414,7 @@ void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         fHalfC12,
         bDagger,
         eOCT,
@@ -424,7 +424,7 @@ void CFieldFermionKSSU3P4::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
 
 void CFieldFermionKSSU3P4::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer, BYTE byGaugeFieldId) const
 {
     const Real fDenorm = F(1.0) + F(6.0) * m_fomega;
     const Real fUFactor = m_fc10 / fDenorm;
@@ -453,7 +453,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fFatFactor,
                     m_pDevicePathBuffer,
@@ -465,7 +465,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fFatFactor,
                     m_pDevicePathBuffer,
@@ -479,7 +479,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
@@ -491,7 +491,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
@@ -503,7 +503,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,
@@ -515,7 +515,7 @@ void CFieldFermionKSSU3P4::DerivateD0(
                 checkCudaErrors(cudaMemcpy(m_pDevicePathBuffer, path, sizeof(INT) * 3, cudaMemcpyHostToDevice));
                 OneLinkForceS(
                     pGaugeBuffer,
-                    1,
+                    byGaugeFieldId,
                     pForce,
                     fHalfC12,
                     m_pDevicePathBuffer,

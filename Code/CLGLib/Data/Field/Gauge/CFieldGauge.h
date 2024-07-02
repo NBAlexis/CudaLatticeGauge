@@ -91,6 +91,8 @@ public:
         return FALSE;
     }
 
+    virtual void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const = 0;
+
     void CopyTo(CField* U) const override;
 
     UBOOL IsGaugeField() const override { return TRUE; }

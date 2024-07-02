@@ -438,11 +438,11 @@ _kernelDFermionKSForce_R_XYTau_Term(
 #pragma region D and derivate
 
 void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
-    const void* pGaugeBuffer, Real f2am,
+    const void* pGaugeBuffer, BYTE byGaugeFieldId, Real f2am,
     UBOOL bDagger, EOperatorCoefficientType eOCT,
     Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
-    CFieldFermionKSSU3D::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+    CFieldFermionKSSU3D::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
 
     deviceSU3Vector* pTarget = (deviceSU3Vector*)pTargetBuffer;
     const deviceSU3Vector* pSource = (const deviceSU3Vector*)pBuffer;
@@ -455,7 +455,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         m_bShiftCenter,
         TRUE,
         CCommonData::m_fOmega,
@@ -470,7 +470,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         m_bShiftCenter,
         FALSE,
         CCommonData::m_fOmega,
@@ -484,7 +484,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pGauge,
         pTarget,
         m_byFieldId,
-        1,
+        byGaugeFieldId,
         CCommonData::m_fOmega,
         bDagger,
         eOCT,
@@ -494,9 +494,10 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
 
 void CFieldFermionKSSU3DR::DerivateD0(
     void* pForce,
-    const void* pGaugeBuffer) const
+    const void* pGaugeBuffer,
+    BYTE byGaugeFieldId) const
 {
-    CFieldFermionKSSU3D::DerivateD0(pForce, pGaugeBuffer);
+    CFieldFermionKSSU3D::DerivateD0(pForce, pGaugeBuffer, byGaugeFieldId);
 
     preparethread;
 
