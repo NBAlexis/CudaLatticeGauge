@@ -68,15 +68,60 @@ _kernelDebugFunction()
     //    __chiralGamma[i].Print();
     //}
     //printf("here1?\n");
+    //for (INT i = 0; i < 15; ++i)
+    //{
+    //    deviceSU4 g = deviceSU4::makeSUNGenerator(i);
+    //    g.DebugPrint("g");
+    //}
 
-    deviceSU4 a = deviceSU4::makeSUNRandomAny(0);
-    deviceSU4 b(a);
-    a.DebugPrint("A");
-    a.Norm();
-    b.Proj();
+    deviceSU4 a = deviceSU4::makeSUNRandomGenerator(0);
+    //deviceSU4 b = deviceSU4::makeSUNRandom(0);
+    a.DebugPrint("a");
+    deviceSU4 b = a.ExpReal(F(0.1));
+    b.DebugPrint("b");
+    //b.DebugPrint("mb");
 
-    a.DebugPrint("B");
-    b.DebugPrint("C");
+    deviceSU4 c(b);
+    deviceSU4 d(b);
+
+    b.Norm();
+    b.DebugPrint("normb");
+
+    a = deviceSU4::makeSUNRandomGenerator(0);
+    b = a.ExpReal(F(0.1));
+    b.DebugPrint("b2");
+    b.Norm();
+    b.DebugPrint("normb2");
+
+    a = deviceSU4::makeSUNRandomGenerator(0);
+    b = a.ExpReal(F(0.1));
+    b.DebugPrint("b3");
+    b.Norm();
+    b.DebugPrint("normb3");
+
+    //a.Mul(b);
+    //a.DebugPrint("maxmb");
+
+    //a.MulDagger(b);
+    //a.DebugPrint("maxdmb");
+
+    //a.DaggerMul(b);
+    //a.DebugPrint("madxmb");
+
+    //b.Ta();
+    //b.DebugPrint("tab");
+
+    //a.Dagger();
+    //a.DebugPrint("dagmadxmb");
+
+    //a.Add(b);
+    //a.DebugPrint("dagmadxmbaddtab");
+
+    //b = b.ExpReal(F(0.2), 4);
+    //b.DebugPrint("mb2");
+
+    //b.AddId();
+    //b.DebugPrint("mb2addid");
 }
 
 __global__ void

@@ -333,28 +333,6 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_SummationDecompose] = static_cast<UINT>(iVaules);
     appDetailed(_T("Summation decompose: %d\n"), m_InitialCache.constIntegers[ECI_SummationDecompose]);
 
-    m_InitialCache.constIntegers[ECI_SUN] = 1;
-    if (params.Exist(_T("Gauge")))
-    {
-        const CParameters gauge = params.GetParameter(_T("Gauge"));
-        if (gauge.Exist(_T("FieldName")))
-        {
-            CCString sFieldName;
-            gauge.FetchStringValue(_T("FieldName"), sFieldName);
-            if (sFieldName == _T("CFieldGaugeSU3")
-             || sFieldName == _T("CFieldGaugeSU3D")
-             || sFieldName == _T("CFieldGaugeSU3TreeImproved"))
-            {
-                m_InitialCache.constIntegers[ECI_SUN] = 3;
-            }
-
-            if (sFieldName.Find(_T("SU3")) >= 0)
-            {
-                m_InitialCache.constIntegers[ECI_SUN] = 3;
-            }
-        }
-    }
-
     memcpy(m_pCudaHelper->m_ConstIntegers, m_InitialCache.constIntegers, sizeof(UINT) * kContentLength);
     memcpy(m_pCudaHelper->m_ConstSignedIntegers, m_InitialCache.constSignedIntegers, sizeof(INT)* kContentLength);
     memcpy(m_pCudaHelper->m_ConstFloats, m_InitialCache.constFloats, sizeof(Real) * kContentLength);

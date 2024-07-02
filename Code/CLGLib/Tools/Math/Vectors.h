@@ -27,6 +27,199 @@ extern "C" {
 #endif /* __cplusplus */
 
     //NOTE!!! DO NOT ALIGN ME!!! THIS WILL BREAK UNION!!!
+    struct deviceSU2Vector
+    {
+    public:
+        __device__ deviceSU2Vector()
+        {
+
+        }
+
+        __device__ deviceSU2Vector(const deviceSU2Vector& other)
+        {
+            m_ve[0] = other.m_ve[0];
+            m_ve[1] = other.m_ve[1];
+        }
+
+        __device__ __inline__ void DebugPrint() const
+        {
+            printf("%2.3f %s %2.3f i, %2.3f %s %2.3f i\n",
+                m_ve[0].x,
+                m_ve[0].y < 0 ? "" : "+",
+                m_ve[0].y,
+
+                m_ve[1].x,
+                m_ve[1].y < 0 ? "" : "+",
+                m_ve[1].y
+            );
+        }
+
+        __device__ __inline__ static deviceSU2Vector makeRandomGaussian(UINT fatIndex)
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _deviceRandomGaussC(fatIndex);
+            ret.m_ve[1] = _deviceRandomGaussC(fatIndex);
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU2Vector makeRandomZ4(UINT fatIndex)
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _deviceRandomZ4(fatIndex);
+            ret.m_ve[1] = _deviceRandomZ4(fatIndex);
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU2Vector makeZeroSU2Vector()
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _make_cuComplex(F(0.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(F(0.0), F(0.0));
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU2Vector makeOneSU2Vector()
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _make_cuComplex(F(1.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(F(1.0), F(0.0));
+            return ret;
+        }
+
+        __device__ __inline__ static deviceSU2Vector makeOneSU2VectorColor(BYTE byColor)
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _make_cuComplex(0 == byColor ? F(1.0) : F(0.0), F(0.0));
+            ret.m_ve[1] = _make_cuComplex(1 == byColor ? F(1.0) : F(0.0), F(0.0));
+            return ret;
+        }
+
+        /**
+        * This is sum _3 (v^* v)
+        */
+        __device__ __inline__ CLGComplex ConjugateDotC(const deviceSU2Vector& other) const
+        {
+            CLGComplex ret = _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]);
+            ret = _cuCaddf(ret, _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]));
+            return ret;
+        }
+
+        __device__ __inline__ void Sub(const deviceSU2Vector& other)
+        {
+            m_ve[0] = _cuCsubf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCsubf(m_ve[1], other.m_ve[1]);
+        }
+
+        __device__ __inline__ void SubComp(const CLGComplex& other)
+        {
+            m_ve[0] = _cuCsubf(m_ve[0], other);
+            m_ve[1] = _cuCsubf(m_ve[1], other);
+        }
+
+        __device__ __inline__ void SubReal(Real other)
+        {
+            m_ve[0] = cuCsubf_cr(m_ve[0], other);
+            m_ve[1] = cuCsubf_cr(m_ve[1], other);
+        }
+
+        __device__ __inline__ void Add(const deviceSU2Vector& other)
+        {
+            m_ve[0] = _cuCaddf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCaddf(m_ve[1], other.m_ve[1]);
+        }
+
+        __device__ __inline__ void AddComp(const CLGComplex& other)
+        {
+            m_ve[0] = _cuCaddf(m_ve[0], other);
+            m_ve[1] = _cuCaddf(m_ve[1], other);
+        }
+
+        __device__ __inline__ void AddReal(Real other)
+        {
+            m_ve[0] = cuCaddf_cr(m_ve[0], other);
+            m_ve[1] = cuCaddf_cr(m_ve[1], other);
+        }
+
+        __device__ __inline__ void MulReal(Real other)
+        {
+            m_ve[0] = cuCmulf_cr(m_ve[0], other);
+            m_ve[1] = cuCmulf_cr(m_ve[1], other);
+        }
+
+        __device__ __inline__ void MulComp(const CLGComplex& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], other);
+            m_ve[1] = _cuCmulf(m_ve[1], other);
+        }
+
+        __device__ __inline__ void Mul(const deviceSU2Vector& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], other.m_ve[0]);
+            m_ve[1] = _cuCmulf(m_ve[1], other.m_ve[1]);
+        }
+
+        /**
+        * v = i^k v
+        */
+        __device__ __inline__ void MulZ4(BYTE byZ4)
+        {
+            switch (byZ4)
+            {
+            case 1:
+            {
+                m_ve[0] = _make_cuComplex(-m_ve[0].y, m_ve[0].x);
+                m_ve[1] = _make_cuComplex(-m_ve[1].y, m_ve[1].x);
+            }
+            break;
+            case 2:
+            {
+                m_ve[0] = _make_cuComplex(-m_ve[0].x, -m_ve[0].y);
+                m_ve[1] = _make_cuComplex(-m_ve[1].x, -m_ve[1].y);
+            }
+            break;
+            case 3:
+            {
+                m_ve[0] = _make_cuComplex(m_ve[0].y, -m_ve[0].x);
+                m_ve[1] = _make_cuComplex(m_ve[1].y, -m_ve[1].x);
+            }
+            break;
+            }
+        }
+
+        __device__ __inline__ void Opposite()
+        {
+            m_ve[0].x = -m_ve[0].x;
+            m_ve[0].y = -m_ve[0].y;
+            m_ve[1].x = -m_ve[1].x;
+            m_ve[1].y = -m_ve[1].y;
+        }
+
+        __device__ __inline__ void Conjugate()
+        {
+            m_ve[0].y = -m_ve[0].y;
+            m_ve[1].y = -m_ve[1].y;
+        }
+
+        __device__ __inline__ deviceSU2Vector SubRealC(Real other) const { deviceSU2Vector ret(*this); ret.SubReal(other); return ret; }
+        __device__ __inline__ deviceSU2Vector SubCompC(const CLGComplex& other) const { deviceSU2Vector ret(*this); ret.SubComp(other); return ret; }
+        __device__ __inline__ deviceSU2Vector SubC(const deviceSU2Vector& other) const { deviceSU2Vector ret(*this); ret.Sub(other); return ret; }
+
+        __device__ __inline__ deviceSU2Vector AddRealC(const Real& other) const { deviceSU2Vector ret(*this); ret.AddReal(other); return ret; }
+        __device__ __inline__ deviceSU2Vector AddCompC(const CLGComplex& other) const { deviceSU2Vector ret(*this); ret.AddComp(other); return ret; }
+        __device__ __inline__ deviceSU2Vector AddC(const deviceSU2Vector& other) const { deviceSU2Vector ret(*this); ret.Add(other); return ret; }
+
+        __device__ __inline__ deviceSU2Vector MulRealC(Real other) const { deviceSU2Vector ret(*this); ret.MulReal(other); return ret; }
+        __device__ __inline__ deviceSU2Vector MulCompC(const CLGComplex& other) const { deviceSU2Vector ret(*this); ret.MulComp(other); return ret; }
+        __device__ __inline__ deviceSU2Vector MulZ4C(BYTE z4) const { deviceSU2Vector ret(*this); ret.MulZ4(z4); return ret; }
+
+        __device__ __inline__ CLGComplex Sum() const
+        {
+            return _cuCaddf(m_ve[0], m_ve[1]);
+        }
+
+        CLGComplex m_ve[2];
+    };
+
     struct deviceSU3Vector
     {
     public:

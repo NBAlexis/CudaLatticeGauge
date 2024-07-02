@@ -61,6 +61,7 @@
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3D.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.h" />
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSUN.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1Real.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeZ2.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Measurement\CMeasurePandChiralTalorKS.h" />
     <ClInclude Include="Measurement\CMeasurePlaqutteEnergy.h" />
     <ClInclude Include="Measurement\CMeasurePolyakov.h" />
+    <ClInclude Include="Measurement\CMeasurePolyakovSUN.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovU1XY.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY.h" />
     <ClInclude Include="Measurement\CMeasurePolyakovXY3D.h" />
@@ -157,9 +159,11 @@
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
+    <ClInclude Include="Tools\Math\SU2.h" />
     <ClInclude Include="Tools\Math\SU3.h" />
     <ClInclude Include="Tools\Math\SUN.h" />
     <ClInclude Include="Tools\Math\Vectors.h" />
+    <ClInclude Include="Tools\Math\VectorsN.h" />
     <ClInclude Include="Tools\Tracer.h" />
     <ClInclude Include="Tools\Timer.h" />
     <ClInclude Include="Update\Continous\CHMC.h" />
@@ -191,6 +195,7 @@
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3D.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cu" />
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSUN.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1Real.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3.cu" />
@@ -293,6 +298,7 @@
     <CudaCompile Include="Measurement\CMeasurePandChiralTalor.cu" />
     <CudaCompile Include="Measurement\CMeasurePandChiralTalorKS.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakov.cu" />
+    <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovU1XY.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY.cu" />
     <CudaCompile Include="Measurement\CMeasurePolyakovXY3D.cu" />
@@ -363,7 +369,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.3.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.5.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -570,6 +576,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.3.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.5.targets" />
   </ImportGroup>
 </Project>

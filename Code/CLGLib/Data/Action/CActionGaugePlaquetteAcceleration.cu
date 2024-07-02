@@ -346,7 +346,7 @@ void CActionGaugePlaquetteAcceleration::Initial(class CLatticeData* pOwner, cons
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
+    m_fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fG = 0.1f;
@@ -358,7 +358,7 @@ void CActionGaugePlaquetteAcceleration::Initial(class CLatticeData* pOwner, cons
 void CActionGaugePlaquetteAcceleration::SetBeta(Real fBeta)
 {
     CCommonData::m_fBeta = static_cast<DOUBLE>(fBeta);
-    m_fBetaOverN = fBeta / static_cast<Real>(_HC_SUN);
+    m_fBetaOverN = fBeta / static_cast<Real>(GetDefaultMatrixN());
 }
 
 UBOOL CActionGaugePlaquetteAcceleration::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const

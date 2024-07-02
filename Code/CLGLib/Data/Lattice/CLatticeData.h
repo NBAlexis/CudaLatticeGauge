@@ -49,6 +49,7 @@ public:
     UINT m_uiRandomType;
     UINT m_uiRandomSeed;
 
+    UINT GetDefaultSUN() const;
     TArray<class CFieldGauge*> m_pGaugeField;
     TArray<class CFieldBoson*> m_pBosonField;
     TArray<class CFieldFermion*> m_pFermionField;

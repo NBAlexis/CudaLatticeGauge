@@ -70,10 +70,25 @@ void CAction::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const
     appCrucial(_T("CAction PrepareForHMC not implemented!\n"));
 }
 
+UINT CAction::GetDefaultMatrixN() const
+{
+    if (m_byGaugeFieldIds.Num() > 0)
+    {
+        const CFieldGauge* gauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]));
+        if (NULL != gauge)
+        {
+            return gauge->MatrixN();
+        }
+    }
+
+    return appGetLattice()->GetDefaultSUN();
+}
+
 CCString CAction::GetInfos(const CCString& tab) const
 {
     CCString sRet = CBase::GetInfos(tab);
     sRet = sRet + tab + _T("ActionId : ") + appToString(m_byActionId) + _T("\n");
+    sRet = sRet + tab + _T("N : ") + appToString(GetDefaultMatrixN()) + _T("\n");
     sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
     sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;

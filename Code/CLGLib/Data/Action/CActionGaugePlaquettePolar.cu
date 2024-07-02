@@ -407,7 +407,7 @@ void CActionGaugePlaquettePolar::SetBetaList(const TArray<Real>& betalst)
     m_lstBeta = betalst;
     for (INT i = 0; i < m_lstBeta.Num(); ++i)
     {
-        m_lstBeta[i] = m_lstBeta[i] / static_cast<Real>(_HC_SUN);
+        m_lstBeta[i] = m_lstBeta[i] / static_cast<Real>(GetDefaultMatrixN());
     }
     if (0 == m_lstBeta.Num())
     {
@@ -449,7 +449,7 @@ CCString CActionGaugePlaquettePolar::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Beta : [") +  + _T("]\n");
     for (UINT i = 0; i < _HC_Lx; ++i)
     {
-        sRet = sRet + appToString(m_lstBeta[i] * _HC_SUN) + _T(", ");
+        sRet = sRet + appToString(m_lstBeta[i] * GetDefaultMatrixN()) + _T(", ");
     }
     sRet = sRet + _T("]\n");
     sRet = sRet + tab + _T("R : [");

@@ -1,0 +1,93 @@
+
+TestSU4:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    CacheStaple : 0
+
+    ActionListLength : 3
+    GaugeFieldCount : 3
+    MeasureListLength : 3
+    FermionFieldCount : 0
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        Omelyan2Lambda : 0.38636665500756728
+
+    ## For D operator, we must have a gauge field
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU4
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+        
+    Gauge2:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU5
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+
+    Gauge3:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU6
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 3
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakovSU4
+        GaugeFields : [1]
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakovSU5
+        GaugeFields : [2]
+
+    Measure3:
+
+        MeasureName : CMeasurePolyakovSU6
+        GaugeFields : [3]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [1]
+
+    Action2:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [2]
+
+    Action3:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [3]
+

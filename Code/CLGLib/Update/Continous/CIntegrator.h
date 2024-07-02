@@ -207,6 +207,7 @@ protected:
         {
             if (NULL != m_pMomentumField[i])
             {
+                //m_pMomentumField[i]->DebugPrintMe();
                 ret += m_pMomentumField[i]->CalculateKinematicEnergy();
             }
         }

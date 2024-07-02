@@ -193,13 +193,15 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Tools/Math/CudaComplexFunction.h"
 #include "Tools/Math/Random.h"
 #include "Tools/Math/Vectors.h" //vectors.h must ealier than gamma matrix
+#include "Tools/Math/VectorsN.h"
 #include "Tools/Math/SU3.h"
+#include "Tools/Math/SU2.h"
+#include "Tools/Math/SUN.h"
 #include "Tools/Math/GammaMatrix.h" //gamma matrix must later than cuComplexI
 
 #include "Tools/Math/CLinearAlgebraHelper.h"
 #include "Tools/Math/CLGFFT.h"
 #include "Tools/Math/CRationalApproximation.h"
-#include "Tools/Math/SUN.h"
 
 #include "Data/CCommonData.h"
 #include "Data/Boundary/CBoundaryCondition.h"
@@ -225,6 +227,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/Gauge/CFieldGaugeU1Real.h"
 #include "Data/Field/Gauge/CFieldGaugeZ2.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3TreeImproved.h"
+#include "Data/Field/Gauge/CFieldGaugeSUN.h"
 
 //#include "Data/Field/CFieldBoson.h"
 
@@ -300,6 +303,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Measurement/CMeasureTopologicChargeXY.h"
 #include "Measurement/CMeasurePolyakovXY.h"
 #include "Measurement/CMeasurePolyakov.h"
+#include "Measurement/CMeasurePolyakovSUN.h"
 #include "Measurement/CMeasureWilsonLoop.h"
 #include "Measurement/CMeasureWilsonLoopXY.h"
 #include "Measurement/CMeasureChiralCondensate.h"

@@ -277,6 +277,15 @@ void CLatticeData::SetAPure(const CFieldGauge* pUnow)
     m_pUpure->TransformToU();
 }
 
+UINT CLatticeData::GetDefaultSUN() const
+{
+    if (m_pGaugeField.Num() > 0 && NULL != m_pGaugeField[0])
+    {
+        return m_pGaugeField[0]->MatrixN();
+    }
+    return 3;
+}
+
 CCString CLatticeData::GetInfos(const CCString& sTab) const
 {
     CCString sRet;
@@ -307,7 +316,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("SUN : %d\n"), _HC_SUN);
+    sInfos.Format(_T("SUN : %d\n"), GetDefaultSUN());
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("Beta : %f\n"), CCommonData::m_fBeta);
     sRet = sRet + sTab + sInfos;

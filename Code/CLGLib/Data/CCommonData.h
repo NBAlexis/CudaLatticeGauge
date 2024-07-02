@@ -83,8 +83,6 @@
 #define _DC_ThreadCountPerBlock (_constIntegers[ECI_ThreadCountPerBlock])
 #define _HC_ThreadCountPerBlock (appGetCudaHelper()->m_ConstIntegers[ECI_ThreadCountPerBlock])
 
-#define _HC_SUN (appGetCudaHelper()->m_ConstIntegers[ECI_SUN])
-
 //Remember not to make plaqutte count device, 
 //Because the plaqutte count can be figured out after boundary condition (so not a constant)
 #define _HC_PlaqutteCount (appGetCudaHelper()->m_ConstIntegers[ECI_PlaqutteCount])
@@ -136,6 +134,15 @@ __DEFINE_ENUM(EFieldType,
     EFT_GaugeU1,
     EFT_GaugeReal,
     EFT_BosonU1,
+
+    EFT_GaugeSU2,
+    EFT_GaugeSUN,
+    EFT_GaugeSU4,
+    EFT_GaugeSU5,
+    EFT_GaugeSU6,
+    EFT_GaugeSU7,
+    EFT_GaugeSU8,
+
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,
 

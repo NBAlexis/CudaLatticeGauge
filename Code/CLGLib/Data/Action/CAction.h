@@ -80,6 +80,8 @@ public:
 
 protected:
 
+    UINT GetDefaultMatrixN() const;
+
     virtual UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const
     {
         appCrucial(_T("CalculateForceOnGauge not implemented\n"));

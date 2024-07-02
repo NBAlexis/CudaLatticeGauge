@@ -37,6 +37,7 @@
     <ClCompile Include="Tests\TestRandom.cpp" />
     <ClCompile Include="Tests\TestRotationAcc.cpp" />
     <ClCompile Include="Tests\TestSolver.cpp" />
+    <ClCompile Include="Tests\TestSUN.cpp" />
     <ClCompile Include="Tests\TestUpdator.cpp" />
     <ClCompile Include="Tests\TestGaugeFixing.cpp" />
   </ItemGroup>
@@ -57,6 +58,7 @@
     <None Include="..\..\Bin\Debug\TestSuit_Rotation.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_MiscUpdate.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Solver.yaml" />
+    <None Include="..\..\Bin\Debug\TestSuit_SUN.yaml" />
     <None Include="..\..\Bin\Debug\TestSuit_Updator.yaml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -530,6 +530,18 @@
     <ClInclude Include="Tools\Math\SUN.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Tools\Math\VectorsN.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\SU2.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSUN.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Measurement\CMeasurePolyakovSUN.h">
+      <Filter>Measurement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -894,6 +906,12 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Boson\CFieldBosonU1.cu">
       <Filter>Data\Field\Boson</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSUN.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
+      <Filter>Measurement</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,7 @@ public:
     void InitialWithByteCompressed(BYTE*) override;
     void InitialField(EFieldInitialType eInitialType) override;
     EFieldType GetFieldType() const override { return EFT_GaugeU1; }
+    UINT MatrixN() const override { return 1; }
     void DebugPrintMe() const override;
 
 #pragma region HMC

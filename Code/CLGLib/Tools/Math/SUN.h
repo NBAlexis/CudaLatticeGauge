@@ -20,7 +20,7 @@
 
 __BEGIN_NAMESPACE
 
-template<int N, int NoE> 
+template<INT N, INT NoE>
 struct deviceSUN
 {
 
@@ -128,7 +128,7 @@ public:
             else
             {
                 INT m = x + 1;
-                Real fac = half / _sqrt(F(2.0) / (m * (m + F(1.0))));
+                Real fac = half * _sqrt(F(2.0) / (m * (m + F(1.0))));
                 for (INT k = 0; k < m; ++k)
                 {
                     ret.m_me[k * N + k] = _make_cuComplex(fac, F(0.0));
@@ -157,7 +157,7 @@ public:
         for (UINT i = 0; i < N * N - 1; ++i)
         {
             const Real r = _deviceRandomGaussFSqrt2(fatIndex);
-            ret.Add(makeSUNGenerator(i).MulRealC(r));
+            ret.Add(makeSUNGenerator(i).MulCompC(_make_cuComplex(F(0.0), r)));
         }
         return ret;
     }
@@ -200,6 +200,20 @@ public:
         return ret;
     }
 
+    template<INT NoVE>
+    __device__ __inline__ static deviceSUN<N, NoE> makeSUNContractV(const deviceSUNVector<N, NoVE>& left, const deviceSUNVector<N, NoVE>& right)
+    {
+        deviceSUN<N, NoE> ret;
+        for (INT y = 0; y < N; ++y)
+        {
+            for (INT x = 0; x < N; ++x)
+            {
+                ret.m_me[y * N + x] = _cuCmulf(_cuConjf(left.m_ve[x]), right.m_ve[y]);
+            }
+        }
+        return ret;
+    }
+
 
 #pragma endregion
 
@@ -213,15 +227,18 @@ public:
         }
     }
 
-    __device__ __inline__ void AddDagger(const deviceSUN<N, NoE>&& right)
+    __device__ __inline__ void AddDagger(const deviceSUN<N, NoE>& right)
     {
-        for (INT i = 0; i < N * N; ++i)
+        for (INT y = 0; y < N; ++y)
         {
-            m_me[i] = _cuCaddf(m_me[i], _cuConjf(right.m_me[i]));
+            for (INT x = 0; x < N; ++x)
+            {
+                m_me[y * N + x] = _cuCaddf(m_me[y * N + x], _cuConjf(right.m_me[x * N + y]));
+            }
         }
     }
 
-    __device__ __inline__ void Sub(const deviceSUN<N, NoE>&& right)
+    __device__ __inline__ void Sub(const deviceSUN<N, NoE>& right)
     {
         for (INT i = 0; i < N * N; ++i)
         {
@@ -229,11 +246,14 @@ public:
         }
     }
 
-    __device__ __inline__ void SubDagger(const deviceSUN<N, NoE>&& right)
+    __device__ __inline__ void SubDagger(const deviceSUN<N, NoE>& right)
     {
-        for (INT i = 0; i < N * N; ++i)
+        for (INT y = 0; y < N; ++y)
         {
-            m_me[i] = _cuCsubf(m_me[i], _cuConjf(right.m_me[i]));
+            for (INT x = 0; x < N; ++x)
+            {
+                m_me[y * N + x] = _cuCsubf(m_me[y * N + x], _cuConjf(right.m_me[x * N + y]));
+            }
         }
     }
 
@@ -288,19 +308,8 @@ public:
 
     __device__ __inline__ void DaggerMul(const deviceSUN<N, NoE>& right)
     {
-        CLGComplex temp[N];
-        for (INT y = 0; y < N; ++y)
-        {
-            for (INT x = 0; x < N; ++x)
-            {
-                temp[x] = _cuCmulf(_cuConjf(m_me[y * N]), right.m_me[x]);
-                for (INT i = 1; i < N; ++i)
-                {
-                    temp[x] = _cuCaddf(temp[x], _cuCmulf(_cuConjf(m_me[y * N + i]), right.m_me[i * N + x]));
-                }
-            }
-            memcpy(m_me + y * N, temp, sizeof(CLGComplex) * N);
-        }
+        Dagger();
+        Mul(right);
     }
 
     __device__ __inline__ void MulDagger(const deviceSUN<N, NoE>& right)
@@ -310,10 +319,10 @@ public:
         {
             for (INT x = 0; x < N; ++x)
             {
-                temp[x] = _cuCmulf(m_me[y * N], _cuConjf(right.m_me[x]));
+                temp[x] = _cuCmulf(m_me[y * N], _cuConjf(right.m_me[x * N]));
                 for (INT i = 1; i < N; ++i)
                 {
-                    temp[x] = _cuCaddf(temp[x], _cuCmulf(m_me[y * N + i], _cuConjf(right.m_me[i * N + x])));
+                    temp[x] = _cuCaddf(temp[x], _cuCmulf(m_me[y * N + i], _cuConjf(right.m_me[x * N + i])));
                 }
             }
             memcpy(m_me + y * N, temp, sizeof(CLGComplex) * N);
@@ -348,10 +357,10 @@ public:
         {
             for (INT y = 0; y < N; ++y)
             {
-                temp[y] = _cuCmulf(_cuConjf(left.m_me[y * N]), m_me[x]);
+                temp[y] = _cuCmulf(_cuConjf(left.m_me[y]), m_me[x]);
                 for (INT i = 1; i < N; ++i)
                 {
-                    temp[y] = _cuCaddf(temp[y], _cuCmulf(_cuConjf(left.m_me[y * N + i]), m_me[i * N + x]));
+                    temp[y] = _cuCaddf(temp[y], _cuCmulf(_cuConjf(left.m_me[i * N + y]), m_me[i * N + x]));
                 }
             }
 
@@ -364,23 +373,8 @@ public:
 
     __device__ __inline__ void MulOnMeND(const deviceSUN<N, NoE>& left)
     {
-        CLGComplex temp[N];
-        for (INT x = 0; x < N; ++x)
-        {
-            for (INT y = 0; y < N; ++y)
-            {
-                temp[y] = _cuCmulf(left.m_me[y * N], _cuConjf(m_me[x]));
-                for (INT i = 1; i < N; ++i)
-                {
-                    temp[y] = _cuCaddf(temp[y], _cuCmulf(left.m_me[y * N + i], _cuConjf(m_me[i * N + x])));
-                }
-            }
-
-            for (INT y = 0; y < N; ++y)
-            {
-                m_me[y * N + x] = temp[y];
-            }
-        }
+        Dagger();
+        MulOnMe(left);
     }
 
     __device__ __inline__ deviceSUN<N, NoE> MulC(const deviceSUN<N, NoE>& right) const
@@ -438,10 +432,10 @@ public:
         {
             for (INT y = 0; y < N; ++y)
             {
-                ret.m_me[y * N + x] = _cuCmulf(m_me[y * N], _cuConjf(right.m_me[x]));
+                ret.m_me[y * N + x] = _cuCmulf(m_me[y * N], _cuConjf(right.m_me[x * N]));
                 for (INT i = 1; i < N; ++i)
                 {
-                    ret.m_me[y * N + x] = _cuCaddf(ret.m_me[y * N + x], _cuCmulf(m_me[y * N + i], _cuConjf(right.m_me[i * N + x])));
+                    ret.m_me[y * N + x] = _cuCaddf(ret.m_me[y * N + x], _cuCmulf(m_me[y * N + i], _cuConjf(right.m_me[x * N + i])));
                 }
             }
         }
@@ -456,10 +450,10 @@ public:
         {
             for (INT y = 0; y < N; ++y)
             {
-                ret.m_me[y * N + x] = _cuCmulf(_cuConjf(m_me[y * N]), right.m_me[x]);
+                ret.m_me[y * N + x] = _cuCmulf(_cuConjf(m_me[y]), right.m_me[x]);
                 for (INT i = 1; i < N; ++i)
                 {
-                    ret.m_me[y * N + x] = _cuCaddf(_cuConjf(ret.m_me[y * N + x]), _cuCmulf(m_me[y * N + i], right.m_me[i * N + x]));
+                    ret.m_me[y * N + x] = _cuCaddf(ret.m_me[y * N + x], _cuCmulf(_cuConjf(m_me[i * N + y]), right.m_me[i * N + x]));
                 }
             }
         }
@@ -516,6 +510,21 @@ public:
             }
         }
 
+        return ret;
+    }
+
+    template<INT NofVE>
+    __device__ __inline__ deviceSUNVector<N, NofVE> MulVector(const deviceSUNVector<N, NofVE>& v) const
+    {
+        deviceSUNVector<N, NofVE> ret;
+        for (INT y = 0; y < N; ++y)
+        {
+            ret.m_ve[y] = _cuCmulf(m_me[y * N], v.m_ve[0]);
+            for (INT x = 1; x < N; ++x)
+            {
+                ret.m_ve[y] = _cuCaddf(ret.m_ve[y], _cuCmulf(m_me[y * N + x], v.m_ve[x]));
+            }
+        }
         return ret;
     }
 
@@ -700,7 +709,7 @@ public:
         deviceSUN<N, NoE> ret;
         for (INT x = 0; x < N; ++x)
         {
-            for (INT y = x; y < N; ++y)
+            for (INT y = 0; y < N; ++y)
             {
                 ret.m_me[y * N + x] = _cuConjf(ret.m_me[x * N + y]);
             }
@@ -714,7 +723,7 @@ public:
         deviceSUN<N, NoE> ret;
         for (INT x = 0; x < N; ++x)
         {
-            for (INT y = x; y < N; ++y)
+            for (INT y = 0; y < N; ++y)
             {
                 ret.m_me[y * N + x] = ret.m_me[x * N + y];
             }
@@ -738,11 +747,14 @@ public:
                     m_me[y * N + x].x = 0;
                     trace += m_me[y * N + x].y;
                 }
+                else
+                {
+                    m_me[y * N + x].x = F(0.5) * (m_me[y * N + x].x - m_me[x * N + y].x);
+                    m_me[y * N + x].y = F(0.5) * (m_me[y * N + x].y + m_me[x * N + y].y);
+                    m_me[x * N + y].x = -m_me[y * N + x].x;
+                    m_me[x * N + y].y = m_me[y * N + x].y;
+                }
             }
-            m_me[y * N + x].x = F(0.5) * (m_me[y * N + x].x - m_me[x * N + y].x);
-            m_me[y * N + x].y = F(0.5) * (m_me[y * N + x].y + m_me[x * N + y].y);
-            m_me[x * N + y].x = -m_me[y * N + x].x;
-            m_me[x * N + y].y = m_me[y * N + x].y;
         }
 
         trace = trace / N;
@@ -826,14 +838,31 @@ public:
     //}
 
     /**
-    * make any matrix to SU3
+    * make any matrix to SUN
+    * 
+    * This is from bridge++ but there is a problem
+    * 
+    * let M = {{0.9879009 + 0.0051302 I, -0.0682856 - 0.0641515 I, -0.0821236 - 0.0152904 I, -0.0859499 - 0.0296949 I}, 
+               {0.0625330 - 0.0694527 I, 0.9924969 - 0.0488579 I, -0.0542777 - 0.0216560 I, 0.0198289 - 0.0045309 I}, 
+               {0.0796094 - 0.0245828 I, 0.0462495 - 0.0277931 I, 0.9932243 - 0.0171367 I, -0.0316254 - 0.0485630 I}, 
+               {0.0872017 - 0.0273023 I, -0.0270464 - 0.0118957 I, 0.0270664 - 0.0456755 I, 0.9920595 + 0.0614532 I}}
+
+      Q.R = M
+      with
+      Q = {{-0.9879142 + 0.0000000 I, 0.0650371 + 0.0674427 I, 0.0818422 + 0.0167314 I, -0.0876184 - 0.0243346 I}, 
+           {-0.0621715 + 0.0697765 I, -0.9936988 - 0.0001736 I, 0.0538887 + 0.0226065 I, 0.0195115 - 0.0057458 I}, 
+           {-0.0794807 + 0.0249959 I, -0.0475645 + 0.0254772 I, -0.9933721 - 0.0003223 I, -0.0345618 - 0.0465189 I}, 
+           {-0.0870588 + 0.0277547 I, 0.0264265 + 0.0132157 I, -0.0278649 + 0.0451927 I, 0.9939610 + 0.0001197 I}}
+
+      but, Q/Exp[-I Arg[Det[Q]]/4], although was an SUN matrix, but not M (which is already an SUN matrix)
     */
     __device__ __inline__ void Norm()
     {
-        QR();
-        CLGComplex d = Determinent();
-        const Real fArg = -__cuCargf(d) / N;
-        MulComp(_make_cuComplex(_cos(fArg), _sin(fArg)));
+        //QR();
+        //CLGComplex d = Determinent();
+        //const Real fArg = -__cuCargf(d) / N;
+        //MulComp(_make_cuComplex(_cos(fArg), _sin(fArg)));
+        Proj();
     }
 
     /**
@@ -865,7 +894,7 @@ public:
             //coef = det(me)
             // If the arg is more than pi/2, this will fall into -1
             //MulComp(_make_cuComplex(F(1.0), -Determinent().y / N));
-            Real fArg = -__cuCargf(Determinent()) / N;
+            const Real fArg = -__cuCargf(Determinent()) / N;
             MulComp(_make_cuComplex(_cos(fArg), _sin(fArg)));
         }
     }
@@ -953,7 +982,7 @@ public:
     * U' = exp(aU) = (1 + a U + a^2 U^2/2 +  ... + a^N U^N/N!)
     *    = 1 + a U (1 + a U /2 (1 + a U/3 ...))
     */
-    __device__ __inline__ deviceSUN<N, NoE> Exp(const CLGComplex& a, BYTE uiPrecision) const
+    __device__ __inline__ deviceSUN<N, NoE> Exp(const CLGComplex& a, BYTE uiPrecision = N + 1) const
     {
         deviceSUN<N, NoE> tmp;
 
@@ -970,7 +999,8 @@ public:
             const Real exp_factor = __rcp(uiPrecision - i);
             CLGComplex alpha = cuCmulf_cr(a, exp_factor);
             //aU/(N-i) = this x alpha
-            deviceSUN<N, NoE> aUoN = MulCompC(alpha);
+            deviceSUN<N, NoE> aUoN(*this); 
+            aUoN.MulComp(alpha);
             if (0 == i)
             {
                 tmp = aUoN;
@@ -985,12 +1015,13 @@ public:
         return tmp;
     }
 
-    __device__ __inline__ deviceSUN<N, NoE> ExpReal(Real a, BYTE uiPrecision) const
+    __device__ __inline__ deviceSUN<N, NoE> ExpReal(Real a, BYTE uiPrecision = N + 1) const
     {
         deviceSUN<N, NoE> tmp;
         for (BYTE i = 0; i < uiPrecision; ++i)
         {
-            deviceSUN<N, NoE> aUoN = MulRealC(a * __rcp(uiPrecision - i));
+            deviceSUN<N, NoE> aUoN(*this); 
+            aUoN.MulReal(a * __rcp(uiPrecision - i));
             if (0 == i)
             {
                 tmp = aUoN;
@@ -1001,7 +1032,7 @@ public:
             }
             tmp.AddId();
         }
-
+        tmp.Norm();
         return tmp;
     }
 

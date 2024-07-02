@@ -220,7 +220,8 @@ void CIntegrator::UpdateP(Real fStep, UBOOL bCacheStaple, ESolverPhase ePhase)
     for (INT i = 0; i < m_lstActions.Num(); ++i)
     {
         //this is accumulate
-        m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), (0 == i && bCacheStaple) ? m_pStapleField.GetData() : NULL, ePhase);
+        m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), 
+            bCacheStaple ? m_pStapleField.GetData() : NULL, ePhase);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 
@@ -331,7 +332,8 @@ void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
         //this is accumulate
         if (!m_lstActions[i]->IsFermion())
         {
-            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
+            m_lstActions[i]->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), 
+                bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
         }
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -480,7 +482,8 @@ void CMultiLevelNestedIntegrator::UpdateP(Real fStep, TArray<UINT> actionList, E
         }
         else
         {
-            pAction->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
+            pAction->CalculateForce(m_pGaugeField.Num(), m_pBosonFields.Num(), m_pGaugeField.GetData(), m_pBosonFields.GetData(), m_pForceField.GetData(), m_pBosonForceFields.GetData(), 
+                bCacheStaple ? m_pStapleField.GetData() : NULL, ESP_Once);
             m_bStapleCached = CCommonData::m_bStoreStaple && bCacheStaple;
         }
         

@@ -24,17 +24,17 @@ void CMeasurePlaqutteEnergy::OnConfigurationAcceptedSingleField(const CFieldGaug
     if (NULL == pCorrespondingStaple || !CCommonData::m_bStoreStaple)
     {
 #if !_CLG_DOUBLEFLOAT
-        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergy(1.0 / _HC_SUN);
+        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergy(1.0 / GetDefaultMatrixN());
 #else
-        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergy(F(1.0) / _HC_SUN);
+        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergy(F(1.0) / GetDefaultMatrixN());
 #endif
     }
     else
     {
 #if !_CLG_DOUBLEFLOAT
-        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergyUsingStable(1.0 / _HC_SUN, pCorrespondingStaple);
+        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergyUsingStable(1.0 / GetDefaultMatrixN(), pCorrespondingStaple);
 #else
-        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergyUsingStable(F(1.0) / _HC_SUN, pCorrespondingStaple);
+        plaqutteEneregy = pAcceptGauge->CalculatePlaqutteEnergyUsingStable(F(1.0) / GetDefaultMatrixN(), pCorrespondingStaple);
 #endif
     }
     plaqutteEneregy = plaqutteEneregy / _HC_PlaqutteCount;

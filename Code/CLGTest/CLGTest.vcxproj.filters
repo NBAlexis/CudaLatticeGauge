@@ -44,6 +44,9 @@
     <ClCompile Include="Tests\TestBoson.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
+    <ClCompile Include="Tests\TestSUN.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLGTest.h" />
@@ -97,6 +100,9 @@
       <Filter>YAMLs</Filter>
     </None>
     <None Include="..\..\Bin\Debug\TestSuit_Boson.yaml">
+      <Filter>YAMLs</Filter>
+    </None>
+    <None Include="..\..\Bin\Debug\TestSuit_SUN.yaml">
       <Filter>YAMLs</Filter>
     </None>
   </ItemGroup>

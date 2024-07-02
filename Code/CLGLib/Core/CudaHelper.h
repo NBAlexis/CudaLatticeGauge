@@ -95,7 +95,6 @@ enum EConstIntId
     ECI_ActionListLength,
     ECI_FermionFieldLength,
     ECI_MeasureListLength,
-    ECI_SUN,
     ECI_ThreadConstaint,
     ECI_ThreadConstaintX,
     ECI_ThreadConstaintY,

@@ -794,9 +794,9 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
 #if !_CLG_DOUBLEFLOAT
-    const Real fBetaOverN = static_cast<Real>(CCommonData::m_fBeta / static_cast<DOUBLE>(_HC_SUN));
+    const Real fBetaOverN = static_cast<Real>(CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN()));
 #else
-    const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(_HC_SUN);
+    const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
 #endif
 
     _ZeroXYPlane(m_pDeviceDataBuffer);

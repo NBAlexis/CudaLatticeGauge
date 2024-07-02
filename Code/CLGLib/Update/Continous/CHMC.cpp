@@ -91,7 +91,9 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         //m_pOwner->FixAllFieldBoundary();
         //m_pOwner->m_pGaugeField->DebugPrintMe();
         m_pIntegrator->Prepare(bAccepted, i);
+        checkCudaErrors(cudaGetLastError());
         m_pOwner->FixAllFieldBoundary();
+        checkCudaErrors(cudaGetLastError());
 
         if (m_bMetropolis || m_bTestHDiff)
         {
@@ -171,6 +173,7 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
             bAccepted = FALSE;
         }
         m_pIntegrator->OnFinishTrajectory(bAccepted); //Here we copy the gauge field back
+        checkCudaErrors(cudaGetLastError());
 
         //If rejected, just accept the old configuration and trigger the measure
         if (bMeasure && bAccepted)

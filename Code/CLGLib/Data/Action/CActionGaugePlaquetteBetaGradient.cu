@@ -291,13 +291,13 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
     {
         if (i < m_fBetaArray.Num())
         {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<DOUBLE>(_HC_SUN);
+            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<DOUBLE>(GetDefaultMatrixN());
         }
         else
         {
             if (0 == i)
             {
-                m_fBetaArray.AddItem(5.0 / static_cast<DOUBLE>(_HC_SUN));
+                m_fBetaArray.AddItem(5.0 / static_cast<DOUBLE>(GetDefaultMatrixN()));
             }
             else
             {
@@ -311,13 +311,13 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
     {
         if (i < m_fBetaArray.Num())
         {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(_HC_SUN);
+            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(GetDefaultMatrixN());
         }
         else
         {
             if (0 == i)
             {
-                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(_HC_SUN));
+                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(GetDefaultMatrixN()));
             }
             else
             {
@@ -347,13 +347,13 @@ void CActionGaugePlaquetteGradient::SetBeta(const TArray<DOUBLE>& fBeta)
     {
         if (i < m_fBetaArray.Num())
         {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<DOUBLE>(_HC_SUN);
+            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<DOUBLE>(GetDefaultMatrixN());
         }
         else
         {
             if (0 == i)
             {
-                m_fBetaArray.AddItem(5.0 / static_cast<DOUBLE>(_HC_SUN));
+                m_fBetaArray.AddItem(5.0 / static_cast<DOUBLE>(GetDefaultMatrixN()));
             }
             else
             {
@@ -367,13 +367,13 @@ void CActionGaugePlaquetteGradient::SetBeta(const TArray<DOUBLE>& fBeta)
     {
         if (i < m_fBetaArray.Num())
         {
-            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(_HC_SUN);
+            m_fBetaArray[i] = m_fBetaArray[i] / static_cast<Real>(GetDefaultMatrixN());
         }
         else
         {
             if (0 == i)
             {
-                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(_HC_SUN));
+                m_fBetaArray.AddItem(F(5.0) / static_cast<Real>(GetDefaultMatrixN()));
             }
             else
             {

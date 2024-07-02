@@ -241,6 +241,20 @@ void CMeasure::Initial(class CMeasurementManager* pOwner, class CLatticeData* pL
     }
 }
 
+UINT CMeasure::GetDefaultMatrixN() const
+{
+    if (m_lstGaugeFieldIds.Num() > 0)
+    {
+        const CFieldGauge* gauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(m_lstGaugeFieldIds[0]));
+        if (NULL != gauge)
+        {
+            return gauge->MatrixN();
+        }
+    }
+
+    return appGetLattice()->GetDefaultSUN();
+}
+
 void CMeasure::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, const class CFieldGauge* const* pAcceptGauge, const class CFieldBoson* const* pAcceptBoson, const class CFieldGauge* const* pCorrespondingStaple)
 {
     if (1 == m_lstGaugeFieldIds.Num() && 0 == m_lstBosonFieldIds.Num())

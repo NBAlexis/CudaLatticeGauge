@@ -1607,7 +1607,7 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(_HC_SUN);
+    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
 
 #if !_CLG_DOUBLEFLOAT
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
@@ -1659,7 +1659,7 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
 void CActionGaugePlaquetteRotating::SetBeta(DOUBLE fBeta)
 {
     CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(_HC_SUN);
+    m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
 }
 
 UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
