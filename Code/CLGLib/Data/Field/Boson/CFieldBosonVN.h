@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldBosonU1NoGauge.h
+// FILENAME : CFieldBosonVN.h
 // 
 // DESCRIPTION:
 // This is the class for all boson fields
@@ -8,21 +8,19 @@
 //  [3/31/2024 nbale]
 //=============================================================================
 
-#ifndef _CFIELDBOSONU1_H_
-#define _CFIELDBOSONU1_H_
+#ifndef _CFIELDBOSONVN_H_
+#define _CFIELDBOSONVN_H_
 
 __BEGIN_NAMESPACE
 
-#if 0
-__CLG_REGISTER_HELPER_HEADER(CFieldBosonU1)
-
-class CLGAPI CFieldBosonU1 : public CFieldBoson
+template<typename deviceDataBoson, typename deviceDataGauge>
+class __DLL_EXPORT CFieldBosonVN : public CFieldBoson
 {
-    __CLGDECLARE_FIELD(CFieldBosonU1)
-
 public:
-    CFieldBosonU1();
-    ~CFieldBosonU1();
+    CFieldBosonVN();
+    ~CFieldBosonVN();
+
+    void CopyTo(CField* U) const override;
 
     /**
     * This should be momentum field
@@ -31,13 +29,6 @@ public:
 
     void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const override;
-    //void DD(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-    //void Square(const CField* pGauge, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-
-    EFieldType GetFieldType() const override
-    {
-        return EFT_BosonU1;
-    }
 
     void InitialField(EFieldInitialType eInitialType) override;
     void InitialFieldWithFile(const CCString&, EFieldFileType) override;
@@ -61,19 +52,28 @@ public:
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
 
-    CLGComplex* m_pDeviceData;
+    virtual UINT VectorN() const = 0;
+    virtual UINT FloatN() const = 0;
+
+    deviceDataBoson* m_pDeviceData;
 
     _GetData
 
-    //CCString GetInfos(const CCString& tab) const override;
-    //Real m_fCharge;
-
 };
-#endif
+
+__CLG_REGISTER_HELPER_HEADER(CFieldBosonU1)
+class CLGAPI CFieldBosonU1 : public CFieldBosonVN<CLGComplex, CLGComplex>
+{
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldBosonU1)
+public:
+    EFieldType GetFieldType() const override { return EFT_BosonU1; }
+    UINT VectorN() const { return 1; }
+    UINT FloatN() const { return 2; }
+};
 
 __END_NAMESPACE
 
-#endif //#ifndef _CFIELDBOSONU1_H_
+#endif //#ifndef _CFIELDBOSONVN_H_
 
 //=============================================================================
 // END OF FILE

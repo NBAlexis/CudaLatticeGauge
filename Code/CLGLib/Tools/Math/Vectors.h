@@ -158,6 +158,26 @@ extern "C" {
             m_ve[1] = _cuCmulf(m_ve[1], other.m_ve[1]);
         }
 
+        __device__ __inline__ deviceSU2Vector MulC(const deviceSU2Vector& other) const
+        {
+            deviceSU2Vector ret(*this);
+            ret.Mul(other);
+            return ret;
+        }
+
+        __device__ __inline__ void DaggerMul(const deviceSU2Vector& other)
+        {
+            m_ve[0] = _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]);
+            m_ve[1] = _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]);
+        }
+
+        __device__ __inline__ deviceSU2Vector DaggerMulC(const deviceSU2Vector& other) const
+        {
+            deviceSU2Vector ret(*this);
+            ret.DaggerMul(other);
+            return ret;
+        }
+
         /**
         * v = i^k v
         */
@@ -198,6 +218,13 @@ extern "C" {
         {
             m_ve[0].y = -m_ve[0].y;
             m_ve[1].y = -m_ve[1].y;
+        }
+
+        __device__ __inline__ deviceSU2Vector ConjugateC() const
+        {
+            deviceSU2Vector ret(*this);
+            ret.Conjugate();
+            return ret;
         }
 
         __device__ __inline__ deviceSU2Vector SubRealC(Real other) const { deviceSU2Vector ret(*this); ret.SubReal(other); return ret; }
@@ -364,11 +391,32 @@ extern "C" {
             m_ve[2] = _cuCmulf(m_ve[2], other);
         }
 
+        __device__ __inline__ void DaggerMul(const deviceSU3Vector& other)
+        {
+            m_ve[0] = _cuCmulf(_cuConjf(m_ve[0]), other.m_ve[0]);
+            m_ve[1] = _cuCmulf(_cuConjf(m_ve[1]), other.m_ve[1]);
+            m_ve[2] = _cuCmulf(_cuConjf(m_ve[2]), other.m_ve[2]);
+        }
+
+        __device__ __inline__ deviceSU3Vector DaggerMulC(const deviceSU3Vector& other) const
+        {
+            deviceSU3Vector ret(*this);
+            ret.DaggerMul(other);
+            return ret;
+        }
+
         __device__ __inline__ void Mul(const deviceSU3Vector& other)
         {
             m_ve[0] = _cuCmulf(m_ve[0], other.m_ve[0]);
             m_ve[1] = _cuCmulf(m_ve[1], other.m_ve[1]);
             m_ve[2] = _cuCmulf(m_ve[2], other.m_ve[2]);
+        }
+
+        __device__ __inline__ deviceSU3Vector MulC(const deviceSU3Vector& other) const
+        {
+            deviceSU3Vector ret(*this);
+            ret.Mul(other);
+            return ret;
         }
 
         /**
@@ -417,6 +465,13 @@ extern "C" {
             m_ve[0].y = -m_ve[0].y;
             m_ve[1].y = -m_ve[1].y;
             m_ve[2].y = -m_ve[2].y;
+        }
+
+        __device__ __inline__ deviceSU3Vector ConjugateC() const
+        {
+            deviceSU3Vector ret(*this);
+            ret.Conjugate();
+            return ret;
         }
 
         __device__ __inline__ deviceSU3Vector SubRealC(Real other) const { deviceSU3Vector ret(*this); ret.SubReal(other); return ret; }

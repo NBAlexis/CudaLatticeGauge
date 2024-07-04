@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldBoundaryGaugeSUN.h
+// FILENAME : CFieldBoundaryOne.h
 // 
 // DESCRIPTION:
 //
@@ -8,8 +8,8 @@
 //  [07/03/2024 nbale]
 //=============================================================================
 
-#ifndef _CFIELDBOUNDARYGAUGESUN_H_
-#define _CFIELDBOUNDARYGAUGESUN_H_
+#ifndef _CFIELDBOUNDARYONE_H_
+#define _CFIELDBOUNDARYONE_H_
 
 __BEGIN_NAMESPACE
 
@@ -18,65 +18,88 @@ __BEGIN_NAMESPACE
 /**
 * It is more convinient NOT to inhirent from CField.
 */
-template<INT N, INT NoE>
-class __DLL_EXPORT CFieldBoundaryGaugeSUN : public CFieldBoundary
+template<typename deviceData>
+class __DLL_EXPORT CFieldBoundaryOne : public CFieldBoundary
 {
 public:
 
-    CFieldBoundaryGaugeSUN();
-    ~CFieldBoundaryGaugeSUN();
-
-    EFieldType GetFieldType() const override { return EFT_GaugeSUN; }
+    CFieldBoundaryOne();
+    ~CFieldBoundaryOne();
 
     void InitialField(CParameters& param) override;
 
-    deviceSUN<N, NoE>* m_pDeviceData;
+    deviceData* m_pDeviceData;
 };
 
+__CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeU1)
+__CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU2)
+__CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU3)
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU4)
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU5)
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU6)
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU7)
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundaryGaugeSU8)
 
-class CLGAPI CFieldBoundaryGaugeSU4 : public CFieldBoundaryGaugeSUN<4, 16>
+class CLGAPI CFieldBoundaryGaugeU1 : public CFieldBoundaryOne<CLGComplex>
+{
+    __CLGDECLARE_CLASS(CFieldBoundaryGaugeU1)
+public:
+    EFieldType GetFieldType() const override { return EFT_GaugeU1; }
+};
+
+class CLGAPI CFieldBoundaryGaugeSU2 : public CFieldBoundaryOne<deviceSU2>
+{
+    __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU2)
+public:
+    EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
+};
+
+class CLGAPI CFieldBoundaryGaugeSU3 : public CFieldBoundaryOne<deviceSU3>
+{
+    __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU3)
+public:
+    EFieldType GetFieldType() const override { return EFT_GaugeSU3; }
+};
+
+class CLGAPI CFieldBoundaryGaugeSU4 : public CFieldBoundaryOne<deviceSU4>
 {
     __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU4)
 public:
     EFieldType GetFieldType() const override { return EFT_GaugeSU4; }
 };
 
-class CLGAPI CFieldBoundaryGaugeSU5 : public CFieldBoundaryGaugeSUN<5, 32>
+class CLGAPI CFieldBoundaryGaugeSU5 : public CFieldBoundaryOne<deviceSU5>
 {
     __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU5)
 public:
     EFieldType GetFieldType() const override { return EFT_GaugeSU5; }
 };
 
-class CLGAPI CFieldBoundaryGaugeSU6 : public CFieldBoundaryGaugeSUN<6, 64>
+class CLGAPI CFieldBoundaryGaugeSU6 : public CFieldBoundaryOne<deviceSU6>
 {
     __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU6)
 public:
     EFieldType GetFieldType() const override { return EFT_GaugeSU6; }
 };
 
-class CLGAPI CFieldBoundaryGaugeSU7 : public CFieldBoundaryGaugeSUN<7, 64>
+class CLGAPI CFieldBoundaryGaugeSU7 : public CFieldBoundaryOne<deviceSU7>
 {
     __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU7)
 public:
     EFieldType GetFieldType() const override { return EFT_GaugeSU7; }
 };
 
-class CLGAPI CFieldBoundaryGaugeSU8 : public CFieldBoundaryGaugeSUN<8, 64>
+class CLGAPI CFieldBoundaryGaugeSU8 : public CFieldBoundaryOne<deviceSU8>
 {
     __CLGDECLARE_CLASS(CFieldBoundaryGaugeSU8)
 public:
     EFieldType GetFieldType() const override { return EFT_GaugeSU8; }
 };
 
+
 __END_NAMESPACE
 
-#endif //#ifndef _CFIELDBOUNDARYGAUGESUN_H_
+#endif //#ifndef _CFIELDBOUNDARYONE_H_
 
 //=============================================================================
 // END OF FILE

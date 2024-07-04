@@ -124,7 +124,7 @@ static __device__ __inline__ const deviceSUN<N, NofE>& _deviceGetGaugeBCSUN(
     const SIndex& idx)
 {
     return idx.IsDirichlet() ?
-        ((CFieldBoundaryGaugeSUN<N, NofE>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundaryOne<deviceSUN<N, NofE>>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -143,7 +143,7 @@ static __device__ __inline__ const deviceSUN<N, NofE>& _deviceGetGaugeBCSUNDir(
 {
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundaryOne<deviceSUN<N, NofE>>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
         ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
@@ -180,7 +180,7 @@ static __device__ __inline__ deviceSUN<N, NofE> _deviceGetGaugeBCSUNDirSIndex(
     BYTE byFieldId)
 {
     deviceSUN<N, NofE> ret = idx.IsDirichlet() ?
-        ((CFieldBoundaryGaugeSUN<N, NofE>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundaryOne<deviceSUN<N, NofE>>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];

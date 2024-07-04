@@ -49,12 +49,10 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonU1.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.h" />
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h" />
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.h" />
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.h" />
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h" />
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h" />
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryZero.h" />
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldBoson.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
@@ -159,6 +157,7 @@
     <ClInclude Include="Tools\Math\CLGFFT.h" />
     <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h" />
     <ClInclude Include="Tools\Math\CRationalApproximation.h" />
+    <ClInclude Include="Tools\Math\DeviceInlineTemplate.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
@@ -193,9 +192,9 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonU1.cu" />
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.cu" />
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.cu" />
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu" />
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu" />
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu" />
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
@@ -282,8 +281,6 @@
     <ClCompile Include="Data\Field\CField.cpp" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu" />
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.cu" />
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Lattice\CIndexData.cu" />
     <CudaCompile Include="Data\Lattice\CLatticeData.cu">
       <FileType>Document</FileType>

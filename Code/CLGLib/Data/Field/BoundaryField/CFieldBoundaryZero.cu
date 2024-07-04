@@ -16,50 +16,46 @@ __BEGIN_NAMESPACE
 /**
 * Initial SU3 Field with a value
 */
-template<INT N, INT NoE>
+template<typename deviceData>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialSUNFeield_Identity(deviceSUN<N, NoE> *pDevicePtr)
+_kernelInitialBoundaryFeield_Zero(deviceData*pDevicePtr)
 {
     const UINT uiSiteIndex = threadIdx.x;
     const UINT uiBoundIndex = threadIdx.y;
 
-    pDevicePtr[uiSiteIndex * _DC_Dir + uiBoundIndex] = deviceSUN<N, NoE>::makeSUNId();
+    pDevicePtr[uiSiteIndex * _DC_Dir + uiBoundIndex] = _makeZero<deviceData>();
 }
 
 
 #pragma endregion
 
 
-template<INT N, INT NoE>
-CFieldBoundaryGaugeSUN<N, NoE>::CFieldBoundaryGaugeSUN() : CFieldBoundary()
+template<typename deviceData>
+CFieldBoundaryZero<deviceData>::CFieldBoundaryZero() : CFieldBoundary()
 {
     //8 faces and 4 directions
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceSUN<N, NoE>) * 8 * _HC_Dir));
+    checkCudaErrors(cudaMalloc((void**)&m_pDeviceData, sizeof(deviceData) * 8 * _HC_Dir));
 }
 
-template<INT N, INT NoE>
-CFieldBoundaryGaugeSUN<N, NoE>::~CFieldBoundaryGaugeSUN()
+template<typename deviceData>
+CFieldBoundaryZero<deviceData>::~CFieldBoundaryZero()
 {
     checkCudaErrors(cudaFree(m_pDeviceData));
 }
 
-template<INT N, INT NoE>
-void CFieldBoundaryGaugeSUN<N, NoE>::InitialField(CParameters& param)
+template<typename deviceData>
+void CFieldBoundaryZero<deviceData>::InitialField(CParameters& param)
 {
     CFieldBoundary::InitialField(param);
 
     //we currently, only support identity
     dim3 block(1, 1, 1);
     dim3 thread(8, _HC_Dir, 1);
-    _kernelInitialSUNFeield_Identity << <block, thread >> > (m_pDeviceData);
+    _kernelInitialBoundaryFeield_Zero << <block, thread >> > (m_pDeviceData);
 }
 
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU4)
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU5)
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU6)
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU7)
-__CLGIMPLEMENT_CLASS(CFieldBoundaryGaugeSU8)
-
+__CLGIMPLEMENT_CLASS(CFieldBoundarySU3Vector)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryWilsonSquareSU3)
 
 __END_NAMESPACE
 

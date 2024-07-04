@@ -49,7 +49,7 @@ _kernelStaticPotentialCorrelatorOfSiteSUN(
 
     if (uiC < uiMax)
     {
-        CLGComplex correlatorres = _cuCmulf(_cToFloat(traceXYZ[uiXYZ]), _cuConjf(_cToFloat(traceXYZ[uiCenter])));
+        CLGComplex correlatorres = _cuCmulf(_cToRealC(traceXYZ[uiXYZ]), _cuConjf(_cToRealC(traceXYZ[uiCenter])));
         atomicAdd(&counter[uiC], 1);
         atomicAdd(&correlator[uiC].x, correlatorres.x);
         atomicAdd(&correlator[uiC].y, correlatorres.y);
@@ -87,7 +87,7 @@ _kernelStaticPotentialCorrelatorOfSite2SUN(
 
     if (uiC < uiMax)
     {
-        CLGComplex correlatorres = _cuCmulf(_cToFloat(traceXYZ[uiXYZ1]), _cuConjf(_cToFloat(traceXYZ[uiXYZ2])));
+        CLGComplex correlatorres = _cuCmulf(_cToRealC(traceXYZ[uiXYZ1]), _cuConjf(_cToRealC(traceXYZ[uiXYZ2])));
         atomicAdd(&counter[uiC], 1);
         atomicAdd(&correlator[uiC].x, correlatorres.x);
         atomicAdd(&correlator[uiC].y, correlatorres.y);
@@ -197,7 +197,7 @@ void CMeasurePolyakov2::OnConfigurationAcceptedSingleField(const class CFieldGau
     checkCudaErrors(cudaMemcpy(m_pHostCorrelatorCounter, m_pCorrelatorCounter, sizeof(UINT) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaMemcpy(m_pHostCorrelator, m_pCorrelator, sizeof(CLGComplex) * m_uiMaxLengthSq, cudaMemcpyDeviceToHost));
 
-    CLGComplex res = _cToFloat(appGetCudaHelper()->ReduceComplex(m_pTraceRes, _HC_Lx * _HC_Ly * _HC_Lz));
+    CLGComplex res = _cToRealC(appGetCudaHelper()->ReduceComplex(m_pTraceRes, _HC_Lx * _HC_Ly * _HC_Lz));
     const UINT uiSiteNumber = appGetLattice()->m_pIndexCache->m_uiSiteXYZ;
     res.x = res.x / uiSiteNumber;
     res.y = res.y / uiSiteNumber;

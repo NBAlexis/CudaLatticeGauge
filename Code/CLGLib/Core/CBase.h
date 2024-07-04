@@ -48,6 +48,17 @@ virtual CField* GetCopy() const \
 } \
 protected:
 
+#define __CLGDECLARE_FIELDWITHOUTCOPYTO(class_name) \
+__CLGDECLARE_CLASS(class_name) \
+public: \
+virtual CField* GetCopy() const \
+{ \
+    class_name* ret = new class_name(); \
+    CopyTo(ret); \
+    return ret; \
+} \
+protected:
+
 //In Ubuntu, we are using static-link, see the problem at
 //https://stackoverflow.com/questions/4767925/how-to-force-gcc-to-link-unreferenced-static-c-objects-from-a-library
 //Tested that, the helper must be outside of the class

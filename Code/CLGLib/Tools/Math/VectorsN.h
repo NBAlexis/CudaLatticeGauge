@@ -185,6 +185,28 @@ public:
         }
     }
 
+    __device__ __inline__ deviceSUNVector<N, NofE> MulC(const deviceSUNVector<N, NofE>& other) const
+    {
+        deviceSUNVector<N, NofE> ret(*this);
+        ret.Mul(other);
+        return ret;
+    }
+
+    __device__ __inline__ void DaggerMul(const deviceSUNVector<N, NofE>& other)
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = _cuCmulf(_cuConjf(m_ve[i]), other.m_ve[i]);
+        }
+    }
+
+    __device__ __inline__ deviceSUNVector<N, NofE> DaggerMulC(const deviceSUNVector<N, NofE>& other) const
+    {
+        deviceSUNVector<N, NofE> ret(*this);
+        ret.DaggerMul(other);
+        return ret;
+    }
+
     /**
     * v = i^k v
     */
@@ -234,6 +256,13 @@ public:
         {
             m_ve[i].y = -m_ve[i].y;
         }
+    }
+
+    __device__ __inline__ deviceSUNVector<N, NofE> ConjugateC() const
+    {
+        deviceSUNVector<N, NofE> ret(*this);
+        ret.Conjugate();
+        return ret;
     }
 
     __device__ __inline__ deviceSUNVector<N, NofE> SubRealC(Real other) const { deviceSUNVector<N, NofE> ret(*this); ret.SubReal(other); return ret; }

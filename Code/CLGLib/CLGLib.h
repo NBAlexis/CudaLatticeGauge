@@ -219,10 +219,12 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/BoundaryField/CFieldBoundary.h"
 
 #include "Data/Field/Gauge/CFieldGauge.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU2.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSUN.h"
+//#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h"
+//#include "Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h"
+//#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSU2.h"
+//#include "Data/Field/BoundaryField/CFieldBoundaryGaugeSUN.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryZero.h"
+#include "Data/Field/BoundaryField/CFieldBoundaryOne.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3D.h"
 #include "Data/Field/Gauge/CFieldGaugeU1.h"
@@ -238,7 +240,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 
 #include "Data/Field/CFieldFermion.h"
 #include "Data/Field/Staggered/CFieldFermionKS.h"
-#include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
+//#include "Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3D.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3DR.h"
@@ -266,6 +268,7 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 
 #include "Data/Field/CFieldBoson.h"
 #include "Data/Field/Boson/CFieldBosonU1.h"
+#include "Data/Field/Boson/CFieldBosonVN.h"
 
 //=====================================================
 
@@ -337,6 +340,8 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "GaugeFixing/CGaugeFixingLandauLosAlamos.h"
 #include "GaugeFixing/CGaugeFixingCoulombLosAlamos.h"
 #include "GaugeFixing/CGaugeFixingRandom.h"
+
+#include "Tools/Math/DeviceInlineTemplate.h"
 
 #include "Update/CUpdator.h"
 #include "Update/Continous/CIntegrator.h"

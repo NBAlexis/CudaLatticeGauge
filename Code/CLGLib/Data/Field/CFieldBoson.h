@@ -60,7 +60,6 @@ public:
      */
     virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
     virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
-    virtual void FieldMultply(const CFieldBoson* x, UBOOL bConj = TRUE) = 0;
 
     UINT GetSiteCount() const { return m_uiSiteCount; }
 

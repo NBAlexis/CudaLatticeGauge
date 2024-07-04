@@ -223,6 +223,24 @@ typedef cuComplex CLGComplex;
 
 #endif
 
+static __host__ __device__ __inline__ CLGComplex _cToRealC(const cuDoubleComplex& c)
+{
+#if _CLG_DOUBLEFLOAT
+    return c;
+#else
+    return _cToFloat(c);
+#endif
+}
+
+static __host__ __device__ __inline__ CLGComplex _cToRealC(const cuComplex& c)
+{
+#if _CLG_DOUBLEFLOAT
+    return _cToDouble(c);
+#else
+    return c;
+#endif
+}
+
 __END_NAMESPACE
 
 #endif//#ifndef _CLGFLOAT_H_

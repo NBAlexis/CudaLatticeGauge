@@ -266,12 +266,6 @@
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h">
       <Filter>Data\Field\BoundaryField</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.h">
-      <Filter>Data\Field\BoundaryField</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.h">
-      <Filter>Data\Field\BoundaryField</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Lattice\CIndexData.h">
       <Filter>Data\Lattice</Filter>
     </ClInclude>
@@ -391,9 +385,6 @@
     </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h">
       <Filter>Data\Action</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.h">
-      <Filter>Data\Field\BoundaryField</Filter>
     </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h">
       <Filter>Data\Action</Filter>
@@ -545,11 +536,17 @@
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU2.h">
       <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.h">
+    <ClInclude Include="Tools\Math\DeviceInlineTemplate.h">
+      <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h">
       <Filter>Data\Field\BoundaryField</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.h">
+    <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryZero.h">
       <Filter>Data\Field\BoundaryField</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h">
+      <Filter>Data\Field\Boson</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -703,12 +700,6 @@
     <CudaCompile Include="Tools\Math\CLinearAlgebraHelper.cu">
       <Filter>Tools\Math</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU3.cu">
-      <Filter>Data\Field\BoundaryField</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryWilsonSquareSU3.cu">
-      <Filter>Data\Field\BoundaryField</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Boundary\CBoundaryConditionPeriodicAndDirichletSquare.cu">
       <Filter>Data\Boundary</Filter>
     </CudaCompile>
@@ -795,9 +786,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeU1.cu">
-      <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu">
       <Filter>Data\Action</Filter>
@@ -925,11 +913,14 @@
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSU2.cu">
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu">
       <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryGaugeSUN.cu">
+    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu">
       <Filter>Data\Field\BoundaryField</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu">
+      <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

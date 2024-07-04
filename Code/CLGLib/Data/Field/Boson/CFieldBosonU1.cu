@@ -12,6 +12,8 @@
 
 __BEGIN_NAMESPACE
 
+#if 0
+
 __CLGIMPLEMENT_CLASS(CFieldBosonU1)
 
 #pragma region kernel D and force
@@ -632,25 +634,25 @@ void CFieldBosonU1::ScalarMultply(Real a)
     _kernelScalarMultiplyRealBoson << <block, threads >> > (m_pDeviceData, a);
 }
 
-void CFieldBosonU1::FieldMultply(const CFieldBoson* x, UBOOL bConj)
-{
-    if (NULL == x || EFT_BosonU1 != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonU1* pField = dynamic_cast<const CFieldBosonU1*>(x);
-
-    preparethread;
-    if (bConj)
-    {
-        _kernelConjMulBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
-    }
-    else
-    {
-        _kernelMulBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
-    }
-}
+//void CFieldBosonU1::FieldMultply(const CFieldBoson* x, UBOOL bConj)
+//{
+//    if (NULL == x || EFT_BosonU1 != x->GetFieldType())
+//    {
+//        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
+//        return;
+//    }
+//    const CFieldBosonU1* pField = dynamic_cast<const CFieldBosonU1*>(x);
+//
+//    preparethread;
+//    if (bConj)
+//    {
+//        _kernelConjMulBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+//    }
+//    else
+//    {
+//        _kernelMulBoson << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
+//    }
+//}
 
 void CFieldBosonU1::Dagger()
 {
@@ -695,6 +697,7 @@ void CFieldBosonU1::MakeRandomMomentum()
 //    sRet = sRet + tab + _T("Charge : ") + appToString(m_fCharge) + _T("\n");
 //    return sRet;
 //}
+#endif
 
 __END_NAMESPACE
 
