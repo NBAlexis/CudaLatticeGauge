@@ -44,9 +44,14 @@ public:
     }
 
     void Report() override;
+    void Reset() override;
+    void Average() override;
 
     UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
+
+    TArray<TArray<DOUBLE>> m_lstElement;
+    TArray<DOUBLE> m_lstAverageElement;
 
 };
 

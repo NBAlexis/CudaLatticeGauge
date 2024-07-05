@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasureBerryPhase.cpp
+// FILENAME : CMeasureBerryPhase.cu
 // 
 // DESCRIPTION:
 // This is the class for one measurement
@@ -9,6 +9,9 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "CMeasureBerryPhase.h"
 
 __BEGIN_NAMESPACE
 

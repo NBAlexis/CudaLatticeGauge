@@ -11,6 +11,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldFermionWilsonSquareSU3.h"
 
 __BEGIN_NAMESPACE
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldFermionKSSU3R.cu
+// FILENAME : CFieldFermionKSSU3P4.cu
 // 
 // DESCRIPTION:
 // 
@@ -7,8 +7,8 @@
 // REVISION:
 //  [09/23/2020 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "CFieldFermionKSSU3P4.h"
 
 __BEGIN_NAMESPACE
 

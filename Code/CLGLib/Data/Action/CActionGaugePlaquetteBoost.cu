@@ -8,7 +8,7 @@
 //  [07/27/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "CActionGaugePlaquetteBoost.h"
 
 __BEGIN_NAMESPACE
 

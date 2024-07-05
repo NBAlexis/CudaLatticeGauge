@@ -19,6 +19,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldGaugeSUN.h"
 
 __BEGIN_NAMESPACE
 

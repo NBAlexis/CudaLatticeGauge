@@ -22,6 +22,8 @@
 
 __BEGIN_NAMESPACE
 
+#if 0
+
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU2)
 
 #pragma region Kernels
@@ -1259,6 +1261,8 @@ void CFieldGaugeSU2::CopyTo(CField* pTarget) const
     CFieldGaugeSU2* pTargetField = dynamic_cast<CFieldGaugeSU2*>(pTarget);
     checkCudaErrors(cudaMemcpy(pTargetField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU2) * m_uiLinkeCount, cudaMemcpyDeviceToDevice));
 }
+
+#endif
 
 __END_NAMESPACE
 

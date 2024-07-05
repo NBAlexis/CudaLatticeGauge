@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasureTopologicChargeXY.h"
 
 __BEGIN_NAMESPACE
 

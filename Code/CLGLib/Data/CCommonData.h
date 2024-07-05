@@ -128,12 +128,9 @@ enum
 __DEFINE_ENUM(EFieldType,
 
     EFT_GaugeSU3,
-    EFT_FermionWilsonSquareSU3,
-    EFT_FermionStaggeredSU3,
-    EFT_FermionStaggeredU1,
+
     EFT_GaugeU1,
     EFT_GaugeReal,
-    EFT_BosonU1,
 
     EFT_GaugeSU2,
     EFT_GaugeSUN,
@@ -142,6 +139,19 @@ __DEFINE_ENUM(EFieldType,
     EFT_GaugeSU6,
     EFT_GaugeSU7,
     EFT_GaugeSU8,
+
+    EFT_FermionWilsonSquareSU3,
+    EFT_FermionStaggeredSU3,
+    EFT_FermionStaggeredU1,
+
+    EFT_BosonComplex,
+    EFT_BosonComplexVector2,
+    EFT_BosonComplexVector3,
+    EFT_BosonComplexVector4,
+    EFT_BosonComplexVector5,
+    EFT_BosonComplexVector6,
+    EFT_BosonComplexVector7,
+    EFT_BosonComplexVector8,
 
     EFT_Max,
     EFT_ForceDword = 0x7fffffff,

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CGaugeFixingLandauLosAlamos.cpp
+// FILENAME : CGaugeFixingCoulombLosAlamos.cpp
 // 
 // DESCRIPTION:
 //
@@ -8,6 +8,7 @@
 //  [09/23/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CGaugeFixingCoulombLosAlamos.h"
 
 __BEGIN_NAMESPACE
 

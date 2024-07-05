@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
-
+#include "CFieldFermionWilsonSquareSU3D.h"
 
 __BEGIN_NAMESPACE
 

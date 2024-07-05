@@ -48,7 +48,6 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.h" />
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
-    <ClInclude Include="Data\Field\Boson\CFieldBosonU1.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h" />
@@ -58,6 +57,7 @@
     <ClInclude Include="Data\Field\CFieldFermion.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGauge.h" />
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeLink.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU2.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3D.h" />
@@ -157,6 +157,7 @@
     <ClInclude Include="Tools\Math\CLGFFT.h" />
     <ClInclude Include="Tools\Math\CLinearAlgebraHelper.h" />
     <ClInclude Include="Tools\Math\CRationalApproximation.h" />
+    <ClInclude Include="Tools\Math\DeviceInlineSU3.h" />
     <ClInclude Include="Tools\Math\DeviceInlineTemplate.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
@@ -191,11 +192,11 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3D.cu" />

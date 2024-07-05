@@ -509,9 +509,6 @@
     <ClInclude Include="Data\Field\CFieldBoson.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Boson\CFieldBosonU1.h">
-      <Filter>Data\Field\Boson</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionPhi4.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
@@ -547,6 +544,12 @@
     </ClInclude>
     <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h">
       <Filter>Data\Field\Boson</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeLink.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceInlineSU3.h">
+      <Filter>Tools\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -901,9 +904,6 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonU1.cu">
-      <Filter>Data\Field\Boson</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSUN.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
@@ -921,6 +921,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu">
       <Filter>Data\Field\Boson</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu">
+      <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

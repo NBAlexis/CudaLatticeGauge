@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CActionGaugePlaquetteGradient.cpp
+// FILENAME : CActionGaugePlaquetteBetaGradient.cpp
 // 
 // DESCRIPTION:
 // This is the class for all fields, gauge, fermion and spin fields are inherent from it
@@ -8,7 +8,7 @@
 //  [08/15/2022 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "CActionGaugePlaquetteBetaGradient.h"
 
 __BEGIN_NAMESPACE
 

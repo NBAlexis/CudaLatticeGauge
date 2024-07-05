@@ -8,6 +8,7 @@
 // REVISION:
 //  [08/27/2023 nbale]
 //=============================================================================
+#include "CFieldFermionWilsonSquareSU3D.h"
 
 #ifndef _CFIELDFERMIONWILSONSQUARESU3GAMMA_H_
 #define _CFIELDFERMIONWILSONSQUARESU3GAMMA_H_

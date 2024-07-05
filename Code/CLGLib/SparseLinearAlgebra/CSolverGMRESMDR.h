@@ -7,6 +7,7 @@
 // REVISION:
 //  [03/24/2019 nbale]
 //=============================================================================
+#include "CSolverGCRODR.h"
 
 #ifndef _CSOLVERGMRESMDR_H_
 #define _CSOLVERGMRESMDR_H_

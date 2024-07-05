@@ -8,6 +8,8 @@
 //  [07/03/2024 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineTemplate.h"
+#include "CFieldBoundaryZero.h"
 
 __BEGIN_NAMESPACE
 

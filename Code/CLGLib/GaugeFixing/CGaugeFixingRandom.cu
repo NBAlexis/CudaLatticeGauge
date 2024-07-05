@@ -8,6 +8,9 @@
 //  [09/25/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "CGaugeFixingRandom.h"
 
 __BEGIN_NAMESPACE
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldGaugeU1.cu
+// FILENAME : CFieldGaugeU1Real.cu
 // 
 // DESCRIPTION:
 // This is the device implementations of gauge SU3
@@ -19,6 +19,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldGaugeU1.h"
+#include "CFieldGaugeU1Real.h"
 
 __BEGIN_NAMESPACE
 
@@ -1189,7 +1191,7 @@ void CFieldGaugeU1Real::InitialU1Real(EU1RealType eChemicalType, EU1RealType eET
 
 }
 
-void CFieldGaugeU1Real::InitialWithByteCompressed(BYTE* byData)
+void CFieldGaugeU1Real::InitialWithByteCompressed(const CCString& sFileName)
 {
     appCrucial(_T("U1 InitialWithByteCompressed Not supported!\n"));
     _FAIL_EXIT;

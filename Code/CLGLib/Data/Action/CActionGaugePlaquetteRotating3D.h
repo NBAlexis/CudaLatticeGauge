@@ -9,6 +9,7 @@
 // REVISION:
 //  [27/10/2022 nbale]
 //=============================================================================
+#include "CActionGaugePlaquetteRotating.h"
 
 #ifndef _CACTIONGAUGEPLAQUETTE_ROTATING3D_H_
 #define _CACTIONGAUGEPLAQUETTE_ROTATING3D_H_

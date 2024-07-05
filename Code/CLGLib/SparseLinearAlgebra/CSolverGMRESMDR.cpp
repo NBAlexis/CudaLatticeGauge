@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CSLASolverGMRESMDR.cpp
+// FILENAME : CSolverGMRESMDR.cpp
 // 
 // DESCRIPTION:
 // This is the class for GMRES Solver
@@ -8,6 +8,7 @@
 //  [03/24/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CSolverGMRESMDR.h"
 
 __BEGIN_NAMESPACE
 

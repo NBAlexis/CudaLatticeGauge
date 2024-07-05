@@ -8,6 +8,7 @@
 //  [12/8/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorLeapFrog.h"
 
 __BEGIN_NAMESPACE
 

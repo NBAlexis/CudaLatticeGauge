@@ -8,6 +8,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldGaugeSU3D.h"
 
 __BEGIN_NAMESPACE
 

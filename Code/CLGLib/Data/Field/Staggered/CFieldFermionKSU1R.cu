@@ -7,8 +7,8 @@
 // REVISION:
 //  [10/03/2021 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "CFieldFermionKSU1R.h"
 
 __BEGIN_NAMESPACE
 

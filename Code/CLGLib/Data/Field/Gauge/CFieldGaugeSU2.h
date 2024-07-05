@@ -13,6 +13,8 @@
 
 __BEGIN_NAMESPACE
 
+#if 0
+
 __CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU2)
 
 class CLGAPI CFieldGaugeSU2 : public CFieldGauge
@@ -558,6 +560,8 @@ static __device__ __inline__ Real _deviceCloverRetrSU2(const deviceSU2* __restri
 }
 
 #pragma endregion
+
+#endif
 
 __END_NAMESPACE
 

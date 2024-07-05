@@ -8,6 +8,7 @@
 //  [03/05/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorForceGradient.h"
 
 __BEGIN_NAMESPACE
 

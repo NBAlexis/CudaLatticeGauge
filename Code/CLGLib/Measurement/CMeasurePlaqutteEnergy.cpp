@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasurePlaqutteEnergy.h"
 
 __BEGIN_NAMESPACE
 

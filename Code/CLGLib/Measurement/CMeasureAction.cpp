@@ -7,8 +7,8 @@
 // REVISION:
 //  [10/06/2019 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "CMeasureAction.h"
 
 __BEGIN_NAMESPACE
 

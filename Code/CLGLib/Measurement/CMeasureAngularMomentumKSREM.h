@@ -7,6 +7,7 @@
 // REVISION:
 //  [08/15/2022 nbale]
 //=============================================================================
+#include "CMeasureAngularMomentumKS.h"
 
 #ifndef _CMEASUREANGULARMOMENTUMKSREM_H_
 #define _CMEASUREANGULARMOMENTUMKSREM_H_

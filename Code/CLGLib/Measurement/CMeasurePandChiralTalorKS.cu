@@ -9,6 +9,9 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "CMeasurePandChiralTalor.h"
+#include "CMeasurePandChiralTalorKS.h"
 
 __BEGIN_NAMESPACE
 

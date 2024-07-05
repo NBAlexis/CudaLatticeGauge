@@ -8,7 +8,8 @@
 //  [02/06/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "CActionFermionWilsonNf2.h"
 
 __BEGIN_NAMESPACE
 

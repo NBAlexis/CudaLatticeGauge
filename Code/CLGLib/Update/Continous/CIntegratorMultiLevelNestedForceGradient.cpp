@@ -8,6 +8,7 @@
 //  [08/17/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorMultiLevelNestedForceGradient.h"
 
 __BEGIN_NAMESPACE
 

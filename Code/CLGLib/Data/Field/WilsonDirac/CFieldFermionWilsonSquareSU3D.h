@@ -8,6 +8,7 @@
 // REVISION:
 //  [05/18/2019 nbale]
 //=============================================================================
+#include "CFieldFermionWilsonSquareSU3.h"
 
 #ifndef _CFIELDFERMIONWILSONSQUARESU3D_H_
 #define _CFIELDFERMIONWILSONSQUARESU3D_H_
@@ -57,27 +58,6 @@ protected:
 };
 
 
-#pragma region device functions
-
-static __device__ __inline__ deviceWilsonVectorSU3 _deviceGetFermionBCWilsonSU3(
-    const deviceWilsonVectorSU3* __restrict__ pBuffer,
-    const SIndex& idx,
-    BYTE byFieldId)
-{
-    return idx.IsDirichlet() ?
-        deviceWilsonVectorSU3::makeZeroWilsonVectorSU3()
-        : pBuffer[idx.m_uiSiteIndex];
-}
-
-static __device__ __inline__ const deviceWilsonVectorSU3& _deviceGetFermionBCWilsonSU3T(
-    const deviceWilsonVectorSU3* __restrict__ pBuffer,
-    const SIndex& idx,
-    BYTE byFieldId)
-{
-    return pBuffer[idx.m_uiSiteIndex];
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 

@@ -178,6 +178,19 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ void MulDagger(const deviceSU2Vector& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], _cuConjf(other.m_ve[0]));
+            m_ve[1] = _cuCmulf(m_ve[1], _cuConjf(other.m_ve[1]));
+        }
+
+        __device__ __inline__ deviceSU2Vector MulDaggerC(const deviceSU2Vector& other) const
+        {
+            deviceSU2Vector ret(*this);
+            ret.MulDagger(other);
+            return ret;
+        }
+
         /**
         * v = i^k v
         */
@@ -402,6 +415,20 @@ extern "C" {
         {
             deviceSU3Vector ret(*this);
             ret.DaggerMul(other);
+            return ret;
+        }
+
+        __device__ __inline__ void MulDagger(const deviceSU3Vector& other)
+        {
+            m_ve[0] = _cuCmulf(m_ve[0], _cuConjf(other.m_ve[0]));
+            m_ve[1] = _cuCmulf(m_ve[1], _cuConjf(other.m_ve[1]));
+            m_ve[2] = _cuCmulf(m_ve[2], _cuConjf(other.m_ve[2]));
+        }
+
+        __device__ __inline__ deviceSU3Vector MulDaggerC(const deviceSU3Vector& other) const
+        {
+            deviceSU3Vector ret(*this);
+            ret.MulDagger(other);
             return ret;
         }
 

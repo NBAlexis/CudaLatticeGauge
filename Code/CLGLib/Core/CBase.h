@@ -4,6 +4,8 @@
 // DESCRIPTION:
 // This is a simple RTTI implementation, can be use for serialize or factory etc
 // Now, only for factory... Not necessary to implement a full version
+// 
+// Since c++ 11, the virtual is replaced with override
 //
 // REVISION:
 //  [12/14/2018 nbale]
@@ -28,7 +30,7 @@ struct __DLL_EXPORT class##class_name : public ClassList \
 static class##class_name m_StaticClass; \
 static CClass * StaticClass(void) { return &m_StaticClass; } \
 static CBase* _StaticCreateObject() { return new class_name(); } \
-virtual const CClass* GetClass() const \
+const CClass* GetClass() const override \
 { return &class_name::m_StaticClass; } \
 protected:
 
@@ -39,8 +41,8 @@ protected:
 #define __CLGDECLARE_FIELD(class_name) \
 __CLGDECLARE_CLASS(class_name) \
 public: \
-virtual void CopyTo(CField* U) const; \
-virtual CField* GetCopy() const \
+void CopyTo(CField* U) const override; \
+CField* GetCopy() const override \
 { \
     class_name* ret = new class_name(); \
     CopyTo(ret); \
@@ -51,7 +53,7 @@ protected:
 #define __CLGDECLARE_FIELDWITHOUTCOPYTO(class_name) \
 __CLGDECLARE_CLASS(class_name) \
 public: \
-virtual CField* GetCopy() const \
+CField* GetCopy() const override \
 { \
     class_name* ret = new class_name(); \
     CopyTo(ret); \

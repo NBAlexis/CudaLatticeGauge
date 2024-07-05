@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasurePolyakov.cu
+// FILENAME : CMeasurePolyakovSUN.cu
 // 
 // DESCRIPTION:
 //
@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasurePolyakovSUN.h"
 
 __BEGIN_NAMESPACE
 

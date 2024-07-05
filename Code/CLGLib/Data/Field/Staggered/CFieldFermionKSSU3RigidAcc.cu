@@ -7,8 +7,9 @@
 // REVISION:
 //  [12/27/2023 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "CFieldFermionKSSU3Gamma.h"
+#include "CFieldFermionKSSU3RigidAcc.h"
 
 __BEGIN_NAMESPACE
 

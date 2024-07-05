@@ -9,6 +9,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineTemplate.h"
+#include "CFieldBosonVN.h"
 
 __BEGIN_NAMESPACE
 
@@ -91,7 +93,7 @@ _kernelDBosonForceVN(
 {
     intokernaldir;
 
-    deviceDataBoson phi_dagger = _daggerC(pBoson[uiSiteIndex]);
+    const deviceDataBoson& phi_dagger = pBoson[uiSiteIndex];
 
     //idir = mu
     for (UINT idir = 0; idir < uiDir; ++idir)
@@ -106,7 +108,7 @@ _kernelDBosonForceVN(
         const deviceDataGauge& x_Gauge_element = pGauge[linkIndex];
 
         //U phi(n+mu)phi^+(n)
-        deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(_mulVec<deviceDataGauge, deviceDataBoson>(x_Gauge_element, phi_p_mu), phi_dagger);
+        deviceDataGauge forceOfThisLink = _makeContract<deviceDataGauge, deviceDataBoson>(phi_dagger, _mulVec<deviceDataGauge, deviceDataBoson>(x_Gauge_element, phi_p_mu));
 
         //TA
         //pForce[linkIndex] = _cuCsubf(pForce[linkIndex], _make_cuComplex(F(0.0), forceOfThisLink.x));
@@ -222,6 +224,14 @@ _kernelDotBosonVN(const deviceDataBoson* __restrict__ pMe, const deviceDataBoson
 
 template<typename deviceDataBoson>
 __global__ void _CLG_LAUNCH_BOUND
+_kernelElementVN(const deviceDataBoson* __restrict__ pMe, UINT idx, DOUBLE* result)
+{
+    intokernal;
+    result[uiSiteIndex] = static_cast<DOUBLE>(_element(pMe[uiSiteIndex], idx));
+}
+
+template<typename deviceDataBoson>
+__global__ void _CLG_LAUNCH_BOUND
 _kernelScalarMultiplyBosonVN(deviceDataBoson* pMe, CLGComplex a)
 {
     intokernal;
@@ -252,7 +262,7 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::D(INT gaugeNum, INT bosonN
 {
     const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
 
-    if (NULL != pGauge && GetFieldType() != pGauge->GetFieldType())
+    if (NULL != pGauge && VectorN() != pGauge->MatrixN())
     {
         appCrucial(_T("CFieldBosonVU can only play with gauge UN!"));
         return;
@@ -318,13 +328,13 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT gaugeNum,
     const CFieldGauge* gauge = pGauge[gaugeidx];
     CFieldGauge* gaugeforce = pGaugeForce[gaugeidx];
 
-    if (NULL == gauge || GetFieldType() != gauge->GetFieldType())
+    if (NULL == gauge || VectorN() != gauge->MatrixN())
     {
         appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
         return;
     }
 
-    if (NULL == gaugeforce || GetFieldType() != gaugeforce->GetFieldType())
+    if (NULL == gaugeforce || VectorN() != gaugeforce->MatrixN())
     {
         appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
         return;
@@ -617,6 +627,19 @@ cuDoubleComplex CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dot(const CFiel
 }
 
 template<typename deviceDataBoson, typename deviceDataGauge>
+TArray<DOUBLE> CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Sum() const
+{
+    preparethread;
+    TArray<DOUBLE> ret;
+    for (UINT i = 0; i < FloatN(); ++i)
+    {
+        _kernelElementVN << <block, threads >> > (m_pDeviceData, i, _D_RealThreadBuffer);
+        ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
+    }
+    return ret;
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(const CLGComplex& a)
 {
     preparethread;
@@ -669,6 +692,13 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::MakeRandomMomentum()
 }
 
 __CLGIMPLEMENT_CLASS(CFieldBosonU1)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU2)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU3)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU4)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU5)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU6)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU7)
+__CLGIMPLEMENT_CLASS(CFieldBosonSU8)
 
 __END_NAMESPACE
 

@@ -9,6 +9,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasurePolyakov.h"
+#include "CMeasurePolyakovXY.h"
 
 __BEGIN_NAMESPACE
 

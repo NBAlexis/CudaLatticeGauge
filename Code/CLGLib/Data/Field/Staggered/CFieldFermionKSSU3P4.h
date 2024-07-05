@@ -7,6 +7,7 @@
 // REVISION:
 //  [10/08/2020 nbale]
 //=============================================================================
+#include "CFieldFermionKSSU3.h"
 
 #ifndef _CFIELDFERMIONKSSU3P4_H_
 #define _CFIELDFERMIONKSSU3P4_H_

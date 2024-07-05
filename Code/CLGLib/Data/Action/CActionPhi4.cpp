@@ -8,6 +8,7 @@
 //  [06/13/2024 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CActionPhi4.h"
 
 __BEGIN_NAMESPACE
 

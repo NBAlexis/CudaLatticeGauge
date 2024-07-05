@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasurePlaqutteEnergy.cpp
+// FILENAME : CMeasureMesonCorrelator.cu
 // 
 // DESCRIPTION:
 // This is the class for one measurement
@@ -9,6 +9,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "CMeasureMesonCorrelator.h"
 
 //c2^*: if c2=i^0 or i^2, c2*=i^0 or i^2, if c2=i^1, c2*=i^3, if c2=i^3, c2*=i^1
 //so, (((c2 & 1) << 1) + c2) & 3

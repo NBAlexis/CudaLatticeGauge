@@ -9,6 +9,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "CMeasureChiralCondensate.h"
 
 __BEGIN_NAMESPACE
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CIntegratorForceGradient.cpp
+// FILENAME : CIntegratorNestedLeapFrog.cpp
 // 
 // DESCRIPTION:
 // This is the Approximate force gradient integrator for HMC
@@ -8,6 +8,7 @@
 //  [03/05/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorNestedLeapFrog.h"
 
 __BEGIN_NAMESPACE
 

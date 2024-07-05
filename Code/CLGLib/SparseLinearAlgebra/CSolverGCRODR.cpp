@@ -8,6 +8,7 @@
 //  [03/15/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CSolverGCRODR.h"
 
 __BEGIN_NAMESPACE
 

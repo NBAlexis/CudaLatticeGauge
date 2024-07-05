@@ -65,52 +65,7 @@ public:
 #endif
 };
 
-#pragma region device functions
 
-static __device__ __inline__ SBYTE _deviceStaggeredFermionSimplePhase(const SSmallInt4& sSite, BYTE byType)
-{
-    SBYTE ret = 1;
-    switch (byType)
-    {
-    case 1:
-        ret = 3 - ((sSite.x & 1) << 1)
-                - ((sSite.y & 1) << 1)
-                - ((sSite.z & 1) << 1);
-        //printf("shift check%d = %d\n", static_cast<INT>(ret), ((sSite.x & 1) ? -1 : 1) + ((sSite.y & 1) ? -1 : 1) + ((sSite.z & 1) ? -1 : 1));
-        break;
-    case 2:
-        ret = 3 - (((sSite.x + sSite.y) & 1) << 1)
-                - (((sSite.y + sSite.z) & 1) << 1)
-                - (((sSite.x + sSite.z) & 1) << 1);
-        break;
-    case 3:
-        ret = 1 - (((sSite.x + sSite.y + sSite.z) & 1) << 1);
-        break;
-    case 4:
-        ret = 1 - ((sSite.x & 1) << 1);
-        break;
-    case 5:
-        ret = 1 - ((sSite.y & 1) << 1);
-        break;
-    case 6:
-        ret = 1 - ((sSite.z & 1) << 1);
-        break;
-    case 7:
-        ret = 1 - (((sSite.x + sSite.y) & 1) << 1);
-        break;
-    case 8:
-        ret = 1 - (((sSite.y + sSite.z) & 1) << 1);
-        break;
-    case 9:
-        ret = 1 - (((sSite.x + sSite.z) & 1) << 1);
-        break;
-    default:
-        break;
-    }
-    return ret;
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 

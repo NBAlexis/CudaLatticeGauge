@@ -11,6 +11,18 @@
 #ifndef _CFIELDBOSONVN_H_
 #define _CFIELDBOSONVN_H_
 
+#define __DEFINE_BOSON_FIELD(FIELD_NAME, TYPE_BOSON, TYPE_GAUGE, VECTOR_N, FLOAT_N, ELEMENT_TYPE) \
+__CLG_REGISTER_HELPER_HEADER(FIELD_NAME) \
+class CLGAPI FIELD_NAME : public CFieldBosonVN<TYPE_BOSON, TYPE_GAUGE> \
+{ \
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(FIELD_NAME) \
+public: \
+    EFieldType GetFieldType() const override { return ELEMENT_TYPE; } \
+    UINT VectorN() const override { return VECTOR_N; } \
+    UINT FloatN() const override { return FLOAT_N; } \
+};
+
+
 __BEGIN_NAMESPACE
 
 template<typename deviceDataBoson, typename deviceDataGauge>
@@ -47,13 +59,11 @@ public:
     void ScalarMultply(const CLGComplex& a) override;
     void ScalarMultply(Real a) override;
     cuDoubleComplex Dot(const CField* other) const override;
+    TArray<DOUBLE> Sum() const override;
 
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-
-    virtual UINT VectorN() const = 0;
-    virtual UINT FloatN() const = 0;
 
     deviceDataBoson* m_pDeviceData;
 
@@ -61,15 +71,14 @@ public:
 
 };
 
-__CLG_REGISTER_HELPER_HEADER(CFieldBosonU1)
-class CLGAPI CFieldBosonU1 : public CFieldBosonVN<CLGComplex, CLGComplex>
-{
-    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldBosonU1)
-public:
-    EFieldType GetFieldType() const override { return EFT_BosonU1; }
-    UINT VectorN() const { return 1; }
-    UINT FloatN() const { return 2; }
-};
+__DEFINE_BOSON_FIELD(CFieldBosonU1, CLGComplex, CLGComplex, 1, 2, EFT_BosonComplex)
+__DEFINE_BOSON_FIELD(CFieldBosonSU2, deviceSU2Vector, deviceSU2, 2, 4, EFT_BosonComplexVector2)
+__DEFINE_BOSON_FIELD(CFieldBosonSU3, deviceSU3Vector, deviceSU3, 3, 6, EFT_BosonComplexVector3)
+__DEFINE_BOSON_FIELD(CFieldBosonSU4, deviceSU4Vector, deviceSU4, 4, 8, EFT_BosonComplexVector4)
+__DEFINE_BOSON_FIELD(CFieldBosonSU5, deviceSU5Vector, deviceSU5, 5, 10, EFT_BosonComplexVector5)
+__DEFINE_BOSON_FIELD(CFieldBosonSU6, deviceSU6Vector, deviceSU6, 6, 12, EFT_BosonComplexVector6)
+__DEFINE_BOSON_FIELD(CFieldBosonSU7, deviceSU7Vector, deviceSU7, 7, 14, EFT_BosonComplexVector7)
+__DEFINE_BOSON_FIELD(CFieldBosonSU8, deviceSU8Vector, deviceSU8, 8, 16, EFT_BosonComplexVector8)
 
 __END_NAMESPACE
 

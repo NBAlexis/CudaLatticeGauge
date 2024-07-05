@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMultiShiftGMRES.cpp
+// FILENAME : CMultiShiftNested.cpp
 // 
 // DESCRIPTION:
 // This is the class for GMRES Solver
@@ -8,6 +8,7 @@
 //  [15/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CMultiShiftNested.h"
 
 __BEGIN_NAMESPACE
 

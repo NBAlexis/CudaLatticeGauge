@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldFermionWilsonSquareSU3.cu
+// FILENAME : CFieldFermionKSU1.cu
 // 
 // DESCRIPTION:
 // This is the device implementations of Wilson fermion
@@ -9,8 +9,10 @@
 // REVISION:
 //  [10/01/2021 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "Data/Field/Gauge/CFieldGaugeU1.h"
+#include "CFieldFermionKSSU3.h"
+#include "CFieldFermionKSU1.h"
 
 __BEGIN_NAMESPACE
 

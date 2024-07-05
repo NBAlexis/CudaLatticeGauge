@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasureMesonCorrelatorStaggered.cpp
+// FILENAME : CMeasureConnectedChiralSusceptibilityKS.cu
 // 
 // DESCRIPTION:
 // This is the class for one measurement
@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasureConnectedChiralSusceptibilityKS.h"
 
 __BEGIN_NAMESPACE
 

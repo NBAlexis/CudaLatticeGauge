@@ -8,6 +8,7 @@
 //  [08/19/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorNested11Stage.h"
 
 __BEGIN_NAMESPACE
 

@@ -8,6 +8,7 @@
 //  [02/24/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CGaugeSmearingAPEStout.h"
 
 __BEGIN_NAMESPACE
 

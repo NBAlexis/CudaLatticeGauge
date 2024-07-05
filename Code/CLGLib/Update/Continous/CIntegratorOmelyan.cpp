@@ -8,6 +8,7 @@
 //  [02/12/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorOmelyan.h"
 
 __BEGIN_NAMESPACE
 

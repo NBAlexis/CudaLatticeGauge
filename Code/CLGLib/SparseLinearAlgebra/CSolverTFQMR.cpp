@@ -8,6 +8,7 @@
 //  [20/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CSolverTFQMR.h"
 
 __BEGIN_NAMESPACE
 

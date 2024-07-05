@@ -20,6 +20,7 @@ UINT TestUpdateBoson(CParameters& sParam)
 
 __REGIST_TEST(TestUpdateBoson, UpdatorBoson, TestBosonU1NoGauge, U1NoGauge);
 __REGIST_TEST(TestUpdateBoson, UpdatorBoson, TestBosonU1, U1);
+__REGIST_TEST(TestUpdateBoson, UpdatorBoson, TestBosonSU4, SU4);
 __REGIST_TEST(TestUpdateBoson, UpdatorBoson, TestBosonU1ExternalGaugeField, ExternalU1);
 
 //=============================================================================

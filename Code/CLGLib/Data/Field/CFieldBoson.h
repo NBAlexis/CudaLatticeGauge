@@ -51,17 +51,13 @@ public:
 
 #pragma endregion
 
-    UBOOL IsGaugeField() const override { return FALSE; }
-    UBOOL IsFermionField() const override { return FALSE; }
-    UBOOL IsBosonField() const override  { return TRUE; }
-
-    /**
-     * For even odd preconditioner
-     */
-    virtual void WriteEvenSites(const CFieldFermion*, const CFieldGauge*, UBOOL) { appCrucial(_T("Not implemented.\n")); }
-    virtual void WriteBackEvenSites(CFieldFermion*, const CFieldGauge*, UBOOL) const { appCrucial(_T("Not implemented.\n")); }
-
+    UBOOL IsBosonField() const override { return TRUE; }
+    virtual UINT VectorN() const = 0;
+    virtual UINT FloatN() const = 0;
+    
     UINT GetSiteCount() const { return m_uiSiteCount; }
+
+    virtual TArray<DOUBLE> Sum() const = 0;
 
     void CopyTo(CField* U) const override
     {

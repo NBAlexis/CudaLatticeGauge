@@ -10,6 +10,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldGaugeSU3TreeImproved.h"
 
 __BEGIN_NAMESPACE
 

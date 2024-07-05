@@ -9,6 +9,10 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/Gauge/CFieldGaugeU1Real.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "CMeasureChiralCondensateKS.h"
+#include "CMeasureAngularMomentumKS.h"
 
 __BEGIN_NAMESPACE
 

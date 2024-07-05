@@ -8,7 +8,9 @@
 //  [29/10/2022 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "Tools/Math/DeviceInlineSU3.h"
+#include "Data/Field/Gauge/CFieldGaugeU1.h"
+#include "CActionGaugePlaquetteRotatingU1_3D.h"
 
 __BEGIN_NAMESPACE
 

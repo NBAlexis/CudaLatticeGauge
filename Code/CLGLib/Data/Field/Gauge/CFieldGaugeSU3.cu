@@ -1185,10 +1185,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
 #endif
     case EFFT_CLGBinCompressed:
     {
-        UINT uiSize = static_cast<UINT>(sizeof(Real) * 9 * m_uiLinkeCount);
-        BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
-        InitialWithByteCompressed(data);
-        free(data);
+        InitialWithByteCompressed(sFileName);
     }
     break;
     default:
@@ -1224,8 +1221,11 @@ void CFieldGaugeSU3::InitialWithByte(BYTE* byData)
     free(readData);
 }
 
-void CFieldGaugeSU3::InitialWithByteCompressed(BYTE* byData)
+void CFieldGaugeSU3::InitialWithByteCompressed(const CCString& sFileName)
 {
+    UINT uiSize = static_cast<UINT>(sizeof(Real) * 9 * m_uiLinkeCount);
+    BYTE* byData = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+
     deviceSU3* readData = (deviceSU3*)malloc(sizeof(deviceSU3) * m_uiLinkeCount);
     for (UINT i = 0; i < m_uiLinkeCount; ++i)
     {
@@ -1261,6 +1261,7 @@ void CFieldGaugeSU3::InitialWithByteCompressed(BYTE* byData)
     checkCudaErrors(cudaDeviceSynchronize());
 
     //DebugPrintMe();
+    free(byData);
 }
 
 void CFieldGaugeSU3::SetByArray(Real* array)

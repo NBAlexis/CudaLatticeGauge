@@ -8,7 +8,7 @@
 //  [05/07/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "CActionGaugePlaquetteRotating.h"
 
 __BEGIN_NAMESPACE
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldFermionKSSU3R.cu
+// FILENAME : CFieldFermionKSSU3REM.cu
 // 
 // DESCRIPTION:
 // 
@@ -7,8 +7,11 @@
 // REVISION:
 //  [09/23/2020 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineSU3.h"
+#include "Data/Field/Gauge/CFieldGaugeU1Real.h"
+#include "CFieldFermionKSSU3GammaEM.h"
+#include "CFieldFermionKSSU3REM.h"
 
 __BEGIN_NAMESPACE
 

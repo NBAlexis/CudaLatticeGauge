@@ -9,6 +9,9 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineSU3.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "CMeasureAMomentumStochastic.h"
 
 __BEGIN_NAMESPACE
 

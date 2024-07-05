@@ -12,6 +12,7 @@
 // REVISION:
 //  [12/27/2023 nbale]
 //=============================================================================
+#include "CFieldFermionKSSU3.h"
 
 #ifndef _CFIELDFERMIONKSSU3RIGIDACC_H_
 #define _CFIELDFERMIONKSSU3RIGIDACC_H_

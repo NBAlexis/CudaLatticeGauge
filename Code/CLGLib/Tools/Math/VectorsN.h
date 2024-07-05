@@ -69,7 +69,7 @@ public:
         return ret;
     }
 
-    __device__ __inline__ static deviceSUNVector<N, NofE> makeZeroSU2Vector()
+    __device__ __inline__ static deviceSUNVector<N, NofE> makeZeroSUNVector()
     {
         deviceSUNVector<N, NofE> ret;
         for (INT i = 0; i < N; ++i)
@@ -204,6 +204,21 @@ public:
     {
         deviceSUNVector<N, NofE> ret(*this);
         ret.DaggerMul(other);
+        return ret;
+    }
+
+    __device__ __inline__ void MulDagger(const deviceSUNVector<N, NofE>& other)
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i] = _cuCmulf(m_ve[i], _cuConjf(other.m_ve[i]));
+        }
+    }
+
+    __device__ __inline__ deviceSUNVector<N, NofE> MulDaggerC(const deviceSUNVector<N, NofE>& other) const
+    {
+        deviceSUNVector<N, NofE> ret(*this);
+        ret.MulDagger(other);
         return ret;
     }
 

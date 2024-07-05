@@ -8,6 +8,9 @@
 //  [12/7/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "Staggered/CFieldFermionKSSU3.h"
+#include "Measurement/CMeasureAngularMomentumKS.h"
 
 __BEGIN_NAMESPACE
 

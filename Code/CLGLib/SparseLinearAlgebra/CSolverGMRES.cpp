@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CSolverBiCGStab.cpp
+// FILENAME : CSolverGMRES.cpp
 // 
 // DESCRIPTION:
 // This is the class for GMRES Solver
@@ -8,6 +8,7 @@
 //  [02/12/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CSolverGMRES.h"
 
 __BEGIN_NAMESPACE
 

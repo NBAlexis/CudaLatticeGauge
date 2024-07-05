@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasureAMomemtumJG.cu
+// FILENAME : CMeasureAMomentumJG.cu
 // 
 // DESCRIPTION:
 //
@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasureAMomentumJG.h"
 
 __BEGIN_NAMESPACE
 

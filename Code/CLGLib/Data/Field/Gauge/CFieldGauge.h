@@ -96,7 +96,6 @@ public:
     void CopyTo(CField* U) const override;
 
     UBOOL IsGaugeField() const override { return TRUE; }
-    UBOOL IsFermionField() const override { return FALSE; }
 
 protected:
 

@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasureMesonCorrelatorStaggered.cpp
+// FILENAME : CMeasureMesonCorrelatorStaggered.cu
 // 
 // DESCRIPTION:
 // This is the class for one measurement
@@ -9,6 +9,8 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3.h"
+#include "CMeasureMesonCorrelatorStaggered.h"
 
 __BEGIN_NAMESPACE
 

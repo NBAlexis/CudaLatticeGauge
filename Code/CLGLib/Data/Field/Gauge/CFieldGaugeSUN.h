@@ -22,10 +22,10 @@ public:
     ~CFieldGaugeSUN();
     void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
     void InitialWithByte(BYTE* byData) override;
-    void InitialWithByteCompressed(BYTE*) override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
+    void InitialWithByteCompressed(const CCString& sFileName) override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
     void InitialField(EFieldInitialType eInitialType) override;
     EFieldType GetFieldType() const override { return EFT_GaugeSUN; }
-    UINT MatrixN() const override { return N; }
+    UINT MatrixN() const override  { return N; }
     void DebugPrintMe() const override;
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;

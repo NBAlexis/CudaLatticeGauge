@@ -8,6 +8,7 @@
 //  [09/21/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CGaugeFixingLandauLosAlamos.h"
 
 __BEGIN_NAMESPACE
 

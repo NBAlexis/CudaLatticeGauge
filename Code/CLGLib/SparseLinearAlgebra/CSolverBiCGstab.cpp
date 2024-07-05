@@ -8,6 +8,7 @@
 //  [01/08/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CSolverBiCGStab.h"
 
 __BEGIN_NAMESPACE
 

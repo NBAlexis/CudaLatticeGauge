@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CMeasureWilsonLoop.h"
 
 __BEGIN_NAMESPACE
 

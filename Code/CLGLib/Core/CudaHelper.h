@@ -252,6 +252,8 @@ public:
     #pragma endregion
 };
 
+#define cudaSafeFree(ptr) if (NULL != ptr) { checkCudaErrors(cudaFree(ptr)); ptr = NULL; }
+
 __END_NAMESPACE
 
 

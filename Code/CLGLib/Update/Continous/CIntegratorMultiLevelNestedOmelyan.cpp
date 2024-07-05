@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CIntegratorMultiLevelOmelyan.cpp
+// FILENAME : CIntegratorMultiLevelNestedOmelyan.cpp
 // 
 // DESCRIPTION:
 // This is the Approximate force gradient integrator for HMC
@@ -8,6 +8,7 @@
 //  [08/18/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CIntegratorMultiLevelNestedOmelyan.h"
 
 __BEGIN_NAMESPACE
 

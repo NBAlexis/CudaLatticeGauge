@@ -8,6 +8,7 @@
 // REVISION:
 //  [09/28/2022 nbale]
 //=============================================================================
+#include "CFieldFermionKSSU3Gamma.h"
 
 #ifndef _CFIELDFERMIONKSSU3GAMMAEM_H_
 #define _CFIELDFERMIONKSSU3GAMMAEM_H_
@@ -107,112 +108,6 @@ public:
 
 };
 
-#pragma region device functions
-
-
-static __device__ __inline__ deviceSU3 _devicePlaneDiagonalEM(
-    const deviceSU3* __restrict__ pDeviceData,
-    const Real* __restrict__ pDeviceDataReal,
-    Real fCharge,
-    const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2)
-{
-    INT dir1[2];
-
-    dir1[0] = dim1; dir1[1] = dim2;
-    deviceSU3 sRet(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 2, byFieldId, dir1));
-
-    dir1[0] = dim2; dir1[1] = dim1;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 2, byFieldId, dir1));
-
-    sRet.MulReal(F(0.5));
-    return sRet;
-}
-
-/**
- * dim1, 2, 3 =
- * 1: x, -1: -x
- * 2: y, -2: -y
- * 3: z, -3: -z
- * 4: t, -4: -t
- */
-static __device__ __inline__ deviceSU3 _deviceCubicDiagonalEM(
-    const deviceSU3* __restrict__ pDeviceData,
-    const Real* __restrict__ pDeviceDataReal,
-    Real fCharge,
-    const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2, SBYTE dim3)
-{
-    INT dir1[3];
-
-    dir1[0] = dim1; dir1[1] = dim2; dir1[2] = dim3;
-    deviceSU3 sRet(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    dir1[0] = dim1; dir1[1] = dim3; dir1[2] = dim2;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    dir1[0] = dim2; dir1[1] = dim1; dir1[2] = dim3;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    dir1[0] = dim2; dir1[1] = dim3; dir1[2] = dim1;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    dir1[0] = dim3; dir1[1] = dim1; dir1[2] = dim2;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    dir1[0] = dim3; dir1[1] = dim2; dir1[2] = dim1;
-    sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 3, byFieldId, dir1));
-
-    sRet.MulReal(OneOver6);
-    return sRet;
-}
-
-static __device__ __inline__ deviceSU3 _deviceHyperCubicDiagonalEM(
-    const deviceSU3* __restrict__ pDeviceData,
-    const Real* __restrict__ pDeviceDataReal,
-    Real fCharge,
-    const SSmallInt4& sStartSite, BYTE byFieldId,
-    SBYTE dim1, SBYTE dim2, SBYTE dim3, SBYTE dim4)
-{
-    deviceSU3 sRet = deviceSU3::makeSU3Zero();
-    const SBYTE dim1234[4] = { dim1, dim2, dim3, dim4 };
-    INT dir1[4];
-    SBYTE dim234[3];
-    for (BYTE k = 0; k < 4; ++k)
-    {
-        dir1[0] = dim1234[k];
-        for (BYTE k2 = 0; k2 < 3; ++k2)
-        {
-            BYTE idx = k2 + 1 + k;
-            idx = idx > 3 ? (idx - 4) : idx;
-            dim234[k2] = dim1234[idx];
-        }
-
-        dir1[1] = dim234[0]; dir1[2] = dim234[1]; dir1[3] = dim234[2];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-
-        dir1[1] = dim234[0]; dir1[2] = dim234[2]; dir1[3] = dim234[1];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-
-        dir1[1] = dim234[1]; dir1[2] = dim234[0]; dir1[3] = dim234[2];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-
-        dir1[1] = dim234[1]; dir1[2] = dim234[2]; dir1[3] = dim234[0];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-
-        dir1[1] = dim234[2]; dir1[2] = dim234[0]; dir1[3] = dim234[1];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-
-        dir1[1] = dim234[2]; dir1[2] = dim234[1]; dir1[3] = dim234[0];
-        sRet.Add(_deviceLinkEM(pDeviceData, pDeviceDataReal, fCharge, sStartSite, 4, byFieldId, dir1));
-    }
-
-    sRet.MulReal(OneOver24);
-    return sRet;
-}
-
-
-#pragma endregion
 
 __END_NAMESPACE
 

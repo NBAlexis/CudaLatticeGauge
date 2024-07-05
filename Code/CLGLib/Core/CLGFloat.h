@@ -189,6 +189,8 @@
 #define _11Stage_RhoP (F(-0.08442961950707149))
 #define _11Stage_ThetaP (F(0.3549000571574260))
 
+#define OneOver32PI2 (F(1.0) / (F(32.0) * PISQ))
+
 __BEGIN_NAMESPACE
 
 static __host__ __device__ __inline__ cuDoubleComplex _cToDouble(const cuComplex& c)

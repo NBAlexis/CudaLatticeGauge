@@ -7,8 +7,9 @@
 // REVISION:
 //  [09/05/2020 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "Tools/Math/DeviceInlineSU3.h"
+#include "CFieldFermionKSSU3DR.h"
 
 __BEGIN_NAMESPACE
 

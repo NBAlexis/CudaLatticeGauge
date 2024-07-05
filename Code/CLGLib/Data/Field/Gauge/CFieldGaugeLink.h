@@ -1,46 +1,43 @@
 //=============================================================================
-// FILENAME : CFieldGaugeSU3.h
+// FILENAME : CFieldGaugeLink.h
 // 
 // DESCRIPTION:
-// This is the class for the gauge fields
+// This is the common class for all gauge fields
 //
 // REVISION:
-//  [12/3/2018 nbale]
+//  [07/04/2018 nbale]
 //=============================================================================
 
-#ifndef _CFIELDGAUGE_SU3_H_
-#define _CFIELDGAUGE_SU3_H_
+#ifndef _CFIELDGAUGE_LINK_H_
+#define _CFIELDGAUGE_LINK_H_
 
-#define gaugeSU3KernelFuncionStart \
+#define gaugeLinkKernelFuncionStart \
     intokernaldir; \
     for (UINT idir = 0; idir < uiDir; ++idir) \
     { \
-        UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir); 
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir); 
 
 
-#define gaugeSU3KernelFuncionEnd \
+#define gaugeLinkKernelFuncionEnd \
     } 
 
 
 
 __BEGIN_NAMESPACE
 
-__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU3)
-
-class CLGAPI CFieldGaugeSU3 : public CFieldGauge
+template<typename deviceGauge, INT matrixN>
+class __DLL_EXPORT CFieldGaugeLink : public CFieldGauge
 {
-    __CLGDECLARE_FIELD(CFieldGaugeSU3)
 
 public:
-    CFieldGaugeSU3();
-    ~CFieldGaugeSU3();
+    CFieldGaugeLink();
+    ~CFieldGaugeLink();
 
     void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
     void InitialWithByte(BYTE* byData) override;
-    void InitialWithByteCompressed(const CCString& sFileName) override;
+    void InitialWithByteCompressed(const CCString& fileName) override { appCrucial(_T("CFieldGaugeLink: InitialWithByteCompressed not supoorted!\n")); }
     void InitialField(EFieldInitialType eInitialType) override;
-    EFieldType GetFieldType() const override { return EFT_GaugeSU3; }
-    UINT MatrixN() const override  { return 3; }
+
     void DebugPrintMe() const override;
 
 #pragma region HMC
@@ -48,17 +45,10 @@ public:
     void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
     void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
     void MakeRandomGenerator() override;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
     DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override;
     DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
     DOUBLE CalculateKinematicEnergy() const override;
-#else
-    Real CalculatePlaqutteEnergy(Real betaOverN) const override;
-    Real CalculatePlaqutteEnergyUseClover(Real betaOverN) const override;
-    Real CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge *pStaple) const override;
-    Real CalculateKinematicEnergy() const override;
-#endif
 
 #pragma endregion
 
@@ -102,30 +92,40 @@ public:
     void ExpMult(Real a, CField* U) const override;
 
     void ElementNormalize() override;
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex Dot(const CField* other) const override;
-#else
-    CLGComplex Dot(const CField* other) const override;
-#endif
-    CCString SaveToCompressedFile(const CCString& fileName) const override;
-    BYTE* CopyDataOut(UINT &uiSize) const override;
+    CCString SaveToCompressedFile(const CCString& fileName) const override { appCrucial(_T("CFieldGaugeLink: SaveToCompressedFile not supoorted!\n")); return _T(""); };
+    BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
 
+    void CopyTo(CField* pTarget) const override;
+
     void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
 
-    deviceSU3* m_pDeviceData;
+    UINT MatrixN() const override { return matrixN; }
+
+    deviceGauge* m_pDeviceData;
 
     _GetData
 
-protected:
+};
 
-    void SetByArray(Real* array);
+
+__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU2)
+
+class CLGAPI CFieldGaugeSU2 : public CFieldGaugeLink<deviceSU2, 2>
+{
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU2)
+public:
+    EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
+
+    void InitialWithByteCompressed(const CCString& sFileName) override;
+    CCString SaveToCompressedFile(const CCString& fileName) const override;
 };
 
 __END_NAMESPACE
 
-#endif //#ifndef _CFIELDGAUGE_SU3_H_
+#endif //#ifndef _CFIELDGAUGE_LINK_H_
 
 //=============================================================================
 // END OF FILE

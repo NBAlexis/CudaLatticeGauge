@@ -8,7 +8,7 @@
 //  [12/4/2018 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "CActionGaugePlaquette.h"
 
 __BEGIN_NAMESPACE
 

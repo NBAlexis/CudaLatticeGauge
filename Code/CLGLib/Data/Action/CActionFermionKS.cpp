@@ -8,7 +8,7 @@
 //  [06/30/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-
+#include "CActionFermionKS.h"
 
 __BEGIN_NAMESPACE
 

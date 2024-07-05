@@ -11,6 +11,7 @@
 // REVISION:
 //  [05/19/2019 nbale]
 //=============================================================================
+#include "CFieldFermionWilsonSquareSU3D.h"
 
 #ifndef _CFIELDFERMIONWILSONSQUARESU3DR_H_
 #define _CFIELDFERMIONWILSONSQUARESU3DR_H_

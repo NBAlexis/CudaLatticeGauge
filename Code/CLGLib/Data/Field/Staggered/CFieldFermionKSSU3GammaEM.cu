@@ -7,8 +7,9 @@
 // REVISION:
 //  [09/28/2020 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
+#include "Data/Field/Gauge/CFieldGaugeU1Real.h"
+#include "CFieldFermionKSSU3GammaEM.h"
 
 __BEGIN_NAMESPACE
 

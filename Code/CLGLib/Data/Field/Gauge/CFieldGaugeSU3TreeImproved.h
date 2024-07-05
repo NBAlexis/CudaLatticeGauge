@@ -23,6 +23,8 @@
 #ifndef _CFIELDGAUGE_SU3_TREEIMPROVED_H_
 #define _CFIELDGAUGE_SU3_TREEIMPROVED_H_
 
+#include "CFieldGaugeSU3.h"
+
 
 __BEGIN_NAMESPACE
 
@@ -60,58 +62,6 @@ public:
 
 };
 
-#pragma region device functions
-
-/**
-* Rectangle clover
-*
-*
-* It sums over:
-*
-* -------
-* |     |
-* ---x---
-*
-* ---x---
-* |     |
-* -------
-*
-* ----
-* |  |
-* x  |
-* |  |
-* ----
-*
-* ----
-* |  |
-* |  x
-* |  |
-* ----
-*/
-static __device__ __inline__ Real _deviceOneRectangleRetr(
-    const BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    const SSmallInt4& sSite, INT iMu, INT iNu)
-{
-    INT path[6] = { iMu, iNu, -iMu, -iMu, -iNu, iMu };
-    return _deviceLink(pDeviceData, sSite, 6, byFieldId, path).ReTr();
-}
-
-static __device__ __inline__ Real _deviceCloverRectangleRetr(
-    const BYTE byFieldId,
-    const deviceSU3* __restrict__ pDeviceData,
-    const SSmallInt4& sSite, BYTE byMu, BYTE byNu)
-{
-    const INT ifwdMu = __fwd(byMu);
-    const INT ifwdNu = __fwd(byNu);
-    Real fRes = _deviceOneRectangleRetr(byFieldId, pDeviceData, sSite, ifwdMu, ifwdNu);
-    fRes += _deviceOneRectangleRetr(byFieldId, pDeviceData, sSite, ifwdMu, -ifwdNu);
-    fRes += _deviceOneRectangleRetr(byFieldId, pDeviceData, sSite, ifwdNu, ifwdMu);
-    fRes += _deviceOneRectangleRetr(byFieldId, pDeviceData, sSite, ifwdNu, -ifwdMu);
-    return fRes;
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 

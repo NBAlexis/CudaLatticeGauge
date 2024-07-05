@@ -8,6 +8,7 @@
 //  [18/06/2020 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
+#include "CMultiShiftFOM.h"
 
 __BEGIN_NAMESPACE
 

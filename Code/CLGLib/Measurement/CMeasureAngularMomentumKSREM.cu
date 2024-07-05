@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CMeasureAngularMomentumKS.cpp
+// FILENAME : CMeasureAngularMomentumKSREM.cpp
 // 
 // DESCRIPTION:
 // almost copy from CMeasureChiralCondensate.cpp, but with Wilson SU3 vector to SU3 vector
@@ -9,6 +9,9 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "Data/Field/Gauge/CFieldGaugeU1Real.h"
+#include "Data/Field/Staggered/CFieldFermionKSSU3REM.h"
+#include "CMeasureAngularMomentumKSREM.h"
 
 __BEGIN_NAMESPACE
 

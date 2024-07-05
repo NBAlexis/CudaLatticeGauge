@@ -40,10 +40,10 @@ public:
 
     void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
     void InitialWithByte(BYTE* byData) override;
-    void InitialWithByteCompressed(BYTE*) override;
+    void InitialWithByteCompressed(const CCString& sFileName) override;
     void InitialField(EFieldInitialType eInitialType) override;
     EFieldType GetFieldType() const override { return EFT_GaugeReal; }
-    UINT MatrixN() const override { return 1; }
+    UINT MatrixN() const override  { return 1; }
     void DebugPrintMe() const override;
 
 #pragma region HMC
@@ -150,145 +150,6 @@ protected:
     void SetByArray(Real* array);
 };
 
-#pragma region Helper device functions
-
-static __device__ __inline__ Real _deviceLinkU1Real(
-    const Real* __restrict__ pDeviceData,
-    SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
-    const INT* __restrict__ pDir)
-{
-    //length can be 0
-    Real fRet = F(0.0);
-    for (BYTE i = 0; i < byLength; ++i)
-    {
-        if (0 == pDir[i])
-        {
-            continue;
-        }
-        UBOOL bDagger = FALSE;
-        const BYTE byDir = pDir[i] > 0 ?
-            static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
-
-        if (pDir[i] < 0) //Move
-        {
-            bDagger = TRUE;
-            _deviceSmallInt4Offset(sStartSite, pDir[i]);
-        }
-        const SIndex& newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(sStartSite) + byDir];
-
-        if (0 == i)
-        {
-            if (!newLink.IsDirichlet())
-            {
-                fRet = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
-                if ((newLink.NeedToDagger() && !bDagger)
-                    || (!newLink.NeedToDagger() && bDagger)
-                    )
-                {
-                    fRet = -fRet;
-                }
-            }
-        }
-        else
-        {
-            if (!newLink.IsDirichlet())
-            {
-                const Real& toAdd = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
-                if ((newLink.NeedToDagger() && !bDagger)
-                 || (!newLink.NeedToDagger() && bDagger)
-                    )
-                {
-                    fRet = fRet - toAdd;
-                }
-                else
-                {
-                    fRet = fRet + toAdd;
-                }
-            }
-        }
-
-        if (pDir[i] > 0) //Move
-        {
-            _deviceSmallInt4Offset(sStartSite, pDir[i]);
-        }
-    }
-
-    return fRet;
-}
-
-static __device__ __inline__ deviceSU3 _deviceLinkEM(
-    const deviceSU3* __restrict__ pDeviceData,
-    const Real* __restrict__ pDeviceDataReal,
-    Real fCharge,
-    SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
-    const INT* __restrict__ pDir)
-{
-    //length can be 0
-    deviceSU3 sRet = deviceSU3::makeSU3Id();
-    Real fRet = F(0.0);
-    for (BYTE i = 0; i < byLength; ++i)
-    {
-        if (0 == pDir[i])
-        {
-            continue;
-        }
-        UBOOL bDagger = FALSE;
-        const BYTE byDir = pDir[i] > 0 ?
-            static_cast<BYTE>(pDir[i] - 1) : static_cast<BYTE>(-pDir[i] - 1);
-
-        if (pDir[i] < 0) //Move
-        {
-            bDagger = TRUE;
-            _deviceSmallInt4Offset(sStartSite, pDir[i]);
-        }
-        const SIndex& newLink = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__bi4(sStartSite) + byDir];
-
-        if (0 == i)
-        {
-            if (!newLink.IsDirichlet())
-            {
-                sRet = pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
-                fRet = pDeviceDataReal[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
-                if ((newLink.NeedToDagger() && !bDagger)
-                    || (!newLink.NeedToDagger() && bDagger)
-                    )
-                {
-                    sRet.Dagger();
-                    fRet = -fRet;
-                }
-            }
-        }
-        else
-        {
-            if (!newLink.IsDirichlet())
-            {
-                const Real& toAdd = pDeviceDataReal[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)];
-                if ((newLink.NeedToDagger() && !bDagger)
-                    || (!newLink.NeedToDagger() && bDagger)
-                    )
-                {
-                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
-                    fRet = fRet - toAdd;
-                }
-                else
-                {
-                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
-                    fRet = fRet + toAdd;
-                }
-            }
-        }
-
-        if (pDir[i] > 0 && i < (byLength - 1)) //Move
-        {
-            _deviceSmallInt4Offset(sStartSite, pDir[i]);
-        }
-    }
-    fRet = fRet * fCharge;
-    sRet.MulComp(_make_cuComplex(_cos(fRet), _sin(fRet)));
-    return sRet;
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 

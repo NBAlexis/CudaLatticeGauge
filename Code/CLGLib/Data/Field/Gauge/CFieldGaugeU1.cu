@@ -19,6 +19,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
+#include "CFieldGaugeU1.h"
 
 __BEGIN_NAMESPACE
 
@@ -998,7 +999,7 @@ void CFieldGaugeU1::InitialWithByte(BYTE* byData)
     free(readData);
 }
 
-void CFieldGaugeU1::InitialWithByteCompressed(BYTE* byData)
+void CFieldGaugeU1::InitialWithByteCompressed(const CCString& sFileName)
 {
     appCrucial(_T("U1 InitialWithByteCompressed Not supported!\n"));
     _FAIL_EXIT;
