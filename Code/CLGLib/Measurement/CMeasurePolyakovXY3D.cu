@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
-#include "Data/Field/Gauge/CFieldGaugeU1.h"
+#include "Data/Field/Gauge/CFieldGaugeLink.h"
 #include "CMeasurePolyakovXY3D.h"
 
 __BEGIN_NAMESPACE

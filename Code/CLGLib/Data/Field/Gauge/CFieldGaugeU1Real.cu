@@ -19,7 +19,7 @@
 //=============================================================================
 
 #include "CLGLib_Private.h"
-#include "CFieldGaugeU1.h"
+#include "CFieldGaugeLink.h"
 #include "CFieldGaugeU1Real.h"
 
 __BEGIN_NAMESPACE

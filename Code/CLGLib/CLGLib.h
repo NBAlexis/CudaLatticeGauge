@@ -95,15 +95,12 @@
 #include "Data/Field/BoundaryField/CFieldBoundaryZero.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryOne.h"
 #include "Data/Field/Gauge/CFieldGaugeLink.h"
+#include "Data/Field/Gauge/CFieldGaugeLinkDirichlet.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3D.h"
-#include "Data/Field/Gauge/CFieldGaugeU1.h"
 #include "Data/Field/Gauge/CFieldGaugeU1Real.h"
 #include "Data/Field/Gauge/CFieldGaugeZ2.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3TreeImproved.h"
-#include "Data/Field/Gauge/CFieldGaugeSUN.h"
-#include "Data/Field/Gauge/CFieldGaugeSU2.h"
-
 
 //#include "Data/Field/CFieldSpin.h"
 

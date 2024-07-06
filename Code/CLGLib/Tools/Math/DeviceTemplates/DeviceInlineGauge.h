@@ -1,87 +1,33 @@
 //=============================================================================
-// FILENAME : CFieldGaugeSU2.h
+// FILENAME : DeviceInlineGauge.h
 // 
 // DESCRIPTION:
-// This is the class for the gauge fields
+// This should be implemented using inherint machinism, but due to historical reasons, it is now templates
+//
 //
 // REVISION:
-//  [07/02/2024 nbale]
+//  [07/03/2024 nbale]
 //=============================================================================
 
-#ifndef _CFIELDGAUGE_SU2_H_
-#define _CFIELDGAUGE_SU2_H_
+#ifndef _DEVICEINLINEGAUGE_H_
+#define _DEVICEINLINEGAUGE_H_
 
 __BEGIN_NAMESPACE
 
-#if 0
-
-__CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU2)
-
-class CLGAPI CFieldGaugeSU2 : public CFieldGauge
-{
-    __CLGDECLARE_FIELD(CFieldGaugeSU2)
-public:
-
-    CFieldGaugeSU2();
-    ~CFieldGaugeSU2();
-    void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFileType) override;
-    void InitialWithByte(BYTE* byData) override;
-    void InitialWithByteCompressed(BYTE*) override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
-    void InitialField(EFieldInitialType eInitialType) override;
-    EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
-    UINT MatrixN() const override { return 2; }
-    void DebugPrintMe() const override;
-    void CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStaple, Real betaOverN) const override;
-    void CalculateOnlyStaple(CFieldGauge* pStaple) const override;
-    void MakeRandomGenerator() override;
-    DOUBLE CalculatePlaqutteEnergy(DOUBLE betaOverN) const override;
-    DOUBLE CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const override;
-    DOUBLE CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge* pStaple) const override;
-    DOUBLE CalculateKinematicEnergy() const override;
-    void Zero() override;
-    void Identity() override;
-    void Dagger() override;
-    void AxpyPlus(const CField* x) override;
-    void AxpyMinus(const CField* x) override;
-    void Axpy(Real a, const CField* x) override;
-    void Axpy(const CLGComplex& a, const CField* x) override;
-    void Mul(const CField* other, UBOOL bDagger = TRUE) override;
-    void ScalarMultply(const CLGComplex& a) override;
-    void ScalarMultply(Real a) override;
-    void SetOneDirectionUnity(BYTE byDir) override;
-    void SetOneDirectionZero(BYTE byDir) override;
-    void TransformToIA() override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
-    void TransformToU() override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
-    void CalculateE_Using_U(CFieldGauge* pResoult) const override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
-    void CalculateNablaE_Using_U(CFieldGauge* pResoult, UBOOL bNaive = FALSE) const override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); }
-    void ExpMult(Real a, CField* U) const override;
-    void ElementNormalize() override;
-    cuDoubleComplex Dot(const CField* other) const override;
-    CCString SaveToCompressedFile(const CCString& fileName) const override { appCrucial(_T("Not supported by %s\n"), __ENUM_TO_STRING(EFieldType, GetFieldType()).c_str()); return _T(""); }
-    BYTE* CopyDataOut(UINT& uiSize) const override;
-    BYTE* CopyDataOutFloat(UINT& uiSize) const override;
-    BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-
-    void PolyakovOnSpatialSite(cuDoubleComplex* buffer) const override;
-
-    deviceSU2* m_pDeviceData;
-
-    _GetData
-};
-
-#pragma region device functions
+#pragma region Gauge
 
 /**
 * Note: for baked plaqutte index, the bond if is set to SIndex
 * If it is a "new SIndex" instead, remember to set the m_byTag
 */
-static __device__ __inline__ const deviceSU2& _deviceGetGaugeBCSU2(
+template<typename deviceGauge>
+static __device__ __inline__ const deviceGauge& _deviceGetGaugeBCT(
     BYTE byFieldId,
-    const deviceSU2* __restrict__ pBuffer,
+    const deviceGauge* __restrict__ pBuffer,
     const SIndex& idx)
 {
     return idx.IsDirichlet() ?
-        ((CFieldBoundaryGaugeSU2*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -91,70 +37,75 @@ static __device__ __inline__ const deviceSU2& _deviceGetGaugeBCSU2(
 * If the bond is on surface, return the Dirichlet
 * else, return the element
 */
-static __device__ __inline__ const deviceSU2& _deviceGetGaugeBCSU2Dir(
+template<typename deviceGauge>
+static __device__ __inline__ const deviceGauge& _deviceGetGaugeBCDirT(
     BYTE byFieldId,
-    const deviceSU2* __restrict__ pBuffer,
+    const deviceGauge* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        ((CFieldBoundaryGaugeSU2*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
-        ] 
+        ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
 }
 
-static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirOne(
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirOneT(
     BYTE byFieldId,
-    const deviceSU2* __restrict__ pBuffer,
+    const deviceGauge* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        deviceSU2::makeSU2Id()
+        _makeId<deviceGauge>()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
-static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirZero(
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirZeroT(
     BYTE byFieldId,
-    const deviceSU2* __restrict__ pBuffer,
+    const deviceGauge* __restrict__ pBuffer,
     UINT uiBigIdx,
     BYTE byDir)
 {
     return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        deviceSU2::makeSU2Zero()
+        _makeZero<deviceGauge>()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
 
-static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirSIndex(
-    const deviceSU2* __restrict__ pBuffer,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirSIndexT(
+    const deviceGauge* __restrict__ pBuffer,
     const SIndex& idx,
     BYTE byFieldId)
 {
-    deviceSU2 ret = idx.IsDirichlet() ?
-        ((CFieldBoundaryGaugeSU2*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+    deviceGauge ret = idx.IsDirichlet() ?
+        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
     if (idx.NeedToDagger())
     {
-        ret.Dagger();
+        _dagger(ret);
     }
     return ret;
 }
 
-static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirOneSIndex(
-    const deviceSU2* __restrict__ pBuffer,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirOneSIndexT(
+    const deviceGauge* __restrict__ pBuffer,
     const SIndex& idx)
 {
     if (idx.IsDirichlet())
     {
-        return deviceSU2::makeSU2Id();
+        return _makeId<deviceGauge>();
     }
     if (idx.NeedToDagger())
     {
-        return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)].DaggerC();
+        return _daggerC(pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)]);
     }
 
     return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -163,17 +114,18 @@ static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirOneSIndex(
 /**
  * Note that, when get zero instead of one, it is minus not dagger
  */
-static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirZeroSIndex(
-    const deviceSU2* __restrict__ pBuffer,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirZeroSIndexT(
+    const deviceGauge* __restrict__ pBuffer,
     const SIndex& idx)
 {
     if (idx.IsDirichlet())
     {
-        return deviceSU2::makeSU2Zero();
+        return _makeZero<deviceGauge>();
     }
     if (idx.NeedToDagger())
     {
-        return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)].MulRealC(F(-1.0));
+        return _mulC(pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)], F(-1.0));
     }
 
     return pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -184,9 +136,10 @@ static __device__ __inline__ deviceSU2 _deviceGetGaugeBCSU2DirZeroSIndex(
  * Use U now to calculate A pure
  * me will be changed, so, if me is A phys, copy me first
  */
-static __device__ __inline__ deviceSU2 _deviceDPureMuSU2(
-    const deviceSU2* __restrict__ piA,
-    const deviceSU2* __restrict__ piApure,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceDPureMuT(
+    const deviceGauge* __restrict__ piA,
+    const deviceGauge* __restrict__ piApure,
     const SSmallInt4& sSite4,
     UINT uiBigIdx,
     BYTE byMu,
@@ -194,26 +147,25 @@ static __device__ __inline__ deviceSU2 _deviceDPureMuSU2(
     BYTE byFieldId)
 {
     //i a D A = (A_nu (n) - A_nu (n-mu)) + iApure _mu A _nu - i A _nu Apure _mu
-    const UINT uiSiteBig_m_mu = __idx->_deviceGetBigIndex(
-        _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1));
+    const UINT uiSiteBig_m_mu = __idx->_deviceGetBigIndex(_deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1));
 
-    deviceSU2 res = _deviceGetGaugeBCSU2DirZero(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
-    deviceSU2 res2 = _deviceGetGaugeBCSU2DirZero(byFieldId, piA, uiBigIdx, byNu); //A _nu
-    res2.Mul(res); //A _nu Apure _mu
-    res.Mul(_deviceGetGaugeBCSU2DirZero(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
-    res.Sub(res2); //[Apure, A]
-    res.Add(_deviceGetGaugeBCSU2DirZero(byFieldId, piA, uiBigIdx, byNu));
-    res.Sub(_deviceGetGaugeBCSU2DirZeroSIndex(piA,
-        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]));
+    deviceGauge res = _deviceGetGaugeBCDirZeroT(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
+    deviceGauge res2 = _deviceGetGaugeBCDirZeroT(byFieldId, piA, uiBigIdx, byNu); //A _nu
+    _mul(res2, res); //A _nu Apure _mu
+    _mul(res, _deviceGetGaugeBCDirZeroT(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
+    _sub(res, res2); //[Apure, A]
+    _add(res, _deviceGetGaugeBCDirZeroT(byFieldId, piA, uiBigIdx, byNu));
+    _sub(res, _deviceGetGaugeBCDirZeroSIndexT(piA,__idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]));
     return res;
 }
 
 /**
  * test using (A(N+mu)-A(N-mu))/2
  */
-static __device__ __inline__ deviceSU2 _deviceDPureMu2SU2(
-    const deviceSU2* __restrict__ piA,
-    const deviceSU2* __restrict__ piApure,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceDPureMu2T(
+    const deviceGauge* __restrict__ piA,
+    const deviceGauge* __restrict__ piApure,
     const SSmallInt4& sSite4,
     UINT uiBigIdx,
     BYTE byMu,
@@ -226,20 +178,21 @@ static __device__ __inline__ deviceSU2 _deviceDPureMu2SU2(
     const UINT uiSiteBig_p_mu = __idx->_deviceGetBigIndex(
         _deviceSmallInt4OffsetC(sSite4, byMu + 1));
 
-    deviceSU2 res = _deviceGetGaugeBCSU2DirZero(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
-    deviceSU2 res2 = _deviceGetGaugeBCSU2DirZero(byFieldId, piA, uiBigIdx, byNu); //A _nu
-    res2.Mul(res); //A _nu Apure _mu
-    res.Mul(_deviceGetGaugeBCSU2DirZero(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
-    res.Sub(res2); //[Apure, A]
-    res.Add(_deviceGetGaugeBCSU2DirZeroSIndex(piA,
-        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_p_mu * _DC_Dir + byNu]).MulRealC(F(0.5)));
-    res.Sub(_deviceGetGaugeBCSU2DirZeroSIndex(piA,
-        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]).MulRealC(F(0.5)));
+    deviceGauge res = _deviceGetGaugeBCDirZeroT(byFieldId, piApure, uiBigIdx, byMu); //Apure _mu
+    deviceGauge res2 = _deviceGetGaugeBCDirZeroT(byFieldId, piA, uiBigIdx, byNu); //A _nu
+    _mul(res2, res); //A _nu Apure _mu
+    _mul(res, _deviceGetGaugeBCDirZeroT(byFieldId, piA, uiBigIdx, byNu)); //Apure _mu A _nu
+    _sub(res, res2); //[Apure, A]
+    _add(res, _mulC(_deviceGetGaugeBCDirZeroSIndexT(piA,
+        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_p_mu * _DC_Dir + byNu]), F(0.5)));
+    _sub(res, _mulC(_deviceGetGaugeBCDirZeroSIndexT(piA,
+        __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiSiteBig_m_mu * _DC_Dir + byNu]), F(0.5)));
     return res;
 }
 
-static __device__ __inline__ deviceSU2 _devicePlaqutteSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _devicePlaqutteT(
+    const deviceGauge* __restrict__ pDeviceData,
     const SIndex* __restrict__ pCachedPlaqutte,
     UINT uiSiteIndex,
     BYTE plaqIdx, //0-5, as 12, 13, 14, 23, 24, 34
@@ -248,22 +201,22 @@ static __device__ __inline__ deviceSU2 _devicePlaqutteSU2(
 )
 {
     SIndex first = pCachedPlaqutte[plaqIdx * plaqLength + uiSiteIndex * plaqCountAll];
-    deviceSU2 toAdd(_deviceGetGaugeBCSU2DirOneSIndex(pDeviceData, first));
+    deviceGauge toAdd(_deviceGetGaugeBCDirOneSIndexT(pDeviceData, first));
     if (first.NeedToDagger())
     {
-        toAdd.Dagger();
+        _dagger(toAdd);
     }
     for (BYTE j = 1; j < plaqLength; ++j)
     {
         first = pCachedPlaqutte[plaqIdx * plaqLength + j + uiSiteIndex * plaqCountAll];
-        deviceSU2 toMul(_deviceGetGaugeBCSU2DirOneSIndex(pDeviceData, first));
+        deviceGauge toMul(_deviceGetGaugeBCDirOneSIndexT(pDeviceData, first));
         if (first.NeedToDagger())
         {
-            toAdd.MulDagger(toMul);
+            _muldag(toAdd, toMul);
         }
         else
         {
-            toAdd.Mul(toMul);
+            _mul(toAdd, toMul);
         }
     }
     return toAdd;
@@ -276,13 +229,14 @@ static __device__ __inline__ deviceSU2 _devicePlaqutteSU2(
  *
  * NOTE: This function assumes the boundary is always unity
  */
-static __device__ __inline__ deviceSU2 _deviceLinkSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceLinkT(
+    const deviceGauge* __restrict__ pDeviceData,
     SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
     const INT* __restrict__ pDir)
 {
     //length can be 0
-    deviceSU2 sRet = deviceSU2::makeSU2Id();
+    deviceGauge sRet = _makeId<deviceGauge>();
     for (BYTE i = 0; i < byLength; ++i)
     {
         if (0 == pDir[i])
@@ -309,7 +263,7 @@ static __device__ __inline__ deviceSU2 _deviceLinkSU2(
                     || (!newLink.NeedToDagger() && bDagger)
                     )
                 {
-                    sRet.Dagger();
+                    _dagger(sRet);
                 }
             }
         }
@@ -321,11 +275,11 @@ static __device__ __inline__ deviceSU2 _deviceLinkSU2(
                     || (!newLink.NeedToDagger() && bDagger)
                     )
                 {
-                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                    _muldag(sRet, pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
                 }
                 else
                 {
-                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                    _mul(sRet, pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
                 }
             }
         }
@@ -343,13 +297,14 @@ static __device__ __inline__ deviceSU2 _deviceLinkSU2(
  * After every move, it maps to inside the lattice
  * Do NOT use it in projective plane boundary condition
  */
-static __device__ __inline__ deviceSU2 _deviceLinkLongSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceLinkLongT(
+    const deviceGauge* __restrict__ pDeviceData,
     SSmallInt4 sStartSite, BYTE byLength, BYTE byFieldId,
     const INT* __restrict__ pDir)
 {
     //length can be 0
-    deviceSU2 sRet = deviceSU2::makeSU2Id();
+    deviceGauge sRet = _makeId<deviceGauge>();
     for (BYTE i = 0; i < byLength; ++i)
     {
         if (0 == pDir[i])
@@ -377,7 +332,7 @@ static __device__ __inline__ deviceSU2 _deviceLinkLongSU2(
                     || (!newLink.NeedToDagger() && bDagger)
                     )
                 {
-                    sRet.Dagger();
+                    _dagger(sRet);
                 }
             }
         }
@@ -389,11 +344,11 @@ static __device__ __inline__ deviceSU2 _deviceLinkLongSU2(
                     || (!newLink.NeedToDagger() && bDagger)
                     )
                 {
-                    sRet.MulDagger(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                    _muldag(sRet, pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
                 }
                 else
                 {
-                    sRet.Mul(pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
+                    _mul(sRet, pDeviceData[_deviceGetLinkIndex(newLink.m_uiSiteIndex, newLink.m_byDir)]);
                 }
             }
         }
@@ -418,8 +373,9 @@ static __device__ __inline__ deviceSU2 _deviceLinkLongSU2(
 *   V      |
 * O ------->
 */
-static __device__ __inline__ deviceSU2 _device1PlaqutteTermPPSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _device1PlaqutteTermPPT(
+    const deviceGauge* __restrict__ pDeviceData,
     BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
 {
     //For any boundary condition it is always, site->mu, site_p_mu->nu, site_p_nu->mu+, site->nu+
@@ -431,10 +387,10 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermPPSU2(
     const SIndex& s_p_nu_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_p_nu) * _DC_Dir + byMu];
     const SIndex& s_nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiB4 + byNu];
 
-    deviceSU2 u(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_mu, byFieldId));
-    u.Mul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_p_mu_nu, byFieldId));
-    u.MulDagger(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_p_nu_mu, byFieldId));
-    u.MulDagger(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_nu, byFieldId));
+    deviceGauge u = _deviceGetGaugeBCDirSIndexT(pDeviceData, s_mu, byFieldId);
+    _mul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_p_mu_nu, byFieldId));
+    _muldag(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_p_nu_mu, byFieldId));
+    _muldag(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_nu, byFieldId));
 
     return u;
 }
@@ -448,8 +404,9 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermPPSU2(
 *    |      V
 *    <------- O
 */
-static __device__ __inline__ deviceSU2 _device1PlaqutteTermMPSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _device1PlaqutteTermMPT(
+    const deviceGauge* __restrict__ pDeviceData,
     BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
 {
     const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1);
@@ -460,10 +417,10 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermMPSU2(
     const SIndex& s_m_mu_p_nu__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_mu_p_nu) * _DC_Dir + byMu];
     const SIndex& s__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIdx * _DC_Dir + byNu];
 
-    deviceSU2 u(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_mu__mu, byFieldId));
-    u.DaggerMul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_mu__nu, byFieldId));
-    u.Mul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_mu_p_nu__mu, byFieldId));
-    u.MulDagger(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s__nu, byFieldId));
+    deviceGauge u = _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_mu__mu, byFieldId);
+    _dagmul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_mu__nu, byFieldId));
+    _mul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_mu_p_nu__mu, byFieldId));
+    _muldag(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s__nu, byFieldId));
 
     return u;
 }
@@ -477,8 +434,9 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermMPSU2(
 *    |      V
 *    <-------
 */
-static __device__ __inline__ deviceSU2 _device1PlaqutteTermPMSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _device1PlaqutteTermPMT(
+    const deviceGauge* __restrict__ pDeviceData,
     BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
 {
     const SSmallInt4 n_m_nu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byNu) - 1);
@@ -489,10 +447,10 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermPMSU2(
     const SIndex& s_m_nu_p_mu__nu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(n_m_nu_p_mu) * _DC_Dir + byNu];
     const SIndex& s__mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIdx * _DC_Dir + byMu];
 
-    deviceSU2 u(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s__mu, byFieldId));
-    u.MulDagger(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu_p_mu__nu, byFieldId));
-    u.MulDagger(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu__mu, byFieldId));
-    u.Mul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu__nu, byFieldId));
+    deviceGauge u = _deviceGetGaugeBCDirSIndexT(pDeviceData, s__mu, byFieldId);
+    _muldag(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu_p_mu__nu, byFieldId));
+    _muldag(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu__mu, byFieldId));
+    _mul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu__nu, byFieldId));
 
     return u;
 }
@@ -506,8 +464,9 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermPMSU2(
 * V      |
 * ------->
 */
-static __device__ __inline__ deviceSU2 _device1PlaqutteTermMMSU2(
-    const deviceSU2* __restrict__ pDeviceData,
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _device1PlaqutteTermMMT(
+    const deviceGauge* __restrict__ pDeviceData,
     BYTE byMu, BYTE byNu, UINT uiBigIdx, const SSmallInt4& sSite4, BYTE byFieldId)
 {
     const SSmallInt4 n_m_mu = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(byMu) - 1);
@@ -522,10 +481,10 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermMMSU2(
 
     //u1^+ u2^+ u3 u4
     //= (u2 u1)^+ u3 u4
-    deviceSU2 u(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu_m_mu__nu, byFieldId));
-    u.Mul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_mu__mu, byFieldId));
-    u.DaggerMul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu_m_mu__mu, byFieldId));
-    u.Mul(_deviceGetGaugeBCSU2DirSIndex(pDeviceData, s_m_nu__nu, byFieldId));
+    deviceGauge u = _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu_m_mu__nu, byFieldId);
+    _mul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_mu__mu, byFieldId));
+    _dagmul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu_m_mu__mu, byFieldId));
+    _mul(u, _deviceGetGaugeBCDirSIndexT(pDeviceData, s_m_nu__nu, byFieldId));
 
     return u;
 }
@@ -538,12 +497,13 @@ static __device__ __inline__ deviceSU2 _device1PlaqutteTermMMSU2(
  * U_{mu,nu}(n)+U_{mu,nu}(n-mu)+U_{mu,nu}(n-nu)+U_{mu,nu}(n-mu-nu)
  *
  */
-static __device__ __inline__ deviceSU2 _deviceCloverSU2(const deviceSU2* __restrict__ pGaugeField, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE byFieldId)
+template<typename deviceGauge>
+static __device__ __inline__ deviceGauge _deviceCloverT(const deviceGauge* __restrict__ pGaugeField, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE byFieldId)
 {
-    deviceSU2 ret(_device1PlaqutteTermPPSU2(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId));
-    ret.Add(_device1PlaqutteTermMMSU2(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId));
-    ret.Add(_device1PlaqutteTermPMSU2(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId));
-    ret.Add(_device1PlaqutteTermMPSU2(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId));
+    deviceGauge ret = _device1PlaqutteTermPPT(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId);
+    _add(ret, _device1PlaqutteTermMMT(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId));
+    _add(ret, _device1PlaqutteTermPMT(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId));
+    _add(ret, _device1PlaqutteTermMPT(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId));
 
     return ret;
 }
@@ -551,21 +511,21 @@ static __device__ __inline__ deviceSU2 _deviceCloverSU2(const deviceSU2* __restr
 /**
  * Avoid the add of matrices
  */
-static __device__ __inline__ Real _deviceCloverRetrSU2(const deviceSU2* __restrict__ pGaugeField, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE byFieldId)
+template<typename deviceGauge>
+static __device__ __inline__ Real _deviceCloverRetrT(const deviceGauge* __restrict__ pGaugeField, const SSmallInt4& sSite4, UINT uiBigIdx, BYTE mu, BYTE nu, BYTE byFieldId)
 {
-    return _device1PlaqutteTermPPSU2(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId).ReTr()
-        + _device1PlaqutteTermMMSU2(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId).ReTr()
-        + _device1PlaqutteTermPMSU2(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId).ReTr()
-        + _device1PlaqutteTermMPSU2(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId).ReTr();
+    return _retr(_device1PlaqutteTermPPT(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId))
+         + _retr(_device1PlaqutteTermMMT(pGaugeField, mu, nu, uiBigIdx, sSite4, byFieldId))
+         + _retr(_device1PlaqutteTermPMT(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId))
+         + _retr(_device1PlaqutteTermMPT(pGaugeField, nu, mu, uiBigIdx, sSite4, byFieldId));
 }
 
 #pragma endregion
 
-#endif
 
 __END_NAMESPACE
 
-#endif //#ifndef _CFIELDGAUGE_SU2_H_
+#endif //#ifndef _DEVICEINLINEGAUGE_H_
 
 //=============================================================================
 // END OF FILE

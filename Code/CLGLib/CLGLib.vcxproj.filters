@@ -67,6 +67,9 @@
     <Filter Include="Data\Field\Gauge">
       <UniqueIdentifier>{1a189ba2-2b8b-4d50-8ae9-bc87319eaa68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tools\Math\DeviceTemplates">
+      <UniqueIdentifier>{44ef62cb-1ce4-4896-9186-55d05cf883d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tools\Timer.h">
@@ -473,9 +476,6 @@
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.h">
       <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1.h">
-      <Filter>Data\Field\Gauge</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1Real.h">
       <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
@@ -524,14 +524,8 @@
     <ClInclude Include="Tools\Math\SU2.h">
       <Filter>Tools\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSUN.h">
-      <Filter>Data\Field\Gauge</Filter>
-    </ClInclude>
     <ClInclude Include="Measurement\CMeasurePolyakovSUN.h">
       <Filter>Measurement</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU2.h">
-      <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
     <ClInclude Include="Tools\Math\DeviceInlineTemplate.h">
       <Filter>Tools\Math</Filter>
@@ -550,6 +544,18 @@
     </ClInclude>
     <ClInclude Include="Tools\Math\DeviceInlineSU3.h">
       <Filter>Tools\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGauge.h">
+      <Filter>Tools\Math\DeviceTemplates</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeChair.h">
+      <Filter>Tools\Math\DeviceTemplates</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeRotationCoefficientFunction.h">
+      <Filter>Tools\Math\DeviceTemplates</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.h">
+      <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -874,9 +880,6 @@
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1.cu">
-      <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1Real.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
@@ -904,14 +907,8 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSUN.cu">
-      <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
       <Filter>Measurement</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu">
-      <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu">
       <Filter>Data\Field\BoundaryField</Filter>
@@ -923,6 +920,9 @@
       <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu">
+      <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
   </ItemGroup>

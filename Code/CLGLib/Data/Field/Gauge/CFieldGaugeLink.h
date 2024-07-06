@@ -22,6 +22,15 @@
     } 
 
 
+#define __DEFINE_GAUGE_LINK(CLASSNAME, DEVICEDATA, N, FIELDTYPE) \
+__CLG_REGISTER_HELPER_HEADER(CLASSNAME) \
+class CLGAPI CLASSNAME : public CFieldGaugeLink<DEVICEDATA, N> \
+{ \
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CLASSNAME) \
+public: \
+    EFieldType GetFieldType() const override { return FIELDTYPE; } \
+};
+
 
 __BEGIN_NAMESPACE
 
@@ -110,6 +119,18 @@ public:
 
 };
 
+__CLG_REGISTER_HELPER_HEADER(CFieldGaugeU1)
+
+class CLGAPI CFieldGaugeU1 : public CFieldGaugeLink<CLGComplex, 1>
+{
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeU1)
+public:
+    EFieldType GetFieldType() const override { return EFT_GaugeU1; }
+
+    void InitialWithByteCompressed(const CCString& sFileName) override;
+    CCString SaveToCompressedFile(const CCString& fileName) const override;
+    void TransformToIA() override;
+};
 
 __CLG_REGISTER_HELPER_HEADER(CFieldGaugeSU2)
 
@@ -121,7 +142,14 @@ public:
 
     void InitialWithByteCompressed(const CCString& sFileName) override;
     CCString SaveToCompressedFile(const CCString& fileName) const override;
+    void TransformToIA() override;
 };
+
+__DEFINE_GAUGE_LINK(CFieldGaugeSU4, deviceSU4, 4, EFT_GaugeSU4)
+__DEFINE_GAUGE_LINK(CFieldGaugeSU5, deviceSU5, 5, EFT_GaugeSU5)
+__DEFINE_GAUGE_LINK(CFieldGaugeSU6, deviceSU6, 6, EFT_GaugeSU6)
+__DEFINE_GAUGE_LINK(CFieldGaugeSU7, deviceSU7, 7, EFT_GaugeSU7)
+__DEFINE_GAUGE_LINK(CFieldGaugeSU8, deviceSU8, 8, EFT_GaugeSU8)
 
 __END_NAMESPACE
 

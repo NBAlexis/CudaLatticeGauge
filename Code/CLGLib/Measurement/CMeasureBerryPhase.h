@@ -7,7 +7,7 @@
 // REVISION:
 //  [10/13/2020 nbale]
 //=============================================================================
-#include "Data/Field/Gauge/CFieldGaugeU1.h"
+#include "Data/Field/Gauge/CFieldGaugeLink.h"
 
 #ifndef _CMEASUREBERRYPHASE_H_
 #define _CMEASUREBERRYPHASE_H_

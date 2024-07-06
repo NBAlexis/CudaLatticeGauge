@@ -20,7 +20,8 @@ UINT TestUpdateSU4(CParameters& sParam)
     return 0;
 }
 
-__REGIST_TEST(TestUpdateSU4, SUN, TestSU4, SU4);
+__REGIST_TEST(TestUpdateSU4, SUN, TestSU4, SUN);
+__REGIST_TEST(TestUpdateSU4, SUN, TestSU4D, SUND);
 
 
 //=============================================================================

@@ -10,7 +10,7 @@
 //  [10/01/2021 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-#include "Data/Field/Gauge/CFieldGaugeU1.h"
+#include "Data/Field/Gauge/CFieldGaugeLink.h"
 #include "CFieldFermionKSSU3.h"
 #include "CFieldFermionKSU1.h"
 

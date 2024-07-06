@@ -1308,27 +1308,105 @@ void CFieldGaugeLink<deviceGauge, matrixN>::PolyakovOnSpatialSite(cuDoubleComple
 
 #pragma region SU2 functions
 
+template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelTransformToULogSU2(deviceSU2* pDeviceData)
+_kernelTransformIAToULogGauge(deviceGauge* pDeviceData)
 {
     gaugeLinkKernelFuncionStart
 
-        pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].StrictExp();
+        pDeviceData[uiLinkIndex] = _strictexp(pDeviceData[uiLinkIndex]);
 
     gaugeLinkKernelFuncionEnd
 }
 
+template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelTransformToIALogSU2(deviceSU2* pDeviceData)
+_kernelTransformToIALogGauge(deviceGauge* pDeviceData)
 {
     gaugeLinkKernelFuncionStart
 
-        pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].Log();
+        pDeviceData[uiLinkIndex] = _strictlog(pDeviceData[uiLinkIndex]);
 
     gaugeLinkKernelFuncionEnd
 }
 
-#pragma endregion
+void CFieldGaugeU1::TransformToIA()
+{
+    preparethread;
+    if (0 == _HC_ALog)
+    {
+        _kernelTransformToIAGauge << <block, threads >> > (m_pDeviceData);
+    }
+    else
+    {
+        _kernelTransformToIALogGauge << <block, threads >> > (m_pDeviceData);
+    }
+}
+
+void CFieldGaugeU1::InitialWithByteCompressed(const CCString& sFileName)
+{
+    UINT uiSize = static_cast<UINT>(sizeof(Real) * m_uiLinkeCount);
+    BYTE* byData = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
+    Real* fRead = (Real*)byData;
+    CLGComplex* readData = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        readData[i].x = F(0.0);
+        readData[i].y = fRead[i];
+    }
+    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaDeviceSynchronize());
+    free(readData);
+
+    preparethread;
+    _kernelTransformIAToULogGauge << <block, threads >> > (m_pDeviceData);
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    free(byData);
+}
+
+CCString CFieldGaugeU1::SaveToCompressedFile(const CCString& fileName) const
+{
+    CFieldGaugeU1* pPooledGauge = dynamic_cast<CFieldGaugeU1*>(GetCopy());
+
+    preparethread;
+    _kernelTransformToIALogGauge << <block, threads >> > (pPooledGauge->m_pDeviceData);
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    CLGComplex* toSave = (CLGComplex*)malloc(sizeof(CLGComplex) * m_uiLinkeCount);
+    checkCudaErrors(cudaMemcpy(toSave, pPooledGauge->m_pDeviceData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyDeviceToHost));
+
+    //This is a traceless anti-Hermitian now, so we only save part of them
+    const UINT uiSize = static_cast<UINT>(sizeof(Real) * m_uiLinkeCount);
+    BYTE* byToSave = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    Real* fToSave = (Real*)byToSave;
+    for (UINT i = 0; i < m_uiLinkeCount; ++i)
+    {
+        fToSave[i] = static_cast<Real>(toSave[i].y);
+    }
+
+    appGetFileSystem()->WriteAllBytes(fileName.c_str(), byToSave, uiSize);
+    //pPooledGauge->DebugPrintMe();
+    free(toSave);
+    CCString MD5 = CLGMD5Hash(byToSave, uiSize);
+    free(byToSave);
+    appSafeDelete(pPooledGauge);
+    return MD5;
+}
+
+void CFieldGaugeSU2::TransformToIA()
+{
+    preparethread;
+    if (0 == _HC_ALog)
+    {
+        _kernelTransformToIAGauge << <block, threads >> > (m_pDeviceData);
+    }
+    else
+    {
+        _kernelTransformToIALogGauge << <block, threads >> > (m_pDeviceData);
+    }
+}
 
 void CFieldGaugeSU2::InitialWithByteCompressed(const CCString& sFileName)
 {
@@ -1354,7 +1432,7 @@ void CFieldGaugeSU2::InitialWithByteCompressed(const CCString& sFileName)
     //DebugPrintMe();
 
     preparethread;
-    _kernelTransformToULogSU2 << <block, threads >> > (m_pDeviceData);
+    _kernelTransformIAToULogGauge << <block, threads >> > (m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
 
     //DebugPrintMe();
@@ -1366,7 +1444,7 @@ CCString CFieldGaugeSU2::SaveToCompressedFile(const CCString& fileName) const
     CFieldGaugeSU2* pPooledGauge = dynamic_cast<CFieldGaugeSU2*>(GetCopy());
 
     preparethread;
-    _kernelTransformToIALogSU2 << <block, threads >> > (pPooledGauge->m_pDeviceData);
+    _kernelTransformToIALogGauge << <block, threads >> > (pPooledGauge->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 
@@ -1395,7 +1473,16 @@ CCString CFieldGaugeSU2::SaveToCompressedFile(const CCString& fileName) const
     return MD5;
 }
 
+
+#pragma endregion
+
+__CLGIMPLEMENT_CLASS(CFieldGaugeU1)
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU2)
+__CLGIMPLEMENT_CLASS(CFieldGaugeSU4)
+__CLGIMPLEMENT_CLASS(CFieldGaugeSU5)
+__CLGIMPLEMENT_CLASS(CFieldGaugeSU6)
+__CLGIMPLEMENT_CLASS(CFieldGaugeSU7)
+__CLGIMPLEMENT_CLASS(CFieldGaugeSU8)
 
 __END_NAMESPACE
 

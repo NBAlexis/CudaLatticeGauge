@@ -12,9 +12,9 @@ TestSU4:
     ExponentialPrecision : 10
     CacheStaple : 0
 
-    ActionListLength : 6
-    GaugeFieldCount : 6
-    MeasureListLength : 6
+    ActionListLength : 7
+    GaugeFieldCount : 7
+    MeasureListLength : 7
     FermionFieldCount : 0
 
     Updator:
@@ -35,16 +35,16 @@ TestSU4:
     Gauge:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU4
+        FieldName : CFieldGaugeU1
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
         FieldId : 1
-        
+
     Gauge2:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU5
+        FieldName : CFieldGaugeSU2
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -53,16 +53,16 @@ TestSU4:
     Gauge3:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU6
+        FieldName : CFieldGaugeSU4
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
         FieldId : 3
-
+        
     Gauge4:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU7
+        FieldName : CFieldGaugeSU5
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -71,7 +71,7 @@ TestSU4:
     Gauge5:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU8
+        FieldName : CFieldGaugeSU6
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -80,11 +80,20 @@ TestSU4:
     Gauge6:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU2
+        FieldName : CFieldGaugeSU7
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
         FieldId : 6
+
+    Gauge7:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU8
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 7
 
     Measure1:
 
@@ -115,6 +124,11 @@ TestSU4:
 
         MeasureName : CMeasurePolyakov2
         GaugeFields : [6]
+
+    Measure7:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [7]
 
     Action1:
 
@@ -151,4 +165,232 @@ TestSU4:
         ActionName : CActionGaugePlaquette
         Beta : 5.0
         GaugeFields : [6]
+
+    Action7:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [7]
+
+TestSU4D:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    CacheStaple : 0
+
+    ActionListLength : 7
+    GaugeFieldCount : 7
+    MeasureListLength : 7
+    FermionFieldCount : 0
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        Omelyan2Lambda : 0.38636665500756728
+
+        ReportMeasure : 0
+
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeU1D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+
+        Period : [0, 0, 1, 1]
+
+    Gauge2:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU2D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+
+        Period : [0, 0, 1, 1]
+
+    Gauge3:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU4D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 3
+
+        Period : [0, 0, 1, 1]
+        
+    Gauge4:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU5D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 4
+
+        Period : [0, 0, 1, 1]
+
+    Gauge5:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU6D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 5
+
+        Period : [0, 0, 1, 1]
+
+    Gauge6:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU7D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 6
+
+        Period : [0, 0, 1, 1]
+
+    Gauge7:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU8D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 7
+        
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeU1
+        FieldId : 1
+
+    GaugeBoundary2:
+
+        FieldName : CFieldBoundaryGaugeSU2
+        FieldId : 2
+
+    GaugeBoundary3:
+
+        FieldName : CFieldBoundaryGaugeSU4
+        FieldId : 3
+
+    GaugeBoundary4:
+
+        FieldName : CFieldBoundaryGaugeSU5
+        FieldId : 4
+
+    GaugeBoundary5:
+
+        FieldName : CFieldBoundaryGaugeSU6
+        FieldId : 5
+
+    GaugeBoundary6:
+
+        FieldName : CFieldBoundaryGaugeSU7
+        FieldId : 6
+
+    GaugeBoundary7:
+
+        FieldName : CFieldBoundaryGaugeSU8
+        FieldId : 7
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [1]
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [2]
+
+    Measure3:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [3]
+
+    Measure4:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [4]
+
+    Measure5:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [5]
+
+    Measure6:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [6]
+
+    Measure7:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [7]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [1]
+
+    Action2:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [2]
+
+    Action3:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [3]
+
+    Action4:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [4]
+
+    Action5:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [5]
+
+    Action6:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [6]
+
+    Action7:
+
+        ActionName : CActionGaugePlaquette
+        Beta : 5.0
+        GaugeFields : [7]
 

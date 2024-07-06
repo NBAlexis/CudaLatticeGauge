@@ -58,12 +58,10 @@
     <ClInclude Include="Data\Field\CFieldSpin.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGauge.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLink.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU2.h" />
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3D.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeSUN.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeU1Real.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeZ2.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKS.h" />
@@ -159,6 +157,9 @@
     <ClInclude Include="Tools\Math\CRationalApproximation.h" />
     <ClInclude Include="Tools\Math\DeviceInlineSU3.h" />
     <ClInclude Include="Tools\Math\DeviceInlineTemplate.h" />
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeChair.h" />
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGauge.h" />
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeRotationCoefficientFunction.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
@@ -197,12 +198,10 @@
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU2.cu" />
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3D.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3TreeImproved.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSUN.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeU1Real.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3Acc.cu" />
