@@ -213,7 +213,7 @@ void CFieldFermionKSSU3RigidAcc::DOperatorKS(void* pTargetBuffer, const void* pB
     {
         CFieldFermionKSSU3Gamma::appApplyGammaKS(pTarget, pSource, pGauge,
             GAMMA3, FALSE, bDagger, F(0.5) * CCommonData::m_fG,
-            eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, 1);
+            eOCT, fRealCoeff, cCmpCoeff, m_byFieldId, byGaugeFieldId);
     }
     else
     {

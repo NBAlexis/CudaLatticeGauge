@@ -31,12 +31,19 @@ public:
         }
     }
 
-    __device__ __inline__ void DebugPrint() const
+    __device__ __inline__ void DebugPrint(const char* header = NULL) const
     {
-        printf("{");
+        if (NULL == header)
+        {
+            printf("{");
+        }
+        else
+        {
+            printf("%s={", header);
+        }
         for (INT i = 0; i < N; ++i)
         {
-            printf("%2.3f %s %2.3f i\n",
+            printf("%2.3f %s %2.3f I",
                 m_ve[i].x,
                 m_ve[i].y < 0 ? "" : "+",
                 m_ve[i].y

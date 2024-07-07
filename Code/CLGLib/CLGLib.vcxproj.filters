@@ -551,11 +551,17 @@
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeChair.h">
       <Filter>Tools\Math\DeviceTemplates</Filter>
     </ClInclude>
-    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeRotationCoefficientFunction.h">
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineUseNoTemplateFunction.h">
       <Filter>Tools\Math\DeviceTemplates</Filter>
     </ClInclude>
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.h">
       <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKST.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredGamma.h">
+      <Filter>Tools\Math\DeviceTemplates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -924,6 +930,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu">
       <Filter>Data\Field\Gauge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKST.cu">
+      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

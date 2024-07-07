@@ -9,7 +9,7 @@
 //  [07/05/2024 nbale]
 //=============================================================================
 #include "Data/Field/BoundaryField/CFieldBoundaryOne.h"
-#include "DeviceTemplates/DeviceInlineGaugeRotationCoefficientFunction.h"
+#include "DeviceTemplates/DeviceInlineUseNoTemplateFunction.h"
 
 #ifndef _DEVICEINLINESU3_H_
 #define _DEVICEINLINESU3_H_
@@ -3351,36 +3351,6 @@ static __device__ __inline__ CLGComplex _deviceVXYTOptimizedU1(
 #pragma endregion
 
 #pragma region device functions GAMMA
-
-static __device__ __inline__ SBYTE _deviceEta2(UINT uiEta, BYTE i, BYTE j)
-{
-    return ((uiEta >> i) + (uiEta >> j)) & 1;
-}
-
-/**
- * eta xyz, eta yzt, eta xyt, ...
- * for 1, 3 there is a minus sign
- * missingDir:
- * 3 - xyz x:1  y:(-1)^x z:(-1)^(x+y)             res: (-1)^y
- * 2 - xyt x:1  y:(-1)^x t:(-1)^(x+y+z)           res: (-1)^(y+z)
- * 0 - yzt y:(-1)^x z:(-1)^(x+y) t:(-1)^(x+y+z)   res: (-1)^(x+z)
- * 1 - xzt x:1  z:(-1)^(x+y) t:(-1)^(x+y+z)       res: (-1)^z
- *
- */
-static __device__ __inline__ SBYTE _deviceEta3(const SSmallInt4& sSite, BYTE missingDir)
-{
-    switch (missingDir)
-    {
-    case 3:
-        return (sSite.y + 1) & 1;
-    case 2:
-        return (sSite.y + sSite.z) & 1;
-    case 0:
-        return (sSite.x + sSite.z) & 1;
-    default:
-        return (sSite.z + 1) & 1;
-    }
-}
 
 static __device__ __inline__ deviceSU3 _devicePlaneDiagonal(
     const deviceSU3* __restrict__ pDeviceData,

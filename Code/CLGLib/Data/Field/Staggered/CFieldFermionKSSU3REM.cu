@@ -1079,7 +1079,7 @@ void CFieldFermionKSSU3REM::ApplyGammaKSS(const CFieldGauge* pGauge, EGammaMatri
         F(1.0), 
         bImag ? _make_cuComplex(F(0.0), -F(1.0)) : _onec,
         m_byFieldId, 
-        1);
+        pGauge->m_byFieldId);
 
     pPooled->Return();
 }

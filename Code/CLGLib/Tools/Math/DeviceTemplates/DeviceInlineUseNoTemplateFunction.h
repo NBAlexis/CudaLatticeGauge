@@ -9,11 +9,12 @@
 //  [07/03/2024 nbale]
 //=============================================================================
 
-#ifndef _DEVICEINLINEGAUGE_ROTATION_COEFFICIENT_FUNCTION_H_
-#define _DEVICEINLINEGAUGE_ROTATION_COEFFICIENT_FUNCTION_H_
+#ifndef _DEVICEINLINEGAUGE_NOTEMPLATE_FUNCTION_H_
+#define _DEVICEINLINEGAUGE_NOTEMPLATE_FUNCTION_H_
 
 __BEGIN_NAMESPACE
 
+#pragma region Rotation
 
 /**
 * g1=O^2(x^2)/2
@@ -458,9 +459,45 @@ static __device__ __inline__ Real _deviceHiShiftedT2(
 
 #pragma endregion
 
+#pragma endregion
+
+#pragma region Gamma KS
+
+static __device__ __inline__ SBYTE _deviceEta2(UINT uiEta, BYTE i, BYTE j)
+{
+    return ((uiEta >> i) + (uiEta >> j)) & 1;
+}
+
+/**
+ * eta xyz, eta yzt, eta xyt, ...
+ * for 1, 3 there is a minus sign
+ * missingDir:
+ * 3 - xyz x:1  y:(-1)^x z:(-1)^(x+y)             res: (-1)^y
+ * 2 - xyt x:1  y:(-1)^x t:(-1)^(x+y+z)           res: (-1)^(y+z)
+ * 0 - yzt y:(-1)^x z:(-1)^(x+y) t:(-1)^(x+y+z)   res: (-1)^(x+z)
+ * 1 - xzt x:1  z:(-1)^(x+y) t:(-1)^(x+y+z)       res: (-1)^z
+ *
+ */
+static __device__ __inline__ SBYTE _deviceEta3(const SSmallInt4& sSite, BYTE missingDir)
+{
+    switch (missingDir)
+    {
+    case 3:
+        return (sSite.y + 1) & 1;
+    case 2:
+        return (sSite.y + sSite.z) & 1;
+    case 0:
+        return (sSite.x + sSite.z) & 1;
+    default:
+        return (sSite.z + 1) & 1;
+    }
+}
+
+#pragma endregion
+
 __END_NAMESPACE
 
-#endif //#ifndef _DEVICEINLINEGAUGE_ROTATION_COEFFICIENT_FUNCTION_H_
+#endif //#ifndef _DEVICEINLINEGAUGE_NOTEMPLATE_FUNCTION_H_
 
 //=============================================================================
 // END OF FILE

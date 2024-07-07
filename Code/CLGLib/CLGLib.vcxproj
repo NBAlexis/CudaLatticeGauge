@@ -75,6 +75,7 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3R.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3REM.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.h" />
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKST.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1R.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.h" />
@@ -159,7 +160,8 @@
     <ClInclude Include="Tools\Math\DeviceInlineTemplate.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeChair.h" />
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGauge.h" />
-    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineGaugeRotationCoefficientFunction.h" />
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineUseNoTemplateFunction.h" />
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredGamma.h" />
     <ClInclude Include="Tools\Math\GammaMatrix.h" />
     <ClInclude Include="Tools\Math\CudaComplexFunction.h" />
     <ClInclude Include="Tools\Math\Random.h" />
@@ -213,6 +215,7 @@
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3R.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3REM.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.cu" />
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKST.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1R.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.cu" />

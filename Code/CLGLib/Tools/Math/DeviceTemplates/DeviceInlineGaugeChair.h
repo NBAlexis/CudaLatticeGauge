@@ -8,8 +8,6 @@
 // REVISION:
 //  [07/06/2024 nbale]
 //=============================================================================
-#include "DeviceInlineGaugeRotationCoefficientFunction.h"
-
 #ifndef _DEVICEINLINEGAUGECHAIR_H_
 #define _DEVICEINLINEGAUGECHAIR_H_
 

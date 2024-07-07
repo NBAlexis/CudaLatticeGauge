@@ -528,6 +528,18 @@ public:
         return ret;
     }
 
+    __device__ __inline__ void MulVectorElement(CLGComplex* res, const CLGComplex * v) const
+    {
+        for (INT y = 0; y < N; ++y)
+        {
+            res[y] = _cuCmulf(m_me[y * N], v[0]);
+            for (INT x = 1; x < N; ++x)
+            {
+                res[y] = _cuCaddf(res[y], _cuCmulf(m_me[y * N + x], v[x]));
+            }
+        }
+    }
+
 #pragma endregion
 
 #pragma region useful functions
@@ -1242,6 +1254,762 @@ public:
         {
             OneStepGaussianLUNoReturn(i);
         }
+    }
+
+    /**
+    * let me be R matrix, set v=R^{-1}.v
+    */
+    template<INT NoVE>
+    __device__ __inline__ void BackwardSubstitution(deviceSUNVector<N, NoVE>& v) const
+    {
+        for (INT i = N - 1; i >= 0; --i)
+        {
+            for (INT j = i + 1; j < N; ++j)
+            {
+                v.m_ve[i] = _cuCsubf(v.m_ve[i], _cuCmulf(m_me[i * N + j], v.m_ve[j]));
+            }
+            if (__cuCabsSqf(m_me[i * N + i]) > _CLG_FLT_MIN_)
+            {
+                v.m_ve[i] = _cuCdivf(v.m_ve[i], m_me[i * N + i]);
+            }
+        }
+    }
+
+    __device__ __inline__ void BackwardSubstitutionElement(CLGComplex* v) const
+    {
+        for (INT i = N - 1; i >= 0; --i)
+        {
+            for (INT j = i + 1; j < N; ++j)
+            {
+                v[i] = _cuCsubf(v[i], _cuCmulf(m_me[i * N + j], v[j]));
+            }
+            if (__cuCabsSqf(m_me[i * N + i]) > _CLG_FLT_MIN_)
+            {
+                v[i] = _cuCdivf(v[i], m_me[i * N + i]);
+            }
+        }
+    }
+
+private:
+
+    __device__ __inline__ void OneStepHouseHolderHessenberg(deviceSUN<N, NoE>& A, UINT i)
+    {
+        //Calculate beta and v
+        Real fLength = F(0.0);
+        for (INT y = i + 1; y < N; ++y)
+        {
+            fLength += __cuCabsSqf(A.m_me[y * N + i]);
+        }
+
+        if (fLength > _CLG_FLT_MIN_)
+        {
+            //Calculate P = 1 - beta (v^+ v)
+            fLength = _sqrt(fLength);
+            CLGComplex vlst[N];
+            Real fULength = F(0.0);
+            for (INT y = i + 1; y < N; ++y)
+            {
+                vlst[y] = A.m_me[y * N + i];
+                if (y == i + 1)
+                {
+                    const Real arg = __cuCargf(vlst[y]);
+                    vlst[y] = _cuCaddf(vlst[y], _make_cuComplex(_cos(arg) * fLength, _sin(arg) * fLength));
+                }
+                fULength += __cuCabsSqf(vlst[y]);
+            }
+
+            if (fULength > _CLG_FLT_MIN_)
+            {
+                const Real fBeta = F(2.0) / fULength;
+
+                //Me = Me.P
+                if (0 == i)
+                {
+                    //P = 1 - beta (v^+ v)
+                    for (INT px = 0; px < N; ++px)
+                    {
+                        for (INT py = 0; py < N; ++py)
+                        {
+                            if (0 == px && 0 == py)
+                            {
+                                m_me[py * N + px] = _onec;
+                            }
+                            else if (px > 0 && py > 0)
+                            {
+                                m_me[py * N + px] = _cuCmulf(vlst[py], _cuConjf(vlst[px]));
+                                if (px == py)
+                                {
+                                    m_me[py * N + px].x = F(1.0) - fBeta * m_me[py * N + px].x;
+                                }
+                                else
+                                {
+                                    m_me[py * N + px].x = -fBeta * m_me[py * N + px].x;
+                                }
+                                m_me[py * N + px].y = -fBeta * m_me[py * N + px].y;
+                            }
+                            else
+                            {
+                                m_me[py * N + px] = _zeroc;
+                            }
+                        }
+                    }
+
+                    //Update A
+                    A.MulOnMe(*this);
+                    A.Mul(*this);
+                }
+                else
+                {
+                    //P = 1 - beta (v^+ v)
+                    deviceSUN<N, NoE> tmp = makeSUNId();
+                    for (INT px = i + 1; px < N; ++px)
+                    {
+                        for (INT py = i + 1; py < N; ++py)
+                        {
+                            tmp.m_me[py * N + px] = _cuCmulf(vlst[py], _cuConjf(vlst[px]));
+                            if (px == py)
+                            {
+                                tmp.m_me[py * N + px].x = F(1.0) - fBeta * tmp.m_me[py * N + px].x;
+                            }
+                            else
+                            {
+                                tmp.m_me[py * N + px].x = -fBeta * tmp.m_me[py * N + px].x;
+                            }
+                            tmp.m_me[py * N + px].y = -fBeta * tmp.m_me[py * N + px].y;
+                        }
+                    }
+
+                    //Update A
+                    A.MulOnMe(tmp);
+                    A.Mul(tmp);
+                    Mul(tmp);
+                }
+            }
+        }
+    }
+
+    __device__ __inline__ void OneStepHouseHolderHessenbergC(deviceSUN<N, NoE>& A, UINT i) const
+    {
+        //Calculate beta and v
+        Real fLength = F(0.0);
+        for (INT y = i + 1; y < N; ++y)
+        {
+            fLength += __cuCabsSqf(A.m_me[y * N + i]);
+        }
+
+        if (fLength > _CLG_FLT_MIN_)
+        {
+            //Calculate P = 1 - beta (v^+ v)
+            fLength = _sqrt(fLength);
+            CLGComplex vlst[N];
+            Real fULength = F(0.0);
+            for (INT y = i + 1; y < N; ++y)
+            {
+                vlst[y] = A.m_me[y * N + i];
+                if (y == i + 1)
+                {
+                    const Real arg = __cuCargf(vlst[y]);
+                    vlst[y] = _cuCaddf(vlst[y], _make_cuComplex(_cos(arg) * fLength, _sin(arg) * fLength));
+                }
+                fULength += __cuCabsSqf(vlst[y]);
+            }
+
+            if (fULength > _CLG_FLT_MIN_)
+            {
+                const Real fBeta = F(2.0) / fULength;
+                //P = 1 - beta (v^+ v)
+                deviceSUN<N, NoE> tmp = makeSUNId();
+                for (INT px = i + 1; px < N; ++px)
+                {
+                    for (INT py = i + 1; py < N; ++py)
+                    {
+                        tmp.m_me[py * N + px] = _cuCmulf(vlst[py], _cuConjf(vlst[px]));
+                        if (px == py)
+                        {
+                            tmp.m_me[py * N + px].x = F(1.0) - fBeta * tmp.m_me[py * N + px].x;
+                        }
+                        else
+                        {
+                            tmp.m_me[py * N + px].x = -fBeta * tmp.m_me[py * N + px].x;
+                        }
+                        tmp.m_me[py * N + px].y = -fBeta * tmp.m_me[py * N + px].y;
+                    }
+                }
+
+                //Update A
+                A.MulOnMe(tmp);
+                A.Mul(tmp);
+            }
+        }
+    }
+
+public:
+
+    __device__ __inline__ deviceSUN<N, NoE> Hessenberg()
+    {
+        deviceSUN<N, NoE> r(*this);
+        for (UINT i = 0; i < (N - 2); ++i)
+        {
+            OneStepHouseHolderHessenberg(r, i);
+        }
+        return r;
+    }
+
+    __device__ __inline__ deviceSUN<N, NoE> HessenbergC() const
+    {
+        deviceSUN<N, NoE> r(*this);
+        for (UINT i = 0; i < (N - 2); ++i)
+        {
+            OneStepHouseHolderHessenbergC(r, i);
+        }
+        return r;
+    }
+
+    #pragma region QR Iteration
+
+    /**
+    * for every 2x2 matrix of mtr which is dx x dx
+    * from the right buttom corner to the left top
+    * Denote it as
+    * i  : m11 m12
+    * i+1: m21 m22
+    * 
+    * if m21 ~ 0 (|m21|^2 << (|m11|^2 + |m22|^2))
+    * set m21 = 0
+    * 
+    * decomp[0] is the start index of none-zero Henssenberg matrix
+    * decomp[1] is the end   index of none-zero Henssenberg matrix
+    * 
+    * if (decomp[1] == i + 2)
+    * it means, at each step of for, decomp[1] was updated (such that the right bottom of it are always 0)
+    * 
+    * if (i + 1 > decomp[0] && i + 1 < decomp[1])
+    *    i + 1 > decomp[0] means decomp[0] was never updated
+    *    i + 1 < decomp[1] means there was at least a two dimension matrix
+    * 
+    */
+    static __device__ __inline__ void checkMatrixIndexDoubleShift(CLGComplex* mtr, INT* decomp, INT dx)
+    {
+        decomp[0] = 0;
+        decomp[1] = dx;
+
+        for (INT i = dx - 2; i >= 0; --i)
+        {
+            if (__cuCabsSqf(mtr[(i + 1) * dx + i]) < _CLG_FLT_MIN_)
+            {
+                mtr[(i + 1) * dx + i] = _make_cuComplex(F(0.0), F(0.0));
+
+                if (decomp[1] == i + 2)
+                {
+                    decomp[1] = i + 1;
+                }
+
+                if (i + 1 > decomp[0] && i + 1 < decomp[1])
+                {
+                    decomp[0] = i + 1;
+                }
+            }
+        }
+    }
+
+
+    /**
+    * H = h00 h01
+    *     h10 h11
+    * a1, a2 be the eigenvalues
+    * s = a1 + a2
+    * t = a1.a2
+    */
+    static __device__ __inline__ void doubleEigen(CLGComplex& s, CLGComplex& t,
+        const CLGComplex& h00, const CLGComplex& h01,
+        const CLGComplex& h10, const CLGComplex& h11)
+    {
+        s = _cuCaddf(h11, h00);
+        t = _cuCsubf(_cuCmulf(h00, h11), _cuCmulf(h10, h01));
+    }
+
+    /**
+    * H = h00 h01
+    *     h10 h11
+    * a1, a2 be the eigenvalues
+    * s = a1 + a2
+    * t = a1.a2
+    */
+    static __device__ __inline__  void doubleShift(
+        CLGComplex& a, CLGComplex& b, CLGComplex& c,
+        const CLGComplex& s, const CLGComplex& t,
+        const CLGComplex& h00, const CLGComplex& h01,
+        const CLGComplex& h10, const CLGComplex& h11,
+        const CLGComplex& h21)
+    {
+        a = _cuCaddf(
+            _cuCmulf(h00, _cuCsubf(h00, s)),
+            _cuCaddf(_cuCmulf(h10, h01), t));
+        b = _cuCmulf(h10,
+            _cuCsubf(_cuCaddf(h00, h11), s)
+        );
+        c = _cuCmulf(h10, h21);
+    }
+
+
+    /**
+    * calculate v=[a, b, c] for house holder to transform input [a, b, c] to [x, 0, 0]
+    */
+    static __device__ __inline__ void threeHouseHolder(CLGComplex& a, CLGComplex& b, CLGComplex& c)
+    {
+        Real len = __cuCabsSqf(a) + __cuCabsSqf(b) + __cuCabsSqf(c);
+        if (len < _CLG_FLT_MIN_)
+        {
+            a = _make_cuComplex(F(0.0), F(0.0));
+            b = _make_cuComplex(F(0.0), F(0.0));
+            c = _make_cuComplex(F(0.0), F(0.0));
+            return;
+        }
+        len = _sqrt(len);
+        Real lena = a.x * a.x + a.y * a.y;
+        Real fCos = F(0.0);
+        Real fSin = F(0.0);
+        if (lena < _CLG_FLT_MIN_)
+        {
+            const Real fArg = _atan2(a.y, a.x);
+            fCos = _cos(fArg);
+            fSin = _sin(fArg);
+        }
+        else
+        {
+            lena = __div(F(1.0), _sqrt(lena));
+            fCos = a.x * lena;
+            fSin = a.y * lena;
+        }
+        a = _cuCaddf(a, _make_cuComplex(len * fCos, len * fSin));
+
+        Real len2 = F(0.5) * (a.x * a.x + a.y * a.y + b.x * b.x + b.y * b.y + c.x * c.x + c.y * c.y);
+        if (len2 < _CLG_FLT_MIN_)
+        {
+            a = _make_cuComplex(F(0.0), F(0.0));
+            b = _make_cuComplex(F(0.0), F(0.0));
+            c = _make_cuComplex(F(0.0), F(0.0));
+            return;
+        }
+        len2 = __div(F(1.0), _sqrt(len2));
+        a.x = a.x * len2;
+        a.y = a.y * len2;
+        b.x = b.x * len2;
+        b.y = b.y * len2;
+        c.x = c.x * len2;
+        c.y = c.y * len2;
+    }
+
+    /**
+    * calculate v=[a, b] for house holder to transform input [a, b] to [x, 0]
+    */
+    static __device__ __inline__ void twoHouseHolder(CLGComplex& a, CLGComplex& b)
+    {
+        Real len = __cuCabsSqf(a) + __cuCabsSqf(b);
+        if (len < _CLG_FLT_MIN_)
+        {
+            a = _make_cuComplex(F(0.0), F(0.0));
+            b = _make_cuComplex(F(0.0), F(0.0));
+            return;
+        }
+        len = _sqrt(len);
+        Real lena = a.x * a.x + a.y * a.y;
+        Real fCos = F(0.0);
+        Real fSin = F(0.0);
+        if (lena < _CLG_FLT_MIN_)
+        {
+            const Real fArg = _atan2(a.y, a.x);
+            fCos = _cos(fArg);
+            fSin = _sin(fArg);
+        }
+        else
+        {
+            lena = __div(F(1.0), _sqrt(lena));
+            fCos = a.x * lena;
+            fSin = a.y * lena;
+        }
+
+        a = _cuCaddf(a, _make_cuComplex(len * fCos, len * fSin));
+
+        Real len2 = F(0.5) * (a.x * a.x + a.y * a.y + b.x * b.x + b.y * b.y);
+        if (len2 < _CLG_FLT_MIN_)
+        {
+            a = _make_cuComplex(F(0.0), F(0.0));
+            b = _make_cuComplex(F(0.0), F(0.0));
+            return;
+        }
+        len2 = __div(F(1.0), _sqrt(len2));
+        a.x = a.x * len2;
+        a.y = a.y * len2;
+        b.x = b.x * len2;
+        b.y = b.y * len2;
+    }
+
+    /**
+    * The hessenberg is decomp[0] - decomp[1] square submatrix of dx x dx matrix mtr
+    * It does not support when dm=2
+    */
+    static __device__ __inline__ void FrancisQRStep(CLGComplex* H, INT dm)
+    {
+        //========= start, calculate s, t, x, y, z
+        CLGComplex s, t, x, y, z;
+        doubleEigen(s, t,
+            H[dm * dm - dm - 2/*(dm - 2) * dm + dm - 2*/],
+            H[dm * dm - dm - 1/*(dm - 2) * dm + dm - 1*/],
+            H[dm * dm - 2/*(dm - 1) * dm + dm - 2*/],
+            H[dm * dm - 1/*(dm - 1) * dm + dm - 1*/]);
+
+        doubleShift(x, y, z, s, t,
+            H[0],
+            H[1],
+            H[dm],
+            H[dm + 1],
+            H[2 * dm + 1]);
+
+        //3x3 matrix um = 1 - v^T v
+        CLGComplex u[9]; 
+        for (INT k = 0; k <= dm - 3; ++k)
+        {
+            //====== calculate um =====
+            threeHouseHolder(x, y, z);
+            //u [i * 3 + j] = h[j]* h[i]
+            u[0] = _cuCmulf(_cuConjf(x), x);
+            u[1] = _cuCmulf(_cuConjf(y), x);
+            u[2] = _cuCmulf(_cuConjf(z), x);
+            u[3] = _cuCmulf(_cuConjf(x), y);
+            u[4] = _cuCmulf(_cuConjf(y), y);
+            u[5] = _cuCmulf(_cuConjf(z), y);
+            u[6] = _cuCmulf(_cuConjf(x), z);
+            u[7] = _cuCmulf(_cuConjf(y), z);
+            u[8] = _cuCmulf(_cuConjf(z), z);
+
+            //u[i * 3 + i] -= 1
+            u[0].x = u[0].x - F(1.0);
+            u[4].x = u[4].x - F(1.0);
+            u[8].x = u[8].x - F(1.0);
+
+            // H(y=k:k+2; x=q-1:n-1) = um.H(y=k:k+2; x=q-1:n-1)
+            INT q = (k < 1) ? 1 : k;
+            for (INT hx = (q - 1); hx < dm; ++hx)
+            {
+                //um 0,1,2, h  k*dm+hx, (k+1)*dm+hx, (k+2)*dm+hx
+                const CLGComplex newhy1 = _cuCaddf(_cuCmulf(u[0], H[k * dm + hx]), _cuCaddf(_cuCmulf(u[1], H[(k + 1) * dm + hx]), _cuCmulf(u[2], H[(k + 2) * dm + hx])));
+                //um 3,4,5
+                const CLGComplex newhy2 = _cuCaddf(_cuCmulf(u[3], H[k * dm + hx]), _cuCaddf(_cuCmulf(u[4], H[(k + 1) * dm + hx]), _cuCmulf(u[5], H[(k + 2) * dm + hx])));
+                //um 6,7,8
+                const CLGComplex newhy3 = _cuCaddf(_cuCmulf(u[6], H[k * dm + hx]), _cuCaddf(_cuCmulf(u[7], H[(k + 1) * dm + hx]), _cuCmulf(u[8], H[(k + 2) * dm + hx])));
+
+                H[k * dm + hx] = _make_cuComplex(-newhy1.x, -newhy1.y);
+                H[(k + 1) * dm + hx] = _make_cuComplex(-newhy2.x, -newhy2.y);
+                H[(k + 2) * dm + hx] = _make_cuComplex(-newhy3.x, -newhy3.y);
+            }
+
+            // H[y=0:q; x=k:k+2] = H[y=0:q; x=k:k+2] u
+            q = k + 3;
+            if (q >= dm)
+            {
+                q = dm - 1;
+            }
+            for (INT hy = 0; hy <= q; ++hy)
+            {
+                //um 0,1,2, h  k*dm+hx, (k+1)*dm+hx, (k+2)*dm+hx
+                const CLGComplex newhx1 = _cuCaddf(_cuCmulf(u[0], H[hy * dm + k]), _cuCaddf(_cuCmulf(u[3], H[hy * dm + k + 1]), _cuCmulf(u[6], H[hy * dm + k + 2])));
+                //um 3,4,5
+                const CLGComplex newhx2 = _cuCaddf(_cuCmulf(u[1], H[hy * dm + k]), _cuCaddf(_cuCmulf(u[4], H[hy * dm + k + 1]), _cuCmulf(u[7], H[hy * dm + k + 2])));
+                //um 6,7,8
+                const CLGComplex newhx3 = _cuCaddf(_cuCmulf(u[2], H[hy * dm + k]), _cuCaddf(_cuCmulf(u[5], H[hy * dm + k + 1]), _cuCmulf(u[8], H[hy * dm + k + 2])));
+
+                H[hy * dm + k] = _make_cuComplex(-newhx1.x, -newhx1.y);
+                H[hy * dm + k + 1] = _make_cuComplex(-newhx2.x, -newhx2.y);
+                H[hy * dm + k + 2] = _make_cuComplex(-newhx3.x, -newhx3.y);
+            }
+
+            //update x,y,z
+            x = H[(k + 1) * dm + k];
+            y = H[(k + 2) * dm + k];
+            if (k < dm - 3)
+            {
+                z = H[(k + 3) * dm + k];
+            }
+        }
+
+        //Final step
+        twoHouseHolder(x, y);
+        u[0] = _cuCmulf(_cuConjf(x), x);
+        u[1] = _cuCmulf(_cuConjf(y), x);
+        u[2] = _cuCmulf(_cuConjf(x), y);
+        u[3] = _cuCmulf(_cuConjf(y), y);
+
+        //u[i * 2 + i] -= 1
+        u[0].x = u[0].x - F(1.0);
+        u[3].x = u[3].x - F(1.0);
+
+        //H[y=n-2:n-1, x=n-3:n-1] = u.H[y=n-2:n-1, x=n-3:n-1]
+        INT startX = (2 == dm) ? 0 : (dm - 3);
+        for (INT hx = startX; hx < dm; ++hx)
+        {
+            const CLGComplex newhy1 = _cuCaddf(_cuCmulf(u[0], H[(dm - 2) * dm + hx]), _cuCmulf(u[1], H[(dm - 1) * dm + hx]));
+            const CLGComplex newhy2 = _cuCaddf(_cuCmulf(u[2], H[(dm - 2) * dm + hx]), _cuCmulf(u[3], H[(dm - 1) * dm + hx]));
+
+            H[(dm - 2) * dm + hx] = _make_cuComplex(-newhy1.x, -newhy1.y);
+            H[(dm - 1) * dm + hx] = _make_cuComplex(-newhy2.x, -newhy2.y);
+        }
+        //H[y=0:n-1, x=n-2:n-1] = H[y=0:n-1, x=n-2:n-1].u
+        for (INT hy = 0; hy < dm; ++hy)
+        {
+            const CLGComplex newhx1 = _cuCaddf(_cuCmulf(u[0], H[hy * dm + dm - 2]), _cuCmulf(u[2], H[hy * dm + dm - 1]));
+            const CLGComplex newhx2 = _cuCaddf(_cuCmulf(u[1], H[hy * dm + dm - 2]), _cuCmulf(u[3], H[hy * dm + dm - 1]));
+
+            H[hy * dm + dm - 2] = _make_cuComplex(-newhx1.x, -newhx1.y);
+            H[hy * dm + dm - 1] = _make_cuComplex(-newhx2.x, -newhx2.y);
+        }
+    }
+
+    static __device__ __inline__ void CalculateEigen2x2(
+        CLGComplex& h00, CLGComplex& h01,
+        CLGComplex& h10, CLGComplex& h11)
+    {
+        //bc
+        const CLGComplex omega = _cuCmulf(h10, h01);
+        const Real fOmegaSq = omega.x * omega.x + omega.y * omega.y;
+        if (fOmegaSq > _CLG_FLT_MIN_)
+        {
+            //(d-a)/2
+            const CLGComplex xi = _make_cuComplex(
+                F(0.5) * (h11.x - h00.x),
+                F(0.5) * (h11.y - h00.y));
+            //sqrt(((d-a)/2)^2 + bc)
+            //when bc > fCrit, eta=sqrt(xi^2+bc) cannot be close to xi
+            CLGComplex eta = _cuCaddf(_cuCmulf(xi, xi), omega);
+            if (__cuCabsSqf(eta) > _CLG_FLT_MIN_)
+            {
+                eta = __cuCsqrtf(eta);
+            }
+            else
+            {
+                eta = _make_cuComplex(F(0.0), F(0.0));
+            }
+            const CLGComplex divider1 = _cuCaddf(eta, xi);
+            const CLGComplex divider2 = _cuCsubf(eta, xi);
+            if (__cuCabsSqf(divider1) > _CLG_FLT_MIN_ && __cuCabsSqf(divider2) > _CLG_FLT_MIN_)
+            {
+                if (xi.x * eta.x + xi.y * eta.y < F(0.0))
+                {
+                    h00 = _cuCaddf(h11, _cuCdivf(omega, _cuCaddf(eta, xi)));
+                    h11 = _cuCsubf(h11, _cuCdivf(omega, _cuCsubf(eta, xi)));
+                }
+                else
+                {
+                    h00 = _cuCsubf(h11, _cuCdivf(omega, _cuCsubf(eta, xi)));
+                    h11 = _cuCaddf(h11, _cuCdivf(omega, _cuCaddf(eta, xi)));
+                }
+            }
+        }
+        h10 = _make_cuComplex(F(0.0), F(0.0));
+    }
+
+    /**
+    * Assume me is Hessenberg matrix
+    * transform me to up traingular with diagonal the eigen values
+    * too complicated to preserve all transformation matrices
+    */
+    __device__ __inline__ void FrancisQRIteration()
+    {
+        CLGComplex submatrix[N * N];
+        INT decomp[2];
+        //iteration for at most N times.
+        for (INT i = 0; i < N * N; ++i)
+        {
+            //find hesenberg
+            checkMatrixIndexDoubleShift(m_me, decomp, N);
+            const INT dm = decomp[1] - decomp[0];
+            if (dm < 2)
+            {
+                return;
+            }
+
+            if (2 == dm)
+            {
+                CalculateEigen2x2(m_me[decomp[0] * N + decomp[0]],       m_me[decomp[0] * N + decomp[0] + 1], 
+                                  m_me[(decomp[0] + 1) * N + decomp[0]], m_me[(decomp[0] + 1) * N + decomp[0] + 1]);
+            }
+            else
+            {
+                //block copy to submatrix
+                for (INT y = 0; y < dm; ++y)
+                {
+                    memcpy(submatrix + y * dm, m_me + (decomp[0] + y) * N + decomp[0], sizeof(CLGComplex) * dm);
+                }
+
+                FrancisQRStep(submatrix, dm);
+
+                //copy back
+                for (INT y = 0; y < dm; ++y)
+                {
+                    memcpy(m_me + (decomp[0] + y) * N + decomp[0], submatrix + y * dm, sizeof(CLGComplex) * dm);
+                }
+            }
+        }
+    }
+
+    #pragma endregion
+
+private:
+
+    __device__ __inline__ void InversePower(const CLGComplex& ev, CLGComplex* startV, Real eps = F(1.0e-10)) const
+    //__device__ __inline__ void InversePower(const CLGComplex& ev, CLGComplex* startV) const
+    {
+        //for (INT i = 0; i < N; ++i)
+        //{
+        //    printf("at first startV = %f, %f\n", startV[i].x, startV[i].y);
+        //}
+        INT iMaxIte = N;
+        CLGComplex tmp[N];
+        const deviceSUN<N, NoE> m = SubCompC(ev);
+        //m.DebugPrint("m");
+        deviceSUN<N, NoE> q(m);
+        const deviceSUN<N, NoE> r = q.QR();
+        q.Dagger();
+        CLGComplex mv[N];
+        m.MulVectorElement(mv, startV);
+        //q.DebugPrint("q");
+        //r.DebugPrint("r");
+        Real s = __cuCabsSqf(mv[0]);
+        for (INT i = 1; i < N; ++i)
+        {
+            s += __cuCabsSqf(mv[i]);
+        }
+        //for (INT i = 0; i < N; ++i)
+        //{
+        //    printf("at first mv = %f, %f\n", mv[i].x, mv[i].y);
+        //}
+        while (iMaxIte > 0 && s > eps)
+        {
+            --iMaxIte;
+            memcpy(tmp, startV, sizeof(CLGComplex) * N);
+            //if (2 * N - 1 == iMaxIte)
+            //{
+            //    for (INT i = 0; i < N; ++i)
+            //    {
+            //        printf("at first iteration tmp = %f, %f\n", tmp[i].x, tmp[i].y);
+            //        printf("at first iteration startV = %f, %f\n", startV[i].x, startV[i].y);
+            //    }
+            //}
+            q.MulVectorElement(startV, tmp);
+            //if (2 * N - 1 == iMaxIte)
+            //{
+            //    q.DebugPrint("q");
+            //    for (INT i = 0; i < N; ++i)
+            //    {
+            //        printf("at first iteration q.startV = %f, %f\n", startV[i].x, startV[i].y);
+            //    }
+            //}
+            r.BackwardSubstitutionElement(startV);
+            //if (2 * N - 1 == iMaxIte)
+            //{
+            //    r.DebugPrint("r");
+            //    for (INT i = 0; i < N; ++i)
+            //    {
+            //        printf("at first iteration r^{-1}.startV = %f, %f\n", startV[i].x, startV[i].y);
+            //    }
+            //}
+            s = __cuCabsSqf(startV[0]);
+            for (INT i = 1; i < N; ++i)
+            {
+                s += __cuCabsSqf(startV[i]);
+                //printf("res startv = %f, %f\n", startV[i].x, startV[i].y);
+            }
+
+            if (s > _CLG_FLT_MIN_)
+            {
+                const Real fFactor = __rcp(_sqrt(s));
+                for (INT i = 0; i < N; ++i)
+                {
+                    startV[i] = cuCmulf_cr(startV[i], fFactor);
+                }
+            }
+            
+            m.MulVectorElement(mv, startV);
+            //if (2 * N - 1 == iMaxIte)
+            //{
+            //    m.DebugPrint("m");
+            //    for (INT i = 0; i < N; ++i)
+            //    {
+            //        printf("at first iteration res mv = %f, %f\n", mv[i].x, mv[i].y);
+            //        printf("at first iteration res startV = %f, %f\n", startV[i].x, startV[i].y);
+            //    }
+            //}
+            s = __cuCabsSqf(mv[0]);
+            for (INT i = 1; i < N; ++i)
+            {
+                s += __cuCabsSqf(mv[i]);
+                //printf("res mv = %f, %f\n", mv[i].x, mv[i].y);
+            }
+            //printf("inverse power iteration: %d error: %f\n", iMaxIte, s);
+        }
+        if (0 == iMaxIte && s > F(0.000001))
+        {
+            printf("warning: Inverse Power Max Iteration Reached, last s = %.20f\n", s);
+        }
+    }
+
+public:
+
+    __device__ __inline__ void EigenValues(CLGComplex* evs) const
+    {
+        deviceSUN<N, NoE> tmp = HessenbergC();
+        tmp.FrancisQRIteration();
+        for (INT i = 0; i < N; ++i)
+        {
+            evs[i] = tmp.m_me[i * N + i];
+        }
+    }
+
+    __device__ __inline__ deviceSUN<N, NoE> EigenSystem(CLGComplex* evs) const
+    {
+        EigenValues(evs);
+        CLGComplex tmpv[N];
+
+        deviceSUN<N, NoE> eigenVectors;
+        for (INT i = 0; i < N; ++i)
+        {
+            for (INT j = 0; j < N; ++j)
+            {
+                tmpv[j] = (i == j) ? _onec : _zeroc;
+            }
+
+            InversePower(evs[i], tmpv);
+            memcpy(eigenVectors.m_me + i * N, tmpv, sizeof(CLGComplex) * N);
+        }
+        return eigenVectors;
+    }
+
+    __device__ __inline__ deviceSUN<N, NoE> Log() const
+    {
+        CLGComplex eign[N];
+        deviceSUN<N, NoE> egv = EigenSystem(eign);
+
+        deviceSUN<N, NoE> ret = makeSUNZero();
+        for (INT i = 0; i < N; ++i)
+        {
+            ret.m_me[i * N + i] = __cuClogf(eign[i]);
+        }
+        ret.MulDagger(egv);
+        return egv.MulC(ret);
+    }
+
+    __device__ __inline__ deviceSUN<N, NoE> StrictExp() const
+    {
+        CLGComplex eign[N];
+        deviceSUN<N, NoE> egv = EigenSystem(eign);
+
+        deviceSUN<N, NoE> ret = makeSUNZero();
+        for (INT i = 0; i < N; ++i)
+        {
+            ret.m_me[i * N + i] = __cuCexpf(eign[i]);
+        }
+        ret.MulDagger(egv);
+        return egv.MulC(ret);
     }
 
 #pragma endregion

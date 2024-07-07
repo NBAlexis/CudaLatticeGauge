@@ -8,6 +8,7 @@
 // REVISION:
 //  [07/03/2024 nbale]
 //=============================================================================
+#include "DeviceTemplates/DeviceInlineUseNoTemplateFunction.h"
 
 #ifndef _DEVICEINLINETEMPLATE_H_
 #define _DEVICEINLINETEMPLATE_H_
@@ -402,6 +403,48 @@ template<> __device__ __inline__ deviceSU7 _makeRandom<deviceSU7>(UINT fatIdx)
 template<> __device__ __inline__ deviceSU8 _makeRandom<deviceSU8>(UINT fatIdx)
 {
     return deviceSU8::makeSUNRandom(fatIdx);
+}
+
+template<typename T> __device__ __inline__ T _makeColorVector(BYTE colorIdx) = delete;
+
+template<> __device__ __inline__ CLGComplex _makeColorVector<CLGComplex>(BYTE colorIdx)
+{
+    return _onec;
+}
+
+template<> __device__ __inline__ deviceSU2Vector _makeColorVector<deviceSU2Vector>(BYTE colorIdx)
+{
+    return deviceSU2Vector::makeOneSU2VectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU3Vector _makeColorVector<deviceSU3Vector>(BYTE colorIdx)
+{
+    return deviceSU3Vector::makeOneSU3VectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU4Vector _makeColorVector<deviceSU4Vector>(BYTE colorIdx)
+{
+    return deviceSU4Vector::makeOneSUNVectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU5Vector _makeColorVector<deviceSU5Vector>(BYTE colorIdx)
+{
+    return deviceSU5Vector::makeOneSUNVectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU6Vector _makeColorVector<deviceSU6Vector>(BYTE colorIdx)
+{
+    return deviceSU6Vector::makeOneSUNVectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU7Vector _makeColorVector<deviceSU7Vector>(BYTE colorIdx)
+{
+    return deviceSU7Vector::makeOneSUNVectorColor(colorIdx);
+}
+
+template<> __device__ __inline__ deviceSU8Vector _makeColorVector<deviceSU8Vector>(BYTE colorIdx)
+{
+    return deviceSU8Vector::makeOneSUNVectorColor(colorIdx);
 }
 
 template<typename T> __device__ __inline__ void _dagger(T& element) = delete;
@@ -1326,6 +1369,7 @@ __END_NAMESPACE
 
 #include "DeviceTemplates/DeviceInlineGauge.h"
 #include "DeviceTemplates/DeviceInlineGaugeChair.h"
+#include "DeviceTemplates/DeviceInlineStaggeredGamma.h"
 
 #endif //#ifndef _DEVICEINLINETEMPLATE_H_
 
