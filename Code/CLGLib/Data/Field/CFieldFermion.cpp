@@ -38,7 +38,7 @@ void ExportDiagnalWilsonSU3(const CCString& sFileName, EMeasureDiagnal eType,
             for (BYTE c = 0; c < maxC; ++c)
             {
                 TArray<CLGComplex> ret;
-                SFermionSource source;
+                SFermionBosonSource source;
                 source.m_eSourceType = EFS_Point;
                 source.m_byColorIndex = c;
                 source.m_bySpinIndex = spinor;
@@ -162,7 +162,7 @@ void ExportDiagnalStaggeredSU3(const CCString& sFileName, EMeasureDiagnal eType,
         {
             TArray<CLGComplex> ret;
 
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_eSourceType = EFS_Point;
             source.m_byColorIndex = c;
             source.m_sSourcePoint = __hostSiteIndexToInt4(x);

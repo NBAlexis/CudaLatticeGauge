@@ -94,7 +94,7 @@ public:
     void PrepareForHMCOnlyRandomize() override;
     void PrepareForHMCNotRandomize(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) override;
 
-    void InitialAsSource(const SFermionSource& sourceData) override;
+    void InitialAsSource(const SFermionBosonSource& sourceData) override;
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;

@@ -341,7 +341,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::BuildSource()
     {
         CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
         assert(NULL != pFermion);
-        SFermionSource source;
+        SFermionBosonSource source;
         source.m_byColorIndex = color;
         source.m_bySpinIndex = 0;
         source.m_eSourceType = m_bWallSource ? EFS_Wall : EFS_Point;
@@ -357,7 +357,7 @@ void CMeasureMesonCorrelatorStaggeredSimple2::BuildSource()
         {
             CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(m_byFieldID2));
             assert(NULL != pFermion);
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_byColorIndex = color;
             source.m_bySpinIndex = 0;
             source.m_eSourceType = m_bWallSource ? EFS_Wall : EFS_Point;

@@ -339,7 +339,9 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
     pData->m_uiPlaqutteCountPerLink = static_cast<BYTE>(2 * (_HC_Dim - 1));
 
     //bake small data
+    checkCudaErrors(cudaDeviceSynchronize());
     _kernalBakeSmallData << <1, 1 >> > (pData->m_pSmallData);
+    checkCudaErrors(cudaDeviceSynchronize());
     //bake walking index
     //_kernalBakeWalkingTable << <blocks, threads >> > (pData->m_pWalkingTable, biggerLatticeMod);
 
@@ -356,9 +358,11 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
 
             //bake map index
             _kernalBakeMappingTable << <blocks, threads >> > (pData->m_pMappingTable, biggerLatticeMod);
+            checkCudaErrors(cudaDeviceSynchronize());
 
             //bake boundary condition
             m_pBoundaryCondition->BakeEdgePoints(i, pData->m_pMappingTable, pData->m_pIndexPositionToSIndex[i]);
+            checkCudaErrors(cudaDeviceSynchronize());
 
             if (pField->IsGaugeField())
             {
@@ -369,15 +373,18 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
                 ));
 
                 m_pBoundaryCondition->BakeBondGlue(i, pData->m_pMappingTable, pData->m_pIndexLinkToSIndex[i]);
+                checkCudaErrors(cudaDeviceSynchronize());
             }
         }
     }
 
     //bake bond infos
     m_pBoundaryCondition->BakeBondInfo(pData->m_pMappingTable, pData->m_pBondInfoTable);
+    checkCudaErrors(cudaDeviceSynchronize());
 
     //bake region id table
     m_pBoundaryCondition->BakeRegionTable(pData->m_byRegionTable);
+    checkCudaErrors(cudaDeviceSynchronize());
 
     //copy the mapping table to device
     checkCudaErrors(cudaMemcpy(pData->m_pDeviceIndexPositionToSIndex, pData->m_pIndexPositionToSIndex, sizeof(SIndex*) * kMaxFieldCount, cudaMemcpyHostToDevice));

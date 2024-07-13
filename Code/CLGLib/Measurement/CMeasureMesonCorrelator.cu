@@ -319,7 +319,7 @@ void CMeasureMesonCorrelator::CalculateCorrelator(INT gaugeNum, INT bosonNum, co
     {
         for (BYTE c = 0; c < 3; ++c)
         {
-            SFermionSource sourceData;
+            SFermionBosonSource sourceData;
             sourceData.m_eSourceType = EFS_Point;
             sourceData.m_sSourcePoint.x = 0;
             sourceData.m_sSourcePoint.y = 0;

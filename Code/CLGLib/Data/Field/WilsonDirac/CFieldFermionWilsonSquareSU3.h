@@ -107,7 +107,7 @@ public:
     void ApplyGamma(EGammaMatrix eGamma) override;
     TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const override;
 
-    void InitialAsSource(const SFermionSource& sourceData) override;
+    void InitialAsSource(const SFermionBosonSource& sourceData) override;
     BYTE* CopyDataOut(UINT &uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;

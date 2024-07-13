@@ -38,7 +38,7 @@ class CLGAPI CFieldBoundarySU3Vector : public CFieldBoundaryZero<deviceSU3Vector
 {
     __CLGDECLARE_CLASS(CFieldBoundarySU3Vector)
 public:
-    EFieldType GetFieldType() const override { return EFT_GaugeSU3; }
+    EFieldType GetFieldType() const override { return EFT_FermionStaggeredSU3; }
 };
 
 class CLGAPI CFieldBoundaryWilsonSquareSU3 : public CFieldBoundaryZero<deviceWilsonVectorSU3>
@@ -47,6 +47,25 @@ class CLGAPI CFieldBoundaryWilsonSquareSU3 : public CFieldBoundaryZero<deviceWil
 public:
     EFieldType GetFieldType() const override { return EFT_FermionWilsonSquareSU3; }
 };
+
+#define __DEFINE_ZERO_BOUNDARY_FIELD(classname, devicetype, fieldtype) \
+__CLG_REGISTER_HELPER_HEADER(classname) \
+class CLGAPI classname : public CFieldBoundaryZero<devicetype> \
+{ \
+    __CLGDECLARE_CLASS(classname) \
+public: \
+    EFieldType GetFieldType() const override { return fieldtype; } \
+}; \
+
+
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonU1, CLGComplex, EFT_BosonComplex)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU2, deviceSU2Vector, EFT_BosonComplexVector2)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU3, deviceSU3Vector, EFT_BosonComplexVector3)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU4, deviceSU4Vector, EFT_BosonComplexVector4)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU5, deviceSU5Vector, EFT_BosonComplexVector5)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU6, deviceSU6Vector, EFT_BosonComplexVector6)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU7, deviceSU7Vector, EFT_BosonComplexVector7)
+__DEFINE_ZERO_BOUNDARY_FIELD(CFieldBoundaryBosonSU8, deviceSU8Vector, EFT_BosonComplexVector8)
 
 __END_NAMESPACE
 

@@ -91,8 +91,10 @@ UINT CHMC::Update(UINT iSteps, UBOOL bMeasure)
         //m_pOwner->FixAllFieldBoundary();
         //m_pOwner->m_pGaugeField->DebugPrintMe();
         m_pIntegrator->Prepare(bAccepted, i);
+        checkCudaErrors(cudaDeviceSynchronize());
         checkCudaErrors(cudaGetLastError());
         m_pOwner->FixAllFieldBoundary();
+        checkCudaErrors(cudaDeviceSynchronize());
         checkCudaErrors(cudaGetLastError());
 
         if (m_bMetropolis || m_bTestHDiff)

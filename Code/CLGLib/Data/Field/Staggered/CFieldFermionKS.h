@@ -31,7 +31,6 @@ public:
         
     }
 
-    enum { _kKSLinkLength = 3 };
     void InitialOtherParameters(CParameters& params) override;
     void Zero() override { InitialField(EFIT_Zero); }
     void Identity() override
@@ -235,40 +234,6 @@ protected:
 
     Real* m_pMDNumerator;
 };
-
-#pragma region Some help functions to implement higher orders
-
-/**
- * Same as CFieldFermionKSSU3R
- * full is a list of path directions with length = iLength
- * it will be divided into two list, where l is full[0, iSep], r is (full[iSep, iLength])^dagger
- * l, r should be allocated on device
- */
-static __device__ __inline__ void _deviceSeperate(const INT* __restrict__ full, INT iSep, UINT iLength, INT* l, INT* r, BYTE& LL, BYTE& RL)
-{
-    LL = static_cast<BYTE>(iSep);
-    RL = static_cast<BYTE>(iLength - iSep);
-
-    for (INT i = 0; i < LL; ++i)
-    {
-        l[i] = -full[iSep - i - 1];
-    }
-
-    for (INT i = 0; i < RL; ++i)
-    {
-        r[i] = full[iSep + i];
-    }
-}
-
-static __device__ __inline__ void _devicePathDagger(const INT* __restrict__ path, INT* res, UINT iLength)
-{
-    for (UINT i = 0; i < iLength; ++i)
-    {
-        res[i] = -path[iLength - i - 1];
-    }
-}
-
-#pragma endregion
 
 __END_NAMESPACE
 

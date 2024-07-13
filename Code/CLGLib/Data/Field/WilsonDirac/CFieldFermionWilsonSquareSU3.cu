@@ -1094,7 +1094,7 @@ UBOOL CFieldFermionWilsonSquareSU3::CalculateForceS(
     return TRUE;
 }
 
-void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceData)
+void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionBosonSource& sourceData)
 {
     const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
     switch (sourceData.m_eSourceType)
@@ -1125,7 +1125,7 @@ void CFieldFermionWilsonSquareSU3::InitialAsSource(const SFermionSource& sourceD
     }
     break;
     default:
-        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
+        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionBosonSource, sourceData.m_eSourceType).c_str());
         break;
     }
 }
@@ -1231,7 +1231,7 @@ TArray<CFieldFermion*> CFieldFermionWilsonSquareSU3::GetSourcesAtSiteFromPool(IN
     {
         for (BYTE c = 0; c < 3; ++c)
         {
-            SFermionSource sourceData;
+            SFermionBosonSource sourceData;
             sourceData.m_eSourceType = EFS_Point;
             sourceData.m_sSourcePoint = site;
             sourceData.m_byColorIndex = c;
@@ -1372,7 +1372,7 @@ UINT CFieldFermionWilsonSquareSU3::TestGamma5Hermitian(const CFieldGauge* pGauge
         const SSmallInt4 point = __hostSiteIndexToInt4(i);
         for (UINT j = 0; j < 12; ++j)
         {
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_byColorIndex = static_cast<BYTE>(j % 3);
             source.m_bySpinIndex = static_cast<BYTE>(j / 3);
             source.m_eSourceType = EFS_Point;

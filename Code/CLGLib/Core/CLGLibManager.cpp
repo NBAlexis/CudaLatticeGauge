@@ -64,7 +64,11 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     assert(iVaules > 1);
     m_InitialCache.constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
 
+#if _CLG_DEBUG
+    __FetchIntWithDefault(_T("MaxThreadPerBlock"), 256);
+#else
     __FetchIntWithDefault(_T("MaxThreadPerBlock"), 0);
+#endif
     if (iVaules > 0)
     {
         CCommonData::m_uiMaxThreadPerBlock = static_cast<UINT>(iVaules);
@@ -518,7 +522,9 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
 
     pBoson->m_byFieldId = byFieldId;
     pBoson->m_pOwner = m_pLatticeData;
+    checkCudaErrors(cudaDeviceSynchronize());
     pBoson->InitialField(eFieldInitial);
+    checkCudaErrors(cudaDeviceSynchronize());
     pBoson->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pBoson);
     m_pLatticeData->m_pBosonField.AddItem(pBoson);
@@ -532,12 +538,14 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
         bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
         bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
     }
 
     __FetchIntWithDefault(_T("PoolNumber"), 0);
     //if (iVaules > 0)
     //{
     m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
+    checkCudaErrors(cudaDeviceSynchronize());
     //}
     appGeneral(_T("Create the boson field %s with id %d and initial: %s\n"), sBosonClassName.c_str(), byFieldId, sValues.c_str());
 }
@@ -899,8 +907,9 @@ void CCLGLibManager::InitialIndexBuffer() const
         appGeneral(_T("No Index Cache"));
         return;
     }
-
+    checkCudaErrors(cudaDeviceSynchronize());
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
+    checkCudaErrors(cudaDeviceSynchronize());
     if (m_pLatticeData->m_pOtherFields.Num() > 0)
     {
         UBOOL bHasStaggeredFermion = FALSE;
@@ -911,11 +920,13 @@ void CCLGLibManager::InitialIndexBuffer() const
             if (NULL != pf && pf->IsGaugeField() && !bPlaqCached)
             {
                 m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, i);
+                checkCudaErrors(cudaDeviceSynchronize());
                 bPlaqCached = TRUE;
             }
             else if (NULL != pf && !pf->IsGaugeField())
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
+                checkCudaErrors(cudaDeviceSynchronize());
                 if (NULL != dynamic_cast<const CFieldFermionKS*>(pf))
                 {
                     bHasStaggeredFermion = TRUE;
@@ -925,11 +936,14 @@ void CCLGLibManager::InitialIndexBuffer() const
         if (bHasStaggeredFermion)
         {
             m_pLatticeData->m_pIndex->BakeEtaMuTable(m_pLatticeData->m_pIndexCache);
+            checkCudaErrors(cudaDeviceSynchronize());
         }
     }
     m_pLatticeData->m_pIndex->CalculateSiteCount(m_pLatticeData->m_pIndexCache);
+    checkCudaErrors(cudaDeviceSynchronize());
 
     m_pCudaHelper->SetDeviceIndex(m_pLatticeData->m_pIndexCache);
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 #pragma endregion
@@ -969,17 +983,20 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
 
     InitialLatticeAndConstant(params);
     InitialRandom(params);
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("LatticeIndex")))
     {
         CreateIndexAndBoundary(params);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Gauge")))
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
         CreateGaugeFields(gauge);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeBoundary")))
     {
@@ -987,6 +1004,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         CreateBoundaryFields(gaugeboundary, _T("CFieldBoundaryGaugeSU3"));
         bGaugeBoundaryFieldCreated = TRUE;
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_GaugeFieldCount] > 1)
     {
@@ -999,6 +1017,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
                 CreateGaugeFields(fermionField);
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
             sFermionSubParamName.Format(_T("GaugeBoundary%d"), i);
             if (params.Exist(sFermionSubParamName))
@@ -1006,6 +1025,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
                 CreateBoundaryFields(bcfermionField, _T("CFieldBoundaryGaugeSU3"));
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
         }
     }
@@ -1021,6 +1041,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
                 CreateBosonFields(fermionField);
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
             sFermionSubParamName.Format(_T("BoundaryBosonField%d"), i);
             if (params.Exist(sFermionSubParamName))
@@ -1028,6 +1049,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
                 CreateBoundaryFields(bcfermionField, _T("CBosonBoundary"));
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
         }
     }
@@ -1043,6 +1065,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
                 CreateFermionFields(fermionField);
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
             sFermionSubParamName.Format(_T("BoundaryFermionField%d"), i);
             if (params.Exist(sFermionSubParamName))
@@ -1050,9 +1073,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
                 CParameters bcfermionField = params.GetParameter(sFermionSubParamName);
                 CreateBoundaryFields(bcfermionField, _T("CFieldBoundaryWilsonSquareSU3"));
             }
+            checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
         }
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 
     //if (m_InitialCache.constIntegers[ECI_OtherGaugeField] > 0)
@@ -1076,11 +1101,13 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     //        checkCudaErrors(cudaGetLastError());
     //    }
     //}
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)
     {
         CreateActionList(params);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Solver")))
     {
@@ -1111,30 +1138,34 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             CreateMultiShiftSolver(solver);
         }
     }
-
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeSmearing")))
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeSmearing"));
         CreateGaugeSmearing(gaugesmearing);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("GaugeFixing")))
     {
         CParameters gaugesmearing = params.GetParameter(_T("GaugeFixing"));
         CreateGaugeFixing(gaugesmearing);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (params.Exist(_T("Updator")))
     {
         CParameters updator = params.GetParameter(_T("Updator"));
         CreateUpdator(updator);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     if (m_InitialCache.constIntegers[ECI_MeasureListLength] > 0)
     {
         CreateMeasurement(params);
     }
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
     //=============================================
     // at last, fill the field pointers

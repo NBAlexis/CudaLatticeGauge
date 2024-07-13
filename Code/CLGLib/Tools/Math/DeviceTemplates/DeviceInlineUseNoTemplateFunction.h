@@ -14,6 +14,8 @@
 
 __BEGIN_NAMESPACE
 
+enum { _kLinkMaxLength = 3 };
+
 #pragma region Rotation
 
 /**
@@ -211,6 +213,11 @@ typedef Real(*_deviceCoeffFunctionPointer) (
     BYTE byFieldId,
     SSmallInt4 site,
     const SIndex& uiSiteBI);
+
+typedef Real(*_deviceCoeffFunctionPointerTwiSites) (
+    BYTE byFieldId,
+    const SSmallInt4& site1,
+    const SSmallInt4& site2);
 
 /**
 * i = 0, 1, 2 correspond to x, y and xy
@@ -494,6 +501,42 @@ static __device__ __inline__ SBYTE _deviceEta3(const SSmallInt4& sSite, BYTE mis
 }
 
 #pragma endregion
+
+#pragma region Fermion - Boson link
+
+
+/**
+ * Same as CFieldFermionKSSU3R
+ * full is a list of path directions with length = iLength
+ * it will be divided into two list, where l is full[0, iSep], r is (full[iSep, iLength])^dagger
+ * l, r should be allocated on device
+ */
+static __device__ __inline__ void _deviceSeperate(const INT* __restrict__ full, INT iSep, UINT iLength, INT* l, INT* r, BYTE& LL, BYTE& RL)
+{
+    LL = static_cast<BYTE>(iSep);
+    RL = static_cast<BYTE>(iLength - iSep);
+
+    for (INT i = 0; i < LL; ++i)
+    {
+        l[i] = -full[iSep - i - 1];
+    }
+
+    for (INT i = 0; i < RL; ++i)
+    {
+        r[i] = full[iSep + i];
+    }
+}
+
+static __device__ __inline__ void _devicePathDagger(const INT* __restrict__ path, INT* res, UINT iLength)
+{
+    for (UINT i = 0; i < iLength; ++i)
+    {
+        res[i] = -path[iLength - i - 1];
+    }
+}
+
+#pragma endregion
+
 
 __END_NAMESPACE
 

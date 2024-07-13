@@ -546,6 +546,57 @@ TestAnitiHermiticity:
 
         MeasureName : CMeasurePlaqutteEnergy
 
+TestBosonHermiticity:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [4, 4, 4, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    GaugeFieldCount : 1
+    FermionFieldCount : 0
+    BosonFieldCount : 1
+    MeasureListLength : 0
+    ##Important, do not calculate energy using staple for Dirichlet
+    CacheStaple : 0 
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 12
+        Omelyan2Lambda : 0.38636665500756728
+
+    Gauge:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeU1
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        FieldId : 1
+
+    BosonField1:
+
+        FieldName : CFieldBosonVNRotationU1
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+        Period : [1, 1, 1, 1]
+        GaugeFields : [1]
+        Omega : 0.1
+        # Constant : 1
+
 
 TestGaugeInvarience:
    

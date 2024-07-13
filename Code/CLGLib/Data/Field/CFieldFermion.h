@@ -13,16 +13,16 @@
 
 __BEGIN_NAMESPACE
 
-__DEFINE_ENUM(EFermionSource,
+__DEFINE_ENUM(EFermionBosonSource,
     EFS_Point,
     EFS_Wall,
     EFS_MomentumWall,
 )
 
 //this is a host only structure
-struct SFermionSource
+struct SFermionBosonSource
 {
-    EFermionSource m_eSourceType;
+    EFermionBosonSource m_eSourceType;
     SSmallInt4 m_sSourcePoint;
     //For staggered fermion, spin index is 0-7, for shift of x,y,z
     BYTE m_bySpinIndex;
@@ -264,7 +264,7 @@ public:
     virtual UBOOL InverseDdagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
     virtual UBOOL InverseDD(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
     virtual UBOOL InverseDDdagger(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson);
-    virtual void InitialAsSource(const SFermionSource& sourceData) = 0;
+    virtual void InitialAsSource(const SFermionBosonSource& sourceData) = 0;
 
     virtual TArray<CFieldFermion*> GetSourcesAtSiteFromPool(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const SSmallInt4& site) const = 0;
     virtual UBOOL RationalApproximation(EFieldOperator op, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, const class CRatinalApproximation* pRational);

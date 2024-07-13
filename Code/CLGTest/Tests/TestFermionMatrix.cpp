@@ -24,7 +24,7 @@ UINT TestFermionDMatrixKS(CParameters& param)
 
     for (UINT i = 0; i < uiSiteCount; ++i)
     {
-        SFermionSource source;
+        SFermionBosonSource source;
         source.m_eSourceType = EFS_Point;
         source.m_byColorIndex = 0;
         source.m_sSourcePoint = __hostSiteIndexToInt4(i);

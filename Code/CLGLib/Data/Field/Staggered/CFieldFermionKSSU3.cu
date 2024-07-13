@@ -755,8 +755,8 @@ _kernelDFermionKSForce_WithLink(
     BYTE pathLength)
 {
     intokernalInt4;
-    INT pathLeft[CFieldFermionKSSU3::_kKSLinkLength];
-    INT pathRight[CFieldFermionKSSU3::_kKSLinkLength];
+    INT pathLeft[_kLinkMaxLength];
+    INT pathRight[_kLinkMaxLength];
     for (BYTE iSeperation = 0; iSeperation <= pathLength; ++iSeperation)
     {
         BYTE LLength = 0;
@@ -858,7 +858,7 @@ _kernelDFermionKS_OneLink(
     CLGComplex cCoeff)
 {
     intokernalInt4;
-    INT pathBuffer[CFieldFermionKSSU3::_kKSLinkLength];
+    INT pathBuffer[_kLinkMaxLength];
     deviceSU3Vector result = deviceSU3Vector::makeZeroSU3Vector();
 
     SSmallInt4 siten = _deviceSmallInt4OffsetC(sSite4, path, pathLength);
@@ -967,7 +967,7 @@ void CFieldFermionKSSU3::OneLinkS(
     Real fRealCoeff, 
     const CLGComplex& cCmpCoeff)
 {
-    assert(pathLength <= _kKSLinkLength);
+    assert(pathLength <= _kLinkMaxLength);
     preparethread;
     _kernelDFermionKS_OneLink << <block, threads >> > (
         m_pDeviceData,
@@ -996,7 +996,7 @@ void CFieldFermionKSSU3::OneLinkForceS(
     BYTE pathLength, 
     BYTE byEtaIdx) const
 {
-    assert(pathLength <= _kKSLinkLength);
+    assert(pathLength <= _kLinkMaxLength);
     preparethread;
     _kernelDFermionKSForce_WithLink << <block, threads >> > (
         (const deviceSU3*)pGuage,
@@ -1438,7 +1438,7 @@ UINT CFieldFermionKSSU3::TestAntiHermitianS(const CFieldGauge* pGauge) const
         const SSmallInt4 point = __hostSiteIndexToInt4(i);
         for (UINT j = 0; j < 3; ++j)
         {
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_byColorIndex = static_cast<BYTE>(j);
             source.m_eSourceType = EFS_Point;
             source.m_sSourcePoint = point;
@@ -1664,7 +1664,7 @@ void CFieldFermionKSSU3::DDWithMassS(const CField* pGauge, Real fMass, EOperator
     pPooled->Return();
 }
 
-void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
+void CFieldFermionKSSU3::InitialAsSource(const SFermionBosonSource& sourceData)
 {
     const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
     switch (sourceData.m_eSourceType)
@@ -1695,7 +1695,7 @@ void CFieldFermionKSSU3::InitialAsSource(const SFermionSource& sourceData)
     }
     break;
     default:
-        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
+        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionBosonSource, sourceData.m_eSourceType).c_str());
         break;
     }
 }
@@ -1784,7 +1784,7 @@ TArray<CFieldFermion*> CFieldFermionKSSU3::GetSourcesAtSiteFromPool(INT gaugeNum
 
     for (BYTE c = 0; c < 3; ++c)
     {
-        SFermionSource sourceData;
+        SFermionBosonSource sourceData;
         sourceData.m_eSourceType = EFS_Point;
         sourceData.m_sSourcePoint = site;
         sourceData.m_byColorIndex = c;

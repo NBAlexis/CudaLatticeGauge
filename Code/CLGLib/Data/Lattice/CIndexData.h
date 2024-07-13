@@ -68,6 +68,7 @@ public:
         memset(m_pMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
 
         memset(m_uiSiteNumber, 0, sizeof(UINT) * kMaxFieldCount);
+        checkCudaErrors(cudaDeviceSynchronize());
 
     }
 

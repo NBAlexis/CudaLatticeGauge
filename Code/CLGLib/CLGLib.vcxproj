@@ -40,6 +40,7 @@
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRigidAcc.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h" />
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingT.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h" />
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.h" />
     <ClInclude Include="Data\Action\CActionPhi4.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVNRotation.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryZero.h" />
@@ -192,10 +194,12 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquettePolar.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRigidAcc.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu" />
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu" />
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />

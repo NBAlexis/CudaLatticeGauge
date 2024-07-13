@@ -224,7 +224,7 @@ __CLGIMPLEMENT_CLASS(CMeasureBerryPhase)
 
 void CMeasureBerryPhase::CalculateMomentumSpacePhiWilsonDiracForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
-    SFermionSource source;
+    SFermionBosonSource source;
     source.m_eSourceType = EFS_Point;
     source.m_byColorIndex = 4;
     source.m_sSourcePoint = xprime;
@@ -270,7 +270,7 @@ void CMeasureBerryPhase::CalculateU1FieldWilsonDirac()
 
 void CMeasureBerryPhase::CalculateMomentumSpacePhiKSForPoint(const SSmallInt4& xprime, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* bosonFields)
 {
-    SFermionSource source;
+    SFermionBosonSource source;
     source.m_eSourceType = EFS_Point;
     source.m_byColorIndex = 4;
     source.m_sSourcePoint = xprime;

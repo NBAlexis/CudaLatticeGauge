@@ -255,7 +255,8 @@ void CIndexData::DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt)
                 )
             {
                 const SSmallInt4 mappingIdx = __hostSiteIndexToInt4(tb[uiBigIdx].m_uiSiteIndex);
-                appGeneral(_T("coord: (%d,%d,%d,%d)=(%d,%d,%d,%d)\n"),
+                appGeneral(_T("coord: %d (%d,%d,%d,%d)=(%d,%d,%d,%d)\n"),
+                    uiBigIdx,
                     coord.x, coord.y, coord.z, coord.w,
                     mappingIdx.x, mappingIdx.y, mappingIdx.z, mappingIdx.w);
             }

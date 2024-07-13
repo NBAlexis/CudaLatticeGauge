@@ -92,7 +92,7 @@ void CMeasureMesonCorrelatorStaggeredSimple::OnConfigurationAccepted(INT gn, INT
 {
     CFieldFermionKSSU3* pFermion = dynamic_cast<CFieldFermionKSSU3*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     assert(NULL != pFermion);
-    SFermionSource pointSource;
+    SFermionBosonSource pointSource;
     pointSource.m_byColorIndex = 4;
     pointSource.m_eSourceType = EFS_Point;
     pointSource.m_sSourcePoint = SSmallInt4(0, 0, 0, 0);

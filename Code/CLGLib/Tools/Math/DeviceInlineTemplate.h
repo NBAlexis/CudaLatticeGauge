@@ -414,36 +414,64 @@ template<> __device__ __inline__ CLGComplex _makeColorVector<CLGComplex>(BYTE co
 
 template<> __device__ __inline__ deviceSU2Vector _makeColorVector<deviceSU2Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 2)
+    {
+        return _makeId<deviceSU2Vector>();
+    }
     return deviceSU2Vector::makeOneSU2VectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU3Vector _makeColorVector<deviceSU3Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 3)
+    {
+        return _makeId<deviceSU3Vector>();
+    }
     return deviceSU3Vector::makeOneSU3VectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU4Vector _makeColorVector<deviceSU4Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 4)
+    {
+        return _makeId<deviceSU4Vector>();
+    }
     return deviceSU4Vector::makeOneSUNVectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU5Vector _makeColorVector<deviceSU5Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 5)
+    {
+        return _makeId<deviceSU5Vector>();
+    }
     return deviceSU5Vector::makeOneSUNVectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU6Vector _makeColorVector<deviceSU6Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 6)
+    {
+        return _makeId<deviceSU6Vector>();
+    }
     return deviceSU6Vector::makeOneSUNVectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU7Vector _makeColorVector<deviceSU7Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 7)
+    {
+        return _makeId<deviceSU7Vector>();
+    }
     return deviceSU7Vector::makeOneSUNVectorColor(colorIdx);
 }
 
 template<> __device__ __inline__ deviceSU8Vector _makeColorVector<deviceSU8Vector>(BYTE colorIdx)
 {
+    if (colorIdx >= 8)
+    {
+        return _makeId<deviceSU8Vector>();
+    }
     return deviceSU8Vector::makeOneSUNVectorColor(colorIdx);
 }
 
@@ -552,10 +580,15 @@ template<> __device__ __inline__ void _add<CLGComplex, CLGComplex>(CLGComplex& l
     left.y = left.y + right.y;
 }
 
+#if _CLG_DOUBLEFLOAT
 #define __DEFINE_TWO_ELEMENT_Func(TYPENAME, FUNC1, FUNC2) \
 template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, Real>(const TYPENAME& left, const Real& right) \
 { \
     return left.FUNC2##RealC(right); \
+} \
+template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, FLOAT>(const TYPENAME& left, const FLOAT& right) \
+{ \
+    return left.FUNC2##RealC(static_cast<Real>(right)); \
 } \
 template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, CLGComplex>(const TYPENAME& left, const CLGComplex& right) \
 { \
@@ -569,6 +602,10 @@ template<> __device__ __inline__ void FUNC1<TYPENAME, Real>(TYPENAME& left, cons
 { \
     return left.FUNC2##Real(right); \
 } \
+template<> __device__ __inline__ void FUNC1<TYPENAME, FLOAT>(TYPENAME& left, const FLOAT& right) \
+{ \
+    return left.FUNC2##Real(static_cast<Real>(right)); \
+} \
 template<> __device__ __inline__ void FUNC1<TYPENAME, CLGComplex>(TYPENAME& left, const CLGComplex& right) \
 { \
     return left.FUNC2##Comp(right); \
@@ -576,8 +613,42 @@ template<> __device__ __inline__ void FUNC1<TYPENAME, CLGComplex>(TYPENAME& left
 template<> __device__ __inline__ void FUNC1<TYPENAME, TYPENAME>(TYPENAME& left, const TYPENAME& right) \
 { \
     return left.FUNC2(right); \
+} 
+#else
+#define __DEFINE_TWO_ELEMENT_Func(TYPENAME, FUNC1, FUNC2) \
+template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, Real>(const TYPENAME& left, const Real& right) \
+{ \
+    return left.FUNC2##RealC(right); \
 } \
-
+template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, DOUBLE>(const TYPENAME& left, const DOUBLE& right) \
+{ \
+    return left.FUNC2##RealC(static_cast<Real>(right)); \
+} \
+template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, CLGComplex>(const TYPENAME& left, const CLGComplex& right) \
+{ \
+    return left.FUNC2##CompC(right); \
+} \
+template<> __device__ __inline__ TYPENAME FUNC1##C<TYPENAME, TYPENAME>(const TYPENAME& left, const TYPENAME& right) \
+{ \
+    return left.FUNC2##C(right); \
+} \
+template<> __device__ __inline__ void FUNC1<TYPENAME, Real>(TYPENAME& left, const Real& right) \
+{ \
+    return left.FUNC2##Real(right); \
+} \
+template<> __device__ __inline__ void FUNC1<TYPENAME, DOUBLE>(TYPENAME& left, const DOUBLE& right) \
+{ \
+    return left.FUNC2##Real(static_cast<Real>(right)); \
+} \
+template<> __device__ __inline__ void FUNC1<TYPENAME, CLGComplex>(TYPENAME& left, const CLGComplex& right) \
+{ \
+    return left.FUNC2##Comp(right); \
+} \
+template<> __device__ __inline__ void FUNC1<TYPENAME, TYPENAME>(TYPENAME& left, const TYPENAME& right) \
+{ \
+    return left.FUNC2(right); \
+} 
+#endif
 
 __DEFINE_TWO_ELEMENT_Func(deviceSU2Vector, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU3Vector, _add, Add)
@@ -991,6 +1062,12 @@ template<> __device__ __inline__  deviceSU3 _strictexp<deviceSU3>(const deviceSU
     return x.StrictExp();
 }
 
+template<INT N, INT NoE> 
+__device__ __inline__  deviceSUN<N, NoE> _strictexp(const deviceSUN<N, NoE>& x)
+{
+    return x.StrictExp();
+}
+
 template<typename T> __device__ __inline__  T _strictlog(const T& x) = delete;
 
 template<> __device__ __inline__  CLGComplex _strictlog<CLGComplex>(const CLGComplex& x)
@@ -1004,6 +1081,12 @@ template<> __device__ __inline__  deviceSU2 _strictlog<deviceSU2>(const deviceSU
 }
 
 template<> __device__ __inline__  deviceSU3 _strictlog<deviceSU3>(const deviceSU3& x)
+{
+    return x.Log();
+}
+
+template<INT N, INT NoE> 
+__device__ __inline__  deviceSUN<N, NoE> _strictlog(const deviceSUN<N, NoE>& x)
 {
     return x.Log();
 }
@@ -1260,6 +1343,24 @@ __device__ __host__ __inline__ void _setelement(deviceSUN<N, NoE>& x, INT idx, R
         }
         x.m_me[idxc].x = v;
     }
+}
+
+template<typename T> __device__ __host__ __inline__ CLGComplex _vn(const T& v, INT idx) = delete;
+template<> __device__ __host__ __inline__ CLGComplex _vn<CLGComplex>(const CLGComplex& v, INT idx)
+{
+    return v;
+}
+template<> __device__ __host__ __inline__ CLGComplex _vn<deviceSU2Vector>(const deviceSU2Vector& v, INT idx)
+{
+    return v.m_ve[idx];
+}
+template<> __device__ __host__ __inline__ CLGComplex _vn<deviceSU3Vector>(const deviceSU3Vector& v, INT idx)
+{
+    return v.m_ve[idx];
+}
+template<INT N, INT NoVE> __device__ __host__ __inline__ CLGComplex _vn(const deviceSUNVector<N, NoVE>& v, INT idx)
+{
+    return v.m_ve[idx];
 }
 
 template<>

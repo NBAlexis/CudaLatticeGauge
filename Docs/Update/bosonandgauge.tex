@@ -90,11 +90,28 @@ so
 \end{split}
 \end{equation}
 
-\subsubsection{\label{sec:bosonandgaugesummary}summary}
+\subsubsection{\label{sec:bosonothersituation}other situation for boson}
 
-The action to implement is,
+Consider again,
 \begin{equation}
 \begin{split}
-&S=\sum _n\left\{-\frac{1}{a^2}\phi^{\dagger}(n) \sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right) + \left(\frac{2D}{a^2} +m\right)\phi^{\dagger}(n)\phi(n) + \lambda \left(\phi^{\dagger}(n)\phi(n)\right)^2\right\}\\
+&D_{\mu}\phi D_{\nu}\phi\\
+\end{split}
+\end{equation}
+
+this time, we use
+\begin{equation}
+\begin{split}
+&D_{\mu}\phi =\frac{U_{\mu}(n)\phi(n+\mu)-U_{-\mu}(n)\phi(n-\mu)}{2a}\\
+\end{split}
+\end{equation}
+so
+\begin{equation}
+\begin{split}
+&S=\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)-\phi^{\dagger}(n)}{a}\frac{U_{\mu}(n)\phi(n+\mu)-\phi(n)}{a} \\
+&+ m \sum _n\phi^{\dagger}(n)\phi(n) + \lambda \sum _n\left(\phi^{\dagger}(n)\phi(n)\right)^2\\
+&=-\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)U^{\dagger}_{\mu}(n)\phi(n)+\phi^{\dagger}(n)U_{\mu}(n)\phi(n+\mu)}{a^2}+\sum _n\sum _{\mu}\frac{\phi^{\dagger}(n+\mu)\phi(n+\mu)+\phi^{\dagger}(n)\phi(n)}{a^2}\\
+&+ m \sum _n\phi^{\dagger}(n)\phi(n) + \lambda \sum _n\left(\phi^{\dagger}(n)\phi(n)\right)^2\\
+&=\sum _n\left\{-\frac{1}{a^2}\phi^{\dagger}(n) \sum _{\mu}\left(U_{-\mu}(n)\phi(n-\mu)+U_{\mu}(n)\phi(n+\mu)\right) + \left(\frac{2D}{a^2} +m\right)\phi^{\dagger}(n)\phi(n) + \lambda \left(\phi^{\dagger}(n)\phi(n)\right)^2\right\}\\
 \end{split}
 \end{equation}

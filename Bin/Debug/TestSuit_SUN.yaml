@@ -394,3 +394,171 @@ TestSU4D:
         Beta : 5.0
         GaugeFields : [7]
 
+TestRotationSUND:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    CacheStaple : 0
+
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    MeasureListLength : 2
+    FermionFieldCount : 0
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        Omelyan2Lambda : 0.38636665500756728
+
+        ReportMeasure : 0
+
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU2D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+        Period : [0, 0, 1, 1]
+
+    Gauge2:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU4D
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+        Period : [0, 0, 1, 1]
+
+    GaugeBoundary:
+
+        FieldName : CFieldBoundaryGaugeSU2
+        FieldId : 1
+
+    GaugeBoundary2:
+
+        FieldName : CFieldBoundaryGaugeSU4
+        FieldId : 2
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [1]
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [2]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquetteRotatingSU2
+        Beta : 5.0
+        Omega : 0.1
+        GaugeFields : [1]
+
+    Action2:
+
+        ActionName : CActionGaugePlaquetteRotatingSU4
+        Beta : 5.0
+        Omega : 0.1
+        GaugeFields : [2]
+
+TestRotationSUNP:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 10
+    CacheStaple : 0
+
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    MeasureListLength : 2
+    FermionFieldCount : 0
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 8
+        Omelyan2Lambda : 0.38636665500756728
+
+        ReportMeasure : 0
+
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+        # Period : [0, 0, 1, 1]
+
+    Gauge2:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU4
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+        # Period : [0, 0, 1, 1]
+
+    Measure1:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [1]
+
+    Measure2:
+
+        MeasureName : CMeasurePolyakov2
+        GaugeFields : [2]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquetteRotatingSU2
+        Beta : 5.0
+        Omega : 0.1
+        CloverEnergy : 1
+        ShiftCoord : 1
+        GaugeFields : [1]
+
+    Action2:
+
+        ActionName : CActionGaugePlaquetteRotatingSU4
+        Beta : 5.0
+        Omega : 0.1
+        CloverEnergy : 1
+        ShiftCoord : 1
+        GaugeFields : [2]
+

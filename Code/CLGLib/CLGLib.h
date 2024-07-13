@@ -135,6 +135,7 @@
 #include "Data/Action/CActionGaugePlaquette.h"
 #include "Data/Action/CActionFermionWilsonNf2.h"
 #include "Data/Action/CActionGaugePlaquetteRotating.h"
+#include "Data/Action/CActionGaugePlaquetteRotatingT.h"
 #include "Data/Action/CActionFermionKS.h"
 #include "Data/Action/CActionGaugePlaquetteAcceleration.h"
 #include "Data/Action/CActionGaugePlaquetteBoost.h"

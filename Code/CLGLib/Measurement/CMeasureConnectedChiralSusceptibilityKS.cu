@@ -25,7 +25,7 @@ void CMeasureConnectedSusceptibilityKS::OnConfigurationAccepted(INT gaugeNum, IN
 {
     m_pSourceZero = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
     CFieldFermion* pSourceZeroCopy = dynamic_cast<CFieldFermion*>(appGetLattice()->GetPooledFieldById(GetFermionFieldId()));
-    SFermionSource sour;
+    SFermionBosonSource sour;
     sour.m_byColorIndex = 0;
     sour.m_eSourceType = EFS_Point;
     sour.m_sSourcePoint = _HC_Center;//SSmallInt4(0, 0, 0, 0);

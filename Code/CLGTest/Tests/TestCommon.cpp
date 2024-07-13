@@ -241,6 +241,19 @@ UINT TestAnitiHermiticity(CParameters&)
     return uiErrors;
 }
 
+UINT TestBosonHermiticity(CParameters&)
+{
+    //test Ddagger
+    appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
+    //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
+    CFieldBoson* pF1 = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledFieldById(2));
+    UINT uiErrors = pF1->CheckHermitian(_FIELDS);
+    appGeneral(_T("=== Tested Boson: \n %s \n"), pF1->GetInfos(_T("     ")).c_str());
+    pF1->Return();
+
+    return uiErrors;
+}
+
 //930 - 990 ms
 //__REGIST_TEST(TestGammaMatrix, Misc, TestGammaMatrixSpeed);
 
@@ -254,6 +267,8 @@ UINT TestDebugFunction(CParameters&)
 __REGIST_TEST(TestGamma5Hermiticity, Tools, TestGamm5Hermiticity, Gamm5Hermiticity);
 
 __REGIST_TEST(TestAnitiHermiticity, Tools, TestAnitiHermiticity, AnitiHermiticity);
+
+__REGIST_TEST(TestBosonHermiticity, Tools, TestBosonHermiticity, BosonHermiticity);
 
 __REGIST_TEST(TestDebugFunction, Tools, TestDebug, Debug);
 

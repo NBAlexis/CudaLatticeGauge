@@ -563,6 +563,12 @@
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredGamma.h">
       <Filter>Tools\Math\DeviceTemplates</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingT.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVNRotation.h">
+      <Filter>Data\Field\Boson</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -933,6 +939,12 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKST.cu">
       <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu">
+      <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

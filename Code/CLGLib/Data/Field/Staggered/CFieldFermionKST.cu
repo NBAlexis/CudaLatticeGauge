@@ -641,8 +641,8 @@ _kernelDFermionKSForce_WithLinkT(
     BYTE pathLength)
 {
     intokernalInt4;
-    INT pathLeft[CFieldFermionKS::_kKSLinkLength];
-    INT pathRight[CFieldFermionKS::_kKSLinkLength];
+    INT pathLeft[_kLinkMaxLength];
+    INT pathRight[_kLinkMaxLength];
     for (BYTE iSeperation = 0; iSeperation <= pathLength; ++iSeperation)
     {
         BYTE LLength = 0;
@@ -742,7 +742,7 @@ _kernelDFermionKS_OneLinkT(
     CLGComplex cCoeff)
 {
     intokernalInt4;
-    INT pathBuffer[CFieldFermionKS::_kKSLinkLength];
+    INT pathBuffer[_kLinkMaxLength];
     deviceVector result = _makeZero<deviceVector>();
 
     SSmallInt4 siten = _deviceSmallInt4OffsetC(sSite4, path, pathLength);
@@ -1280,7 +1280,7 @@ UINT CFieldFermionKST<deviceVector, deviceGauge, vectorN>::TestAntiHermitianS(co
         const SSmallInt4 point = __hostSiteIndexToInt4(i);
         for (UINT j = 0; j < vectorN; ++j)
         {
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_byColorIndex = static_cast<BYTE>(j);
             source.m_eSourceType = EFS_Point;
             source.m_sSourcePoint = point;
@@ -1513,7 +1513,7 @@ void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::DDWithMassS(const CFi
 }
 
 template<typename deviceVector, typename deviceGauge, INT vectorN>
-void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::InitialAsSource(const SFermionSource& sourceData)
+void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::InitialAsSource(const SFermionBosonSource& sourceData)
 {
     const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
     switch (sourceData.m_eSourceType)
@@ -1544,7 +1544,7 @@ void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::InitialAsSource(const
     }
     break;
     default:
-        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionSource, sourceData.m_eSourceType).c_str());
+        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionBosonSource, sourceData.m_eSourceType).c_str());
         break;
     }
 }
@@ -1631,7 +1631,7 @@ TArray<CFieldFermion*> CFieldFermionKST<deviceVector, deviceGauge, vectorN>::Get
 
     for (BYTE c = 0; c < vectorN; ++c)
     {
-        SFermionSource sourceData;
+        SFermionBosonSource sourceData;
         sourceData.m_eSourceType = EFS_Point;
         sourceData.m_sSourcePoint = site;
         sourceData.m_byColorIndex = c;

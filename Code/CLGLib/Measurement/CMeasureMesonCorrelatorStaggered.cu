@@ -448,7 +448,7 @@ void CMeasureMesonCorrelatorStaggered::CalculateSources(INT gn, INT bn, const CF
         for (BYTE c = 0; c < 3; ++c)
         {
             const INT idx = shift * 3 + c;
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_bySpinIndex = shift;
             source.m_byColorIndex = c;
             source.m_eSourceType = EFS_Wall;
@@ -533,7 +533,7 @@ void CMeasureMesonCorrelatorStaggered::SimplerVersion()
                 for (BYTE c = 0; c < 3; ++c)
                 {
                     const INT idx = shift * 3 + c;
-                    SFermionSource source;
+                    SFermionBosonSource source;
                     source.m_bySpinIndex = shift;
                     source.m_byColorIndex = c;
                     source.m_eSourceType = EFS_Wall;

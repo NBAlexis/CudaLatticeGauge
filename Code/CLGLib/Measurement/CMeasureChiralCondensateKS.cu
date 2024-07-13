@@ -514,7 +514,7 @@ TArray<TArray<CLGComplex>> CMeasureChiralCondensateKS::ExportDiagnal(INT gaugeNu
 
         for (BYTE c = 0; c < maxC; ++c)
         {
-            SFermionSource source;
+            SFermionBosonSource source;
             source.m_eSourceType = EFS_Point;
             source.m_byColorIndex = c;
             source.m_sSourcePoint = __hostSiteIndexToInt4(x);

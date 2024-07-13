@@ -25,6 +25,15 @@ UBOOL CFieldBoson::ApplyOperator(EFieldOperator op, INT gaugeNum, INT bosonNum, 
     }
 }
 
+void CFieldBoson::D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+{
+    CFieldBoson* pPooled = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledCopy(this));
+    DFromSource(pPooled, gaugeNum, bosonNum, pGauge, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
+    pPooled->Return();
+}
+
+
+
 __END_NAMESPACE
 
 //=============================================================================

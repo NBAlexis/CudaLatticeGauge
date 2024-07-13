@@ -59,6 +59,15 @@ void CFieldBoundaryZero<deviceData>::InitialField(CParameters& param)
 __CLGIMPLEMENT_CLASS(CFieldBoundarySU3Vector)
 __CLGIMPLEMENT_CLASS(CFieldBoundaryWilsonSquareSU3)
 
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonU1)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU2)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU3)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU4)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU5)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU6)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU7)
+__CLGIMPLEMENT_CLASS(CFieldBoundaryBosonSU8)
+
 __END_NAMESPACE
 
 

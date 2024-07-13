@@ -22,6 +22,8 @@ UINT TestUpdateSU4(CParameters& sParam)
 
 __REGIST_TEST(TestUpdateSU4, SUN, TestSU4, SUN);
 __REGIST_TEST(TestUpdateSU4, SUN, TestSU4D, SUND);
+___REGIST_TEST(TestUpdateSU4, SUN, TestRotationSUND, SUNRD, _TEST_BOUND);
+___REGIST_TEST(TestUpdateSU4, SUN, TestRotationSUNP, SUNRP, _TEST_BOUND);
 
 
 //=============================================================================
