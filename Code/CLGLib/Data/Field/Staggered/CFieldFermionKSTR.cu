@@ -443,8 +443,8 @@ _kernelDFermionKSForce_PR_XYTermT(
             _mul(phi2, F(-1.0));
             _mul(phi4, F(-1.0));
         }
-        deviceGauge res = _makeContract<deviceGauge>(phi1, phi2);
-        _add(res, _makeContract<deviceGauge>(phi4, phi3));
+        deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
+        _add(res, _makeContract<deviceGauge, deviceVector>(phi4, phi3));
         _ta(res);
         const Real eta_tau = (iTau > 0 ? 
             ((pEtaTable[sn1.m_uiSiteIndex] >> 3) & 1) 
@@ -531,11 +531,11 @@ _kernelDFermionKSForce_PR_XYTau_TermT(
             _mul(phi2, F(-1.0));
             _mul(phi4, F(-1.0));
         }
-        deviceGauge res = _makeContract<deviceGauge>(phi1, phi2);
+        deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
         //This was phi2 phi1+ * eta124(n1) - phi3 phi4+ * eta124(n2)
         //The sign of the second term is because of 'dagger'
         //However, eta124(n1) = -eta124(n2), so use Add directly.
-        _add(res, _makeContract<deviceGauge>(phi4, phi3));
+        _add(res, _makeContract<deviceGauge, deviceVector>(phi4, phi3));
         _ta(res);
         _mul(res, OneOver48 * static_cast<Real>(fOmega) * pNumerators[rfieldId] * eta124);
 

@@ -494,7 +494,7 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::ExpMult(Real a, CField* U) const
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()
 {
-    appDetailed(_T("CFieldGaugeLink<deviceGauge, matrixN>::FixBoundary()\n"));
+    appDetailed(_T("CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()\n"));
 
     preparethread;
     _kernelFixBoundaryT_D << <block, threads >> > (m_pDeviceData);

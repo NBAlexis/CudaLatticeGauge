@@ -79,8 +79,6 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKST.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTD.h" />
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTR.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1.h" />
-    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSU1R.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.h" />
     <ClInclude Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.h" />
@@ -223,8 +221,6 @@
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKST.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSU1R.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.cu" />

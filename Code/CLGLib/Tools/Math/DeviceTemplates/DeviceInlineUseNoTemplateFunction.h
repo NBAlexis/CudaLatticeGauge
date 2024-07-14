@@ -214,10 +214,12 @@ typedef Real(*_deviceCoeffFunctionPointer) (
     SSmallInt4 site,
     const SIndex& uiSiteBI);
 
-typedef Real(*_deviceCoeffFunctionPointerTwiSites) (
+typedef Real(*_deviceCoeffFunctionPointerTwoSites) (
     BYTE byFieldId,
-    const SSmallInt4& site1,
-    const SSmallInt4& site2);
+    SSmallInt4 site1,
+    SSmallInt4 site2,
+    const SIndex& uiSiteBI1,
+    const SIndex& uiSiteBI2);
 
 /**
 * i = 0, 1, 2 correspond to x, y and xy

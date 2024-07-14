@@ -9,6 +9,17 @@
 //=============================================================================
 #include "CFieldBosonVN.h"
 
+#define __DEFINE_ROTATION_BOSON(N) \
+__CLG_REGISTER_HELPER_HEADER(CFieldBosonVNRotationSU##N) \
+class CLGAPI CFieldBosonVNRotationSU##N : public CFieldBosonVNRotation<deviceSU##N##Vector, deviceSU##N> \
+{ \
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldBosonVNRotationSU##N) \
+public: \
+    EFieldType GetFieldType() const override { return EFT_BosonComplexVector##N; } \
+    UINT VectorN() const override { return N; } \
+    UINT FloatN() const override { return 2 * N; } \
+};
+
 #ifndef _CFIELDBOSONVNROTATION_H_
 #define _CFIELDBOSONVNROTATION_H_
 
@@ -30,7 +41,23 @@ public:
 
     Real m_fOmega;
     INT* m_pDevicePath;
-    _deviceCoeffFunctionPointer m_pfCx;
+    UBOOL m_bShiftCenter;
+    _deviceCoeffFunctionPointerTwoSites m_pfCx;
+    _deviceCoeffFunctionPointerTwoSites m_pfCy;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxy;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxShift;
+    _deviceCoeffFunctionPointerTwoSites m_pfCyShift;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxyShiftXYPP;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxyShiftYXPP;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxyShiftYXPM;
+    _deviceCoeffFunctionPointerTwoSites m_pfCxyShiftXYMP;
+    _deviceCoeffFunctionPointer m_pfCxCySq;
+    _deviceCoeffFunctionPointer m_pfCxCySqShift;
+
+    _deviceCoeffFunctionPointer m_pfCxSq;
+    _deviceCoeffFunctionPointer m_pfCySq;
+    _deviceCoeffFunctionPointer m_pfCxSqShift;
+    _deviceCoeffFunctionPointer m_pfCySqShift;
 
 protected:
 
@@ -46,6 +73,14 @@ public:
     UINT VectorN() const override { return 1; } 
     UINT FloatN() const override { return 2; } 
 };
+
+__DEFINE_ROTATION_BOSON(2)
+__DEFINE_ROTATION_BOSON(3)
+__DEFINE_ROTATION_BOSON(4)
+__DEFINE_ROTATION_BOSON(5)
+__DEFINE_ROTATION_BOSON(6)
+__DEFINE_ROTATION_BOSON(7)
+__DEFINE_ROTATION_BOSON(8)
 
 __END_NAMESPACE
 

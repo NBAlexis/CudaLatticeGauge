@@ -30,10 +30,12 @@ public:
         EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0), void* pOtherParameters = NULL) override;
 
     /**
-    * Calculate force can fail due to solver
+    * NOTE: This is minus term in D
+    * S = - (Dphi)^2 + c1 phi^2 + c2 phi^4 + ...
+    * This is not D, but the minus terms in D
+    * (partial phi)^2 = phi^2 - phi(n)[U_{mu}(n)phi(n+mu) + U_{-mu}(n)phi(n-mu)]
+    * This is [U_{mu}(n)phi(n+mu) + U_{-mu}(n)phi(n-mu)]
     */
-    //virtual UBOOL CalculateForceOnGauge(const CFieldGauge* pGauge, CFieldGauge* pForce, ESolverPhase ePhase) const = 0;
-
     virtual void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0));
     virtual void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const = 0;
 

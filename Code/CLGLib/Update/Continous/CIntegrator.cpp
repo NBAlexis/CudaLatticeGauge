@@ -198,6 +198,7 @@ void CIntegrator::UpdateU(Real fStep) const
         }
     }
 
+    FixBosonBondary(m_pBosonMomentumFields);
     for (INT i = 0; i < m_pBosonFields.Num(); ++i)
     {
         if (NULL != m_pBosonFields[i])
@@ -206,6 +207,7 @@ void CIntegrator::UpdateU(Real fStep) const
             m_pBosonFields[i]->Axpy(fStep, m_pBosonMomentumFields[i]);
         }
     }
+    FixBosonBondary(m_pBosonFields);
 
     checkCudaErrors(cudaDeviceSynchronize());
 }

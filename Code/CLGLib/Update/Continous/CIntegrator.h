@@ -112,6 +112,7 @@ protected:
             }
         }
 
+        FixBosonBondary(m_pBosonForceFields);
         for (INT i = 0; i < m_pBosonMomentumFields.Num(); ++i)
         {
             if (NULL != m_pBosonMomentumFields[i])
@@ -119,6 +120,7 @@ protected:
                 m_pBosonMomentumFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
             }
         }
+        FixBosonBondary(m_pBosonMomentumFields);
     }
 
     /**
@@ -135,6 +137,7 @@ protected:
             }
         }
 
+        FixBosonBondary(m_pBosonForceFields);
         for (INT i = 0; i < m_pBosonForceFields.Num(); ++i)
         {
             if (NULL != m_pBosonFields[i])
@@ -142,6 +145,7 @@ protected:
                 m_pBosonFields[i]->Axpy(fStep, m_pBosonForceFields[i]);
             }
         }
+        FixBosonBondary(m_pBosonFields);
     }
 
     static void SetOneDirZero(const TArray<CFieldGauge*>& fields, BYTE byDir)
@@ -162,6 +166,17 @@ protected:
             if (NULL != fields[i])
             {
                 fields[i]->SetOneDirectionUnity(byDir);
+            }
+        }
+    }
+
+    static void FixBosonBondary(const TArray<CFieldBoson*>& fields)
+    {
+        for (INT i = 0; i < fields.Num(); ++i)
+        {
+            if (NULL != fields[i])
+            {
+                fields[i]->FixBoundary();
             }
         }
     }
@@ -240,6 +255,7 @@ protected:
                 m_pBosonMomentumFields[i]->MakeRandomMomentum();
             }
         }
+        FixBosonBondary(m_pBosonMomentumFields);
     }
 
     void PreserveFields() const

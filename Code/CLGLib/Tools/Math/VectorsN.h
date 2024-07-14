@@ -287,6 +287,14 @@ public:
         return ret;
     }
 
+    __device__ __inline__ void Re()
+    {
+        for (INT i = 0; i < N; ++i)
+        {
+            m_ve[i].y = F(0.0);
+        }
+    }
+
     __device__ __inline__ deviceSUNVector<N, NofE> SubRealC(Real other) const { deviceSUNVector<N, NofE> ret(*this); ret.SubReal(other); return ret; }
     __device__ __inline__ deviceSUNVector<N, NofE> SubCompC(const CLGComplex& other) const { deviceSUNVector<N, NofE> ret(*this); ret.SubComp(other); return ret; }
     __device__ __inline__ deviceSUNVector<N, NofE> SubC(const deviceSUNVector<N, NofE>& other) const { deviceSUNVector<N, NofE> ret(*this); ret.Sub(other); return ret; }

@@ -552,7 +552,9 @@ TestBosonHermiticity:
     Dir : 4
     LatticeLength : [4, 4, 4, 4]
     LatticeIndex : CIndexSquare
-    LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionTorusSquare
+    # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
+    LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
     RandomType : ER_Schrage
     RandomSeed : 1234567
@@ -590,11 +592,12 @@ TestBosonHermiticity:
     BosonField1:
 
         FieldName : CFieldBosonVNRotationU1
-        FieldInitialType : EFIT_Random
+        FieldInitialType : EFIT_RandomGenerator
         FieldId : 2
-        Period : [1, 1, 1, 1]
+        Period : [0, 0, 1, 1]
         GaugeFields : [1]
         Omega : 0.1
+        # ShiftCenter : 1
         # Constant : 1
 
 

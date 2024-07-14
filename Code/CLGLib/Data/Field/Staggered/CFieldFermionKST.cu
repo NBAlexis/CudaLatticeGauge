@@ -1846,10 +1846,10 @@ _kernelFermionKSForceGamma1234T(
         const deviceVector* phi_id = pFermionPointers[uiR + uiRational];
 
         deviceVector toContract = _mulVec(pGauge[linkIndex], phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
-        deviceGauge thisTerm = _makeContract<deviceGauge>(phi_id[uiSiteIndex], toContract);
+        deviceGauge thisTerm = _makeContract<deviceGauge, deviceVector>(phi_id[uiSiteIndex], toContract);
 
         toContract = _mulVec(pGauge[linkIndex], phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
-        _sub(thisTerm, _makeContract<deviceGauge>(toContract, phi_i[uiSiteIndex]));
+        _sub(thisTerm, _makeContract<deviceGauge, deviceVector>(toContract, phi_i[uiSiteIndex]));
 
         if (x_p_mu_Fermion.NeedToOpposite())
         {
@@ -2210,11 +2210,11 @@ _kernelDFermionKSForce_WithLink_SigmaIJT(
                 //deviceVector phi3 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
                 //deviceVector phi4 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
 
-                deviceGauge res = _makeContract<deviceGauge>(phi1, phi2);
+                deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
                 //This Add is required by partial(D^+D)
                 phi1 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
                 phi2 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
-                _add(res, _makeContract<deviceGauge>(phi1, phi2));
+                _add(res, _makeContract<deviceGauge, deviceVector>(phi1, phi2));
                 //res.Add(deviceGauge::makeSU3ContractV(phi4, phi3));
                 _ta(res);
                 _mul(res, fGammCoefficient * pNumerators[rfieldId]);
@@ -2317,11 +2317,11 @@ _kernelDFermionKSForce_WithLink_Gamma51234T(
                 //deviceVector phi3 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
                 //deviceVector phi4 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
 
-                deviceGauge res = _makeContract<deviceGauge>(phi1, phi2);
+                deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
                 //This Add is required by partial(D^+D)
                 phi1 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
                 phi2 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
-                _add(res, _makeContract<deviceGauge>(phi1, phi2));
+                _add(res, _makeContract<deviceGauge, deviceVector>(phi1, phi2));
                 //res.Add(deviceGauge::makeSU3ContractV(phi4, phi3));
                 _ta(res);
                 _mul(res, fGammCoefficient * pNumerators[rfieldId]);
@@ -2425,11 +2425,11 @@ _kernelDFermionKSForce_WithLink_Gamma5T(
                 //deviceVector phi3 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
                 //deviceVector phi4 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
 
-                deviceGauge res = _makeContract<deviceGauge>(phi1, phi2);
+                deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
                 //This Add is required by partial(D^+D)
                 phi1 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
                 phi2 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
-                _sub(res, _makeContract<deviceGauge>(phi1, phi2));
+                _sub(res, _makeContract<deviceGauge, deviceVector>(phi1, phi2));
                 //res.Add(deviceGauge::makeSU3ContractV(phi4, phi3));
 
                 _mul(res, _make_cuComplex(F(0.0), fGammCoefficient * pNumerators[rfieldId]));

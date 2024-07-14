@@ -172,10 +172,10 @@ _kernelDFermionKSForce_DT(
             const deviceVector* phi_id = pFermionPointers[uiR + uiRational];
             //const deviceGauge gaugelink = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIndex, idir);
             deviceVector toContract = _mulVec(pGauge[linkIndex], phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
-            deviceGauge thisTerm = _makeContract<deviceGauge>(phi_id[uiSiteIndex], toContract);
+            deviceGauge thisTerm = _makeContract<deviceGauge, deviceVector>(phi_id[uiSiteIndex], toContract);
 
             toContract = _mulVec(pGauge[linkIndex], phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
-            _add(thisTerm, _makeContract<deviceGauge>(toContract, phi_i[uiSiteIndex]));
+            _add(thisTerm, _makeContract<deviceGauge, deviceVector>(toContract, phi_i[uiSiteIndex]));
 
             if (x_p_mu_Fermion.NeedToOpposite())
             {

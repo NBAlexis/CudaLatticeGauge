@@ -275,6 +275,13 @@ __DEFINE_ENUM(ESolverPhase,
             return static_cast<UINT>(((x * _HC_Ly + y) * _HC_Lz + z) * _HC_Lt + w);
         }
 
+        __device__ __inline__ UBOOL Out() const
+        {
+            return x < 0 || x >= _DC_Lx
+                || y < 0 || y >= _DC_Ly
+                || z < 0 || z >= _DC_Lz
+                || w < 0 || w >= _DC_Lt;
+        }
     };
 #if defined(__cplusplus)
 }

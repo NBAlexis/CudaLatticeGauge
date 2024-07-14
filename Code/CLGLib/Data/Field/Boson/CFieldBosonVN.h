@@ -73,15 +73,24 @@ protected:
 
     void DFromSource(const CFieldBoson* pSource, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
 
-    virtual void OneLinkS(const deviceDataBoson* pSource, const deviceDataGauge* pGuage, BYTE byGaugeFieldId, 
-        Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
+    /**
+    * NOTE: If put to D operator, this is minus
+    * S = - (Dphi)^2 + c1 phi^2 + c2 phi^4 + ...
+    * This is not D, but the minus terms in D
+    */
+    virtual void OneLink(const deviceDataBoson* pSource, const deviceDataGauge* pGuage, BYTE byGaugeFieldId, 
+        Real fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff,
         const INT* pDevicePath, BYTE pathLength, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
 
     virtual void DiagnalTerm(const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
 
-    virtual void OneLinkForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, const INT* pDevicePath, BYTE pathLength) const;
+    virtual void OneLinkForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff, const INT* pDevicePath, BYTE pathLength) const;
 
-    //void OneLinkForceBoson(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataBoson* pForce, _deviceCoeffFunctionPointer fpCoeff, const INT* pDevicePath, BYTE pathLength) const;
+    virtual void PartialSq(const deviceDataBoson* pSource, const deviceDataGauge* pGuage, BYTE byGaugeFieldId,
+        Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir,
+        EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
+
+    virtual void PartialSqForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir) const;
 
 public:
 

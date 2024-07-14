@@ -1025,6 +1025,12 @@ __device__ __inline__ CLGComplex _tr(const deviceSUN<N, NoE>& x)
     return x.Tr();
 }
 
+template<typename T> __device__ __inline__ void _re(T& v) = delete;
+template<> __device__ __inline__ void _re<CLGComplex>(CLGComplex& v) { v.y = F(0.0); }
+template<> __device__ __inline__ void _re<deviceSU2Vector>(deviceSU2Vector& v) { v.Re(); }
+template<> __device__ __inline__ void _re<deviceSU3Vector>(deviceSU3Vector& v) { v.Re(); }
+template<INT N, INT NoVE> __device__ __inline__ void _re(deviceSUNVector<N, NoVE>& v) { v.Re(); }
+
 template<typename T> __device__ __host__ __inline__  BYTE _dim() = delete;
 
 template<> __device__ __host__ __inline__  BYTE _dim<Real>() { return 1; }
@@ -1483,6 +1489,41 @@ inline CCString appToString(const deviceSUN<N, NoE>& v)
     }
     ret = ret + _T("}}");
     return ret;
+}
+
+template<typename T> __device__ __inline__  void _print(const T& x) = delete;
+
+template<> __device__ __inline__  void _print<Real>(const Real& x)
+{
+    printf("%f\n", x);
+}
+template<> __device__ __inline__  void _print<CLGComplex>(const CLGComplex& x)
+{
+    printf("%f + %f I\n", x.x, x.y);
+}
+template<> __device__ __inline__  void _print<deviceSU2>(const deviceSU2& x)
+{
+    x.DebugPrint();
+}
+template<> __device__ __inline__  void _print<deviceSU3>(const deviceSU3& x)
+{
+    x.DebugPrint();
+}
+template<> __device__ __inline__  void _print<deviceSU2Vector>(const deviceSU2Vector& x)
+{
+    x.DebugPrint();
+}
+template<> __device__ __inline__  void _print<deviceSU3Vector>(const deviceSU3Vector& x)
+{
+    x.DebugPrint();
+}
+template<INT N, INT NoE> __device__ __inline__  void _print(const deviceSUN<N, NoE>& x)
+{
+    x.DebugPrint();
+}
+template<INT N, INT NoVE> __device__ __inline__  void _print(const deviceSUNVector<N, NoVE>& x)
+{
+    x.DebugPrint();
 }
 
 #pragma endregion

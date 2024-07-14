@@ -240,6 +240,12 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ void Re()
+        {
+            m_ve[0].y = F(0.0);
+            m_ve[1].y = F(0.0);
+        }
+
         __device__ __inline__ deviceSU2Vector SubRealC(Real other) const { deviceSU2Vector ret(*this); ret.SubReal(other); return ret; }
         __device__ __inline__ deviceSU2Vector SubCompC(const CLGComplex& other) const { deviceSU2Vector ret(*this); ret.SubComp(other); return ret; }
         __device__ __inline__ deviceSU2Vector SubC(const deviceSU2Vector& other) const { deviceSU2Vector ret(*this); ret.Sub(other); return ret; }
@@ -499,6 +505,13 @@ extern "C" {
             deviceSU3Vector ret(*this);
             ret.Conjugate();
             return ret;
+        }
+
+        __device__ __inline__ void Re()
+        {
+            m_ve[0].y = F(0.0);
+            m_ve[1].y = F(0.0);
+            m_ve[2].y = F(0.0);
         }
 
         __device__ __inline__ deviceSU3Vector SubRealC(Real other) const { deviceSU3Vector ret(*this); ret.SubReal(other); return ret; }
