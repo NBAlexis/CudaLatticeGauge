@@ -10,7 +10,7 @@
 
 #include "CLGLib_Private.h"
 #include "Data/Field/Staggered/CFieldFermionKSSU3.h"
-#include "Data/Field/Staggered/CFieldFermionKSU1.h"
+#include "Data/Field/Staggered/CFieldFermionKST.h"
 #include "CMeasureChiralCondensateKS.h"
 
 __BEGIN_NAMESPACE

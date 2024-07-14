@@ -500,6 +500,11 @@ static __device__ __inline__ SBYTE _deviceEta3(const SSmallInt4& sSite, BYTE mis
     }
 }
 
+static __device__ __inline__ Real _deviceEta124(const SSmallInt4& sSite)
+{
+    return (((sSite.y + sSite.z) & 1) > 0) ? (F(-1.0)) : (F(1.0));
+}
+
 #pragma endregion
 
 #pragma region Fermion - Boson link
@@ -532,6 +537,27 @@ static __device__ __inline__ void _devicePathDagger(const INT* __restrict__ path
     for (UINT i = 0; i < iLength; ++i)
     {
         res[i] = -path[iLength - i - 1];
+    }
+}
+
+static void Seperate(INT* full, INT iSep, INT* l, INT* r, BYTE& LL, BYTE& RL)
+{
+    LL = static_cast<BYTE>(iSep);
+    RL = static_cast<BYTE>(3 - iSep);
+
+    for (INT i = 0; i < LL; ++i)
+    {
+        //trace back
+        l[i] = -full[iSep - i - 1];
+
+        //If iSep = 0, This loop will not enter
+        //If iSep = 1, This is -full[0]
+        //If iSep = 2, This is -full[1], -full[0]
+    }
+
+    for (INT i = 0; i < RL; ++i)
+    {
+        r[i] = full[iSep + i];
     }
 }
 

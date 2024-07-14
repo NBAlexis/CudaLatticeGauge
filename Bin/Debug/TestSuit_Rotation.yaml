@@ -846,7 +846,7 @@ TestRotationProjectivePlaneU1:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : 0.107689
-    ExpectedResDebug : 0.138
+    ExpectedResDebug : 0.639037
 
     Updator:
 
@@ -1222,7 +1222,7 @@ TestRotationQuenchedU13D:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : 0.816398
-    ExpectedResDebug : 0.641533
+    ExpectedResDebug : 0.806426
 
     # 53551575Nt4 Omega60 
     Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]

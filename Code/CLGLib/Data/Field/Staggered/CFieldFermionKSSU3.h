@@ -125,27 +125,6 @@ protected:
     void OneLinkForceS(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const override;
 
-    static void Seperate(INT* full, INT iSep, INT* l, INT* r, BYTE& LL, BYTE& RL)
-    {
-        LL = static_cast<BYTE>(iSep);
-        RL = static_cast<BYTE>(3 - iSep);
-
-        for (INT i = 0; i < LL; ++i)
-        {
-            //trace back
-            l[i] = -full[iSep - i - 1];
-
-            //If iSep = 0, This loop will not enter
-            //If iSep = 1, This is -full[0]
-            //If iSep = 2, This is -full[1], -full[0]
-        }
-
-        for (INT i = 0; i < RL; ++i)
-        {
-            r[i] = full[iSep + i];
-        }
-    }
-
     //phi _i and Dst0 phi _i
     deviceSU3Vector** m_pRationalFieldPointers;
 };

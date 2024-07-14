@@ -60,6 +60,11 @@ protected:
     UINT m_uiPlaqutteCount;
 };
 
+__CLG_REGISTER_HELPER_HEADER(CActionGaugePlaquetteRotatingU1) 
+class CLGAPI CActionGaugePlaquetteRotatingU1 : public CActionGaugePlaquetteRotatingT<CLGComplex, 1> 
+{ 
+    __CLGDECLARE_CLASS(CActionGaugePlaquetteRotatingU1)
+};
 
 __DEFINE_ROTATIONACTION(2)
 __DEFINE_ROTATIONACTION(4)

@@ -522,7 +522,6 @@ static __device__ __inline__ Real _deviceCloverRetrT(const deviceGauge* __restri
 
 #pragma endregion
 
-
 __END_NAMESPACE
 
 #endif //#ifndef _DEVICEINLINEGAUGE_H_

@@ -7,7 +7,6 @@
 // REVISION:
 //  [3/31/2024 nbale]
 //=============================================================================
-#include "Tools/Math/DeviceTemplates/DeviceInlineUseNoTemplateFunction.h"
 
 #ifndef _CFIELDBOSONVN_H_
 #define _CFIELDBOSONVN_H_
@@ -40,6 +39,7 @@ public:
     */
     void MakeRandomMomentum() override;
 
+    void D(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
     void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const override;
 
     void InitialField(EFieldInitialType eInitialType) override;
@@ -51,7 +51,6 @@ public:
     void Dagger() override;
 
     //This is Axpy(1.0f, x)
-    void FixBoundary() override;
     void AxpyPlus(const CField* x) override;
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;
@@ -65,25 +64,6 @@ public:
     BYTE* CopyDataOut(UINT& uiSize) const override;
     BYTE* CopyDataOutFloat(UINT& uiSize) const override;
     BYTE* CopyDataOutDouble(UINT& uiSize) const override;
-
-    UINT CheckHermitian(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) const override;
-    void InitialAsSource(const SFermionBosonSource& sourceData) override;
-
-protected:
-
-    void DFromSource(const CFieldBoson* pSource, INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType = EOCT_None, Real fCoeffReal = F(1.0), Real fCoeffImg = F(0.0)) override;
-
-    virtual void OneLinkS(const deviceDataBoson* pSource, const deviceDataGauge* pGuage, BYTE byGaugeFieldId, 
-        Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
-        const INT* pDevicePath, BYTE pathLength, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
-
-    virtual void DiagnalTerm(const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
-
-    virtual void OneLinkForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, const INT* pDevicePath, BYTE pathLength) const;
-
-    //void OneLinkForceBoson(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataBoson* pForce, _deviceCoeffFunctionPointer fpCoeff, const INT* pDevicePath, BYTE pathLength) const;
-
-public:
 
     deviceDataBoson* m_pDeviceData;
 

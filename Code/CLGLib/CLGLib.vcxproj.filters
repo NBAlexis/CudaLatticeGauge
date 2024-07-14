@@ -386,16 +386,10 @@
     <ClInclude Include="Measurement\CMeasureWilsonLoopXY.h">
       <Filter>Measurement</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1.h">
-      <Filter>Data\Action</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteBetaGradient.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
     <ClInclude Include="Data\Action\CActionGaugePlaquetteRotating3D.h">
-      <Filter>Data\Action</Filter>
-    </ClInclude>
-    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.h">
       <Filter>Data\Action</Filter>
     </ClInclude>
     <ClInclude Include="Measurement\CMeasurePolyakovU1XY.h">
@@ -568,6 +562,18 @@
     </ClInclude>
     <ClInclude Include="Data\Field\Boson\CFieldBosonVNRotation.h">
       <Filter>Data\Field\Boson</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Action\CActionGaugePlaquetteRotatingT3D.h">
+      <Filter>Data\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTD.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTR.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredRotation.h">
+      <Filter>Tools\Math\DeviceTemplates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -805,16 +811,10 @@
     <CudaCompile Include="Measurement\CMeasureWilsonLoopXY.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1.cu">
-      <Filter>Data\Action</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteBetaGradient.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotating3D.cu">
-      <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingU1_3D.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePolyakovU1XY.cu">
@@ -945,6 +945,15 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu">
       <Filter>Data\Field\Boson</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu">
+      <Filter>Data\Action</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cu">
+      <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cu">
+      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

@@ -185,6 +185,14 @@ public:
     deviceVector** m_pHostLeftBuffer;
 };
 
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionKSU1)
+class CLGAPI CFieldFermionKSU1 : public CFieldFermionKST<CLGComplex, CLGComplex, 1>
+{
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldFermionKSU1)
+public:
+    EFieldType GetFieldType() const override { return EFT_FermionStaggeredU1; }
+};
+
 __END_NAMESPACE
 
 #endif //#ifndef _CFIELDFERMIONKST_H_

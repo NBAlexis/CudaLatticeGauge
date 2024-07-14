@@ -726,6 +726,7 @@ template<> __device__ __inline__ void _mul<Real, Real>(Real& left, const Real& r
 {
     left = left * right;
 }
+
 template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, Real>(const CLGComplex& left, const Real& right)
 {
     return cuCmulf_cr(left, right);
@@ -734,6 +735,26 @@ template<> __device__ __inline__ void _mul<CLGComplex, Real>(CLGComplex& left, c
 {
     left = cuCmulf_cr(left, right);
 }
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, FLOAT>(const CLGComplex& left, const FLOAT& right)
+{
+    return cuCmulf_cr(left, static_cast<Real>(right));
+}
+template<> __device__ __inline__ void _mul<CLGComplex, FLOAT>(CLGComplex& left, const FLOAT& right)
+{
+    left = cuCmulf_cr(left, static_cast<Real>(right));
+}
+#else
+template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, DOUBLE>(const CLGComplex& left, const DOUBLE& right)
+{
+    return cuCmulf_cr(left, static_cast<Real>(right));
+}
+template<> __device__ __inline__ void _mul<CLGComplex, DOUBLE>(CLGComplex& left, const DOUBLE& right)
+{
+    left = cuCmulf_cr(left, static_cast<Real>(right));
+}
+#endif
+
 template<> __device__ __inline__ CLGComplex _mulC<CLGComplex, CLGComplex>(const CLGComplex& left, const CLGComplex& right)
 {
     return _cuCmulf(left, right);
@@ -1471,6 +1492,7 @@ __END_NAMESPACE
 #include "DeviceTemplates/DeviceInlineGauge.h"
 #include "DeviceTemplates/DeviceInlineGaugeChair.h"
 #include "DeviceTemplates/DeviceInlineStaggeredGamma.h"
+#include "DeviceTemplates/DeviceInlineStaggeredRotation.h"
 
 #endif //#ifndef _DEVICEINLINETEMPLATE_H_
 

@@ -1464,6 +1464,7 @@ CCString CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::GetInfos(const CC
     return sRet;
 }
 
+__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingU1)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU2)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU4)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU5)

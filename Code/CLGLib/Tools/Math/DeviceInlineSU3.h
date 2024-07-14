@@ -704,7 +704,7 @@ static __device__ __inline__ Real _deviceCloverRetr(const deviceSU3* __restrict_
 
 #pragma endregion
 
-
+#if 0
 #pragma region Helper device functions device gauge U1
 
 static __device__ __inline__ CLGComplex _deviceLinkU1(
@@ -989,6 +989,7 @@ static __device__ __inline__ Real _deviceCloverRetrU1(const CLGComplex* __restri
 }
 
 #pragma endregion
+#endif
 
 #pragma region Helper device functions U1 Real
 
@@ -1939,7 +1940,7 @@ static __device__ __inline__ deviceSU3 _deviceStapleChairTerm2(
 
 
 //================= Put those device functions to header file because we will use them ==============
-
+#if 0
 #pragma region device function rotation U1
 
 #pragma region Energy
@@ -3349,6 +3350,7 @@ static __device__ __inline__ CLGComplex _deviceVXYTOptimizedU1(
 }
 
 #pragma endregion
+#endif
 
 #pragma region device functions GAMMA
 
@@ -3855,11 +3857,6 @@ static __device__ __inline__ deviceSU3 _deviceVXXTau(
 
     sRet.MulReal(OneOver3);
     return sRet;
-}
-
-static __device__ __inline__ Real _deviceEta124(const SSmallInt4& sSite)
-{
-    return (((sSite.y + sSite.z) & 1) > 0) ? (F(-1.0)) : (F(1.0));
 }
 
 static __device__ __inline__ deviceSU3 _deviceVXYT(

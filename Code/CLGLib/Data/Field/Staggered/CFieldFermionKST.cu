@@ -854,7 +854,7 @@ void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::OneLinkS(
     Real fRealCoeff, 
     const CLGComplex& cCmpCoeff)
 {
-    assert(pathLength <= _kKSLinkLength);
+    assert(pathLength <= _kLinkMaxLength);
     preparethread;
     _kernelDFermionKS_OneLinkT << <block, threads >> > (
         m_pDeviceData,
@@ -884,7 +884,7 @@ void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::OneLinkForceS(
     BYTE pathLength, 
     BYTE byEtaIdx) const
 {
-    assert(pathLength <= _kKSLinkLength);
+    assert(pathLength <= _kLinkMaxLength);
     preparethread;
     _kernelDFermionKSForce_WithLinkT << <block, threads >> > (
         (const deviceGauge*)pGuage,
@@ -1553,18 +1553,17 @@ template<typename deviceVector, typename deviceGauge, INT vectorN>
 BYTE* CFieldFermionKST<deviceVector, deviceGauge, vectorN>::CopyDataOut(UINT& uiSize) const
 {
     deviceVector* toSave = (deviceVector*)malloc(sizeof(deviceVector) * m_uiSiteCount);
-    uiSize = static_cast<UINT>(sizeof(Real) * m_uiSiteCount * 6);
+    uiSize = static_cast<UINT>(sizeof(Real) * m_uiSiteCount * 2 * vectorN);
     BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
     checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceVector) * m_uiSiteCount, cudaMemcpyDeviceToHost));
     for (UINT i = 0; i < m_uiSiteCount; ++i)
     {
-        Real oneSite[6];
-        for (UINT k = 0; k < 3; ++k)
+        Real oneSite[2 * vectorN];
+        for (UINT k = 0; k < 2 * vectorN; ++k)
         {
-            oneSite[2 * k] = static_cast<Real>(toSave[i].m_ve[k].x);
-            oneSite[2 * k + 1] = static_cast<Real>(toSave[i].m_ve[k].y);
+            oneSite[k] = _element(toSave[i], k);
         }
-        memcpy(saveData + sizeof(Real) * i * 6, oneSite, sizeof(Real) * 6);
+        memcpy(saveData + sizeof(Real) * i * 2 * vectorN, oneSite, sizeof(Real) * 2 * vectorN);
     }
 
     //appGetFileSystem()->WriteAllBytes(fileName.c_str(), saveData, uiSize);
@@ -3091,6 +3090,8 @@ void CFieldMatrixOperationKST<deviceVector, deviceGauge, vectorN>::VectorMultipl
 }
 
 #pragma endregion
+
+__CLGIMPLEMENT_CLASS(CFieldFermionKSU1)
 
 __END_NAMESPACE
 
