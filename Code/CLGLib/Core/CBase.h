@@ -86,6 +86,13 @@ void __forceclass##classname##specifyname() \
     (void)unused; \
 }
 
+#define __CLG_TEMPLATE_FORCE_CONSTRUCTOR2(classname) \
+void __forceclass##classname() \
+{ \
+    classname unused(); \
+    (void)unused; \
+}
+
 __BEGIN_NAMESPACE
 
 enum { kMaxClassNameLength = 127 };
