@@ -1082,13 +1082,13 @@ void CFieldGaugeLink<deviceGauge, matrixN>::SetOneDirectionZero(BYTE byDir)
 }
 
 template<typename deviceGauge, INT matrixN>
-CFieldGaugeLink<deviceGauge, matrixN>::CFieldGaugeLink<deviceGauge, matrixN>() : CFieldGauge()
+CFieldGaugeLink<deviceGauge, matrixN>::CFieldGaugeLink() : CFieldGauge()
 {
     checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceGauge) * m_uiLinkeCount));
 }
 
 template<typename deviceGauge, INT matrixN>
-CFieldGaugeLink<deviceGauge, matrixN>::~CFieldGaugeLink<deviceGauge, matrixN>()
+CFieldGaugeLink<deviceGauge, matrixN>::~CFieldGaugeLink()
 {
     checkCudaErrors(__cudaFree(m_pDeviceData));
 }
