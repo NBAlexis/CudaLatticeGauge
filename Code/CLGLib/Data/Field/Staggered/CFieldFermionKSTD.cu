@@ -210,8 +210,8 @@ void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
     _kernelDFermionKS_DT << <block, threads >> > (
         pSource,
         pGauge,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[this->m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[this->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         f2am,
