@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CSolverBiCGStab.cpp
+// FILENAME : CSolverBiCGstab.cpp
 // 
 // DESCRIPTION:
 // This is the class for BiCGStab solver
@@ -8,7 +8,7 @@
 //  [01/08/2019 nbale]
 //=============================================================================
 #include "CLGLib_Private.h"
-#include "CSolverBiCGStab.h"
+#include "CSolverBiCGstab.h"
 
 __BEGIN_NAMESPACE
 
