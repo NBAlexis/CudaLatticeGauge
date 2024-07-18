@@ -893,6 +893,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
     return this->m_fNewEnergy;
 }
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CActionGaugePlaquetteRotatingT3D, U1, CLGComplex, 1)
+
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingU1_3D)
 
 __END_NAMESPACE

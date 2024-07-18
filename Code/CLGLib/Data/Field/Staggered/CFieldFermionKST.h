@@ -23,6 +23,13 @@ public:
 
     CFieldFermionKST();
     ~CFieldFermionKST();
+    EFieldType GetFieldType() const override { return EFT_Max; }
+    CField* GetCopy() const override
+    {
+        CFieldFermionKST<deviceVector, deviceGauge, vectorN>* ret = new CFieldFermionKST<deviceVector, deviceGauge, vectorN>();
+        CopyTo(ret);
+        return ret;
+    }
 
     void InitialField(EFieldInitialType eInitialType) override;
     void InitialFieldWithFile(const CCString&, EFieldFileType) override;

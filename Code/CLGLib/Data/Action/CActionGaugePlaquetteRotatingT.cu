@@ -1462,6 +1462,10 @@ CCString CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::GetInfos(const CC
     return sRet;
 }
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CActionGaugePlaquetteRotatingT, U1, CLGComplex, 1)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CActionGaugePlaquetteRotatingT, SU2, deviceSU2, 2)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CActionGaugePlaquetteRotatingT, SU4, deviceSU4, 4)
+
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingU1)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU2)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU4)

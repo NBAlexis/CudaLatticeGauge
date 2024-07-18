@@ -34,6 +34,15 @@ public:
     ~CFieldBosonVN();
 
     void CopyTo(CField* U) const override;
+    EFieldType GetFieldType() const override { return EFT_Max; }
+    CField* GetCopy() const override
+    {
+        CFieldBosonVN<deviceDataBoson, deviceDataGauge>* ret = new CFieldBosonVN<deviceDataBoson, deviceDataGauge>();
+        CopyTo(ret);
+        return ret;
+    }
+    UINT VectorN() const override { return 0; }
+    UINT FloatN() const override { return 0; }
 
     /**
     * This should be momentum field

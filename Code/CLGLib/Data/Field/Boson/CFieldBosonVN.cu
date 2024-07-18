@@ -1294,6 +1294,15 @@ UINT CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CheckHermitian(INT gaugeNu
     return uiWrong;
 }
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, U1, CLGComplex, CLGComplex)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU2, deviceSU2Vector, deviceSU2)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU3, deviceSU3Vector, deviceSU3)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU4, deviceSU4Vector, deviceSU4)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU5, deviceSU5Vector, deviceSU5)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU6, deviceSU6Vector, deviceSU6)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU7, deviceSU7Vector, deviceSU7)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU8, deviceSU8Vector, deviceSU8)
+
 __CLGIMPLEMENT_CLASS(CFieldBosonU1)
 __CLGIMPLEMENT_CLASS(CFieldBosonSU2)
 __CLGIMPLEMENT_CLASS(CFieldBosonSU3)

@@ -3091,6 +3091,8 @@ void CFieldMatrixOperationKST<deviceVector, deviceGauge, vectorN>::VectorMultipl
 
 #pragma endregion
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldMatrixOperationKST, U1, CLGComplex, CLGComplex, 1)
+
 __CLGIMPLEMENT_CLASS(CFieldFermionKSU1)
 
 __END_NAMESPACE

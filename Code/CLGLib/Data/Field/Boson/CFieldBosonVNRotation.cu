@@ -1150,6 +1150,15 @@ CCString CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::GetInfos(const
     return sRet;
 }
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RU1, CLGComplex, CLGComplex)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU2, deviceSU2Vector, deviceSU2)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU3, deviceSU3Vector, deviceSU3)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU4, deviceSU4Vector, deviceSU4)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU5, deviceSU5Vector, deviceSU5)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU6, deviceSU6Vector, deviceSU6)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU7, deviceSU7Vector, deviceSU7)
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVNRotation, RSU8, deviceSU8Vector, deviceSU8)
+
 __CLGIMPLEMENT_CLASS(CFieldBosonVNRotationU1)
 __CLGIMPLEMENT_CLASS(CFieldBosonVNRotationSU2)
 __CLGIMPLEMENT_CLASS(CFieldBosonVNRotationSU3)

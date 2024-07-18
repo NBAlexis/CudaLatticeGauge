@@ -851,6 +851,8 @@ CCString CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::GetInfos(const C
     return sRet;
 }
 
+__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldFermionKSTR, U1, CLGComplex, CLGComplex, 1)
+
 __CLGIMPLEMENT_CLASS(CFieldFermionKSU1R)
 
 __END_NAMESPACE
