@@ -677,7 +677,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     INT hostPath[2] = { 1, 4 };
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -692,7 +692,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 4; hostPath[1] = 1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -707,7 +707,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 4; hostPath[1] = -1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -722,7 +722,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = -1; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -742,7 +742,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 2; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -757,7 +757,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 4; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -772,7 +772,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 4; hostPath[1] = -2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -787,7 +787,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = -2; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -807,7 +807,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 1; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -822,7 +822,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 2; hostPath[1] = 1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -837,7 +837,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = 2; hostPath[1] = -1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -852,7 +852,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     hostPath[0] = -1; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
-    OneLink(
+    this->OneLink(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -868,7 +868,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
 
 #pragma region +Omega^2 y^2 px^2 + Omega^2 x^2 py^2, square term
 
-    DiagnalTerm(
+    this->DiagnalTerm(
         pSourceVN->m_pDeviceData, 
         -F(2.0) * m_fOmega * m_fOmega,
         m_bShiftCenter ? m_pfCxCySqShift : m_pfCxCySq,
@@ -880,7 +880,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
 
 #pragma region +Omega^2 y^2 px^2 + Omega^2 x^2 py^2, shift term
 
-    PartialSq(
+    this->PartialSq(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -892,7 +892,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
         cCompCoeff
     );
 
-    PartialSq(
+    this->PartialSq(
         pSourceVN->m_pDeviceData,
         NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
         NULL == pGauge ? 0 : pGauge->m_byFieldId,
@@ -945,7 +945,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     INT hostPath[2] = { 1, 4 };
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -957,7 +957,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 4; hostPath[1] = 1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -969,7 +969,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 4; hostPath[1] = -1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -981,7 +981,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = -1; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -997,7 +997,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 2; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1009,7 +1009,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 4; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1021,7 +1021,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 4; hostPath[1] = -2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1033,7 +1033,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = -2; hostPath[1] = 4;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1049,7 +1049,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 1; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1061,7 +1061,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 2; hostPath[1] = 1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1073,7 +1073,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = 2; hostPath[1] = -1;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1085,7 +1085,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
     hostPath[0] = -1; hostPath[1] = 2;
     checkCudaErrors(cudaMemcpy(m_pDevicePath, hostPath, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    OneLinkForceGauge(
+    this->OneLinkForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1099,7 +1099,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 
 #pragma region +Omega^2 y^2 px^2 + Omega^2 x^2 py^2, shift term
 
-    PartialSqForceGauge(
+    this->PartialSqForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
@@ -1108,7 +1108,7 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
         0
     );
 
-    PartialSqForceGauge(
+    this->PartialSqForceGauge(
         (const deviceDataGauge*)gauge->GetData(),
         gauge->m_byFieldId,
         (deviceDataGauge*)gaugeforce->GetData(),
