@@ -389,7 +389,7 @@ template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::MakeRandomGenerator()
 {
     preparethread;
-    _kernelInitialGeneratorT_D << <block, threads >> > (m_pDeviceData);
+    _kernelInitialGeneratorT_D << <block, threads >> > (this->m_pDeviceData);
 }
 
 /**
@@ -400,12 +400,12 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::MakeRandomGenerator()
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* pStable, Real betaOverN) const
 {
-    if (NULL == pForce || GetFieldType() != pForce->GetFieldType())
+    if (NULL == pForce || this->GetFieldType() != pForce->GetFieldType())
     {
         appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: force field is not SU3");
         return;
     }
-    if (NULL != pStable && GetFieldType() != pStable->GetFieldType())
+    if (NULL != pStable && this->GetFieldType() != pStable->GetFieldType())
     {
         appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: stape field is not SU3");
         return;
@@ -419,8 +419,8 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateForceAndStaple(CFieldGauge
     assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
 
     _kernelStapleAtSiteCacheIndexT_D << <block, threads >> > (
-        m_byFieldId,
-        m_pDeviceData,
+        this->m_byFieldId,
+        this->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
@@ -436,8 +436,8 @@ DOUBLE CFieldGaugeLinkD<deviceGauge, matrixN>::CalculatePlaqutteEnergy(DOUBLE be
 
     preparethread;
     _kernelPlaqutteEnergyCacheIndexT_D << <block, threads >> > (
-        m_byFieldId,
-        m_pDeviceData,
+        this->m_byFieldId,
+        this->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
@@ -451,14 +451,14 @@ template<typename deviceGauge, INT matrixN>
 DOUBLE CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateKinematicEnergy() const
 {
     preparethread;
-    _kernelCalculateKinematicEnergyT_D << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);
+    _kernelCalculateKinematicEnergyT_D << <block, threads >> > (this->m_pDeviceData, _D_RealThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateOnlyStaple(CFieldGauge* pStaple) const
 {
-    if (NULL == pStaple || GetFieldType() != pStaple->GetFieldType())
+    if (NULL == pStaple || this->GetFieldType() != pStaple->GetFieldType())
     {
         appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: stable field is not SU3");
         return;
@@ -467,8 +467,8 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateOnlyStaple(CFieldGauge* pS
 
     preparethread;
     _kernelCalculateOnlyStapleT_D << <block, threads >> > (
-        m_byFieldId,
-        m_pDeviceData,
+        this->m_byFieldId,
+        this->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pStappleCache,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
@@ -478,7 +478,7 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateOnlyStaple(CFieldGauge* pS
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::ExpMult(Real a, CField* U) const
 {
-    if (NULL == U || GetFieldType() != U->GetFieldType())
+    if (NULL == U || this->GetFieldType() != U->GetFieldType())
     {
         appCrucial("CFieldGaugeLink<deviceGauge, matrixN>: U field is not SU3");
         return;
@@ -487,7 +487,7 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::ExpMult(Real a, CField* U) const
     CFieldGaugeLink<deviceGauge, matrixN>* pUField = dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(U);
 
     preparethread;
-    _kernelExpMultRealT_D << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+    _kernelExpMultRealT_D << < block, threads >> > (this->m_pDeviceData, a, pUField->m_pDeviceData);
     
 }
 
@@ -497,28 +497,28 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()
     appDetailed(_T("CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()\n"));
 
     preparethread;
-    _kernelFixBoundaryT_D << <block, threads >> > (m_pDeviceData);
+    _kernelFixBoundaryT_D << <block, threads >> > (this->m_pDeviceData);
 }
 
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::TransformToIA()
 {
     preparethread;
-    _kernelTransformUToIAT_D << <block, threads >> > (m_pDeviceData);
+    _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
 }
 
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::TransformToU()
 {
     preparethread;
-    _kernelTransformIAToUT_D << <block, threads >> > (m_pDeviceData);
+    _kernelTransformIAToUT_D << <block, threads >> > (this->m_pDeviceData);
 }
 
 template<typename deviceGauge, INT matrixN>
 CCString CFieldGaugeLinkD<deviceGauge, matrixN>::GetInfos(const CCString &tab) const
 {
     CCString sRet = CFieldGaugeLink<deviceGauge, matrixN>::GetInfos(tab);
-    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
+    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(this->m_byFieldId);
     sRet = sRet + tab + appToString(boundary) + _T("\n");
 
     return sRet;
@@ -529,11 +529,11 @@ void CFieldGaugeU1D::TransformToIA()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformUToIAT_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
     }
     else
     {
-        _kernelTransformUToIALogT_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_pDeviceData);
     }
 }
 
@@ -548,12 +548,12 @@ void CFieldGaugeU1D::InitialWithByteCompressed(const CCString& sFileName)
         readData[i].x = F(0.0);
         readData[i].y = fRead[i];
     }
-    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(this->m_pDeviceData, readData, sizeof(CLGComplex) * m_uiLinkeCount, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
     free(readData);
 
     preparethread;
-    _kernelTransformIAToULogT_D << <block, threads >> > (m_pDeviceData);
+    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
 
     free(byData);
@@ -594,11 +594,11 @@ void CFieldGaugeSU2D::TransformToIA()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformUToIAT_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
     }
     else
     {
-        _kernelTransformUToIALogT_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_pDeviceData);
     }
 }
 
@@ -619,14 +619,14 @@ void CFieldGaugeSU2D::InitialWithByteCompressed(const CCString& sFileName)
         readData[i].m_me[0] = _make_cuComplex(F(0.0), oneLink[2]);
         readData[i].m_me[3] = _make_cuComplex(F(0.0), -oneLink[2]);
     }
-    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceSU2) * m_uiLinkeCount, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(this->m_pDeviceData, readData, sizeof(deviceSU2) * m_uiLinkeCount, cudaMemcpyHostToDevice));
     checkCudaErrors(cudaDeviceSynchronize());
     free(readData);
 
     //DebugPrintMe();
 
     preparethread;
-    _kernelTransformIAToULogT_D << <block, threads >> > (m_pDeviceData);
+    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
 
     //DebugPrintMe();
