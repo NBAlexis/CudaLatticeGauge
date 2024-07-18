@@ -19,8 +19,6 @@ __BEGIN_NAMESPACE
 template<typename deviceGauge, INT matrixN>
 class __DLL_EXPORT CActionGaugePlaquetteRotatingT3D : public CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>
 {
-public:
-    CActionGaugePlaquetteRotatingT3D() : CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>() {}
 protected:
 
     DOUBLE EnergySingleField(UBOOL bBeforeEvolution, const class CFieldGauge* pGauge, const class CFieldGauge* pStable = NULL) override;

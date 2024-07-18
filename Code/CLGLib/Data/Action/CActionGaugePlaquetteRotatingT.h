@@ -28,7 +28,17 @@ class __DLL_EXPORT CActionGaugePlaquetteRotatingT : public CAction
 {
 public:
 
-    CActionGaugePlaquetteRotatingT();
+    CActionGaugePlaquetteRotatingT()
+        : CAction()
+        , m_fOmega(F(0.0))
+        , m_bCloverEnergy(FALSE)
+        , m_bShiftHalfCoord(FALSE)
+        , m_bTorus(FALSE)
+    {
+        SetOmega(F(0.0));
+    }
+    ~CActionGaugePlaquetteRotatingT() {}
+
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     CCString GetInfos(const CCString& tab) const override;
 

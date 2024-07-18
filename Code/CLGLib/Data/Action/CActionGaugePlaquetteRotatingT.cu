@@ -1028,17 +1028,6 @@ _kernelAddForceChairTermT_Term5_Shifted(
 #pragma endregion
 
 template<typename deviceGauge, INT matrixN>
-CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::CActionGaugePlaquetteRotatingT()
-    : CAction()
-    , m_fOmega(F(0.0))
-    , m_bCloverEnergy(FALSE)
-    , m_bShiftHalfCoord(FALSE)
-    , m_bTorus(FALSE)
-{
-    SetOmega(F(0.0));
-}
-
-template<typename deviceGauge, INT matrixN>
 void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::PrepareForHMCSingleField(const CFieldGauge* pGauge, UINT uiUpdateIterate)
 {
     if (0 == uiUpdateIterate)
