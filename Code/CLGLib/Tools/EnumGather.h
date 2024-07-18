@@ -35,6 +35,10 @@ inline THashMap<CCString, INT> appGetEnumTable(const CCString &inGatheredEnum)
     THashMap<CCString, INT> sOutTable;
     for (INT i = 0; i < sEnumArray.Num(); ++i)
     {
+        if (sEnumArray[i].GetLength() >= 2 && sEnumArray[i].Left(2) == _T("//"))
+        {
+            continue;
+        }
         TArray <INT> inSeps2;
         inSeps2.AddItem(_T('='));
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety);
@@ -66,6 +70,10 @@ inline CCString appEnumToStringEabc(Eabc v)
     INT iCurrentNum = -1;
     for (INT i = 0; i < sEnumArray.Num(); ++i)
     {
+        if (sEnumArray[i].GetLength() >= 2 && sEnumArray[i].Left(2) == _T("//"))
+        {
+            continue;
+        }
         TArray <INT> inSeps2;
         inSeps2.AddItem(_T('='));
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety);
@@ -104,6 +112,10 @@ __END_NAMESPACE
     INT iCurrentNum = -1; \
     for (INT i = 0; i < sEnumArray.Num(); ++i) \
     { \
+        if (sEnumArray[i].GetLength() >= 2 && sEnumArray[i].Left(2) == _T("//")) \
+        { \
+            continue; \
+        } \
         TArray <INT> inSeps2; \
         inSeps2.AddItem(_T('=')); \
         TArray <CCString> sEnumArray2 = appGetStringList(sEnumArray[i], inSeps2, EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety); \

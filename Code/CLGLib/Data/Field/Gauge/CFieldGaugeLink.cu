@@ -1476,6 +1476,14 @@ CCString CFieldGaugeSU2::SaveToCompressedFile(const CCString& fileName) const
 
 #pragma endregion
 
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, U1, CLGComplex, 1);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU2, deviceSU2, 2);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU4, deviceSU3, 4);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU5, deviceSU4, 5);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU6, deviceSU5, 6);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU7, deviceSU6, 7);
+__CLG_TEMPLATE_FORCE_CONSTRUCTOR(CFieldGaugeLink, SU8, deviceSU7, 8);
+
 __CLGIMPLEMENT_CLASS(CFieldGaugeU1)
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU2)
 __CLGIMPLEMENT_CLASS(CFieldGaugeSU4)

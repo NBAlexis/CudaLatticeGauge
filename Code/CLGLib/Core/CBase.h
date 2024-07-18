@@ -79,6 +79,13 @@ struct CLGAPI class_name##helper \
 static class_name##helper s_##class_name##helper; 
 
 
+#define __CLG_TEMPLATE_FORCE_CONSTRUCTOR(classname, specifyname, ...) \
+void __forceclass##classname##specifyname() \
+{ \
+    classname<__VA_ARGS__> unused(); \
+    (void)unused; \
+}
+
 __BEGIN_NAMESPACE
 
 enum { kMaxClassNameLength = 127 };
