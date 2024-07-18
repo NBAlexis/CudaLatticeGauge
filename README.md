@@ -1,5 +1,7 @@
 # CudaLatticeGauge
 
+***NOTE, move to https://gitee.com/NBAlexis/CudaLatticeGauge***
+
 lattice gauge (lattice QCD) simulation with CUDA</br>
 
 Test on laptops using GMRES with 12 orthrognal basis</br>
