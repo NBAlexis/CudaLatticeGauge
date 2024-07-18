@@ -2,7 +2,10 @@
 // FILENAME : CActionGaugePlaquetteRotatingT3D.cu
 // 
 // DESCRIPTION:
-// This is the class for rotating su3
+// This is the class for rotating in the case of 3D
+// 
+// see:
+// https://cboard.cprogramming.com/cplusplus-programming/113400-gcc-template-class-child-cant-directly-access-parent-fields.html
 //
 // REVISION:
 //  [27/10/2022 nbale]
@@ -743,7 +746,7 @@ _kernelAddForceChairTermT_Term5_Shifted3D(
 template<typename deviceGauge, INT matrixN>
 UBOOL CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
 {
-    pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(GetBetaOverN()));
+    pGauge->CalculateForceAndStaple(pForce, pStaple, static_cast<Real>(this->GetBetaOverN()));
 
     const CFieldGaugeLink<deviceGauge, matrixN>* pGaugeSU3 = dynamic_cast<const CFieldGaugeLink<deviceGauge, matrixN>*>(pGauge);
     CFieldGaugeLink<deviceGauge, matrixN>* pForceSU3 = dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(pForce);
@@ -756,34 +759,34 @@ UBOOL CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::CalculateForceOnGa
     preparethread;
 
 
-    if (!m_bShiftHalfCoord)
+    if (!this->m_bShiftHalfCoord)
     {
         _kernelAddForce4PlaqutteTermT_XY3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega() * GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
 
         _kernelAddForceChairTermT_Term13D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
 
         _kernelAddForceChairTermT_Term33D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
 
         _kernelAddForceChairTermT_Term53D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega() * GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
     }
     else
     {
 
         _kernelAddForce4PlaqutteTermT_XYZ_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, FALSE, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega() * GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
         
         _kernelAddForceChairTermT_Term1_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
 
         _kernelAddForceChairTermT_Term3_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega());
 
         _kernelAddForceChairTermT_Term5_Shifted3D << <block, threads >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData,
-            pForceSU3->m_pDeviceData, GetBetaOverN(), GetOmega() * GetOmega());
+            pForceSU3->m_pDeviceData, this->GetBetaOverN(), this->GetOmega() * this->GetOmega());
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -803,13 +806,13 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         return this->m_fLastEnergy;
     }
 
-    if (IsCloverEnergy())
+    if (this->IsCloverEnergy())
     {
-        this->m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(GetBetaOverN());
+        this->m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(this->GetBetaOverN());
     }
     else
     {
-        this->m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(GetBetaOverN());
+        this->m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(this->GetBetaOverN());
     }
     
     const CFieldGaugeLink<deviceGauge, matrixN>* pGaugeSU3 = dynamic_cast<const CFieldGaugeLink<deviceGauge, matrixN>*>(pGauge);
@@ -823,14 +826,14 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
 
     appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
 
-    if (m_bShiftHalfCoord)
+    if (this->m_bShiftHalfCoord)
     {
 
         _kernelAdd4PlaqutteTermT_Shifted3D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            GetBetaOverN(),
-            GetOmega() * GetOmega(),
+            this->GetBetaOverN(),
+            this->GetOmega() * this->GetOmega(),
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -838,8 +841,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         _kernelAddChairTermT_Term1234_Shifted3D << <block, threads >> > (
             pGaugeSU3->m_byFieldId, 
             pGaugeSU3->m_pDeviceData, 
-            GetBetaOverN(),
-            GetOmega(), 
+            this->GetBetaOverN(),
+            this->GetOmega(), 
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -847,8 +850,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         _kernelAddChairTermT_Term5_Shifted3D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            GetBetaOverN(),
-            GetOmega() * GetOmega(),
+            this->GetBetaOverN(),
+            this->GetOmega() * this->GetOmega(),
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -860,8 +863,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
             appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-            GetBetaOverN(),
-            GetOmega() * GetOmega(),
+            this->GetBetaOverN(),
+            this->GetOmega() * this->GetOmega(),
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -869,8 +872,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         _kernelAddChairTermT_Term1234_3D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            GetBetaOverN(),
-            GetOmega(),
+            this->GetBetaOverN(),
+            this->GetOmega(),
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -878,8 +881,8 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         _kernelAddChairTermT_Term53D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            GetBetaOverN(),
-            GetOmega() * GetOmega(),
+            this->GetBetaOverN(),
+            this->GetOmega() * this->GetOmega(),
             _D_RealThreadBuffer);
 
         this->m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
