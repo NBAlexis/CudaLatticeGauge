@@ -78,6 +78,8 @@ public:
 
     virtual UBOOL IsFermion() const { return FALSE; }
 
+    DOUBLE GetBetaOverN() const { return m_fBetaOverN; }
+
 protected:
 
     UINT GetDefaultMatrixN() const;

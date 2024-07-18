@@ -1034,7 +1034,6 @@ CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::CActionGaugePlaquetteRotat
     , m_bCloverEnergy(FALSE)
     , m_bShiftHalfCoord(FALSE)
     , m_bTorus(FALSE)
-    , m_uiPlaqutteCount(0)
 {
     SetOmega(F(0.0));
 }
@@ -1054,8 +1053,6 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::Initial(class CLattic
     CAction::Initial(pOwner, param, byId);
 
     m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
-
-    m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     DOUBLE fOmega = 0.1;
     param.FetchValueDOUBLE(_T("Omega"), fOmega);

@@ -34,7 +34,8 @@ public:
 
     void SetBeta(DOUBLE fBeta);
     void SetOmega(DOUBLE fOmega);
-    void GetOmega() const { return m_fOmega; }
+    DOUBLE GetOmega() const { return m_fOmega; }
+    UBOOL IsCloverEnergy() const { return m_bCloverEnergy; }
 
 protected:
 
@@ -56,9 +57,6 @@ protected:
     UBOOL m_bShiftHalfCoord;
     UBOOL m_bTorus;
 
-protected:
-
-    UINT m_uiPlaqutteCount;
 };
 
 __CLG_REGISTER_HELPER_HEADER(CActionGaugePlaquetteRotatingU1) 
