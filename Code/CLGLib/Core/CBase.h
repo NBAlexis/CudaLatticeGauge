@@ -67,8 +67,13 @@ protected:
 
 
 #define __CLGIMPLEMENT_CLASS(class_name) \
-    class_name##helper::class_name##helper() {} \
-    __DLL_EXPORT class_name::class##class_name class_name::m_StaticClass;
+class_name##helper::class_name##helper() {} \
+__DLL_EXPORT class_name::class##class_name class_name::m_StaticClass; \
+void __force_constructor##class_name() \
+{ \
+    class_name unused##class_name; \
+    (void)unused##class_name; \
+}
 
 
 #define __CLG_REGISTER_HELPER_HEADER(class_name) \
@@ -78,20 +83,6 @@ struct CLGAPI class_name##helper \
 }; \
 static class_name##helper s_##class_name##helper; 
 
-
-#define __CLG_TEMPLATE_FORCE_CONSTRUCTOR(classname, specifyname, ...) \
-void __forceclass##classname##specifyname() \
-{ \
-    classname<__VA_ARGS__> unused##classname##specifyname; \
-    (void)unused##classname##specifyname; \
-}
-
-#define __CLG_TEMPLATE_FORCE_CONSTRUCTOR2(classname) \
-void __forceclass##classname() \
-{ \
-    classname unused##classname; \
-    (void)unused##classname; \
-}
 
 __BEGIN_NAMESPACE
 
