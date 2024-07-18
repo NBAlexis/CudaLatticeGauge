@@ -64,7 +64,7 @@
 #else
 # define __DLL_IMPORT            
 # define CLGAPIPRIVATE
-# define __DLL_EXPORT            
+# define __DLL_EXPORT            __attribute__((visibility("default")))    
 # define __IMPORT_LIB(libname)    
 # undef FORCEINLINE
 # undef CDECL

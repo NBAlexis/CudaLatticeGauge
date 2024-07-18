@@ -14,12 +14,8 @@
 #include "Core/CLGSetup.h"
 #include "Core/CLGDefine.h"
 
-#if defined(_CLG_WIN)
-#   if !defined(CLGAPI)
-#       define CLGAPI __DLL_EXPORT
-#   endif
-#else
-#    define CLGAPI  
+#if !defined(CLGAPI)
+#    define CLGAPI __DLL_EXPORT
 #endif
 
 
