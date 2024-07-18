@@ -509,8 +509,6 @@ public:
                 m_me[(y + iLeftStartY) * N + x + iLeftStartX] = right.m_me[(y + iRightStartY) * N + x + iRightStartX];
             }
         }
-
-        return ret;
     }
 
     template<INT NofVE>
