@@ -83,6 +83,13 @@ struct CLGAPI class_name##helper \
 }; \
 static class_name##helper s_##class_name##helper; 
 
+#define __CLG_FORCETEMPLATE_CONSTRUCTOR(classname, specifiyname, ...) \
+void __force_constructor##classname##specifiyname() \
+{ \
+    classname<__VA_ARGS__> unused##classname##specifiyname; \
+    (void)unused##classname##specifiyname; \
+}
+
 
 __BEGIN_NAMESPACE
 

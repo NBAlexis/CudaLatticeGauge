@@ -17,7 +17,6 @@ class CLGAPI CFieldGaugeSU##N##D : public CFieldGaugeLinkD<deviceSU##N, N> \
 { \
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU##N##D) \
 public: \
-    CFieldGaugeSU##N##D() : CFieldGaugeLinkD<deviceSU##N, N>() { } \
     EFieldType GetFieldType() const override { return EFT_GaugeSU##N; } \
 };
 
@@ -30,7 +29,6 @@ template<typename deviceGauge, INT matrixN>
 class __DLL_EXPORT CFieldGaugeLinkD : public CFieldGaugeLink<deviceGauge, matrixN>
 {
 public:
-    CFieldGaugeLinkD() : CFieldGaugeLink<deviceGauge, matrixN>() {}
 
 #pragma region HMC
 
@@ -79,7 +77,6 @@ class CLGAPI CFieldGaugeU1D : public CFieldGaugeLinkD<CLGComplex, 1>
 {
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeU1D)
 public:
-    CFieldGaugeU1D() : CFieldGaugeLinkD<CLGComplex, 1>() {}
     EFieldType GetFieldType() const override { return EFT_GaugeU1; }
 
     void InitialWithByteCompressed(const CCString& sFileName) override;
@@ -93,7 +90,6 @@ class CLGAPI CFieldGaugeSU2D : public CFieldGaugeLinkD<deviceSU2, 2>
 {
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU2D)
 public:
-    CFieldGaugeSU2D() : CFieldGaugeLinkD<deviceSU2, 2>() {}
     EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
 
     void InitialWithByteCompressed(const CCString& sFileName) override;
