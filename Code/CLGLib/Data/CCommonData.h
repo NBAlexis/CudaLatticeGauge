@@ -177,7 +177,7 @@ __DEFINE_ENUM(ESolverPhase,
     extern "C" {
 #endif /* __cplusplus */
     //instead of int4
-    struct CLGAPI alignas(4) SSmallInt4
+    struct CLGAPI SSmallInt4
     {
         __device__ __host__ SSmallInt4() {}
         __device__ __host__ SSmallInt4(const SSmallInt4& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
