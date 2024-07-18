@@ -589,7 +589,7 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
             pGauge,
             appGetLattice()->m_pIndexCache->m_pEtaMu,
             pTarget,
-            m_byFieldId,
+            this->m_byFieldId,
             byGaugeFieldId,
             CCommonData::m_fOmega,
             _HC_Center,
@@ -601,7 +601,7 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
             pSource,
             pGauge,
             pTarget,
-            m_byFieldId,
+            this->m_byFieldId,
             byGaugeFieldId,
             CCommonData::m_fOmega,
             eOCT,
@@ -616,7 +616,7 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
         pGauge,
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
-        m_byFieldId,
+        this->m_byFieldId,
         byGaugeFieldId,
         CCommonData::m_fOmega,
         _HC_Center,
@@ -631,7 +631,7 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
         pSource,
         pGauge,
         pTarget,
-        m_byFieldId,
+        this->m_byFieldId,
         byGaugeFieldId,
         CCommonData::m_fOmega,
         bDagger,
@@ -709,10 +709,10 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DerivateD0(
                     (const deviceGauge*)pGaugeBuffer,
                     (deviceGauge*)pForce,
                     appGetLattice()->m_pIndexCache->m_pEtaMu,
-                    m_pRationalFieldPointers,
-                    m_pMDNumerator,
-                    m_rMD.m_uiDegree,
-                    m_byFieldId,
+                    this->m_pRationalFieldPointers,
+                    this->m_pMDNumerator,
+                    this->m_rMD.m_uiDegree,
+                    this->m_byFieldId,
                     CCommonData::m_fOmega, 
                     static_cast<BYTE>(imu), iTau[pathidx],
                     L[0], L[1], L[2], LLength,
@@ -792,10 +792,10 @@ void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::DerivateD0(
                     _kernelDFermionKSForce_PR_XYTau_TermT << <block, threads >> > (
                         (const deviceGauge*)pGaugeBuffer,
                         (deviceGauge*)pForce,
-                        m_pRationalFieldPointers,
-                        m_pMDNumerator,
-                        m_rMD.m_uiDegree,
-                        m_byFieldId,
+                        this->m_pRationalFieldPointers,
+                        this->m_pMDNumerator,
+                        this->m_rMD.m_uiDegree,
+                        this->m_byFieldId,
                         CCommonData::m_fOmega,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength
@@ -815,7 +815,7 @@ template<typename deviceVector, typename deviceGauge, INT vectorN>
 void CFieldFermionKSTR<deviceVector, deviceGauge, vectorN>::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionKST<deviceVector, deviceGauge, vectorN>::InitialOtherParameters(params);
-    m_bEachSiteEta = TRUE;
+    this->m_bEachSiteEta = TRUE;
 
     INT iReal = 0;
     if (params.FetchValueINT(_T("RealRotation"), iReal))

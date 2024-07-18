@@ -215,7 +215,7 @@ void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::DOperatorKS(void* pT
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         pTarget,
         f2am,
-        m_byFieldId,
+        this->m_byFieldId,
         byGaugeFieldId,
         bDagger,
         eOCT,
@@ -239,10 +239,10 @@ void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::DerivateD0(
         (deviceGauge*)pForce,
         appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
-        m_pRationalFieldPointers,
-        m_pMDNumerator,
-        m_rMD.m_uiDegree,
-        m_byFieldId);
+        this->m_pRationalFieldPointers,
+        this->m_pMDNumerator,
+        this->m_rMD.m_uiDegree,
+        this->m_byFieldId);
 }
 
 #pragma endregion
@@ -270,20 +270,20 @@ template<typename deviceVector, typename deviceGauge, INT vectorN>
 void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::FixBoundary()
 {
     preparethread;
-    _kernelDFermionKS_FixBoundaryT << <block, threads >> > (m_pDeviceData, m_byFieldId);
+    _kernelDFermionKS_FixBoundaryT << <block, threads >> > (this->m_pDeviceData, this->m_byFieldId);
 }
 
 template<typename deviceVector, typename deviceGauge, INT vectorN>
 void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
 {
-    InitialField(EFIT_RandomGaussian);
+    this->InitialField(EFIT_RandomGaussian);
     FixBoundary();
-    D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
+    this->D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
     FixBoundary();
 
-    if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
+    if (NULL != appGetFermionSolver(this->m_byFieldId) && !appGetFermionSolver(this->m_byFieldId)->IsAbsoluteAccuracy())
     {
-        m_fLength = Dot(this).x;
+        this->m_fLength = Dot(this).x;
     }
 
 }
@@ -293,7 +293,7 @@ CCString CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::GetInfos(const C
 {
     CCString sRet = CFieldFermionKST<deviceVector, deviceGauge, vectorN>::GetInfos(tab);
 
-    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(m_byFieldId);
+    SSmallInt4 boundary = appGetLattice()->m_pIndex->GetBoudanryCondition()->GetFieldBC(this->m_byFieldId);
     sRet = sRet + tab +appToString(boundary) + _T("\n");
     return sRet;
 }
