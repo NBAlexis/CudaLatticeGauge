@@ -627,15 +627,15 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
 {
     CFieldBosonVN<deviceDataBoson, deviceDataGauge>::DFromSource(pSource, gaugeNum, bosonNum, pGaugeFields, pBoson, eCoeffType, fCoeffReal, fCoeffImg);
 
-    const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, pGaugeFields);
+    const CFieldGauge* pGauge = this->GetDefaultGauge(gaugeNum, pGaugeFields);
 
-    if (NULL != pGauge && VectorN() != pGauge->MatrixN())
+    if (NULL != pGauge && this->VectorN() != pGauge->MatrixN())
     {
         appCrucial(_T("CFieldBosonVU can only play with gauge UN!"));
         return;
     }
 
-    if (NULL == pSource || GetFieldType() != pSource->GetFieldType())
+    if (NULL == pSource || this->GetFieldType() != pSource->GetFieldType())
     {
         appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
         return;
@@ -649,12 +649,12 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::DFromSource(const 
     }
 
     //try external gauge field
-    if (NULL == pGauge && m_byGaugeFieldIds.Num() > 0)
+    if (NULL == pGauge && this->m_byGaugeFieldIds.Num() > 0)
     {
-        const CField* externelfield = appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]);
+        const CField* externelfield = appGetLattice()->GetFieldById(this->m_byGaugeFieldIds[0]);
         if (NULL != externelfield)
         {
-            pGauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]));
+            pGauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(this->m_byGaugeFieldIds[0]));
             if (pGauge->IsDynamic())
             {
                 appCrucial(_T("CFieldBosonUN: A dynamic field is configured for this UN, but not for the action!\n"));
@@ -914,13 +914,13 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
 {
     CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(gaugeNum, bosonNum, pGauge, pGaugeForce, pBoson);
 
-    if (m_byGaugeFieldIds.Num() < 1)
+    if (this->m_byGaugeFieldIds.Num() < 1)
     {
         appCrucial(_T("CFieldBosonUN ForceOnGauge: there is no gauge!"));
         return;
     }
-    INT gaugeidx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pGauge, m_byGaugeFieldIds[0]);
-    if (gaugeidx < 0 || gaugeidx >= m_byGaugeFieldIds.Num())
+    INT gaugeidx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pGauge, this->m_byGaugeFieldIds[0]);
+    if (gaugeidx < 0 || gaugeidx >= this->m_byGaugeFieldIds.Num())
     {
         appCrucial(_T("CFieldBosonUN ForceOnGauge: there is no gauge!"));
         return;
@@ -929,13 +929,13 @@ void CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT g
     const CFieldGauge* gauge = pGauge[gaugeidx];
     CFieldGauge* gaugeforce = pGaugeForce[gaugeidx];
 
-    if (NULL == gauge || VectorN() != gauge->MatrixN())
+    if (NULL == gauge || this->VectorN() != gauge->MatrixN())
     {
         appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
         return;
     }
 
-    if (NULL == gaugeforce || VectorN() != gaugeforce->MatrixN())
+    if (NULL == gaugeforce || this->VectorN() != gaugeforce->MatrixN())
     {
         appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
         return;
