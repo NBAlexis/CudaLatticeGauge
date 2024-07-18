@@ -237,7 +237,7 @@ void CFieldFermionKSTD<deviceVector, deviceGauge, vectorN>::DerivateD0(
     _kernelDFermionKSForce_DT << <block, threads >> > (
         (const deviceGauge*)pGaugeBuffer,
         (deviceGauge*)pForce,
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[this->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_pEtaMu,
         this->m_pRationalFieldPointers,
         this->m_pMDNumerator,
