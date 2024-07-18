@@ -34,6 +34,7 @@ public:
 
     void SetBeta(DOUBLE fBeta);
     void SetOmega(DOUBLE fOmega);
+    void GetOmega() const { return m_fOmega; }
 
 protected:
 
