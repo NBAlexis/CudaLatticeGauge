@@ -1429,14 +1429,6 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::CalculateForceOnGauge
     }
 }
 
-
-template<typename deviceGauge, INT matrixN>
-void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::SetOmega(DOUBLE fOmega)
-{ 
-    m_fOmega = fOmega; 
-    CCommonData::m_fOmega = fOmega;
-}
-
 template<typename deviceGauge, INT matrixN>
 CCString CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::GetInfos(const CCString &tab) const
 {

@@ -43,7 +43,11 @@ public:
     CCString GetInfos(const CCString& tab) const override;
 
     void SetBeta(DOUBLE fBeta);
-    void SetOmega(DOUBLE fOmega);
+    void SetOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        CCommonData::m_fOmega = fOmega;
+    }
     DOUBLE GetOmega() const { return m_fOmega; }
     UBOOL IsCloverEnergy() const { return m_bCloverEnergy; }
 
