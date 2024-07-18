@@ -28,6 +28,7 @@ class CLGAPI CLASSNAME : public CFieldGaugeLink<DEVICEDATA, N> \
 { \
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CLASSNAME) \
 public: \
+    CLASSNAME() : CFieldGaugeLink<DEVICEDATA, N>() {} \
     EFieldType GetFieldType() const override { return FIELDTYPE; } \
 };
 
@@ -125,6 +126,7 @@ class CLGAPI CFieldGaugeU1 : public CFieldGaugeLink<CLGComplex, 1>
 {
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeU1)
 public:
+    CFieldGaugeU1() : CFieldGaugeLink<CLGComplex, 1>() {}
     EFieldType GetFieldType() const override { return EFT_GaugeU1; }
 
     void InitialWithByteCompressed(const CCString& sFileName) override;
@@ -138,6 +140,7 @@ class CLGAPI CFieldGaugeSU2 : public CFieldGaugeLink<deviceSU2, 2>
 {
     __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldGaugeSU2)
 public:
+    CFieldGaugeSU2() : CFieldGaugeLink<deviceSU2, 2>() {}
     EFieldType GetFieldType() const override { return EFT_GaugeSU2; }
 
     void InitialWithByteCompressed(const CCString& sFileName) override;
