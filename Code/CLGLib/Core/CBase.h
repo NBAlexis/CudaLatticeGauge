@@ -82,15 +82,15 @@ static class_name##helper s_##class_name##helper;
 #define __CLG_TEMPLATE_FORCE_CONSTRUCTOR(classname, specifyname, ...) \
 void __forceclass##classname##specifyname() \
 { \
-    classname<__VA_ARGS__> unused(); \
-    (void)unused; \
+    classname<__VA_ARGS__> unused##classname##specifyname; \
+    (void)unused##classname##specifyname; \
 }
 
 #define __CLG_TEMPLATE_FORCE_CONSTRUCTOR2(classname) \
 void __forceclass##classname() \
 { \
-    classname unused(); \
-    (void)unused; \
+    classname unused##classname; \
+    (void)unused##classname; \
 }
 
 __BEGIN_NAMESPACE
