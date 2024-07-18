@@ -277,10 +277,10 @@ __DEFINE_ENUM(ESolverPhase,
 
         __device__ __inline__ UBOOL Out() const
         {
-            return x < 0 || x >= _DC_Lx
-                || y < 0 || y >= _DC_Ly
-                || z < 0 || z >= _DC_Lz
-                || w < 0 || w >= _DC_Lt;
+            return x < 0 || x >= _DC_Lxi
+                || y < 0 || y >= _DC_Lyi
+                || z < 0 || z >= _DC_Lzi
+                || w < 0 || w >= _DC_Lti;
         }
     };
 #if defined(__cplusplus)

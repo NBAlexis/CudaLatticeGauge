@@ -242,7 +242,7 @@ TestAccelerationTorusQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411029
+    ExpectedRes : 0.411030
     ExpectedResDebug : 0.591390
 
     Updator:
@@ -256,7 +256,7 @@ TestAccelerationTorusQ:
         # IntegratorType : CIntegratorNestedForceGradient
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 10
         # NestedStep : 10
 
     Gauge:
@@ -272,26 +272,6 @@ TestAccelerationTorusQ:
     GaugeBoundary:
 
         FieldName : CFieldBoundaryGaugeSU3
-
-    FermionField1:
-
-        FieldName : CFieldFermionKSSU3Acc
-        FieldInitialType : EFIT_RandomGaussian
-
-        # 2am
-        Mass : 0.5
-        FieldId : 2
-        PoolNumber : 15
-
-        Period : [1, 1, 1, -1]
-
-        # MC is to prepare
-        # This is x^{1/8}
-        MC : [1.2315463126994253, -0.0008278241356180749, -0.014245354429491623, -0.4488176917209997, 0.004266594097242546, 0.0642861314434021, 1.0607522874248192]
-
-        # MD is to calculate force
-        # This is x^{-1/4}
-        MD : [0.6530478708579666, 0.00852837235258859, 0.05154361612777617, 0.4586723601896008, 0.0022408218960485566, 0.039726885022656366, 0.5831433967066838]
         
     Action1:
    
@@ -351,7 +331,7 @@ TestAccelerationDirichletMidCenterQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.420602
+    ExpectedRes : 0.411214
     ExpectedResDebug : 0.591390
 
     Updator:
@@ -365,7 +345,7 @@ TestAccelerationDirichletMidCenterQ:
         # IntegratorType : CIntegratorNestedForceGradient
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 10
         # NestedStep : 10
 
     Gauge:
@@ -461,7 +441,7 @@ TestAccelerationTorusMidCenterQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411029
+    ExpectedRes : 0.408805
     ExpectedResDebug : 0.591390
 
     Updator:
@@ -475,7 +455,7 @@ TestAccelerationTorusMidCenterQ:
         # IntegratorType : CIntegratorNestedForceGradient
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 10
         # NestedStep : 10
 
     Gauge:

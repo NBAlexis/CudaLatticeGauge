@@ -1036,6 +1036,7 @@ CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::CActionGaugePlaquetteRotat
     , m_bTorus(FALSE)
     , m_uiPlaqutteCount(0)
 {
+    SetOmega(F(0.0));
 }
 
 template<typename deviceGauge, INT matrixN>
@@ -1467,10 +1468,10 @@ CCString CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::GetInfos(const CC
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingU1)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU2)
 __CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU4)
-__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU5)
-__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU6)
-__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU7)
-__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU8)
+//__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU5)
+//__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU6)
+//__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU7)
+//__CLGIMPLEMENT_CLASS(CActionGaugePlaquetteRotatingSU8)
 
 __END_NAMESPACE
 

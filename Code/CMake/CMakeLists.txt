@@ -63,27 +63,29 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating3D.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT3D.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionPhi4.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/CCommonData.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundary.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryZero.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3TreeImproved.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeU1.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeU1Real.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeZ2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKS.h
@@ -91,15 +93,15 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3Acc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3D.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3DR.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3EM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3Gamma.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3GammaEM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3P4.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3R.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3REM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3RigidAcc.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSU1.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSU1R.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKST.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTD.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTR.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Acc.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Boost.h
@@ -123,6 +125,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAngularMomentumKSREM.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBerryPhase.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBosonCond.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensate.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChiralCondensateKS.h
@@ -137,6 +140,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalorKS.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePlaqutteEnergy.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovSUN.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovU1XY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY3D.h
@@ -176,11 +180,21 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLGFFT.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CLinearAlgebraHelper.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CRationalApproximation.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceInlineSU3.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceInlineTemplate.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceTemplates/DeviceInlineGaugeChair.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceTemplates/DeviceInlineGauge.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceTemplates/DeviceInlineStaggeredRotation.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceTemplates/DeviceInlineUseNoTemplateFunction.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/DeviceTemplates/DeviceInlineStaggeredGamma.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/GammaMatrix.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/CudaComplexFunction.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Random.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/SU2.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/SU3.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/SUN.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/Vectors.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Math/VectorsN.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Tracer.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Tools/Timer.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Update/Continous/CHMC.h
@@ -201,30 +215,33 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquettePolar.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRigidAcc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating3D.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingU1_3D.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonU1.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeU1.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryZero.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3TreeImproved.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeU1.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeU1Real.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3DR.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3EM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3Gamma.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3GammaEM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3P4.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3REM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3RigidAcc.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSU1.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSU1R.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKST.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTD.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Boost.cu
@@ -246,8 +263,6 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Core/CudaHelper.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotating.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionPeriodicAndDirichletSquare.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryGaugeSU3.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexData.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CLatticeData.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureChargeAndCurrents.cu
@@ -261,6 +276,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalor.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePandChiralTalorKS.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakov.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovSUN.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovU1XY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasurePolyakovXY3D.cu
@@ -278,9 +294,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Lattice/CIndexSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionPhi4.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBosonCond.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftGMRES.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftBiCGStab.cpp
@@ -346,6 +364,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.h
     ${PROJECT_SOURCE_DIR}/CLGTest/CLGTest.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestAngularMomentum.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestBoundary.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestConfigurationFileIO.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestFermionMatrix.cpp
@@ -356,6 +375,7 @@ add_executable(CLGTest
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRandom.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestRotationAcc.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSolver.cpp
+    ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestSUN.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestUpdator.cpp
     ${PROJECT_SOURCE_DIR}/CLGTest/Tests/TestGaugeFixing.cpp
     )
@@ -393,12 +413,10 @@ add_executable(StaggeredRotation
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/GaugeFixingJob.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Measure3D.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/MeasureU1.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/Simulate3D.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateBeta.cpp
-    ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateEM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateREM.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateU1.cpp
     ${PROJECT_SOURCE_DIR}/Applications/StaggeredRotation/SimulateU13D.cpp

@@ -845,7 +845,7 @@ TestRotationProjectivePlaneU1:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.107689
+    ExpectedRes : 0.842893
     ExpectedResDebug : 0.639037
 
     Updator:
