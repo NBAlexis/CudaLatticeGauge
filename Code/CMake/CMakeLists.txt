@@ -72,15 +72,17 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionTorusSquare.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/CCommonData.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNKernel.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundary.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryZero.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CField.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldCommonKernel.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.h
@@ -219,10 +221,11 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNKernel.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryZero.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGauge.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldCommonKernel.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.cu
@@ -297,6 +300,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionPhi4.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBosonCond.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp
