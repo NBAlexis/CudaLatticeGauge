@@ -30,8 +30,15 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 class __DLL_EXPORT CFieldBosonVN : public CFieldBoson
 {
 public:
-    CFieldBosonVN();
-    ~CFieldBosonVN();
+    CFieldBosonVN() : CFieldBoson()
+    {
+        CCommonKernel<deviceDataBoson>::AllocateBuffer(m_pDeviceData, m_uiSiteCount);
+    }
+
+    ~CFieldBosonVN()
+    {
+        CCommonKernel<deviceDataBoson>::FreeBuffer(m_pDeviceData);
+    }
 
     void CopyTo(CField* U) const override;
     EFieldType GetFieldType() const override { return EFT_Max; }

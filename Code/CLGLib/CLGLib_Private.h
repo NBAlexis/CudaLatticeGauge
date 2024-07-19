@@ -192,9 +192,10 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
  //=======================================================
  //Field
 #include "Data/Field/CField.h"
+#include "Data/Field/CFieldCommonKernel.h"
 #include "Data/Field/BoundaryField/CFieldBoundary.h"
 
-#include "Data/Field/Gauge/CFieldGauge.h"
+#include "Data/Field/CFieldGauge.h"
 #include "Data/Field/Gauge/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldFermion.h"
 #include "Data/Field/Staggered/CFieldFermionKS.h"

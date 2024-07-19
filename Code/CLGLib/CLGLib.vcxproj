@@ -49,15 +49,17 @@
     <ClInclude Include="Data\Boundary\CBoundaryConditionTorusSquare.h" />
     <ClInclude Include="Data\CCommonData.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVN.h" />
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVNKernel.h" />
     <ClInclude Include="Data\Field\Boson\CFieldBosonVNRotation.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundary.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryOne.h" />
     <ClInclude Include="Data\Field\BoundaryField\CFieldBoundaryZero.h" />
     <ClInclude Include="Data\Field\CField.h" />
     <ClInclude Include="Data\Field\CFieldBoson.h" />
+    <ClInclude Include="Data\Field\CFieldCommonKernel.h" />
     <ClInclude Include="Data\Field\CFieldFermion.h" />
+    <ClInclude Include="Data\Field\CFieldGauge.h" />
     <ClInclude Include="Data\Field\CFieldSpin.h" />
-    <ClInclude Include="Data\Field\Gauge\CFieldGauge.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLink.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.h" />
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h" />
@@ -198,10 +200,11 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu" />
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNKernel.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu" />
     <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu" />
-    <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu" />
+    <CudaCompile Include="Data\Field\CFieldCommonKernel.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu" />
@@ -249,6 +252,7 @@
     <ClCompile Include="Data\Action\CActionPhi4.cpp" />
     <ClCompile Include="Data\Field\CFieldBoson.cpp" />
     <ClCompile Include="Data\Field\CFieldFermion.cpp" />
+    <ClCompile Include="Data\Field\CFieldGauge.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <FileType>Document</FileType>

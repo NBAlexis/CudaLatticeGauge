@@ -1,18 +1,20 @@
 //=============================================================================
-// FILENAME : CFieldBosonvn.h
+// FILENAME : CFieldBosonVNKernel.h
 // 
 // DESCRIPTION:
 // This is the class for the spin fields
 //
 // REVISION:
-//  [07/04/2024 nbale]
+//  [07/20/2024 nbale]
 //=============================================================================
 
 #include "CLGLib_Private.h"
 #include "Tools/Math/DeviceInlineTemplate.h"
-#include "CFieldBosonVN.h"
+#include "CFieldBosonVNKernel.h"
 
 __BEGIN_NAMESPACE
+
+#if 0
 
 
 #pragma region kernel D and force
@@ -729,19 +731,19 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT gaugeNum,
     checkCudaErrors(cudaDeviceSynchronize());
 }
 
-//template<typename deviceDataBoson, typename deviceDataGauge>
-//CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CFieldBosonVN()
-//    : CFieldBoson()
-//    //, m_fCharge(F(0.1))
-//{
-//    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount));
-//}
-//
-//template<typename deviceDataBoson, typename deviceDataGauge>
-//CFieldBosonVN<deviceDataBoson, deviceDataGauge>::~CFieldBosonVN()
-//{
-//    checkCudaErrors(__cudaFree(m_pDeviceData));
-//}
+template<typename deviceDataBoson, typename deviceDataGauge>
+CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CFieldBosonVN()
+    : CFieldBoson()
+    //, m_fCharge(F(0.1))
+{
+    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount));
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+CFieldBosonVN<deviceDataBoson, deviceDataGauge>::~CFieldBosonVN()
+{
+    checkCudaErrors(__cudaFree(m_pDeviceData));
+}
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialField(EFieldInitialType eInitialType)
@@ -1311,6 +1313,8 @@ __CLGIMPLEMENT_CLASS(CFieldBosonSU5)
 __CLGIMPLEMENT_CLASS(CFieldBosonSU6)
 __CLGIMPLEMENT_CLASS(CFieldBosonSU7)
 __CLGIMPLEMENT_CLASS(CFieldBosonSU8)
+
+#endif
 
 __END_NAMESPACE
 

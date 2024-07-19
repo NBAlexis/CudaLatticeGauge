@@ -1,5 +1,5 @@
 //=============================================================================
-// FILENAME : CFieldGauge.cu
+// FILENAME : CFieldGauge.cpp
 // 
 // DESCRIPTION:
 //

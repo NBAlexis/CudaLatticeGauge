@@ -452,9 +452,6 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.h">
       <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
-    <ClInclude Include="Data\Field\Gauge\CFieldGauge.h">
-      <Filter>Data\Field\Gauge</Filter>
-    </ClInclude>
     <ClInclude Include="Data\Field\Gauge\CFieldGaugeSU3.h">
       <Filter>Data\Field\Gauge</Filter>
     </ClInclude>
@@ -568,6 +565,15 @@
     </ClInclude>
     <ClInclude Include="Tools\Math\DeviceTemplates\DeviceInlineStaggeredRotation.h">
       <Filter>Tools\Math\DeviceTemplates</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldGauge.h">
+      <Filter>Data\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\Boson\CFieldBosonVNKernel.h">
+      <Filter>Data\Field\Boson</Filter>
+    </ClInclude>
+    <ClInclude Include="Data\Field\CFieldCommonKernel.h">
+      <Filter>Data\Field</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -688,6 +694,9 @@
     </ClCompile>
     <ClCompile Include="Measurement\CMeasureBosonCond.cpp">
       <Filter>Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\CFieldGauge.cpp">
+      <Filter>Data\Field</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -868,9 +877,6 @@
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.cu">
       <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGauge.cu">
-      <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeSU3.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
@@ -942,6 +948,12 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cu">
       <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNKernel.cu">
+      <Filter>Data\Field\Boson</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\CFieldCommonKernel.cu">
+      <Filter>Data\Field</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

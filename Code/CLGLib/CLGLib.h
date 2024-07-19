@@ -89,9 +89,10 @@
 //=======================================================
 //Field
 #include "Data/Field/CField.h"
+#include "Data/Field/CFieldCommonKernel.h"
 #include "Data/Field/BoundaryField/CFieldBoundary.h"
 
-#include "Data/Field/Gauge/CFieldGauge.h"
+#include "Data/Field/CFieldGauge.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryZero.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryOne.h"
 #include "Data/Field/Gauge/CFieldGaugeLink.h"
