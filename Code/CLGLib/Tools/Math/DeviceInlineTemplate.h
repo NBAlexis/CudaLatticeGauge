@@ -19,15 +19,25 @@ __BEGIN_NAMESPACE
 
 template<typename T> __device__ __inline__ T _makeId() = delete;
 
-template<> __device__ __inline__ Real _makeId<Real>()
-{
-    return F(1.0);
-}
+template<> __device__ __inline__ INT _makeId<INT>() { return 1; }
+template<> __device__ __inline__ UINT _makeId<UINT>() { return 1; }
+template<> __device__ __inline__ BYTE _makeId<BYTE>() { return 1; }
+template<> __device__ __inline__ Real _makeId<Real>() { return F(1.0); }
+template<> __device__ __inline__ CLGComplex _makeId<CLGComplex>() { return _onec; }
 
-template<> __device__ __inline__ CLGComplex _makeId<CLGComplex>()
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ FLOAT _makeId<FLOAT>() { return 1.0f; }
+template<> __device__ __inline__ cuComplex _makeId<cuComplex>()
 {
-    return _onec;
+    return make_cuComplex(1.0f, 0.0f);
 }
+#else
+template<> __device__ __inline__ DOUBLE _makeId<DOUBLE>() { return 1.0; }
+template<> __device__ __inline__ cuDoubleComplex _makeId<cuDoubleComplex>()
+{
+    return make_cuDoubleComplex(1.0, 0.0);
+}
+#endif
 
 template<> __device__ __inline__ deviceSU2 _makeId<deviceSU2>()
 {
@@ -99,19 +109,34 @@ template<> __device__ __inline__ deviceSU8Vector _makeId<deviceSU8Vector>()
     return deviceSU8Vector::makeOneSUNVector();
 }
 
+template<> __device__ __inline__ deviceWilsonVectorSU3 _makeId<deviceWilsonVectorSU3>()
+{
+    return deviceWilsonVectorSU3::makeOneWilsonVectorSU3();
+}
+
 
 
 template<typename T> __device__ __inline__ T _makeZero() = delete;
 
-template<> __device__ __inline__ Real _makeZero<Real>()
-{
-    return F(0.0);
-}
+template<> __device__ __inline__ INT _makeZero<INT>() { return 0; }
+template<> __device__ __inline__ UINT _makeZero<UINT>() { return 0; }
+template<> __device__ __inline__ BYTE _makeZero<BYTE>() { return 0; }
+template<> __device__ __inline__ Real _makeZero<Real>() { return F(0.0); }
+template<> __device__ __inline__ CLGComplex _makeZero<CLGComplex>() { return _zeroc; }
 
-template<> __device__ __inline__ CLGComplex _makeZero<CLGComplex>()
+#if _CLG_DOUBLEFLOAT
+template<> __device__ __inline__ FLOAT _makeZero<FLOAT>() { return 0.0f; }
+template<> __device__ __inline__ cuComplex _makeZero<cuComplex>()
 {
-    return _zeroc;
+    return make_cuComplex(0.0f, 0.0f);
 }
+#else
+template<> __device__ __inline__ DOUBLE _makeZero<DOUBLE>() { return 0.0; }
+template<> __device__ __inline__ cuDoubleComplex _makeZero<cuDoubleComplex>()
+{
+    return make_cuDoubleComplex(0.0, 0.0);
+}
+#endif
 
 template<> __device__ __inline__ deviceSU2 _makeZero<deviceSU2>()
 {
@@ -187,6 +212,7 @@ template<> __device__ __inline__ deviceSU8Vector _makeZero<deviceSU8Vector>()
 {
     return deviceSU8Vector::makeZeroSUNVector();
 }
+
 
 template<typename TMatrix, typename TVector> __device__ __inline__ TMatrix _makeContract(const TVector& left, const TVector& right) = delete;
 
@@ -314,6 +340,53 @@ template<> __device__ __inline__ deviceSU8 _makeGaussian<deviceSU8>(UINT fatIdx)
     return deviceSU8::makeSUNRandomGenerator(fatIdx);
 }
 
+template<> __device__ __inline__ deviceWilsonVectorSU3 _makeGaussian<deviceWilsonVectorSU3>(UINT fatIdx)
+{
+    return deviceWilsonVectorSU3::makeRandomGaussian(fatIdx);
+}
+
+template<typename T> __device__ __inline__ T _makeSumGenerator(Real factor) = delete;
+
+template<> __device__ __inline__ CLGComplex _makeSumGenerator(Real factor)
+{
+    return _make_cuComplex(F(0.0), factor);
+}
+
+template<> __device__ __inline__ deviceSU2 _makeSumGenerator(Real factor)
+{
+    return deviceSU2::makeSU2SumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU3 _makeSumGenerator(Real factor)
+{
+    return deviceSU3::makeSU3SumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU4 _makeSumGenerator(Real factor)
+{
+    return deviceSU4::makeSUNSumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU5 _makeSumGenerator(Real factor)
+{
+    return deviceSU5::makeSUNSumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU6 _makeSumGenerator(Real factor)
+{
+    return deviceSU6::makeSUNSumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU7 _makeSumGenerator(Real factor)
+{
+    return deviceSU7::makeSUNSumGenerator(factor);
+}
+
+template<> __device__ __inline__ deviceSU8 _makeSumGenerator(Real factor)
+{
+    return deviceSU8::makeSUNSumGenerator(factor);
+}
+
 template<typename T> __device__ __inline__ T _makeZ4(UINT fatIdx) = delete;
 
 template<> __device__ __inline__ CLGComplex _makeZ4<CLGComplex>(UINT fatIdx)
@@ -354,6 +427,11 @@ template<> __device__ __inline__ deviceSU7Vector _makeZ4<deviceSU7Vector>(UINT f
 template<> __device__ __inline__ deviceSU8Vector _makeZ4<deviceSU8Vector>(UINT fatIdx)
 {
     return deviceSU8Vector::makeRandomZ4(fatIdx);
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _makeZ4<deviceWilsonVectorSU3>(UINT fatIdx)
+{
+    return deviceWilsonVectorSU3::makeRandomZ4(fatIdx);
 }
 
 
@@ -1371,6 +1449,26 @@ __device__ __host__ __inline__ void _setelement(deviceSUN<N, NoE>& x, INT idx, R
         x.m_me[idxc].x = v;
     }
 }
+
+template<typename T> __device__ __host__ __inline__  BYTE _elementdim() = delete;
+
+template<> __device__ __host__ __inline__  BYTE _elementdim<Real>() { return 1; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<CLGComplex>() { return 2; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU2Vector>() { return 4; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU3Vector>() { return 6; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU4Vector>() { return 8; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU5Vector>() { return 10; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU6Vector>() { return 12; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU7Vector>() { return 14; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU8Vector>() { return 16; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU2>() { return 8; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU3>() { return 18; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU4>() { return 32; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU5>() { return 50; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU6>() { return 72; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU7>() { return 98; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceSU8>() { return 128; }
+template<> __device__ __host__ __inline__  BYTE _elementdim<deviceWilsonVectorSU3>() { return 24; }
 
 template<typename T> __device__ __host__ __inline__ CLGComplex _vn(const T& v, INT idx) = delete;
 template<> __device__ __host__ __inline__ CLGComplex _vn<CLGComplex>(const CLGComplex& v, INT idx)

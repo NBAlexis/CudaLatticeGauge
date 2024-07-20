@@ -17,7 +17,7 @@ __BEGIN_NAMESPACE
 /**
 * No need to initial pRes = 0
 */
-extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes);
+extern CLGAPI void _PolyakovAtSite(const deviceSU3* __restrict__ pDeviceBuffer, deviceSU3* pRes, BYTE byFieldId);
 
 __CLG_REGISTER_HELPER_HEADER(CMeasurePolyakovXY)
 

@@ -21,6 +21,7 @@ __CLGIMPLEMENT_CLASS(CMeasurePolyakovU1XY)
 __global__ void
 _CLG_LAUNCH_BOUND 
 _kernelPolyakovLoopOfSiteU1(
+    BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceBuffer,
     UINT uiT,
     CLGComplex* res)
@@ -39,7 +40,7 @@ _kernelPolyakovLoopOfSiteU1(
 
     if (0 == uiT)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
         {
             res[uiXYZ] = _zeroc;
         }
@@ -50,7 +51,7 @@ _kernelPolyakovLoopOfSiteU1(
     }
     else
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
         {
             res[uiXYZ] = _zeroc;
         }
@@ -67,6 +68,7 @@ _kernelPolyakovLoopOfSiteU1(
 __global__ void
 _CLG_LAUNCH_BOUND
 _kernelPolyakovLoopOfSiteZU1(
+    BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceBuffer,
     CLGComplex* res)
 {
@@ -81,7 +83,7 @@ _kernelPolyakovLoopOfSiteZU1(
 
         if (0 == z)
         {
-            if (__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+            if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
             {
                 res[uiXYT] = _zeroc;
             }
@@ -92,7 +94,7 @@ _kernelPolyakovLoopOfSiteZU1(
         }
         else
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
             {
                 res[uiXYT] = _cuCmulf(res[uiXYT], pDeviceBuffer[uiLinkIdx]);
             }
@@ -151,13 +153,13 @@ _kernelPolyakovZTraceOfSiteXYU1(
 
 #pragma endregion
 
-CLGAPI void _PolyakovAtSiteU1(const CLGComplex* __restrict__ pDeviceBuffer, CLGComplex* pRes)
+CLGAPI void _PolyakovAtSiteU1(const CLGComplex* __restrict__ pDeviceBuffer, CLGComplex* pRes, BYTE byFieldId)
 {
     dim3 block1(_HC_DecompX, _HC_DecompY, 1);
     dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
     for (UINT uiT = 0; uiT < _HC_Lt; ++uiT)
     {
-        _kernelPolyakovLoopOfSiteU1 << <block1, threads1 >> >(pDeviceBuffer, uiT, pRes);
+        _kernelPolyakovLoopOfSiteU1 << <block1, threads1 >> >(byFieldId, pDeviceBuffer, uiT, pRes);
     }
 }
 
@@ -311,7 +313,7 @@ void CMeasurePolyakovU1XY::OnConfigurationAcceptedSingleField(const class CField
     dim3 threads1(_HC_DecompLx, _HC_DecompLy, 1);
     for (UINT uiT = 0; uiT < _HC_Lt; ++uiT)
     {
-        _kernelPolyakovLoopOfSiteU1 << <block1, threads1 >> > (pGaugeU1->m_pDeviceData, uiT, m_pTmpLoop);
+        _kernelPolyakovLoopOfSiteU1 << <block1, threads1 >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, uiT, m_pTmpLoop);
     }
     _ZeroXYPlaneC(m_pXYDeviceLoopDensity);
     _ZeroXYPlane(m_pXYDeviceLoopDensityAbs);
@@ -425,7 +427,7 @@ void CMeasurePolyakovU1XY::OnConfigurationAcceptedSingleField(const class CField
     {
         dim3 block3(_HC_DecompX, 1, _HC_DecompZ);
         dim3 threads3(_HC_DecompLx, 1, _HC_DecompLz);
-        _kernelPolyakovLoopOfSiteZU1 << <block3, threads3 >> > (pGaugeU1->m_pDeviceData, m_pTmpLoopZ);
+        _kernelPolyakovLoopOfSiteZU1 << <block3, threads3 >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, m_pTmpLoopZ);
         _ZeroXYPlaneC(m_pXYDeviceLoopDensity);
         _kernelPolyakovZTraceOfSiteXYU1 << <block3, threads3 >> > (m_pTmpLoopZ, m_pXYDeviceLoopDensity);
 

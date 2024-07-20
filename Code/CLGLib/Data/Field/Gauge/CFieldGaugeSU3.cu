@@ -932,7 +932,8 @@ _kernelSetOneDirZeroPoint(deviceSU3* pDeviceData, UINT uiSiteIndex, BYTE byDir)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPolyakovLoopOfSiteSU3(
     const deviceSU3* __restrict__ pDeviceBuffer,
-    cuDoubleComplex* res)
+    cuDoubleComplex* res,
+    BYTE byFieldId)
 {
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiSiteIndex = uiXYZ * _DC_Lt;
@@ -941,7 +942,7 @@ _kernelPolyakovLoopOfSiteSU3(
     UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
     deviceSU3 tmp = deviceSU3::makeSU3Zero();
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
     {
         tmp = pDeviceBuffer[uiLinkIdx];
     }
@@ -953,7 +954,7 @@ _kernelPolyakovLoopOfSiteSU3(
         site4 = __deviceSiteIndexToInt4(newSiteIndex);
         uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
         {
             tmp.Mul(pDeviceBuffer[uiLinkIdx]);
         }
@@ -1780,7 +1781,7 @@ void CFieldGaugeSU3::PolyakovOnSpatialSite(cuDoubleComplex* buffer) const
 {
     dim3 block(_HC_DecompX, _HC_DecompY, 1);
     dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
-    _kernelPolyakovLoopOfSiteSU3 << <block, threads >> > (m_pDeviceData, buffer);
+    _kernelPolyakovLoopOfSiteSU3 << <block, threads >> > (m_pDeviceData, buffer, m_byFieldId);
 }
 
 

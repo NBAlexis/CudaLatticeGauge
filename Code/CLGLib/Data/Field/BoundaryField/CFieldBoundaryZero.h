@@ -19,16 +19,22 @@ __BEGIN_NAMESPACE
 * It is more convinient NOT to inhirent from CField.
 */
 template<typename deviceData>
-class __DLL_EXPORT CFieldBoundaryZero : public CFieldBoundary
+class __DLL_EXPORT CFieldBoundaryZero : public CFieldBoundary<deviceData>
 {
 public:
+    CFieldBoundaryZero() : CFieldBoundary<deviceData>()
+    {
+    }
 
-    CFieldBoundaryZero();
-    ~CFieldBoundaryZero();
+    ~CFieldBoundaryZero()
+    {
+    }
 
-    void InitialField(CParameters& param) override;
-
-    deviceData* m_pDeviceData;
+    void InitialField(CParameters& param) override
+    {
+        CFieldBoundary<deviceData>::InitialField(param);
+        CCommonKernel<deviceData>::Initial(this->m_pDeviceData, 8 * _HC_Dir, EFIT_Zero);
+    }
 };
 
 __CLG_REGISTER_HELPER_HEADER(CFieldBoundarySU3Vector)

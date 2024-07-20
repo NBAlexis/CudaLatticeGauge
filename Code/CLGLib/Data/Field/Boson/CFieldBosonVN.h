@@ -30,17 +30,32 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 class __DLL_EXPORT CFieldBosonVN : public CFieldBoson
 {
 public:
-    CFieldBosonVN() : CFieldBoson()
+    CFieldBosonVN() 
+        : CFieldBoson()
+        , m_pDeviceData(NULL)
     {
-        CCommonKernel<deviceDataBoson>::AllocateBuffer(m_pDeviceData, m_uiSiteCount);
+        CCommonKernel<deviceDataBoson>::AllocateBuffer(&m_pDeviceData, m_uiSiteCount);
     }
 
     ~CFieldBosonVN()
     {
-        CCommonKernel<deviceDataBoson>::FreeBuffer(m_pDeviceData);
+        CCommonKernel<deviceDataBoson>::FreeBuffer(&m_pDeviceData);
     }
 
-    void CopyTo(CField* U) const override;
+    void CopyTo(CField* U) const override
+    {
+        if (NULL == U || GetFieldType() != U->GetFieldType())
+        {
+            appCrucial(_T("EFT_BosonU1 can only copy to EFT_BosonU1!"));
+            return;
+        }
+
+        CFieldBoson::CopyTo(U);
+
+        CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(U);
+        CCommonKernel<deviceDataBoson>::CopyBuffer(pField->m_pDeviceData, m_pDeviceData, m_uiSiteCount);
+    }
+
     EFieldType GetFieldType() const override { return EFT_Max; }
     CField* GetCopy() const override
     {
@@ -54,20 +69,39 @@ public:
     /**
     * This should be momentum field
     */
-    void MakeRandomMomentum() override;
+    void MakeRandomMomentum() override
+    {
+        if (m_bConstant)
+        {
+            Zero();
+            return;
+        }
+
+        CCommonKernelSite<deviceDataBoson>::InitialBuffer(m_pDeviceData, m_byFieldId, EFIT_RandomGaussian);
+    }
 
     void ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const override;
 
-    void InitialField(EFieldInitialType eInitialType) override;
+    void InitialField(EFieldInitialType eInitialType) override
+    {
+        CCommonKernelSite<deviceDataBoson>::InitialBuffer(m_pDeviceData, m_byFieldId, eInitialType);
+    }
     void InitialFieldWithFile(const CCString&, EFieldFileType) override;
     void InitialWithByte(BYTE* byData) override;
     //void InitialOtherParameters(CParameters& params) override;
     void DebugPrintMe() const override;
 
-    void Dagger() override;
+    void Dagger() override
+    {
+        CCommonKernelSite<deviceDataBoson>::Dagger(m_pDeviceData, m_byFieldId);
+    }
 
     //This is Axpy(1.0f, x)
-    void FixBoundary() override;
+    void FixBoundary() override
+    {
+        CCommonKernelSite<deviceDataBoson>::FixBoundary(m_pDeviceData, m_byFieldId);
+    }
+
     void AxpyPlus(const CField* x) override;
     void AxpyMinus(const CField* x) override;
     void Axpy(Real a, const CField* x) override;

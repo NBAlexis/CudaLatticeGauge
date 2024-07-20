@@ -20,7 +20,7 @@ __CLGIMPLEMENT_CLASS(CFieldGaugeSU3D)
 * Initial SU3 Field with a value
 */
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr)
+_kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr, BYTE byFieldId)
 {
     deviceSU3 zero = deviceSU3::makeSU3Zero();
 
@@ -32,7 +32,7 @@ _kernelInitialSU3Generator_D(deviceSU3 *pDevicePtr)
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             pDevicePtr[uiLinkIndex] = zero;
         }
@@ -236,7 +236,8 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelExpMultSU3RealQ_D(
     const deviceSU3 * __restrict__ pMyDeviceData,
     Real a,
-    deviceSU3 *pU)
+    deviceSU3 *pU,
+    BYTE byFieldId)
 {
     intokernalInt4;
     const UINT uiDir = _DC_Dir;
@@ -244,7 +245,7 @@ _kernelExpMultSU3RealQ_D(
 
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
             deviceSU3 expP = pMyDeviceData[linkIndex].QuickExp(a);
@@ -264,7 +265,8 @@ _kernelExpMultSU3Real_D(
     const deviceSU3 * __restrict__ pMyDeviceData,
     Real a,
     deviceSU3 *pU,
-    BYTE prec)
+    BYTE prec,
+    BYTE byFieldId)
 {
     intokernalInt4;
     const UINT uiDir = _DC_Dir;
@@ -272,7 +274,7 @@ _kernelExpMultSU3Real_D(
 
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
             deviceSU3 expP = pMyDeviceData[linkIndex].ExpReal(a, prec);
@@ -292,6 +294,7 @@ _kernelExpMultSU3Real_D(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData,
+    BYTE byFieldId,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE* results
 #else
@@ -306,7 +309,7 @@ _kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData,
     Real resThisThread = F(0.0);
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
             resThisThread += pDeviceData[linkIndex].DaggerMulC(pDeviceData[linkIndex]).ReTr();
@@ -317,7 +320,7 @@ _kernelCalculateKinematicEnergySU3_D(const deviceSU3 * __restrict__ pDeviceData,
 
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
+_kernelFixBoundarySU3_D(deviceSU3 * pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
 
@@ -326,11 +329,11 @@ _kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
-            SIndex idx = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+            SIndex idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
             pDeviceData[_deviceGetLinkIndex(uiSiteIndex, idir)] =
-                ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[1])->m_pDeviceData
+                ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData
                 [
                     __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idir
                 ];
@@ -345,7 +348,7 @@ _kernelFixBoundarySU3_D(deviceSU3 * pDeviceData)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformToIA_D(
-    deviceSU3* pDeviceData)
+    deviceSU3* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
@@ -353,7 +356,7 @@ _kernelTransformToIA_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex].Ta();
@@ -367,7 +370,7 @@ __global__ void _CLG_LAUNCH_BOUND_HALF
 __global__ void _CLG_LAUNCH_BOUND
 #endif
 _kernelTransformToIALog_D(
-    deviceSU3* pDeviceData)
+    deviceSU3* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
@@ -375,7 +378,7 @@ _kernelTransformToIALog_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].Log();
@@ -388,7 +391,7 @@ _kernelTransformToIALog_D(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformToU_D(
-    deviceSU3* pDeviceData)
+    deviceSU3* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
@@ -396,7 +399,7 @@ _kernelTransformToU_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             //pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].ExpReal(F(1.0), 8);
@@ -413,7 +416,7 @@ __global__ void _CLG_LAUNCH_BOUND_HALF
 __global__ void _CLG_LAUNCH_BOUND
 #endif
 _kernelTransformToU_DLog(
-    deviceSU3* pDeviceData)
+    deviceSU3* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
@@ -421,7 +424,7 @@ _kernelTransformToU_DLog(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             //pDeviceData[uiLinkIndex] = pDeviceData[uiLinkIndex].ExpReal(F(1.0), 8);
@@ -436,7 +439,7 @@ _kernelTransformToU_DLog(
 void CFieldGaugeSU3D::MakeRandomGenerator()
 {
     preparethread;
-    _kernelInitialSU3Generator_D << <block, threads >> > (m_pDeviceData);
+    _kernelInitialSU3Generator_D << <block, threads >> > (m_pDeviceData, m_byFieldId);
 }
 
 /**
@@ -499,7 +502,7 @@ Real CFieldGaugeSU3D::CalculateKinematicEnergy() const
 #endif
 {
     preparethread;
-    _kernelCalculateKinematicEnergySU3_D << <block, threads >> > (m_pDeviceData, _D_RealThreadBuffer);
+    _kernelCalculateKinematicEnergySU3_D << <block, threads >> > (m_pDeviceData, m_byFieldId, _D_RealThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
@@ -535,11 +538,11 @@ void CFieldGaugeSU3D::ExpMult(Real a, CField* U) const
     preparethread;
     if (0 == _HC_ExpPrecision)
     {
-        _kernelExpMultSU3RealQ_D << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData);
+        _kernelExpMultSU3RealQ_D << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData, m_byFieldId);
     }
     else
     {
-        _kernelExpMultSU3Real_D << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData, static_cast<BYTE>(_HC_ExpPrecision));
+        _kernelExpMultSU3Real_D << < block, threads >> > (m_pDeviceData, a, pUField->m_pDeviceData, static_cast<BYTE>(_HC_ExpPrecision), m_byFieldId);
     }
     
 }
@@ -549,7 +552,7 @@ void CFieldGaugeSU3D::FixBoundary()
     appDetailed(_T("CFieldGaugeSU3::FixBoundary()\n"));
 
     preparethread;
-    _kernelFixBoundarySU3_D << <block, threads >> > (m_pDeviceData);
+    _kernelFixBoundarySU3_D << <block, threads >> > (m_pDeviceData, m_byFieldId);
 
     //DebugPrintMe();
     //INT i = 0;
@@ -560,11 +563,11 @@ void CFieldGaugeSU3D::TransformToIA()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformToIA_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformToIA_D << <block, threads >> > (m_pDeviceData, m_byFieldId);
     }
     else
     {
-        _kernelTransformToIALog_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformToIALog_D << <block, threads >> > (m_pDeviceData, m_byFieldId);
     }
 }
 
@@ -573,11 +576,11 @@ void CFieldGaugeSU3D::TransformToU()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformToU_D << <block, threads >> > (m_pDeviceData);
+        _kernelTransformToU_D << <block, threads >> > (m_pDeviceData, m_byFieldId);
     }
     else
     {
-        _kernelTransformToU_DLog << <block, threads >> > (m_pDeviceData);
+        _kernelTransformToU_DLog << <block, threads >> > (m_pDeviceData, m_byFieldId);
     }
     
 }

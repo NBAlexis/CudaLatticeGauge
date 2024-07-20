@@ -29,7 +29,7 @@ extern __constant__ Real _constFloats[kContentLength];
 * Note that, the pointers are copyied here. So the virtual functions should not be used!
 */
 extern __constant__ class CField* __fieldPointers[kMaxFieldCount];
-extern __constant__ class CFieldBoundary* __boundaryFieldPointers[kMaxFieldCount];
+extern __constant__ class CFieldBoundaryParent* __boundaryFieldPointers[kMaxFieldCount];
 
 extern __constant__ class CRandom* __r;
 extern __constant__ class CIndexData* __idx;
@@ -216,34 +216,21 @@ public:
         }
     }
 
-#if !_CLG_DOUBLEFLOAT
     void ThreadBufferZero(cuDoubleComplex* pDeviceBuffer, cuDoubleComplex cInitial = make_cuDoubleComplex(0.0, 0.0)) const;
     void ThreadBufferZero(DOUBLE* pDeviceBuffer, DOUBLE fInitial = 0.0) const;
-#else
-    void ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial = _make_cuComplex(F(0.0),F(0.0))) const;
-    void ThreadBufferZero(Real * pDeviceBuffer, Real fInitial = F(0.0)) const;
-#endif
 
     //m_uiThreadCount = Volumn, so this is in fact volumn sum
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex ThreadBufferSum(cuDoubleComplex* pDeviceBuffer);
     DOUBLE ThreadBufferSum(DOUBLE* pDeviceBuffer);
-#else
-    CLGComplex ThreadBufferSum(CLGComplex * pDeviceBuffer);
-    Real ThreadBufferSum(Real * pDeviceBuffer);
-#endif
+
 
     //struct SIndex* m_pIndexBuffer;
-#if !_CLG_DOUBLEFLOAT
     cuDoubleComplex* m_pComplexBufferThreadCount;
     DOUBLE* m_pRealBufferThreadCount;
-#else
-    CLGComplex * m_pComplexBufferThreadCount;
-    Real * m_pRealBufferThreadCount;
-#endif
+
 
     class CField * m_deviceFieldPointers[kMaxFieldCount];
-    class CFieldBoundary * m_deviceBoundaryFieldPointers[kMaxFieldCount];
+    class CFieldBoundaryParent* m_deviceBoundaryFieldPointers[kMaxFieldCount];
 
     //thread per grid ( = volumn)
     UINT m_uiThreadCount;

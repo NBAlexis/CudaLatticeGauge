@@ -21,6 +21,7 @@ __CLGIMPLEMENT_CLASS(CMeasurePolyakovXY3D)
 __global__ void
 _CLG_LAUNCH_BOUND 
 _kernelPolyakovLoopOfSite3D_SU3(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceBuffer,
     CLGComplex* res,
     Real* resAbs)
@@ -37,7 +38,7 @@ _kernelPolyakovLoopOfSite3D_SU3(
 
         if (0 == uiZ)
         {
-            if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+            if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
             {
                 resZ = deviceSU3::makeSU3Zero();
             }
@@ -48,7 +49,7 @@ _kernelPolyakovLoopOfSite3D_SU3(
         }
         else
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
             {
                 resZ.Mul(pDeviceBuffer[uiLinkIdx]);
             }
@@ -61,6 +62,7 @@ _kernelPolyakovLoopOfSite3D_SU3(
 __global__ void
 _CLG_LAUNCH_BOUND
 _kernelPolyakovLoopOfSite3D_U1(
+    BYTE byFieldId,
     const CLGComplex* __restrict__ pDeviceBuffer,
     CLGComplex* res,
     Real* resAbs)
@@ -76,7 +78,7 @@ _kernelPolyakovLoopOfSite3D_U1(
 
         if (0 == uiZ)
         {
-            if (__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+            if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
             {
                 res[uiXY] = _zeroc;
             }
@@ -87,7 +89,7 @@ _kernelPolyakovLoopOfSite3D_U1(
         }
         else
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
             {
                 res[uiXY] = _cuCmulf(res[uiXY], pDeviceBuffer[uiLinkIdx]);
             }
@@ -196,7 +198,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pAcceptGauge);
         dim3 block1(_HC_DecompX, 1, 1);
         dim3 threads1(_HC_DecompLx, 1, 1);
-        _kernelPolyakovLoopOfSite3D_SU3 << <block1, threads1 >> > (pGaugeSU3->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
+        _kernelPolyakovLoopOfSite3D_SU3 << <block1, threads1 >> > (pGaugeSU3->m_byFieldId, pGaugeSU3->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
     }
     else
     {
@@ -208,7 +210,7 @@ void CMeasurePolyakovXY3D::OnConfigurationAcceptedSingleField(const class CField
         const CFieldGaugeU1* pGaugeU1 = dynamic_cast<const CFieldGaugeU1*>(pAcceptGauge);
         dim3 block1(_HC_DecompX, 1, 1);
         dim3 threads1(_HC_DecompLx, 1, 1);
-        _kernelPolyakovLoopOfSite3D_U1 << <block1, threads1 >> > (pGaugeU1->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
+        _kernelPolyakovLoopOfSite3D_U1 << <block1, threads1 >> > (pGaugeU1->m_byFieldId, pGaugeU1->m_pDeviceData, m_pXYDeviceLoopDensity, m_pXYDeviceLoopDensityAbs);
     }
     
     checkCudaErrors(cudaMemcpy(m_pXYHostLoopDensity, m_pXYDeviceLoopDensity, sizeof(CLGComplex) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));

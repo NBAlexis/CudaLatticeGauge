@@ -45,7 +45,7 @@ static __device__ __inline__ const deviceSU3& _deviceGetGaugeBCSU3Dir(
     BYTE byDir)
 {
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
         ((CFieldBoundaryGaugeSU3*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
         ]
@@ -58,7 +58,7 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirOne(
     UINT uiBigIdx,
     BYTE byDir)
 {
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
         deviceSU3::makeSU3Id()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
@@ -69,7 +69,7 @@ static __device__ __inline__ deviceSU3 _deviceGetGaugeBCSU3DirZero(
     UINT uiBigIdx,
     BYTE byDir)
 {
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
         deviceSU3::makeSU3Zero()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }

@@ -11,17 +11,6 @@
 #ifndef _CFIELDGAUGE_LINK_H_
 #define _CFIELDGAUGE_LINK_H_
 
-#define gaugeLinkKernelFuncionStart \
-    intokernaldir; \
-    for (UINT idir = 0; idir < uiDir; ++idir) \
-    { \
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir); 
-
-
-#define gaugeLinkKernelFuncionEnd \
-    } 
-
-
 #define __DEFINE_GAUGE_LINK(CLASSNAME, DEVICEDATA, N, FIELDTYPE) \
 __CLG_REGISTER_HELPER_HEADER(CLASSNAME) \
 class CLGAPI CLASSNAME : public CFieldGaugeLink<DEVICEDATA, N> \

@@ -90,7 +90,7 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, static_cast<BYTE>(idir)))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, static_cast<BYTE>(idir)))
         {
             continue;
         }
@@ -203,7 +203,7 @@ _kernelStapleAtSiteSU3CacheIndexGradient(
         }
 
         //staple calculated
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, static_cast<BYTE>(idir)))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, static_cast<BYTE>(idir)))
         {
             deviceSU3 force(pDeviceData[linkIndex]);
             force.MulDagger(res);

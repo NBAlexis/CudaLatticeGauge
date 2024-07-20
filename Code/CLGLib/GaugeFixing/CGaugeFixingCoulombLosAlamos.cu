@@ -49,7 +49,7 @@ _kernelCalculateGOdd_S(
         const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
-        pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
+        pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir) ? su3Id : pU[uiLinkIndex]);
         if (site_m_mu.NeedToDagger())
         {
             pG[uiSiteIndex3D].Add(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
@@ -100,7 +100,7 @@ _kernelCalculateGEven_S(
         const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
-        pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
+        pG[uiSiteIndex3D].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir) ? su3Id : pU[uiLinkIndex]);
         if (site_m_mu.NeedToDagger())
         {
             pG[uiSiteIndex3D].Add(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
@@ -149,7 +149,7 @@ _kernelGaugeTransformOdd_S(
     {
         for (BYTE dir = 0; dir < uiDir - 1; ++dir)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
             {
                 const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
 
@@ -193,7 +193,7 @@ _kernelGaugeTransformEven_S(
     {
         for (BYTE dir = 0; dir < uiDir - 1; ++dir)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
             {
                 const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
 
@@ -225,7 +225,7 @@ _kernelGaugeTransform3DTOdd(
         return;
     }
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
         if (!site.IsDirichlet())
@@ -270,7 +270,7 @@ _kernelGaugeTransform3DTEven(
         return;
     }
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
         if (!site.IsDirichlet())
@@ -316,7 +316,7 @@ _kernelGaugeTransform3Dcpy(
 
     for (BYTE dir = 0; dir < uiDir - 1; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
@@ -351,7 +351,7 @@ _kernelGaugeTransform3DTcpy(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
         if (!site.IsDirichlet())
@@ -395,7 +395,8 @@ _kernelCalculateASpace_S(
         CLGComplex* pA12,
         CLGComplex* pA13,
         Real* pA22,
-        CLGComplex* pA23)
+        CLGComplex* pA23,
+        BYTE byFieldId)
 {
     intokernalInt4_S;
 
@@ -406,7 +407,7 @@ _kernelCalculateASpace_S(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A.Ta();
@@ -473,7 +474,7 @@ _kernelCalculateCoulombDivation_S(
     for (BYTE dir = 0; dir < uiDir - 1; ++dir)
     {
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             g11 = g11 - pA11[uiLinkIndex3D];
             g12 = _cuCsubf(g12, pA12[uiLinkIndex3D]);
@@ -637,7 +638,8 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
             m_pA12,
             m_pA13,
             m_pA22,
-            m_pA23);
+            m_pA23,
+            byFieldId);
 
         _kernelCalculateCoulombDivation_S << <block, threads >> > (
             byFieldId,
@@ -668,7 +670,8 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __
         m_pA12,
         m_pA13,
         m_pA22,
-        m_pA23);
+        m_pA23,
+        byFieldId);
 
     _kernelCalculateCoulombDivation_S << <block, threads >> > (
         byFieldId,

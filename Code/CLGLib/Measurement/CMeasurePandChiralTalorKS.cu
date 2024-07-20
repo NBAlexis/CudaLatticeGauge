@@ -197,6 +197,7 @@ _kernelDFermionKS_PR_XYTau_Term_NoOmega(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPolyakovLoopOfSiteTalor2(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pDeviceBuffer,
 #if _CLG_DOUBLEFLOAT
     CLGComplex* res, Real* sumCount
@@ -221,7 +222,7 @@ _kernelPolyakovLoopOfSiteTalor2(
 
         if (0 == t)
         {
-            if (__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+            if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
             {
                 beforeTrace = deviceSU3::makeSU3Zero();
             }
@@ -237,7 +238,7 @@ _kernelPolyakovLoopOfSiteTalor2(
         }
         else
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
             {
                 beforeTrace.Mul(pDeviceBuffer[uiLinkIdx]);
             }
@@ -568,16 +569,13 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
 
     //=========== Calculate Polyakov loop ================
     _kernelPolyakovLoopOfSiteTalor2 << <blockxyz, threadsxyz >> > (
+        pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         _D_ComplexThreadBuffer,
         _D_RealThreadBuffer
         );
 
-#if _CLG_DOUBLEFLOAT
-    CLGComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
-#else
     cuDoubleComplex polyakovSum = appGetCudaHelper()->ReduceComplex(_D_ComplexThreadBuffer, _HC_Volume_xyz);
-#endif
 
     m_lstPolyakov.AddItem(polyakovSum);
 

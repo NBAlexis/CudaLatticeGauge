@@ -169,7 +169,7 @@ _kernelAddForce4PlaqutteTermSU3_Polar(
     #pragma unroll
     for (UINT idir = 0; idir < 4; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             continue;
         }

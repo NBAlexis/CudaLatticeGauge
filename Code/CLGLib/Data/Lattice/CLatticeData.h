@@ -15,6 +15,23 @@
 
 __BEGIN_NAMESPACE
 
+__DEFINE_ENUM(EFieldInitialType,
+
+    EFIT_Zero,
+    EFIT_Identity,
+    EFIT_Random,
+    EFIT_RandomGenerator,
+    EFIT_SumGenerator, //for testing use only
+    EFIT_RandomGaussian,
+    EFIT_RandomZ4,
+
+    EFIT_ReadFromFile,
+
+    EFIT_U1Real,
+
+    EFIT_ForceDWORD = 0x7fffffff,
+    )
+
 class CLGAPI CLatticeData
 {
 public:
@@ -64,8 +81,8 @@ public:
 
     
     THashMap<BYTE, class CField*> m_pFieldMap;
-    TArray<class CFieldBoundary*> m_pAllBoundaryFields; //only for delete
-    THashMap<BYTE, class CFieldBoundary*> m_pBoundaryFieldMap;
+    TArray<class CFieldBoundaryParent*> m_pAllBoundaryFields; //only for delete
+    THashMap<BYTE, class CFieldBoundaryParent*> m_pBoundaryFieldMap;
 
     TArray<class CFieldPool*> m_pFieldPools;
     THashMap<BYTE, class CFieldPool*> m_pFieldPoolMap;
@@ -94,7 +111,7 @@ public:
     class CGaugeFixing* m_pGaugeFixing;
 
     class CField* GetFieldById(BYTE byId) const { return m_pFieldMap.Exist(byId) ? m_pFieldMap.GetAt(byId) : NULL; }
-    class CFieldBoundary* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }
+    class CFieldBoundaryParent* GetBoundaryFieldById(BYTE byId) const { return m_pBoundaryFieldMap.Exist(byId) ? m_pBoundaryFieldMap.GetAt(byId) : NULL; }
     class CAction* GetActionById(BYTE byId) const { return m_pActionMap.Exist(byId) ? m_pActionMap.GetAt(byId) : NULL; }
     class CField* GetPooledFieldById(BYTE byId);
     class CField* GetPooledCopy(const CField* pField);
@@ -108,7 +125,13 @@ public:
 
 protected:
 
-    TArray<class CField*> m_pOtherFields; //only for delete
+    /**
+    * store all fields
+    * used for initial every field buffer
+    * and to clean up the fields
+    */
+    TArray<class CField*> m_pOtherFields; 
+    TArray<EFieldInitialType> m_eFieldInitialTypes;
 };
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);

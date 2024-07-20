@@ -111,7 +111,7 @@ _kernelAddForce4PlaqutteTermT_XY3D(
     for (BYTE idir = 0; idir < 3; ++idir)
     {
 
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             continue;
         }
@@ -236,7 +236,7 @@ _kernelAddForceChairTermT_Term13D(
     //add force for dir=3
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term1_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 0, 1, 0);
@@ -252,7 +252,7 @@ _kernelAddForceChairTermT_Term13D(
     //add force for dir=2
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term1_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 0, 2, 0);
@@ -268,7 +268,7 @@ _kernelAddForceChairTermT_Term13D(
     //add force for dir=x
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term1_1 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 0, 1, 0);
@@ -300,7 +300,7 @@ _kernelAddForceChairTermT_Term33D(
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term3_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 1, 0, _deviceHi1);
@@ -316,7 +316,7 @@ _kernelAddForceChairTermT_Term33D(
     //add force for mu=4
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term3_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 1, 2, _deviceHi1);
@@ -332,7 +332,7 @@ _kernelAddForceChairTermT_Term33D(
     //add force for mu=4
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term3_2 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             2, 1, 0, _deviceHi1);
@@ -364,7 +364,7 @@ _kernelAddForceChairTermT_Term53D(
     //+Omega^2 xy V132
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term5_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, _deviceHi2);
@@ -379,7 +379,7 @@ _kernelAddForceChairTermT_Term53D(
     //+Omega^2 xy V132
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term5_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 2, 0, _deviceHi2);
@@ -394,7 +394,7 @@ _kernelAddForceChairTermT_Term53D(
     //+Omega^2 xy V132
     const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term5_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, _deviceHi2);

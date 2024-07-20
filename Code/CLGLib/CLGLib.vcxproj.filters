@@ -698,6 +698,12 @@
     <ClCompile Include="Data\Field\CFieldGauge.cpp">
       <Filter>Data\Field</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cpp">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cpp">
+      <Filter>Data\Field\BoundaryField</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -915,12 +921,6 @@
     </CudaCompile>
     <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
       <Filter>Measurement</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cu">
-      <Filter>Data\Field\BoundaryField</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cu">
-      <Filter>Data\Field\BoundaryField</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu">
       <Filter>Data\Field\Boson</Filter>

@@ -22,7 +22,7 @@ __constant__ gammaMatrix __chiralGamma[EGM_MAX];
 __constant__ deviceSU3 __SU3Generators[9];
 
 __constant__ CField* __fieldPointers[kMaxFieldCount];
-__constant__ CFieldBoundary* __boundaryFieldPointers[kMaxFieldCount];
+__constant__ CFieldBoundaryParent* __boundaryFieldPointers[kMaxFieldCount];
 
 #pragma region Kernels
 
@@ -140,7 +140,6 @@ _kernelDebugFunctionForSites()
     //}
 }
 
-#if !_CLG_DOUBLEFLOAT
 __global__ void _CLG_LAUNCH_BOUND
 _kernelThreadBufferZeroReal(DOUBLE* arr, DOUBLE initial)
 {
@@ -184,51 +183,6 @@ _kernelReduceComp(cuDoubleComplex* arr, UINT uiJump, UINT uiMax)
         arr[uiIdFrom - uiJump] = cuCadd(arr[uiIdFrom - uiJump], arr[uiIdFrom]);
     }
 }
-#else
-__global__ void _CLG_LAUNCH_BOUND
-_kernelThreadBufferZeroReal(Real * arr, Real initial)
-{
-    intokernal;
-    arr[uiSiteIndex] = initial;
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelThreadBufferZeroComplex(CLGComplex * arr, CLGComplex initial)
-{
-    intokernal;
-    arr[uiSiteIndex] = initial;
-}
-
-__global__ void 
-_CLG_LAUNCH_BOUND
-_kernelReduceReal(Real* arr, UINT uiJump, UINT uiMax)
-{
-    //for length 16 array
-    //for jump = 1, this is 1->0, 3->2, 5->4, 7->6, 9->10, 11->10, 13->12, 15->14 
-    //for jump = 2, this is 2->0, 6->4, 10->8, 14->12 
-    //for jump = 4, this is 4->0, 12->8 
-    //for jump = 8, this is 8->0, and is finished.
-
-    //id target = idx * (jump << 1)
-    //id from = target + jump
-    UINT uiIdFrom = (threadIdx.x + blockIdx.x * blockDim.x) * (uiJump << 1) + uiJump;
-    if (uiIdFrom < uiMax)
-    {
-        arr[uiIdFrom - uiJump] += arr[uiIdFrom];
-    }
-}
-
-__global__ void
-_CLG_LAUNCH_BOUND
-_kernelReduceComp(CLGComplex* arr, UINT uiJump, UINT uiMax)
-{
-    UINT uiIdFrom = (threadIdx.x + blockIdx.x * blockDim.x) * (uiJump << 1) + uiJump;
-    if (uiIdFrom < uiMax)
-    {
-        arr[uiIdFrom - uiJump] = _cuCaddf(arr[uiIdFrom - uiJump], arr[uiIdFrom]);
-    }
-}
-#endif
 
 #pragma endregion
 
@@ -594,7 +548,7 @@ void CCudaHelper::SetFieldPointers()
             m_deviceFieldPointers[i] = pDeviceField;
         }
 
-        CFieldBoundary * pBoundaryField = appGetLattice()->GetBoundaryFieldById(i);
+        CFieldBoundaryParent * pBoundaryField = appGetLattice()->GetBoundaryFieldById(i);
         if (NULL == pBoundaryField)
         {
             m_deviceBoundaryFieldPointers[i] = NULL;
@@ -602,7 +556,7 @@ void CCudaHelper::SetFieldPointers()
         else
         {
             const UINT uiSize = pBoundaryField->GetClass()->GetSize();
-            CFieldBoundary* pDeviceBoundaryField = NULL;
+            CFieldBoundaryParent* pDeviceBoundaryField = NULL;
             checkCudaErrors(cudaMalloc((void**)&pDeviceBoundaryField, static_cast<size_t>(uiSize)));
             checkCudaErrors(cudaMemcpy(pDeviceBoundaryField, pBoundaryField, static_cast<size_t>(uiSize), cudaMemcpyHostToDevice));
             m_deviceBoundaryFieldPointers[i] = pDeviceBoundaryField;
@@ -610,7 +564,7 @@ void CCudaHelper::SetFieldPointers()
     }
 
     checkCudaErrors(cudaMemcpyToSymbol(__fieldPointers, m_deviceFieldPointers, sizeof(CField*) * kMaxFieldCount));
-    checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundary*) * kMaxFieldCount));
+    checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundaryParent*) * kMaxFieldCount));
 }
 
 TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
@@ -661,17 +615,10 @@ void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
 {
     m_uiThreadCount = uiThreadCount;
     m_uiReducePower = GetReduceDim((uiThreadCount + 1) >> 1);
-#if !_CLG_DOUBLEFLOAT
     checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(DOUBLE) * uiThreadCount));
     checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(cuDoubleComplex) * uiThreadCount));
-#else
-    checkCudaErrors(cudaMalloc((void**)&m_pRealBufferThreadCount, sizeof(Real)* uiThreadCount));
-    checkCudaErrors(cudaMalloc((void**)&m_pComplexBufferThreadCount, sizeof(CLGComplex)* uiThreadCount));
-#endif
-
 }
 
-#if !_CLG_DOUBLEFLOAT
 cuDoubleComplex CCudaHelper::ThreadBufferSum(cuDoubleComplex* pDeviceBuffer)
 {
     return ReduceComplexWithThreadCount(pDeviceBuffer);
@@ -757,97 +704,6 @@ cuDoubleComplex CCudaHelper::ReduceComplexWithThreadCount(cuDoubleComplex* devic
     cudaMemcpy(result, deviceBuffer, sizeof(cuDoubleComplex), cudaMemcpyDeviceToHost);
     return result[0];
 }
-#else
-/**
-* When block is not (1,1,1), some times, this will be excuted when only few block is finished.
-* Must wait until all blocks finished.
-*/
-CLGComplex CCudaHelper::ThreadBufferSum(CLGComplex * pDeviceBuffer)
-{
-    return ReduceComplexWithThreadCount(pDeviceBuffer);
-}
-
-Real CCudaHelper::ThreadBufferSum(Real * pDeviceBuffer)
-{
-    return ReduceRealWithThreadCount(pDeviceBuffer);
-}
-
-void CCudaHelper::ThreadBufferZero(CLGComplex * pDeviceBuffer, CLGComplex cInitial) const
-{
-    preparethread;
-    _kernelThreadBufferZeroComplex<<<block, threads>>>(pDeviceBuffer, cInitial);
-}
-
-void CCudaHelper::ThreadBufferZero(Real * pDeviceBuffer, Real fInitial) const
-{
-    preparethread;
-    _kernelThreadBufferZeroReal << <block, threads >> >(pDeviceBuffer, fInitial);
-}
-
-Real CCudaHelper::ReduceReal(Real* deviceBuffer, UINT uiLength)
-{
-    const UINT iRequiredDim = (uiLength + 1) >> 1;
-    const UINT iPower = GetReduceDim(iRequiredDim);
-    for (UINT i = 0; i <= iPower; ++i)
-    {
-        UINT iJump = 1 << i;
-        UINT iThreadNeeded = 1 << (iPower - i);
-        UINT iBlock = iThreadNeeded > _HC_ThreadConstraint ? iThreadNeeded / _HC_ThreadConstraint : 1;
-        UINT iThread = iThreadNeeded > _HC_ThreadConstraint ? _HC_ThreadConstraint : iThreadNeeded;
-        _kernelReduceReal << <iBlock, iThread >> > (deviceBuffer, iJump, uiLength);
-    }
-    Real result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(Real), cudaMemcpyDeviceToHost);
-    return result[0];
-}
-
-Real CCudaHelper::ReduceRealWithThreadCount(Real* deviceBuffer)
-{
-    for (UINT i = 0; i <= m_uiReducePower; ++i)
-    {
-        UINT iJump = 1 << i;
-        UINT iThreadNeeded = 1 << (m_uiReducePower - i);
-        UINT iBlock = iThreadNeeded > _HC_ThreadConstraint ? iThreadNeeded / _HC_ThreadConstraint : 1;
-        UINT iThread = iThreadNeeded > _HC_ThreadConstraint ? _HC_ThreadConstraint : iThreadNeeded;
-        _kernelReduceReal << <iBlock, iThread >> > (deviceBuffer, iJump, m_uiThreadCount);
-    }
-    Real result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(Real), cudaMemcpyDeviceToHost);
-    return result[0];
-}
-
-CLGComplex CCudaHelper::ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength)
-{
-    const UINT iRequiredDim = (uiLength + 1) >> 1;
-    const UINT iPower = GetReduceDim(iRequiredDim);
-    for (UINT i = 0; i <= iPower; ++i)
-    {
-        UINT iJump = 1 << i;
-        UINT iThreadNeeded = 1 << (iPower - i);
-        UINT iBlock = iThreadNeeded > _HC_ThreadConstraint ? iThreadNeeded / _HC_ThreadConstraint : 1;
-        UINT iThread = iThreadNeeded > _HC_ThreadConstraint ? _HC_ThreadConstraint : iThreadNeeded;
-        _kernelReduceComp << <iBlock, iThread >> > (deviceBuffer, iJump, uiLength);
-    }
-    CLGComplex result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(CLGComplex), cudaMemcpyDeviceToHost);
-    return result[0];
-}
-
-CLGComplex CCudaHelper::ReduceComplexWithThreadCount(CLGComplex* deviceBuffer)
-{
-    for (UINT i = 0; i <= m_uiReducePower; ++i)
-    {
-        UINT iJump = 1 << i;
-        UINT iThreadNeeded = 1 << (m_uiReducePower - i);
-        UINT iBlock = iThreadNeeded > _HC_ThreadConstraint ? iThreadNeeded / _HC_ThreadConstraint : 1;
-        UINT iThread = iThreadNeeded > _HC_ThreadConstraint ? _HC_ThreadConstraint : iThreadNeeded;
-        _kernelReduceComp << <iBlock, iThread >> > (deviceBuffer, iJump, m_uiThreadCount);
-    }
-    CLGComplex result[1];
-    cudaMemcpy(result, deviceBuffer, sizeof(CLGComplex), cudaMemcpyDeviceToHost);
-    return result[0];
-}
-#endif
 
 __END_NAMESPACE
 

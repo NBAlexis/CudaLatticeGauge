@@ -685,7 +685,8 @@ template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelPolyakovLoopOfSiteGauge(
     const deviceGauge* __restrict__ pDeviceBuffer,
-    cuDoubleComplex* res)
+    cuDoubleComplex* res,
+    BYTE byFieldId)
 {
     UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
     const UINT uiSiteIndex = uiXYZ * _DC_Lt;
@@ -694,7 +695,7 @@ _kernelPolyakovLoopOfSiteGauge(
     UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
     deviceGauge tmp = _makeZero<deviceGauge>();
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
     {
         tmp = pDeviceBuffer[uiLinkIdx];
     }
@@ -706,7 +707,7 @@ _kernelPolyakovLoopOfSiteGauge(
         site4 = __deviceSiteIndexToInt4(newSiteIndex);
         uiBigIdx = __idx->_deviceGetBigIndex(site4);
 
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, _DC_Dir - 1))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
         {
             _mul(tmp, pDeviceBuffer[uiLinkIdx]);
         }
@@ -1303,7 +1304,7 @@ void CFieldGaugeLink<deviceGauge, matrixN>::PolyakovOnSpatialSite(cuDoubleComple
 {
     dim3 block(_HC_DecompX, _HC_DecompY, 1);
     dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
-    _kernelPolyakovLoopOfSiteGauge << <block, threads >> > (m_pDeviceData, buffer);
+    _kernelPolyakovLoopOfSiteGauge << <block, threads >> > (m_pDeviceData, buffer, m_byFieldId);
 }
 
 #pragma region SU2 functions

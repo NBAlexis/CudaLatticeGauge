@@ -20,7 +20,7 @@ __BEGIN_NAMESPACE
 */
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelInitialGeneratorT_D(deviceGauge *pDevicePtr)
+_kernelInitialGeneratorT_D(deviceGauge *pDevicePtr, BYTE byFieldId)
 {
     deviceGauge zero = _makeZero<deviceGauge>();
 
@@ -32,7 +32,7 @@ _kernelInitialGeneratorT_D(deviceGauge *pDevicePtr)
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             pDevicePtr[uiLinkIndex] = zero;
         }
@@ -227,6 +227,7 @@ _kernelCalculateOnlyStapleT_D(
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelExpMultRealT_D(
+    BYTE byFieldId,
     const deviceGauge * __restrict__ pMyDeviceData,
     Real a,
     deviceGauge *pU)
@@ -237,7 +238,7 @@ _kernelExpMultRealT_D(
 
     for (BYTE idir = 0; idir < uiDir; ++idir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
             deviceGauge expP = _expreal(pMyDeviceData[linkIndex], a);
@@ -257,7 +258,9 @@ _kernelExpMultRealT_D(
 */
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateKinematicEnergyT_D(const deviceGauge * __restrict__ pDeviceData,
+_kernelCalculateKinematicEnergyT_D(
+    BYTE byFieldId,
+    const deviceGauge * __restrict__ pDeviceData,
     DOUBLE* results
 )
 {
@@ -268,7 +271,7 @@ _kernelCalculateKinematicEnergyT_D(const deviceGauge * __restrict__ pDeviceData,
     Real resThisThread = F(0.0);
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
             resThisThread += _retr(_dagmulC(pDeviceData[linkIndex], pDeviceData[linkIndex]));
@@ -279,7 +282,7 @@ _kernelCalculateKinematicEnergyT_D(const deviceGauge * __restrict__ pDeviceData,
 
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelFixBoundaryT_D(deviceGauge * pDeviceData)
+_kernelFixBoundaryT_D(deviceGauge * pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
 
@@ -288,11 +291,11 @@ _kernelFixBoundaryT_D(deviceGauge * pDeviceData)
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
-            SIndex idx = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+            SIndex idx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
             pDeviceData[_deviceGetLinkIndex(uiSiteIndex, idir)] =
-                ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[1])->m_pDeviceData
+                ((CFieldBoundary<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData
                 [
                     __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idir
                 ];
@@ -307,6 +310,7 @@ _kernelFixBoundaryT_D(deviceGauge * pDeviceData)
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformUToIAT_D(
+    BYTE byFieldId,
     deviceGauge* pDeviceData)
 {
     intokernalInt4;
@@ -315,7 +319,7 @@ _kernelTransformUToIAT_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             _ta(pDeviceData[uiLinkIndex]);
@@ -326,6 +330,7 @@ _kernelTransformUToIAT_D(
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformUToIALogT_D(
+    BYTE byFieldId,
     deviceGauge* pDeviceData)
 {
     intokernalInt4;
@@ -334,7 +339,7 @@ _kernelTransformUToIALogT_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex] = _strictlog(pDeviceData[uiLinkIndex]);
@@ -348,6 +353,7 @@ _kernelTransformUToIALogT_D(
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformIAToUT_D(
+    BYTE byFieldId,
     deviceGauge* pDeviceData)
 {
     intokernalInt4;
@@ -356,7 +362,7 @@ _kernelTransformIAToUT_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex] = _expreal(pDeviceData[uiLinkIndex], F(1.0));
@@ -367,6 +373,7 @@ _kernelTransformIAToUT_D(
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelTransformIAToULogT_D(
+    BYTE byFieldId,
     deviceGauge* pDeviceData)
 {
     intokernalInt4;
@@ -375,7 +382,7 @@ _kernelTransformIAToULogT_D(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
             pDeviceData[uiLinkIndex] = _strictexp(pDeviceData[uiLinkIndex]);
@@ -389,7 +396,7 @@ template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::MakeRandomGenerator()
 {
     preparethread;
-    _kernelInitialGeneratorT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelInitialGeneratorT_D << <block, threads >> > (this->m_pDeviceData, this->m_byFieldId);
 }
 
 /**
@@ -451,7 +458,7 @@ template<typename deviceGauge, INT matrixN>
 DOUBLE CFieldGaugeLinkD<deviceGauge, matrixN>::CalculateKinematicEnergy() const
 {
     preparethread;
-    _kernelCalculateKinematicEnergyT_D << <block, threads >> > (this->m_pDeviceData, _D_RealThreadBuffer);
+    _kernelCalculateKinematicEnergyT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData, _D_RealThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
@@ -487,7 +494,7 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::ExpMult(Real a, CField* U) const
     CFieldGaugeLink<deviceGauge, matrixN>* pUField = dynamic_cast<CFieldGaugeLink<deviceGauge, matrixN>*>(U);
 
     preparethread;
-    _kernelExpMultRealT_D << < block, threads >> > (this->m_pDeviceData, a, pUField->m_pDeviceData);
+    _kernelExpMultRealT_D << < block, threads >> > (this->m_byFieldId, this->m_pDeviceData, a, pUField->m_pDeviceData);
     
 }
 
@@ -497,21 +504,21 @@ void CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()
     appDetailed(_T("CFieldGaugeLinkD<deviceGauge, matrixN>::FixBoundary()\n"));
 
     preparethread;
-    _kernelFixBoundaryT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelFixBoundaryT_D << <block, threads >> > (this->m_pDeviceData, this->m_byFieldId);
 }
 
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::TransformToIA()
 {
     preparethread;
-    _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelTransformUToIAT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
 }
 
 template<typename deviceGauge, INT matrixN>
 void CFieldGaugeLinkD<deviceGauge, matrixN>::TransformToU()
 {
     preparethread;
-    _kernelTransformIAToUT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelTransformIAToUT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
 }
 
 template<typename deviceGauge, INT matrixN>
@@ -529,11 +536,11 @@ void CFieldGaugeU1D::TransformToIA()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
+        _kernelTransformUToIAT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     }
     else
     {
-        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_pDeviceData);
+        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     }
 }
 
@@ -553,7 +560,7 @@ void CFieldGaugeU1D::InitialWithByteCompressed(const CCString& sFileName)
     free(readData);
 
     preparethread;
-    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
 
     free(byData);
@@ -564,7 +571,7 @@ CCString CFieldGaugeU1D::SaveToCompressedFile(const CCString& fileName) const
     CFieldGaugeU1* pPooledGauge = dynamic_cast<CFieldGaugeU1*>(GetCopy());
 
     preparethread;
-    _kernelTransformUToIALogT_D << <block, threads >> > (pPooledGauge->m_pDeviceData);
+    _kernelTransformUToIALogT_D << <block, threads >> > (m_byFieldId, pPooledGauge->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 
@@ -594,11 +601,11 @@ void CFieldGaugeSU2D::TransformToIA()
     preparethread;
     if (0 == _HC_ALog)
     {
-        _kernelTransformUToIAT_D << <block, threads >> > (this->m_pDeviceData);
+        _kernelTransformUToIAT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     }
     else
     {
-        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_pDeviceData);
+        _kernelTransformUToIALogT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     }
 }
 
@@ -626,7 +633,7 @@ void CFieldGaugeSU2D::InitialWithByteCompressed(const CCString& sFileName)
     //DebugPrintMe();
 
     preparethread;
-    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_pDeviceData);
+    _kernelTransformIAToULogT_D << <block, threads >> > (this->m_byFieldId, this->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
 
     //DebugPrintMe();
@@ -638,7 +645,7 @@ CCString CFieldGaugeSU2D::SaveToCompressedFile(const CCString& fileName) const
     CFieldGaugeSU2* pPooledGauge = dynamic_cast<CFieldGaugeSU2*>(GetCopy());
 
     preparethread;
-    _kernelTransformUToIALogT_D << <block, threads >> > (pPooledGauge->m_pDeviceData);
+    _kernelTransformUToIALogT_D << <block, threads >> > (pPooledGauge->m_byFieldId, pPooledGauge->m_pDeviceData);
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 

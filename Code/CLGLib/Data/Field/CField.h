@@ -23,24 +23,6 @@ void* GetData() override \
 
 __BEGIN_NAMESPACE
 
-__DEFINE_ENUM(EFieldInitialType,
-
-    EFIT_Zero,
-    EFIT_Identity,
-    EFIT_Random,
-    EFIT_RandomGenerator,
-    EFIT_SumGenerator, //for testing use only
-    EFIT_RandomGaussian,
-    EFIT_RandomZ4,
-
-    EFIT_ReadFromFile,
-
-    EFIT_U1Real,
-
-    EFIT_ForceDWORD = 0x7fffffff,
-    )
-
-
 __DEFINE_ENUM(EFieldFileType,
     EFFT_BridgePPTXT,
     EFFT_BridgePPBin,

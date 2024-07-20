@@ -39,6 +39,7 @@ _kernelRandomGauge(deviceSU3* pGx)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformRandom(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pGx,
     deviceSU3* pGauge)
 {
@@ -49,7 +50,7 @@ _kernelGaugeTransformRandom(
 
     for (BYTE dir = 0; dir < _DC_Dir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
@@ -143,7 +144,7 @@ void CGaugeFixingRandom::GaugeFixing(CFieldGauge* pResGauge)
 
     preparethread;
     _kernelRandomGauge << <block, threads >> > (m_pG);
-    _kernelGaugeTransformRandom << <block, threads >> > (m_pG, pGaugeSU3->m_pDeviceData);
+    _kernelGaugeTransformRandom << <block, threads >> > (pGaugeSU3->m_byFieldId, m_pG, pGaugeSU3->m_pDeviceData);
 }
 
 void CGaugeFixingRandom::AlsoFixingFermion(CFieldFermion* pFermion) const

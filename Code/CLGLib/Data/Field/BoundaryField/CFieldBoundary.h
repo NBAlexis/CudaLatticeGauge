@@ -14,17 +14,33 @@
 
 __BEGIN_NAMESPACE
 
+class CLGAPI CFieldBoundaryParent : public CBase
+{
+public:
+    virtual void InitialField(CParameters& param) = 0;
+};
+
 /**
 * It is more convinient NOT to inhirent from CField.
 */
-class CLGAPI CFieldBoundary : public CBase
+template<typename deviceData>
+class __DLL_EXPORT CFieldBoundary : public CFieldBoundaryParent
 {
 public:
-    CFieldBoundary() : m_byFieldId(0) {}
-    ~CFieldBoundary() {}
+    CFieldBoundary() 
+        : m_byFieldId(0)
+        , m_pDeviceData(NULL)
+    {
+        CCommonKernel<deviceData>::AllocateBuffer(&m_pDeviceData, 8 * _HC_Dir);
+    }
+
+    ~CFieldBoundary() 
+    {
+        CCommonKernel<deviceData>::FreeBuffer(&m_pDeviceData);
+    }
 
     virtual EFieldType GetFieldType() const = 0;
-    virtual void InitialField(CParameters& param)
+    void InitialField(CParameters& param) override
     {
         INT iValue = 1;
         param.FetchValueINT(_T("FieldId"), iValue);
@@ -39,6 +55,7 @@ public:
     }
 
     BYTE m_byFieldId;
+    deviceData* m_pDeviceData;
 };
 
 __END_NAMESPACE

@@ -111,7 +111,7 @@ _kernelAddForce4PlaqutteTermT_XY(
     #pragma unroll
     for (BYTE idir = 0; idir < 3; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIdx, idir))
+        if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
         {
             continue;
         }
@@ -272,7 +272,7 @@ _kernelAddForceChairTermT_Term1(
     //add force for dir=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const deviceGauge staple_term1_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 0, 1, bTorus ? _deviceHi0T : _deviceHi0);
@@ -288,7 +288,7 @@ _kernelAddForceChairTermT_Term1(
     //add force for dir=2
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term1_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 0, 3, bTorus ? _deviceHi0T : _deviceHi0);
@@ -304,7 +304,7 @@ _kernelAddForceChairTermT_Term1(
     //add force for dir=x
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term1_1 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 0, 1, bTorus ? _deviceHi0T : _deviceHi0);
@@ -337,7 +337,7 @@ _kernelAddForceChairTermT_Term2(
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const deviceGauge staple_term2_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 1, bTorus ? _deviceHi0T : _deviceHi0);
@@ -353,7 +353,7 @@ _kernelAddForceChairTermT_Term2(
     //add force for mu=4
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term2_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 2, 3, bTorus ? _deviceHi0T : _deviceHi0);
@@ -369,7 +369,7 @@ _kernelAddForceChairTermT_Term2(
     //add force for mu=4
     const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term2_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 1, bTorus ? _deviceHi0T : _deviceHi0);
@@ -402,7 +402,7 @@ _kernelAddForceChairTermT_Term3(
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const deviceGauge staple_term3_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 1, 0, bTorus ? _deviceHi1T : _deviceHi1);
@@ -418,7 +418,7 @@ _kernelAddForceChairTermT_Term3(
     //add force for mu=4
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term3_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 1, 3, bTorus ? _deviceHi1T : _deviceHi1);
@@ -434,7 +434,7 @@ _kernelAddForceChairTermT_Term3(
     //add force for mu=4
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term3_2 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 1, 0, bTorus ? _deviceHi1T : _deviceHi1);
@@ -468,7 +468,7 @@ _kernelAddForceChairTermT_Term4(
     //add force for mu=4
     const UINT uiLink4 = _deviceGetLinkIndex(uiSiteIndex, 3);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const deviceGauge staple_term4_4 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 0, bTorus ? _deviceHi1T : _deviceHi1);
@@ -484,7 +484,7 @@ _kernelAddForceChairTermT_Term4(
     //add force for mu=4
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term4_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 3, bTorus ? _deviceHi1T : _deviceHi1);
@@ -500,7 +500,7 @@ _kernelAddForceChairTermT_Term4(
     //add force for mu=4
     const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term4_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             3, 2, 0, bTorus ? _deviceHi1T : _deviceHi1);
@@ -533,7 +533,7 @@ _kernelAddForceChairTermT_Term5(
     //-Omega^2 xy V132
     const UINT uiLink1 = _deviceGetLinkIndex(uiSiteIndex, 0);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 0))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 0))
     {
         const deviceGauge staple_term5_1 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, bTorus ? _deviceHi2T : _deviceHi2);
@@ -548,7 +548,7 @@ _kernelAddForceChairTermT_Term5(
     //+Omega^2 xy V132
     const UINT uiLink2 = _deviceGetLinkIndex(uiSiteIndex, 1);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 1))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 1))
     {
         const deviceGauge staple_term5_2 = _deviceStapleChairTerm1T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             1, 2, 0, bTorus ? _deviceHi2T : _deviceHi2);
@@ -563,7 +563,7 @@ _kernelAddForceChairTermT_Term5(
     //+Omega^2 xy V132
     const UINT uiLink3 = _deviceGetLinkIndex(uiSiteIndex, 2);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 2))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 2))
     {
         const deviceGauge staple_term5_3 = _deviceStapleChairTerm2T(byFieldId, pDeviceData, sSite4, uiSiteIndex, uiBigIdx,
             0, 2, 1, bTorus ? _deviceHi2T : _deviceHi2);

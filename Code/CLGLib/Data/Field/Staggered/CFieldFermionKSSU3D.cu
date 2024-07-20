@@ -137,7 +137,8 @@ _kernelDFermionKSForce_D(
     const deviceSU3Vector* const* __restrict__ pFermionPointers,
     const Real* __restrict__ pNumerators,
     UINT uiRational,
-    BYTE byFieldId)
+    BYTE byFieldId,
+    BYTE byGaugeFieldId)
 {
     intokernalInt4;
     const UINT uiBigIndex = __bi(sSite4);
@@ -149,7 +150,7 @@ _kernelDFermionKSForce_D(
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIndex, static_cast<BYTE>(idir)))
+        if (__idx->_deviceIsBondOnSurface(uiBigIndex, byGaugeFieldId, static_cast<BYTE>(idir)))
         {
             continue;
         }
@@ -240,7 +241,8 @@ void CFieldFermionKSSU3D::DerivateD0(
         m_pRationalFieldPointers,
         m_pMDNumerator,
         m_rMD.m_uiDegree,
-        m_byFieldId);
+        m_byFieldId,
+        byGaugeFieldId);
 }
 
 #pragma endregion

@@ -217,7 +217,7 @@ void CMeasurePolyakov::OnConfigurationAcceptedSingleField(const class CFieldGaug
     res[0] = _make_cuComplex(F(0.0), F(0.0));
     checkCudaErrors(cudaMemcpy(m_pTmpDeviceSum, res, sizeof(CLGComplex), cudaMemcpyHostToDevice));
 
-    _PolyakovAtSite(pGaugeSU3->m_pDeviceData, m_pTmpLoop);
+    _PolyakovAtSite(pGaugeSU3->m_pDeviceData, m_pTmpLoop, pGaugeSU3->m_byFieldId);
     _kernelPolyakovTraceOfSite << <block1, threads1 >> > (m_pTmpLoop, m_pTraceRes, m_pTmpDeviceSum);
 
     _kernelInitialStaticPotentialCorrelatorOfSite << <block2, threads2 >> > (m_pCorrelatorCounter, m_pCorrelator);

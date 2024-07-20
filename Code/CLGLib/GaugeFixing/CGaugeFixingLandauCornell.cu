@@ -27,7 +27,8 @@ _kernelCalculateA(
     cuDoubleComplex* pA12,
     cuDoubleComplex* pA13,
     DOUBLE* pA22,
-    cuDoubleComplex* pA23)
+    cuDoubleComplex* pA23,
+    BYTE byFieldId)
 {
     intokernalInt4;
 
@@ -37,7 +38,7 @@ _kernelCalculateA(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A.Ta();
@@ -69,7 +70,8 @@ _kernelCalculateALog(
     cuDoubleComplex* pA12,
     cuDoubleComplex* pA13,
     DOUBLE* pA22,
-    cuDoubleComplex* pA23)
+    cuDoubleComplex* pA23,
+    BYTE byFieldId)
 {
     intokernalInt4;
 
@@ -79,7 +81,7 @@ _kernelCalculateALog(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A = su3A.Log();
@@ -137,7 +139,7 @@ _kernelCalculateAGradient(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] - pA11[uiLinkIndex];
             pGamma12[uiSiteIndex] = cuCsub(pGamma12[uiSiteIndex], pA12[uiLinkIndex]);
@@ -403,7 +405,7 @@ _kernelGaugeTransform(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
@@ -694,7 +696,8 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                pResGauge->m_byFieldId);
         }
         else
         {
@@ -704,7 +707,8 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                pResGauge->m_byFieldId);
         }
 
         _kernelCalculateAGradient << <block, threads >> > (
@@ -841,7 +845,8 @@ Real CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
             m_pA12,
             m_pA13,
             m_pA22,
-            m_pA23);
+            m_pA23,
+            pGaugeSU3->m_byFieldId);
     }
     else
     {
@@ -851,7 +856,8 @@ Real CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
             m_pA12,
             m_pA13,
             m_pA22,
-            m_pA23);
+            m_pA23,
+            pGaugeSU3->m_byFieldId);
     }
 
     _kernelCalculateAGradient << <block, threads >> > (

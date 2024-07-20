@@ -16,7 +16,6 @@ __BEGIN_NAMESPACE
 
 #pragma region Cornell Steepest Descend
 
-#if !_CLG_DOUBLEFLOAT
 /**
  * A_mu (n) = TA(U _mu (n))/i
  */
@@ -28,7 +27,8 @@ _kernelCalculateA3D(
     cuDoubleComplex* pA12,
     cuDoubleComplex* pA13,
     DOUBLE* pA22,
-    cuDoubleComplex* pA23)
+    cuDoubleComplex* pA23,
+    BYTE byFieldId)
 {
     intokernalInt4_S;
 
@@ -40,7 +40,7 @@ _kernelCalculateA3D(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A.Ta();
@@ -73,7 +73,8 @@ _kernelCalculateA3DLog(
     cuDoubleComplex* pA12,
     cuDoubleComplex* pA13,
     DOUBLE* pA22,
-    cuDoubleComplex* pA23)
+    cuDoubleComplex* pA23,
+    BYTE byFieldId)
 {
     intokernalInt4_S;
 
@@ -86,7 +87,7 @@ _kernelCalculateA3DLog(
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A = su3A.Log();
@@ -146,7 +147,7 @@ _kernelCalculateAGradient3D(
     for (BYTE dir = 0; dir < uiDir - 1; ++dir)
     {
         const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] - pA11[uiLinkIndex3D];
             pGamma12[uiSiteIndex3D] = cuCsub(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex3D]);
@@ -216,206 +217,6 @@ _kernelCalculateG3D(
             : pA.ExpReal(fAlpha, _DC_ExpPrecision);
     }
 }
-#else
-/**
- * A_mu (n) = TA(U _mu (n))/i
- */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateA3D(
-        SBYTE uiT,
-        const deviceSU3* __restrict__ pU,
-        Real* pA11,
-        CLGComplex* pA12,
-        CLGComplex* pA13,
-        Real* pA22,
-        CLGComplex* pA23)
-{
-    intokernalInt4_S;
-
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir); 
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    //No need to calcuate A4, since we don't need it
-    for (BYTE dir = 0; dir < uiDir - 1; ++dir)
-    {
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            deviceSU3 su3A(pU[uiLinkIndex]);
-            su3A.Ta();
-            pA11[uiLinkIndex3D] = su3A.m_me[0].y;
-            pA12[uiLinkIndex3D] = su3A.m_me[1];
-            pA13[uiLinkIndex3D] = su3A.m_me[2];
-            pA22[uiLinkIndex3D] = su3A.m_me[4].y;
-            pA23[uiLinkIndex3D] = su3A.m_me[5];
-        }
-        else
-        {
-            pA11[uiLinkIndex3D] = F(0.0);
-            pA12[uiLinkIndex3D] = _zeroc;
-            pA13[uiLinkIndex3D] = _zeroc;
-            pA22[uiLinkIndex3D] = F(0.0);
-            pA23[uiLinkIndex3D] = _zeroc;
-        }
-    }
-}
-
-#if _CLG_DEBUG
-__global__ void _CLG_LAUNCH_BOUND_HALF
-#else
-__global__ void _CLG_LAUNCH_BOUND
-#endif
-_kernelCalculateA3DLog(
-    SBYTE uiT,
-    const deviceSU3* __restrict__ pU,
-    Real* pA11,
-    CLGComplex* pA12,
-    CLGComplex* pA13,
-    Real* pA22,
-    CLGComplex* pA23)
-{
-    intokernalInt4_S;
-
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    //No need to calcuate A4, since we don't need it
-#pragma unroll
-    for (BYTE dir = 0; dir < 3; ++dir)
-    {
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            deviceSU3 su3A(pU[uiLinkIndex]);
-            su3A = su3A.Log();
-            pA11[uiLinkIndex3D] = su3A.m_me[0].y;
-            pA12[uiLinkIndex3D] = su3A.m_me[1];
-            pA13[uiLinkIndex3D] = su3A.m_me[2];
-            pA22[uiLinkIndex3D] = su3A.m_me[4].y;
-            pA23[uiLinkIndex3D] = su3A.m_me[5];
-        }
-        else
-        {
-            pA11[uiLinkIndex3D] = F(0.0);
-            pA12[uiLinkIndex3D] = _zeroc;
-            pA13[uiLinkIndex3D] = _zeroc;
-            pA22[uiLinkIndex3D] = F(0.0);
-            pA23[uiLinkIndex3D] = _zeroc;
-        }
-    }
-}
-
-/**
- * Gamma(n) = Delta _{-mu} A(n) = \sum _mu (A_mu(n - mu) - A_mu(n))
- */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateAGradient3D(
-    BYTE byFieldId,
-    SBYTE uiT,
-    Real* pGamma11,
-    CLGComplex* pGamma12,
-    CLGComplex* pGamma13,
-    Real* pGamma22,
-    CLGComplex* pGamma23,
-    const Real* __restrict__ pA11,
-    const CLGComplex* __restrict__ pA12,
-    const CLGComplex* __restrict__ pA13,
-    const Real* __restrict__ pA22,
-    const CLGComplex* __restrict__ pA23)
-{
-    intokernalInt4_S_Only3D;
-
-    pGamma11[uiSiteIndex3D] = F(0.0);
-    pGamma12[uiSiteIndex3D] = _zeroc;
-    pGamma13[uiSiteIndex3D] = _zeroc;
-    pGamma22[uiSiteIndex3D] = F(0.0);
-    pGamma23[uiSiteIndex3D] = _zeroc;
-    
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    //const BYTE uiDir2 = uiDir * 2;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-    if (site.IsDirichlet())
-    {
-        return;
-    }
-
-    //No need to calcuate A4, since we don't need it
-    for (BYTE dir = 0; dir < uiDir - 1; ++dir)
-    {
-        const UINT uiLinkIndex3D = uiSiteIndex3D * (uiDir - 1) + dir;
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] - pA11[uiLinkIndex3D];
-            pGamma12[uiSiteIndex3D] = _cuCsubf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex3D]);
-            pGamma13[uiSiteIndex3D] = _cuCsubf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex3D]);
-            pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] - pA22[uiLinkIndex3D];
-            pGamma23[uiSiteIndex3D] = _cuCsubf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex3D]);
-        }
-
-        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
-        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
-        const UINT uiLinkIndex2_3D = (p_m_mu_dir.m_uiSiteIndex / _DC_Lt) * (uiDir - 1) + dir;
-
-        //if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
-        if (!p_m_mu_dir.IsDirichlet())
-        {
-            if (p_m_mu_dir.NeedToDagger())
-            {
-                pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] - pA11[uiLinkIndex2_3D];
-                pGamma12[uiSiteIndex3D] = _cuCsubf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
-                pGamma13[uiSiteIndex3D] = _cuCsubf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
-                pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] - pA22[uiLinkIndex2_3D];
-                pGamma23[uiSiteIndex3D] = _cuCsubf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex2_3D]);
-            }
-            else
-            {
-                pGamma11[uiSiteIndex3D] = pGamma11[uiSiteIndex3D] + pA11[uiLinkIndex2_3D];
-                pGamma12[uiSiteIndex3D] = _cuCaddf(pGamma12[uiSiteIndex3D], pA12[uiLinkIndex2_3D]);
-                pGamma13[uiSiteIndex3D] = _cuCaddf(pGamma13[uiSiteIndex3D], pA13[uiLinkIndex2_3D]);
-                pGamma22[uiSiteIndex3D] = pGamma22[uiSiteIndex3D] + pA22[uiLinkIndex2_3D];
-                pGamma23[uiSiteIndex3D] = _cuCaddf(pGamma23[uiSiteIndex3D], pA23[uiLinkIndex2_3D]);
-            }
-        }
-    }
-}
-
-/**
- * g(x)=exp(-i a Delta A)
- */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateG3D(
-    SBYTE uiT,
-    deviceSU3* pG,
-    const Real* __restrict__ pGamma11,
-    const CLGComplex* __restrict__ pGamma12,
-    const CLGComplex* __restrict__ pGamma13,
-    const Real* __restrict__ pGamma22,
-    const CLGComplex* __restrict__ pGamma23,
-    Real fAlpha)
-{
-    intokernalInt4_S_Only3D;
-
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-
-    if (site.IsDirichlet())
-    {
-        pG[uiSiteIndex3D] = deviceSU3::makeSU3Id();
-    }
-    else
-    {
-        deviceSU3 pA = deviceSU3::makeSU3TA(
-            pGamma12[uiSiteIndex3D], pGamma13[uiSiteIndex3D], pGamma23[uiSiteIndex3D],
-            pGamma11[uiSiteIndex3D], pGamma22[uiSiteIndex3D]);
-        pG[uiSiteIndex3D] = (0 == _DC_ExpPrecision)
-            ? pA.QuickExp(fAlpha)
-            : pA.ExpReal(fAlpha, _DC_ExpPrecision);
-    }
-}
-#endif
 
 /**
  * g(n) U_mu(n) g(n+mu)^dagger
@@ -438,7 +239,7 @@ _kernelGaugeTransform3D(
 
     for (BYTE dir = 0; dir < uiDir - 1; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             const UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
@@ -473,7 +274,7 @@ _kernelGaugeTransform3DT(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
         const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
         if (!site.IsDirichlet())
@@ -512,6 +313,7 @@ _kernelGaugeTransform3DT(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateTrAGradientSq3D(
+    BYTE byFieldId,
     SBYTE uiT,
     DOUBLE* pDeviceRes,
     const DOUBLE* __restrict__ pDeltaA11,
@@ -522,7 +324,7 @@ _kernelCalculateTrAGradientSq3D(
 {
     intokernalInt4_S_Only3D;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (site.IsDirichlet())
     {
         pDeviceRes[uiSiteIndex3D] = 0.0;
@@ -821,7 +623,8 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                byFieldId);
         }
         else
         {
@@ -832,7 +635,8 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                byFieldId);
         }
 
         _kernelCalculateAGradient3D << <block, threads >> > (
@@ -851,6 +655,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
 
         //======= 2. Calculate Theta    =========
         _kernelCalculateTrAGradientSq3D << <block, threads >> > (
+            byFieldId,
             uiT,
             _D_RealThreadBuffer,
             m_pGamma11,
@@ -971,7 +776,8 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                pGauge->m_byFieldId);
         }
         else
         {
@@ -982,7 +788,8 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
                 m_pA12,
                 m_pA13,
                 m_pA22,
-                m_pA23);
+                m_pA23,
+                pGauge->m_byFieldId);
         }
 
         _kernelCalculateAGradient3D << <block, threads >> > (
@@ -1000,6 +807,7 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
             m_pA23);
 
         _kernelCalculateTrAGradientSq3D << <block, threads >> > (
+            pGauge->m_byFieldId,
             uiT,
             _D_RealThreadBuffer,
             m_pGamma11,

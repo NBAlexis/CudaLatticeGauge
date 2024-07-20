@@ -146,9 +146,10 @@ public:
         return m_pDeviceIndexLinkToSIndex[byFieldId][_deviceGetBigIndex(inSite) * 4 + byDir];
     }
 
-    __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byDir) const
+    __device__ __inline__ UBOOL _deviceIsBondOnSurface(UINT uiBigIdx, BYTE byFieldId, BYTE byDir) const
     {
-        return (m_pBondInfoTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
+        return (m_pDeviceIndexLinkToSIndex[byFieldId][uiBigIdx * 4 + byDir].m_byTag & _kDirichlet) != 0;
+        //return (m_pBondInfoTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
     }
 
     //====================================================

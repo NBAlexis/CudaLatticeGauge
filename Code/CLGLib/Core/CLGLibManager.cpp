@@ -65,9 +65,9 @@ void CCLGLibManager::InitialLatticeAndConstant(CParameters& params)
     m_InitialCache.constIntegers[ECI_Dir] = static_cast<UINT>(iVaules);
 
 #if _CLG_DEBUG
-    __FetchIntWithDefault(_T("MaxThreadPerBlock"), 256);
+    __FetchIntWithDefault(_T("MaxThreadPerBlock"), _CLG_LAUNCH_MAX_THREAD);
 #else
-    __FetchIntWithDefault(_T("MaxThreadPerBlock"), 0);
+    __FetchIntWithDefault(_T("MaxThreadPerBlock"), _CLG_LAUNCH_MAX_THREAD);
 #endif
     if (iVaules > 0)
     {
@@ -444,12 +444,8 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     }
 
     pGauge->m_byFieldId = byFieldId;
-    if (EFIT_ReadFromFile != eGaugeInitial)
-    {
-        pGauge->m_pOwner = m_pLatticeData;
-        pGauge->InitialField(eGaugeInitial);
-    }
-    else
+    pGauge->m_pOwner = m_pLatticeData;
+    if (EFIT_ReadFromFile == eGaugeInitial)
     {
         CCString sFileType, sFileName;
         if (!params.FetchStringValue(_T("GaugeFileType"), sFileType)
@@ -459,7 +455,6 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
             _FAIL_EXIT;
         }
         const EFieldFileType eFileType = __STRING_TO_ENUM(EFieldFileType, sFileType);
-        pGauge->m_pOwner = m_pLatticeData;
         pGauge->InitialFieldWithFile(sFileName, eFileType);
     }
     checkCudaErrors(cudaDeviceSynchronize());
@@ -482,8 +477,9 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     m_pLatticeData->m_pGaugeField.AddItem(pGauge);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pGauge);
     m_pLatticeData->m_pOtherFields.AddItem(pGauge);
+    m_pLatticeData->m_eFieldInitialTypes.AddItem(eGaugeInitial);
     m_pLatticeData->CreateFieldPool(byFieldId, 0);
-
+    checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the gauge %s (field id %d) with initial: %s\n"), sGaugeClassName.c_str(), byFieldId, sValues.c_str());
 }
 
@@ -497,7 +493,7 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
     sBosonClassName = sValues;
     __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
     const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
-
+    checkCudaErrors(cudaDeviceSynchronize());
     CBase* pBosonField = appCreate(sBosonClassName);
     CFieldBoson* pBoson = (NULL != pBosonField) ? (dynamic_cast<CFieldBoson*>(pBosonField)) : NULL;
     if (NULL == pBoson)
@@ -522,13 +518,14 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
 
     pBoson->m_byFieldId = byFieldId;
     pBoson->m_pOwner = m_pLatticeData;
-    checkCudaErrors(cudaDeviceSynchronize());
-    pBoson->InitialField(eFieldInitial);
-    checkCudaErrors(cudaDeviceSynchronize());
+    //checkCudaErrors(cudaDeviceSynchronize());
+    //pBoson->InitialField(eFieldInitial);
+    //checkCudaErrors(cudaDeviceSynchronize());
     pBoson->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pBoson);
     m_pLatticeData->m_pBosonField.AddItem(pBoson);
     m_pLatticeData->m_pOtherFields.AddItem(pBoson);
+    m_pLatticeData->m_eFieldInitialTypes.AddItem(eFieldInitial);
     TArray<INT> periodic;
     if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
@@ -585,11 +582,12 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
 
     pFermion->m_byFieldId = byFieldId;
     pFermion->m_pOwner = m_pLatticeData;
-    pFermion->InitialField(eFieldInitial);
+    //pFermion->InitialField(eFieldInitial);
     pFermion->InitialOtherParameters(params);
     m_pLatticeData->m_pFieldMap.SetAt(byFieldId, pFermion);
     m_pLatticeData->m_pFermionField.AddItem(pFermion);
     m_pLatticeData->m_pOtherFields.AddItem(pFermion);
+    m_pLatticeData->m_eFieldInitialTypes.AddItem(eFieldInitial);
     TArray<INT> periodic;
     if (params.FetchValueArrayINT(_T("Period"), periodic))
     {
@@ -606,6 +604,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
     //{
         m_pLatticeData->CreateFieldPool(byFieldId, iVaules);
     //}
+    checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
 }
 
@@ -619,11 +618,11 @@ void CCLGLibManager::CreateBoundaryFields(class CParameters& params, const CCStr
     const CCString sFieldClassName = sValues;
 
     CBase* pBCField = appCreate(sFieldClassName);
-    CFieldBoundary* pBC = (NULL != pBCField) ? (dynamic_cast<CFieldBoundary*>(pBCField)) : NULL;
+    CFieldBoundaryParent* pBC = (NULL != pBCField) ? (dynamic_cast<CFieldBoundaryParent*>(pBCField)) : NULL;
 
     if (NULL == pBC)
     {
-        appCrucial(_T("Unable to create the boundary fermion field! with name %s!"), sFieldClassName.c_str());
+        appCrucial(_T("Unable to create the boundary field! with name %s!"), sFieldClassName.c_str());
     }
     pBC->InitialField(params);
     INT defaultId = -1;
@@ -634,7 +633,8 @@ void CCLGLibManager::CreateBoundaryFields(class CParameters& params, const CCStr
     __FetchIntWithDefault(_T("FieldId"), defaultId);
     const BYTE byFieldId = static_cast<BYTE>(iVaules);
     m_pLatticeData->m_pBoundaryFieldMap.SetAt(byFieldId, pBC);
-    appGeneral(_T("Create the boundary fermion field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
+    checkCudaErrors(cudaDeviceSynchronize());
+    appGeneral(_T("Create the boundary field %s with initial: %s\n"), sFieldClassName.c_str(), sValues.c_str());
 }
 
 //void CCLGLibManager::CreateOtherGaugeFields(class CParameters& params) const
@@ -896,6 +896,22 @@ void CCLGLibManager::CreateGaugeFixing(class CParameters& params) const
     }
 }
 
+void CCLGLibManager::InitialFieldBuffer() const
+{
+    assert(m_pLatticeData->m_eFieldInitialTypes.Num() == m_pLatticeData->m_pOtherFields.Num());
+    for (INT i = 0; i < m_pLatticeData->m_pOtherFields.Num(); ++i)
+    {
+        if (EFIT_ReadFromFile != m_pLatticeData->m_eFieldInitialTypes[i])
+        {
+            checkCudaErrors(cudaDeviceSynchronize());
+            checkCudaErrors(cudaGetLastError());
+            m_pLatticeData->m_pOtherFields[i]->InitialField(m_pLatticeData->m_eFieldInitialTypes[i]);
+            checkCudaErrors(cudaDeviceSynchronize());
+            checkCudaErrors(cudaGetLastError());
+        }
+    }
+}
+
 #pragma endregion
 
 #pragma region Caches
@@ -908,8 +924,10 @@ void CCLGLibManager::InitialIndexBuffer() const
         return;
     }
     checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
     m_pLatticeData->m_pIndex->BakeAllIndexBuffer(m_pLatticeData->m_pIndexCache);
     checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
     if (m_pLatticeData->m_pOtherFields.Num() > 0)
     {
         UBOOL bHasStaggeredFermion = FALSE;
@@ -921,12 +939,14 @@ void CCLGLibManager::InitialIndexBuffer() const
             {
                 m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, i);
                 checkCudaErrors(cudaDeviceSynchronize());
+                checkCudaErrors(cudaGetLastError());
                 bPlaqCached = TRUE;
             }
             else if (NULL != pf && !pf->IsGaugeField())
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
                 checkCudaErrors(cudaDeviceSynchronize());
+                checkCudaErrors(cudaGetLastError());
                 if (NULL != dynamic_cast<const CFieldFermionKS*>(pf))
                 {
                     bHasStaggeredFermion = TRUE;
@@ -937,13 +957,16 @@ void CCLGLibManager::InitialIndexBuffer() const
         {
             m_pLatticeData->m_pIndex->BakeEtaMuTable(m_pLatticeData->m_pIndexCache);
             checkCudaErrors(cudaDeviceSynchronize());
+            checkCudaErrors(cudaGetLastError());
         }
     }
     m_pLatticeData->m_pIndex->CalculateSiteCount(m_pLatticeData->m_pIndexCache);
     checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
 
     m_pCudaHelper->SetDeviceIndex(m_pLatticeData->m_pIndexCache);
     checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
 }
 
 #pragma endregion
@@ -957,6 +980,8 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     if (params.FetchValueINT(_T("DeviceIndex"), m_iDeviceId))
     {
         checkCudaErrors(cudaSetDevice(m_iDeviceId));
+        checkCudaErrors(cudaDeviceSynchronize());
+        checkCudaErrors(cudaGetLastError());
         //checkCudaErrors(cudaInitDevice(m_iDeviceId));
 
         cudaDeviceProp deviceProp;
@@ -978,10 +1003,14 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
         if (fBufferSize > F(0.1) && fBufferSize < F(32.0))
         {
             m_pBuffer->Initial(static_cast<FLOAT>(fBufferSize));
+            checkCudaErrors(cudaDeviceSynchronize());
+            checkCudaErrors(cudaGetLastError());
         }
     }
 
     InitialLatticeAndConstant(params);
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
     InitialRandom(params);
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
@@ -1101,8 +1130,32 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     //        checkCudaErrors(cudaGetLastError());
     //    }
     //}
+
+    //=============================================
+    // at last, fill the field pointers
+    // and copy the index data to device
+    InitialIndexBuffer();
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
+    m_pCudaHelper->SetFieldPointers();
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+    m_pLatticeData->FixAllFieldBoundary();
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
+    {
+        appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
+    }
+
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+
+    //The buffer can be initialled only after boundary fixed
+    InitialFieldBuffer();
+
+    //Other things such as measurement, integrator, solver, gauge fixing, gauge smearing...
     if (m_InitialCache.constIntegers[ECI_ActionListLength] > 0)
     {
         CreateActionList(params);
@@ -1165,26 +1218,6 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     {
         CreateMeasurement(params);
     }
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
-    //=============================================
-    // at last, fill the field pointers
-    // and copy the index data to device
-    InitialIndexBuffer();
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
-    m_pCudaHelper->SetFieldPointers();
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
-    m_pLatticeData->FixAllFieldBoundary();
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
-
-    if (NULL != m_pLatticeData->m_pIndex && m_pLatticeData->m_pIndex->NeedToFixBoundary() && !bGaugeBoundaryFieldCreated)
-    {
-        appCrucial(_T("Using Dirichlet boundary without specify a gauge boundary!\n"));
-    }
-
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
 

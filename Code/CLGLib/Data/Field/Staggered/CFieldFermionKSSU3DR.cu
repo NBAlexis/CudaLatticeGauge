@@ -250,6 +250,7 @@ _kernelDFermionKSForce_R_XYTerm(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
     UBOOL bShiftCenter,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
@@ -315,7 +316,7 @@ _kernelDFermionKSForce_R_XYTerm(
         //For mu
         if (0 == byContribution || 2 == byContribution)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byMu))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byGaugeFieldId, byMu))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byMu);
                 pForce[linkIndex].Sub(res);
@@ -325,7 +326,7 @@ _kernelDFermionKSForce_R_XYTerm(
         //For tau
         if (1 == byContribution || 2 == byContribution)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, 3))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byGaugeFieldId, 3))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
                 if (iMu > 0)
@@ -352,6 +353,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
     const Real* __restrict__ pNumerators,
     UINT uiRational,
     BYTE byFieldId,
+    BYTE byGaugeFieldId,
 #if !_CLG_DOUBLEFLOAT
     DOUBLE fOmega,
 #else
@@ -412,7 +414,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
 
         if (pathLdir1 > 0)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, pathLdir1 - 1))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byGaugeFieldId, pathLdir1 - 1))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLdir1 - 1);
                 pForce[linkIndex].Sub(res);
@@ -421,7 +423,7 @@ _kernelDFermionKSForce_R_XYTau_Term(
 
         if (pathRdir1 > 0)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, pathRdir1 - 1))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byGaugeFieldId, pathRdir1 - 1))
             {
                 const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRdir1 - 1);
                 pForce[linkIndex].Add(res);
@@ -552,6 +554,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                     m_pMDNumerator,
                     m_rMD.m_uiDegree,
                     m_byFieldId,
+                    byGaugeFieldId,
                     m_bShiftCenter,
                     CCommonData::m_fOmega,
                     static_cast<BYTE>(imu), iMu[pathidx],
@@ -613,6 +616,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                         m_pMDNumerator,
                         m_rMD.m_uiDegree,
                         m_byFieldId,
+                        byGaugeFieldId,
                         CCommonData::m_fOmega,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength

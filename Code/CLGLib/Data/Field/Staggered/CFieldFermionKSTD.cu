@@ -138,7 +138,8 @@ _kernelDFermionKSForce_DT(
     const deviceVector* const* __restrict__ pFermionPointers,
     const Real* __restrict__ pNumerators,
     UINT uiRational,
-    BYTE byFieldId)
+    BYTE byFieldId,
+    BYTE byGaugeFieldId)
 {
     intokernalInt4;
     const UINT uiBigIndex = __bi(sSite4);
@@ -150,7 +151,7 @@ _kernelDFermionKSForce_DT(
     //idir = mu
     for (UINT idir = 0; idir < _DC_Dir; ++idir)
     {
-        if (__idx->_deviceIsBondOnSurface(uiBigIndex, static_cast<BYTE>(idir)))
+        if (__idx->_deviceIsBondOnSurface(uiBigIndex, byGaugeFieldId, static_cast<BYTE>(idir)))
         {
             continue;
         }

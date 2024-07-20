@@ -743,12 +743,12 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT gaugeNum,
 //    checkCudaErrors(__cudaFree(m_pDeviceData));
 //}
 
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialField(EFieldInitialType eInitialType)
-{
-    preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
-}
+//template<typename deviceDataBoson, typename deviceDataGauge>
+//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialField(EFieldInitialType eInitialType)
+//{
+//    preparethread;
+//    _kernelInitialBosonVN << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
+//}
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFieldType)
@@ -1028,51 +1028,51 @@ void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(Real a)
     _kernelScalarMultiplyRealBosonVN << <block, threads >> > (m_pDeviceData, a);
 }
 
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dagger()
-{
-    preparethread;
-    _kernelBosonConjugateVN << <block, threads >> > (m_pDeviceData);
-}
+//template<typename deviceDataBoson, typename deviceDataGauge>
+//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dagger()
+//{
+//    preparethread;
+//    _kernelBosonConjugateVN << <block, threads >> > (m_pDeviceData);
+//}
 
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()
-{
-    //appGeneral(_T("CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()\n"));
-    preparethread;
-    _kernelBosonFixBoundary << <block, threads >> > (m_pDeviceData, m_byFieldId);
-}
+//template<typename deviceDataBoson, typename deviceDataGauge>
+//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()
+//{
+//    //appGeneral(_T("CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()\n"));
+//    preparethread;
+//    _kernelBosonFixBoundary << <block, threads >> > (m_pDeviceData, m_byFieldId);
+//}
 
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyTo(CField* U) const
-{
-    if (NULL == U || GetFieldType() != U->GetFieldType())
-    {
-        appCrucial(_T("EFT_BosonU1 can only copy to EFT_BosonU1!"));
-        return;
-    }
+//template<typename deviceDataBoson, typename deviceDataGauge>
+//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyTo(CField* U) const
+//{
+//    if (NULL == U || GetFieldType() != U->GetFieldType())
+//    {
+//        appCrucial(_T("EFT_BosonU1 can only copy to EFT_BosonU1!"));
+//        return;
+//    }
+//
+//    CFieldBoson::CopyTo(U);
+//
+//    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(U);
+//    checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
+//}
 
-    CFieldBoson::CopyTo(U);
-
-    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(U);
-    checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::MakeRandomMomentum()
-{
-    if (m_bConstant)
-    {
-        Zero();
-        return;
-    }
-
-    preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (
-        m_pDeviceData,
-        m_byFieldId,
-        EFIT_RandomGaussian);
-}
+//template<typename deviceDataBoson, typename deviceDataGauge>
+//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::MakeRandomMomentum()
+//{
+//    if (m_bConstant)
+//    {
+//        Zero();
+//        return;
+//    }
+//
+//    preparethread;
+//    _kernelInitialBosonVN << <block, threads >> > (
+//        m_pDeviceData,
+//        m_byFieldId,
+//        EFIT_RandomGaussian);
+//}
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::DiagnalTerm(

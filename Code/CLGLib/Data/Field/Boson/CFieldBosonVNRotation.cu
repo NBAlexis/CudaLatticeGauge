@@ -573,6 +573,7 @@ CFieldBosonVNRotation<deviceDataBoson, deviceDataGauge>::CFieldBosonVNRotation()
     , m_pfCxSqShift(NULL)
     , m_pfCySqShift(NULL)
 {
+    checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePath, sizeof(INT) * _kLinkMaxLength));
 
     checkCudaErrors(cudaMemcpyFromSymbol(&m_pfCx, _deviceBosonRotationCxPf, sizeof(_deviceCoeffFunctionPointerTwoSites)));

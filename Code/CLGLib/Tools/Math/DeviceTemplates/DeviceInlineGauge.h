@@ -27,7 +27,7 @@ static __device__ __inline__ const deviceGauge& _deviceGetGaugeBCT(
     const SIndex& idx)
 {
     return idx.IsDirichlet() ?
-        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundary<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];
@@ -45,8 +45,8 @@ static __device__ __inline__ const deviceGauge& _deviceGetGaugeBCDirT(
     BYTE byDir)
 {
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
-        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
+        ((CFieldBoundary<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(site) * _DC_Dir + byDir
         ]
         : pBuffer[_deviceGetLinkIndex(site.m_uiSiteIndex, byDir)];
@@ -59,7 +59,7 @@ static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirOneT(
     UINT uiBigIdx,
     BYTE byDir)
 {
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
         _makeId<deviceGauge>()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
@@ -71,7 +71,7 @@ static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirZeroT(
     UINT uiBigIdx,
     BYTE byDir)
 {
-    return __idx->_deviceIsBondOnSurface(uiBigIdx, byDir) ?
+    return __idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, byDir) ?
         _makeZero<deviceGauge>()
         : pBuffer[_deviceGetLinkIndex(__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx].m_uiSiteIndex, byDir)];
 }
@@ -83,7 +83,7 @@ static __device__ __inline__ deviceGauge _deviceGetGaugeBCDirSIndexT(
     BYTE byFieldId)
 {
     deviceGauge ret = idx.IsDirichlet() ?
-        ((CFieldBoundaryOne<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
+        ((CFieldBoundary<deviceGauge>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData[
             __idx->_devcieExchangeBoundaryFieldSiteIndex(idx) * _DC_Dir + idx.m_byDir
         ]
         : pBuffer[_deviceGetLinkIndex(idx.m_uiSiteIndex, idx.m_byDir)];

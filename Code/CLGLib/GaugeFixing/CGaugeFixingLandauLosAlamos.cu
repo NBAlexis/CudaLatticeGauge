@@ -44,7 +44,7 @@ _kernelCalculateGAL(
         const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
-        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
+        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir) ? su3Id : pU[uiLinkIndex]);
         pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
@@ -83,7 +83,7 @@ _kernelCalculateGOdd(
         const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
-        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
+        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir) ? su3Id : pU[uiLinkIndex]);
         pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
@@ -122,7 +122,7 @@ _kernelCalculateGEven(
         const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
         const SIndex& site_m_mu = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
 
-        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, dir) ? su3Id : pU[uiLinkIndex]);
+        pG[uiSiteIndex].Add(__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir) ? su3Id : pU[uiLinkIndex]);
         pG[uiSiteIndex].AddDagger(_deviceGetGaugeBCSU3DirOneSIndex(pU, site_m_mu));
     }
 
@@ -149,7 +149,7 @@ _kernelGaugeTransformAL(
 
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
@@ -202,7 +202,7 @@ _kernelGaugeTransformOdd(
     {
         for (BYTE dir = 0; dir < uiDir; ++dir)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
             {
                 UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
                 const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
@@ -244,7 +244,7 @@ _kernelGaugeTransformEven(
     {
         for (BYTE dir = 0; dir < uiDir; ++dir)
         {
-            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+            if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
             {
                 UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
                 const SSmallInt4 p_p_mu_site = _deviceSmallInt4OffsetC(sSite4, dir + 1);
@@ -265,6 +265,7 @@ _kernelGaugeTransformEven(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateAAll(
+        BYTE byFieldId,
         const deviceSU3* __restrict__ pU,
         Real* pA11,
         CLGComplex* pA12,
@@ -280,7 +281,7 @@ _kernelCalculateAAll(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             deviceSU3 su3A(pU[uiLinkIndex]);
             su3A.Ta();
@@ -346,7 +347,7 @@ _kernelCalculateLandauDivation(
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
         const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, dir))
         {
             g11 = g11 - pA11[uiLinkIndex];
             g12 = _cuCsubf(g12, pA12[uiLinkIndex]);
@@ -464,6 +465,7 @@ Real CGaugeFixingLandauLosAlamos::CheckRes(const CFieldGauge* pGauge)
 
     preparethread;
     _kernelCalculateAAll << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         m_pA11,
         m_pA12,

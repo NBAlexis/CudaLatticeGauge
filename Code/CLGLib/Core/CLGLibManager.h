@@ -91,6 +91,8 @@ protected:
 
     //Requared
     void InitialIndexBuffer() const;
+
+    void InitialFieldBuffer() const;
 };
 
 extern CLGAPI CCLGLibManager GCLGManager;
