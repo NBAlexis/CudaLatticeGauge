@@ -138,6 +138,8 @@ inline class CLatticeData* appGetLattice();
 
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);
 
+inline class CMultiShiftSolver* appGetMultiShiftSolver(BYTE byFieldId);
+
 inline class CGaugeSmearing* appGetGaugeSmearing();
 
 

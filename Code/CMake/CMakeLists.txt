@@ -239,9 +239,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3R.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3REM.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSSU3RigidAcc.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTD.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTKernel.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTR.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Acc.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3Boost.cu
@@ -304,6 +302,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKST.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTD.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTR.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Measurement/CMeasureBosonCond.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/SparseLinearAlgebra/CMultiShiftFOM.cpp

@@ -407,149 +407,240 @@ void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DerivateD0(
 
 #pragma endregion
 
-#pragma region Staggered
+#pragma region DOperator Dirichlet
+
+#pragma region kernel
 
 /**
-* Initialize
+*
 */
-//template<typename deviceVector>
-//__global__ void _CLG_LAUNCH_BOUND
-//_kernelInitialFermionKST(deviceVector* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType)
-//{
-//    intokernalInt4;
-//
-//    switch (eInitialType)
-//    {
-//    case EFIT_Zero:
-//    {
-//        pDevicePtr[uiSiteIndex] = _makeZero<deviceVector>();
-//    }
-//    break;
-//    case EFIT_Identity:
-//    {
-//        pDevicePtr[uiSiteIndex] = _makeId<deviceVector>();
-//    }
-//    break;
-//    case EFIT_RandomGaussian:
-//    {
-//        pDevicePtr[uiSiteIndex] = _makeGaussian<deviceVector>(_deviceGetFatIndex(uiSiteIndex, 0));
-//    }
-//    break;
-//    case EFIT_RandomZ4:
-//    {
-//        pDevicePtr[uiSiteIndex] = _makeZ4<deviceVector>(_deviceGetFatIndex(uiSiteIndex, 0));
-//    }
-//    break;
-//    default:
-//    {
-//        printf("Wilson Fermion Field cannot be initialized with this type!");
-//    }
-//    break;
-//    }
-//}
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_DT(
+    const deviceVector* __restrict__ pDeviceData,
+    const deviceGauge* __restrict__ pGauge,
+    const SIndex* __restrict__ pGaugeMove,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    deviceVector* pResultData,
+    Real f2am,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    UBOOL bDDagger,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    const UINT uiBigIndex = __bi(sSite4);
+    deviceVector result = _makeZero<deviceVector>();
+
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex].IsDirichlet())
+    {
+        pResultData[uiSiteIndex] = result;
+        return;
+    }
+    pResultData[uiSiteIndex] = pDeviceData[uiSiteIndex];
+
+    //idir = mu
+    for (UINT idir = 0; idir < _DC_Dir; ++idir)
+    {
+        //Get Gamma mu
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+
+        //x, mu
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+        const SIndex& x_m_mu_Gauge = pGaugeMove[linkIndex];
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        const SIndex& x_m_mu_Fermion = pFermionMove[2 * linkIndex + 1];
+        deviceVector res = _makeZero<deviceVector>();
+
+        //UBOOL btestpf = FALSE;
+        if (!x_p_mu_Fermion.IsDirichlet())
+        {
+            const deviceGauge& x_Gauge_element = _deviceGetGaugeBCDirT(byGaugeFieldId, pGauge, uiBigIndex, idir);
+            //U(x,mu) phi(x+ mu)
+            res = _mulVec(x_Gauge_element, pDeviceData[x_p_mu_Fermion.m_uiSiteIndex]);
+            if (x_p_mu_Fermion.NeedToOpposite())
+            {
+                _mul(res, F(-1.0));
+            }
+            //btestpf = TRUE;
+        }
+
+        //UBOOL btestmf = FALSE;
+        if (!x_m_mu_Fermion.IsDirichlet())
+        {
+            const deviceGauge x_m_mu_Gauge_element = _deviceGetGaugeBCT(byGaugeFieldId, pGauge, x_m_mu_Gauge);
+            const deviceVector u_dagger_phi_x_m_m = _mulVec(x_m_mu_Gauge_element, pDeviceData[x_m_mu_Fermion.m_uiSiteIndex]);
+            if (x_m_mu_Fermion.NeedToOpposite())
+            {
+                _add(res, u_dagger_phi_x_m_m);
+            }
+            else
+            {
+                _sub(res, u_dagger_phi_x_m_m);
+            }
+            //btestmf = TRUE;
+        }
+        //if (!btestpf && !btestmf)
+        //{
+        //    printf("both p fermion and m fermion are dirichlet?\n");
+        //}
+
+        _mul(res, eta_mu);
+        _add(result, res);
+    }
+
+    _mul(pResultData[uiSiteIndex], f2am);
+    //if (__cuCabsSqf(result.m_ve[0]) + __cuCabsSqf(result.m_ve[1]) + __cuCabsSqf(result.m_ve[2]) < 1.0e-10)
+    //{
+    //    printf("zero result!\n");
+    //}
+
+    if (bDDagger)
+    {
+        _sub(pResultData[uiSiteIndex], result);
+    }
+    else
+    {
+        _add(pResultData[uiSiteIndex], result);
+    }
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        _mul(pResultData[uiSiteIndex], fCoeff);
+        break;
+    case EOCT_Complex:
+        _mul(pResultData[uiSiteIndex], cCoeff);
+        break;
+    }
+}
 
 /**
-* generate phi by gaussian random.
-* phi = (D^+D)^{1/4} phi
-*/
-//template<typename deviceVector, typename deviceGauge, INT vectorN>
-//void CFieldFermionKST<deviceVector, deviceGauge, vectorN>::PrepareForHMC(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
-//{
-//    preparethread;
-//    _kernelInitialFermionKST << <block, threads >> > (
-//        m_pDeviceData,
-//        m_byFieldId,
-//        EFIT_RandomGaussian);
-//
-//    D_MC(gaugeNum, bosonNum, gaugeFields, pBoson);
-//
-//    if (NULL != appGetFermionSolver(m_byFieldId) && !appGetFermionSolver(m_byFieldId)->IsAbsoluteAccuracy())
-//    {
-//        m_fLength = Dot(this).x;
-//    }
-//
-//    //For KS, we generally use shifted solver, so do NOT cache the last result
-//}
-
-/**
- * Use \sqrt{a} and b of rational A^{-1/2}
+ * Calculate Force
  */
-//template<typename deviceVector, typename deviceGauge, INT vectorN>
-//UBOOL CFieldFermionKST<deviceVector, deviceGauge, vectorN>::CalculateForceS(
-//    const CFieldGauge* pGauge,
-//    CFieldGauge* pForce,
-//    ESolverPhase ePhase) const
-//{
-//    if (NULL == pGauge || vectorN != pGauge->MatrixN())
-//    {
-//        appCrucial(_T("CFieldFermionKST<deviceVector, deviceGauge, vectorN> can only play with gauge SU3!"));
-//        return FALSE;
-//    }
-//    if (NULL == pForce || vectorN != pForce->MatrixN())
-//    {
-//        appCrucial(_T("CFieldFermionKST<deviceVector, deviceGauge, vectorN> can only play with gauge SU3!"));
-//        return FALSE;
-//    }
-//
-//    TArray<CField*> phii;
-//    TArray<CFieldFermionKST<deviceVector, deviceGauge, vectorN>*> phiid;
-//    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-//    {
-//        CField* pPhi_i = dynamic_cast<CField*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-//        phii.AddItem(pPhi_i);
-//        CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pPhi_id = dynamic_cast<CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
-//        phiid.AddItem(pPhi_id);
-//    }
-//
-//    CMultiShiftSolver* solver = appGetMultiShiftSolver(m_byFieldId);
-//    if (NULL == solver)
-//    {
-//        appCrucial(_T("No multi solver found!"));
-//        _FAIL_EXIT;
-//    }
-//
-//    TArray<CLGComplex> shifts;
-//    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-//    {
-//        shifts.AddItem(_make_cuComplex(m_rMD.m_lstB[i], F(0.0)));
-//    }
-//    TArray<const CFieldGauge*> gaues;
-//    gaues.AddItem(pGauge);
-//    solver->Solve(phii, shifts, this, 1, 0, gaues.GetData(), NULL, EFO_F_DDdagger);
-//
-//    const UINT uiBufferSize = sizeof(deviceVector*) * 2 * m_rMD.m_uiDegree;
-//    deviceVector** hostPointers = (deviceVector**)appAlloca(uiBufferSize);
-//    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-//    {
-//        CFieldFermionKST<deviceVector, deviceGauge, vectorN>* phi_ks = dynamic_cast<CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(phii[i]);
-//        phi_ks->CopyTo(phiid[i]);
-//        if (m_bDiagonalMass)
-//        {
-//            phiid[i]->DS(pGauge);
-//        }
-//        else
-//        {
-//            phiid[i]->D0S(pGauge);
-//        }
-//
-//        hostPointers[i] = phi_ks->m_pDeviceData;
-//        hostPointers[i + m_rMD.m_uiDegree] = phiid[i]->m_pDeviceData;
-//    }
-//    checkCudaErrors(cudaMemcpy(m_pRationalFieldPointers, hostPointers, uiBufferSize, cudaMemcpyHostToDevice));
-//
-//    const CFieldGaugeLink<deviceGauge, vectorN>* pGaugeSU3 = dynamic_cast<const CFieldGaugeLink<deviceGauge, vectorN>*>(pGauge);
-//    CFieldGaugeLink<deviceGauge, vectorN>* pForceSU3 = dynamic_cast<CFieldGaugeLink<deviceGauge, vectorN>*>(pForce);
-//
-//    DerivateD0(pForceSU3->m_pDeviceData, pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId);
-//
-//    for (UINT i = 0; i < m_rMD.m_uiDegree; ++i)
-//    {
-//        phii[i]->Return();
-//        phiid[i]->Return();
-//    }
-//
-//    return TRUE;
-//}
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKSForce_DT(
+    const deviceGauge* __restrict__ pGauge,
+    deviceGauge* pForce,
+    const SIndex* __restrict__ pFermionMove,
+    const BYTE* __restrict__ pEtaTable,
+    const deviceVector* const* __restrict__ pFermionPointers,
+    const Real* __restrict__ pNumerators,
+    UINT uiRational,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId)
+{
+    intokernalInt4;
+    const UINT uiBigIndex = __bi(sSite4);
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex].IsDirichlet())
+    {
+        return;
+    }
+
+    //idir = mu
+    for (UINT idir = 0; idir < _DC_Dir; ++idir)
+    {
+        if (__idx->_deviceIsBondOnSurface(uiBigIndex, byGaugeFieldId, static_cast<BYTE>(idir)))
+        {
+            continue;
+        }
+
+        //Get Gamma mu
+        const Real eta_mu = (1 == ((pEtaTable[uiSiteIndex] >> idir) & 1)) ? F(-1.0) : F(1.0);
+        //x, mu
+        const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+
+        const SIndex& x_p_mu_Fermion = pFermionMove[2 * linkIndex];
+        if (x_p_mu_Fermion.IsDirichlet())
+        {
+            continue;
+        }
+
+        for (UINT uiR = 0; uiR < uiRational; ++uiR)
+        {
+            const deviceVector* phi_i = pFermionPointers[uiR];
+            const deviceVector* phi_id = pFermionPointers[uiR + uiRational];
+            //const deviceGauge gaugelink = _deviceGetGaugeBCSU3Dir(pGauge, uiBigIndex, idir);
+            deviceVector toContract = _mulVec(pGauge[linkIndex], phi_i[x_p_mu_Fermion.m_uiSiteIndex]);
+            deviceGauge thisTerm = _makeContract<deviceGauge, deviceVector>(phi_id[uiSiteIndex], toContract);
+
+            toContract = _mulVec(pGauge[linkIndex], phi_id[x_p_mu_Fermion.m_uiSiteIndex]);
+            _add(thisTerm, _makeContract<deviceGauge, deviceVector>(toContract, phi_i[uiSiteIndex]));
+
+            if (x_p_mu_Fermion.NeedToOpposite())
+            {
+                _mul(thisTerm, eta_mu * pNumerators[uiR] * F(-1.0));
+            }
+            else
+            {
+                _mul(thisTerm, eta_mu * pNumerators[uiR]);
+            }
+
+            _ta(thisTerm);
+            _sub(pForce[linkIndex], thisTerm);
+        }
+    }
+
+}
+
+
+#pragma endregion
+
+template<typename deviceVector, typename deviceGauge, INT vectorN>
+void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DOperatorKS_D(UBOOL bEachSiteEta, deviceVector* pTarget, const deviceVector* pSource,
+    const deviceGauge* pGauge, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+    UBOOL bDagger, EOperatorCoefficientType eOCT,
+    Real fRealCoeff, const CLGComplex& cCmpCoeff)
+{
+    preparethread;
+    _kernelDFermionKS_DT << <block, threads >> > (
+        pSource,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pTarget,
+        f2am,
+        byFieldId,
+        byGaugeFieldId,
+        bDagger,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff);
+}
+
+/**
+ * partial D_{st0} / partial omega
+ * Make sure m_pMDNumerator and m_pRationalFieldPointers are filled
+ */
+template<typename deviceVector, typename deviceGauge, INT vectorN>
+void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DerivateD0_D(
+    const deviceVector* pFermion,
+    BYTE byFieldId,
+    deviceGauge* pForce,
+    const deviceGauge* pGaugeBuffer,
+    BYTE byGaugeFieldId,
+    const deviceVector* const* pRationalFields,
+    const Real* pNumerator,
+    UINT uiRationApproxOrder)
+{
+    preparethread;
+    _kernelDFermionKSForce_DT << <block, threads >> > (
+        pGaugeBuffer,
+        pForce,
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pRationalFields,
+        pNumerator,
+        uiRationApproxOrder,
+        byFieldId,
+        byGaugeFieldId);
+}
 
 #pragma endregion
 
@@ -2252,6 +2343,798 @@ void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::VectorMultiplyM
 #pragma endregion
 
 #pragma endregion
+
+#pragma region DOperator Rotation
+
+#pragma region kernel
+
+/**
+* When link n and n+mu, the coordinate is stick with n
+* When link n and n-mu, the coordinate is stick with n-mu
+* Irrelavent with tau
+* Optimization: bXorY removed, block.x *= 2
+*/
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_PR_XYTermT(
+    const deviceVector* __restrict__ pDeviceData,
+    const deviceGauge* __restrict__ pGauge,
+    const BYTE* __restrict__ pEtaTable,
+    deviceVector* pResultData,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    DOUBLE fOmega,
+    SSmallInt4 sCenter,
+    UBOOL bDDagger,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    deviceVector result = _makeZero<deviceVector>();
+    //const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    const INT eta_tau = pEtaTable[uiSiteIndex] >> 3;
+
+#pragma unroll
+    for (UINT idx = 0; idx < 8; ++idx)
+    {
+        const UBOOL bPlusMu = idx & 2;
+        const UBOOL bPlusTau = idx & 4;
+        //x or y, and y or x is the derivate, not coefficient
+        const UINT bXorY = idx & 1;
+        const UINT bYorX = 1 - bXorY;
+        SSmallInt4 sTargetSite = sSite4;
+        SSmallInt4 sMidSite = sSite4;
+        sTargetSite.m_byData4[bYorX] = sTargetSite.m_byData4[bYorX] + (bPlusMu ? 2 : -2);
+        sMidSite.m_byData4[bYorX] = sMidSite.m_byData4[bYorX] + (bPlusMu ? 1 : -1);
+        sTargetSite.w = sTargetSite.w + (bPlusTau ? 1 : -1);
+        //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
+        const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sTargetSite)];
+        const SIndex& sMiddleBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sMidSite)];
+        sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
+
+        //note that bYorX = 1, it is x partial_y term, therefore is '-'
+        //INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+        INT this_eta_tau = (bPlusTau ? eta_tau : (pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3))
+            + bYorX;
+
+        if (sTargetBigIndex.NeedToOpposite())
+        {
+            this_eta_tau = this_eta_tau + 1;
+        }
+
+        deviceVector right = _mulVec(_deviceVXXTauOptimizedT(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau),
+            pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
+
+        //when bXorY = 1, it is y partial _x, so is [1]
+        //when bXorY = 0, it is x partial _y, so is [0]
+        _mul(right, sMidSite.m_byData4[bXorY] - sCenter.m_byData4[bXorY] + F(0.5));
+
+        if (!bPlusMu)
+        {
+            //for -2x, -2y terms, there is another minus sign
+            this_eta_tau = this_eta_tau + 1;
+        }
+
+        if (this_eta_tau & 1)
+        {
+            _sub(result, right);
+        }
+        else
+        {
+            _add(result, right);
+        }
+    }
+
+    if (bDDagger)
+    {
+        _mul(result, F(-0.25) * fOmega);
+    }
+    else
+    {
+        _mul(result, F(0.25) * fOmega);
+    }
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        _mul(result, fCoeff);
+        break;
+    case EOCT_Complex:
+        _mul(result, cCoeff);
+        break;
+    }
+
+    _add(pResultData[uiSiteIndex], result);
+}
+
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_PR_XYTermRealT(
+    const deviceVector* __restrict__ pDeviceData,
+    const deviceGauge* __restrict__ pGauge,
+    const BYTE* __restrict__ pEtaTable,
+    deviceVector* pResultData,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    DOUBLE fOmega,
+    SSmallInt4 sCenter,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    deviceVector result = _makeZero<deviceVector>();
+    //const INT eta_tau = ((pEtaTable[uiSiteIndex] >> 3) & 1);
+    const INT eta_tau = pEtaTable[uiSiteIndex] >> 3;
+
+#pragma unroll
+    for (UINT idx = 0; idx < 8; ++idx)
+    {
+        const UBOOL bPlusMu = idx & 2;
+        const UBOOL bPlusTau = idx & 4;
+        //x or y, and y or x is the derivate, not coefficient
+        const UINT bXorY = idx & 1;
+        const UINT bYorX = 1 - bXorY;
+        SSmallInt4 sTargetSite = sSite4;
+        SSmallInt4 sMidSite = sSite4;
+        sTargetSite.m_byData4[bYorX] = sTargetSite.m_byData4[bYorX] + (bPlusMu ? 2 : -2);
+        sMidSite.m_byData4[bYorX] = sMidSite.m_byData4[bYorX] + (bPlusMu ? 1 : -1);
+        sTargetSite.w = sTargetSite.w + (bPlusTau ? 1 : -1);
+        //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
+        const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sTargetSite)];
+        const SIndex& sMiddleBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sMidSite)];
+        sMidSite = __deviceSiteIndexToInt4(sMiddleBigIndex.m_uiSiteIndex);
+
+        //note that bYorX = 1, it is x partial_y term, therefore is '-'
+        //INT this_eta_tau = (bPlusTau ? eta_tau : ((pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3) & 1))
+        INT this_eta_tau = (bPlusTau ? eta_tau : (pEtaTable[sTargetBigIndex.m_uiSiteIndex] >> 3))
+            + bYorX;
+
+        if (sTargetBigIndex.NeedToOpposite())
+        {
+            this_eta_tau = this_eta_tau + 1;
+        }
+
+        deviceVector right = _mulVec(_deviceVXXTauOptimizedT(pGauge, sSite4, byGaugeFieldId, bXorY, bPlusMu, bPlusTau),
+            pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
+
+        //when bXorY = 1, it is y partial _x, so is [1]
+        //when bXorY = 0, it is x partial _y, so is [0]
+        _mul(right, sMidSite.m_byData4[bXorY] - sCenter.m_byData4[bXorY] + F(0.5));
+
+        if (!bPlusMu)
+        {
+            //for -2x, -2y terms, there is another minus sign
+            this_eta_tau = this_eta_tau + 1;
+        }
+
+        if (this_eta_tau & 1)
+        {
+            _sub(result, right);
+        }
+        else
+        {
+            _add(result, right);
+        }
+    }
+
+    //if (bDDagger)
+    //{
+    //    _mul(result, F(-0.25) * fOmega);
+    //}
+    //else
+    //{
+        //_mul(result, F(0.25) * fOmega);
+    //}
+    _mul(result, _make_cuComplex(F(0.0), F(-0.25) * fOmega));
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        _mul(result, fCoeff);
+        break;
+    case EOCT_Complex:
+        _mul(result, cCoeff);
+        break;
+    }
+
+    _add(pResultData[uiSiteIndex], result);
+}
+
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_PR_XYTau_TermT(
+    const deviceVector* __restrict__ pDeviceData,
+    const deviceGauge* __restrict__ pGauge,
+    deviceVector* pResultData,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    DOUBLE fOmega,
+    UBOOL bDDagger,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    deviceVector result = _makeZero<deviceVector>();
+
+#pragma unroll
+    for (UINT idx = 0; idx < 8; ++idx)
+    {
+        const UBOOL bPlusX = (0 != (idx & 1));
+        const UBOOL bPlusY = (0 != (idx & 2));
+        const UBOOL bPlusT = (0 != (idx & 4));
+
+        SSmallInt4 sOffset = sSite4;
+        sOffset.x = sOffset.x + (bPlusX ? 1 : -1);
+        sOffset.y = sOffset.y + (bPlusY ? 1 : -1);
+        sOffset.w = sOffset.w + (bPlusT ? 1 : -1);
+
+        //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
+        const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
+
+        const deviceVector right = _mulVec(_deviceVXYTOptimizedT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT), pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
+        const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
+
+        //eta124 of site is almost always -target, so use left or right is same
+        //The only exception is on the boundary
+        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+
+        if (sTargetBigIndex.NeedToOpposite())
+        {
+            eta124 = eta124 + 1;
+        }
+
+        if (eta124 & 1)
+        {
+            _sub(result, right);
+        }
+        else
+        {
+            _add(result, right);
+        }
+    }
+
+    if (bDDagger)
+    {
+        _mul(result, -F(0.125) * fOmega);
+    }
+    else
+    {
+        _mul(result, F(0.125) * fOmega);
+    }
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        _mul(result, fCoeff);
+        break;
+    case EOCT_Complex:
+        _mul(result, cCoeff);
+        break;
+    }
+
+    _add(pResultData[uiSiteIndex], result);
+}
+
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKS_PR_XYTau_TermRealT(
+    const deviceVector* __restrict__ pDeviceData,
+    const deviceGauge* __restrict__ pGauge,
+    deviceVector* pResultData,
+    BYTE byFieldId,
+    BYTE byGaugeFieldId,
+    DOUBLE fOmega,
+    EOperatorCoefficientType eCoeff,
+    Real fCoeff,
+    CLGComplex cCoeff)
+{
+    intokernalInt4;
+
+    deviceVector result = _makeZero<deviceVector>();
+
+#pragma unroll
+    for (UINT idx = 0; idx < 8; ++idx)
+    {
+        const UBOOL bPlusX = (0 != (idx & 1));
+        const UBOOL bPlusY = (0 != (idx & 2));
+        const UBOOL bPlusT = (0 != (idx & 4));
+
+        SSmallInt4 sOffset = sSite4;
+        sOffset.x = sOffset.x + (bPlusX ? 1 : -1);
+        sOffset.y = sOffset.y + (bPlusY ? 1 : -1);
+        sOffset.w = sOffset.w + (bPlusT ? 1 : -1);
+
+        //We have anti-periodic boundary, so we need to use index out of lattice to get the correct sign
+        const SIndex& sTargetBigIndex = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(sOffset)];
+
+        const deviceVector right = _mulVec(_deviceVXYTOptimizedT(pGauge, sSite4, byGaugeFieldId, bPlusX, bPlusY, bPlusT), pDeviceData[sTargetBigIndex.m_uiSiteIndex]);
+        const SSmallInt4 site_target = __deviceSiteIndexToInt4(sTargetBigIndex.m_uiSiteIndex);
+
+        //eta124 of site is almost always -target, so use left or right is same
+        //The only exception is on the boundary
+        INT eta124 = bPlusT ? (sSite4.y + sSite4.z) : (site_target.y + site_target.z + 1);
+
+        if (sTargetBigIndex.NeedToOpposite())
+        {
+            eta124 = eta124 + 1;
+        }
+
+        if (eta124 & 1)
+        {
+            _sub(result, right);
+        }
+        else
+        {
+            _add(result, right);
+        }
+    }
+
+    //if (bDDagger)
+    //{
+    //    _mul(result, -F(0.125) * fOmega);
+    //}
+    //else
+    //{
+    //    _mul(result, F(0.125) * fOmega);
+    //}
+    _mul(result, _make_cuComplex(F(0.0), F(-0.125) * fOmega));
+
+    switch (eCoeff)
+    {
+    case EOCT_Real:
+        _mul(result, fCoeff);
+        break;
+    case EOCT_Complex:
+        _mul(result, cCoeff);
+        break;
+    }
+
+    _add(pResultData[uiSiteIndex], result);
+}
+
+#pragma endregion
+
+#pragma region Derivate
+
+/**
+ * Have n, n->n1, n->n2,
+ * 1. we need to obtain V_(n, n1) , V_(n, n2)
+ * 2. we need phi(n1), phi(n2), phid(n1), phid(n2)
+ *
+ * byContribution: 0 for mu, 1 for tau, 2 for both mu and tau
+ *
+ * iTau = 1 for +t, -1 for -t
+ */
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKSForce_PR_XYTermT(
+    const deviceGauge* __restrict__ pGauge,
+    deviceGauge* pForce,
+    const BYTE* __restrict__ pEtaTable,
+    const deviceVector* const* __restrict__ pFermionPointers,
+    const Real* __restrict__ pNumerators,
+    UINT uiRational,
+    BYTE byFieldId,
+    DOUBLE fOmega,
+    BYTE byMu, INT iTau,
+    INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
+    INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength,
+    BYTE byContribution)
+{
+    intokernalInt4;
+    //const UINT uiBigIdx = __bi(sSite4);
+
+    //=================================
+    // 1. Find n1, n2
+    INT Ldirs[3] = { pathLdir1, pathLdir2, pathLdir3 };
+    INT Rdirs[3] = { pathRdir1, pathRdir2, pathRdir3 };
+    SSmallInt4 site_n1 = _deviceSmallInt4OffsetC(sSite4, Ldirs, Llength);
+    const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_n1)];
+    const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(_deviceSmallInt4OffsetC(sSite4, Rdirs, Rlength))];
+    //const SSmallInt4 middleSite = _deviceSmallInt4OffsetC(site_n1, byMu + 1);
+    //From now on, site_n1 is smiddle
+    site_n1 = _deviceSmallInt4OffsetC(site_n1, byMu + 1);
+    const SIndex& smiddle = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(site_n1)];
+
+    site_n1 = __deviceSiteIndexToInt4(smiddle.m_uiSiteIndex);
+    //y Dx and -x Dy
+    const Real fNv = (0 == byMu)
+        ? static_cast<Real>(site_n1.y - _DC_Centery + F(0.5))
+        : static_cast<Real>(_DC_Centerx - site_n1.x - F(0.5));
+
+    //=================================
+    // 2. Find V(n,n1), V(n,n2)
+    const deviceGauge vnn1 = _deviceLinkT(pGauge, sSite4, Llength, 1, Ldirs);
+    const deviceGauge vnn2 = _deviceLinkT(pGauge, sSite4, Rlength, 1, Rdirs);
+
+    for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
+    {
+        const deviceVector* phi_i = pFermionPointers[rfieldId];
+        const deviceVector* phi_id = pFermionPointers[rfieldId + uiRational];
+        //=================================
+        // 3. Find phi_{1,2,3,4}(n1), phi_i(n2)
+        deviceVector phi1 = _mulVec(vnn1, phi_id[sn1.m_uiSiteIndex]);
+        deviceVector phi2 = _mulVec(vnn2, phi_i[sn2.m_uiSiteIndex]);
+        deviceVector phi3 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
+        deviceVector phi4 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
+        if (sn1.NeedToOpposite())
+        {
+            _mul(phi1, F(-1.0));
+            _mul(phi3, F(-1.0));
+        }
+        if (sn2.NeedToOpposite())
+        {
+            _mul(phi2, F(-1.0));
+            _mul(phi4, F(-1.0));
+        }
+        deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
+        _add(res, _makeContract<deviceGauge, deviceVector>(phi4, phi3));
+        _ta(res);
+        const Real eta_tau = (iTau > 0 ?
+            ((pEtaTable[sn1.m_uiSiteIndex] >> 3) & 1)
+            : ((pEtaTable[sn2.m_uiSiteIndex] >> 3) & 1))
+            ? F(-1.0) : F(1.0);
+        _mul(res, OneOver12 * fOmega * fNv * pNumerators[rfieldId] * eta_tau);
+
+        //For mu
+        if (0 == byContribution || 2 == byContribution)
+        {
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, byMu);
+            _sub(pForce[linkIndex], res);
+        }
+
+        //For tau
+        if (1 == byContribution || 2 == byContribution)
+        {
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
+            if (iTau > 0)
+            {
+                _sub(pForce[linkIndex], res);
+            }
+            else
+            {
+                _add(pForce[linkIndex], res);
+            }
+        }
+    }
+}
+
+/**
+ *
+ */
+template<typename deviceVector, typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDFermionKSForce_PR_XYTau_TermT(
+    const deviceGauge* __restrict__ pGauge,
+    deviceGauge* pForce,
+    const deviceVector* const* __restrict__ pFermionPointers,
+    const Real* __restrict__ pNumerators,
+    UINT uiRational,
+    BYTE byFieldId,
+    DOUBLE fOmega,
+    INT pathLdir1, INT pathLdir2, INT pathLdir3, BYTE Llength,
+    INT pathRdir1, INT pathRdir2, INT pathRdir3, BYTE Rlength)
+{
+    intokernalInt4;
+    //const UINT uiBigIdx = __bi(sSite4);
+
+    //=================================
+    // 1. Find n1, n2
+    INT Ldirs[3] = { pathLdir1, pathLdir2, pathLdir3 };
+    INT Rdirs[3] = { pathRdir1, pathRdir2, pathRdir3 };
+    const SSmallInt4 siten1 = _deviceSmallInt4OffsetC(sSite4, Ldirs, Llength);
+    const SSmallInt4 siten2 = _deviceSmallInt4OffsetC(sSite4, Rdirs, Rlength);
+    const SIndex& sn1 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten1)];
+    const SIndex& sn2 = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__bi(siten2)];
+
+    //Why use sn2? shouldn't it be sn1?
+    const Real eta124 = _deviceEta124(__deviceSiteIndexToInt4(sn1.m_uiSiteIndex));
+    //=================================
+    // 2. Find V(n,n1), V(n,n2)
+    const deviceGauge vnn1 = _deviceLinkT(pGauge, sSite4, Llength, 1, Ldirs);
+    const deviceGauge vnn2 = _deviceLinkT(pGauge, sSite4, Rlength, 1, Rdirs);
+
+    for (BYTE rfieldId = 0; rfieldId < uiRational; ++rfieldId)
+    {
+        const deviceVector* phi_i = pFermionPointers[rfieldId];
+        const deviceVector* phi_id = pFermionPointers[rfieldId + uiRational];
+
+        //=================================
+        // 3. Find phi_{1,2,3,4}(n1), phi_i(n2)
+        deviceVector phi1 = _mulVec(vnn1, phi_id[sn1.m_uiSiteIndex]);
+        deviceVector phi2 = _mulVec(vnn2, phi_i[sn2.m_uiSiteIndex]);
+        deviceVector phi3 = _mulVec(vnn1, phi_i[sn1.m_uiSiteIndex]);
+        deviceVector phi4 = _mulVec(vnn2, phi_id[sn2.m_uiSiteIndex]);
+        if (sn1.NeedToOpposite())
+        {
+            _mul(phi1, F(-1.0));
+            _mul(phi3, F(-1.0));
+        }
+        if (sn2.NeedToOpposite())
+        {
+            _mul(phi2, F(-1.0));
+            _mul(phi4, F(-1.0));
+        }
+        deviceGauge res = _makeContract<deviceGauge, deviceVector>(phi1, phi2);
+        //This was phi2 phi1+ * eta124(n1) - phi3 phi4+ * eta124(n2)
+        //The sign of the second term is because of 'dagger'
+        //However, eta124(n1) = -eta124(n2), so use Add directly.
+        _add(res, _makeContract<deviceGauge, deviceVector>(phi4, phi3));
+        _ta(res);
+        _mul(res, OneOver48 * static_cast<Real>(fOmega) * pNumerators[rfieldId] * eta124);
+
+        //Use eta124 of n2 so Add left Sub right
+        //Change to use eta124 of n1, Sub left and Add right
+        if (pathLdir1 > 0)
+        {
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathLdir1 - 1);
+            _add(pForce[linkIndex], res);
+        }
+
+        if (pathRdir1 > 0)
+        {
+            const UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, pathRdir1 - 1);
+            _sub(pForce[linkIndex], res);
+        }
+    }
+
+}
+
+#pragma endregion
+
+#pragma region D and derivate
+
+template<typename deviceVector, typename deviceGauge, INT vectorN>
+void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DOperatorKS_R_RealRotation(
+    DOUBLE fOmega, 
+    UBOOL bEachSiteEta, deviceVector* pTarget, const deviceVector* pSource,
+    const deviceGauge* pGauge, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+    UBOOL bDagger, EOperatorCoefficientType eOCT,
+    Real fRealCoeff, const CLGComplex& cCmpCoeff)
+{
+    //CFieldFermionKST<deviceVector, deviceGauge, vectorN>::DOperatorKS(pTargetBuffer, pBuffer, pGaugeBuffer, byGaugeFieldId, f2am, bDagger, eOCT, fRealCoeff, cCmpCoeff);
+
+    preparethread;
+    if (bDagger)
+    {
+        appCrucial(_T("D dagger is not supported for real rotation!\n"));
+    }
+
+    _kernelDFermionKS_PR_XYTermRealT << <block, threads >> > (
+        pSource,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pTarget,
+        byFieldId,
+        byGaugeFieldId,
+        fOmega,
+        _HC_Center,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff);
+
+    _kernelDFermionKS_PR_XYTau_TermRealT << <block, threads >> > (
+        pSource,
+        pGauge,
+        pTarget,
+        byFieldId,
+        byGaugeFieldId,
+        fOmega,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff);
+}
+
+template<typename deviceVector, typename deviceGauge, INT vectorN>
+void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DOperatorKS_R_ImaginaryRotation(
+    DOUBLE fOmega,
+    UBOOL bEachSiteEta, deviceVector* pTarget, const deviceVector* pSource,
+    const deviceGauge* pGauge, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+    UBOOL bDagger, EOperatorCoefficientType eOCT,
+    Real fRealCoeff, const CLGComplex& cCmpCoeff)
+{
+    preparethread;
+    _kernelDFermionKS_PR_XYTermT << <block, threads >> > (
+        pSource,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pEtaMu,
+        pTarget,
+        byFieldId,
+        byGaugeFieldId,
+        fOmega,
+        _HC_Center,
+        bDagger,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff);
+
+    _kernelDFermionKS_PR_XYTau_TermT << <block, threads >> > (
+        pSource,
+        pGauge,
+        pTarget,
+        byFieldId,
+        byGaugeFieldId,
+        fOmega,
+        bDagger,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff);
+}
+
+template<typename deviceVector, typename deviceGauge, INT vectorN>
+void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DerivateD0_R(
+    DOUBLE fOmega,
+    const deviceVector* pFermion,
+    BYTE byFieldId,
+    deviceGauge* pForce,
+    const deviceGauge* pGaugeBuffer,
+    BYTE byGaugeFieldId,
+    const deviceVector* const* pRationalFields,
+    const Real* pNumerator,
+    UINT uiRationApproxOrder)
+{
+
+
+    preparethread;
+
+#pragma region X Y Term
+    INT mu[2] = { 0, 1 };
+    for (INT imu = 0; imu < 2; ++imu)
+    {
+        INT dirs[6][3] =
+        {
+            {4, mu[imu] + 1, mu[imu] + 1},
+            {mu[imu] + 1, 4, mu[imu] + 1},
+            {mu[imu] + 1, mu[imu] + 1, 4},
+            //{4, -mu[imu] - 1, -mu[imu] - 1},
+            //{-mu[imu] - 1, 4, -mu[imu] - 1},
+            //{-mu[imu] - 1, -mu[imu] - 1, 4},
+            {mu[imu] + 1, mu[imu] + 1, -4},
+            {mu[imu] + 1, -4, mu[imu] + 1},
+            {-4, mu[imu] + 1, mu[imu] + 1},
+        };
+
+        INT iTau[6] = { 1, 1, 1, -1, -1, -1 };
+        BYTE contributionOf[6][4] =
+        {
+            {1, 0, 0, 3},
+            {0, 1, 0, 3},
+            {0, 0, 1, 3},
+            //{1, 3, 0, 0},
+            //{3, 2, 3, 0},
+            //{3, 0, 2, 3},
+            {0, 0, 3, 1},
+            {0, 3, 2, 3},
+            {3, 2, 0, 3},
+        };
+
+        for (INT pathidx = 0; pathidx < 6; ++pathidx)
+        {
+            for (INT iSeperation = 0; iSeperation < 4; ++iSeperation)
+            {
+                if (3 == contributionOf[pathidx][iSeperation])
+                {
+                    continue;
+                }
+
+                INT L[3] = { 0, 0, 0 };
+                INT R[3] = { 0, 0, 0 };
+                BYTE LLength = 0;
+                BYTE RLength = 0;
+
+                Seperate(dirs[pathidx], iSeperation, L, R, LLength, RLength);
+
+                _kernelDFermionKSForce_PR_XYTermT << <block, threads >> > (
+                    pGaugeBuffer,
+                    pForce,
+                    appGetLattice()->m_pIndexCache->m_pEtaMu,
+                    pRationalFields,
+                    pNumerator,
+                    uiRationApproxOrder,
+                    byFieldId,
+                    fOmega,
+                    static_cast<BYTE>(imu), iTau[pathidx],
+                    L[0], L[1], L[2], LLength,
+                    R[0], R[1], R[2], RLength,
+                    contributionOf[pathidx][iSeperation]
+                    );
+            }
+        }
+    }
+
+#pragma endregion
+
+#pragma region Polarization term
+
+    //===========================
+    //polarization terms
+    //ilinkType is +-x +-y +t,
+    //INT linkTypes[4][3] =
+    //{
+    //    {1, 2, 4},
+    //    {1, 2, -4},
+    //    {-1, 2, 4},
+    //    {-1, 2, -4}
+    //};
+    INT linkTypes[4][3] =
+    {
+        {1, 2, 4},
+        {1, -2, 4},
+        {-1, 2, 4},
+        {-1, -2, 4}
+    };
+
+    for (INT ilinkType = 0; ilinkType < 4; ++ilinkType)
+    {
+        INT sixlinks[6][3] =
+        {
+            {linkTypes[ilinkType][0], linkTypes[ilinkType][1], linkTypes[ilinkType][2]},
+            {linkTypes[ilinkType][0], linkTypes[ilinkType][2], linkTypes[ilinkType][1]},
+            {linkTypes[ilinkType][1], linkTypes[ilinkType][0], linkTypes[ilinkType][2]},
+            {linkTypes[ilinkType][1], linkTypes[ilinkType][2], linkTypes[ilinkType][0]},
+            {linkTypes[ilinkType][2], linkTypes[ilinkType][0], linkTypes[ilinkType][1]},
+            {linkTypes[ilinkType][2], linkTypes[ilinkType][1], linkTypes[ilinkType][0]}
+        };
+
+        for (INT isixtype = 0; isixtype < 6; ++isixtype)
+        {
+            //bearly no change of time, because force calculation is not frequent
+            /*
+            _giveupkernelDFermionKSForce_PR_XYTau_Term2 << <block, threads >> > (
+                (const deviceGauge*)pGaugeBuffer,
+                (deviceGauge*)pForce,
+                m_pRationalFieldPointers,
+                m_pMDNumerator,
+                m_rMD.m_uiDegree,
+                m_byFieldId,
+                CCommonData::m_fOmega,
+                sixlinks[isixtype][0], sixlinks[isixtype][1], sixlinks[isixtype][2]
+                );
+            */
+
+            for (INT iSeperation = 0; iSeperation < 4; ++iSeperation)
+            {
+                INT L[3] = { 0, 0, 0 };
+                INT R[3] = { 0, 0, 0 };
+                BYTE LLength = 0;
+                BYTE RLength = 0;
+
+                Seperate(sixlinks[isixtype], iSeperation, L, R, LLength, RLength);
+
+                const UBOOL bHasLeft = (LLength > 0) && (L[0] > 0);
+                const UBOOL bHasRight = (RLength > 0) && (R[0] > 0);
+
+                if (bHasLeft || bHasRight)
+                {
+                    _kernelDFermionKSForce_PR_XYTau_TermT << <block, threads >> > (
+                        pGaugeBuffer,
+                        pForce,
+                        pRationalFields,
+                        pNumerator,
+                        uiRationApproxOrder,
+                        byFieldId,
+                        fOmega,
+                        L[0], L[1], L[2], LLength,
+                        R[0], R[1], R[2], RLength
+                        );
+                }
+            }
+        }
+    }
+
+#pragma endregion
+}
+
+#pragma endregion
+
+#pragma endregion
+
 
 template class CFieldFermionKSTKernel<CLGComplex, CLGComplex, 1>;
 

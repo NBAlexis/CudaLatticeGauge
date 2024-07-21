@@ -43,14 +43,6 @@ public:
         }
     }
 
-    EFieldType GetFieldType() const override { return EFT_Max; }
-    CField* GetCopy() const override
-    {
-        CFieldFermionKST<deviceVector, deviceGauge, vectorN>* ret = new CFieldFermionKST<deviceVector, deviceGauge, vectorN>();
-        CopyTo(ret);
-        return ret;
-    }
-
     void InitialField(EFieldInitialType eInitialType) override
     {
         CCommonKernelSite<deviceVector>::InitialBuffer(m_pDeviceData, m_byFieldId, eInitialType);
@@ -71,7 +63,7 @@ public:
             appCrucial(_T("File not found: %s\n"), sFileName.c_str());
             _FAIL_EXIT;
         }
-        if (uiSize != static_cast<UINT>(sizeof(Real) * vectorn * m_uiSiteCount))
+        if (uiSize != (sizeof(Real) * vectorn * m_uiSiteCount))
         {
             appCrucial(_T("File size not correct: expecting: %d, found: %d\n"), static_cast<UINT>(sizeof(Real) * vectorn * m_uiSiteCount), uiSize);
             _FAIL_EXIT;

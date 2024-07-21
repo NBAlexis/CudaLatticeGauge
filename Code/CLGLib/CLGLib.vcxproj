@@ -218,9 +218,7 @@
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3R.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3REM.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSSU3RigidAcc.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cu" />
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernel.cu" />
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Acc.cu" />
     <CudaCompile Include="Data\Field\WilsonDirac\CFieldFermionWilsonSquareSU3Boost.cu" />
@@ -256,6 +254,8 @@
     <ClCompile Include="Data\Field\CFieldFermion.cpp" />
     <ClCompile Include="Data\Field\CFieldGauge.cpp" />
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKST.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cpp" />
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cpp" />
     <ClCompile Include="Measurement\CMeasureAction.cpp" />
     <CudaCompile Include="Measurement\CMeasureBerryPhase.cu">
       <FileType>Document</FileType>

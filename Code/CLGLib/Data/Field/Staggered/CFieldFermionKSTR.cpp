@@ -1,21 +1,18 @@
 //=============================================================================
-// FILENAME : CFieldFermionKST.cpp
+// FILENAME : CFieldFermionKSTR.cpp
 // 
 // DESCRIPTION:
-// This is the device implementations of Wilson fermion
-//
-// This implementation assumes SU3 and square lattice
+// 
 //
 // REVISION:
-//  [12/08/2019 nbale]
+//  [09/23/2020 nbale]
 //=============================================================================
-
 #include "CLGLib_Private.h"
-#include "CFieldFermionKST.h"
+#include "CFieldFermionKSTR.h"
 
 __BEGIN_NAMESPACE
 
-__CLGIMPLEMENT_CLASS(CFieldFermionKSU1)
+__CLGIMPLEMENT_CLASS(CFieldFermionKSU1R)
 
 __END_NAMESPACE
 

@@ -37,6 +37,46 @@ public:
         const Real* pNumerator,
         UINT uiRationApproxOrder);
 
+    static void DOperatorKS_D(UBOOL bEachSiteEta, deviceVector* pTargetBuffer, const deviceVector* pBuffer,
+        const deviceGauge* pGaugeBuffer, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT,
+        Real fRealCoeff, const CLGComplex& cCmpCoeff);
+
+    static void DerivateD0_D(
+        const deviceVector* pFermion,
+        BYTE byFieldId,
+        deviceGauge* pForce,
+        const deviceGauge* pGaugeBuffer,
+        BYTE byGaugeFieldId,
+        const deviceVector* const* pRationalFields,
+        const Real* pNumerator,
+        UINT uiRationApproxOrder);
+
+    static void DOperatorKS_R_RealRotation(
+        DOUBLE fOmega,
+        UBOOL bEachSiteEta, deviceVector* pTargetBuffer, const deviceVector* pBuffer,
+        const deviceGauge* pGaugeBuffer, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT,
+        Real fRealCoeff, const CLGComplex& cCmpCoeff);
+
+    static void DOperatorKS_R_ImaginaryRotation(
+        DOUBLE fOmega,
+        UBOOL bEachSiteEta, deviceVector* pTargetBuffer, const deviceVector* pBuffer,
+        const deviceGauge* pGaugeBuffer, BYTE byFieldId, BYTE byGaugeFieldId, Real f2am,
+        UBOOL bDagger, EOperatorCoefficientType eOCT,
+        Real fRealCoeff, const CLGComplex& cCmpCoeff);
+
+    static void DerivateD0_R(
+        DOUBLE fOmega,
+        const deviceVector* pFermion,
+        BYTE byFieldId,
+        deviceGauge* pForce,
+        const deviceGauge* pGaugeBuffer,
+        BYTE byGaugeFieldId,
+        const deviceVector* const* pRationalFields,
+        const Real* pNumerator,
+        UINT uiRationApproxOrder);
+
     static void OnlyMass(const deviceVector* pSource, deviceVector* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
 
     static void OneLinkS(const deviceVector* pSource, BYTE byFieldId, const deviceGauge* pGauge, BYTE byGaugeFieldId, deviceVector* pTarget, Real fCoefficient,
@@ -92,6 +132,12 @@ public:
         BYTE byGaugeFieldID);
 
     static void VectorMultiplyMatrix(deviceVector** hostResBuffer, deviceVector** hostLeftBuffer, deviceVector** resBuffer, deviceVector** leftBuffer, TArray<CField*>& res, const TArray<CField*>& left, const CLGComplex* deviceMatrix, UINT uiDimX, UINT uiDimY);
+
+#pragma region Rotation
+
+
+
+#pragma endregion
 };
 
 __END_NAMESPACE

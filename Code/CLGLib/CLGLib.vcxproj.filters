@@ -719,6 +719,12 @@
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKST.cpp">
       <Filter>Data\Field\Staggered</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cpp">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cpp">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -948,12 +954,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTD.cu">
-      <Filter>Data\Field\Staggered</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cu">
-      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVNKernel.cu">
       <Filter>Data\Field\Boson</Filter>
