@@ -442,7 +442,7 @@ TestBosonRotation:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 10
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -514,7 +514,7 @@ TestBosonRotationD:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 10
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:

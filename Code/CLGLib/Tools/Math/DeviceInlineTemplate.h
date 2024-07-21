@@ -1317,6 +1317,15 @@ template<> __device__ __host__ __inline__ Real _element<deviceSU3>(const deviceS
     return F(0.0);
 }
 
+template<> __device__ __host__ __inline__ Real _element<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& x, INT idx)
+{
+    if (idx < 24)
+    {
+        return x.m_rme[idx];
+    }
+    return F(0.0);
+}
+
 template<INT N, INT NoE>
 __device__ __host__ __inline__ Real _element(const deviceSUN<N, NoE>& x, INT idx)
 {
@@ -1433,6 +1442,14 @@ template<> __device__ __host__ __inline__ void _setelement<deviceSU3>(deviceSU3&
             x.m_me[idxc].y = v;
         }
         x.m_me[idxc].x = v;
+    }
+}
+
+template<> __device__ __host__ __inline__ void _setelement<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& x, INT idx, Real v)
+{
+    if (idx < 24)
+    {
+        x.m_rme[idx] = v;
     }
 }
 

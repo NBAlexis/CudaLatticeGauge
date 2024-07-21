@@ -239,6 +239,8 @@ public:
     #pragma endregion
 };
 
+extern void CLGAPI appExistCuda();
+
 #define cudaSafeFree(ptr) if (NULL != ptr) { checkCudaErrors(cudaFree(ptr)); ptr = NULL; }
 
 __END_NAMESPACE

@@ -196,7 +196,7 @@ public:
 #if _CLG_WIN
         CCString ret = strpath + _T("/") + m_sFileName + _T("(") + appToString(m_iLine) + _T(")");
 #else
-        CCString ret = _T(" file:///") + strpath + _T("/") + m_sFileName + _T("  line:") + appToString(m_iLine);
+        CCString ret = _T(" file://") + strpath + _T("/") + m_sFileName + _T("  line:") + appToString(m_iLine);
 #endif
         ret = ret.Replace(_T("\\"), _T("/"));
         return ret;

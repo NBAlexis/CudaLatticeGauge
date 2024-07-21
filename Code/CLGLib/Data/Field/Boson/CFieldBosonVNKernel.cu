@@ -11,13 +11,11 @@
 #include "CLGLib_Private.h"
 #include "Tools/Math/DeviceInlineTemplate.h"
 #include "CFieldBosonVNKernel.h"
+#include "CFieldBosonVN.h"
 
 __BEGIN_NAMESPACE
 
-#if 0
-
-
-#pragma region kernel D and force
+#pragma region kernel
 
 /**
 * sum_mu (U_mu(n)phi(n+mu) + U_{-mu}(n)phi(n-mu))
@@ -31,7 +29,7 @@ _kernelDBosonVN(
     const SIndex* __restrict__ pBosonMove,
     deviceDataBoson* pResultData,
     EOperatorCoefficientType eCoeff,
-    Real fRealCoeff, 
+    Real fRealCoeff,
     CLGComplex cCmpCoeff,
     BYTE byFieldId)
 {
@@ -67,7 +65,7 @@ _kernelDBosonVN(
             const deviceDataBoson u_phi_x_p_m = _mulVec(x_Gauge_element, pDeviceData[x_p_mu_Boson.m_uiSiteIndex]);
             _add(result, u_phi_x_p_m);
         }
-        
+
         if (!x_m_mu_Boson.IsDirichlet())
         {
             deviceDataGauge x_m_mu_Gauge_element = NULL == pGauge ? _makeId<deviceDataGauge>() : pGauge[_deviceGetLinkIndex(x_m_mu_Gauge.m_uiSiteIndex, idir)];
@@ -94,7 +92,6 @@ _kernelDBosonVN(
         break;
     }
 }
-
 
 template<typename deviceDataBoson, typename deviceDataGauge>
 __global__ void _CLG_LAUNCH_BOUND
@@ -141,177 +138,6 @@ _kernelDBosonForceVN(
         //pGaugeForce[linkIndex].y = pGaugeForce[linkIndex].y - F(1.0) * forceOfThisLink.y;
         _ta<deviceDataGauge>(forceOfThisLink);
         _sub(pGaugeForce[linkIndex], forceOfThisLink);
-    }
-}
-
-#pragma endregion
-
-#pragma region other kernels
-
-/**
-* Initialize
-*/
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelInitialBosonVN(deviceDataBoson* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType)
-{
-    intokernal;
-    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    //const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    //if (sIdx.IsDirichlet())
-    //{
-    //    pDevicePtr[uiSiteIndex] = _makeZero<deviceDataBoson>();
-    //    return;
-    //}
-
-    switch (eInitialType)
-    {
-    case EFIT_Zero:
-    {
-        pDevicePtr[uiSiteIndex] = _makeZero<deviceDataBoson>();
-    }
-    break;
-    case EFIT_Identity:
-    {
-        pDevicePtr[uiSiteIndex] = _makeId<deviceDataBoson>();
-    }
-    break;
-    case EFIT_RandomGaussian:
-    case EFIT_RandomGenerator:
-    {
-        pDevicePtr[uiSiteIndex] = _makeGaussian<deviceDataBoson>(_deviceGetFatIndex(uiSiteIndex, 0));
-    }
-    break;
-    case EFIT_RandomZ4:
-    {
-        pDevicePtr[uiSiteIndex] = _makeZ4<deviceDataBoson>(_deviceGetFatIndex(uiSiteIndex, 0));
-    }
-    break;
-    default:
-    {
-        printf("Wilson Fermion Field cannot be initialized with this type! %d\n", eInitialType);
-    }
-    break;
-    }
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAddBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelSubBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther)
-{
-    intokernal;
-    _sub(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMulBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyComplexBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther, CLGComplex a)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], _mulC(pOther[uiSiteIndex], a));
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMulComplexBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther, UBOOL bConj)
-{
-    intokernal;
-    if (bConj)
-    {
-        _dagger(pMe[uiSiteIndex]);
-    }
-    _mul(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyRealBosonVN(deviceDataBoson* pMe, const deviceDataBoson* __restrict__ pOther, Real a)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], _mulC(pOther[uiSiteIndex], a));
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelDotBosonVN(const deviceDataBoson* __restrict__ pMe, const deviceDataBoson* __restrict__ pOther, cuDoubleComplex* result)
-{
-    intokernal;
-    result[uiSiteIndex] = _cToDouble(_dot(pMe[uiSiteIndex], pOther[uiSiteIndex]));
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelElementVN(const deviceDataBoson* __restrict__ pMe, UINT idx, DOUBLE* result)
-{
-    intokernal;
-    result[uiSiteIndex] = static_cast<DOUBLE>(_element(pMe[uiSiteIndex], idx));
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplyBosonVN(deviceDataBoson* pMe, CLGComplex a)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], a);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplyRealBosonVN(deviceDataBoson* pMe, Real a)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], a);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBosonConjugateVN(deviceDataBoson* pDeviceData)
-{
-    intokernal;
-    _dagger(pDeviceData[uiSiteIndex]);
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelBosonFixBoundary(deviceDataBoson* pDeviceData, BYTE byFieldId)
-{
-    intokernalInt4;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
-    if (sIdx.IsDirichlet())
-    {
-        pDeviceData[uiSiteIndex] = _makeZero<deviceDataBoson>();
-    }
-}
-
-template<typename deviceDataBoson>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMakePointSourceBoson(deviceDataBoson* pDeviceData, UINT uiDesiredSite, BYTE byColor)
-{
-    intokernal;
-    if (uiSiteIndex == uiDesiredSite)
-    {
-        pDeviceData[uiSiteIndex] = _makeColorVector<deviceDataBoson>(byColor);
-    }
-    else
-    {
-        pDeviceData[uiSiteIndex] = _makeZero<deviceDataBoson>();
     }
 }
 
@@ -405,7 +231,7 @@ _kernelBosonForce_WithLink(
 
     INT pathLeft[_kLinkMaxLength];
     INT pathRight[_kLinkMaxLength];
-    
+
 
     for (BYTE iSeperation = 0; iSeperation <= pathLength; ++iSeperation)
     {
@@ -483,7 +309,7 @@ _kernelBosonDiagnal(
 
     const Real fCoefficient1 = (*pfcoeff)(byFieldId, sSite4, sIdx) * fCoefficient;
     deviceDataBoson result = _mulC(pDeviceData[uiSiteIndex], fCoefficient1);
-    
+
     switch (eCoeff)
     {
     case EOCT_Real:
@@ -626,619 +452,18 @@ _kernelDPartialBosonForceVN(
 #pragma endregion
 
 template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::DFromSource(const CFieldBoson* pSource, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, EOperatorCoefficientType eCoeffType, Real fCoeffReal, Real fCoeffImg)
+UINT CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CheckHermitian(const CFieldBoson* data, UINT uiSiteCount, INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson)
 {
-    const CFieldGauge* pGauge = GetDefaultGauge(gaugeNum, gaugeFields);
-
-    if (NULL != pGauge && VectorN() != pGauge->MatrixN())
-    {
-        appCrucial(_T("CFieldBosonVU can only play with gauge UN!"));
-        return;
-    }
-
-    if (NULL == pSource || GetFieldType() != pSource->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pSourceVN = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(pSource);
-    if (NULL == pSourceVN)
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-
-    //try external gauge field
-    if (NULL == pGauge && m_byGaugeFieldIds.Num() > 0)
-    {
-        const CField* externelfield = appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]);
-        if (NULL != externelfield)
-        {
-            pGauge = dynamic_cast<const CFieldGauge*>(appGetLattice()->GetFieldById(m_byGaugeFieldIds[0]));
-            if (pGauge->IsDynamic())
-            {
-                appCrucial(_T("CFieldBosonUN: A dynamic field is configured for this UN, but not for the action!\n"));
-                pGauge = NULL;
-            }
-        }
-    }
-
-    Real fRealCoeff = fCoeffReal;
-    const CLGComplex cCompCoeff = _make_cuComplex(fCoeffReal, fCoeffImg);
-    if (EOCT_Minus == eCoeffType)
-    {
-        eCoeffType = EOCT_Real;
-        fRealCoeff = F(-1.0);
-    }
-
-    preparethread;
-    _kernelDBosonVN << <block, threads >> > (
-        pSourceVN->m_pDeviceData,
-        NULL == pGauge ? NULL : (const deviceDataGauge*)pGauge->GetData(),
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-        m_pDeviceData,
-        eCoeffType,
-        fRealCoeff,
-        cCompCoeff,
-        m_byFieldId);
-
-    checkCudaErrors(cudaDeviceSynchronize());
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ForceOnGauge(INT gaugeNum, INT bosonNum, const CFieldGauge* const* pGauge, CFieldGauge* const* pGaugeForce, const CFieldBoson* const* pBoson) const
-{
-    if (m_byGaugeFieldIds.Num() < 1)
-    {
-        appCrucial(_T("CFieldBosonUN ForceOnGauge: there is no gauge!"));
-        return;
-    }
-    INT gaugeidx = CLatticeData::GetGaugeFieldIndexById(gaugeNum, pGauge, m_byGaugeFieldIds[0]);
-    if (gaugeidx < 0 || gaugeidx >= m_byGaugeFieldIds.Num())
-    {
-        appCrucial(_T("CFieldBosonUN ForceOnGauge: there is no gauge!"));
-        return;
-    }
-
-    const CFieldGauge* gauge = pGauge[gaugeidx];
-    CFieldGauge* gaugeforce = pGaugeForce[gaugeidx];
-
-    if (NULL == gauge || VectorN() != gauge->MatrixN())
-    {
-        appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
-        return;
-    }
-
-    if (NULL == gaugeforce || VectorN() != gaugeforce->MatrixN())
-    {
-        appCrucial(_T("CFieldBosonUN can only play with gauge UN!"));
-        return;
-    }
-
-    preparethread;
-    _kernelDBosonForceVN << <block, threads >> > (
-        m_pDeviceData,
-        (const deviceDataGauge*)gauge->GetData(),
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-        (deviceDataGauge*)gaugeforce->GetData(),
-        gauge->m_byFieldId,
-        m_byFieldId
-        );
-
-    //gaugeu1->DebugPrintMe();
-    checkCudaErrors(cudaDeviceSynchronize());
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CFieldBosonVN()
-    : CFieldBoson()
-    //, m_fCharge(F(0.1))
-{
-    checkCudaErrors(__cudaMalloc((void**)&m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount));
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-CFieldBosonVN<deviceDataBoson, deviceDataGauge>::~CFieldBosonVN()
-{
-    checkCudaErrors(__cudaFree(m_pDeviceData));
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialField(EFieldInitialType eInitialType)
-{
-    preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (m_pDeviceData, m_byFieldId, eInitialType);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFieldType)
-{
-    if (eFieldType != EFFT_CLGBin
-     && eFieldType != EFFT_CLGBinFloat
-     && eFieldType != EFFT_CLGBinDouble)
-    {
-        appCrucial(_T("CFieldBosonU1::InitialFieldWithFile: Not support %s File\n"), __ENUM_TO_STRING(EFieldFileType, eFieldType).c_str());
-        return;
-    }
-
-    UINT uiSize = static_cast<UINT>(sizeof(Real) * FloatN() * m_uiSiteCount);
-    if (eFieldType == EFFT_CLGBinFloat)
-    {
-        uiSize = static_cast<UINT>(sizeof(FLOAT) * FloatN() * m_uiSiteCount);
-    }
-    else if (eFieldType == EFFT_CLGBinDouble)
-    {
-        uiSize = static_cast<UINT>(sizeof(DOUBLE) * FloatN() * m_uiSiteCount);
-    }
-    UINT uiReadSize = uiSize;
-    BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiReadSize);
-    if (NULL == data)
-    {
-        appCrucial(_T("File not found: %s\n"), sFileName.c_str());
-        _FAIL_EXIT;
-    }
-
-    if (uiSize != uiReadSize)
-    {
-        appCrucial(_T("File size not correct: expecting: %d, found: %d\n"), uiSize, uiReadSize);
-        _FAIL_EXIT;
-    }
-
-#if _CLG_DOUBLEFLOAT
-    if (eFieldType == EFFT_CLGBinFloat)
-    {
-        FLOAT* data1 = (FLOAT*)data;
-        DOUBLE* data2 = (DOUBLE*)(malloc(sizeof(DOUBLE) * FloatN() * m_uiSiteCount));
-        for (UINT i = 0; i < m_uiSiteCount * FloatN(); ++i)
-        {
-            data2[i] = static_cast<DOUBLE>(data1[i]);
-        }
-        InitialWithByte((BYTE*)data2);
-        free(data);
-        free(data2);
-    }
-#else
-    if (eFieldType == EFFT_CLGBinDouble)
-    {
-        DOUBLE* data1 = (DOUBLE*)data;
-        FLOAT* data2 = (FLOAT*)(malloc(sizeof(FLOAT) * FloatN() * m_uiSiteCount));
-        for (UINT i = 0; i < m_uiSiteCount * FloatN(); ++i)
-        {
-            data2[i] = static_cast<FLOAT>(data1[i]);
-        }
-        InitialWithByte((BYTE*)data2);
-        free(data);
-        free(data2);
-    }
-#endif
-    else
-    {
-        InitialWithByte(data);
-        free(data);
-    }
-
-    appCrucial(_T("CFieldBosonU1::InitialFieldWithFile: Not support %s File\n"), __ENUM_TO_STRING(EFieldFileType, eFieldType).c_str());
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialWithByte(BYTE* byData)
-{
-    deviceDataBoson* readData = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * m_uiSiteCount);
-    Real* hostBuffer = (Real*)byData;
-    for (UINT i = 0; i < m_uiSiteCount; ++i)
-    {
-        for (UINT j = 0; j < FloatN(); ++j)
-        {
-            _setelement(readData[i], j, hostBuffer[FloatN() * i + j]);
-        }
-    }
-    checkCudaErrors(cudaMemcpy(m_pDeviceData, readData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyHostToDevice));
-    free(readData);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-BYTE* CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyDataOut(UINT& uiSize) const
-{
-    deviceDataBoson* toSave = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * m_uiSiteCount);
-    uiSize = static_cast<UINT>(sizeof(Real) * m_uiSiteCount * FloatN());
-    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
-    Real* fsaveData = (Real*)saveData;
-    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToHost));
-    for (UINT i = 0; i < m_uiSiteCount; ++i)
-    {
-        for (UINT j = 0; j < FloatN(); ++j)
-        {
-            fsaveData[FloatN() * i + j] = _element(toSave[i], j);
-        }
-    }
-    free(toSave);
-    return saveData;
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-BYTE* CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyDataOutFloat(UINT& uiSize) const
-{
-    deviceDataBoson* toSave = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * m_uiSiteCount);
-    uiSize = static_cast<UINT>(sizeof(FLOAT) * m_uiSiteCount * FloatN());
-    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
-    FLOAT* fsaveData = (FLOAT*)saveData;
-    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToHost));
-    for (UINT i = 0; i < m_uiSiteCount; ++i)
-    {
-        for (UINT j = 0; j < FloatN(); ++j)
-        {
-            fsaveData[FloatN() * i + j] = static_cast<FLOAT>(_element(toSave[i], j));
-        }
-    }
-    free(toSave);
-    return saveData;
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-BYTE* CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyDataOutDouble(UINT& uiSize) const
-{
-    deviceDataBoson* toSave = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * m_uiSiteCount);
-    uiSize = static_cast<UINT>(sizeof(DOUBLE) * m_uiSiteCount * FloatN());
-    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
-    DOUBLE* fsaveData = (DOUBLE*)saveData;
-    checkCudaErrors(cudaMemcpy(toSave, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToHost));
-    for (UINT i = 0; i < m_uiSiteCount; ++i)
-    {
-        for (UINT j = 0; j < FloatN(); ++j)
-        {
-            fsaveData[FloatN() * i + j] = static_cast<DOUBLE>(_element(toSave[i], j));
-        }
-    }
-    free(toSave);
-    return saveData;
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::DebugPrintMe() const
-{
-    deviceDataBoson* toprint = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * m_uiSiteCount);
-    checkCudaErrors(cudaMemcpy(toprint, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToHost));
-
-    appPushLogDate(FALSE);
-    for (UINT uiSite = 0; uiSite < m_uiSiteCount; ++uiSite)
-    {
-        if (0 == (uiSite % _HC_Lt))
-        {
-            appGeneral(_T("\n"));
-        }
-        const SSmallInt4 site4 = __hostSiteIndexToInt4(uiSite);
-        appGeneral(_T(" (%d,%d,%d,%d) = %s, "),
-            site4.x, site4.y, site4.z, site4.w,
-            appToString(toprint[uiSite]).c_str());
-    }
-    appPopLogDate();
-
-    appSafeFree(toprint);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::AxpyPlus(const CField* x)
-{
-    if (NULL == x || GetFieldType() != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-
-    preparethread;
-    _kernelAddBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::AxpyMinus(const CField* x)
-{
-    if (NULL == x || GetFieldType() != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-
-    preparethread;
-    _kernelSubBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Axpy(Real a, const CField* x)
-{
-    if (NULL == x || GetFieldType() != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-
-    preparethread;
-    _kernelAxpyRealBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Axpy(const CLGComplex& a, const CField* x)
-{
-    if (NULL == x || GetFieldType() != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-
-    preparethread;
-    _kernelAxpyComplexBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, a);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Mul(const CField* other, UBOOL bDagger)
-{
-    if (NULL == other || GetFieldType() != other->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return;
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(other);
-
-    preparethread;
-    _kernelMulComplexBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, bDagger);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-cuDoubleComplex CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dot(const CField* x) const
-{
-    if (NULL == x || GetFieldType() != x->GetFieldType())
-    {
-        appCrucial(_T("CFieldBosonU1 can only work with CFieldBosonU1!"));
-        return make_cuDoubleComplex(0.0, 0.0);
-    }
-    const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-    preparethread;
-    _kernelDotBosonVN << <block, threads >> > (m_pDeviceData, pField->m_pDeviceData, _D_ComplexThreadBuffer);
-
-    return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-TArray<DOUBLE> CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Sum() const
-{
-    preparethread;
-    TArray<DOUBLE> ret;
-    for (UINT i = 0; i < FloatN(); ++i)
-    {
-        _kernelElementVN << <block, threads >> > (m_pDeviceData, i, _D_RealThreadBuffer);
-        ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
-    }
-    return ret;
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(const CLGComplex& a)
-{
-    preparethread;
-    _kernelScalarMultiplyBosonVN << <block, threads >> > (m_pDeviceData, a);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::ScalarMultply(Real a)
-{
-    preparethread;
-    _kernelScalarMultiplyRealBosonVN << <block, threads >> > (m_pDeviceData, a);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::Dagger()
-{
-    preparethread;
-    _kernelBosonConjugateVN << <block, threads >> > (m_pDeviceData);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()
-{
-    //appGeneral(_T("CFieldBosonVN<deviceDataBoson, deviceDataGauge>::FixBoundary()\n"));
-    preparethread;
-    _kernelBosonFixBoundary << <block, threads >> > (m_pDeviceData, m_byFieldId);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CopyTo(CField* U) const
-{
-    if (NULL == U || GetFieldType() != U->GetFieldType())
-    {
-        appCrucial(_T("EFT_BosonU1 can only copy to EFT_BosonU1!"));
-        return;
-    }
-
-    CFieldBoson::CopyTo(U);
-
-    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(U);
-    checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceDataBoson) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::MakeRandomMomentum()
-{
-    if (m_bConstant)
-    {
-        Zero();
-        return;
-    }
-
-    preparethread;
-    _kernelInitialBosonVN << <block, threads >> > (
-        m_pDeviceData,
-        m_byFieldId,
-        EFIT_RandomGaussian);
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::DiagnalTerm(
-    const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
-    EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
-{
-    preparethread;
-    _kernelBosonDiagnal << <block, threads >> > (
-        pSource,
-        m_pDeviceData,
-        m_byFieldId,
-        fCoeffiecient,
-        fpCoeff,
-        eOCT,
-        fRealCoeff,
-        cCmpCoeff
-        );
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::OneLink(
-    const deviceDataBoson* pSource,
-    const deviceDataGauge* pGuage,
-    BYTE byGaugeFieldId,
-    Real fCoefficient,
-    _deviceCoeffFunctionPointerTwoSites fpCoeff,
-    const INT* pDevicePath,
-    BYTE pathLength,
-    EOperatorCoefficientType eOCT,
-    Real fRealCoeff,
-    const CLGComplex& cCmpCoeff)
-{
-    assert(pathLength <= _kLinkMaxLength);
-    preparethread;
-    _kernelBosonOneLink << <block, threads >> > (
-        pSource,
-        (const deviceDataGauge*)pGuage,
-        m_pDeviceData,
-        m_byFieldId,
-        byGaugeFieldId,
-        fCoefficient,
-        fpCoeff,
-        pDevicePath,
-        pathLength,
-        eOCT,
-        fRealCoeff,
-        cCmpCoeff
-        );
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::OneLinkForceGauge(
-    const deviceDataGauge* pGuage, 
-    BYTE byGaugeFieldId, 
-    deviceDataGauge* pForce, 
-    Real fCoefficient,
-    _deviceCoeffFunctionPointerTwoSites fpCoeff,
-    const INT* pDevicePath, 
-    BYTE pathLength) const
-{
-    assert(pathLength <= _kLinkMaxLength);
-    preparethread;
-    _kernelBosonForce_WithLink << <block, threads >> > (
-        (const deviceDataGauge*)pGuage,
-        (deviceDataGauge*)pForce,
-        m_pDeviceData,
-        m_byFieldId,
-        byGaugeFieldId,
-        fCoefficient,
-        fpCoeff,
-        pDevicePath,
-        pathLength
-        );
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::PartialSq(
-    const deviceDataBoson* pSource,
-    const deviceDataGauge* pGuage,
-    BYTE byGaugeFieldId,
-    Real fCoefficient,
-    _deviceCoeffFunctionPointer fpCoeff,
-    BYTE idir,
-    EOperatorCoefficientType eOCT,
-    Real fRealCoeff,
-    const CLGComplex& cCmpCoeff)
-{
-    preparethread;
-    _kernelDPartialBosonVN << <block, threads >> > (
-        pSource,
-        pGuage,
-        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[m_byFieldId],
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-        m_pDeviceData,
-        idir,
-        fCoefficient,
-        fpCoeff,
-        eOCT,
-        fRealCoeff,
-        cCmpCoeff,
-        m_byFieldId
-        );
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(
-    const deviceDataGauge* pGuage,
-    BYTE byGaugeFieldId,
-    deviceDataGauge* pForce,
-    Real fCoefficient,
-    _deviceCoeffFunctionPointer fpCoeff,
-    BYTE idir) const
-{
-    preparethread;
-    _kernelDPartialBosonForceVN << <block, threads >> > (
-        m_pDeviceData,
-        pGuage,
-        appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
-        pForce,
-        idir,
-        fCoefficient,
-        fpCoeff,
-        byGaugeFieldId,
-        m_byFieldId
-        );
-}
-
-//template<typename deviceDataBoson, typename deviceDataGauge>
-//void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::OneLinkForceBoson(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataBoson* pForce, _deviceCoeffFunctionPointer fpCoeff, const INT* pDevicePath, BYTE pathLength) const
-//{
-//
-//}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-void CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialAsSource(const SFermionBosonSource& sourceData)
-{
-    const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
-    switch (sourceData.m_eSourceType)
-    {
-    case EFS_Point:
-        {
-            preparethread;
-            _kernelMakePointSourceBoson << <block, threads >> > (m_pDeviceData, uiSiteIndex, sourceData.m_byColorIndex);
-        }
-        break;
-    default:
-        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionBosonSource, sourceData.m_eSourceType).c_str());
-        break;
-    }
-}
-
-template<typename deviceDataBoson, typename deviceDataGauge>
-UINT CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CheckHermitian(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson) const
-{
-    const UINT uiVolume = m_uiSiteCount;
-    const UINT uiRealVolume = VectorN() * uiVolume;
+    const UINT uiVolume = uiSiteCount;
+    const UINT uiRealVolume = data->VectorN() * uiVolume;
     CLGComplex* matrixElement = (CLGComplex*)malloc(sizeof(CLGComplex) * uiRealVolume * uiRealVolume);
     deviceDataBoson* hostData = (deviceDataBoson*)malloc(sizeof(deviceDataBoson) * uiVolume);
-    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* v = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(appGetLattice()->GetPooledFieldById(m_byFieldId));
+    CFieldBosonVN<deviceDataBoson, deviceDataGauge>* v = dynamic_cast<CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(appGetLattice()->GetPooledFieldById(data->m_byFieldId));
 
     for (UINT i = 0; i < uiVolume; ++i)
     {
         const SSmallInt4 point = __hostSiteIndexToInt4(i);
-        for (UINT j = 0; j < VectorN(); ++j)
+        for (UINT j = 0; j < data->VectorN(); ++j)
         {
             SFermionBosonSource source;
             source.m_byColorIndex = static_cast<BYTE>(j);
@@ -1249,12 +474,12 @@ UINT CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CheckHermitian(INT gaugeNu
 
             checkCudaErrors(cudaMemcpy(hostData, v->m_pDeviceData, sizeof(deviceDataBoson) * uiVolume, cudaMemcpyDeviceToHost));
 
-            const UINT x = i * VectorN() + j;
+            const UINT x = i * data->VectorN() + j;
             for (UINT k = 0; k < uiVolume; ++k)
             {
-                for (UINT l = 0; l < VectorN(); ++l)
+                for (UINT l = 0; l < data->VectorN(); ++l)
                 {
-                    matrixElement[(VectorN() * k + l) * uiRealVolume + x] = _vn(hostData[k], l);
+                    matrixElement[(data->VectorN() * k + l) * uiRealVolume + x] = _vn(hostData[k], l);
                 }
             }
             appGeneral(_T("%d / %d have been done\n"), x, uiRealVolume);
@@ -1268,11 +493,11 @@ UINT CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CheckHermitian(INT gaugeNu
     {
         const UINT x = i / uiRealVolume;
         const UINT y = i % uiRealVolume;
-        const SSmallInt4 xSite = __hostSiteIndexToInt4(x / VectorN());
-        const SSmallInt4 ySite = __hostSiteIndexToInt4(y / VectorN());
+        const SSmallInt4 xSite = __hostSiteIndexToInt4(x / data->VectorN());
+        const SSmallInt4 ySite = __hostSiteIndexToInt4(y / data->VectorN());
         const UINT daggerIdx = y * uiRealVolume + x;
-        const BYTE cx = static_cast<BYTE>(x % VectorN());
-        const BYTE cy = static_cast<BYTE>(y % VectorN());
+        const BYTE cx = static_cast<BYTE>(x % data->VectorN());
+        const BYTE cy = static_cast<BYTE>(y % data->VectorN());
 
         if (_cuCabsf(matrixElement[i]) > F(0.0000001))
         {
@@ -1296,25 +521,820 @@ UINT CFieldBosonVN<deviceDataBoson, deviceDataGauge>::CheckHermitian(INT gaugeNu
     return uiWrong;
 }
 
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, U1, CLGComplex, CLGComplex)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU2, deviceSU2Vector, deviceSU2)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU3, deviceSU3Vector, deviceSU3)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU4, deviceSU4Vector, deviceSU4)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU5, deviceSU5Vector, deviceSU5)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU6, deviceSU6Vector, deviceSU6)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU7, deviceSU7Vector, deviceSU7)
-__CLG_FORCETEMPLATE_CONSTRUCTOR(CFieldBosonVN, SU8, deviceSU8Vector, deviceSU8)
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::ForceOnGauge(const deviceDataBoson* data, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, deviceDataGauge* force)
+{
+    preparethread;
+    _kernelDBosonForceVN << <block, threads >> > (
+        data,
+        gaugedata,
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        force,
+        byGaugeFieldId,
+        byFieldId
+        );
 
-__CLGIMPLEMENT_CLASS(CFieldBosonU1)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU2)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU3)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU4)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU5)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU6)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU7)
-__CLGIMPLEMENT_CLASS(CFieldBosonSU8)
+    //gaugeu1->DebugPrintMe();
+    //checkCudaErrors(cudaDeviceSynchronize());
+}
 
-#endif
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DFromSource(const deviceDataBoson* source, deviceDataBoson* target, BYTE byFieldId, BYTE byGaugeFieldId, const deviceDataGauge* gaugedata, 
+    EOperatorCoefficientType eCoeffType, Real fRealCoeff, const CLGComplex& cCompCoeff)
+{
+    preparethread;
+    _kernelDBosonVN << <block, threads >> > (
+        source,
+        gaugedata,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        target,
+        eCoeffType,
+        fRealCoeff,
+        cCompCoeff,
+        byFieldId);
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DiagnalTerm(
+    deviceDataBoson* pTarget,
+    BYTE byFieldId,
+    const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
+    EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+{
+    preparethread;
+    _kernelBosonDiagnal << <block, threads >> > (
+        pSource,
+        pTarget,
+        byFieldId,
+        fCoeffiecient,
+        fpCoeff,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff
+        );
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLink(
+    deviceDataBoson* pTarget,
+    BYTE byFieldId,
+    const deviceDataBoson* pSource,
+    const deviceDataGauge* pGauge,
+    BYTE byGaugeFieldId,
+    Real fCoefficient,
+    _deviceCoeffFunctionPointerTwoSites fpCoeff,
+    const INT* pDevicePath,
+    BYTE pathLength,
+    EOperatorCoefficientType eOCT,
+    Real fRealCoeff,
+    const CLGComplex& cCmpCoeff)
+{
+    assert(pathLength <= _kLinkMaxLength);
+    preparethread;
+    _kernelBosonOneLink << <block, threads >> > (
+        pSource,
+        pGauge,
+        pTarget,
+        byFieldId,
+        byGaugeFieldId,
+        fCoefficient,
+        fpCoeff,
+        pDevicePath,
+        pathLength,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff
+        );
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLinkForceGauge(
+    const deviceDataBoson* pBoson,
+    BYTE byFieldId,
+    const deviceDataGauge* pGauge,
+    BYTE byGaugeFieldId,
+    deviceDataGauge* pForce,
+    Real fCoefficient,
+    _deviceCoeffFunctionPointerTwoSites fpCoeff,
+    const INT* pDevicePath,
+    BYTE pathLength)
+{
+    assert(pathLength <= _kLinkMaxLength);
+    preparethread;
+    _kernelBosonForce_WithLink << <block, threads >> > (
+        pGauge,
+        pForce,
+        pBoson,
+        byFieldId,
+        byGaugeFieldId,
+        fCoefficient,
+        fpCoeff,
+        pDevicePath,
+        pathLength
+        );
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSq(
+    deviceDataBoson* pTarget,
+    BYTE byFieldId,
+    const deviceDataBoson* pSource,
+    const deviceDataGauge* pGauge,
+    BYTE byGaugeFieldId,
+    Real fCoefficient,
+    _deviceCoeffFunctionPointer fpCoeff,
+    BYTE idir,
+    EOperatorCoefficientType eOCT,
+    Real fRealCoeff,
+    const CLGComplex& cCmpCoeff)
+{
+    preparethread;
+    _kernelDPartialBosonVN << <block, threads >> > (
+        pSource,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pGaugeMoveCache[byFieldId],
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        pTarget,
+        idir,
+        fCoefficient,
+        fpCoeff,
+        eOCT,
+        fRealCoeff,
+        cCmpCoeff,
+        byFieldId
+        );
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(
+    const deviceDataBoson* pBoson,
+    BYTE byFieldId,
+    const deviceDataGauge* pGauge,
+    BYTE byGaugeFieldId,
+    deviceDataGauge* pForce,
+    Real fCoefficient,
+    _deviceCoeffFunctionPointer fpCoeff,
+    BYTE idir)
+{
+    preparethread;
+    _kernelDPartialBosonForceVN << <block, threads >> > (
+        pBoson,
+        pGauge,
+        appGetLattice()->m_pIndexCache->m_pMoveCache[byFieldId],
+        pForce,
+        idir,
+        fCoefficient,
+        fpCoeff,
+        byGaugeFieldId,
+        byFieldId
+        );
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::AllocatePathBuffer(INT** pathbuffer)
+{
+    checkCudaErrors(cudaMalloc((void**)pathbuffer, sizeof(INT) * _kLinkMaxLength));
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::FreePathBuffer(INT* pathbuffer)
+{
+    checkCudaErrors(cudaFree(pathbuffer));
+}
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyPathBuffer(INT* devicepathbuffer, const INT* hostpathbuffer, BYTE length)
+{
+    checkCudaErrors(cudaMemcpy(devicepathbuffer, hostpathbuffer, sizeof(INT) * length, cudaMemcpyHostToDevice));
+}
+
+#pragma region rotation
+
+__device__ Real _deviceBosonRotationCx(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx;
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx;
+    }
+
+    return F(0.5) * (fX1 + fX2);
+}
+
+__device__ Real _deviceBosonRotationCy(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery;
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery;
+    }
+
+    return F(0.5) * (fY1 + fY2);
+}
+
+__device__ Real _deviceBosonRotationCxy(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx;
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx;
+    }
+
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery;
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery;
+    }
+
+    return F(0.25) * ((fX1 + fX2) * (fY1 + fY2));
+}
+
+__device__ Real _deviceBosonRotationCxShift(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx + F(0.5);
+    }
+
+    return F(0.5) * (fX1 + fX2);
+}
+
+__device__ Real _deviceBosonRotationCyShift(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery + F(0.5);
+    }
+
+    return F(0.5) * (fY1 + fY2);
+}
+
+/**
+* first x then y
+*/
+__device__ Real _deviceBosonRotationCxyShiftXYPP(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    UBOOL bOppsite = FALSE;
+    if (_DC_Lxi == site2.x || -1 == site2.y || _DC_Lxi == site1.x || -1 == site1.y)
+    {
+        bOppsite = TRUE;
+    }
+
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx + F(0.5);
+    }
+
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery + F(0.5);
+    }
+
+    if (bOppsite)
+    {
+        return F(-0.25) * ((fX1 + fX2) * (fY1 + fY2));
+    }
+    return F(0.25) * ((fX1 + fX2) * (fY1 + fY2));
+}
+
+__device__ Real _deviceBosonRotationCxyShiftYXPP(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    UBOOL bOppsite = FALSE;
+    if (_DC_Lyi == site2.y || -1 == site2.x || _DC_Lyi == site1.y || -1 == site1.x)
+    {
+        bOppsite = TRUE;
+    }
+
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx + F(0.5);
+    }
+
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery + F(0.5);
+    }
+
+    if (bOppsite)
+    {
+        return F(-0.25) * ((fX1 + fX2) * (fY1 + fY2));
+    }
+    return F(0.25) * ((fX1 + fX2) * (fY1 + fY2));
+}
+
+__device__ Real _deviceBosonRotationCxyShiftYXPM(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    UBOOL bOppsite = FALSE;
+    if (_DC_Lyi == site2.y || _DC_Lxi == site2.x || _DC_Lyi == site1.y || _DC_Lxi == site1.x)
+    {
+        bOppsite = TRUE;
+    }
+
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx + F(0.5);
+    }
+
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery + F(0.5);
+    }
+
+    if (bOppsite)
+    {
+        return F(-0.25) * ((fX1 + fX2) * (fY1 + fY2));
+    }
+    return F(0.25) * ((fX1 + fX2) * (fY1 + fY2));
+}
+
+__device__ Real _deviceBosonRotationCxyShiftXYMP(BYTE byFieldId, SSmallInt4 site1, SSmallInt4 site2, const SIndex& uiSiteBI1, const SIndex& uiSiteBI2)
+{
+    UBOOL bOppsite = FALSE;
+    if (-1 == site2.y || -1 == site2.x || -1 == site1.y || -1 == site1.x)
+    {
+        bOppsite = TRUE;
+    }
+
+    Real fX1, fX2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fX1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fX1 = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fX2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fX2 = static_cast<Real>(site2.x) - _DC_Centerx + F(0.5);
+    }
+
+    Real fY1, fY2;
+    if (uiSiteBI1.IsDirichlet())
+    {
+        fY1 = F(0.0);
+    }
+    else
+    {
+        if (site1.Out())
+        {
+            site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+        }
+        fY1 = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    }
+
+    if (uiSiteBI2.IsDirichlet())
+    {
+        fY2 = F(0.0);
+    }
+    else
+    {
+        if (site2.Out())
+        {
+            site2 = __deviceSiteIndexToInt4(uiSiteBI2.m_uiSiteIndex);
+        }
+        fY2 = static_cast<Real>(site2.y) - _DC_Centery + F(0.5);
+    }
+
+    if (bOppsite)
+    {
+        return F(-0.25) * ((fX1 + fX2) * (fY1 + fY2));
+    }
+    return F(0.25) * ((fX1 + fX2) * (fY1 + fY2));
+}
+
+__device__ Real _deviceBosonRotationCxCySq(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    const Real x = static_cast<Real>(site1.x) - _DC_Centerx;
+    const Real y = static_cast<Real>(site1.y) - _DC_Centery;
+    return x * x + y * y;
+}
+
+__device__ Real _deviceBosonRotationCxCySqShift(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    const Real x = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    const Real y = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    return x * x + y * y;
+}
+
+
+__device__ Real _deviceBosonRotationCxSq(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    if (site1.Out())
+    {
+        site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+    }
+    const Real x = static_cast<Real>(site1.x) - _DC_Centerx;
+    return x * x;
+}
+
+__device__ Real _deviceBosonRotationCySq(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    if (site1.Out())
+    {
+        site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+    }
+    const Real y = static_cast<Real>(site1.y) - _DC_Centery;
+    return y * y;
+}
+
+__device__ Real _deviceBosonRotationCxSqShift(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    if (site1.Out())
+    {
+        site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+    }
+    const Real x = static_cast<Real>(site1.x) - _DC_Centerx + F(0.5);
+    return x * x;
+}
+
+__device__ Real _deviceBosonRotationCySqShift(BYTE byFieldId, SSmallInt4 site1, const SIndex& uiSiteBI1)
+{
+    if (site1.Out())
+    {
+        site1 = __deviceSiteIndexToInt4(uiSiteBI1.m_uiSiteIndex);
+    }
+    const Real y = static_cast<Real>(site1.y) - _DC_Centery + F(0.5);
+    return y * y;
+}
+
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxPf = _deviceBosonRotationCx;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCyPf = _deviceBosonRotationCy;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxyPf = _deviceBosonRotationCxy;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxPfShift = _deviceBosonRotationCxShift;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCyPfShift = _deviceBosonRotationCyShift;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxyPfShiftXYPP = _deviceBosonRotationCxyShiftXYPP;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxyPfShiftYXPP = _deviceBosonRotationCxyShiftYXPP;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxyPfShiftYXPM = _deviceBosonRotationCxyShiftYXPM;
+__device__ _deviceCoeffFunctionPointerTwoSites _deviceBosonRotationCxyPfShiftXYMP = _deviceBosonRotationCxyShiftXYMP;
+
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCxCySqPf = _deviceBosonRotationCxCySq;
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCxCySqShiftPf = _deviceBosonRotationCxCySqShift;
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCxSqPf = _deviceBosonRotationCxSq;
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCySqPf = _deviceBosonRotationCySq;
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCxSqShiftPf = _deviceBosonRotationCxSqShift;
+__device__ _deviceCoeffFunctionPointer _deviceBosonRotationCySqShiftPf = _deviceBosonRotationCySqShift;
+
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCx(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxPf, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCy(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCyPf, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxy(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxyPf, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxShift(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxPfShift, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCyShift(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCyPfShift, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxyShiftXYPP(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxyPfShiftXYPP, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxyShiftYXPP(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxyPfShiftYXPP, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxyShiftYXPM(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxyPfShiftYXPM, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxyShiftXYMP(_deviceCoeffFunctionPointerTwoSites* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxyPfShiftXYMP, sizeof(_deviceCoeffFunctionPointerTwoSites)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxCySq(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxCySqPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxCySqShift(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxCySqShiftPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxSq(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxSqPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCySq(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCySqPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCxSqShift(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCxSqShiftPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+template<typename deviceDataBoson, typename deviceDataGauge>
+void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::CopyFunctionPointCySqShift(_deviceCoeffFunctionPointer* target)
+{
+    checkCudaErrors(cudaMemcpyFromSymbol(target, _deviceBosonRotationCySqShiftPf, sizeof(_deviceCoeffFunctionPointer)));
+}
+
+#pragma endregion
+
+template class CFieldBosonVNKernel<CLGComplex, CLGComplex>;
+template class CFieldBosonVNKernel<deviceSU2Vector, deviceSU2>;
+template class CFieldBosonVNKernel<deviceSU3Vector, deviceSU3>;
+template class CFieldBosonVNKernel<deviceSU4Vector, deviceSU4>;
+template class CFieldBosonVNKernel<deviceSU5Vector, deviceSU5>;
+template class CFieldBosonVNKernel<deviceSU6Vector, deviceSU6>;
+template class CFieldBosonVNKernel<deviceSU7Vector, deviceSU7>;
+template class CFieldBosonVNKernel<deviceSU8Vector, deviceSU8>;
 
 __END_NAMESPACE
 

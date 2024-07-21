@@ -600,7 +600,7 @@ _kernelMakeWallSourceKST(deviceVector* pDeviceData,
     intokernalOnlyInt4;
 
     //pDeviceData[uiSiteIndex] = _makeZero<deviceVector>_makeZero();
-    //We shall not set zero here!
+    //We shall not set zero here! [2024/7/21/ why not: because offset site will be set to non-zero!!]
 
     if ( (0 == (sSite4.x & 1))
       && (0 == (sSite4.y & 1))

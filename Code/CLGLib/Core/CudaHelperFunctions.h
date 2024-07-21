@@ -131,6 +131,7 @@ exit(EXIT_FAILURE);
 
 __BEGIN_NAMESPACE
 
+extern void CLGAPI appExistCuda();
 
 // CUDA Utility Helper Functions
 inline int stringRemoveDelimiter(char delimiter, const char *string) {
@@ -1252,7 +1253,7 @@ static const char *_cudaGetErrorEnum(NppStatus error) {
 
 #ifdef __DRIVER_TYPES_H__
 #ifndef DEVICE_RESET
-#define DEVICE_RESET cudaDeviceReset();
+#define DEVICE_RESET appExistCuda();
 #endif
 #else
 #ifndef DEVICE_RESET

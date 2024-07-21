@@ -16,6 +16,60 @@ __BEGIN_NAMESPACE
 
 #pragma region common
 
+template<typename T>
+void CCommonKernel<T>::AllocateBuffer(T** pointer, UINT count)
+{
+    checkCudaErrors(__cudaMalloc((void**)pointer, sizeof(T) * count));
+    checkCudaErrors(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGetLastError());
+}
+
+template<typename T>
+void CCommonKernel<T>::FreeBuffer(T** pointer)
+{
+    checkCudaErrors(__cudaFree(*pointer));
+    *pointer = NULL;
+}
+
+template<typename T>
+void CCommonKernel<T>::CopyBuffer(T* dest, const T* source, UINT count)
+{
+    checkCudaErrors(cudaMemcpy(dest, source, sizeof(T) * count, cudaMemcpyDeviceToDevice));
+}
+
+template class CCommonKernel<INT>;
+#if _CLG_DOUBLEFLOAT
+template class CCommonKernel<FLOAT>;
+#else
+template class CCommonKernel<DOUBLE>;
+#endif
+template class CCommonKernel<Real>;
+#if _CLG_DOUBLEFLOAT
+template class CCommonKernel<cuComplex>;
+#else
+template class CCommonKernel<cuDoubleComplex>;
+#endif
+template class CCommonKernel<CLGComplex>;
+template class CCommonKernel<deviceSU2>;
+template class CCommonKernel<deviceSU3>;
+template class CCommonKernel<deviceSU4>;
+template class CCommonKernel<deviceSU5>;
+template class CCommonKernel<deviceSU6>;
+template class CCommonKernel<deviceSU7>;
+template class CCommonKernel<deviceSU8>;
+template class CCommonKernel<deviceSU2Vector>;
+template class CCommonKernel<deviceSU3Vector>;
+template class CCommonKernel<deviceSU4Vector>;
+template class CCommonKernel<deviceSU5Vector>;
+template class CCommonKernel<deviceSU6Vector>;
+template class CCommonKernel<deviceSU7Vector>;
+template class CCommonKernel<deviceSU8Vector>;
+template class CCommonKernel<deviceWilsonVectorSU3>;
+
+#pragma endregion
+
+#pragma region field
+
 #pragma region kernel
 
 template<typename T>
@@ -49,28 +103,7 @@ _kernelInitialCommon(T* pDevicePtr, UINT count, EFieldInitialType eInitialType)
 #pragma endregion
 
 template<typename T>
-void CCommonKernel<T>::AllocateBuffer(T** pointer, UINT count)
-{
-    checkCudaErrors(__cudaMalloc((void**)pointer, sizeof(T) * count));
-    checkCudaErrors(cudaDeviceSynchronize());
-    checkCudaErrors(cudaGetLastError());
-}
-
-template<typename T>
-void CCommonKernel<T>::FreeBuffer(T** pointer)
-{
-    checkCudaErrors(__cudaFree(*pointer));
-    *pointer = NULL;
-}
-
-template<typename T>
-void CCommonKernel<T>::CopyBuffer(T* dest, const T* source, UINT count)
-{
-    checkCudaErrors(cudaMemcpy(dest, source, sizeof(T) * count, cudaMemcpyDeviceToDevice));
-}
-
-template<typename T>
-void CCommonKernel<T>::Initial(T* pointer, UINT count, EFieldInitialType eInitialType)
+void CCommonKernelField<T>::Initial(T* pointer, UINT count, EFieldInitialType eInitialType)
 {
     __SIMPLEDECOMPOSE(count);
     _kernelInitialCommon << <block, thread >> > (pointer, count, eInitialType);
@@ -78,34 +111,97 @@ void CCommonKernel<T>::Initial(T* pointer, UINT count, EFieldInitialType eInitia
     checkCudaErrors(cudaGetLastError());
 }
 
-template class CCommonKernel<INT>;
-#if _CLG_DOUBLEFLOAT
-template class CCommonKernel<FLOAT>;
-#else
-template class CCommonKernel<DOUBLE>;
-#endif
-template class CCommonKernel<Real>;
-#if _CLG_DOUBLEFLOAT
-template class CCommonKernel<cuComplex>;
-#else
-template class CCommonKernel<cuDoubleComplex>;
-#endif
-template class CCommonKernel<CLGComplex>;
-template class CCommonKernel<deviceSU2>;
-template class CCommonKernel<deviceSU3>;
-template class CCommonKernel<deviceSU4>;
-template class CCommonKernel<deviceSU5>;
-template class CCommonKernel<deviceSU6>;
-template class CCommonKernel<deviceSU7>;
-template class CCommonKernel<deviceSU8>;
-template class CCommonKernel<deviceSU2Vector>;
-template class CCommonKernel<deviceSU3Vector>;
-template class CCommonKernel<deviceSU4Vector>;
-template class CCommonKernel<deviceSU5Vector>;
-template class CCommonKernel<deviceSU6Vector>;
-template class CCommonKernel<deviceSU7Vector>;
-template class CCommonKernel<deviceSU8Vector>;
-template class CCommonKernel<deviceWilsonVectorSU3>;
+template<typename T>
+BYTE* CCommonKernelField<T>::CopyDataOut(T* pointer, UINT count, UINT& uiSize)
+{
+    T* toSave = (T*)malloc(sizeof(T) * count);
+    uiSize = static_cast<UINT>(sizeof(Real) * count * _elementdim<T>());
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    Real* fsaveData = (Real*)saveData;
+    checkCudaErrors(cudaMemcpy(toSave, pointer, sizeof(T) * count, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < count; ++i)
+    {
+        for (UINT j = 0; j < _elementdim<T>(); ++j)
+        {
+            fsaveData[_elementdim<T>() * i + j] = _element(toSave[i], j);
+        }
+    }
+    free(toSave);
+    return saveData;
+}
+
+template<typename T>
+BYTE* CCommonKernelField<T>::CopyDataOutFloat(T* pointer, UINT count, UINT& uiSize)
+{
+    T* toSave = (T*)malloc(sizeof(T) * count);
+    uiSize = static_cast<UINT>(sizeof(FLOAT) * count * _elementdim<T>());
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    FLOAT* fsaveData = (FLOAT*)saveData;
+    checkCudaErrors(cudaMemcpy(toSave, pointer, sizeof(T) * count, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < count; ++i)
+    {
+        for (UINT j = 0; j < _elementdim<T>(); ++j)
+        {
+            fsaveData[_elementdim<T>() * i + j] = static_cast<FLOAT>(_element(toSave[i], j));
+        }
+    }
+    free(toSave);
+    return saveData;
+}
+
+template<typename T>
+BYTE* CCommonKernelField<T>::CopyDataOutDouble(T* pointer, UINT count, UINT& uiSize)
+{
+    T* toSave = (T*)malloc(sizeof(T) * count);
+    uiSize = static_cast<UINT>(sizeof(DOUBLE) * count * _elementdim<T>());
+    BYTE* saveData = (BYTE*)malloc(static_cast<size_t>(uiSize));
+    DOUBLE* fsaveData = (DOUBLE*)saveData;
+    checkCudaErrors(cudaMemcpy(toSave, pointer, sizeof(T) * count, cudaMemcpyDeviceToHost));
+    for (UINT i = 0; i < count; ++i)
+    {
+        for (UINT j = 0; j < _elementdim<T>(); ++j)
+        {
+            fsaveData[_elementdim<T>() * i + j] = static_cast<DOUBLE>(_element(toSave[i], j));
+        }
+    }
+    free(toSave);
+    return saveData;
+}
+
+template<typename T>
+void CCommonKernelField<T>::InitialWithByte(T* pointer, UINT count, const BYTE* byData)
+{
+    T* readData = (T*)malloc(sizeof(T) * count);
+    for (UINT i = 0; i < count; ++i)
+    {
+        assert(_elementdim<T>() <= CCString::_CLG_MAX_PATH);
+        Real thisSite[CCString::_CLG_MAX_PATH];
+        memcpy(thisSite, byData + i * sizeof(Real) * _elementdim<T>(), sizeof(Real) * _elementdim<T>());
+        for (UINT k = 0; k < _elementdim<T>(); ++k)
+        {
+            _setelement(readData[i], k, thisSite[k]);
+        }
+    }
+    checkCudaErrors(cudaMemcpy(pointer, readData, sizeof(T) * count, cudaMemcpyHostToDevice));
+    free(readData);
+}
+
+template class CCommonKernelField<CLGComplex>;
+template class CCommonKernelField<deviceSU2>;
+template class CCommonKernelField<deviceSU3>;
+template class CCommonKernelField<deviceSU4>;
+template class CCommonKernelField<deviceSU5>;
+template class CCommonKernelField<deviceSU6>;
+template class CCommonKernelField<deviceSU7>;
+template class CCommonKernelField<deviceSU8>;
+template class CCommonKernelField<deviceSU2Vector>;
+template class CCommonKernelField<deviceSU3Vector>;
+template class CCommonKernelField<deviceSU4Vector>;
+template class CCommonKernelField<deviceSU5Vector>;
+template class CCommonKernelField<deviceSU6Vector>;
+template class CCommonKernelField<deviceSU7Vector>;
+template class CCommonKernelField<deviceSU8Vector>;
+template class CCommonKernelField<deviceWilsonVectorSU3>;
 
 #pragma endregion
 
@@ -285,6 +381,49 @@ _kernelFixBoundarySite(T* pDeviceData, BYTE byFieldId)
     }
 }
 
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMakePointSourceSite(T* pDeviceData, UINT uiDesiredSite, BYTE byColor)
+{
+    intokernal;
+    if (uiSiteIndex == uiDesiredSite)
+    {
+        pDeviceData[uiSiteIndex] = _makeColorVector<T>(byColor);
+    }
+    else
+    {
+        pDeviceData[uiSiteIndex] = _makeZero<T>();
+    }
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMakeWallSourceSite(T* pDeviceData,
+    INT uiDesiredT, UINT uiShift, BYTE color, BYTE byFieldID)
+{
+    intokernalOnlyInt4;
+
+    //Since there is a 'uiShift', which set values for neighbours
+    //We should not set every site to zero here!
+
+    if ((0 == (sSite4.x & 1))
+     && (0 == (sSite4.y & 1))
+     && (0 == (sSite4.z & 1))
+     && (uiDesiredT < 0 || uiDesiredT == sSite4.w))
+    {
+        //sSite4 is no longer used
+        sSite4.x = sSite4.x + static_cast<SBYTE>(uiShift & 1);
+        sSite4.y = sSite4.y + static_cast<SBYTE>((uiShift >> 1) & 1);
+        sSite4.z = sSite4.z + static_cast<SBYTE>((uiShift >> 2) & 1);
+        const SIndex& sIdx = __idx->m_pDeviceIndexPositionToSIndex[byFieldID][__bi(sSite4)];
+        if (!sIdx.IsDirichlet())
+        {
+            pDeviceData[sIdx.m_uiSiteIndex] = _makeColorVector<T>(color);
+        }
+    }
+    
+}
+
 #pragma endregion
 
 template<typename T> 
@@ -360,25 +499,79 @@ void CCommonKernelSite<T>::ScalarMultply(T* dest, BYTE byFieldId, Real a)
 }
 
 template<typename T>
-cuDoubleComplex CCommonKernelSite<T>::Dot(T* dest, BYTE byFieldId, const T* other)
+cuDoubleComplex CCommonKernelSite<T>::Dot(const T* me, BYTE byFieldId, const T* other)
 {
     preparethread;
-    _kernelDotSite << <block, threads >> > (dest, other, _D_ComplexThreadBuffer);
+    _kernelDotSite << <block, threads >> > (me, other, _D_ComplexThreadBuffer);
 
     return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
 }
 
 template<typename T>
-TArray<DOUBLE> CCommonKernelSite<T>::Sum(T* dest, BYTE byFieldId)
+TArray<DOUBLE> CCommonKernelSite<T>::Sum(const T* me, BYTE byFieldId)
 {
     preparethread;
     TArray<DOUBLE> ret;
     for (UINT i = 0; i < _elementdim<T>(); ++i)
     {
-        _kernelElementSite << <block, threads >> > (dest, i, _D_RealThreadBuffer);
+        _kernelElementSite << <block, threads >> > (me, i, _D_RealThreadBuffer);
         ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
     }
     return ret;
+}
+
+template<typename T>
+void CCommonKernelSite<T>::InitialSource(T* data, BYTE byFieldId, const SFermionBosonSource& sourceData)
+{
+    
+    switch (sourceData.m_eSourceType)
+    {
+    case EFS_Point:
+    {
+        preparethread;
+        const UINT uiSiteIndex = _hostGetSiteIndex(sourceData.m_sSourcePoint);
+        _kernelMakePointSourceSite << <block, threads >> > (data, uiSiteIndex, sourceData.m_byColorIndex);
+    }
+    break;
+    case EFS_Wall:
+    {
+        preparethread;
+        _kernelInitialSite << <block, threads >> > (data, byFieldId, EFIT_Zero);
+        _kernelMakeWallSourceSite << <block, threads >> > (
+            data,
+            static_cast<INT>(sourceData.m_sSourcePoint.w),
+            sourceData.m_bySpinIndex,
+            sourceData.m_byColorIndex,
+            byFieldId);
+    }
+    break;
+    default:
+        appCrucial(_T("The source type %s not implemented yet!\n"), __ENUM_TO_STRING(EFermionBosonSource, sourceData.m_eSourceType).c_str());
+        break;
+    }
+}
+
+template<typename T>
+void CCommonKernelSite<T>::DebugPrint(const T* data, UINT sitecount)
+{
+    T* toprint = (T*)malloc(sizeof(T) * sitecount);
+    checkCudaErrors(cudaMemcpy(toprint, data, sizeof(T) * sitecount, cudaMemcpyDeviceToHost));
+
+    appPushLogDate(FALSE);
+    for (UINT uiSite = 0; uiSite < sitecount; ++uiSite)
+    {
+        if (0 == (uiSite % _HC_Lt))
+        {
+            appGeneral(_T("\n"));
+        }
+        const SSmallInt4 site4 = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T(" (%d,%d,%d,%d) = %s, "),
+            site4.x, site4.y, site4.z, site4.w,
+            appToString(toprint[uiSite]).c_str());
+    }
+    appPopLogDate();
+
+    appSafeFree(toprint);
 }
 
 template class CCommonKernelSite<CLGComplex>;
@@ -685,11 +878,40 @@ void CCommonKernelLink<T>::ScalarMultply(T* dest, BYTE byFieldId, Real a)
 }
 
 template<typename T>
-cuDoubleComplex CCommonKernelLink<T>::Dot(T* dest, BYTE byFieldId, const T* other)
+cuDoubleComplex CCommonKernelLink<T>::Dot(const T* me, BYTE byFieldId, const T* other)
 {
     preparethread;
-    _kernelDotLink << < block, threads >> > (dest, other, _D_ComplexThreadBuffer);
+    _kernelDotLink << < block, threads >> > (me, other, _D_ComplexThreadBuffer);
     return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::DebugPrint(const T* data, UINT uiLinkCount)
+{
+    //preparethread;
+    //_kernelPrintSU3 << < block, threads >> > (m_pDeviceData);
+
+    //===================================================
+    //Since Debug Print Me is only used to debug, we do it slow but convinient
+    T* pToPrint = (T*)malloc(sizeof(T) * uiLinkCount);
+    checkCudaErrors(cudaMemcpy(pToPrint, data, sizeof(T) * uiLinkCount, cudaMemcpyDeviceToHost));
+
+    for (UINT uiLink = 0; uiLink < uiLinkCount; ++uiLink)
+    {
+        UINT uiSite = uiLink / _HC_Dir;
+        UINT uiDir = uiLink % _HC_Dir;
+        SSmallInt4 site = __hostSiteIndexToInt4(uiSite);
+        appGeneral(_T(" --- %d(%d, %d, %d, %d)_%d ---\n %s\n"),
+            uiLink,
+            static_cast<INT>(site.x),
+            static_cast<INT>(site.y),
+            static_cast<INT>(site.z),
+            static_cast<INT>(site.w),
+            uiDir,
+            appToString(pToPrint[uiLink]).c_str());
+    }
+
+    free(pToPrint);
 }
 
 template class CCommonKernelLink<CLGComplex>;

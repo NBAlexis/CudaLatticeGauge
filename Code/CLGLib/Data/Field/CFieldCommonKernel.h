@@ -43,7 +43,17 @@ public:
     static void AllocateBuffer(T** pointer, UINT count);
     static void FreeBuffer(T** pointer);
     static void CopyBuffer(T* dest, const T* source, UINT count);
+};
+
+template<typename T>
+class __DLL_EXPORT CCommonKernelField
+{
+public:
     static void Initial(T* pointer, UINT count, EFieldInitialType eInitialType);
+    static BYTE* CopyDataOut(T* pointer, UINT count, UINT& uiSize);
+    static BYTE* CopyDataOutFloat(T* pointer, UINT count, UINT& uiSize);
+    static BYTE* CopyDataOutDouble(T* pointer, UINT count, UINT& uiSize);
+    static void InitialWithByte(T* pointer, UINT count, const BYTE* data);
 };
 
 template<typename T>
@@ -60,8 +70,10 @@ public:
     static void Mul(T* dest, BYTE byFieldId, const T* other, UBOOL bDagger = TRUE);
     static void ScalarMultply(T* dest, BYTE byFieldId, const CLGComplex& a);
     static void ScalarMultply(T* dest, BYTE byFieldId, Real a);
-    static cuDoubleComplex Dot(T* dest, BYTE byFieldId, const T* other);
-    static TArray<DOUBLE> Sum(T* dest, BYTE byFieldId);
+    static cuDoubleComplex Dot(const T* me, BYTE byFieldId, const T* other);
+    static TArray<DOUBLE> Sum(const T* me, BYTE byFieldId);
+    static void InitialSource(T* data, BYTE byFieldId, const SFermionBosonSource& sourceData);
+    static void DebugPrint(const T* data, UINT sitecount);
 };
 
 template<typename T>
@@ -78,7 +90,8 @@ public:
     static void Mul(T* dest, BYTE byFieldId, const T* other, UBOOL bDagger = TRUE);
     static void ScalarMultply(T* dest, BYTE byFieldId, const CLGComplex& a);
     static void ScalarMultply(T* dest, BYTE byFieldId, Real a);
-    static cuDoubleComplex Dot(T* dest, BYTE byFieldId, const T* other);
+    static cuDoubleComplex Dot(const T* me, BYTE byFieldId, const T* other);
+    static void DebugPrint(const T* data, UINT uiLinkCount);
 };
 
 __END_NAMESPACE

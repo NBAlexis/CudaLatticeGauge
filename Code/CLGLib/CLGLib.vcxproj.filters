@@ -704,6 +704,12 @@
     <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cpp">
       <Filter>Data\Field\BoundaryField</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Field\Boson\CFieldBosonVN.cpp">
+      <Filter>Data\Field\Boson</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cpp">
+      <Filter>Data\Field\Boson</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -922,9 +928,6 @@
     <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu">
-      <Filter>Data\Field\Boson</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu">
       <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
@@ -936,9 +939,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu">
       <Filter>Data\Action</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu">
-      <Filter>Data\Field\Boson</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu">
       <Filter>Data\Action</Filter>

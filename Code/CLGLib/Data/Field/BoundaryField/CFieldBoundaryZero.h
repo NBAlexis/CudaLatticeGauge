@@ -33,7 +33,7 @@ public:
     void InitialField(CParameters& param) override
     {
         CFieldBoundary<deviceData>::InitialField(param);
-        CCommonKernel<deviceData>::Initial(this->m_pDeviceData, 8 * _HC_Dir, EFIT_Zero);
+        CCommonKernelField<deviceData>::Initial(this->m_pDeviceData, 8 * _HC_Dir, EFIT_Zero);
     }
 };
 

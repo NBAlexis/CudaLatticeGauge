@@ -220,9 +220,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionGaugePlaquetteRotatingT3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNKernel.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldCommonKernel.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.cu
@@ -296,6 +294,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionPhi4.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryZero.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp

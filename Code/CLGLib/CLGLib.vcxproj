@@ -199,9 +199,7 @@
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu" />
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT3D.cu" />
     <CudaCompile Include="Data\Boundary\CBoundaryConditionProjectivePlaneSquare.cu" />
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonVN.cu" />
     <CudaCompile Include="Data\Field\Boson\CFieldBosonVNKernel.cu" />
-    <CudaCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cu" />
     <CudaCompile Include="Data\Field\CFieldCommonKernel.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu" />
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu" />
@@ -248,6 +246,8 @@
     <ClCompile Include="Data\Action\CAction.cpp" />
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
     <ClCompile Include="Data\Action\CActionPhi4.cpp" />
+    <ClCompile Include="Data\Field\Boson\CFieldBosonVN.cpp" />
+    <ClCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cpp" />
     <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cpp" />
     <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryZero.cpp" />
     <ClCompile Include="Data\Field\CFieldBoson.cpp" />

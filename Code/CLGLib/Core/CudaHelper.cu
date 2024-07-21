@@ -705,6 +705,11 @@ cuDoubleComplex CCudaHelper::ReduceComplexWithThreadCount(cuDoubleComplex* devic
     return result[0];
 }
 
+void CLGAPI appExistCuda()
+{
+    cudaDeviceReset();
+}
+
 __END_NAMESPACE
 
 
