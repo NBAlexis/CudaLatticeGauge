@@ -194,7 +194,10 @@ FORCEINLINE void appGetPath(TCHAR* outchar, UINT bufferSize)
 #if _CLG_WIN
     GetCurrentDirectory(bufferSize, outchar);
 #else
-    getcwd(outchar, bufferSize);
+    if (!getcwd(outchar, bufferSize))
+    {
+        printf("getcwd error\n");
+    }
 #endif
 }
 
