@@ -55,7 +55,7 @@ public:
             appCrucial(_T("CFieldFermionKST<deviceVector, deviceGauge, vectorN>::InitialFieldWithFile: Only support CLG Bin File\n"));
             return;
         }
-        const UINT vectorn = static_cast<const UINT>(_elementdim<deviceVector>());
+        const UINT vectorn = _elementdim<deviceVector>();
         UINT uiSize = static_cast<UINT>(sizeof(Real) * vectorn * m_uiSiteCount);
         BYTE* data = appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         if (NULL == data)

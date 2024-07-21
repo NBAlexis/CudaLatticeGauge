@@ -62,7 +62,7 @@ public:
 
         if (NULL != appGetFermionSolver(this->m_byFieldId) && !appGetFermionSolver(this->m_byFieldId)->IsAbsoluteAccuracy())
         {
-            this->m_fLength = Dot(this).x;
+            this->m_fLength = this->Dot(this).x;
         }
 
     }
