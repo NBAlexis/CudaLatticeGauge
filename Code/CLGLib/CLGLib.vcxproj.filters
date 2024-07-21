@@ -575,6 +575,9 @@
     <ClInclude Include="Data\Field\CFieldCommonKernel.h">
       <Filter>Data\Field</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTKernel.h">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -709,6 +712,9 @@
     </ClCompile>
     <ClCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cpp">
       <Filter>Data\Field\Boson</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Version.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -954,6 +960,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\CFieldCommonKernel.cu">
       <Filter>Data\Field</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernel.cu">
+      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
