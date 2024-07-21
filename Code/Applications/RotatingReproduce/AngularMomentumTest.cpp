@@ -34,6 +34,7 @@ INT TestAngularMomentum(CParameters& params)
     }
 
     CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
+    CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
     appGeneral(_T("Start up.\n"));
     appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
 
@@ -42,7 +43,8 @@ INT TestAngularMomentum(CParameters& params)
         UINT uiLastAccept = 0;
         const Real omega = F(0.02) * i;
         appGeneral(_T("%d run: Omega = %f.\n"), i + 1, omega);
-        pGauageAction->SetOmega(omega);
+        pGauageAction->SetGaugeOmega(omega);
+        pFermion->SetFermionOmega(omega);
         appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
         appGetLattice()->m_pUpdator->SetConfigurationCount(0);

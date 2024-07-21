@@ -186,6 +186,8 @@ INT Measurement(CParameters& params)
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
+    CFieldFermionKSSU3R* pLight = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSSU3R* pHeavy = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(3));
 
     CFieldFermionKSSU3* pF1Light = NULL;
     CFieldFermionKSSU3* pF2Light = NULL;
@@ -213,10 +215,18 @@ INT Measurement(CParameters& params)
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
-        CCommonData::m_fOmega = fOmega * uiOmega;
+        //CCommonData::m_fOmega = fOmega * uiOmega;
         if (NULL != pAG)
         {
-            pAG->SetOmega(CCommonData::m_fOmega);
+            pAG->SetGaugeOmega(fOmega * uiOmega);
+        }
+        if (NULL != pLight)
+        {
+            pLight->SetFermionOmega(fOmega * uiOmega);
+        }
+        if (NULL != pHeavy)
+        {
+            pHeavy->SetFermionOmega(fOmega * uiOmega);
         }
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();
@@ -480,9 +490,12 @@ INT Measurement(CParameters& params)
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
                                 sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appToString(CCommonData::m_fOmega) + _T("\n");
                                 sFileContent = sFileContent + _T("Mass: ") + appToString(pF1Light->m_f2am) + _T("\n");
+                                sFileContent = sFileContent + _T("Gauge Omega: ") + appToString(pAG->GetOmega()) + _T("\n");
+                                sFileContent = sFileContent + _T("Light Omega: ") + appToString(pLight->GetOmega()) + _T("\n");
+                                sFileContent = sFileContent + _T("Heavy Omega: ") + appToString(pHeavy->GetOmega()) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Light->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                                sFileContent = sFileContent + appGetLattice()->GetInfos();
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }
                         }
@@ -547,9 +560,12 @@ INT Measurement(CParameters& params)
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
                                 sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
-                                sFileContent = sFileContent + _T("Omega: ") + appToString(CCommonData::m_fOmega) + _T("\n");
+                                sFileContent = sFileContent + _T("Gauge Omega: ") + appToString(pAG->GetOmega()) + _T("\n");
+                                sFileContent = sFileContent + _T("Light Omega: ") + appToString(pLight->GetOmega()) + _T("\n");
+                                sFileContent = sFileContent + _T("Heavy Omega: ") + appToString(pHeavy->GetOmega()) + _T("\n");
                                 sFileContent = sFileContent + _T("Mass: ") + appToString(pF1Heavy->m_f2am) + _T("\n");
                                 sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1Heavy->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n");
+                                sFileContent = sFileContent + appGetLattice()->GetInfos();
                                 appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent);
                             }
                         }

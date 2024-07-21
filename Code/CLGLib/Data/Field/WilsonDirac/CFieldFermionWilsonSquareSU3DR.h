@@ -34,6 +34,7 @@ public:
         , m_bNaive(TRUE)
         , m_bExponential(FALSE)
         , m_bShiftCenter(FALSE)
+        , m_fOmega(0.0)
     {
     }
 
@@ -51,6 +52,18 @@ public:
     UBOOL m_bNaive;
     UBOOL m_bExponential;
     UBOOL m_bShiftCenter;
+
+    void SetFermionOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        UpdatePooledParamters();
+    }
+
+    DOUBLE GetFermionOmega() const { return m_fOmega; }
+
+private:
+
+    DOUBLE m_fOmega;
 };
 
 __END_NAMESPACE

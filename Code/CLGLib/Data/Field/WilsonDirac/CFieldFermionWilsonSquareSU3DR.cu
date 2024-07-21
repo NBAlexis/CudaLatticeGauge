@@ -1789,7 +1789,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             pTarget,
             m_fKai,
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId,
             bDagger,
             m_bNaive,
@@ -1805,7 +1805,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             pTarget,
             m_bShiftCenter,
             m_fKai,
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId,
             byGaugeFieldId,
             bDagger,
@@ -1822,7 +1822,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             pTarget,
             m_bShiftCenter,
             m_fKai,
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId,
             byGaugeFieldId,
             bDagger,
@@ -1852,7 +1852,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             pTarget,
             m_fKai,
-            CCommonData::m_fOmega,
+            m_fOmega,
             //F(0.0),
             m_byFieldId,
             byGaugeFieldId,
@@ -1875,7 +1875,7 @@ void CFieldFermionWilsonSquareSU3DR::DOperator(void* pTargetBuffer, const void* 
             pTarget,
             m_bShiftCenter,
             m_fKai,
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId,
             byGaugeFieldId,
             bDagger,
@@ -2005,7 +2005,7 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pForceSU3,
             m_bShiftCenter,
             m_fKai, 
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId);
 
         _kernelDWilsonForceSU3_DR_Y_Naive << <block, threads >> > (
@@ -2016,7 +2016,7 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pForceSU3,
             m_bShiftCenter,
             m_fKai, 
-            CCommonData::m_fOmega,
+            m_fOmega,
             m_byFieldId);
     }
     else
@@ -2029,7 +2029,7 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pForceSU3,
             m_bShiftCenter,
             m_fKai, 
-            CCommonData::m_fOmega, 
+            m_fOmega, 
             m_byFieldId);
 
         _kernelDWilsonForceSU3_DR_Y << <block, threads >> > (
@@ -2040,7 +2040,7 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             pForceSU3,
             m_bShiftCenter,
             m_fKai, 
-            CCommonData::m_fOmega, 
+            m_fOmega, 
             m_byFieldId);
     }
 
@@ -2053,7 +2053,7 @@ void CFieldFermionWilsonSquareSU3DR::DerivateDOperator(void* pForce, const void*
             appGetLattice()->m_pIndexCache->m_pMoveCache[m_byFieldId],
             pForceSU3,
             m_fKai, 
-            CCommonData::m_fOmega, 
+            m_fOmega, 
             //F(0.0),
             m_byFieldId);
     }
@@ -2076,6 +2076,12 @@ void CFieldFermionWilsonSquareSU3DR::InitialOtherParameters(CParameters& params)
     INT iShiftCenter = 0;
     params.FetchValueINT(_T("ShiftCenter"), iShiftCenter);
     m_bShiftCenter = 0 != iShiftCenter;
+
+    DOUBLE fValue = 0.1;
+    if (params.FetchValueDOUBLE(_T("Omega"), fValue))
+    {
+        m_fOmega = fValue;
+    }
 }
 
 void CFieldFermionWilsonSquareSU3DR::CopyTo(CField* U) const
@@ -2087,6 +2093,7 @@ void CFieldFermionWilsonSquareSU3DR::CopyTo(CField* U) const
         pField->m_bNaive = m_bNaive;
         pField->m_bExponential = m_bExponential;
         pField->m_bShiftCenter = m_bShiftCenter;
+        pField->m_fOmega = m_fOmega;
     }
 }
 
@@ -2096,6 +2103,7 @@ CCString CFieldFermionWilsonSquareSU3DR::GetInfos(const CCString &tab) const
     sRet = sRet + tab + _T("Naive : ") + appToString(m_bNaive) + _T("\n");
     sRet = sRet + tab + _T("Exponential : ") + appToString(m_bExponential) + _T("\n");
     sRet = sRet + tab + _T("ShiftCenter : ") + appToString(m_bShiftCenter) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
 
     return sRet;
 }

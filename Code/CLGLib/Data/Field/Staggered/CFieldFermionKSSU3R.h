@@ -27,6 +27,7 @@ public:
 
     CFieldFermionKSSU3R() : CFieldFermionKSSU3()
         , m_bRealRotation(FALSE)
+        , m_fOmega(0.0)
     {
 
     }
@@ -43,6 +44,18 @@ public:
     CCString GetInfos(const CCString& tab) const override;
 
     UBOOL m_bRealRotation;
+
+    void SetFermionOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        this->UpdatePooledParamters();
+    }
+
+    DOUBLE GetOmega() const { return m_fOmega; }
+
+private:
+
+    DOUBLE m_fOmega;
 };
 
 

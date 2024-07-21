@@ -9,6 +9,7 @@
 
 #include "StaggeredRotation.h"
 
+#if 0
 INT SimulateStaggeredBeta(CParameters& params)
 {
     #pragma region Parameters
@@ -296,3 +297,4 @@ INT SimulateStaggeredBeta(CParameters& params)
 
     return 0;
 }
+#endif

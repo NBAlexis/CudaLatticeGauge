@@ -155,7 +155,7 @@ INT SimulateStaggeredRotation3D(CParameters& params)
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
             if (NULL != pGaugeRotation)
             {
-                pGaugeRotation->SetOmega(F(0.0));
+                pGaugeRotation->SetGaugeOmega(F(0.0));
             }
             else
             {
@@ -201,7 +201,7 @@ INT SimulateStaggeredRotation3D(CParameters& params)
 
             if (NULL != pGaugeRotation)
             {
-                pGaugeRotation->SetOmega(fSep * uiOmega);
+                pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
             }
             else
             {

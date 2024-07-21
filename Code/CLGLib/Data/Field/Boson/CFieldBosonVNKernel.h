@@ -25,7 +25,7 @@ public:
     static void DiagnalTerm(
         deviceDataBoson* pTarget,
         BYTE byFieldId,
-        const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
+        const deviceDataBoson* pSource, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
         EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff);
 
     static void OneLink(
@@ -34,7 +34,7 @@ public:
         const deviceDataBoson* pSource,
         const deviceDataGauge* pGauge,
         BYTE byGaugeFieldId,
-        Real fCoefficient,
+        DOUBLE fCoefficient,
         _deviceCoeffFunctionPointerTwoSites fpCoeff,
         const INT* pDevicePath,
         BYTE pathLength,
@@ -48,7 +48,7 @@ public:
         const deviceDataGauge* pGauge,
         BYTE byGaugeFieldId,
         deviceDataGauge* pForce,
-        Real fCoefficient,
+        DOUBLE fCoefficient,
         _deviceCoeffFunctionPointerTwoSites fpCoeff,
         const INT* pDevicePath,
         BYTE pathLength);
@@ -59,7 +59,7 @@ public:
         const deviceDataBoson* pSource,
         const deviceDataGauge* pGauge,
         BYTE byGaugeFieldId,
-        Real fCoefficient,
+        DOUBLE fCoefficient,
         _deviceCoeffFunctionPointer fpCoeff,
         BYTE idir,
         EOperatorCoefficientType eOCT,
@@ -72,7 +72,7 @@ public:
         const deviceDataGauge* pGauge,
         BYTE byGaugeFieldId,
         deviceDataGauge* pForce,
-        Real fCoefficient,
+        DOUBLE fCoefficient,
         _deviceCoeffFunctionPointer fpCoeff,
         BYTE idir);
 

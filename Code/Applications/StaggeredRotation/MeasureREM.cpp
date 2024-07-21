@@ -56,12 +56,15 @@ __DEFINE_ENUM(EDistributionJobKSREM,
             sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n"); \
             sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n"); \
             sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n"); \
-            sFileContent = sFileContent + _T("Omega: ") + appToString(CCommonData::m_fOmega) + _T("\n"); \
             sFileContent = sFileContent + _T("Magnetic: ") + appToString(pU1->m_feBz) + _T("\n"); \
             sFileContent = sFileContent + _T("MagneticType: ") + __ENUM_TO_STRING(EU1RealType, pU1->m_eB) + _T("\n"); \
             sFileContent = sFileContent + _T("Mass: ") + appToString(pF1##ftype->m_f2am) + _T("\n"); \
+            sFileContent = sFileContent + _T("U Omega: ") + appToString(pFu->GetOmega()) + _T("\n"); \
+            sFileContent = sFileContent + _T("D Omega: ") + appToString(pFd->GetOmega()) + _T("\n"); \
+            sFileContent = sFileContent + _T("S Omega: ") + appToString(pFs->GetOmega()) + _T("\n"); \
             sFileContent = sFileContent + _T("Chage: ") + appToString(pF1##ftype->m_fQ) + _T("\n"); \
             sFileContent = sFileContent + _T("ShiftCenter: ") + (pF1##ftype->m_bEachSiteEta ? _T("TRUE") : _T("FALSE")) + _T("\n"); \
+            sFileContent = sFileContent + sFileContent = sFileContent + appGetLattice()->GetInfos(); \
             appGetFileSystem()->WriteAllText(sFermionFile + _T(".txt"), sFileContent); \
         } \
     } \
@@ -232,7 +235,9 @@ INT MeasurementREM(CParameters& params)
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
-
+    CFieldFermionKSSU3REM* pFu = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSSU3REM* pFd = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(3));
+    CFieldFermionKSSU3REM* pFs = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(4));
     CFieldFermionKSSU3REM* pF1u = NULL;
     CFieldFermionKSSU3REM* pF2u = NULL;
     CFieldFermionKSSU3REM* pF1d = NULL;
@@ -255,13 +260,16 @@ INT MeasurementREM(CParameters& params)
 
     for (UINT uiListIdx = iListStart; uiListIdx < iListEnd; ++uiListIdx)
     {
-        CCommonData::m_fOmega = lstOmega[uiListIdx];
+        //CCommonData::m_fOmega = lstOmega[uiListIdx];
         pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx], TRUE);
 
         if (NULL != pAG)
         {
-            pAG->SetOmega(CCommonData::m_fOmega);
+            pAG->SetGaugeOmega(lstOmega[uiListIdx]);
         }
+        pFu->SetFermionOmega(lstOmega[uiListIdx]);
+        pFd->SetFermionOmega(lstOmega[uiListIdx]);
+        pFs->SetFermionOmega(lstOmega[uiListIdx]);
         appGeneral(_T("(* ==== Omega(%f) Magnetic(%f) ========= *)\n"), lstOmega[uiListIdx], lstMagnetic[uiListIdx]);
         pPL->Reset();
         pJG->Reset();

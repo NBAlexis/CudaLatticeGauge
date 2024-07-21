@@ -127,6 +127,7 @@ protected:
 
     //phi _i and Dst0 phi _i
     deviceSU3Vector** m_pRationalFieldPointers;
+    DOUBLE m_fOmega;
 };
 
 class CLGAPI CFieldMatrixOperationKSSU3 : public CFieldMatrixOperation

@@ -1821,10 +1821,6 @@ CCString CFieldFermionKSSU3Gamma::GetInfos(const CCString& tab) const
     return sRet;
 }
 
-void CFieldFermionKSSU3Gamma::UpdatePooledParamters() const
-{
-    appGetLattice()->ReCopyPooled(m_byFieldId);
-}
 
 __END_NAMESPACE
 

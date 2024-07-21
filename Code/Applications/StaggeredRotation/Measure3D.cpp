@@ -194,7 +194,7 @@ INT Measurement3D(CParameters& params)
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
-        CCommonData::m_fOmega = fOmega * uiOmega;
+        //CCommonData::m_fOmega = fOmega * uiOmega;
         //if (NULL != pAG)
         //{
         //    pAG->SetOmega(CCommonData::m_fOmega);

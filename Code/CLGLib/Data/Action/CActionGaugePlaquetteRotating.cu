@@ -1601,14 +1601,12 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     DOUBLE fOmega = 0.1;
     param.FetchValueDOUBLE(_T("Omega"), fOmega);
     m_fOmega = fOmega;
-    CCommonData::m_fOmega = fOmega;
 #else
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fOmega = F(0.1);
     param.FetchValueReal(_T("Omega"), fOmega);
     m_fOmega = fOmega;
-    CCommonData::m_fOmega = fOmega;
 #endif
 
 
@@ -2215,10 +2213,9 @@ void CActionGaugePlaquetteRotating::CalculateForceOnGaugeTorus(const class CFiel
 //    return m_pOwner->m_pGaugeField->CalculatePlaqutteEnergy(m_fBetaOverN) / m_uiPlaqutteCount;
 //}
 
-void CActionGaugePlaquetteRotating::SetOmega(DOUBLE fOmega)
+void CActionGaugePlaquetteRotating::SetGaugeOmega(DOUBLE fOmega)
 { 
     m_fOmega = fOmega; 
-    CCommonData::m_fOmega = fOmega;
 }
 
 //void CActionGaugePlaquetteRotating::SetCenter(const SSmallInt4 &newCenter) 

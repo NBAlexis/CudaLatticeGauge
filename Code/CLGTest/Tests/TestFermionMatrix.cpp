@@ -29,7 +29,6 @@ UINT TestFermionDMatrixKS(CParameters& param)
         source.m_byColorIndex = 0;
         source.m_sSourcePoint = __hostSiteIndexToInt4(i);
         pField->InitialAsSource(source);
-        CCommonData::m_fOmega = F(0.2);
         pField->D(_FIELDS);
         //pField->InverseD(appGetLattice()->m_pGaugeField);
         //pField->ApplyGammaKS(appGetLattice()->m_pGaugeField, GAMMA53);

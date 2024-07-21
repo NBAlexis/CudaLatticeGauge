@@ -35,7 +35,7 @@ public:
         , m_bShiftHalfCoord(FALSE)
         , m_bTorus(FALSE)
     {
-        SetOmega(F(0.0));
+        SetGaugeOmega(F(0.0));
     }
     ~CActionGaugePlaquetteRotatingT() {}
 
@@ -43,10 +43,9 @@ public:
     CCString GetInfos(const CCString& tab) const override;
 
     void SetBeta(DOUBLE fBeta);
-    void SetOmega(DOUBLE fOmega)
+    void SetGaugeOmega(DOUBLE fOmega)
     {
         m_fOmega = fOmega;
-        CCommonData::m_fOmega = fOmega;
     }
     DOUBLE GetOmega() const { return m_fOmega; }
     UBOOL IsCloverEnergy() const { return m_bCloverEnergy; }

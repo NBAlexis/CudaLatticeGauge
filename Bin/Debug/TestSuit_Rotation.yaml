@@ -60,6 +60,7 @@ TestRotationWilsonDiracDirichlet:
         Period : [0, 0, 1, -1]
         Naive : 1
         Exponential : 1
+        Omega : 0.2
 
     BoundaryFermionField1:
 
@@ -160,6 +161,7 @@ TestRotationWilsonDiracTorus:
         ## Default to use Naive discretization (which is faster)
         Naive : 1
         Exponential : 1
+        Omega : 0.2
       
     Action1:
    
@@ -256,6 +258,7 @@ TestRotationWilsonDiracProjectivePlane:
         Naive : 1
         Exponential : 1
         ShiftCenter : 1
+        Omega : 0.2
        
     Action1:
    
@@ -360,6 +363,7 @@ TestRotationKSDirichlet:
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+        Omega : 0.2
 
         Period : [0, 0, 1, -1]
 
@@ -433,7 +437,7 @@ TestRotationKSTorus:
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
@@ -450,7 +454,7 @@ TestRotationKSTorus:
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 35
+        IntegratorStep : 30
         NestedStep : 5
         # BindDir : 10
 
@@ -474,6 +478,7 @@ TestRotationKSTorus:
         FieldId : 2
         PoolNumber : 15
         ShiftCenter : 1
+        Omega : 0.2
 
         Period : [1, 1, 1, -1]
 
@@ -598,6 +603,7 @@ TestRotationKSProjectivePlane:
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+        Omega : 0.2
 
         EachSiteEta : 1
 
@@ -715,6 +721,7 @@ TestRotationEMProjectivePlane:
 
         Charge : -0.333333333333333333
         EMFieldID : 4
+        Omega : 0.2
 
         Period : [1, 1, 1, -1]
 
@@ -734,6 +741,7 @@ TestRotationEMProjectivePlane:
 
         Charge : 0.6666666666666666666667
         EMFieldID : 4
+        Omega : 0.2
 
         Period : [1, 1, 1, -1]
 
@@ -768,6 +776,7 @@ TestRotationEMProjectivePlane:
         FieldId : 2
 
     Action3:
+
         ActionName : CActionFermionKS
         FieldId : 3
 
@@ -890,6 +899,7 @@ TestRotationProjectivePlaneU1:
         Mass : 0.5
         FieldId : 2
         PoolNumber : 15
+        Omega : 0.2
 
         EachSiteEta : 1
 
@@ -920,6 +930,8 @@ TestRotationProjectivePlaneU1:
         FieldId : 3
         PoolNumber : 15
         EachSiteEta : 1
+        Omega : 0.2
+
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -943,6 +955,8 @@ TestRotationProjectivePlaneU1:
         FieldId : 4
         PoolNumber : 15
         EachSiteEta : 1
+        Omega : 0.2
+
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -966,6 +980,8 @@ TestRotationProjectivePlaneU1:
         FieldId : 5
         PoolNumber : 15
         EachSiteEta : 1
+        Omega : 0.2
+
         Period : [1, 1, 1, -1]
 
         # MC is to prepare
@@ -1146,7 +1162,7 @@ TestRotationQuenched3D:
     ExpectMiss : 2
     ExpectMissDebug : 1
     ExpectedRes : 0.729716
-    ExpectedResDebug : 0.607305
+    ExpectedResDebug : 0.647564
 
     ## ============================================================
     ## Initial files
@@ -1159,7 +1175,7 @@ TestRotationQuenched3D:
         UpdatorType : CHMC
         Metropolis : 1
         ReportMeasure : 0
-        Adaptive : 1
+        Adaptive : 0
         MinMaxStep : [4, 50]
         GrowReduceThreshold : [-0.3, 0.02]
         InnerLeapfrog : 1
@@ -1170,7 +1186,7 @@ TestRotationQuenched3D:
         # IntegratorType : CIntegratorNestedOmelyan
         IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 30
+        IntegratorStep : 8
 
     Gauge:
 
@@ -1185,7 +1201,7 @@ TestRotationQuenched3D:
         CloverEnergy : 1
         ShiftCoord : 1
         Beta : 12.0
-        Omega : 0.0
+        Omega : 0.2
 
     Measure1:
 

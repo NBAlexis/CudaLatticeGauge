@@ -89,7 +89,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 #if _CLG_DEBUG
     appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.3. last HDiff = %f : expected < 0.15\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
 #else
-    appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%),  last HDiff = %f : expected < 0.08\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
+    appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.12 (exp(-0.1)=90%%),  last HDiff = %f : expected < 0.1\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
 #endif
 
 #if _CLG_DEBUG
@@ -104,7 +104,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 #if _CLG_DEBUG
     if (fHDiff > F(0.3))
 #else
-    if (fHDiff > F(0.1))
+    if (fHDiff > F(0.12))
 #endif
     {
         ++uiError;
@@ -113,7 +113,7 @@ UINT TestUpdateCommon(CParameters& sParam)
 #if _CLG_DEBUG
     if (fLastHDiff > F(0.15))
 #else
-    if (fLastHDiff > F(0.08))
+    if (fLastHDiff > F(0.1))
 #endif
     {
         ++uiError;

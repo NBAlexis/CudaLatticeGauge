@@ -461,7 +461,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         byGaugeFieldId,
         m_bShiftCenter,
         TRUE,
-        CCommonData::m_fOmega,
+        m_fOmega,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -476,7 +476,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         byGaugeFieldId,
         m_bShiftCenter,
         FALSE,
-        CCommonData::m_fOmega,
+        m_fOmega,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -488,7 +488,7 @@ void CFieldFermionKSSU3DR::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         m_byFieldId,
         byGaugeFieldId,
-        CCommonData::m_fOmega,
+        m_fOmega,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -556,7 +556,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                     m_byFieldId,
                     byGaugeFieldId,
                     m_bShiftCenter,
-                    CCommonData::m_fOmega,
+                    m_fOmega,
                     static_cast<BYTE>(imu), iMu[pathidx],
                     L[0], L[1], L[2], LLength,
                     R[0], R[1], R[2], RLength,
@@ -617,7 +617,7 @@ void CFieldFermionKSSU3DR::DerivateD0(
                         m_rMD.m_uiDegree,
                         m_byFieldId,
                         byGaugeFieldId,
-                        CCommonData::m_fOmega,
+                        m_fOmega,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength
                         );
@@ -635,6 +635,12 @@ void CFieldFermionKSSU3DR::InitialOtherParameters(CParameters& params)
 {
     CFieldFermionKSSU3D::InitialOtherParameters(params);
 
+    DOUBLE fValue = 0.1;
+    if (params.FetchValueDOUBLE(_T("Omega"), fValue))
+    {
+        m_fOmega = fValue;
+    }
+
     INT iShiftCenter = 0;
     if (params.FetchValueINT(_T("ShiftCenter"), iShiftCenter))
     {
@@ -649,13 +655,14 @@ void CFieldFermionKSSU3DR::CopyTo(CField* U) const
     if (NULL != pOther)
     {
         pOther->m_bShiftCenter = m_bShiftCenter;
+        pOther->m_fOmega = m_fOmega;
     }
 }
 
 CCString CFieldFermionKSSU3DR::GetInfos(const CCString& tab) const
 {
     CCString sRet = CFieldFermionKSSU3D::GetInfos(tab);
-    sRet = sRet + tab + _T("Omega : ") + appToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
     sRet = sRet + tab + _T("ShiftCenter : ") + appToString(m_bShiftCenter) + _T("\n");
     return sRet;
 }

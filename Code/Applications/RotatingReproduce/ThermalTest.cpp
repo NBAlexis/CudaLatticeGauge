@@ -113,6 +113,7 @@ INT TestThermal(CParameters& params)
         //}
 
         CActionGaugePlaquetteRotating * pGauageAction = dynamic_cast<CActionGaugePlaquetteRotating *>(appGetLattice()->GetActionById(1));
+        CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
         CCString sHeader;
         sHeader.Format(_T("Nt%d"), uiNt);
         appSetLogHeader(sHeader);
@@ -147,7 +148,8 @@ INT TestThermal(CParameters& params)
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
             if (NULL != pGauageAction)
             {
-                pGauageAction->SetOmega(F(0.0));
+                pGauageAction->SetGaugeOmega(F(0.0));
+                pFermion->SetFermionOmega(F(0.0));
             }
             appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
@@ -188,7 +190,8 @@ INT TestThermal(CParameters& params)
 
             if (NULL != pGauageAction)
             {
-                pGauageAction->SetOmega(fSep * uiOmega);
+                pGauageAction->SetGaugeOmega(fSep * uiOmega);
+                pFermion->SetFermionOmega(F(0.0));
             }
 
             if (bAdditive)

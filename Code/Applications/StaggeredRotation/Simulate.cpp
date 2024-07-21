@@ -118,6 +118,11 @@ INT SimulateStaggeredRotation(CParameters& params)
         //}
 
         CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
+        CFieldFermionKSSU3R* pF2 = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(2));
+        CFieldFermionKSSU3R* pF3 = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(3));
+        CFieldFermionKSSU3R* pF4 = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(4));
+        CFieldFermionKSSU3R* pF5 = dynamic_cast<CFieldFermionKSSU3R*>(appGetLattice()->GetFieldById(5));
+
         //CActionGaugePlaquette* pGaugeNoRotation = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
         CCString sHeader;
         sHeader.Format(_T("Nt%d"), uiNt);
@@ -157,11 +162,22 @@ INT SimulateStaggeredRotation(CParameters& params)
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
             if (NULL != pGaugeRotation)
             {
-                pGaugeRotation->SetOmega(F(0.0));
+                pGaugeRotation->SetGaugeOmega(F(0.0));
             }
             else
             {
                 appCrucial(_T("!!! Note you are using a no rotating action!\n"));
+            }
+            if (NULL != pF2)
+            {
+                pF2->SetFermionOmega(F(0.0));
+                pF3->SetFermionOmega(F(0.0));
+                pF4->SetFermionOmega(F(0.0));
+                pF5->SetFermionOmega(F(0.0));
+            }
+            else
+            {
+                appCrucial(_T("!!! Note you are using a no rotating ferion or quenched approximation!\n"));
             }
 
             appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
@@ -203,11 +219,22 @@ INT SimulateStaggeredRotation(CParameters& params)
 
             if (NULL != pGaugeRotation)
             {
-                pGaugeRotation->SetOmega(fSep * uiOmega);
+                pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
             }
             else
             {
                 appCrucial(_T("!!! NOTE: you are using non-rotating action!!!\n"));
+            }
+            if (NULL != pF2)
+            {
+                pF2->SetFermionOmega(F(0.0));
+                pF3->SetFermionOmega(F(0.0));
+                pF4->SetFermionOmega(F(0.0));
+                pF5->SetFermionOmega(F(0.0));
+            }
+            else
+            {
+                appCrucial(_T("!!! Note you are using a no rotating ferion or quenched approximation!\n"));
             }
 
             if (bAdditive)

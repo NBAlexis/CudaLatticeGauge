@@ -218,6 +218,8 @@ public:
 
     friend class CFieldPool;
 
+    void UpdatePooledParamters() const;
+
 protected:
 
     const CFieldGauge* GetDefaultGauge(INT gaugeNum, const CFieldGauge* const* gaugeFields) const

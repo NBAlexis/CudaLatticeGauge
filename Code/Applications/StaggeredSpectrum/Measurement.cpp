@@ -45,7 +45,7 @@ void WriteStringFileRealArray(const CCString& sFileName, const TArray<Real>& lst
     file.close();
 }
 
-void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<Real>& lst1, const TArray<CLGComplex>& lst2, UBOOL bAppend = FALSE)
+void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<Real>& list1, const TArray<CLGComplex>& list2, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     std::ofstream file;
@@ -60,11 +60,11 @@ void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<Real>& 
     TCHAR strleft[50];
     TCHAR strreal[50];
     TCHAR strimg[50];
-    for (INT i = 0; i < lst1.Num(); ++i)
+    for (INT i = 0; i < list1.Num(); ++i)
     {
-        _gcvt_s(strleft, 50, lst1[i], iDigital);
-        _gcvt_s(strreal, 50, lst2[i].x, iDigital);
-        _gcvt_s(strimg, 50, lst2[i].y, iDigital);
+        _gcvt_s(strleft, 50, list1[i], iDigital);
+        _gcvt_s(strreal, 50, list2[i].x, iDigital);
+        _gcvt_s(strimg, 50, list2[i].y, iDigital);
         CCString s1 = CCString(strleft);
         CCString s2 = CCString(strreal);
         CCString s3 = CCString(strimg);
@@ -249,7 +249,7 @@ void WriteStringFileRealArray(const CCString& sFileName, const TArray<DOUBLE>& l
     file.close();
 }
 
-void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<DOUBLE>& lst1, const TArray<cuDoubleComplex>& lst2, UBOOL bAppend = FALSE)
+void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<DOUBLE>& list1, const TArray<cuDoubleComplex>& list2, UBOOL bAppend = FALSE)
 {
     const INT iDigital = static_cast<INT>(kExportDigital);
     std::ofstream file;
@@ -264,11 +264,11 @@ void WriteStringFileDoubleColumn(const CCString& sFileName, const TArray<DOUBLE>
     TCHAR strleft[50];
     TCHAR strreal[50];
     TCHAR strimg[50];
-    for (INT i = 0; i < lst1.Num(); ++i)
+    for (INT i = 0; i < list1.Num(); ++i)
     {
-        _gcvt_s(strleft, 50, lst1[i], iDigital);
-        _gcvt_s(strreal, 50, lst2[i].x, iDigital);
-        _gcvt_s(strimg, 50, lst2[i].y, iDigital);
+        _gcvt_s(strleft, 50, list1[i], iDigital);
+        _gcvt_s(strreal, 50, list2[i].x, iDigital);
+        _gcvt_s(strimg, 50, list2[i].y, iDigital);
         CCString s1 = CCString(strleft);
         CCString s2 = CCString(strreal);
         CCString s3 = CCString(strimg);

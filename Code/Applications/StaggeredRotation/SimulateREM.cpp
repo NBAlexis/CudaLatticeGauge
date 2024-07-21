@@ -102,6 +102,10 @@ INT SimulateStaggeredRotationEM(CParameters& params)
     //}
 
     CActionGaugePlaquetteRotating* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->GetActionById(1));
+    CFieldFermionKSSU3REM* pF2 = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSSU3REM* pF3 = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(3));
+    CFieldFermionKSSU3REM* pF4 = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(4));
+    CFieldFermionKSSU3REM* pF5 = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(5));
     CCString sHeader;
     sHeader.Format(_T("Nt%d"), _HC_Lt);
     appSetLogHeader(sHeader);
@@ -138,7 +142,11 @@ INT SimulateStaggeredRotationEM(CParameters& params)
     if (bNeedBake && iBeforeEquib > 0)
     {
         appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-        pGaugeRotation->SetOmega(F(0.0));
+        pGaugeRotation->SetGaugeOmega(F(0.0));
+        pF2->SetFermionOmega(F(0.0));
+        pF3->SetFermionOmega(F(0.0));
+        pF4->SetFermionOmega(F(0.0));
+        pF5->SetFermionOmega(F(0.0));
         pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), F(0.0), TRUE);
 
         appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
@@ -177,7 +185,11 @@ INT SimulateStaggeredRotationEM(CParameters& params)
         appSetLogHeader(sHeader);
         appGeneral(_T("\n========= Omega=%f Magnetic=%f ==========\n"), lstOmega[uiListIdx], lstMagnetic[uiListIdx]);
 
-        pGaugeRotation->SetOmega(lstOmega[uiListIdx]);
+        pGaugeRotation->SetGaugeOmega(lstOmega[uiListIdx]);
+        pF2->SetFermionOmega(lstOmega[uiListIdx]);
+        pF3->SetFermionOmega(lstOmega[uiListIdx]);
+        pF4->SetFermionOmega(lstOmega[uiListIdx]);
+        pF5->SetFermionOmega(lstOmega[uiListIdx]);
         pU1->InitialU1Real(EURT_None, EURT_None, pU1->m_eB, F(0.0), F(0.0), lstMagnetic[uiListIdx], TRUE);
 
         if (bAdditive)

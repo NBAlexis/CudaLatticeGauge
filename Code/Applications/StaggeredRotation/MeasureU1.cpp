@@ -154,6 +154,8 @@ INT MeasurementU1(CParameters& params)
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
 
     CActionGaugePlaquetteRotatingU1* pAG = dynamic_cast<CActionGaugePlaquetteRotatingU1*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
+    CFieldFermionKSU1R* pLight = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(2));
+    CFieldFermionKSU1R* pHeavy = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(3));
 
     CFieldFermionKSU1* pF1Light = NULL;
     CFieldFermionKSU1* pF2Light = NULL;
@@ -177,10 +179,18 @@ INT MeasurementU1(CParameters& params)
 
     for (UINT uiOmega = iStartOmega; uiOmega <= iEndOmega; ++uiOmega)
     {
-        CCommonData::m_fOmega = fOmega * uiOmega;
+        //CCommonData::m_fOmega = fOmega * uiOmega;
         if (NULL != pAG)
         {
-            pAG->SetOmega(CCommonData::m_fOmega);
+            pAG->SetGaugeOmega(fOmega * uiOmega);
+        }
+        if (NULL != pLight)
+        {
+            pLight->SetFermionOmega(fOmega * uiOmega);
+        }
+        if (NULL != pHeavy)
+        {
+            pHeavy->SetFermionOmega(fOmega * uiOmega);
         }
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();

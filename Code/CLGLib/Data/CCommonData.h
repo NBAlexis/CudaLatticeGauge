@@ -493,10 +493,8 @@ public:
 
 #if !_CLG_DOUBLEFLOAT
     static DOUBLE m_fBeta;
-    static DOUBLE m_fOmega;
 #else
     static Real m_fBeta;
-    static Real m_fOmega;
 #endif
     static Real m_fKai;
 

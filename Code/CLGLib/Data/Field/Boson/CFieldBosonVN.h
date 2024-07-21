@@ -367,7 +367,7 @@ protected:
     * This is not D, but the minus terms in D
     */
     virtual void OneLink(const deviceDataBoson* pSource, const deviceDataGauge* pGauge, BYTE byGaugeFieldId,
-        Real fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff,
+        DOUBLE fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff,
         const INT* pDevicePath, BYTE pathLength, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
     {
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLink(m_pDeviceData, m_byFieldId, pSource, pGauge, byGaugeFieldId, fCoeffiecient, fpCoeff, pDevicePath, pathLength, eOCT, fRealCoeff, cCmpCoeff);
@@ -376,12 +376,12 @@ protected:
     /**
     * f(x) phi^*(x)phi(x)
     */
-    virtual void DiagnalTerm(const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+    virtual void DiagnalTerm(const deviceDataBoson* pSource, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
     {
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DiagnalTerm(m_pDeviceData, m_byFieldId, pSource, fCoeffiecient, fpCoeff, eOCT, fRealCoeff, cCmpCoeff);
     }
 
-    virtual void OneLinkForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff, const INT* pDevicePath, BYTE pathLength) const
+    virtual void OneLinkForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointerTwoSites fpCoeff, const INT* pDevicePath, BYTE pathLength) const
     {
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLinkForceGauge(m_pDeviceData, m_byFieldId, pGuage, byGaugeFieldId, pForce, fCoeffiecient, fpCoeff, pDevicePath, pathLength);
     }
@@ -391,13 +391,13 @@ protected:
     * f(n) U_mu(n)phi(n+mu) + f(n-mu) U_{-mu}(n)phi(n-mu)
     */
     virtual void PartialSq(const deviceDataBoson* pSource, const deviceDataGauge* pGuage, BYTE byGaugeFieldId,
-        Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir,
+        DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir,
         EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
     {
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSq(m_pDeviceData, m_byFieldId, pSource, pGuage, byGaugeFieldId, fCoeffiecient, fpCoeff, idir, eOCT, fRealCoeff, cCmpCoeff);
     }
 
-    virtual void PartialSqForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir) const
+    virtual void PartialSqForceGauge(const deviceDataGauge* pGuage, BYTE byGaugeFieldId, deviceDataGauge* pForce, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff, BYTE idir) const
     {
         CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(m_pDeviceData, m_byFieldId, pGuage, byGaugeFieldId, pForce, fCoeffiecient, fpCoeff, idir);
     }

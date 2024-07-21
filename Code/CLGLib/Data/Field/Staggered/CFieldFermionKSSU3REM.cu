@@ -799,7 +799,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         pTarget,
         m_byFieldId,
         byGaugeFieldId,
-        CCommonData::m_fOmega,
+        m_fOmega,
         m_fQ,
         _HC_Center,
         bDagger,
@@ -818,7 +818,7 @@ void CFieldFermionKSSU3REM::DOperatorKS(void* pTargetBuffer, const void* pBuffer
         pTarget,
         m_byFieldId,
         byGaugeFieldId,
-        CCommonData::m_fOmega,
+        m_fOmega,
         m_fQ,
         bDagger,
         eOCT,
@@ -906,7 +906,7 @@ void CFieldFermionKSSU3REM::DerivateD0(
                     m_pMDNumerator,
                     m_rMD.m_uiDegree,
                     m_byFieldId,
-                    CCommonData::m_fOmega,
+                    m_fOmega,
                     m_fQ,
                     static_cast<BYTE>(imu), iTau[pathidx],
                     L[0], L[1], L[2], LLength,
@@ -992,7 +992,7 @@ void CFieldFermionKSSU3REM::DerivateD0(
                         m_pMDNumerator,
                         m_rMD.m_uiDegree,
                         m_byFieldId,
-                        CCommonData::m_fOmega,
+                        m_fOmega,
                         m_fQ,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength
@@ -1013,6 +1013,7 @@ CFieldFermionKSSU3REM::CFieldFermionKSSU3REM()
     , m_byEMFieldID(0)
     , m_fQ(F(0.0))
     , m_pDevicePathBuffer(NULL)
+    , m_fOmega(0.0)
 {
     checkCudaErrors(cudaMalloc((void**)&m_pDevicePathBuffer, sizeof(INT) * 4));
 }
@@ -1036,6 +1037,12 @@ void CFieldFermionKSSU3REM::InitialOtherParameters(CParameters& params)
     if (params.FetchValueINT(_T("EMFieldID"), iValue))
     {
         m_byEMFieldID = static_cast<BYTE>(iValue);
+    }
+
+    DOUBLE dValue = 0.1;
+    if (params.FetchValueDOUBLE(_T("Omega"), dValue))
+    {
+        m_fOmega = dValue;
     }
 }
 
@@ -1091,12 +1098,13 @@ void CFieldFermionKSSU3REM::CopyTo(CField* U) const
     CFieldFermionKSSU3REM* pTarget = dynamic_cast<CFieldFermionKSSU3REM*>(U);
     pTarget->m_byEMFieldID = m_byEMFieldID;
     pTarget->m_fQ = m_fQ;
+    pTarget->m_fOmega = m_fOmega;
 }
 
 CCString CFieldFermionKSSU3REM::GetInfos(const CCString& tab) const
 {
     CCString sRet = CFieldFermionKSSU3::GetInfos(tab);
-    sRet = sRet + tab + _T("Omega : ") + appToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
     sRet = sRet + tab + _T("Background Field ID : ") + appToString(m_byEMFieldID) + _T("\n");
     sRet = sRet + tab + _T("fQ : ") + appToString(m_fQ) + _T("\n");
     return sRet;

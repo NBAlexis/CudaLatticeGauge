@@ -144,7 +144,7 @@ INT SimulateStaggeredRotationU13D(CParameters& params)
         if (bNeedBake && iBeforeEquib > 0)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-            pGaugeRotation->SetOmega(F(0.0));
+            pGaugeRotation->SetGaugeOmega(F(0.0));
 
             appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
@@ -183,7 +183,7 @@ INT SimulateStaggeredRotationU13D(CParameters& params)
             appSetLogHeader(sHeader);
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
 
-            pGaugeRotation->SetOmega(fSep * uiOmega);
+            pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
 
             if (bAdditive)
             {

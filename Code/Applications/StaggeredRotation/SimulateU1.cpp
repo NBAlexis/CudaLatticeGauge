@@ -108,6 +108,10 @@ INT SimulateStaggeredRotationU1(CParameters& params)
         TArray<CLGComplex> polykov;
 
         CActionGaugePlaquetteRotatingU1* pGaugeRotation = dynamic_cast<CActionGaugePlaquetteRotatingU1*>(appGetLattice()->GetActionById(1));
+        CFieldFermionKSU1R* pF2 = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(2));
+        CFieldFermionKSU1R* pF3 = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(3));
+        CFieldFermionKSU1R* pF4 = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(4));
+        CFieldFermionKSU1R* pF5 = dynamic_cast<CFieldFermionKSU1R*>(appGetLattice()->GetFieldById(5));
         CCString sHeader;
         sHeader.Format(_T("Nt%d"), uiNt);
         appSetLogHeader(sHeader);
@@ -144,7 +148,14 @@ INT SimulateStaggeredRotationU1(CParameters& params)
         if (bNeedBake && iBeforeEquib > 0)
         {
             appGetLattice()->m_pUpdator->SetSaveConfiguration(FALSE, _T("notsave"));
-            pGaugeRotation->SetOmega(F(0.0));
+            pGaugeRotation->SetGaugeOmega(F(0.0));
+            if (NULL != pF2)
+            {
+                pF2->SetFermionOmega(F(0.0));
+                pF3->SetFermionOmega(F(0.0));
+                pF4->SetFermionOmega(F(0.0));
+                pF5->SetFermionOmega(F(0.0));
+            }
 
             appGetLattice()->m_pGaugeField[0]->InitialField(EFIT_Random);
 
@@ -183,7 +194,14 @@ INT SimulateStaggeredRotationU1(CParameters& params)
             appSetLogHeader(sHeader);
             appGeneral(_T("\n========= Omega=%f  ==========\n"), fSep * uiOmega);
 
-            pGaugeRotation->SetOmega(fSep * uiOmega);
+            pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
+            if (NULL != pF2)
+            {
+                pF2->SetFermionOmega(fSep* uiOmega);
+                pF3->SetFermionOmega(fSep* uiOmega);
+                pF4->SetFermionOmega(fSep* uiOmega);
+                pF5->SetFermionOmega(fSep* uiOmega);
+            }
 
             if (bAdditive)
             {

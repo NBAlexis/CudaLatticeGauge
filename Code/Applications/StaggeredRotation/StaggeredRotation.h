@@ -360,7 +360,7 @@ inline void AppendStringFile(const CCString& sFileName, const CCString& sContent
 }
 
 
-extern INT SimulateStaggeredBeta(CParameters& params);
+//extern INT SimulateStaggeredBeta(CParameters& params);
 extern INT SimulateStaggeredRotation(CParameters& params);
 extern INT SimulateStaggeredRotation3D(CParameters& params);
 extern INT SimulateStaggeredRotationU1(CParameters& params);

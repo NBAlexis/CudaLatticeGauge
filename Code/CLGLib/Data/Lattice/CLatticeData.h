@@ -60,7 +60,7 @@ public:
      */
     void SetAPure(const CFieldGauge* pUnow);
 
-    CCString GetInfos(const CCString& sTab) const;
+    CCString GetInfos(const CCString& sTab = _T("")) const;
 
     class CRandom* m_pRandom;
     UINT m_uiRandomType;

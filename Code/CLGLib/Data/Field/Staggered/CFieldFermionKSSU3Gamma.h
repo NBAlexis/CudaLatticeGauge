@@ -108,7 +108,7 @@ public:
     /**
      * every time set gamma coefficient, update the parameters of pooled
      */
-    void UpdatePooledParamters() const;
+    //void UpdatePooledParamters() const;
 
 };
 

@@ -24,7 +24,7 @@ public:
 
     CFieldFermionKSTR() : CFieldFermionKST<deviceVector, deviceGauge, vectorN>()
         , m_bRealRotation(FALSE)
-        , m_fOmega(F(0.0))
+        , m_fOmega(0.0)
     {
 
     }
@@ -41,7 +41,7 @@ protected:
         }
 
         CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DerivateD0_R(
-            CCommonData::m_fOmega,
+            m_fOmega,
             this->m_pDeviceData,
             this->m_byFieldId,
             (deviceGauge*)pForce,
@@ -59,7 +59,7 @@ protected:
         if (m_bRealRotation)
         {
             CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DOperatorKS_R_RealRotation(
-                CCommonData::m_fOmega,
+                m_fOmega,
                 this->m_bEachSiteEta, 
                 (deviceVector*)pTargetBuffer,
                 (const deviceVector*)pBuffer,
@@ -75,7 +75,7 @@ protected:
         else
         {
             CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DOperatorKS_R_ImaginaryRotation(
-                CCommonData::m_fOmega,
+                m_fOmega,
                 this->m_bEachSiteEta, 
                 (deviceVector*)pTargetBuffer,
                 (const deviceVector*)pBuffer,
@@ -103,8 +103,8 @@ public:
             m_bRealRotation = (0 != iReal);
         }
 
-        Real fValue = F(0.1);
-        if (params.FetchValueReal(_T("Omega"), fValue))
+        DOUBLE fValue = 0.1;
+        if (params.FetchValueDOUBLE(_T("Omega"), fValue))
         {
             m_fOmega = fValue;
         }
@@ -130,7 +130,16 @@ public:
     }
 
     UBOOL m_bRealRotation;
-    Real m_fOmega;
+
+    void SetFermionOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        this->UpdatePooledParamters();
+    }
+
+protected:
+
+    DOUBLE m_fOmega;
 };
 
 __CLG_REGISTER_HELPER_HEADER(CFieldFermionKSU1R)

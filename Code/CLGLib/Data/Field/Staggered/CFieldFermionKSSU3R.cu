@@ -705,7 +705,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
             pTarget,
             m_byFieldId,
             byGaugeFieldId,
-            CCommonData::m_fOmega,
+            m_fOmega,
             _HC_Center,
             eOCT,
             fRealCoeff,
@@ -717,7 +717,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
             pTarget,
             m_byFieldId,
             byGaugeFieldId,
-            CCommonData::m_fOmega,
+            m_fOmega,
             eOCT,
             fRealCoeff,
             cCmpCoeff);
@@ -732,7 +732,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         m_byFieldId,
         byGaugeFieldId,
-        CCommonData::m_fOmega,
+        m_fOmega,
         _HC_Center,
         bDagger,
         eOCT,
@@ -747,7 +747,7 @@ void CFieldFermionKSSU3R::DOperatorKS(void* pTargetBuffer, const void* pBuffer,
         pTarget,
         m_byFieldId,
         byGaugeFieldId,
-        CCommonData::m_fOmega,
+        m_fOmega,
         bDagger,
         eOCT,
         fRealCoeff,
@@ -826,7 +826,7 @@ void CFieldFermionKSSU3R::DerivateD0(
                     m_pMDNumerator,
                     m_rMD.m_uiDegree,
                     m_byFieldId,
-                    CCommonData::m_fOmega, 
+                    m_fOmega, 
                     static_cast<BYTE>(imu), iTau[pathidx],
                     L[0], L[1], L[2], LLength,
                     R[0], R[1], R[2], RLength,
@@ -909,7 +909,7 @@ void CFieldFermionKSSU3R::DerivateD0(
                         m_pMDNumerator,
                         m_rMD.m_uiDegree,
                         m_byFieldId,
-                        CCommonData::m_fOmega,
+                        m_fOmega,
                         L[0], L[1], L[2], LLength,
                         R[0], R[1], R[2], RLength
                         );
@@ -929,6 +929,12 @@ void CFieldFermionKSSU3R::InitialOtherParameters(CParameters& params)
     CFieldFermionKSSU3::InitialOtherParameters(params);
     m_bEachSiteEta = TRUE;
 
+    DOUBLE fValue = 0.1;
+    if (params.FetchValueDOUBLE(_T("Omega"), fValue))
+    {
+        m_fOmega = fValue;
+    }
+
     INT iReal = 0;
     if (params.FetchValueINT(_T("RealRotation"), iReal))
     {
@@ -943,13 +949,14 @@ void CFieldFermionKSSU3R::CopyTo(CField* U) const
     if (NULL != pOther)
     {
         pOther->m_bRealRotation = m_bRealRotation;
+        pOther->m_fOmega = m_fOmega;
     }
 }
 
 CCString CFieldFermionKSSU3R::GetInfos(const CCString& tab) const
 {
     CCString sRet = CFieldFermionKSSU3::GetInfos(tab);
-    sRet = sRet + tab + _T("Omega : ") + appToString(CCommonData::m_fOmega) + _T("\n");
+    sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
     sRet = sRet + tab + _T("RealRotation : ") + appToString(m_bRealRotation) + _T("\n");
     return sRet;
 }

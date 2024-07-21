@@ -1046,7 +1046,6 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::Initial(class CLattic
     DOUBLE fOmega = 0.1;
     param.FetchValueDOUBLE(_T("Omega"), fOmega);
     m_fOmega = fOmega;
-    CCommonData::m_fOmega = fOmega;
 
     INT iUsing4Plaq = 0;
     if (param.FetchValueINT(_T("CloverEnergy"), iUsing4Plaq))

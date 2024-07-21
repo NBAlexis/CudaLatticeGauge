@@ -156,7 +156,6 @@ int main(int argc, char * argv[])
 
     appGetLattice()->m_pUpdator->SetConfigurationCount(0);
     appGetLattice()->m_pMeasurements->Reset();
-    appGeneral(_T("Omega:%f\n"), CCommonData::m_fOmega);
     while (
         (bOnlyMeasure && uiAccepCountAfterE < iEquib)
      || (!bOnlyMeasure && appGetLattice()->m_pUpdator->GetConfigurationCount() < iEquib)

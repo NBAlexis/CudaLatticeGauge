@@ -10,6 +10,7 @@
 
 #include "CLGLib_Private.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3DR.h"
 #include "CMeasureChargeAndCurrents.h"
 
 __BEGIN_NAMESPACE
@@ -227,13 +228,20 @@ void CMeasureChargeAndCurrents::SourceSanningSingleField(const class CFieldGauge
     deviceWilsonVectorSU3** ppDevicePtr;
     checkCudaErrors(cudaMalloc((void**)&ppDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12));
     checkCudaErrors(cudaMemcpy(ppDevicePtr, pDevicePtr, sizeof(deviceWilsonVectorSU3*) * 12, cudaMemcpyHostToDevice));
+
+    Real fOmega = F(0.0);
+    const CFieldFermionWilsonSquareSU3DR* pRA = dynamic_cast<const CFieldFermionWilsonSquareSU3DR*>(sources[0]);
+    if (NULL != pRA)
+    {
+        fOmega = static_cast<Real>(pRA->GetFermionOmega());
+    }
     
     //sourceSite.x = 1 to lx - 1
     _kernel_Gammas << <_blocks, _thread1 >> > (
         ppDevicePtr,
         sourceSite,
         CCommonData::m_fKai,
-        static_cast<Real>(CCommonData::m_fOmega),
+        fOmega,
         static_cast<BYTE>(sourceSite.x), //array idx
         GetFermionFieldId(),
         //m_pMeasureFunctions,

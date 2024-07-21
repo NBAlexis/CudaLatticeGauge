@@ -33,7 +33,7 @@ class __DLL_EXPORT CFieldBosonVNRotation : public CFieldBosonVN<deviceDataBoson,
 public:
     CFieldBosonVNRotation()
         : CFieldBosonVN<deviceDataBoson, deviceDataGauge>()
-        , m_fOmega(F(0.0))
+        , m_fOmega(0.0)
         , m_pDevicePath(NULL)
         , m_bShiftCenter(FALSE)
         , m_pfCx(NULL)
@@ -92,8 +92,8 @@ public:
     {
         CFieldBosonVN<deviceDataBoson, deviceDataGauge>::InitialOtherParameters(param);
 
-        Real fValue = F(0.1);
-        if (param.FetchValueReal(_T("Omega"), fValue))
+        DOUBLE fValue = 0.1;
+        if (param.FetchValueDOUBLE(_T("Omega"), fValue))
         {
             m_fOmega = fValue;
         }
@@ -113,7 +113,7 @@ public:
         return sRet;
     }
 
-    Real m_fOmega;
+    DOUBLE m_fOmega;
     INT* m_pDevicePath;
     UBOOL m_bShiftCenter;
     _deviceCoeffFunctionPointerTwoSites m_pfCx;
@@ -344,6 +344,12 @@ public:
 
         //gaugeu1->DebugPrintMe();
         checkCudaErrors(cudaDeviceSynchronize());
+    }
+
+    void SetBosonOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        this->UpdatePooledParamters();
     }
 
 protected:

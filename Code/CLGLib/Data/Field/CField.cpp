@@ -82,6 +82,11 @@ CCString CField::GetInfos(const CCString& tab) const
     return sRet;
 }
 
+void CField::UpdatePooledParamters() const
+{
+    appGetLattice()->ReCopyPooled(m_byFieldId);
+}
+
 CFieldFermion::CFieldFermion()
 : CField()
 {

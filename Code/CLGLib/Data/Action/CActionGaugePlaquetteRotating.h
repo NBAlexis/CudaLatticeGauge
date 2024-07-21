@@ -28,7 +28,8 @@ public:
     CCString GetInfos(const CCString& tab) const override;
 
     void SetBeta(DOUBLE fBeta);
-    void SetOmega(DOUBLE fOmega);
+    void SetGaugeOmega(DOUBLE fOmega);
+    DOUBLE GetOmega() const { return m_fOmega; }
 
 protected:
 

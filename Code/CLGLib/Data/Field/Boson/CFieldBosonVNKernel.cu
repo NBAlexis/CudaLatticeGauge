@@ -149,7 +149,7 @@ _kernelBosonOneLink(
     deviceDataBoson* pResultData,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites pfcoeff,
     const INT* __restrict__ path,
     BYTE pathLength,
@@ -216,7 +216,7 @@ _kernelBosonForce_WithLink(
     const deviceDataBoson* __restrict__ pBoson,
     BYTE byFieldId,
     BYTE byGaugeFieldId,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites pfcoeff,
     const INT* __restrict__ path,
     BYTE pathLength)
@@ -292,7 +292,7 @@ _kernelBosonDiagnal(
     const deviceDataBoson* __restrict__ pDeviceData,
     deviceDataBoson* pResultData,
     BYTE byFieldId,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointer pfcoeff,
     EOperatorCoefficientType eCoeff,
     Real fCoeff,
@@ -336,7 +336,7 @@ _kernelDPartialBosonVN(
     const SIndex* __restrict__ pBosonMove,
     deviceDataBoson* pResultData,
     BYTE idir,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointer pfcoeff,
     EOperatorCoefficientType eCoeff,
     Real fRealCoeff,
@@ -409,7 +409,7 @@ _kernelDPartialBosonForceVN(
     const SIndex* __restrict__ pBosonMove,
     deviceDataGauge* pGaugeForce,
     BYTE idir,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointer pfcoeff,
     BYTE byGaugeFieldId,
     BYTE byFieldId)
@@ -559,7 +559,7 @@ template<typename deviceDataBoson, typename deviceDataGauge>
 void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::DiagnalTerm(
     deviceDataBoson* pTarget,
     BYTE byFieldId,
-    const deviceDataBoson* pSource, Real fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
+    const deviceDataBoson* pSource, DOUBLE fCoeffiecient, _deviceCoeffFunctionPointer fpCoeff,
     EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
 {
     preparethread;
@@ -582,7 +582,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLink(
     const deviceDataBoson* pSource,
     const deviceDataGauge* pGauge,
     BYTE byGaugeFieldId,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites fpCoeff,
     const INT* pDevicePath,
     BYTE pathLength,
@@ -615,7 +615,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::OneLinkForceGauge(
     const deviceDataGauge* pGauge,
     BYTE byGaugeFieldId,
     deviceDataGauge* pForce,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointerTwoSites fpCoeff,
     const INT* pDevicePath,
     BYTE pathLength)
@@ -642,7 +642,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSq(
     const deviceDataBoson* pSource,
     const deviceDataGauge* pGauge,
     BYTE byGaugeFieldId,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointer fpCoeff,
     BYTE idir,
     EOperatorCoefficientType eOCT,
@@ -673,7 +673,7 @@ void CFieldBosonVNKernel<deviceDataBoson, deviceDataGauge>::PartialSqForceGauge(
     const deviceDataGauge* pGauge,
     BYTE byGaugeFieldId,
     deviceDataGauge* pForce,
-    Real fCoefficient,
+    DOUBLE fCoefficient,
     _deviceCoeffFunctionPointer fpCoeff,
     BYTE idir)
 {

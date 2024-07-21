@@ -10,6 +10,7 @@
 
 #include "CLGLib_Private.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
+#include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3DR.h"
 #include "CMeasureChiralCondensate.h"
 
 __BEGIN_NAMESPACE
@@ -253,6 +254,12 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     const Real oneOuiVolume = F(1.0) / appGetLattice()->m_pIndexCache->m_uiSiteNumber[GetFermionFieldId()];
     const CFieldFermionWilsonSquareSU3 * pF1W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pZ4);
     const CFieldFermionWilsonSquareSU3 * pF2W = dynamic_cast<const CFieldFermionWilsonSquareSU3*>(pInverseZ4);
+    const CFieldFermionWilsonSquareSU3DR* pF1WR = dynamic_cast<const CFieldFermionWilsonSquareSU3DR*>(pZ4);
+    DOUBLE fOmega = 0.0;
+    if (NULL != pF1WR)
+    {
+        fOmega = pF1WR->GetFermionOmega();
+    }
     
 #pragma region Dot
 
@@ -262,7 +269,7 @@ void CMeasureChiralCondensate::OnConfigurationAcceptedZ4SingleField(
     {
         _kernelDotMeasureAll << <block, threads >> > (
             i,
-            CCommonData::m_fOmega,
+            fOmega,
             pF1W->m_pDeviceData,
             pF2W->m_pDeviceData,
             m_pDeviceXYBuffer[i],

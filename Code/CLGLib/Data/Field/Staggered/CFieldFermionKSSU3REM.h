@@ -49,6 +49,18 @@ public:
     BYTE m_byEMFieldID;
     Real m_fQ;
     INT* m_pDevicePathBuffer;
+
+    void SetFermionOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        this->UpdatePooledParamters();
+    }
+
+    DOUBLE GetOmega() const { return m_fOmega; }
+
+private:
+
+    DOUBLE m_fOmega;
 };
 
 __END_NAMESPACE

@@ -27,6 +27,7 @@ public:
 
     CFieldFermionKSSU3DR() : CFieldFermionKSSU3D()
         , m_bShiftCenter(FALSE)
+        , m_fOmega(0.0)
     {
 
     }
@@ -64,7 +65,16 @@ public:
         }
     }
 
+    void SetFermionOmega(DOUBLE fOmega)
+    {
+        m_fOmega = fOmega;
+        this->UpdatePooledParamters();
+    }
+
     UBOOL m_bShiftCenter;
+
+private:
+    DOUBLE m_fOmega;
 };
 
 __END_NAMESPACE

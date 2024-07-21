@@ -231,7 +231,6 @@ UINT TestGamma5Hermiticity(CParameters& param)
 UINT TestAnitiHermiticity(CParameters&)
 {
     //test Ddagger
-    appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
     //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
     CFieldFermionKS* pF1 = dynamic_cast<CFieldFermionKS*>(appGetLattice()->GetPooledFieldById(2));
     UINT uiErrors = pF1->TestAntiHermitian(_FIELDS);
@@ -244,7 +243,6 @@ UINT TestAnitiHermiticity(CParameters&)
 UINT TestBosonHermiticity(CParameters&)
 {
     //test Ddagger
-    appGeneral(_T("omega?:%f\n"), CCommonData::m_fOmega);
     //CFieldGauge* pGauge = dynamic_cast<CFieldGauge*>(appGetLattice()->m_pGaugeField);
     CFieldBoson* pF1 = dynamic_cast<CFieldBoson*>(appGetLattice()->GetPooledFieldById(2));
     UINT uiErrors = pF1->CheckHermitian(_FIELDS);
