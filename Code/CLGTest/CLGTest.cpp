@@ -17,7 +17,7 @@ UINT RunTest(CParameters&params, const TestList* pTest)
 
     appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
     CParameters paramForTheTest = params.GetParameter(pTest->m_sParamName);
-    appGeneral(_T("============= Parameters =============\n"));
+    appGeneral(_T("============= Parameters %s =============\n"), paramForTheTest.GetLocation().c_str());
     paramForTheTest.Dump(_T(""));
     //Initial
     if (!appInitialCLG(paramForTheTest))
@@ -30,8 +30,20 @@ UINT RunTest(CParameters&params, const TestList* pTest)
     timer.Start();
     const UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
-    appGeneral(_T("=========== Finished %s, errors: %d, cost: %f(ms)\n ------------- End --------------\n\n"), pTest->m_sParamName, uiErrors, timer.Elapsed());
+    appGeneral(_T("=========== Finished %s, errors: %d, cost: %f(ms)\n ======== Param: %s \n ------------- End --------------\n\n"), 
+        pTest->m_sParamName, 
+        uiErrors, 
+        timer.Elapsed(),
+        paramForTheTest.GetLocation().c_str());
 
+#if _CLG_WIN
+    OutputDebugString(_T("Param Name: "));
+    OutputDebugString(paramForTheTest.GetName().c_str());
+    OutputDebugString(_T(", double click following:\n"));
+    OutputDebugString(paramForTheTest.GetLocation().c_str());
+    OutputDebugString(_T("\n"));
+#endif
+    //std::cerr << paramForTheTest.GetLocation().c_str() << std::endl;
     //Final
     //appQuitCLG();
 
@@ -87,10 +99,9 @@ void DeleteAllLists(THashMap<CCString, TArray<TestList*>*>& category)
     }
 }
 
-int main(int argc, char * argv[])
+void LoadParams(CParameters& params)
 {
-    //Load settings
-    CParameters params;
+    params.RemoveAll();
 #if _CLG_DEBUG
     CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
     CYAMLParser::ParseFile(_T("TestSuit_Common.yaml"), params);
@@ -126,6 +137,13 @@ int main(int argc, char * argv[])
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_SUN.yaml"), params);
     //CYAMLParser::ParseFile(_T("../Debug/TestSuit_EvenOdd.yaml"), params);
 #endif
+}
+
+int main(int argc, char * argv[])
+{
+    //Load settings
+    CParameters params;
+    LoadParams(params);
     appSetupLog(params);
 
     BYTE realByte[8];
@@ -167,7 +185,7 @@ int main(int argc, char * argv[])
     ListAllTests(category);
     while (TRUE)
     {
-        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info\n");
+        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info, p - reload params\n");
         //ListAllTests(category);
         //inputNumber = -1;
         std::string name;
@@ -179,6 +197,13 @@ int main(int argc, char * argv[])
         if (sRes == _T("q"))
         {
             break;
+        }
+
+        if (sRes == _T("p"))
+        {
+            LoadParams(params);
+            ListAllTests(category);
+            bExcuted = TRUE;
         }
 
         if (sRes == _T("l"))

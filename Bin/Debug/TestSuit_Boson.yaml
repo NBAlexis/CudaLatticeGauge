@@ -28,7 +28,7 @@ TestBosonU1NoGauge:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
     BosonField1:
@@ -151,7 +151,7 @@ TestBosonU1ExternalGaugeField:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
+        IntegratorStep : 5
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -214,7 +214,7 @@ TestBosonSU4:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -362,7 +362,7 @@ TestBosonU1P:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 5
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:

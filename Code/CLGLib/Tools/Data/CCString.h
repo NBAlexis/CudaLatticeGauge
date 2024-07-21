@@ -107,7 +107,7 @@ public:
 class CLGAPI CCString
 {
 public:
-    enum { MAX_PATH = 8192, };
+    enum { _CLG_MAX_PATH = 8192, };
 
     CCString();
     CCString(const CCString& stringSrc);
@@ -815,8 +815,8 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
     TArray<CCString> outList;
     const CCBitFlag flag(dwFlag);
     const TCHAR * lpsz = (const TCHAR *)(orignString);
-    TCHAR lp[CCString::MAX_PATH];
-    memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
+    TCHAR lp[CCString::_CLG_MAX_PATH];
+    memset(lp, 0, CCString::_CLG_MAX_PATH * sizeof(TCHAR));
     INT currentIndex = 0;
 
     while (1)
@@ -861,7 +861,7 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, TArray<INT
                 outList.AddItem(sNewWord);
             }
 
-            memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
+            memset(lp, 0, CCString::_CLG_MAX_PATH * sizeof(TCHAR));
             currentIndex = 0;
             ++lpsz;
         }
@@ -899,9 +899,9 @@ inline TArray<CCString> appGetStringList(const CCString &orignString, INT sepera
 inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate, UBOOL bCutSep = FALSE, UBOOL bCutHead = FALSE)
 {
     const TCHAR * lpsz = (const TCHAR *)(orignString);
-    TCHAR lp [CCString::MAX_PATH];
-    memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
-    appStrcpy(lp, CCString::MAX_PATH, lpsz);
+    TCHAR lp [CCString::_CLG_MAX_PATH];
+    memset(lp, 0, CCString::_CLG_MAX_PATH * sizeof(TCHAR));
+    appStrcpy(lp, CCString::_CLG_MAX_PATH, lpsz);
     INT location = -1;
     for (INT i = 0; i < seperate.Num(); ++i)
     {
@@ -924,8 +924,8 @@ inline CCString appGetCutTail(const CCString &orignString, TArray<INT> seperate,
     {
         if (bCutSep)
             ++location;
-        memset(lp, 0, CCString::MAX_PATH * sizeof(TCHAR));
-        appStrcpy(lp, CCString::MAX_PATH, (lpsz + location));
+        memset(lp, 0, CCString::_CLG_MAX_PATH * sizeof(TCHAR));
+        appStrcpy(lp, CCString::_CLG_MAX_PATH, (lpsz + location));
     }
     else
     {

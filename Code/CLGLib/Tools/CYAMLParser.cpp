@@ -73,7 +73,7 @@ void CParameters::Dump(const CCString& indent) const
 
 #pragma region CYAMLParser
 
-INT CYAMLParser::ParseStream(const CCString &sName, ISTREAM& iss, CParameters& params)
+INT CYAMLParser::ParseStream(const CCString &sName, const CCString& sFileName, INT iStartLine, ISTREAM& iss, CParameters& params)
 {
     INT retv = EXIT_SUCCESS;
 
@@ -101,6 +101,7 @@ INT CYAMLParser::ParseStream(const CCString &sName, ISTREAM& iss, CParameters& p
         if (indent < 0) 
         {
             appParanoiac(_T("CYAMLParser: empty line. skip.\n"));
+            ++iStartLine;
             continue;
         }
 
@@ -111,11 +112,12 @@ INT CYAMLParser::ParseStream(const CCString &sName, ISTREAM& iss, CParameters& p
             {
                 appGeneral(_T("CYAMLParser: Error: unexpected nest level.\n"));
                 retv = EXIT_FAILURE;
+                ++iStartLine;
                 continue;
             }
 
             // start new level
-            current_params = new CParameters(sLastName);
+            current_params = new CParameters(sLastName, sFileName, iStartLine);
             current_indent = indent;
 
             expect_map = FALSE;
@@ -199,6 +201,7 @@ INT CYAMLParser::ParseStream(const CCString &sName, ISTREAM& iss, CParameters& p
             levels.push(level_t(indent, env_t(key, current_params)));
             sLastName = key;
         }
+        ++iStartLine;
     }
 
     while (current_indent > 0)
@@ -355,6 +358,7 @@ INT CYAMLParser::ParseVector(TCHAR *buf, TArray<CCString>& vec)
 
 void CYAMLParser::ParseFile(const CCString& params_file, CParameters& params)
 {
+    params.SetFile(params_file, 0);
     INT  filesize = 0;
     TCHAR *buf = 0;
 

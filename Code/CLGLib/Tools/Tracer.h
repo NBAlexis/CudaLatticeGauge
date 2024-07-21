@@ -197,6 +197,13 @@ public:
     inline void PopLogDate() { m_lstLogDate.Pop(); }
     inline void SetLogHeader(const CCString& sHeader) { m_sTraceHeader = sHeader; }
 
+    //static inline CCString CapsuleURL(const CCString& url, const CCString& title)
+    //{
+    //    return _T("\\e]8;;") + url + _T("\\e\\\\") + title + _T("\\e]8;;\\e\\\\");
+    //}
+
+    //static CCString CapsuleTextFile(const CCString& name, const CCString& filename, INT line);
+
 private:
 
     EVerboseLevel m_eLevel;

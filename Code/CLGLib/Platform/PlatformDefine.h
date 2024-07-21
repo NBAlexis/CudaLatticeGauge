@@ -11,6 +11,14 @@
 #ifndef _PLATFORMDEFINE_H_
 #define _PLATFORMDEFINE_H_
 
+#if _CLG_WIN
+#include <windows.h>
+#include <iostream>
+#else
+#include <unistd.h>
+#include <limits.h>
+#endif
+
 #pragma region Warnings
 
 //No using when compile with nvcc...
@@ -178,6 +186,15 @@ FORCEINLINE void appGetTimeUtc(TCHAR* outchar, UINT buffSize)
 #else
     gmtm = *gmtime(&now);
     strftime(outchar, buffSize, "%A %c", &gmtm);
+#endif
+}
+
+FORCEINLINE void appGetPath(TCHAR* outchar, UINT bufferSize)
+{
+#if _CLG_WIN
+    GetCurrentDirectory(bufferSize, outchar);
+#else
+    getcwd(outchar, bufferSize);
 #endif
 }
 

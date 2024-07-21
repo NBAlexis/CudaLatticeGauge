@@ -476,6 +476,7 @@
       <PrecompiledHeaderFile>CLGLib_Private.h</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(Configuration).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Libs;$(CudaToolkitLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -565,6 +566,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ExceptionHandling>Sync</ExceptionHandling>
       <DisableSpecificWarnings>26451;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

@@ -57,10 +57,18 @@ class CLGAPI CParameters
 {
 public:
 
-    CParameters() { }
-    CParameters(const CCString& sName) : m_sName(sName) { }
+    CParameters() : m_iLine(-1) { }
+    CParameters(const CCString& sName, const CCString& sFileName, INT iLine)
+        : m_sName(sName) 
+        , m_sFileName(sFileName)
+        , m_iLine(iLine)
+    {
+    }
+
     CParameters(const CParameters& other)
         : m_sName(other.m_sName)
+        , m_sFileName(other.m_sFileName)
+        , m_iLine(other.m_iLine)
     { 
         m_pStrings = other.m_pStrings;
         m_pStringVector = other.m_pStringVector;
@@ -166,6 +174,8 @@ public:
     inline void Copy(const CParameters& other)
     {
         m_sName = other.m_sName;
+        m_sFileName = other.m_sFileName;
+        m_iLine = other.m_iLine;
         m_pStrings = other.m_pStrings;
         m_pStringVector = other.m_pStringVector;
         m_pParameters = other.m_pParameters;
@@ -178,10 +188,39 @@ public:
     }
 
     CCString GetName() const { return m_sName; }
+    CCString GetLocation() const 
+    { 
+        static TCHAR path[CCString::_CLG_MAX_PATH];
+        appGetPath(path, CCString::_CLG_MAX_PATH);
+        const CCString strpath(path);
+#if _CLG_WIN
+        CCString ret = strpath + _T("/") + m_sFileName + _T("(") + appToString(m_iLine) + _T(")");
+#else
+        CCString ret = _T(" file:///") + strpath + _T("/") + m_sFileName + _T("  line:") + appToString(m_iLine);
+#endif
+        ret = ret.Replace(_T("\\"), _T("/"));
+        return ret;
+    }
+
+    void SetFile(const CCString& path, INT iLine) { m_sFileName = path; m_iLine = iLine; }
+    UBOOL ValidFile() const { return m_iLine >= 0; }
+
+    void RemoveAll()
+    {
+        m_sName = _T("");
+        m_sFileName = _T("");
+        m_iLine = -1;
+
+        m_pStrings.RemoveAll();
+        m_pStringVector.RemoveAll();
+        m_pParameters.RemoveAll();
+    }
 
 private:
 
     CCString m_sName;
+    CCString m_sFileName;
+    INT m_iLine;
 
     // scalar
     THashMap<CCString, CCString>               m_pStrings;
@@ -202,7 +241,7 @@ public:
     //These are functions for parse
     static void Parse(const CCString& sName, ISTREAM& iss, CParameters& params)
     {
-        const INT result = ParseStream(sName, iss, params);
+        const INT result = ParseStream(sName, sName, 0, iss, params);
 
         if (result != EXIT_SUCCESS) 
         {
@@ -211,7 +250,7 @@ public:
         }
     }
 
-    static INT ParseStream(const CCString &sName, ISTREAM& iss, CParameters& params);
+    static INT ParseStream(const CCString &sName, const CCString& sFileName, INT iStartLine, ISTREAM& iss, CParameters& params);
     static INT ParseLine(TCHAR *buf, CCString& key, CCString& value);
     static INT ParseVector(TCHAR *buf, TArray<CCString>& vec);
 };
