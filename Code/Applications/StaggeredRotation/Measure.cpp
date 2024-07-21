@@ -40,6 +40,10 @@ INT Measurement(CParameters& params)
     params.FetchValueINT(_T("EndOmega"), iVaule);
     UINT iEndOmega = static_cast<UINT>(iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("BindOmega"), iVaule);
+    UINT iBindOmega = static_cast<UINT>(iVaule);
+
     iVaule = 1;
     params.FetchValueINT(_T("StartN"), iVaule);
     UINT iStartN = static_cast<UINT>(iVaule);
@@ -218,16 +222,31 @@ INT Measurement(CParameters& params)
         //CCommonData::m_fOmega = fOmega * uiOmega;
         if (NULL != pAG)
         {
-            pAG->SetGaugeOmega(fOmega * uiOmega);
+            if (iBindOmega & 1)
+            {
+                appGeneral(_T("Disable gauge omega!\n"));
+                pAG->SetGaugeOmega(0.0);
+            }
+            else
+            {
+                pAG->SetGaugeOmega(fOmega * uiOmega);
+            }
         }
         if (NULL != pLight)
         {
-            pLight->SetFermionOmega(fOmega * uiOmega);
+            if (iBindOmega & 2)
+            {
+                appGeneral(_T("Disable fermion omega!\n"));
+                pLight->SetFermionOmega(0.0);
+                pHeavy->SetFermionOmega(0.0);
+            }
+            else
+            {
+                pLight->SetFermionOmega(fOmega* uiOmega);
+                pHeavy->SetFermionOmega(fOmega* uiOmega);
+            }
         }
-        if (NULL != pHeavy)
-        {
-            pHeavy->SetFermionOmega(fOmega * uiOmega);
-        }
+        
         appGeneral(_T("(* ==== Omega(%f) ========= *)\n"), fOmega * uiOmega);
         pPL->Reset();
         pJG->Reset();

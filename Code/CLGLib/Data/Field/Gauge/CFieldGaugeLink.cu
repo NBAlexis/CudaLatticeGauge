@@ -878,7 +878,7 @@ void CFieldGaugeLink<deviceGauge, matrixN>::InitialFieldWithFile(const CCString&
         FLOAT* fdata = (FLOAT*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         if (uiSize != sizeof(FLOAT) * 2 * MatrixN() * MatrixN() * _HC_LinkCount)
         {
-            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(FLOAT) * 2 * MatrixN() * MatrixN() * _HC_LinkCount);
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, static_cast<UINT>(sizeof(FLOAT) * 2 * MatrixN() * MatrixN() * _HC_LinkCount));
         }
         for (UINT i = 0; i < 2 * MatrixN() * MatrixN() * m_uiLinkeCount; ++i)
         {

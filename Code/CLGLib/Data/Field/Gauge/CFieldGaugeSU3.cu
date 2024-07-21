@@ -1152,7 +1152,7 @@ void CFieldGaugeSU3::InitialFieldWithFile(const CCString& sFileName, EFieldFileT
         FLOAT* fdata = (FLOAT*)appGetFileSystem()->ReadAllBytes(sFileName.c_str(), uiSize);
         if (uiSize != sizeof(FLOAT) * 18 * _HC_LinkCount)
         {
-            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, sizeof(FLOAT) * 18 * _HC_LinkCount);
+            appCrucial(_T("Loading file size not match: %s, %d, expecting %d"), sFileName.c_str(), uiSize, static_cast<INT>(sizeof(FLOAT) * 18 * _HC_LinkCount));
         }
         for (UINT i = 0; i < 18 * m_uiLinkeCount; ++i)
         {

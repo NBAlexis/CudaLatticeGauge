@@ -59,14 +59,10 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE CheckRes(const CFieldGauge* pGauge) override;
-#else
-    Real CheckRes(const CFieldGauge* pGauge) override;
-#endif
+
     CCString GetInfos(const CCString& sTab) const override;
 
-#if !_CLG_DOUBLEFLOAT
     DOUBLE m_fAlpha;
 
     //device SU3 is not alligned, therefor use CLGComplex*
@@ -83,24 +79,7 @@ public:
     deviceSU3* m_pG;
     DOUBLE* m_pMomentumTable;
     cuDoubleComplex* m_pTempFFTBuffer;
-#else
-    Real m_fAlpha;
 
-    //device SU3 is not alligned, therefor use CLGComplex*
-    Real* m_pA11;
-    CLGComplex* m_pA12;
-    CLGComplex* m_pA13;
-    Real* m_pA22;
-    CLGComplex* m_pA23;
-    Real* m_pGamma11;
-    CLGComplex* m_pGamma12;
-    CLGComplex* m_pGamma13;
-    Real* m_pGamma22;
-    CLGComplex* m_pGamma23;
-    deviceSU3* m_pG;
-    Real* m_pMomentumTable;
-    CLGComplex* m_pTempFFTBuffer;
-#endif
 
     //FFT accelaration
     UBOOL m_bFA;

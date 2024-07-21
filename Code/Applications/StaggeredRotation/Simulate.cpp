@@ -31,6 +31,10 @@ INT SimulateStaggeredRotation(CParameters& params)
     params.FetchValueINT(_T("OmegaSep"), iVaule);
     UINT iAfterEquib = static_cast<UINT>(iVaule);
 
+    iVaule = 0;
+    params.FetchValueINT(_T("BindOmega"), iVaule);
+    UINT iBindOmega = static_cast<UINT>(iVaule);
+
     iVaule = 2;
     params.FetchValueINT(_T("MinNt"), iVaule);
     UINT iMinNt = static_cast<UINT>(iVaule);
@@ -219,7 +223,15 @@ INT SimulateStaggeredRotation(CParameters& params)
 
             if (NULL != pGaugeRotation)
             {
-                pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
+                if (iBindOmega & 1)
+                {
+                    appGeneral(_T("Disable gauge rotation!\n"));
+                    pGaugeRotation->SetGaugeOmega(0.0);
+                }
+                else
+                {
+                    pGaugeRotation->SetGaugeOmega(fSep * uiOmega);
+                }
             }
             else
             {
@@ -227,10 +239,21 @@ INT SimulateStaggeredRotation(CParameters& params)
             }
             if (NULL != pF2)
             {
-                pF2->SetFermionOmega(F(0.0));
-                pF3->SetFermionOmega(F(0.0));
-                pF4->SetFermionOmega(F(0.0));
-                pF5->SetFermionOmega(F(0.0));
+                if (iBindOmega & 2)
+                {
+                    appGeneral(_T("Disable fermion rotation!\n"));
+                    pF2->SetFermionOmega(F(0.0));
+                    pF3->SetFermionOmega(F(0.0));
+                    pF4->SetFermionOmega(F(0.0));
+                    pF5->SetFermionOmega(F(0.0));
+                }
+                else
+                {
+                    pF2->SetFermionOmega(fSep* uiOmega);
+                    pF3->SetFermionOmega(fSep* uiOmega);
+                    pF4->SetFermionOmega(fSep* uiOmega);
+                    pF5->SetFermionOmega(fSep* uiOmega);
+                }
             }
             else
             {

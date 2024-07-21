@@ -210,7 +210,7 @@ _kernelCalculateG3D(
     else
     {
         const deviceSU3 pA = deviceSU3::makeSU3TA(
-            _cToFloat(pGamma12[uiSiteIndex3D]), _cToFloat(pGamma13[uiSiteIndex3D]), _cToFloat(pGamma23[uiSiteIndex3D]),
+            _cToRealC(pGamma12[uiSiteIndex3D]), _cToRealC(pGamma13[uiSiteIndex3D]), _cToRealC(pGamma23[uiSiteIndex3D]),
             static_cast<Real>(pGamma11[uiSiteIndex3D]), static_cast<Real>(pGamma22[uiSiteIndex3D]));
         pG[uiSiteIndex3D] = (0 == _DC_ExpPrecision)
             ? pA.QuickExp(fAlpha)
@@ -306,7 +306,6 @@ _kernelGaugeTransform3DT(
 }
 
 
-#if !_CLG_DOUBLEFLOAT
 /**
 * res = Tr[Delta A^2]
 * If Delta A is a anti-Hermitian, Tr[Delta A^2] = 2 (|A12|^2+|A13|^2+|A23|^2 + |A11+A22|^2)
@@ -336,36 +335,7 @@ _kernelCalculateTrAGradientSq3D(
     const DOUBLE fM1122 = pDeltaA11[uiSiteIndex3D] + pDeltaA22[uiSiteIndex3D];
     pDeviceRes[uiSiteIndex3D] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
 }
-#else
-/**
-* res = Tr[Delta A^2]
-* If Delta A is a anti-Hermitian, Tr[Delta A^2] = 2 (|A12|^2+|A13|^2+|A23|^2 + |A11+A22|^2)
-*/
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateTrAGradientSq3D(
-    SBYTE uiT,
-    Real* pDeviceRes,
-    const Real* __restrict__ pDeltaA11,
-    const CLGComplex* __restrict__ pDeltaA12,
-    const CLGComplex* __restrict__ pDeltaA13,
-    const Real* __restrict__ pDeltaA22,
-    const CLGComplex* __restrict__ pDeltaA23)
-{
-    intokernalInt4_S_Only3D;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-    if (site.IsDirichlet())
-    {
-        pDeviceRes[uiSiteIndex3D] = F(0.0);
-    }
 
-    const Real fAbs1 = _cuCabsf(pDeltaA12[uiSiteIndex3D]);
-    const Real fAbs2 = _cuCabsf(pDeltaA13[uiSiteIndex3D]);
-    const Real fAbs3 = _cuCabsf(pDeltaA23[uiSiteIndex3D]);
-    const Real fM1122 = pDeltaA11[uiSiteIndex3D] + pDeltaA22[uiSiteIndex3D];
-    pDeviceRes[uiSiteIndex3D] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-}
-#endif
 
 #pragma endregion
 
@@ -544,6 +514,8 @@ void CGaugeFixingCoulombCornell::Initial(class CLatticeData* pOwner, const CPara
         appCrucial(_T("Do not use FFT for single float point\n"));
         m_bFA = FALSE;
     }
+#endif
+
     //========== Initial Buffers ==============
     checkCudaErrors(cudaMalloc((void**)&m_pA11, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(DOUBLE)));
     checkCudaErrors(cudaMalloc((void**)&m_pA12, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(cuDoubleComplex)));
@@ -556,31 +528,13 @@ void CGaugeFixingCoulombCornell::Initial(class CLatticeData* pOwner, const CPara
     checkCudaErrors(cudaMalloc((void**)&m_pGamma13, _HC_Volume_xyz * sizeof(cuDoubleComplex)));
     checkCudaErrors(cudaMalloc((void**)&m_pGamma22, _HC_Volume_xyz * sizeof(DOUBLE)));
     checkCudaErrors(cudaMalloc((void**)&m_pGamma23, _HC_Volume_xyz * sizeof(cuDoubleComplex)));
-#else
-    //========== Initial Buffers ==============
-    checkCudaErrors(cudaMalloc((void**)& m_pA11, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA12, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA13, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA22, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pA23, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
-
-    checkCudaErrors(cudaMalloc((void**)& m_pGamma11, _HC_Volume_xyz * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pGamma12, _HC_Volume_xyz * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pGamma13, _HC_Volume_xyz * sizeof(CLGComplex)));
-    checkCudaErrors(cudaMalloc((void**)& m_pGamma22, _HC_Volume_xyz * sizeof(Real)));
-    checkCudaErrors(cudaMalloc((void**)& m_pGamma23, _HC_Volume_xyz * sizeof(CLGComplex)));
-#endif
 
     checkCudaErrors(cudaMalloc((void**)& m_pG, _HC_Volume_xyz * sizeof(deviceSU3)));
     if (m_bFA)
     {
-#if !_CLG_DOUBLEFLOAT
         checkCudaErrors(cudaMalloc((void**)&m_pMomentumTable, _HC_Volume_xyz * sizeof(DOUBLE)));
         checkCudaErrors(cudaMalloc((void**)&m_pTempFFTBuffer, _HC_Volume_xyz * sizeof(cuDoubleComplex)));
-#else
-        checkCudaErrors(cudaMalloc((void**)& m_pMomentumTable, _HC_Volume_xyz * sizeof(Real)));
-        checkCudaErrors(cudaMalloc((void**)& m_pTempFFTBuffer, _HC_Volume_xyz * sizeof(CLGComplex)));
-#endif
+
         preparethread_S;
         _kernelBakeMomentumTable3D << <block, threads >> > (m_pMomentumTable, _HC_Volume_xyz);
     }
@@ -605,11 +559,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
 {
     preparethread_S;
     m_iIterate = 0;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fTheta = 0.0;
-#else
-    Real fTheta = F(0.0);
-#endif
 
     while (m_iIterate < m_iMaxIterate)
     {
@@ -674,59 +624,39 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
             return;
         }
 
+#if _CLG_DOUBLEFLOAT
+#define __FFT3DWithXYZ FFT3DWithXYZ
+#else
+#define __FFT3DWithXYZ FFT3DWithXYZDouble
+#endif
         //======= 3. FFT =========
         if (m_bFA)
         {
-#if !_CLG_DOUBLEFLOAT
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma12, m_lstDims, TRUE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma12, m_lstDims, TRUE);
             _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma12);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma12, m_lstDims, FALSE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma12, m_lstDims, FALSE);
 
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma13, m_lstDims, TRUE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma13, m_lstDims, TRUE);
             _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma13);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma13, m_lstDims, FALSE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma13, m_lstDims, FALSE);
 
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma23, m_lstDims, TRUE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma23, m_lstDims, TRUE);
             _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma23);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pGamma23, m_lstDims, FALSE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pGamma23, m_lstDims, FALSE);
 
             _kernelFFTRtoC3D << <block, threads >> > (m_pGamma11, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pTempFFTBuffer, m_lstDims, TRUE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, TRUE);
             _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pTempFFTBuffer, m_lstDims, FALSE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, FALSE);
             _kernelFFTCtoR3D << <block, threads >> > (m_pTempFFTBuffer, m_pGamma11);
 
             _kernelFFTRtoC3D << <block, threads >> > (m_pGamma22, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pTempFFTBuffer, m_lstDims, TRUE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, TRUE);
             _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZDouble(m_pTempFFTBuffer, m_lstDims, FALSE);
-            _kernelFFTCtoR3D << <block, threads >> > (m_pTempFFTBuffer, m_pGamma22); 
-#else
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma12, m_lstDims, TRUE);
-            _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma12);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma12, m_lstDims, FALSE);
-
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma13, m_lstDims, TRUE);
-            _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma13);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma13, m_lstDims, FALSE);
-
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma23, m_lstDims, TRUE);
-            _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pGamma23);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pGamma23, m_lstDims, FALSE);
-
-            _kernelFFTRtoC3D << <block, threads >> > (m_pGamma11, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, TRUE);
-            _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, FALSE);
-            _kernelFFTCtoR3D << <block, threads >> > (m_pTempFFTBuffer, m_pGamma11);
-
-            _kernelFFTRtoC3D << <block, threads >> > (m_pGamma22, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, TRUE);
-            _kernelFFTScale3D << <block, threads >> > (m_pMomentumTable, m_pTempFFTBuffer);
-            CCLGFFTHelper::FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, FALSE);
+            CCLGFFTHelper::__FFT3DWithXYZ(m_pTempFFTBuffer, m_lstDims, FALSE);
             _kernelFFTCtoR3D << <block, threads >> > (m_pTempFFTBuffer, m_pGamma22);
-#endif
         }
+#undef __FFT3DWithXYZ
 
         //======= 4. Gauge Transform    =========
         _kernelCalculateG3D << <block, threads >> > (
@@ -746,11 +676,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
     appGeneral(_T("Gauge fixing failed with last error = %2.15f\n"), fTheta);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
-#else
-Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
-#endif
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
@@ -758,11 +684,7 @@ Real CGaugeFixingCoulombCornell::CheckRes(const CFieldGauge* pGauge)
         return F(0.0);
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fRet = 2.0;
-#else
-    Real fRet = F(0.0);
-#endif
 
     preparethread_S;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)

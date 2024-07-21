@@ -436,11 +436,7 @@ __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateCoulombDivation_S(
     BYTE byFieldId,
     SBYTE uiT,
-#if !_CLG_DOUBLEFLOAT
     DOUBLE* pDeviceRes,
-#else
-    Real* pDeviceRes,
-#endif
     const Real* __restrict__ pA11,
     const CLGComplex* __restrict__ pA12,
     const CLGComplex* __restrict__ pA13,
@@ -454,11 +450,7 @@ _kernelCalculateCoulombDivation_S(
 
     if (site.IsDirichlet())
     {
-#if !_CLG_DOUBLEFLOAT
         pDeviceRes[uiSiteIndex3D] = 0.0;
-#else
-        pDeviceRes[uiSiteIndex3D] = F(0.0);
-#endif
         return;
     }
 
@@ -514,11 +506,8 @@ _kernelCalculateCoulombDivation_S(
     const Real fAbs2 = _cuCabsf(g13);
     const Real fAbs3 = _cuCabsf(g23);
     const Real fM1122 = g11 + g22;
-#if !_CLG_DOUBLEFLOAT
     pDeviceRes[uiSiteIndex3D] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-#else
-    pDeviceRes[uiSiteIndex3D] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-#endif
+
 }
 
 
@@ -597,37 +586,21 @@ void CGaugeFixingCoulombLosAlamos::Initial(class CLatticeData* pOwner, const CPa
     checkCudaErrors(cudaMalloc((void**)& m_pA23, _HC_Volume_xyz * (_HC_Dir - 1) * sizeof(CLGComplex)));
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
-#else
-Real CGaugeFixingCoulombLosAlamos::CheckRes(const CFieldGauge* pGauge)
-#endif
 {
     if (NULL == pGauge || EFT_GaugeSU3 != pGauge->GetFieldType())
     {
         appCrucial(_T("CGaugeFixingLandauCornell only implemented with gauge SU3!\n"));
-#if !_CLG_DOUBLEFLOAT
         return 0.0;
-#else
-        return F(0.0);
-#endif
     }
 
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     return CheckResDeviceBuffer(pGaugeSU3->m_pDeviceData, pGauge->m_byFieldId);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
-#else
-Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restrict__ pGauge, BYTE byFieldId)
-#endif
 {
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fRes = 0.0;
-#else
-    Real fRes = F(0.0);
-#endif
     preparethread_S;
     for (SBYTE uiT = 0; uiT < static_cast<SBYTE>(_HC_Lt); ++uiT)
     {
@@ -655,11 +628,7 @@ Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBuffer(const deviceSU3* __restr
     return fRes / _HC_Lt;
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
-#else
-Real CGaugeFixingCoulombLosAlamos::CheckResDeviceBufferOnlyT(const deviceSU3* __restrict__ pGauge, SBYTE uiT, BYTE byFieldId)
-#endif
 {
     preparethread_S;
 

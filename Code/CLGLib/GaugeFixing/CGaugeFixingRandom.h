@@ -35,11 +35,8 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& params) override;
     void GaugeFixing(CFieldGauge* pResGauge) override;
-#if !_CLG_DOUBLEFLOAT
     DOUBLE CheckRes(const CFieldGauge* ) override { return 0.0; }
-#else
-    Real CheckRes(const CFieldGauge* pGauge) override { return F(0.0); }
-#endif
+
     CCString GetInfos(const CCString& sTab) const override;
 
     /**

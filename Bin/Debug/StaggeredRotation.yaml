@@ -27,6 +27,8 @@ JobSimulate:
     OmegaSep : 1
     OmegaStart : 0
     MaxOmega : 0.008
+    # 0 - all has rotation, 1 - gauge zero rotation, 2 - fermion zero rotation, 3 - no rotation
+    BindOmega : 0
     MinNt : 4
     MaxNt : 4
     SavePrefix : ./RWSRF580018036_
@@ -343,6 +345,8 @@ JobMeasure:
     OmegaRange : 0.128
     StartOmega : 1
     EndOmega : 8
+    # 0 - all has rotation, 1 - gauge zero rotation, 2 - fermion zero rotation, 3 - no rotation
+    BindOmega : 0
     StartN : 101
     EndN : 200
     SaveFermionFile : 0

@@ -129,13 +129,10 @@ extern "C" {
         return _make_cuComplex(x.x * y, x.y * y);
     }
 
-#if !_CLG_DOUBLEFLOAT
-
     __device__ __host__ static __inline__ cuDoubleComplex cuCmulf_cd(const cuDoubleComplex& x, DOUBLE y)
     {
         return make_cuDoubleComplex(x.x * y, x.y * y);
     }
-#endif
 
     __device__ static __inline__ CLGComplex cuCmulf_rc(Real y, const CLGComplex& x)
     {

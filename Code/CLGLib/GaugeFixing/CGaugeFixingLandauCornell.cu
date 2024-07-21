@@ -16,7 +16,6 @@ __BEGIN_NAMESPACE
 
 #pragma region Cornell Steepest Descend
 
-#if !_CLG_DOUBLEFLOAT
 /**
  * A_mu (n) = TA(U _mu (n))/i
  */
@@ -176,189 +175,18 @@ _kernelCalculateAGradient(
     }
 }
 
-#else
-/**
- * A_mu (n) = TA(U _mu (n))/i
- */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateA(
-    const deviceSU3* __restrict__ pU,
-    Real* pA11,
-    CLGComplex* pA12, 
-    CLGComplex* pA13,
-    Real* pA22,
-    CLGComplex* pA23)
-{
-    intokernalInt4;
-
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    
-    for (BYTE dir = 0; dir < uiDir; ++dir)
-    {
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            deviceSU3 su3A(pU[uiLinkIndex]);
-            su3A.Ta();
-            pA11[uiLinkIndex] = su3A.m_me[0].y;
-            pA12[uiLinkIndex] = su3A.m_me[1];
-            pA13[uiLinkIndex] = su3A.m_me[2];
-            pA22[uiLinkIndex] = su3A.m_me[4].y;
-            pA23[uiLinkIndex] = su3A.m_me[5];
-        }
-        else
-        {
-            pA11[uiLinkIndex] = F(0.0);
-            pA12[uiLinkIndex] = _zeroc;
-            pA13[uiLinkIndex] = _zeroc;
-            pA22[uiLinkIndex] = F(0.0);
-            pA23[uiLinkIndex] = _zeroc;
-        }
-    }
-}
-
-#if _CLG_DEBUG
-__global__ void _CLG_LAUNCH_BOUND_HALF
-#else
-__global__ void _CLG_LAUNCH_BOUND
-#endif
-_kernelCalculateALog(
-    const deviceSU3* __restrict__ pU,
-    Real* pA11,
-    CLGComplex* pA12,
-    CLGComplex* pA13,
-    Real* pA22,
-    CLGComplex* pA23)
-{
-    intokernalInt4;
-
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-
-    for (BYTE dir = 0; dir < uiDir; ++dir)
-    {
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            deviceSU3 su3A(pU[uiLinkIndex]);
-            su3A = su3A.Log();
-            pA11[uiLinkIndex] = su3A.m_me[0].y;
-            pA12[uiLinkIndex] = su3A.m_me[1];
-            pA13[uiLinkIndex] = su3A.m_me[2];
-            pA22[uiLinkIndex] = su3A.m_me[4].y;
-            pA23[uiLinkIndex] = su3A.m_me[5];
-        }
-        else
-        {
-            pA11[uiLinkIndex] = F(0.0);
-            pA12[uiLinkIndex] = _zeroc;
-            pA13[uiLinkIndex] = _zeroc;
-            pA22[uiLinkIndex] = F(0.0);
-            pA23[uiLinkIndex] = _zeroc;
-        }
-    }
-}
-
-/**
- * Gamma(n) = Delta _{-mu} A(n) = \sum _mu (A_mu(n - mu) - A_mu(n))
- */
-__global__ void _CLG_LAUNCH_BOUND
-_kernelCalculateAGradient(
-    BYTE byFieldId,
-    Real* pGamma11,
-    CLGComplex* pGamma12,
-    CLGComplex* pGamma13,
-    Real* pGamma22,
-    CLGComplex* pGamma23,
-    const Real* __restrict__ pA11,
-    const CLGComplex* __restrict__ pA12,
-    const CLGComplex* __restrict__ pA13,
-    const Real* __restrict__ pA22,
-    const CLGComplex* __restrict__ pA23)
-{
-    intokernalInt4;
-
-    pGamma11[uiSiteIndex] = F(0.0);
-    pGamma12[uiSiteIndex] = _zeroc;
-    pGamma13[uiSiteIndex] = _zeroc;
-    pGamma22[uiSiteIndex] = F(0.0);
-    pGamma23[uiSiteIndex] = _zeroc;
-
-    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
-    //const BYTE uiDir2 = uiDir * 2;
-    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
-    if (site.IsDirichlet())
-    {
-        return;
-    }
-
-    for (BYTE dir = 0; dir < uiDir; ++dir)
-    {
-        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
-        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, dir))
-        {
-            pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] - pA11[uiLinkIndex];
-            pGamma12[uiSiteIndex] = _cuCsubf(pGamma12[uiSiteIndex], pA12[uiLinkIndex]);
-            pGamma13[uiSiteIndex] = _cuCsubf(pGamma13[uiSiteIndex], pA13[uiLinkIndex]);
-            pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] - pA22[uiLinkIndex];
-            pGamma23[uiSiteIndex] = _cuCsubf(pGamma23[uiSiteIndex], pA23[uiLinkIndex]);
-        }
-
-        //const SIndex site_m_mu = __idx->m_pDeviceIndexPositionToSIndex[1][p_m_mu];
-        //const UINT uiLinkIndex2 = _deviceGetLinkIndex(site_m_mu.m_uiSiteIndex, dir);
-        const SSmallInt4 p_m_mu_site = _deviceSmallInt4OffsetC(sSite4, -static_cast<INT>(dir) - 1);
-        const SIndex& p_m_mu_dir = __idx->m_pDeviceIndexLinkToSIndex[byFieldId][__idx->_deviceGetBigIndex(p_m_mu_site) * uiDir + dir];
-        //if (!__idx->_deviceIsBondOnSurface(p_m_mu, dir))
-        if (!p_m_mu_dir.IsDirichlet())
-        {
-            const UINT uiLinkIndex2 = _deviceGetLinkIndex(p_m_mu_dir.m_uiSiteIndex, dir);
-            if (p_m_mu_dir.NeedToDagger())
-            {
-                pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] - pA11[uiLinkIndex2];
-                pGamma12[uiSiteIndex] = _cuCsubf(pGamma12[uiSiteIndex], pA12[uiLinkIndex2]);
-                pGamma13[uiSiteIndex] = _cuCsubf(pGamma13[uiSiteIndex], pA13[uiLinkIndex2]);
-                pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] - pA22[uiLinkIndex2];
-                pGamma23[uiSiteIndex] = _cuCsubf(pGamma23[uiSiteIndex], pA23[uiLinkIndex2]);
-            }
-            else
-            {
-                pGamma11[uiSiteIndex] = pGamma11[uiSiteIndex] + pA11[uiLinkIndex2];
-                pGamma12[uiSiteIndex] = _cuCaddf(pGamma12[uiSiteIndex], pA12[uiLinkIndex2]);
-                pGamma13[uiSiteIndex] = _cuCaddf(pGamma13[uiSiteIndex], pA13[uiLinkIndex2]);
-                pGamma22[uiSiteIndex] = pGamma22[uiSiteIndex] + pA22[uiLinkIndex2];
-                pGamma23[uiSiteIndex] = _cuCaddf(pGamma23[uiSiteIndex], pA23[uiLinkIndex2]);
-            }
-        }
-    }
-}
-
-#endif
-
-
-
 /**
  * g(x)=exp(-i a Delta A)
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateG(
     deviceSU3* pG,
-#if !_CLG_DOUBLEFLOAT
     const DOUBLE* __restrict__ pGamma11,
     const cuDoubleComplex* __restrict__ pGamma12,
     const cuDoubleComplex* __restrict__ pGamma13,
     const DOUBLE* __restrict__ pGamma22,
     const cuDoubleComplex* __restrict__ pGamma23,
     DOUBLE fAlpha
-#else
-    const Real* __restrict__ pGamma11,
-    const CLGComplex* __restrict__ pGamma12,
-    const CLGComplex* __restrict__ pGamma13,
-    const Real* __restrict__ pGamma22,
-    const CLGComplex* __restrict__ pGamma23,
-    Real fAlpha
-#endif
 )
 {
     intokernalInt4;
@@ -429,21 +257,12 @@ _kernelGaugeTransform(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateTrAGradientSq(
-#if !_CLG_DOUBLEFLOAT
     DOUBLE* pDeviceRes,
     const DOUBLE* __restrict__ pDeltaA11,
     const cuDoubleComplex* __restrict__ pDeltaA12,
     const cuDoubleComplex* __restrict__ pDeltaA13,
     const DOUBLE* __restrict__ pDeltaA22,
     const cuDoubleComplex* __restrict__ pDeltaA23
-#else
-    Real* pDeviceRes,
-    const Real* __restrict__ pDeltaA11,
-    const CLGComplex* __restrict__ pDeltaA12,
-    const CLGComplex* __restrict__ pDeltaA13,
-    const Real* __restrict__ pDeltaA22,
-    const CLGComplex* __restrict__ pDeltaA23
-#endif
 )
 {
     intokernalInt4;
@@ -451,28 +270,16 @@ _kernelCalculateTrAGradientSq(
     const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
     if (site.IsDirichlet())
     {
-#if !_CLG_DOUBLEFLOAT
         pDeviceRes[uiSiteIndex] = 0.0;
-#else
-        pDeviceRes[uiSiteIndex] = F(0.0);
-#endif
+
         return;
     }
 
-
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fAbs1 = cuCabs(pDeltaA12[uiSiteIndex]);
     DOUBLE fAbs2 = cuCabs(pDeltaA13[uiSiteIndex]);
     DOUBLE fAbs3 = cuCabs(pDeltaA23[uiSiteIndex]);
     DOUBLE fM1122 = pDeltaA11[uiSiteIndex] + pDeltaA22[uiSiteIndex];
     pDeviceRes[uiSiteIndex] = 2.0 * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-#else
-    Real fAbs1 = _cuCabsf(pDeltaA12[uiSiteIndex]);
-    Real fAbs2 = _cuCabsf(pDeltaA13[uiSiteIndex]);
-    Real fAbs3 = _cuCabsf(pDeltaA23[uiSiteIndex]);
-    Real fM1122 = pDeltaA11[uiSiteIndex] + pDeltaA22[uiSiteIndex];
-    pDeviceRes[uiSiteIndex] = F(2.0) * (fAbs1 * fAbs1 + fAbs2 * fAbs2 + fAbs3 * fAbs3 + fM1122 * fM1122);
-#endif
 }
 
 
@@ -482,18 +289,13 @@ _kernelCalculateTrAGradientSq(
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernelBakeMomentumTable(
-#if !_CLG_DOUBLEFLOAT
     DOUBLE* pP,
-#else
-    Real* pP,
-#endif
     UINT uiV)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
 
-#if !_CLG_DOUBLEFLOAT
     DOUBLE fDenorm = static_cast<DOUBLE>(uiDir);
     for (BYTE dir = 0; dir < uiDir; ++dir)
     {
@@ -508,25 +310,8 @@ _kernelBakeMomentumTable(
     //when p^2=0, p^2=1, or p^2 = 2(Nd - sum cos)
     //4 * 4 / 2(Nd - sum cos)
     pP[uiSiteIndex] = 8.0 / (fDenorm * uiV);
-#else
-    Real fDenorm = static_cast<Real>(uiDir);
-    for (BYTE dir = 0; dir < uiDir; ++dir)
-    {
-        fDenorm -= _cos(F(2.0) * PI * sSite4.m_byData4[dir] / static_cast<Real>(_constIntegers[ECI_Lx + dir]));
-    }
-
-    if (abs(fDenorm) < _CLG_FLT_EPSILON)
-    {
-        fDenorm = F(0.5);
-    }
-
-    //when p^2=0, p^2=1, or p^2 = 2(Nd - sum cos)
-    //4 * 4 / 2(Nd - sum cos)
-    pP[uiSiteIndex] = F(8.0) / (fDenorm * uiV);
-#endif
 }
 
-#if !_CLG_DOUBLEFLOAT
 __global__ void _CLG_LAUNCH_BOUND
 _kernelFFTRtoC(const DOUBLE* __restrict__ realBuffer, cuDoubleComplex* complexBuffer)
 {
@@ -547,32 +332,6 @@ _kernelFFTScale(const DOUBLE* __restrict__ pP, cuDoubleComplex* fftRes)
     intokernal;
     fftRes[uiSiteIndex] = cuCmulf_cd(fftRes[uiSiteIndex], pP[uiSiteIndex]);
 }
-
-#else
-__global__ void _CLG_LAUNCH_BOUND
-_kernelFFTRtoC(const Real* __restrict__ realBuffer, CLGComplex* complexBuffer)
-{
-    intokernal;
-    complexBuffer[uiSiteIndex] = _make_cuComplex(realBuffer[uiSiteIndex], F(0.0));
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelFFTCtoR(
-    const CLGComplex* __restrict__ complexBuffer, 
-    Real* realBuffer
-)
-{
-    intokernal;
-    realBuffer[uiSiteIndex] = complexBuffer[uiSiteIndex].x;
-}
-
-__global__ void _CLG_LAUNCH_BOUND
-_kernelFFTScale(const Real* __restrict__ pP, CLGComplex* fftRes)
-{
-    intokernal;
-    fftRes[uiSiteIndex] = cuCmulf_cr(fftRes[uiSiteIndex], pP[uiSiteIndex]);
-}
-#endif
 
 #pragma endregion
 
