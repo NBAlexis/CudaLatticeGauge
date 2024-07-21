@@ -93,6 +93,11 @@
 #include "Data/Field/BoundaryField/CFieldBoundary.h"
 
 #include "Data/Field/CFieldGauge.h"
+#include "Data/Field/CFieldFermion.h"
+#include "Data/Field/CFieldBoson.h"
+#include "SparseLinearAlgebra/CSLASolver.h"
+#include "SparseLinearAlgebra/CMultiShiftSolver.h"
+
 #include "Data/Field/BoundaryField/CFieldBoundaryZero.h"
 #include "Data/Field/BoundaryField/CFieldBoundaryOne.h"
 #include "Data/Field/Gauge/CFieldGaugeLink.h"
@@ -105,7 +110,6 @@
 
 //#include "Data/Field/CFieldSpin.h"
 
-#include "Data/Field/CFieldFermion.h"
 #include "Data/Field/Staggered/CFieldFermionKS.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3.h"
 #include "Data/Field/WilsonDirac/CFieldFermionWilsonSquareSU3D.h"
@@ -128,7 +132,6 @@
 #include "Data/Field/Staggered/CFieldFermionKSTR.h"
 #include "Data/Field/Staggered/CFieldFermionKSSU3REM.h"
 
-#include "Data/Field/CFieldBoson.h"
 #include "Data/Field/Boson/CFieldBosonVN.h"
 
 //=====================================================
@@ -149,14 +152,12 @@
 #include "Data/Action/CActionGaugePlaquetteRotatingT3D.h"
 #include "Data/Action/CActionPhi4.h"
 
-#include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CSolverBiCGstab.h"
 #include "SparseLinearAlgebra/CSolverGMRES.h"
 #include "SparseLinearAlgebra/CSolverGCR.h"
 #include "SparseLinearAlgebra/CSolverGCRODR.h"
 #include "SparseLinearAlgebra/CSolverGMRESMDR.h"
 #include "SparseLinearAlgebra/CSolverTFQMR.h"
-#include "SparseLinearAlgebra/CMultiShiftSolver.h"
 #include "SparseLinearAlgebra/CMultiShiftGMRES.h"
 #include "SparseLinearAlgebra/CMultiShiftFOM.h"
 #include "SparseLinearAlgebra/CMultiShiftBiCGStab.h"

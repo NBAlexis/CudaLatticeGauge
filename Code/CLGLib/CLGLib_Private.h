@@ -196,18 +196,19 @@ const UINT uiSiteIndex3D = (sSite4.x * _DC_Ly + sSite4.y) * _DC_Lz + sSite4.z;
 #include "Data/Field/BoundaryField/CFieldBoundary.h"
 
 #include "Data/Field/CFieldGauge.h"
-#include "Data/Field/Gauge/CFieldGaugeSU3.h"
 #include "Data/Field/CFieldFermion.h"
-#include "Data/Field/Staggered/CFieldFermionKS.h"
 #include "Data/Field/CFieldBoson.h"
-
-//=====================================================
-
-#include "Data/Action/CAction.h"
 
 #include "SparseLinearAlgebra/CSLASolver.h"
 #include "SparseLinearAlgebra/CMultiShiftSolver.h"
 
+#include "Data/Field/Gauge/CFieldGaugeSU3.h"
+#include "Data/Field/Staggered/CFieldFermionKS.h"
+
+
+//=====================================================
+
+#include "Data/Action/CAction.h"
 
 #include "Measurement/CMeasure.h"
 #include "Measurement/CMeasurementManager.h"

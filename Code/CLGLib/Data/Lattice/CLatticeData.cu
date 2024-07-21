@@ -299,7 +299,7 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     {
         sRealByte += appToString(realByte[i]) + _T(", ");
     }
-
+    sInfos.Format(_T("Version : %d\n"), appVersion());
     sInfos.Format(_T("LatticeSize : [%d, %d, %d, %d]\n"), _HC_Lx, _HC_Ly, _HC_Lz, _HC_Lt);
     sRet = sTab + sInfos;
     sInfos.Format(_T("Center : [%d, %d, %d, %d]\n"), _HC_Centerx, _HC_Centery, _HC_Centerz, _HC_Centert);

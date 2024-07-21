@@ -14,6 +14,26 @@
 
 __BEGIN_NAMESPACE
 
+void CLGAPI appSimpleMalloc(void** ptr, size_t size)
+{
+    checkCudaErrors(cudaMalloc(ptr, size));
+}
+
+void CLGAPI appSimpleFree(void* ptr)
+{
+    checkCudaErrors(cudaFree(ptr));
+}
+
+void CLGAPI appSimpleCopyDD(void* target, void* source, size_t size)
+{
+    checkCudaErrors(cudaMemcpy(target, source, size, cudaMemcpyDeviceToDevice));
+}
+
+void CLGAPI appSimpleCopyHD(void* target, void* source, size_t size)
+{
+    checkCudaErrors(cudaMemcpy(target, source, size, cudaMemcpyHostToDevice));
+}
+
 #pragma region common
 
 template<typename T>

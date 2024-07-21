@@ -11,6 +11,6 @@
 
 __BEGIN_NAMESPACE
 
-constexpr UINT CLGAPI appVersion() { return 0; }
+UINT CLGAPI appVersion() { return 1; }
 
 __END_NAMESPACE

@@ -109,7 +109,7 @@ public:
 
     #pragma region Help functions to implement higher orders
 
-    void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) override;
+    void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
 
     #pragma endregion
 
@@ -121,7 +121,7 @@ protected:
 
     void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) override;
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const override;
     void OneLinkForceS(const void* pGuage, BYTE byGaugeFieldId, void* pForce, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx) const override;
 

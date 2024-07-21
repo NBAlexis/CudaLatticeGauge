@@ -35,6 +35,12 @@ static inline INT Ceil(LONGLONG a, LONGLONG b)
     return static_cast<INT>((a == b * c) ? c : (c + 1));
 }
 
+extern void CLGAPI appSimpleMalloc(void** ptr, size_t size);
+extern void CLGAPI appSimpleFree(void* ptr);
+extern void CLGAPI appSimpleCopyDD(void* target, void* source, size_t size);
+extern void CLGAPI appSimpleCopyHD(void* target, void* source, size_t size);
+
+
 //to avoid explict instantiation of every fucntion, we just explict instantiation a class
 template<typename T>
 class __DLL_EXPORT CCommonKernel

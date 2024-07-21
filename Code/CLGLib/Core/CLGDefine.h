@@ -56,6 +56,7 @@
 # undef FORCEINLINE
 # undef CDECL
 # define FORCEINLINE             __forceinline
+# define FORCE_NOT_INLINE        __declspec(noinline)
 # define CDECL                   __cdecl
 
 # define SUPPORTS_PRAGMA_PACK 1
@@ -69,6 +70,7 @@
 # undef FORCEINLINE
 # undef CDECL
 # define FORCEINLINE             inline
+# define FORCE_NOT_INLINE        __attribute__((noinline))
 # define CDECL                   __cdecl
 
 # define SUPPORTS_PRAGMA_PACK 0

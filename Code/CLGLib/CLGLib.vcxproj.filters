@@ -716,6 +716,9 @@
     <ClCompile Include="Core\Version.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Field\Staggered\CFieldFermionKST.cpp">
+      <Filter>Data\Field\Staggered</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />
@@ -939,9 +942,6 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu">
       <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Staggered\CFieldFermionKST.cu">
-      <Filter>Data\Field\Staggered</Filter>
     </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu">
       <Filter>Data\Action</Filter>

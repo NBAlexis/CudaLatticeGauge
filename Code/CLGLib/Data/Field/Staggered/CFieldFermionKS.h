@@ -31,6 +31,15 @@ public:
         
     }
 
+    ~CFieldFermionKS()
+    {
+        if (NULL != m_pMDNumerator)
+        {
+            checkCudaErrors(cudaFree(m_pMDNumerator));
+            m_pMDNumerator = NULL;
+        }
+    }
+
     void InitialOtherParameters(CParameters& params) override;
     void Zero() override { InitialField(EFIT_Zero); }
     void Identity() override
@@ -103,17 +112,24 @@ public:
         pField->m_rMC = m_rMC;
         pField->m_rMD = m_rMD;
         pField->m_bEachSiteEta = m_bEachSiteEta;
+
+        if (NULL != pField->m_pMDNumerator)
+        {
+            checkCudaErrors(cudaFree(pField->m_pMDNumerator));
+        }
+        checkCudaErrors(cudaMalloc((void**)&pField->m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
+        checkCudaErrors(cudaMemcpy(pField->m_pMDNumerator, m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyDeviceToDevice));
     }
 
 public:
 
     #pragma region Help functions to implement higher orders
 
-    virtual void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) = 0;
+    virtual void OnlyMass(void* pTarget, Real f2am, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const  = 0;
 
     virtual void OneLink(INT gaugeNum, INT bosonNum, const CFieldGauge* const* gaugeFields, const CFieldBoson* const* pBoson, void* pTarget, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx, 
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         if (SingleField())
         {
@@ -209,7 +225,7 @@ protected:
 
     virtual void OneLinkS(const void* pGuage, BYTE byGaugeFieldId, void* pTarget, Real fCoefficient,
         const INT* pDevicePath, BYTE pathLength, BYTE byEtaIdx,
-        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+        UBOOL bDagger, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
     {
         appCrucial(_T("OneLinkS not implemented\n"));
     }

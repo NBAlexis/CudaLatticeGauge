@@ -941,7 +941,7 @@ _kernelDFermionKS_OnlyMass(
 }
 
 
-void CFieldFermionKSSU3::OnlyMass(void* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff)
+void CFieldFermionKSSU3::OnlyMass(void* pTarget, Real fm, EOperatorCoefficientType eOCT, Real fRealCoeff, const CLGComplex& cCmpCoeff) const
 {
     preparethread;
     _kernelDFermionKS_OnlyMass << <block, threads >> > (
@@ -965,7 +965,7 @@ void CFieldFermionKSSU3::OneLinkS(
     UBOOL bDagger,
     EOperatorCoefficientType eOCT, 
     Real fRealCoeff, 
-    const CLGComplex& cCmpCoeff)
+    const CLGComplex& cCmpCoeff) const
 {
     assert(pathLength <= _kLinkMaxLength);
     preparethread;
@@ -1029,10 +1029,6 @@ CFieldFermionKSSU3::~CFieldFermionKSSU3()
     if (NULL != m_pRationalFieldPointers)
     {
         checkCudaErrors(cudaFree(m_pRationalFieldPointers));
-    }
-    if (NULL != m_pMDNumerator)
-    {
-        checkCudaErrors(cudaFree(m_pMDNumerator));
     }
 }
 
@@ -1199,18 +1195,12 @@ void CFieldFermionKSSU3::CopyTo(CField* U) const
     CFieldFermionKSSU3* pField = dynamic_cast<CFieldFermionKSSU3*>(U);
     checkCudaErrors(cudaMemcpy(pField->m_pDeviceData, m_pDeviceData, sizeof(deviceSU3Vector) * m_uiSiteCount, cudaMemcpyDeviceToDevice));
 
-    if (NULL != pField->m_pMDNumerator)
-    {
-        checkCudaErrors(cudaFree(pField->m_pMDNumerator));
-    }
     if (NULL != pField->m_pRationalFieldPointers)
     {
         checkCudaErrors(cudaFree(pField->m_pRationalFieldPointers));
     }
 
     checkCudaErrors(cudaMalloc((void**)&pField->m_pRationalFieldPointers, sizeof(deviceSU3Vector*) * 2 * m_rMD.m_uiDegree));
-    checkCudaErrors(cudaMalloc((void**)&pField->m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree));
-    checkCudaErrors(cudaMemcpy(pField->m_pMDNumerator, m_pMDNumerator, sizeof(Real) * m_rMD.m_uiDegree, cudaMemcpyDeviceToDevice));
 }
 
 void CFieldFermionKSSU3::AxpyPlus(const CField* x)

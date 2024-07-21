@@ -15,7 +15,7 @@
 
 __BEGIN_NAMESPACE
 
-extern constexpr UINT CLGAPI appVersion();
+extern UINT CLGAPI appVersion();
 
 struct CLGAPI SCLGLibManangerInitialCache
 {
