@@ -43,6 +43,8 @@ public:
     //class CCString GetDefaultDirectory();
 };
 
+inline class CFileSystem* appGetFileSystem();
+
 __END_NAMESPACE
 
 #endif //#ifndef _CFILE_H_

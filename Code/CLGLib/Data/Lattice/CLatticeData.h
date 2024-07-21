@@ -134,6 +134,8 @@ protected:
     TArray<EFieldInitialType> m_eFieldInitialTypes;
 };
 
+inline class CLatticeData* appGetLattice();
+
 inline class CSLASolver* appGetFermionSolver(BYTE byFieldId);
 
 inline class CGaugeSmearing* appGetGaugeSmearing();
