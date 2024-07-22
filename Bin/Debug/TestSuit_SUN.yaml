@@ -17,6 +17,16 @@ TestSU4:
     MeasureListLength : 7
     FermionFieldCount : 0
 
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.294244]
+    ExpectedResDebug : [0.636606, 0.643125, 0.166273, 0.103867, 0.070201, 0.053004, 0.039010]
+
     Updator:
 
         ## UpdatorType = { CHMC }
@@ -97,37 +107,37 @@ TestSU4:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [1]
 
     Measure2:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [2]
 
     Measure3:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [3]
 
     Measure4:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [4]
 
     Measure5:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [5]
 
     Measure6:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [6]
 
     Measure7:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [7]
 
     Action1:
@@ -189,6 +199,16 @@ TestSU4D:
     GaugeFieldCount : 7
     MeasureListLength : 7
     FermionFieldCount : 0
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.294244]
+    ExpectedResDebug : [0.697512, 0.522663, 0.302223, 0.248983, 0.222101, 0.206047, 0.194497]
 
     Updator:
 
@@ -319,37 +339,37 @@ TestSU4D:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [1]
 
     Measure2:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [2]
 
     Measure3:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [3]
 
     Measure4:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [4]
 
     Measure5:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [5]
 
     Measure6:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [6]
 
     Measure7:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [7]
 
     Action1:
@@ -412,6 +432,16 @@ TestRotationSUND:
     MeasureListLength : 2
     FermionFieldCount : 0
 
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.294244]
+    ExpectedResDebug : [0.522527, 0.305695]
+
     Updator:
 
         ## UpdatorType = { CHMC }
@@ -459,12 +489,12 @@ TestRotationSUND:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [1]
 
     Measure2:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [2]
 
     Action1:
@@ -498,6 +528,16 @@ TestRotationSUNP:
     GaugeFieldCount : 2
     MeasureListLength : 2
     FermionFieldCount : 0
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.698130, 0.171356]
+    ExpectedResDebug : [0.698130, 0.171356]
 
     Updator:
 
@@ -536,12 +576,12 @@ TestRotationSUNP:
 
     Measure1:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [1]
 
     Measure2:
 
-        MeasureName : CMeasurePolyakov2
+        MeasureName : CMeasurePlaqutteEnergy
         GaugeFields : [2]
 
     Action1:
@@ -560,5 +600,98 @@ TestRotationSUNP:
         Omega : 0.1
         CloverEnergy : 1
         ShiftCoord : 1
+        GaugeFields : [2]
+
+TestRotationSUNT:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [6, 6, 6, 4]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    ThreadAutoDecompose : 1
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ExponentialPrecision : 0
+    CacheStaple : 0
+
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    MeasureListLength : 2
+    FermionFieldCount : 0
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 5
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.294244]
+    ExpectedResDebug : [0.703390, 0.170123]
+
+    Updator:
+
+        ## UpdatorType = { CHMC }
+        UpdatorType : CHMC
+
+        Metropolis : 1
+
+        ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
+        IntegratorType : CIntegratorForceGradient
+        IntegratorStepLength : 1
+        IntegratorStep : 10
+        Omelyan2Lambda : 0.38636665500756728
+
+        ReportMeasure : 0
+
+    Gauge:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU2
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 1
+        # Period : [0, 0, 1, 1]
+
+    Gauge2:
+    
+        ## FieldName = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeSU4
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+        FieldId : 2
+        # Period : [0, 0, 1, 1]
+
+    Measure1:
+
+        MeasureName : CMeasurePlaqutteEnergy
+        GaugeFields : [1]
+
+    Measure2:
+
+        MeasureName : CMeasurePlaqutteEnergy
+        GaugeFields : [2]
+
+    Action1:
+
+        ActionName : CActionGaugePlaquetteRotatingSU2
+        Beta : 5.0
+        Omega : 0.1
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Torus : 1
+        GaugeFields : [1]
+
+    Action2:
+
+        ActionName : CActionGaugePlaquetteRotatingSU4
+        Beta : 5.0
+        Omega : 0.1
+        CloverEnergy : 1
+        ShiftCoord : 1
+        Torus : 1
         GaugeFields : [2]
 

@@ -11,11 +11,11 @@
 
 __BEGIN_NAMESPACE
 
-#if !_CLG_DOUBLEFLOAT
-DOUBLE CLGAPI CCommonData::m_fBeta = 0.0;
-#else
-Real CLGAPI CCommonData::m_fBeta = F(0.0);
-#endif
+//#if !_CLG_DOUBLEFLOAT
+//DOUBLE CLGAPI CCommonData::m_fBeta = 0.0;
+//#else
+//Real CLGAPI CCommonData::m_fBeta = F(0.0);
+//#endif
 Real CLGAPI CCommonData::m_fKai = F(0.0);
 Real CLGAPI CCommonData::m_fG = F(0.0);
 Real CLGAPI CCommonData::m_fShiftedMass = F(0.0);
@@ -315,8 +315,6 @@ CCString CLatticeData::GetInfos(const CCString& sTab) const
     sInfos.Format(_T("A field Definition (is Log(U) or U.TA()) : %d\n"), _HC_ALog);
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("SUN : %d\n"), GetDefaultSUN());
-    sRet = sRet + sTab + sInfos;
-    sInfos.Format(_T("Beta : %f\n"), CCommonData::m_fBeta);
     sRet = sRet + sTab + sInfos;
     sInfos.Format(_T("H diff : %f\n"), m_pUpdator->GetLastHDiff());
     sRet = sRet + sTab + sInfos;

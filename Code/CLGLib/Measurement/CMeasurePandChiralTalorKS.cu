@@ -583,14 +583,14 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
     _kernelAddChairTermSU3_Term12_Shifted_NoOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
     DOUBLE omegaterm = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
     _kernelAddChairTermSU3_Term34_Shifted_NoOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
     omegaterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 
@@ -600,7 +600,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
     _kernelAdd4PlaqutteTermSU3_Shifted_NoOmegaSq << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
 
     DOUBLE omegasqterm = appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
@@ -609,7 +609,7 @@ void CMeasurePandChiralTalorKS::OnConfigurationAcceptedSingleField(const CFieldG
     _kernelAddChairTermSU3_Term5_Shifted_NoOmegaSq << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
     omegasqterm += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 

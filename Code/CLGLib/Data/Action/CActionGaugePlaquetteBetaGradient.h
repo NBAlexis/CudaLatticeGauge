@@ -27,7 +27,7 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     CCString GetInfos(const CCString &tab) const override;
-    void SetBeta(const TArray<DOUBLE>& fBeta);
+    void SetBetaList(const TArray<DOUBLE>& fBeta);
 
 protected:
 

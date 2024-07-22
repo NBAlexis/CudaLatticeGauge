@@ -763,6 +763,8 @@ void CMeasureAMomentumJG::Initial(CMeasurementManager* pOwner, CLatticeData* pLa
     param.FetchValueINT(_T("NaiveNabla"), iValue);
     m_bNaiveNabla = iValue != 0;
 
+    param.FetchValueDOUBLE(_T("BetaOverN"), m_fBetaOverN);
+
     if (m_bMeasureSpin)
     {
         m_pE = dynamic_cast<CFieldGauge*>(appGetLattice()->GetFieldById(GetGaugeFieldIdSingleField())->GetCopy());
@@ -795,11 +797,11 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
     }
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
 
-#if !_CLG_DOUBLEFLOAT
-    const Real fBetaOverN = static_cast<Real>(CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN()));
-#else
-    const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
-#endif
+//#if !_CLG_DOUBLEFLOAT
+//    const Real fBetaOverN = static_cast<Real>(CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN()));
+//#else
+//    const Real fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
+//#endif
 
     _ZeroXYPlane(m_pDeviceDataBuffer);
 
@@ -810,7 +812,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         _kernelCalculateAngularMomentumJGProjectivePlane << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            fBetaOverN,
+            static_cast<Real>(m_fBetaOverN),
             GetGaugeFieldIdSingleField());
     }
     else
@@ -818,7 +820,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         _kernelCalculateAngularMomentumJG << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            fBetaOverN,
+            static_cast<Real>(m_fBetaOverN),
             GetGaugeFieldIdSingleField());
     }
 
@@ -885,7 +887,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         _kernelCalculateAngularMomentumS2ProjectivePlane << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            fBetaOverN,
+            static_cast<Real>(m_fBetaOverN),
             GetGaugeFieldIdSingleField());
     }
     else
@@ -893,7 +895,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
         _kernelCalculateAngularMomentumS2 << <block, threads >> > (
             pGaugeSU3->m_pDeviceData,
             m_pDeviceDataBuffer,
-            fBetaOverN,
+            static_cast<Real>(m_fBetaOverN),
             GetGaugeFieldIdSingleField());
     }
 
@@ -947,7 +949,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                 pESU3->m_pDeviceData, 
                 pAphysSU3->m_pDeviceData, 
                 m_pDeviceDataBuffer,
-                fBetaOverN);
+                static_cast<Real>(m_fBetaOverN)
+                );
 
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -988,7 +991,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN);
+                    static_cast<Real>(m_fBetaOverN)
+                    );
             }
             else
             {
@@ -998,7 +1002,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN);
+                    static_cast<Real>(m_fBetaOverN)
+                    );
             }
 
             _AverageXYPlane(m_pDeviceDataBuffer);
@@ -1057,7 +1062,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                 pESU3->m_pDeviceData,
                 pDpureA->m_pDeviceData,
                 m_pDeviceDataBuffer,
-                fBetaOverN);
+                static_cast<Real>(m_fBetaOverN)
+                );
 
             _AverageXYPlane(m_pDeviceDataBuffer);
             checkCudaErrors(cudaMemcpy(m_pHostDataBuffer, m_pDeviceDataBuffer, sizeof(Real) * _HC_Lx * _HC_Ly, cudaMemcpyDeviceToHost));
@@ -1103,7 +1109,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN);
+                    static_cast<Real>(m_fBetaOverN)
+                    );
             }
             else
             {
@@ -1112,7 +1119,8 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pESU3->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN);
+                    static_cast<Real>(m_fBetaOverN)
+                    );
             }
 
             _AverageXYPlane(m_pDeviceDataBuffer);
@@ -1163,7 +1171,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN
+                    static_cast<Real>(m_fBetaOverN)
                     );
 
                 _AverageXYPlane(m_pDeviceDataBuffer);
@@ -1202,7 +1210,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
                     pDpureA->m_pDeviceData,
                     pAphysSU3->m_pDeviceData,
                     m_pDeviceDataBuffer,
-                    fBetaOverN
+                    static_cast<Real>(m_fBetaOverN)
                     );
 
                 _AverageXYPlane(m_pDeviceDataBuffer);

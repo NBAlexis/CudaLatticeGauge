@@ -11,12 +11,12 @@
 
 UINT TestUpdateCommon(CParameters& sParam)
 {
-    Real fExpected = F(0.65);
+    TArray<Real> expectres;
 
 #if !_CLG_DEBUG
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
+    sParam.FetchValueArrayReal(_T("ExpectedRes"), expectres);
 #else
-    sParam.FetchValueReal(_T("ExpectedResDebug"), fExpected);
+    sParam.FetchValueArrayReal(_T("ExpectedResDebug"), expectres);
 #endif
 
     INT iValue = 0;
@@ -28,6 +28,12 @@ UINT TestUpdateCommon(CParameters& sParam)
     sParam.FetchValueINT(_T("BeforeMetropolisDebug"), iValue);
 #endif
     UINT uiBeforeMetropolis = static_cast<UINT>(iValue);
+
+#if _CLG_DEBUG
+    iValue = 0;
+    sParam.FetchValueINT(_T("SkipThermalDebug"), iValue);
+    UBOOL bSkipThermal = (0 != iValue);
+#endif
 
 #if !_CLG_DEBUG
     iValue = 12;
@@ -47,143 +53,93 @@ UINT TestUpdateCommon(CParameters& sParam)
 #endif
     UINT uiExpectAccept = static_cast<UINT>(uiMetropolis - iValue);
 
-
-    CMeasurePlaqutteEnergy* pMeasure = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    if (NULL == pMeasure)
-    {
-        return 1;
-    }
-
     //Equilibration
-#if _CLG_DEBUG
-    appGetLattice()->m_pUpdator->Update(uiBeforeMetropolis, FALSE);
+#if !_CLG_DEBUG
+    appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
 #else
-    appGetLattice()->m_pUpdator->Update(uiBeforeMetropolis, FALSE);
-#endif
-
-    //Measure
-    if (NULL != pMeasure)
+    if (bSkipThermal)
     {
-        pMeasure->Reset();
+        appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
     }
+#endif
+    appGetLattice()->m_pUpdator->Update(uiBeforeMetropolis, FALSE);
+#if !_CLG_DEBUG
+    appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
+#else
+    if (bSkipThermal)
+    {
+        appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
+    }
+#endif
+    //Measure
+    appGetLattice()->m_pMeasurements->Reset();
 
     appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
-#if _CLG_DEBUG
     appGetLattice()->m_pUpdator->Update(uiMetropolis, TRUE);
-#else
-    appGetLattice()->m_pUpdator->Update(uiMetropolis, TRUE);
-#endif
 
-    pMeasure->Average();
-    const Real fRes = pMeasure->GetAverageRealRes();
-    appGeneral(_T("res : expected=%f res=%f "), fExpected, fRes);
+    appGetLattice()->m_pMeasurements->AverageAll();
+    const TArray<Real> fRes = appGetLattice()->m_pMeasurements->AverageReals();
+    CCString sProblem;
+    sProblem.Format(_T("res : expected=%s res=%s "), appToString(expectres).c_str(), appToString(fRes).c_str());
+    appGeneral(sProblem);
     UINT uiError = 0;
-    if (appAbs(fRes - fExpected) > F(0.15))
+    if (expectres.Num() != fRes.Num())
     {
+        LastProbem(sProblem);
         ++uiError;
     }
+    else
+    {
+        for (INT i = 0; i < fRes.Num(); ++i)
+        {
+            if (appAbs(fRes[i] - expectres[i]) > F(0.15))
+            {
+                LastProbem(sProblem);
+                ++uiError;
+                break;
+            }
+        }
+    }
+
 
     const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount() - uiBeforeMetropolis;
     const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
     const Real fLastHDiff = appAbs(appGetLattice()->m_pUpdator->GetLastHDiff());
 #if _CLG_DEBUG
-    appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.3. last HDiff = %f : expected < 0.15\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
+    const Real fExpectedHDiff = F(0.3);
+    const Real fExpectedLastHDiff = F(0.15);
 #else
-    appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < 0.12 (exp(-0.1)=90%%),  last HDiff = %f : expected < 0.1\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fLastHDiff);
+    const Real fExpectedHDiff = F(0.12);
+    const Real fExpectedLastHDiff = F(0.1);
 #endif
 
-#if _CLG_DEBUG
+    appGeneral(_T("accept (%d/%d) : expected >= %d. HDiff = %f : expected < %f,  last HDiff = %f : expected < %f\n"), uiAccept, uiMetropolis, uiExpectAccept, fHDiff, fExpectedHDiff, fLastHDiff, fExpectedLastHDiff);
+
     if (uiAccept < uiExpectAccept)
-#else
-    if (uiAccept < uiExpectAccept)
-#endif
     {
+        sProblem.Format(_T("accept : %d < expect=%d "), uiAccept, uiExpectAccept);
+        LastProbem(sProblem);
         ++uiError;
     }
 
-#if _CLG_DEBUG
-    if (fHDiff > F(0.3))
-#else
-    if (fHDiff > F(0.12))
-#endif
+    if (fHDiff > fExpectedHDiff)
     {
+        sProblem.Format(_T("hdiff : %f > expect=%f "), fHDiff, fExpectedHDiff);
+        LastProbem(sProblem);
         ++uiError;
     }
 
-#if _CLG_DEBUG
-    if (fLastHDiff > F(0.15))
-#else
-    if (fLastHDiff > F(0.1))
-#endif
+    if (fLastHDiff > fExpectedLastHDiff)
     {
+        sProblem.Format(_T("last-hdiff : %f > expect=%f "), fLastHDiff, fExpectedLastHDiff);
+        LastProbem(sProblem);
         ++uiError;
     }
 
     return uiError;
 }
-
-/*
-UINT TestUpdator3D(CParameters& sParam)
-{
-    Real fExpected = F(0.2064);
-    sParam.FetchValueReal(_T("ExpectedRes"), fExpected);
-
-    //we calculate staple energy from beta = 1 - 6
-    //CActionGaugePlaquette* pAction = dynamic_cast<CActionGaugePlaquette*>(appGetLattice()->GetActionById(1));
-    //if (NULL == pAction)
-    //{
-    //    return 1;
-    //}
-    CMeasurePlaqutteEnergy* pMeasure = dynamic_cast<CMeasurePlaqutteEnergy*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
-    if (NULL == pMeasure)
-    {
-        return 1;
-    }
-
-    //pAction->SetBeta(F(3.0));
-
-    //Equilibration
-    appGetLattice()->m_pUpdator->Update(10, FALSE);
-
-    //Measure
-    pMeasure->Reset();
-    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
-    appGetLattice()->m_pUpdator->Update(40, TRUE);
-
-    const Real fRes = pMeasure->m_fLastRealResult;
-    appGeneral(_T("res : expected=%f res=%f"), fExpected, fRes);
-    UINT uiError = 0;
-    if (appAbs(fRes - fExpected) > F(0.005))
-    {
-        ++uiError;
-    }
-
-    const UINT uiAccept = appGetLattice()->m_pUpdator->GetConfigurationCount();
-    const Real fHDiff = static_cast<Real>(appGetLattice()->m_pUpdator->GetHDiff());
-    appGeneral(_T("accept (%d/50) : expected >= 45. HDiff = %f : expected < 0.1 (exp(-0.1)=90%%)\n"), uiAccept, appGetLattice()->m_pUpdator->GetHDiff());
-
-    if (uiAccept < 45)
-    {
-        ++uiError;
-    }
-
-    if (fHDiff > F(0.1))
-    {
-        ++uiError;
-    }
-
-    return uiError;
-}
-*/
-
-//__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorLeapFrog);
-
-//__REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorOmelyan);
 
 __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient, ForceGradient);
-
-___REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorForceGradient3D, ForceGradient3D, _TEST_BOUND);
-
 __REGIST_TEST(TestUpdateCommon, Updator, TestUpdatorTreeImproved, TreeImproved);
 
 

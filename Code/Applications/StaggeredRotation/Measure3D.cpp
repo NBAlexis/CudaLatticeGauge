@@ -153,7 +153,7 @@ INT Measurement3D(CParameters& params)
     // "heavy" is light, "light" is heavy
     //============================================
     
-    CCommonData::m_fBeta = fBeta;
+    //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY3D* pPL = dynamic_cast<CMeasurePolyakovXY3D*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     //CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));

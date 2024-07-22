@@ -205,7 +205,7 @@ INT Simulate(CParameters& params)
             }
         }
     }
-    pGaugeGradient->SetBeta(betaArray);
+    pGaugeGradient->SetBetaList(betaArray);
 
     UBOOL bNeedBake = TRUE;
     if (!bAdditive && bHasOldFile)
@@ -362,7 +362,7 @@ INT Simulate(CParameters& params)
                 }
             }
         }
-        pGaugeGradient->SetBeta(betaArray);
+        pGaugeGradient->SetBetaList(betaArray);
 
         if (bAdditive)
         {

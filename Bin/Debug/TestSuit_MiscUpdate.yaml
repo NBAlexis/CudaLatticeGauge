@@ -995,7 +995,7 @@ TestBetaGradient:
         IntegratorType : CIntegratorNestedForceGradient
         # IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 6
+        IntegratorStep : 5
         NestedStep : 5
 
     Gauge:

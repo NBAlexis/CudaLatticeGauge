@@ -26,7 +26,6 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     CCString GetInfos(const CCString &tab) const override;
-    void SetBeta(DOUBLE fBeta);
 
     //Real GetEnergyPerPlaqutte() const;
     UBOOL m_bCloverEnergy;

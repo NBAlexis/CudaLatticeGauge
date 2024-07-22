@@ -25,7 +25,6 @@ public:
 
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     CCString GetInfos(const CCString &tab) const override;
-    void SetBeta(Real fBeta);
     static void SetG(Real fOmega);
     //void SetCenter(const SSmallInt4 &newCenter);
     //Real GetEnergyPerPlaqutte() const;

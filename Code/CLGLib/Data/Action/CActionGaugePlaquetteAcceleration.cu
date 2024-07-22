@@ -347,19 +347,12 @@ void CActionGaugePlaquetteAcceleration::Initial(class CLatticeData* pOwner, cons
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fG = 0.1f;
     param.FetchValueReal(_T("AccG"), fG);
     CCommonData::m_fG = fG;
 
-}
-
-void CActionGaugePlaquetteAcceleration::SetBeta(Real fBeta)
-{
-    CCommonData::m_fBeta = static_cast<DOUBLE>(fBeta);
-    m_fBetaOverN = fBeta / static_cast<Real>(GetDefaultMatrixN());
 }
 
 UBOOL CActionGaugePlaquetteAcceleration::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
@@ -446,7 +439,6 @@ void CActionGaugePlaquetteAcceleration::SetG(Real fG)
 CCString CActionGaugePlaquetteAcceleration::GetInfos(const CCString &tab) const
 {
     CCString sRet = CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("fG : ") + appToString(CCommonData::m_fG) + _T("\n");
     return sRet;
 }

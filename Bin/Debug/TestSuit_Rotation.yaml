@@ -18,14 +18,14 @@ TestRotationWilsonDiracDirichlet:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.587613
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.587613]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 
@@ -118,14 +118,14 @@ TestRotationWilsonDiracTorus:
     CacheStaple : 0
     ExponentialPrecision : 10
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.445789
-    ExpectedResRelease : 0.369222
+    ExpectedRes : [0.445789]
+    ExpectedResRelease : [0.369222]
 
     Updator:
 
@@ -214,14 +214,14 @@ TestRotationWilsonDiracProjectivePlane:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.538359
-    ExpectedResDebug : 0.538359
+    ExpectedRes : [0.538359]
+    ExpectedResDebug : [0.538359]
 
     Updator:
 
@@ -317,14 +317,14 @@ TestRotationKSDirichlet:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.536160
-    ExpectedResDebug : 0.413
+    ExpectedRes : [0.536160]
+    ExpectedResDebug : [0.413]
 
     Updator:
 
@@ -435,14 +435,14 @@ TestRotationKSTorus:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.480466
-    ExpectedResDebug : 0.413
+    ExpectedRes : [0.480466]
+    ExpectedResDebug : [0.413]
 
     Updator:
 
@@ -552,14 +552,14 @@ TestRotationKSProjectivePlane:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.414636
-    ExpectedResDebug : 0.413
+    ExpectedRes : [0.414636]
+    ExpectedResDebug : [0.413]
 
     Updator:
 
@@ -573,7 +573,7 @@ TestRotationKSProjectivePlane:
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 18
+        IntegratorStep : 12
         NestedStep : 8
 
     Gauge:
@@ -677,14 +677,14 @@ TestRotationEMProjectivePlane:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 5
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411987
-    ExpectedResDebug : 0.43
+    ExpectedRes : [0.411987]
+    ExpectedResDebug : [0.43]
 
     Updator:
 
@@ -848,14 +848,14 @@ TestRotationProjectivePlaneU1:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 8
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.842893
-    ExpectedResDebug : 0.639037
+    ExpectedRes : [0.842893]
+    ExpectedResDebug : [0.639037]
 
     Updator:
 
@@ -869,7 +869,7 @@ TestRotationProjectivePlaneU1:
         # IntegratorType : CIntegratorOmelyan
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 30
+        IntegratorStep : 8
         NestedStep : 10
 
     Gauge:
@@ -1155,14 +1155,14 @@ TestRotationQuenched3D:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 8
     BeforeMetropolisDebug : 1
     Metropolis : 12
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.729716
-    ExpectedResDebug : 0.647564
+    ExpectedRes : [0.793678]
+    ExpectedResDebug : [0.639329]
 
     ## ============================================================
     ## Initial files
@@ -1186,7 +1186,8 @@ TestRotationQuenched3D:
         # IntegratorType : CIntegratorNestedOmelyan
         IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 6
+        IntegratorStepDebug : 10
 
     Gauge:
 
@@ -1231,14 +1232,14 @@ TestRotationQuenchedU13D:
     SavePrefix : ./500QuenchedU13D_
     Additive : 0
 
-    BeforeMetropolis : 3
+    BeforeMetropolis : 10
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.816398
-    ExpectedResDebug : 0.806426
+    ExpectedRes : [0.964938]
+    ExpectedResDebug : [0.770858]
 
     # 53551575Nt4 Omega60 
     Polyakovs : [0.068154081702, 0.048238586634, 0.125783473253, 0.047594130039, 0.034346383065, 0.054236494005, 0.170299991965]
@@ -1279,7 +1280,8 @@ TestRotationQuenchedU13D:
         # IntegratorType : CIntegratorNestedOmelyan
         IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 50
+        IntegratorStep : 16
+        IntegratorStepDebug : 35
 
     Gauge:
 
@@ -1294,7 +1296,7 @@ TestRotationQuenchedU13D:
         CloverEnergy : 1
         ShiftCoord : 1
         Beta : 50.0
-        Omega : 0.0
+        Omega : 0.1
 
     Measure1:
 

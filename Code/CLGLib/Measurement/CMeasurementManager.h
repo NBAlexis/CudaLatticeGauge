@@ -30,6 +30,9 @@ public:
     void OnUpdateFinished(UBOOL bReport = TRUE);
     void Reset();
     void Report();
+    void AverageAll();
+    TArray<Real> AverageReals() const;
+    TArray<Real> LastReals() const;
 
     CMeasure* GetMeasureById(BYTE byId) const;
 

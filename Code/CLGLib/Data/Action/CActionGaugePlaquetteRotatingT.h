@@ -42,13 +42,14 @@ public:
     void Initial(class CLatticeData* pOwner, const CParameters& param, BYTE byId) override;
     CCString GetInfos(const CCString& tab) const override;
 
-    void SetBeta(DOUBLE fBeta);
     void SetGaugeOmega(DOUBLE fOmega)
     {
         m_fOmega = fOmega;
     }
     DOUBLE GetOmega() const { return m_fOmega; }
     UBOOL IsCloverEnergy() const { return m_bCloverEnergy; }
+
+    UINT GetDefaultMatrixN() const override { return matrixN; }
 
 protected:
 

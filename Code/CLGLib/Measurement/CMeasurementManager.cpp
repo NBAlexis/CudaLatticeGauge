@@ -217,6 +217,43 @@ void CMeasurementManager::Report()
 #endif
 }
 
+void CMeasurementManager::AverageAll()
+{
+    for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
+    {
+        if (NULL != m_lstAllMeasures[i])
+        {
+            m_lstAllMeasures[i]->Average();
+        }
+    }
+}
+
+TArray<Real> CMeasurementManager::AverageReals() const
+{
+    TArray<Real> ret;
+    for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
+    {
+        if (NULL != m_lstAllMeasures[i])
+        {
+            ret.AddItem(m_lstAllMeasures[i]->GetAverageRealRes());
+        }
+    }
+    return ret;
+}
+
+TArray<Real> CMeasurementManager::LastReals() const
+{
+    TArray<Real> ret;
+    for (INT i = 0; i < m_lstAllMeasures.Num(); ++i)
+    {
+        if (NULL != m_lstAllMeasures[i])
+        {
+            ret.AddItem(m_lstAllMeasures[i]->GetLastRealRes());
+        }
+    }
+    return ret;
+}
+
 CMeasure* CMeasurementManager::GetMeasureById(BYTE byId) const
 {
     return m_mapMeasures.GetAt(byId);

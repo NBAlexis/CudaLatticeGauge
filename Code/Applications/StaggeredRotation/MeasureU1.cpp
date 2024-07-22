@@ -138,7 +138,7 @@ INT MeasurementU1(CParameters& params)
     // "heavy" is light, "light" is heavy
     //============================================
     
-    CCommonData::m_fBeta = fBeta;
+    //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovU1XY* pPL = dynamic_cast<CMeasurePolyakovU1XY*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));

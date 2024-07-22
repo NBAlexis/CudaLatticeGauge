@@ -31,7 +31,7 @@ void CAction::Initial(class CLatticeData* pOwner, const CParameters& param, BYTE
     DOUBLE fBeta = 0.1;
     if (param.FetchValueDOUBLE(_T("Beta"), fBeta))
     {
-        CCommonData::m_fBeta = fBeta;
+        m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
     }
 }
 
@@ -88,7 +88,8 @@ CCString CAction::GetInfos(const CCString& tab) const
 {
     CCString sRet = CBase::GetInfos(tab);
     sRet = sRet + tab + _T("ActionId : ") + appToString(m_byActionId) + _T("\n");
-    sRet = sRet + tab + _T("N : ") + appToString(GetDefaultMatrixN()) + _T("\n");
+    sRet = sRet + tab + _T("Nc : ") + appToString(GetDefaultMatrixN()) + _T("\n");
+    sRet = sRet + tab + _T("Beta / Nc : ") + appToString(m_fBetaOverN) + _T("\n");
     sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_byGaugeFieldIds) + _T("\n");
     sRet = sRet + tab + _T("BosonFields : ") + appToString(m_byBosonFieldIds) + _T("\n");
     return sRet;

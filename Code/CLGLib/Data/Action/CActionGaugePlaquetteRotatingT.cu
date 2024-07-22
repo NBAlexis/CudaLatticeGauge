@@ -1041,8 +1041,6 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::Initial(class CLattic
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
-
     DOUBLE fOmega = 0.1;
     param.FetchValueDOUBLE(_T("Omega"), fOmega);
     m_fOmega = fOmega;
@@ -1063,13 +1061,6 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::Initial(class CLattic
     INT iTorus = 0;
     param.FetchValueINT(_T("Torus"), iTorus);
     m_bTorus = (0 != iTorus);
-}
-
-template<typename deviceGauge, INT matrixN>
-void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::SetBeta(DOUBLE fBeta)
-{
-    CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
 }
 
 template<typename deviceGauge, INT matrixN>
@@ -1097,7 +1088,7 @@ UBOOL CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::CalculateForceOnGaug
     }
     else
     {
-        CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
+        CalculateForceOnGaugeDirichlet(pGaugeSU3, pForceSU3);
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -1432,7 +1423,6 @@ template<typename deviceGauge, INT matrixN>
 CCString CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::GetInfos(const CCString &tab) const
 {
     CCString sRet = CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
 
     sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0")) + _T("\n");

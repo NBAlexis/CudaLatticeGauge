@@ -31,11 +31,9 @@ void CMeasureBosonCond::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, cons
     }
 
     const CFieldBoson* bosonfield = pAcceptBoson[ibosonidx];
-#if !_CLG_DOUBLEFLOAT
-    UpdateComplexResult(_cToFloat(bosonfield->Dot(bosonfield)));
-#else
-    UpdateComplexResult(bosonfield->Dot(bosonfield));
-#endif
+    const CLGComplex condsq = _cToRealC(bosonfield->Dot(bosonfield));
+    UpdateRealResult(_cuCabsf(condsq));
+
     m_lstElement.AddItem(bosonfield->Sum());
 }
 
@@ -110,7 +108,7 @@ void CMeasureBosonCond::Report()
     appGeneral(_T("{"));
     for (UINT i = 0; i < m_uiConfigurationCount; ++i)
     {
-        LogGeneralComplex(CmpResAtI(i));
+        appGeneral(_T("%f, "), RealResAtI(i));
     }
     appGeneral(_T("}\n"));
 
@@ -121,7 +119,7 @@ void CMeasureBosonCond::Report()
     }
 
     appGeneral(_T("\n ----------- average(Phi^2) = "));
-    ReportAverageComplexRes();
+    appGeneral(_T("%f, "), GetAverageRealRes());
 
     appGeneral(_T(" --------\n==========================================================================\n"));
     appPopLogDate();

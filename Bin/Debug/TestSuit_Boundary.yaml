@@ -25,10 +25,14 @@ TestDirichletBoundary:
         Metropolis : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
+        # IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 25
-        Omelyan2Lambda : 0.38636665500756728
+        # IntegratorStep : 50
+        # Omelyan2Lambda : 0.38636665500756728
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStep : 6
+        NestedStep : 6
 
     Gauge:
     
@@ -109,10 +113,14 @@ TestProjectivePlaneBoundary:
         Metropolis : 1
 
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
-        IntegratorType : CIntegratorOmelyan
+        # IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 60
-        Omelyan2Lambda : 0.38636665500756728
+        # IntegratorStep : 50
+        # Omelyan2Lambda : 0.38636665500756728
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
+        IntegratorStep : 6
+        NestedStep : 6
 
     Gauge:
     

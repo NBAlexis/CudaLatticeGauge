@@ -223,7 +223,9 @@ protected:
             if (NULL != m_pMomentumField[i])
             {
                 //m_pMomentumField[i]->DebugPrintMe();
-                ret += m_pMomentumField[i]->CalculateKinematicEnergy();
+                DOUBLE kin = m_pMomentumField[i]->CalculateKinematicEnergy();
+                appGeneral(_T("kin %d: %f\n"), i, kin);
+                ret += kin;
             }
         }
 

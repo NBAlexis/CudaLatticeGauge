@@ -95,7 +95,7 @@ protected:
 
 public:
 
-    UINT GetDefaultMatrixN() const;
+    //UINT GetDefaultMatrixN() const;
 
     virtual void Average();
     virtual void Report() = 0;
@@ -442,7 +442,6 @@ public:
         sRet = sRet + tab + _T("FermionFieldId : ") + appToString(m_byFermionFieldId) + _T("\n");
         sRet = sRet + tab + _T("GaugeFields : ") + appToString(m_lstGaugeFieldIds) + _T("\n");
         sRet = sRet + tab + _T("BosonFields : ") + appToString(m_lstBosonFieldIds) + _T("\n");
-        sRet = sRet + tab + _T("Default SUN : ") + appToString(GetDefaultMatrixN()) + _T("\n");
         return sRet;
     }
 

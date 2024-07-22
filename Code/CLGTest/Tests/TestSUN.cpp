@@ -9,21 +9,12 @@
 
 #include "CLGTest.h"
 
-UINT TestUpdateSU4(CParameters& sParam)
-{
-    appGetLattice()->m_pUpdator->SetAutoCorrection(FALSE);
-    appGetLattice()->m_pUpdator->Update(5, FALSE);
-    appGetLattice()->m_pUpdator->SetAutoCorrection(TRUE);
-    appGetLattice()->m_pUpdator->SetTestHdiff(TRUE);
-    appGetLattice()->m_pUpdator->Update(5, TRUE);
+__REGIST_TEST(TestUpdateCommon, SUN, TestSU4, SUN);
+__REGIST_TEST(TestUpdateCommon, SUN, TestSU4D, SUND);
+__REGIST_TEST(TestUpdateCommon, SUN, TestRotationSUND, SUNRD);
+__REGIST_TEST(TestUpdateCommon, SUN, TestRotationSUNP, SUNRP);
+__REGIST_TEST(TestUpdateCommon, SUN, TestRotationSUNT, SUNRT);
 
-    return 0;
-}
-
-__REGIST_TEST(TestUpdateSU4, SUN, TestSU4, SUN);
-__REGIST_TEST(TestUpdateSU4, SUN, TestSU4D, SUND);
-___REGIST_TEST(TestUpdateSU4, SUN, TestRotationSUND, SUNRD, _TEST_BOUND);
-___REGIST_TEST(TestUpdateSU4, SUN, TestRotationSUNP, SUNRP, _TEST_BOUND);
 
 
 //=============================================================================

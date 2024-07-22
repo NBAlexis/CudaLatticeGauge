@@ -377,11 +377,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     {
         for (UINT i = 0; i < ECPCTTT_Max; ++i)
         {
-#if _CLG_DOUBLEFLOAT
-            m_cTmpSum[i] = _zeroc;
-#else
             m_cTmpSum[i] = make_cuDoubleComplex(0.0, 0.0);
-#endif
         }
     }
 
@@ -395,11 +391,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     preparethread;
 
     //======= D =========
-#if _CLG_DOUBLEFLOAT
-    m_cTmpSum[ECPCTTT_D] = _cuCaddf(m_cTmpSum[ECPCTTT_D], pF1W->Dot(pF2W));
-#else
     m_cTmpSum[ECPCTTT_D] = cuCadd(m_cTmpSum[ECPCTTT_D], pF1W->Dot(pF2W));
-#endif
 
     //======= MD =========
     pF2W->CopyTo(pTmp);
@@ -415,11 +407,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         );
 
 
-#if _CLG_DOUBLEFLOAT
-    m_cTmpSum[ECPCTTT_MD] = _cuCaddf(m_cTmpSum[ECPCTTT_MD], pF1W->Dot(pF2W));
-#else
     m_cTmpSum[ECPCTTT_MD] = cuCadd(m_cTmpSum[ECPCTTT_MD], pF1W->Dot(pF2W));
-#endif
 
     //======= DMD =========
     TArray<const CFieldGauge*> gauges;
@@ -428,11 +416,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
     pF2W->InverseD(1, 0, gauges.GetData(), NULL);
 
 
-#if _CLG_DOUBLEFLOAT
-    m_cTmpSum[ECPCTTT_DMD] = _cuCaddf(m_cTmpSum[ECPCTTT_DMD], pF1W->Dot(pF2W));
-#else
     m_cTmpSum[ECPCTTT_DMD] = cuCadd(m_cTmpSum[ECPCTTT_DMD], pF1W->Dot(pF2W));
-#endif
 
     //======= MDMD =========
 
@@ -449,11 +433,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedZ4SingleField(
         );
 
 
-#if _CLG_DOUBLEFLOAT
-    m_cTmpSum[ECPCTTT_MDMD] = _cuCaddf(m_cTmpSum[ECPCTTT_MDMD], pF1W->Dot(pF2W));
-#else
     m_cTmpSum[ECPCTTT_MDMD] = cuCadd(m_cTmpSum[ECPCTTT_MDMD], pF1W->Dot(pF2W));
-#endif
 
     //======= DMDMD =========
 
@@ -522,7 +502,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
     _kernelActionTalorOmega << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
 
 #if _CLG_DOUBLEFLOAT
@@ -538,7 +518,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
         appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-        CCommonData::m_fBeta,
+        m_fBetaOverN,
         _D_RealThreadBuffer);
 
 #if _CLG_DOUBLEFLOAT

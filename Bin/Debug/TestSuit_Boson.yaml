@@ -14,9 +14,18 @@ TestBosonU1NoGauge:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [873.033691]
+    ExpectedResDebug : [873.033691]
 
     Updator:
 
@@ -67,9 +76,18 @@ TestBosonU1:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [75.354797]
+    ExpectedResDebug : [75.354797]
 
     Updator:
 
@@ -137,9 +155,18 @@ TestBosonU1ExternalGaugeField:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [73.827850]
+    ExpectedResDebug : [73.827850]
 
     Updator:
 
@@ -200,9 +227,18 @@ TestBosonSU4:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [249.035706]
+    ExpectedResDebug : [249.035706]
 
     Updator:
 
@@ -270,9 +306,18 @@ TestBosonU1D:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [54.775406]
+    ExpectedResDebug : [54.775406]
 
     Updator:
 
@@ -348,9 +393,18 @@ TestBosonU1P:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [75.341156]
+    ExpectedResDebug : [75.341156]
 
     Updator:
 
@@ -428,9 +482,18 @@ TestBosonRotation:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [620.642700]
+    ExpectedResDebug : [620.642700]
 
     Updator:
 
@@ -500,9 +563,18 @@ TestBosonRotationD:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [448.517944]
+    ExpectedResDebug : [448.517944]
 
     Updator:
 
@@ -579,9 +651,18 @@ TestBosonRotationP:
     FermionFieldCount : 0
     BosonFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.565
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
+
+    SkipThermalDebug : 1
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 3
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [2644.178711]
+    ExpectedResDebug : [2644.178711]
 
     Updator:
 

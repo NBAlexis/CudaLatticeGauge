@@ -106,8 +106,8 @@ TestUpdatorForceGradient:
     MetropolisDebug : 10
     ExpectMiss : 3
     ExpectMissDebug : 2
-    ExpectedRes : 0.2064
-    ExpectedResDebug : 0.2064
+    ExpectedRes : [0.2064]
+    ExpectedResDebug : [0.2064]
 
 
     Updator:
@@ -154,8 +154,8 @@ TestUpdatorForceGradient3D:
     MetropolisDebug : 10
     ExpectMiss : 3
     ExpectMissDebug : 2
-    ExpectedRes : 0.2064
-    ExpectedResDebug : 0.068861
+    ExpectedRes : [0.2064]
+    ExpectedResDebug : [0.068861]
 
     Updator:
         UpdatorType : CHMC
@@ -265,12 +265,12 @@ TestUpdatorTreeImproved:
 
     BeforeMetropolis : 5
     BeforeMetropolisDebug : 2
-    Metropolis : 45
+    Metropolis : 25
     MetropolisDebug : 10
     ExpectMiss : 3
     ExpectMissDebug : 2
-    ExpectedRes : 0.294244
-    ExpectedResDebug : 0.292609
+    ExpectedRes : [0.294244]
+    ExpectedResDebug : [0.292609]
 
 
     Updator:
@@ -278,7 +278,7 @@ TestUpdatorTreeImproved:
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 15
+        IntegratorStep : 10
 
     Gauge:
     

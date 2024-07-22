@@ -103,6 +103,18 @@ struct STestSuits
 typedef TSimpleDoubleLinkedList<STestSuits> TestList;
 
 extern TestList* _testSuits;
+extern CCString _bug;
+
+inline void LastProbem(const CCString& problem)
+{
+    _bug = _bug + problem;
+}
+
+extern CCString _msg;
+inline void AddMsg(const CCString& msg)
+{
+    _msg = _msg + msg;
+}
 
 //=============================================================================
 // Switches which turn on or turn off tests

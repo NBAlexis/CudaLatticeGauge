@@ -283,6 +283,7 @@ TestAngularMomentum:
         MeasureSpin : 1
         MeasureApprox : 1
         ShowResult : 1
+        BetaOverN : 1.6666666666666666666666666666667
 
     Measure2:
 

@@ -224,7 +224,7 @@ INT Measurement(CParameters& params)
                 }
             }
         }
-        pGaugeGradient->SetBeta(betaArray);
+        pGaugeGradient->SetBetaList(betaArray);
     }
 
     CFieldFermionKSSU3* pF1Light = NULL;
@@ -342,7 +342,7 @@ INT Measurement(CParameters& params)
                     }
                 }
             }
-            pGaugeGradient->SetBeta(betaArray);
+            pGaugeGradient->SetBetaList(betaArray);
         }
         appGeneral(_T("(* ==== Beta(%s) ========= *)\n"), PrefixList[uiOmega].c_str());
         pPL->Reset();

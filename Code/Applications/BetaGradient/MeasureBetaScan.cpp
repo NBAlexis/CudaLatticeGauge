@@ -163,16 +163,17 @@ INT MeasurementBetaScan(CParameters& params)
         {
             pAG->SetBeta(BetaList[uiOmega]);
         }
-        else
-        {
-            CCommonData::m_fBeta = BetaList[uiOmega];
-        }
+
         appGeneral(_T("(* ==== Beta(%f) ========= *)\n"), BetaList[uiOmega]);
         pPL->Reset();
         pWL->Reset();
         pCCLight->Reset();
         //pCCHeavy->Reset();
         pAMJG->Reset();
+        if (NULL != pAMJG)
+        {
+            pAMJG->m_fBetaOverN = BetaList[uiOmega] / 3.0;
+        }
 
         pCCLight->SetFieldCount(iFieldCount);
         //pCCHeavy->SetFieldCount(iFieldCount);

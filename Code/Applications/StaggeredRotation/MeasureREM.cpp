@@ -55,7 +55,7 @@ __DEFINE_ENUM(EDistributionJobKSREM,
             } \
             sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n"); \
             sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n"); \
-            sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n"); \
+            sFileContent = sFileContent + _T("Beta: ") + appToString(fBeta) + _T("\n"); \
             sFileContent = sFileContent + _T("Magnetic: ") + appToString(pU1->m_feBz) + _T("\n"); \
             sFileContent = sFileContent + _T("MagneticType: ") + __ENUM_TO_STRING(EU1RealType, pU1->m_eB) + _T("\n"); \
             sFileContent = sFileContent + _T("Mass: ") + appToString(pF1##ftype->m_f2am) + _T("\n"); \
@@ -220,7 +220,7 @@ INT MeasurementREM(CParameters& params)
     TArray<TArray<CLGComplex>> lstPolyOutZ;
 
    
-    CCommonData::m_fBeta = fBeta;
+    //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CFieldGaugeU1Real* pU1 = dynamic_cast<CFieldGaugeU1Real*>(appGetLattice()->GetFieldById(5));
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
@@ -233,6 +233,7 @@ INT MeasurementREM(CParameters& params)
     CMeasureAngularMomentumKSREM* pFAs = dynamic_cast<CMeasureAngularMomentumKSREM*>(appGetLattice()->m_pMeasurements->GetMeasureById(7));
 
     CMeasureAMomentumJG* pJG = dynamic_cast<CMeasureAMomentumJG*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
+    pJG->m_fBetaOverN = fBeta / 3.0;
 
     CActionGaugePlaquetteRotating* pAG = dynamic_cast<CActionGaugePlaquetteRotating*>(appGetLattice()->m_pActionList.Num() > 0 ? appGetLattice()->m_pActionList[0] : NULL);
     CFieldFermionKSSU3REM* pFu = dynamic_cast<CFieldFermionKSSU3REM*>(appGetLattice()->GetFieldById(2));

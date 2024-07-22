@@ -80,9 +80,14 @@ public:
 
     DOUBLE GetBetaOverN() const { return m_fBetaOverN; }
 
+    void SetBeta(DOUBLE fBeta)
+    {
+        m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
+    }
+
 protected:
 
-    UINT GetDefaultMatrixN() const;
+    virtual UINT GetDefaultMatrixN() const;
 
     virtual UBOOL CalculateForceOnGaugeSingleField(const class CFieldGauge* pGauge, class CFieldGauge* pForce, class CFieldGauge* pStaple, ESolverPhase ePhase) const
     {

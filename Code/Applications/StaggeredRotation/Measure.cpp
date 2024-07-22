@@ -172,7 +172,7 @@ INT Measurement(CParameters& params)
     // "heavy" is light, "light" is heavy
     //============================================
     
-    CCommonData::m_fBeta = fBeta;
+    //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     CMeasurePolyakovXY* pPL = dynamic_cast<CMeasurePolyakovXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(1));
     CMeasureChiralCondensateKS* pCCLight = dynamic_cast<CMeasureChiralCondensateKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(2));
@@ -184,6 +184,8 @@ INT Measurement(CParameters& params)
     CMeasureConnectedSusceptibilityKS* pCCSHeavy = dynamic_cast<CMeasureConnectedSusceptibilityKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(8));
     CMeasureWilsonLoopXY* pWilson = dynamic_cast<CMeasureWilsonLoopXY*>(appGetLattice()->m_pMeasurements->GetMeasureById(9));
     CMeasurePandChiralTalorKS* pTaylorLight = dynamic_cast<CMeasurePandChiralTalorKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(10));
+    pJG->m_fBetaOverN = fBeta / 3.0;
+    pTaylorLight->m_fBetaOverN = fBeta / 3.0;
     //CMeasurePandChiralTalorKS* pTaylorHeavy = dynamic_cast<CMeasurePandChiralTalorKS*>(appGetLattice()->m_pMeasurements->GetMeasureById(11));
 
     //CMeasureAction* pPE = dynamic_cast<CMeasureAction*>(appGetLattice()->m_pMeasurements->GetMeasureById(6));
@@ -508,7 +510,7 @@ INT Measurement(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appToString(fBeta) + _T("\n");
                                 sFileContent = sFileContent + _T("Mass: ") + appToString(pF1Light->m_f2am) + _T("\n");
                                 sFileContent = sFileContent + _T("Gauge Omega: ") + appToString(pAG->GetOmega()) + _T("\n");
                                 sFileContent = sFileContent + _T("Light Omega: ") + appToString(pLight->GetOmega()) + _T("\n");
@@ -578,7 +580,7 @@ INT Measurement(CParameters& params)
                                 }
                                 sFileContent = sFileContent + _T("MD51: ") + sMD51 + _T("\n");
                                 sFileContent = sFileContent + _T("MD52: ") + sMD52 + _T("\n");
-                                sFileContent = sFileContent + _T("Beta: ") + appToString(CCommonData::m_fBeta) + _T("\n");
+                                sFileContent = sFileContent + _T("Beta: ") + appToString(fBeta) + _T("\n");
                                 sFileContent = sFileContent + _T("Gauge Omega: ") + appToString(pAG->GetOmega()) + _T("\n");
                                 sFileContent = sFileContent + _T("Light Omega: ") + appToString(pLight->GetOmega()) + _T("\n");
                                 sFileContent = sFileContent + _T("Heavy Omega: ") + appToString(pHeavy->GetOmega()) + _T("\n");

@@ -56,6 +56,10 @@ void CIntegrator::Initial(class CHMC* pOwner, class CLatticeData* pLattice, cons
 
     INT iStepCount = 50;
     params.FetchValueINT(_T("IntegratorStep"), iStepCount);
+#if _CLG_DEBUG
+    params.FetchValueINT(_T("IntegratorStepDebug"), iStepCount);
+#endif
+
     Real fStepLength = F(1.0);
     params.FetchValueReal(_T("IntegratorStepLength"), fStepLength);
     m_uiStepCount = (UINT)iStepCount;

@@ -270,7 +270,6 @@ void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CP
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<Real>(GetDefaultMatrixN());
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     Real fG = 0.1f;
@@ -300,7 +299,6 @@ void CActionGaugePlaquetteRigidAcc::Initial(class CLatticeData* pOwner, const CP
 
 void CActionGaugePlaquetteRigidAcc::SetBeta(Real fBeta)
 {
-    CCommonData::m_fBeta = static_cast<DOUBLE>(fBeta);
     m_fBetaOverN = fBeta / static_cast<Real>(GetDefaultMatrixN());
 }
 
@@ -381,7 +379,6 @@ void CActionGaugePlaquetteRigidAcc::SetG(Real fG)
 CCString CActionGaugePlaquetteRigidAcc::GetInfos(const CCString &tab) const
 {
     CCString sRet = CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Acc : ") + appToString(CCommonData::m_fG) + _T("\n");
     sRet = sRet + tab + _T("Dirichlet : ") + appToString(m_bDirichlet) + _T("\n");
     return sRet;

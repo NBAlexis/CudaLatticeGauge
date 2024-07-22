@@ -491,11 +491,11 @@ class CLGAPI CCommonData
 {
 public:
 
-#if !_CLG_DOUBLEFLOAT
-    static DOUBLE m_fBeta;
-#else
-    static Real m_fBeta;
-#endif
+//#if !_CLG_DOUBLEFLOAT
+//    static DOUBLE m_fBeta;
+//#else
+//    static Real m_fBeta;
+//#endif
     static Real m_fKai;
 
     static UBOOL m_bStoreStaple;

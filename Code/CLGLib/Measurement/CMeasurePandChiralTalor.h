@@ -33,6 +33,7 @@ class CLGAPI CMeasurePandChiralTalor : public CMeasureStochastic
 public:
     CMeasurePandChiralTalor()
         : CMeasureStochastic()
+        , m_fBetaOverN(0.0)
     {
     }
 
@@ -47,21 +48,21 @@ public:
     UBOOL IsGaugeOrBosonMeasurement() const override { return FALSE; }
     UBOOL IsZ4Source() const override { return TRUE; }
 
+    CCString GetInfos(const CCString& tab) const override
+    {
+        CCString sRet = CMeasureStochastic::GetInfos(tab);
+        sRet = sRet + tab + _T("BetaOverN : ") + appToString(m_fBetaOverN) + _T("\n");
+        return sRet;
+    }
+
 public:
 
-#if _CLG_DOUBLEFLOAT
-    CLGComplex m_cTmpSum[ECPCTTT_Max];
-    TArray<CLGComplex> m_lstTraceRes[ECPCTTT_Max];
-    TArray<CLGComplex> m_lstPolyakov;
-    TArray<Real> m_lstPolyakovSOmega;
-    TArray<Real> m_lstPolyakovSOmegaSq;
-#else
     cuDoubleComplex m_cTmpSum[ECPCTTT_Max];
     TArray<cuDoubleComplex> m_lstTraceRes[ECPCTTT_Max];
     TArray<cuDoubleComplex> m_lstPolyakov;
     TArray<DOUBLE> m_lstPolyakovSOmega;
     TArray<DOUBLE> m_lstPolyakovSOmegaSq;
-#endif
+    DOUBLE m_fBetaOverN;
 };
 
 __END_NAMESPACE

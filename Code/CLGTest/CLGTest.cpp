@@ -10,9 +10,14 @@
 #include "CLGTest.h"
 
 TestList* _testSuits;
+CCString _bug;
+CCString _msg;
 
 UINT RunTest(CParameters&params, const TestList* pTest)
 {
+    _bug = _T("");
+    _msg = _T("");
+
     appQuitCLG();
 
     appGeneral("\n=========== Testing:%s \n", pTest->m_sParamName);
@@ -22,6 +27,7 @@ UINT RunTest(CParameters&params, const TestList* pTest)
     //Initial
     if (!appInitialCLG(paramForTheTest))
     {
+        _bug = _T("Initial CLG Failed");
         return 1;
     }
 
@@ -30,15 +36,26 @@ UINT RunTest(CParameters&params, const TestList* pTest)
     timer.Start();
     const UINT uiErrors = (*pTest->m_pfTest)(paramForTheTest);
     timer.Stop();
+    Real fCost = timer.Elapsed();
     appGeneral(_T("=========== Finished %s, errors: %d, cost: %f(ms)\n ======== Param: %s \n ------------- End --------------\n\n"), 
         pTest->m_sParamName, 
         uiErrors, 
-        timer.Elapsed(),
+        fCost,
         paramForTheTest.GetLocation().c_str());
+
+    CCString sFinishMsg;
+    sFinishMsg.Format(_T(" cost:%f ms"), fCost);
+    AddMsg(sFinishMsg);
 
 #if _CLG_WIN
     OutputDebugString(_T("Param Name: "));
     OutputDebugString(paramForTheTest.GetName().c_str());
+    OutputDebugString(_T(", Error: "));
+    OutputDebugString(appToString(uiErrors).c_str());
+    OutputDebugString(_T(", Cost: "));
+    OutputDebugString(appToString(timer.Elapsed()).c_str());
+    OutputDebugString(_T(", Last probem: "));
+    OutputDebugString(_bug.c_str());
     OutputDebugString(_T(", double click following:\n"));
     OutputDebugString(paramForTheTest.GetLocation().c_str());
     OutputDebugString(_T("\n"));
@@ -185,7 +202,7 @@ int main(int argc, char * argv[])
     ListAllTests(category);
     while (TRUE)
     {
-        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T("==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info, p - reload params\n");
+        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T(": (") << appVersion() << _T(") ==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info, p - reload params\n");
         //ListAllTests(category);
         //inputNumber = -1;
         std::string name;
@@ -298,7 +315,8 @@ int main(int argc, char * argv[])
             UINT uiError = 0;
             UINT uiPassed = 0;
             UINT uiTotal = 0;
-            TArray<CCString> problemTest;
+            TArray<CCString> problemTestName;
+            TArray<CCString> problemTestBug;
             for (INT i = 0; i < allTests.Num(); ++i)
             {
                 if (allTests[i]->IsCheck())
@@ -312,15 +330,16 @@ int main(int argc, char * argv[])
                     else
                     {
                         uiError += uiThisError;
-                        problemTest.AddItem(allTests[i]->m_sParamName);
+                        problemTestName.AddItem(allTests[i]->m_sParamName);
+                        problemTestBug.AddItem(_bug);
                     }
                 }
             }
             timer.Stop();
             appGeneral(_T("\nRun all test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), uiPassed, uiTotal, uiError, timer.Elapsed() * 0.001f);
-            for (INT i = 0; i < problemTest.Num(); ++i)
+            for (INT i = 0; i < problemTestName.Num(); ++i)
             {
-                appGeneral(_T("problem test suits: %s\n"), problemTest[i].c_str());
+                appGeneral(_T("problem test suits: %s, problem: %s\n"), problemTestName[i].c_str(), problemTestBug[i].c_str());
             }
             bExcuted = TRUE;
         }
@@ -357,46 +376,78 @@ int main(int argc, char * argv[])
                     timer.Start();
                     UINT uiError = 0;
                     UINT uiPassed = 0;
-                    TArray<CCString> unpassed;
+                    TArray<CCString> skippedname;
+                    TArray<CCString> unpassedname;
+                    TArray<CCString> unpassedbug;
+                    TArray<CCString> unpassedmsg;
+                    TArray<CCString> passedname;
+                    TArray<CCString> passedmsg;
                     for (INT j = 0; j < category[keys[i]]->Num(); ++j)
                     {
                         const TestList* pTest = category[keys[i]]->GetAt(j);
 #if _CLG_DEBUG
                         if (pTest->OnlyRelease())
+                        {
+                            skippedname.AddItem(pTest->m_sParamName);
                             continue;
+                        }
 #endif
 
 #if !_CLG_USE_LAUNCH_BOUND
                         if (pTest->OnlyBound())
+                        {
+                            skippedname.AddItem(pTest->m_sParamName);
                             continue;
+                        }
 #endif
 
 #if !_CLG_DOUBLEFLOAT
                         if (pTest->OnlyDouble())
+                        {
+                            skippedname.AddItem(pTest->m_sParamName);
                             continue;
+                        }
 #else
                         if (pTest->OnlySingle())
+                        {
+                            skippedname.AddItem(pTest->m_sParamName);
                             continue;
+                        }
 #endif
 
                         UINT uiThisError = RunTest(params, pTest);
                         if (0 == uiThisError)
                         {
                             ++uiPassed;
+                            passedname.AddItem(category[keys[i]]->GetAt(j)->m_sParamName);
+                            unpassedmsg.AddItem(_msg);
                         }
                         else
                         {
                             uiError += uiThisError;
-                            unpassed.AddItem(category[keys[i]]->GetAt(j)->m_sParamName);
+                            unpassedname.AddItem(category[keys[i]]->GetAt(j)->m_sParamName);
+                            unpassedbug.AddItem(_bug);
+                            passedmsg.AddItem(_msg);
                         }
                     }
                     timer.Stop();
                     appGeneral(_T("Run all %s test with %d(success) / %d(total) (with %d errors) and %f secs\n\n\n================\n"), 
                         keys[i].c_str(), uiPassed, category[keys[i]]->Num(),
                         uiError, timer.Elapsed() * 0.001f);
-                    for (INT unpassidx = 0; unpassidx < unpassed.Num(); ++unpassidx)
+
+                    for (INT unpassidx = 0; unpassidx < skippedname.Num(); ++unpassidx)
                     {
-                        appGeneral(_T("Faield:%s\n"), unpassed[unpassidx].c_str());
+                        appGeneral(_T("Skipped:%s\n"), skippedname[unpassidx].c_str());
+                    }
+
+                    for (INT unpassidx = 0; unpassidx < passedname.Num(); ++unpassidx)
+                    {
+                        appGeneral(_T("Success:%s, %s\n"), passedname[unpassidx].c_str(), unpassedmsg[unpassidx].c_str());
+                    }
+
+                    for (INT unpassidx = 0; unpassidx < unpassedname.Num(); ++unpassidx)
+                    {
+                        appGeneral(_T("Faield:%s, Bug:%s, Msg:%s\n"), unpassedname[unpassidx].c_str(), unpassedbug[unpassidx].c_str(), passedmsg[unpassidx].c_str());
                     }
                     break;
                     //bExcuted = TRUE;

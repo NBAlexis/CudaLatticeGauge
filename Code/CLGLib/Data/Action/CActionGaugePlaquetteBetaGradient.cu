@@ -339,7 +339,7 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
 
 }
 
-void CActionGaugePlaquetteGradient::SetBeta(const TArray<DOUBLE>& fBeta)
+void CActionGaugePlaquetteGradient::SetBetaList(const TArray<DOUBLE>& fBeta)
 {
     m_fBetaArray = fBeta;
 #if !_CLG_DOUBLEFLOAT

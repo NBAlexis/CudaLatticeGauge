@@ -40,7 +40,7 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
+    //m_fBetaOverN = m_fBetaOverN / static_cast<DOUBLE>(GetDefaultMatrixN());
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
     INT iUsing4Plaq = 0;
@@ -51,11 +51,6 @@ void CActionGaugePlaquette::Initial(class CLatticeData* pOwner, const CParameter
             m_bCloverEnergy = TRUE;
         }
     }
-}
-void CActionGaugePlaquette::SetBeta(DOUBLE fBeta)
-{
-    CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
 }
 
 UBOOL CActionGaugePlaquette::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
@@ -101,7 +96,6 @@ DOUBLE CActionGaugePlaquette::EnergySingleField(UBOOL bBeforeEvolution, const cl
 CCString CActionGaugePlaquette::GetInfos(const CCString &tab) const
 {
     CCString sRet = CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Clover : ") + appToString(m_bCloverEnergy) + _T("\n");
     return sRet;
 }

@@ -1278,8 +1278,8 @@ TestFermionUpdatorKSGamma:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.24
-    ExpectedRes : 0.209288
+    ExpectedResDebug : [0.24]
+    ExpectedRes : [0.209288]
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
@@ -1392,8 +1392,8 @@ TestFermionUpdatorKSGammaProj:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.24
-    ExpectedRes : 0.209288
+    ExpectedResDebug : [0.24]
+    ExpectedRes : [0.209288]
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
@@ -1509,8 +1509,8 @@ TestFermionUpdatorKSGammaEM:
     GaugeFieldCount : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.24
-    ExpectedRes : 0.211636
+    ExpectedResDebug : [0.24]
+    ExpectedRes : [0.211636]
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
@@ -1640,8 +1640,8 @@ TestFermionUpdatorKSGammaEMProj:
     GaugeFieldCount : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.24
-    ExpectedRes : 0.209035
+    ExpectedResDebug : [0.24]
+    ExpectedRes : [0.209035]
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1

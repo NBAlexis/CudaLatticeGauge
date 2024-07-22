@@ -21,7 +21,7 @@ TestFileIOBridgePPText:
         ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
         GaugeFileType : EFFT_BridgePPTXT
 
-        GaugeFileName : bridgepp_conf_text.dat
+        GaugeFileName : ../Debug/bridgepp_conf_text.dat
 
 TestFileIOBridgePPBin:
     Dim : 4
@@ -45,7 +45,7 @@ TestFileIOBridgePPBin:
         ## GaugeFileType = {EFFT_BridgePPTXT, EFFT_BridgePPBin}
         GaugeFileType : EFFT_BridgePPBin
 
-        GaugeFileName : bridgepp_conf_binary.dat
+        GaugeFileName : ../Debug/bridgepp_conf_binary.dat
 
 TestSaveConfiguration:
 

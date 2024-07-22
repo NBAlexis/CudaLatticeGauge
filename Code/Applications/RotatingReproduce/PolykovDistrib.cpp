@@ -387,7 +387,7 @@ INT MeasurePolyakovDist(CParameters& params)
     TArray<TArray<CLGComplex>> lstPolyInZ;
     TArray<TArray<CLGComplex>> lstPolyOutZ;
 
-    CCommonData::m_fBeta = fBeta;
+    //CCommonData::m_fBeta = fBeta;
     UINT uiNewLine = (iEndN - iStartN + 1) / 5;
     if (uiNewLine < 1)
     {
@@ -402,6 +402,8 @@ INT MeasurePolyakovDist(CParameters& params)
     CFieldFermionWilsonSquareSU3DR* pFermion = dynamic_cast<CFieldFermionWilsonSquareSU3DR*>(appGetLattice()->GetFieldById(2));
     //CActionFermionWilsonNf2* pAF = dynamic_cast<CActionFermionWilsonNf2*>(appGetLattice()->m_pActionList[1]);
     appPushLogDate(FALSE);
+
+    pJG->m_fBetaOverN = fBeta / 3.0;
 
     CFieldFermionWilsonSquareSU3* pF1 = NULL;
     CFieldFermionWilsonSquareSU3* pF2 = NULL;

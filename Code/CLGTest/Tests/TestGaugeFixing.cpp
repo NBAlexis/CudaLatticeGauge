@@ -376,7 +376,7 @@ __REGIST_TEST(TestGaugeFixingCoulombDR, GaugeFixing, TestGaugeFixingCoulombLosAl
 
 __REGIST_TEST(TestGaugeFixingCoulombDRChiral, GaugeFixing, TestGaugeFixingCoulombDRChiral, CoulombDRChiral);
 
-___REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, GaugeFixing, TestGaugeFixingRotationKS, RotationKS, _TEST_BOUND);
+__REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane, GaugeFixing, TestGaugeFixingRotationKS, RotationKS);
 
 __REGIST_TEST(TestGaugeFixingCoulombPorjectivePlane2, GaugeFixing, TestGaugeFixingRotationKS2, RotationKS2);
 

@@ -1593,8 +1593,6 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
 {
     CAction::Initial(pOwner, param, byId);
 
-    m_fBetaOverN = CCommonData::m_fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
-
 #if !_CLG_DOUBLEFLOAT
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
@@ -1638,12 +1636,6 @@ void CActionGaugePlaquetteRotating::Initial(class CLatticeData* pOwner, const CP
     INT iTorus = 0;
     param.FetchValueINT(_T("Torus"), iTorus);
     m_bTorus = (0 != iTorus);
-}
-
-void CActionGaugePlaquetteRotating::SetBeta(DOUBLE fBeta)
-{
-    CCommonData::m_fBeta = fBeta;
-    m_fBetaOverN = fBeta / static_cast<DOUBLE>(GetDefaultMatrixN());
 }
 
 UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGaugeSingleField(const CFieldGauge * pGauge, class CFieldGauge * pForce, class CFieldGauge * pStaple, ESolverPhase ePhase) const
@@ -1724,7 +1716,8 @@ UBOOL CActionGaugePlaquetteRotating::CalculateForceOnGaugeSingleField(const CFie
     }
     else
     {
-        CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
+        //CalculateForceOnGaugeTorus(pGaugeSU3, pForceSU3);
+        CalculateForceOnGaugeDirichlet(pGaugeSU3, pForceSU3);
     }
 
     checkCudaErrors(cudaDeviceSynchronize());
@@ -1928,6 +1921,11 @@ DOUBLE CActionGaugePlaquetteRotating::XYTerm2(const class CFieldGauge* pGauge)
 void CActionGaugePlaquetteRotating::EnergyDirichlet(const class CFieldGaugeSU3* pGaugeSU3)
 {
     assert(!m_bShiftHalfCoord && !m_bCloverEnergy);
+    if (!(!m_bShiftHalfCoord && !m_bCloverEnergy))
+    {
+        appCrucial(_T("Dirichlet gauge rotation does not support shift-center and clover\n"));
+    }
+
     m_fNewEnergy = pGaugeSU3->CalculatePlaqutteEnergy(m_fBetaOverN);
 
     preparethread;
@@ -2226,7 +2224,6 @@ void CActionGaugePlaquetteRotating::SetGaugeOmega(DOUBLE fOmega)
 CCString CActionGaugePlaquetteRotating::GetInfos(const CCString &tab) const
 {
     CCString sRet = CAction::GetInfos(tab);
-    sRet = sRet + tab + _T("Beta : ") + appToString(CCommonData::m_fBeta) + _T("\n");
     sRet = sRet + tab + _T("Omega : ") + appToString(m_fOmega) + _T("\n");
 
     sRet = sRet + tab + _T("ShiftCenter : ") + (m_bShiftHalfCoord ? _T("1") : _T("0")) + _T("\n");

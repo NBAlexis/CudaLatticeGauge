@@ -20,15 +20,15 @@ UINT TestUpdateBoson(CParameters& sParam)
     return 0;
 }
 
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonU1NoGauge, U1NoGauge);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonU1, U1);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonSU4, SU4);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonU1ExternalGaugeField, ExternalU1);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonU1D, U1D);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonU1P, U1P);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonRotation, Rotation);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonRotationD, RotationD);
-__REGIST_TEST(TestUpdateBoson, Boson, TestBosonRotationP, RotationP);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonU1NoGauge, U1NoGauge);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonU1, U1);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonSU4, SU4);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonU1ExternalGaugeField, ExternalU1);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonU1D, U1D);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonU1P, U1P);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonRotation, Rotation);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonRotationD, RotationD);
+__REGIST_TEST(TestUpdateCommon, Boson, TestBosonRotationP, RotationP);
 
 //=============================================================================
 // END OF FILE

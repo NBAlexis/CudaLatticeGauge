@@ -71,6 +71,7 @@ public:
         , m_pDpureA(NULL)
         , m_bMeasureApprox(FALSE)
         , m_bProjectivePlane(FALSE)
+        , m_fBetaOverN(0.0)
     {
     }
 
@@ -83,6 +84,18 @@ public:
 
     UBOOL IsGaugeOrBosonMeasurement() const override { return TRUE; }
     UBOOL IsSourceScanning() const override { return FALSE; }
+
+    CCString GetInfos(const CCString& tab) const override
+    {
+        CCString sRet = CMeasure::GetInfos(tab);
+        sRet = sRet + tab + _T("MeasureDistribution : ") + appToString(m_bMeasureDistribution) + _T("\n");
+        sRet = sRet + tab + _T("MeasureSpin : ") + appToString(m_bMeasureSpin) + _T("\n");
+        sRet = sRet + tab + _T("NaiveNabla : ") + appToString(m_bNaiveNabla) + _T("\n");
+        sRet = sRet + tab + _T("MeasureApprox : ") + appToString(m_bMeasureApprox) + _T("\n");
+        sRet = sRet + tab + _T("ProjectivePlane : ") + appToString(m_bProjectivePlane) + _T("\n");
+        sRet = sRet + tab + _T("BetaOverN : ") + appToString(m_fBetaOverN) + _T("\n");
+        return sRet;
+    }
 
 protected:
 
@@ -158,6 +171,8 @@ public:
     TArray<Real> m_lstJGS2Inner;
     //s2 as function of R
     TArray<Real> m_lstJGS2;
+
+    DOUBLE m_fBetaOverN;
 };
 
 __END_NAMESPACE

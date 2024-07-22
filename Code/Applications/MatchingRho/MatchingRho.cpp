@@ -120,6 +120,7 @@ int main(int argc, char * argv[])
     CMeasureChiralCondensate* pCC = dynamic_cast<CMeasureChiralCondensate*>(appGetLattice()->m_pMeasurements->GetMeasureById(3));
 
     CMeasurePandChiralTalor* pTalor = dynamic_cast<CMeasurePandChiralTalor*>(appGetLattice()->m_pMeasurements->GetMeasureById(4));
+    pTalor->m_fBetaOverN = appGetLattice()->m_pActionList[0]->GetBetaOverN();
 
     CFieldGaugeSU3* pStaple = NULL;
     if (bDoSmearing)
