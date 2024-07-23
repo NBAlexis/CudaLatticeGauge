@@ -18,7 +18,7 @@ __BEGIN_NAMESPACE
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateLinkCount(
     INT* res,
-    const BYTE* __restrict__ pBoundInfo,
+    const SIndex* __restrict__ linktable,
     const UINT* __restrict__ pSmallData
 )
 {
@@ -28,7 +28,8 @@ _kernelCalculateLinkCount(
     INT uiCount = 0;
     for (BYTE byDir = 0; byDir < _DC_Dir; ++byDir)
     {
-        if (0 == (pBoundInfo[uiBigIdx * _DC_Dir + byDir] & _kDirichlet))
+        //if (0 == (pBoundInfo[uiBigIdx * _DC_Dir + byDir] & _kDirichlet))
+        if (!linktable[uiBigIdx].IsDirichlet())
         {
             ++uiCount;
         }
@@ -391,16 +392,29 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
             }
         }
 
-        if (NULL != pData->m_pBondInfoTable[i])
+        //if (NULL != pData->m_pBondInfoTable[i])
+        //{
+        //    hostres[0] = 0;
+        //    hostres[1] = 0;
+
+        //    checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
+        //    _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable[i], pData->m_pSmallData);
+        //    checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
+        //    pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
+        //    
+        //    appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
+        //}
+
+        if (NULL != pData->m_pIndexLinkToSIndex[i])
         {
             hostres[0] = 0;
             hostres[1] = 0;
 
             checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-            _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable[i], pData->m_pSmallData);
+            _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pIndexLinkToSIndex[i], pData->m_pSmallData);
             checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
             pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
-            
+
             appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
         }
     }

@@ -64,8 +64,9 @@ _kernalBakeMappingTable(SSmallInt4* pDeviceData, uint3 mods)
 __global__ void _CLG_LAUNCH_BOUND
 _kernelBakePlaqIndexAtSite(SIndex* pResult,
     const SIndex* __restrict__ pLinkTable,
-    const UINT* __restrict__ pSmallDataTable,
-    const BYTE* __restrict__ pBondInfoTable)
+    const UINT* __restrict__ pSmallDataTable
+    //, const BYTE* __restrict__ pBondInfoTable
+)
 {
     intokernalInt4;
 
@@ -82,7 +83,7 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
         for (BYTE uiPlaq = uiLink + 1; uiPlaq < uiDim; ++uiPlaq)
         {
             pResult[iListIndex] = SIndex(uiSiteIndex, uiLink);
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiLink) ? _kDirichlet : 0;
+            pResult[iListIndex].m_byTag = pLinkTable[uiBigSiteIndex * _DC_Dir + uiLink].IsDirichlet() ? _kDirichlet : 0;
             ++iListIndex;
 
             //start ----> uiLink
@@ -101,7 +102,7 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
             ++iListIndex;
 
             pResult[iListIndex] = SIndex(uiSiteIndex, uiPlaq);
-            pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiPlaq) ? _kDirichlet : 0;
+            pResult[iListIndex].m_byTag = pLinkTable[uiBigSiteIndex * _DC_Dir + uiPlaq].IsDirichlet() ? _kDirichlet : 0; //_deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, uiPlaq) ? _kDirichlet : 0;
             pResult[iListIndex].m_byTag = pResult[iListIndex].m_byTag ^ _kDaggerOrOpposite; //Since this is inside lattice, | or ^ are both OK
             ++iListIndex;
         }
@@ -120,8 +121,9 @@ _kernelBakePlaqIndexAtSite(SIndex* pResult,
 __global__ void _CLG_LAUNCH_BOUND
 _kernelBakePlaqIndexAtLink(SIndex* pResult,
     const SIndex* __restrict__ pLinkTable,
-    const UINT* __restrict__ pSmallDataTable,
-    const BYTE* __restrict__ pBondInfoTable)
+    const UINT* __restrict__ pSmallDataTable
+    //, const BYTE* __restrict__ pBondInfoTable
+)
 {
     intokernalInt4;
 
@@ -144,7 +146,7 @@ _kernelBakePlaqIndexAtLink(SIndex* pResult,
                 //add forward
                 //[site][p_dir], [site+p_dir][b_dir], [site+b_dir][p_dir]^1
                 pResult[iListIndex] = SIndex(uiSiteIndex, i);
-                pResult[iListIndex].m_byTag = _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, i) ? _kDirichlet : 0;
+                pResult[iListIndex].m_byTag = pLinkTable[uiBigSiteIndex * _DC_Dir + i].IsDirichlet()  ? _kDirichlet : 0;  // _deviceIsBondDirichlet(pBondInfoTable, uiBigSiteIndex, i) ? _kDirichlet : 0;
                 ++iListIndex;
 
                 //start ---> i
@@ -372,16 +374,16 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
                     * _HC_Dir
                 ));
 
-                checkCudaErrors(cudaMalloc((void**)&pData->m_pBondInfoTable[i], sizeof(BYTE)
-                    * (_HC_Lx + 2 * CIndexData::kCacheIndexEdge) * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
-                    * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge) * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge)
-                    * _HC_Dir
-                ));
+                //checkCudaErrors(cudaMalloc((void**)&pData->m_pBondInfoTable[i], sizeof(BYTE)
+                //    * (_HC_Lx + 2 * CIndexData::kCacheIndexEdge) * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                //    * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge) * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge)
+                //    * _HC_Dir
+                //));
 
                 m_pBoundaryCondition->BakeBondGlue(i, pData->m_pMappingTable, pData->m_pIndexLinkToSIndex[i]);
                 checkCudaErrors(cudaDeviceSynchronize());
-                m_pBoundaryCondition->BakeBondInfo(pData->m_pMappingTable, pData->m_pBondInfoTable[i], i);
-                checkCudaErrors(cudaDeviceSynchronize());
+                //m_pBoundaryCondition->BakeBondInfo(pData->m_pMappingTable, pData->m_pBondInfoTable[i], i);
+                //checkCudaErrors(cudaDeviceSynchronize());
             }
         }
     }
@@ -411,12 +413,12 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
         //bake plaqutte per site       
         _kernelBakePlaqIndexAtSite << <block, threads >> > (
             pData->m_pPlaqutteCache, pData->m_pIndexLinkToSIndex[byFieldId], 
-            pData->m_pSmallData, pData->m_pBondInfoTable[byFieldId]);
+            pData->m_pSmallData); // , pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
         //bake plaqutte per link
         _kernelBakePlaqIndexAtLink << <block, threads >> > (
             pData->m_pStappleCache, pData->m_pIndexLinkToSIndex[byFieldId], 
-            pData->m_pSmallData, pData->m_pBondInfoTable[byFieldId]);
+            pData->m_pSmallData); // , pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 }

@@ -85,15 +85,15 @@ _kernalBakeEdgeProjectivePlaneBoundary(
 /**
 * Nothing to write, just initial as 0
 */
-__global__ void _CLG_LAUNCH_BOUND
-_kernalBakeBondInfo_ProjectivePlane(BYTE* pDeviceData)
-{
-    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-    for (UINT i = 0; i < _DC_Dir; ++i)
-    {
-        pDeviceData[idxAll * _DC_Dir + i] = 0;
-    }
-}
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernalBakeBondInfo_ProjectivePlane(BYTE* pDeviceData)
+//{
+//    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+//    for (UINT i = 0; i < _DC_Dir; ++i)
+//    {
+//        pDeviceData[idxAll * _DC_Dir + i] = 0;
+//    }
+//}
 
 __global__ void _CLG_LAUNCH_BOUND
 _kernalBakeBoundGlueProjectivePlaneBoundary(
@@ -241,12 +241,6 @@ CBoundaryConditionProjectivePlaneSquare::CBoundaryConditionProjectivePlaneSquare
     m_FieldBC[1].w = 1;
 }
 
-//void CBoundaryConditionProjectivePlaneSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
-//{
-//    assert(byFieldId < kMaxFieldCount);
-//    m_FieldBC[byFieldId] = bc.m_sPeriodic;
-//}
-
 void CBoundaryConditionProjectivePlaneSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
     uint4 biggerLattice;
@@ -267,21 +261,21 @@ void CBoundaryConditionProjectivePlaneSquare::BakeEdgePoints(BYTE byFieldId, con
     _kernalBakeEdgeProjectivePlaneBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
-void CBoundaryConditionProjectivePlaneSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable, BYTE byFieldId) const
-{
-    uint4 biggerLattice;
-    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
-
-    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
-    dim3 threads(threadPerSite, 1, 1);
-    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
-
-    _kernalBakeBondInfo_ProjectivePlane << <blocks, threads >> > (deviceTable);
-}
+//void CBoundaryConditionProjectivePlaneSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable, BYTE byFieldId) const
+//{
+//    uint4 biggerLattice;
+//    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+//
+//    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+//    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+//    dim3 threads(threadPerSite, 1, 1);
+//    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+//
+//    _kernalBakeBondInfo_ProjectivePlane << <blocks, threads >> > (deviceTable);
+//}
 
 void CBoundaryConditionProjectivePlaneSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {

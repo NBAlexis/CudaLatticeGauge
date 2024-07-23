@@ -48,8 +48,10 @@ public:
 
     /**
     * The bondary condition of the bonds(links) sometimes should be different from the sites.
+    * 
+    * Discarded: bond info are all put into link table
     */
-    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const = 0;
+    //virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const = 0;
 
     /**
      * For the glue of links, we must bake the target.

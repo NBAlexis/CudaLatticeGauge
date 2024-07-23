@@ -54,7 +54,7 @@ public:
         //    * (_HC_Lx + 2 * kCacheIndexEdge) * (_HC_Ly + 2 * kCacheIndexEdge)
         //    * (_HC_Lz + 2 * kCacheIndexEdge) * (_HC_Lt + 2 * kCacheIndexEdge)
         //    * _HC_Dir));
-        memset(m_pBondInfoTable, 0, sizeof(BYTE*) * kMaxFieldCount);
+        //memset(m_pBondInfoTable, 0, sizeof(BYTE*) * kMaxFieldCount);
 
         //region id is a byte, so max is 256
         checkCudaErrors(cudaMalloc((void**)&m_byRegionTable, sizeof(UINT) * 256));
@@ -91,11 +91,11 @@ public:
 
         for (BYTE i = 0; i < kMaxFieldCount; ++i)
         {
-            if (NULL != m_pBondInfoTable[i])
-            {
-                checkCudaErrors(cudaFree(m_pBondInfoTable[i]));
-                m_pBondInfoTable[i] = NULL;
-            }
+            //if (NULL != m_pBondInfoTable[i])
+            //{
+            //    checkCudaErrors(cudaFree(m_pBondInfoTable[i]));
+            //    m_pBondInfoTable[i] = NULL;
+            //}
             if (NULL != m_pIndexPositionToSIndex[i])
             {
                 checkCudaErrors(cudaFree(m_pIndexPositionToSIndex[i]));
@@ -208,7 +208,7 @@ public:
     UINT* m_byRegionTable;
 
     SSmallInt4* m_pMappingTable;
-    BYTE* m_pBondInfoTable[kMaxFieldCount];
+    //BYTE* m_pBondInfoTable[kMaxFieldCount];
 
     //extend site position to SIndex mapping (i.e. m_pIndexPositionToSIndex[index])
     SIndex* m_pIndexPositionToSIndex[kMaxFieldCount];

@@ -46,7 +46,7 @@ public:
     //It is only neccessary when simulating with holes or inpuries
     UBOOL NeedToFixBoundary() const override { return TRUE; }
 
-    void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const override;
+    //void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const override;
 
     void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const override;
 };

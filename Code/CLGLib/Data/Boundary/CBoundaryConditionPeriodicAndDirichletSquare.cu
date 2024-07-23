@@ -146,75 +146,75 @@ _kernalBakeEdgePeriodicDirichletBoundary(
     }
 }
 
-__global__ void _CLG_LAUNCH_BOUND
-_kernalBakeBondInfoPeriodicDirichletBoundary(
-    SSmallInt4 bc,
-    BYTE* pDeviceData,
-    const SSmallInt4* __restrict__ pMapping,
-    uint3 mods)
-{
-    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
-
-    SSmallInt4 realCoord(pMapping[idxAll]);
-
-    UBOOL bDirich = FALSE;
-    BYTE byZeroCount = 0;
-    BYTE byZeroDir = 0;
-    for (BYTE uiDir = 0; uiDir < 4; ++uiDir)
-    {
-        if (realCoord.m_byData4[uiDir] <= 0 && 0 == bc.m_byData4[uiDir])
-        {
-            if (realCoord.m_byData4[uiDir] < 0)
-            {
-                bDirich = TRUE;
-            }
-            else
-            {
-                byZeroCount++;
-                byZeroDir = uiDir;
-            }
-        }
-        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1 && 0 == bc.m_byData4[uiDir])
-        {
-            bDirich = TRUE;
-        }
-    }
-
-    if (bDirich || byZeroCount > 1)
-    {
-        //all bonds are Dirichlet
-        for (UINT i = 0; i < _DC_Dir; ++i)
-        {
-            pDeviceData[idxAll * _DC_Dir + i] = _kDirichlet;
-        }
-        //printf("idx = %d,%d,%d,%d, dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
-    }
-    else if (1 == byZeroCount)
-    {
-        //except the direction of the zero index, all others are Dirichlet
-        for (UINT i = 0; i < _DC_Dir; ++i)
-        {
-            if (i != byZeroDir)
-            {
-                pDeviceData[idxAll * _DC_Dir + i] = _kDirichlet;
-            }
-            else
-            {
-                pDeviceData[idxAll * _DC_Dir + i] = 0;
-            }
-        }
-        //printf("idx = %d,%d,%d,%d, half dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
-    }
-    else
-    {
-        //not Dirichlet
-        for (UINT i = 0; i < _DC_Dir; ++i)
-        {
-            pDeviceData[idxAll * _DC_Dir + i] = 0;
-        }
-        //printf("idx = %d,%d,%d,%d, not dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
-    }
-}
+//__global__ void _CLG_LAUNCH_BOUND
+//_kernalBakeBondInfoPeriodicDirichletBoundary(
+//    SSmallInt4 bc,
+//    BYTE* pDeviceData,
+//    const SSmallInt4* __restrict__ pMapping,
+//    uint3 mods)
+//{
+//    UINT idxAll = threadIdx.x + blockDim.x * blockIdx.x;
+//
+//    SSmallInt4 realCoord(pMapping[idxAll]);
+//
+//    UBOOL bDirich = FALSE;
+//    BYTE byZeroCount = 0;
+//    BYTE byZeroDir = 0;
+//    for (BYTE uiDir = 0; uiDir < 4; ++uiDir)
+//    {
+//        if (realCoord.m_byData4[uiDir] <= 0 && 0 == bc.m_byData4[uiDir])
+//        {
+//            if (realCoord.m_byData4[uiDir] < 0)
+//            {
+//                bDirich = TRUE;
+//            }
+//            else
+//            {
+//                byZeroCount++;
+//                byZeroDir = uiDir;
+//            }
+//        }
+//        else if (realCoord.m_byData4[uiDir] > _constIntegers[ECI_Lx + uiDir] - 1 && 0 == bc.m_byData4[uiDir])
+//        {
+//            bDirich = TRUE;
+//        }
+//    }
+//
+//    if (bDirich || byZeroCount > 1)
+//    {
+//        //all bonds are Dirichlet
+//        for (UINT i = 0; i < _DC_Dir; ++i)
+//        {
+//            pDeviceData[idxAll * _DC_Dir + i] = _kDirichlet;
+//        }
+//        //printf("idx = %d,%d,%d,%d, dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
+//    }
+//    else if (1 == byZeroCount)
+//    {
+//        //except the direction of the zero index, all others are Dirichlet
+//        for (UINT i = 0; i < _DC_Dir; ++i)
+//        {
+//            if (i != byZeroDir)
+//            {
+//                pDeviceData[idxAll * _DC_Dir + i] = _kDirichlet;
+//            }
+//            else
+//            {
+//                pDeviceData[idxAll * _DC_Dir + i] = 0;
+//            }
+//        }
+//        //printf("idx = %d,%d,%d,%d, half dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
+//    }
+//    else
+//    {
+//        //not Dirichlet
+//        for (UINT i = 0; i < _DC_Dir; ++i)
+//        {
+//            pDeviceData[idxAll * _DC_Dir + i] = 0;
+//        }
+//        //printf("idx = %d,%d,%d,%d, not dirichlet\n", realCoord.x, realCoord.y, realCoord.z, realCoord.w);
+//    }
+//}
 
 
 __global__ void _CLG_LAUNCH_BOUND
@@ -443,28 +443,28 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeRegionTable(UINT* deviceT
     checkCudaErrors(cudaMemcpy(deviceTable, regionTable, sizeof(UINT) * 256, cudaMemcpyHostToDevice));
 }
 
-void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceBuffer, BYTE byFieldId) const
-{
-    uint4 biggerLattice;
-    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
-    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
-    uint3 biggerLatticeMod;
-
-    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
-    dim3 threads(threadPerSite, 1, 1);
-    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
-
-    //appGeneral(_T("block=%d, %d, %d, thread= %d, %d, %d\n"), blocks.x, blocks.y, blocks.z, threads.x, threads.y, threads.z);
-
-    biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
-    biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
-    biggerLatticeMod.z = biggerLattice.w;
-
-    _kernalBakeBondInfoPeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, deviceMappingTable, biggerLatticeMod);
-}
+//void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceBuffer, BYTE byFieldId) const
+//{
+//    uint4 biggerLattice;
+//    biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.y = _HC_Ly + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.z = _HC_Lz + 2 * CIndexData::kCacheIndexEdge;
+//    biggerLattice.w = _HC_Lt + 2 * CIndexData::kCacheIndexEdge;
+//    uint3 biggerLatticeMod;
+//
+//    const UINT uiVolumn = biggerLattice.x * biggerLattice.y * biggerLattice.z * biggerLattice.w;
+//    const UINT threadPerSite = CIndexSquare::GetDecompose(uiVolumn);
+//    dim3 threads(threadPerSite, 1, 1);
+//    dim3 blocks(uiVolumn / threadPerSite, 1, 1);
+//
+//    //appGeneral(_T("block=%d, %d, %d, thread= %d, %d, %d\n"), blocks.x, blocks.y, blocks.z, threads.x, threads.y, threads.z);
+//
+//    biggerLatticeMod.x = biggerLattice.y * biggerLattice.z * biggerLattice.w;
+//    biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
+//    biggerLatticeMod.z = biggerLattice.w;
+//
+//    _kernalBakeBondInfoPeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, deviceMappingTable, biggerLatticeMod);
+//}
 
 void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {

@@ -105,11 +105,13 @@ public:
 
 static __device__ __inline__ UINT _deviceGetBigIndex(const SSmallInt4& sSite, const UINT* __restrict__ pSmallData);
 
-static __device__ __inline__ UBOOL _deviceIsBondDirichlet(const BYTE* __restrict__ pTable,
-    UINT uiBigIdx, BYTE byDir)
-{
-    return (pTable[uiBigIdx * _DC_Dir + byDir] & _kDirichlet) != 0;
-}
+//static __device__ __inline__ UBOOL _deviceIsBondDirichlet(const SIndex* __restrict__ pTable,
+//    UINT uiBigIdx, BYTE byDir)
+//{
+//    return (pTable[uiBigIdx * _DC_Dir + byDir].m_byTag & _kDirichlet) != 0;
+//}
+
+
 
 #pragma endregion
 
