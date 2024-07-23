@@ -137,7 +137,7 @@ _kernelCalculateAGradient3D(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (site.IsDirichlet())
     {
         return;
@@ -189,6 +189,7 @@ _kernelCalculateAGradient3D(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateG3D(
+    BYTE byFieldId,
     SBYTE uiT,
     deviceSU3* pG,
     const DOUBLE* __restrict__ pGamma11,
@@ -201,7 +202,7 @@ _kernelCalculateG3D(
     intokernalInt4_S_Only3D;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (site.IsDirichlet())
     {
@@ -276,7 +277,7 @@ _kernelGaugeTransform3DT(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
-        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
         if (!site.IsDirichlet())
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
@@ -660,6 +661,7 @@ void CGaugeFixingCoulombCornell::GaugeFixingOneTimeSlice(deviceSU3* pDeviceBuffe
 
         //======= 4. Gauge Transform    =========
         _kernelCalculateG3D << <block, threads >> > (
+            byFieldId,
             uiT,
             m_pG,
             m_pGamma11,

@@ -372,14 +372,21 @@ void CIndexSquare::BakeAllIndexBuffer(CIndexData* pData)
                     * _HC_Dir
                 ));
 
+                checkCudaErrors(cudaMalloc((void**)&pData->m_pBondInfoTable[i], sizeof(BYTE)
+                    * (_HC_Lx + 2 * CIndexData::kCacheIndexEdge) * (_HC_Ly + 2 * CIndexData::kCacheIndexEdge)
+                    * (_HC_Lz + 2 * CIndexData::kCacheIndexEdge) * (_HC_Lt + 2 * CIndexData::kCacheIndexEdge)
+                    * _HC_Dir
+                ));
+
                 m_pBoundaryCondition->BakeBondGlue(i, pData->m_pMappingTable, pData->m_pIndexLinkToSIndex[i]);
+                checkCudaErrors(cudaDeviceSynchronize());
+                m_pBoundaryCondition->BakeBondInfo(pData->m_pMappingTable, pData->m_pBondInfoTable[i], i);
                 checkCudaErrors(cudaDeviceSynchronize());
             }
         }
     }
 
     //bake bond infos
-    m_pBoundaryCondition->BakeBondInfo(pData->m_pMappingTable, pData->m_pBondInfoTable);
     checkCudaErrors(cudaDeviceSynchronize());
 
     //bake region id table
@@ -404,12 +411,12 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
         //bake plaqutte per site       
         _kernelBakePlaqIndexAtSite << <block, threads >> > (
             pData->m_pPlaqutteCache, pData->m_pIndexLinkToSIndex[byFieldId], 
-            pData->m_pSmallData, pData->m_pBondInfoTable);
+            pData->m_pSmallData, pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
         //bake plaqutte per link
         _kernelBakePlaqIndexAtLink << <block, threads >> > (
             pData->m_pStappleCache, pData->m_pIndexLinkToSIndex[byFieldId], 
-            pData->m_pSmallData, pData->m_pBondInfoTable);
+            pData->m_pSmallData, pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
     }
 }

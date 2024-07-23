@@ -41,14 +41,12 @@ public:
 
     void BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const override;
 
-    void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) override;
-
     void BakeRegionTable(UINT* deviceTable) const override;
 
     //It is only neccessary when simulating with holes or inpuries
     UBOOL NeedToFixBoundary() const override { return TRUE; }
 
-    void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const override;
+    void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const override;
 
     void BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceTable) const override;
 };

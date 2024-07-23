@@ -132,11 +132,11 @@ CBoundaryConditionTorusSquare::CBoundaryConditionTorusSquare() : CBoundaryCondit
     m_FieldBC[1].w = 1;
 }
 
-void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
-{
-    assert(byFieldId < kMaxFieldCount);
-    m_FieldBC[byFieldId] = bc.m_sPeriodic;
-}
+//void CBoundaryConditionTorusSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
+//{
+//    assert(byFieldId < kMaxFieldCount);
+//    m_FieldBC[byFieldId] = bc.m_sPeriodic;
+//}
 
 void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
@@ -158,7 +158,7 @@ void CBoundaryConditionTorusSquare::BakeEdgePoints(BYTE byFieldId, const SSmallI
     _kernalBakeEdgeTorusBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
-void CBoundaryConditionTorusSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable) const
+void CBoundaryConditionTorusSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable, BYTE byFieldId) const
 {
     uint4 biggerLattice;
     biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;

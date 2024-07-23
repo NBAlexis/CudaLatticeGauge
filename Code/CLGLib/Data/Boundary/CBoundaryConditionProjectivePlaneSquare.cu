@@ -241,11 +241,11 @@ CBoundaryConditionProjectivePlaneSquare::CBoundaryConditionProjectivePlaneSquare
     m_FieldBC[1].w = 1;
 }
 
-void CBoundaryConditionProjectivePlaneSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
-{
-    assert(byFieldId < kMaxFieldCount);
-    m_FieldBC[byFieldId] = bc.m_sPeriodic;
-}
+//void CBoundaryConditionProjectivePlaneSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
+//{
+//    assert(byFieldId < kMaxFieldCount);
+//    m_FieldBC[byFieldId] = bc.m_sPeriodic;
+//}
 
 void CBoundaryConditionProjectivePlaneSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
@@ -267,7 +267,7 @@ void CBoundaryConditionProjectivePlaneSquare::BakeEdgePoints(BYTE byFieldId, con
     _kernalBakeEdgeProjectivePlaneBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceMappingTable, deviceBuffer, biggerLatticeMod);
 }
 
-void CBoundaryConditionProjectivePlaneSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable) const
+void CBoundaryConditionProjectivePlaneSquare::BakeBondInfo(const SSmallInt4*, BYTE* deviceTable, BYTE byFieldId) const
 {
     uint4 biggerLattice;
     biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;

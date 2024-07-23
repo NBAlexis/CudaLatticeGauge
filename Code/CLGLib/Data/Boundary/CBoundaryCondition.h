@@ -42,14 +42,14 @@ public:
     /**
     * For example, set field Id of BC or set anti-periodic condition
     */
-    virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc) = 0;
+    virtual void SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc);
 
     virtual void BakeRegionTable(UINT* deviceTable) const {}
 
     /**
     * The bondary condition of the bonds(links) sometimes should be different from the sites.
     */
-    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable) const = 0;
+    virtual void BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceTable, BYTE byFieldId) const = 0;
 
     /**
      * For the glue of links, we must bake the target.

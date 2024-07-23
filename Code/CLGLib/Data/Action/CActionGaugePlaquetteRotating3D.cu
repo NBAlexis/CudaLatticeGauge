@@ -209,7 +209,7 @@ _kernelAddChairTermSU3_Term53D(
 
     const UINT uiN = __idx->_deviceGetBigIndex(sSite4);
 
-    if (__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
+    if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         results[uiSiteIndex] = F(0.0);
         return;

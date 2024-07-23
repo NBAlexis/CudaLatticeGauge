@@ -472,6 +472,17 @@ CField* CCLGLibManager::CreateGaugeFields(class CParameters& params) const
         bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
         bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+    else
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = 1;
+        bc.m_sPeriodic.y = 1;
+        bc.m_sPeriodic.z = 1;
+        bc.m_sPeriodic.w = 1;
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
     }
 
     m_pLatticeData->m_pGaugeField.AddItem(pGauge);
@@ -532,6 +543,16 @@ CField* CCLGLibManager::CreateBosonFields(class CParameters& params) const
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
         checkCudaErrors(cudaDeviceSynchronize());
     }
+    else
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = 1;
+        bc.m_sPeriodic.y = 1;
+        bc.m_sPeriodic.z = 1;
+        bc.m_sPeriodic.w = 1;
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
 
     __FetchIntWithDefault(_T("PoolNumber"), 0);
     //if (iVaules > 0)
@@ -566,7 +587,7 @@ CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
     BYTE byFieldId = static_cast<BYTE>(iVaules);
     if (byFieldId >= kMaxFieldCount || byFieldId <= 1 || m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
-        appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d! Using default: %d\n"), sFermionClassName.c_str(), byFieldId);
+        appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d! Using default: %d\n"), sFermionClassName.c_str(), byFieldId, m_byLoadingFieldId);
         byFieldId = m_byLoadingFieldId;
     }
 
@@ -587,6 +608,17 @@ CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
         bc.m_sPeriodic.z = static_cast<SBYTE>(periodic[2]);
         bc.m_sPeriodic.w = static_cast<SBYTE>(periodic[3]);
         m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
+    }
+    else
+    {
+        SBoundCondition bc;
+        bc.m_sPeriodic.x = 1;
+        bc.m_sPeriodic.y = 1;
+        bc.m_sPeriodic.z = 1;
+        bc.m_sPeriodic.w = -1;
+        m_pLatticeData->SetFieldBoundaryCondition(byFieldId, bc);
+        checkCudaErrors(cudaDeviceSynchronize());
     }
 
     __FetchIntWithDefault(_T("PoolNumber"), 0);

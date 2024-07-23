@@ -246,6 +246,7 @@
     <ClCompile Include="Data\Action\CAction.cpp" />
     <ClCompile Include="Data\Action\CActionFermionKS.cpp" />
     <ClCompile Include="Data\Action\CActionPhi4.cpp" />
+    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp" />
     <ClCompile Include="Data\Field\Boson\CFieldBosonVN.cpp" />
     <ClCompile Include="Data\Field\Boson\CFieldBosonVNRotation.cpp" />
     <ClCompile Include="Data\Field\BoundaryField\CFieldBoundaryOne.cpp" />

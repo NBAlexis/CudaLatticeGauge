@@ -29,7 +29,7 @@ _kernelCalculateGOdd_S(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || !sSite4.IsOdd())
     {
@@ -80,7 +80,7 @@ _kernelCalculateGEven_S(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || sSite4.IsOdd())
     {
@@ -132,7 +132,7 @@ _kernelGaugeTransformOdd_S(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (sSite4.IsOdd())
     {
@@ -176,7 +176,7 @@ _kernelGaugeTransformEven_S(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (!sSite4.IsOdd())
     {
@@ -227,7 +227,7 @@ _kernelGaugeTransform3DTOdd(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
-        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
         if (!site.IsDirichlet())
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
@@ -272,7 +272,7 @@ _kernelGaugeTransform3DTEven(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
-        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
         if (!site.IsDirichlet())
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
@@ -353,7 +353,7 @@ _kernelGaugeTransform3DTcpy(
 
     if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, 3))
     {
-        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+        const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
         if (!site.IsDirichlet())
         {
             const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, 3);
@@ -446,7 +446,7 @@ _kernelCalculateCoulombDivation_S(
     intokernalInt4_S_Only3D;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (site.IsDirichlet())
     {

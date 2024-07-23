@@ -725,6 +725,9 @@
     <ClCompile Include="Data\Field\Staggered\CFieldFermionKSTR.cpp">
       <Filter>Data\Field\Staggered</Filter>
     </ClCompile>
+    <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
+      <Filter>Data\Boundary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="FileTemplate.txt" />

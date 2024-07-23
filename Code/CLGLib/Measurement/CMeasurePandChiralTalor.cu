@@ -339,7 +339,7 @@ _kernelActionTalorOmegaSq(
 #endif
     }
 
-    if (!__idx->m_pDeviceIndexPositionToSIndex[1][uiN].IsDirichlet())
+    if (!__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiN].IsDirichlet())
     {
         const Real fXYOmega2 = -(sSite4.x - _DC_Centerx) * (sSite4.y - _DC_Centery);
 

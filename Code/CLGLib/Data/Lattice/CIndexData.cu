@@ -390,17 +390,21 @@ void CIndex::CalculateSiteCount(class CIndexData* pData) const
                 appGeneral(_T("============== Real Spatial Volume = %d ============\n"), pData->m_uiSiteXYZ);
             }
         }
-    }
 
-    hostres[0] = 0;
-    hostres[1] = 0;
-    
-    checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
-    _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable, pData->m_pSmallData);
-    checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
-    pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
+        if (NULL != pData->m_pBondInfoTable[i])
+        {
+            hostres[0] = 0;
+            hostres[1] = 0;
+
+            checkCudaErrors(cudaMemcpy(deviceRes, hostres, sizeof(INT) * 2, cudaMemcpyHostToDevice));
+            _kernelCalculateLinkCount << <block, threads >> > (deviceRes, pData->m_pBondInfoTable[i], pData->m_pSmallData);
+            checkCudaErrors(cudaMemcpy(hostres, deviceRes, sizeof(INT) * 2, cudaMemcpyDeviceToHost));
+            pData->m_uiLinkNumber = static_cast<UINT>(hostres[0]);
+            
+            appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
+        }
+    }
     checkCudaErrors(cudaFree(deviceRes));
-    appGeneral(_T("============== Real Link Count = %d ============\n"), pData->m_uiLinkNumber);
 }
 
 

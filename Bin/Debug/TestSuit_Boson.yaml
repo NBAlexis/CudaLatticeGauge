@@ -24,8 +24,8 @@ TestBosonU1NoGauge:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [827.433182]
-    ExpectedResDebug : [873.033691]
+    ExpectedRes : [0.213143]
+    ExpectedResDebug : [0.213143]
 
     Updator:
 
@@ -86,8 +86,8 @@ TestBosonU1:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [97.896905]
-    ExpectedResDebug : [75.354797]
+    ExpectedRes : [0.018397]
+    ExpectedResDebug : [0.018397]
 
     Updator:
 
@@ -165,8 +165,8 @@ TestBosonU1ExternalGaugeField:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [92.149603]
-    ExpectedResDebug : [73.827850]
+    ExpectedRes : [0.018024]
+    ExpectedResDebug : [0.018024]
 
     Updator:
 
@@ -237,8 +237,8 @@ TestBosonSU4:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [358.435910]
-    ExpectedResDebug : [249.035706]
+    ExpectedRes : [0.072059]
+    ExpectedResDebug : [0.072059]
 
     Updator:
 
@@ -317,8 +317,8 @@ TestBosonU1D:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [73.284790]
-    ExpectedResDebug : [54.775406]
+    ExpectedRes : [0.013373]
+    ExpectedResDebug : [0.013373]
 
     Updator:
 
@@ -404,8 +404,8 @@ TestBosonU1P:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [99.045142]
-    ExpectedResDebug : [75.341156]
+    ExpectedRes : [0.018394]
+    ExpectedResDebug : [0.018394]
 
     Updator:
 
@@ -493,8 +493,8 @@ TestBosonRotation:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [620.642700]
-    ExpectedResDebug : [620.642700]
+    ExpectedRes : [0.075757]
+    ExpectedResDebug : [0.075757]
 
     Updator:
 
@@ -535,6 +535,7 @@ TestBosonRotation:
         GaugeFields : [1]
         Beta : 1.0
         Omega : 0.1
+        Torus : 1
 
     Action2:
    
@@ -574,8 +575,8 @@ TestBosonRotationD:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [632.304413]
-    ExpectedResDebug : [448.517944]
+    ExpectedRes : [0.054751]
+    ExpectedResDebug : [0.054751]
 
     Updator:
 
@@ -663,8 +664,8 @@ TestBosonRotationP:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [1525.036106]
-    ExpectedResDebug : [2644.178711]
+    ExpectedRes : [0.322776]
+    ExpectedResDebug : [0.322776]
 
     Updator:
 

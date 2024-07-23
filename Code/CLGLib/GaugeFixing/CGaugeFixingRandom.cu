@@ -17,12 +17,12 @@ __BEGIN_NAMESPACE
 #pragma region kernels
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelRandomGauge(deviceSU3* pGx)
+_kernelRandomGauge(deviceSU3* pGx, BYTE byFieldId)
 {
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (site.IsDirichlet())
     {
@@ -55,7 +55,7 @@ _kernelGaugeTransformRandom(
             UINT uiLinkDir = _deviceGetLinkIndex(uiSiteIndex, dir);
             deviceSU3 res(pGauge[uiLinkDir]);
             SSmallInt4 sWalking = _deviceSmallInt4OffsetC(sSite4, dir + 1);
-            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[1][__idx->_deviceGetBigIndex(sWalking)];
+            const SIndex site_p_mu = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][__idx->_deviceGetBigIndex(sWalking)];
             if (!site_p_mu.IsDirichlet())
             {
                 res.MulDagger(pGx[site_p_mu.m_uiSiteIndex]);
@@ -69,12 +69,13 @@ _kernelGaugeTransformRandom(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformFermionWilsonSU3(
     const deviceSU3* __restrict__ pGx,
-    deviceWilsonVectorSU3* pFermion)
+    deviceWilsonVectorSU3* pFermion, 
+    BYTE byFermionFieldId)
 {
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFermionFieldId][uiBigIdx];
 
     if (!site.IsDirichlet())
     {
@@ -85,12 +86,13 @@ _kernelGaugeTransformFermionWilsonSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformFermionKSSU3(
     const deviceSU3* __restrict__ pGx,
-    deviceSU3Vector* pFermion)
+    deviceSU3Vector* pFermion, 
+    BYTE byFermionFieldId)
 {
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFermionFieldId][uiBigIdx];
 
     if (!site.IsDirichlet())
     {
@@ -101,13 +103,14 @@ _kernelGaugeTransformFermionKSSU3(
 __global__ void _CLG_LAUNCH_BOUND
 _kernelGaugeTransformAPhys(
     const deviceSU3* __restrict__ pGx,
-    deviceSU3* pAphys)
+    deviceSU3* pAphys,
+    BYTE byFieldId)
 {
     intokernalInt4;
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (!site.IsDirichlet())
     {
@@ -143,7 +146,7 @@ void CGaugeFixingRandom::GaugeFixing(CFieldGauge* pResGauge)
     CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<CFieldGaugeSU3*>(pResGauge);
 
     preparethread;
-    _kernelRandomGauge << <block, threads >> > (m_pG);
+    _kernelRandomGauge << <block, threads >> > (m_pG, pGaugeSU3->m_byFieldId);
     _kernelGaugeTransformRandom << <block, threads >> > (pGaugeSU3->m_byFieldId, m_pG, pGaugeSU3->m_pDeviceData);
 }
 
@@ -162,13 +165,13 @@ void CGaugeFixingRandom::AlsoFixingFermion(CFieldFermion* pFermion) const
 void CGaugeFixingRandom::AlsoFixingFermionWilsonSU3(CFieldFermionWilsonSquareSU3* pFermion) const
 {
     preparethread;
-    _kernelGaugeTransformFermionWilsonSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData);
+    _kernelGaugeTransformFermionWilsonSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData, pFermion->m_byFieldId);
 }
 
 void CGaugeFixingRandom::AlsoFixingFermionKSSU3(CFieldFermionKSSU3* pFermion) const
 {
     preparethread;
-    _kernelGaugeTransformFermionKSSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData);
+    _kernelGaugeTransformFermionKSSU3 << <block, threads >> > (m_pG, pFermion->m_pDeviceData, pFermion->m_byFieldId);
 }
 
 void CGaugeFixingRandom::AlsoFixingAphys(CFieldGauge* pGauge) const
@@ -181,7 +184,7 @@ void CGaugeFixingRandom::AlsoFixingAphys(CFieldGauge* pGauge) const
     CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<CFieldGaugeSU3*>(pGauge);
 
     preparethread;
-    _kernelGaugeTransformAPhys << <block, threads >> > (m_pG, pGaugeSU3->m_pDeviceData);
+    _kernelGaugeTransformAPhys << <block, threads >> > (m_pG, pGaugeSU3->m_pDeviceData, pGaugeSU3->m_byFieldId);
 }
 
 CCString CGaugeFixingRandom::GetInfos(const CCString& tab) const

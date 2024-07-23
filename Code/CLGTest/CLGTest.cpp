@@ -156,6 +156,56 @@ void LoadParams(CParameters& params)
 #endif
 }
 
+void Print(const CCString& command)
+{
+    TArray <CCString> sArgs = appGetStringList(command, _T(' '), EGSLF_IgnorTabSpaceInSide | EGSLF_IgnorEmety);
+    if (sArgs.Num() > 1)
+    {
+        if (sArgs[1] == _T("class"))
+        {
+            GClassGather.TraceAllClass();
+            appGeneral(_T("\n================================\n"));
+            return;
+        }
+        else if (sArgs[1] == _T("device"))
+        {
+            CCudaHelper::DeviceQuery();
+        }
+        else if (sArgs[1] == _T("lattice"))
+        {
+            appGeneral(_T("\n=======================================\n") + appGetLattice()->GetInfos(_T("")) + _T("\n=======================================\n"));
+        }
+        else if (sArgs[1] == _T("field"))
+        {
+            if (sArgs.Num() > 2)
+            {
+                BYTE byNum = appStrToBYTE(sArgs[2]);
+                CField* field = appGetLattice()->GetFieldById(byNum);
+                if (NULL != field)
+                {
+                    field->DebugPrintMe();
+                }
+                else
+                {
+                    appGeneral(_T("Print field, but field not found, the command was: %s\n"), command.c_str());
+                }
+                return;
+            }
+        }
+        else if (sArgs[1] == _T("bond"))
+        {
+            if (sArgs.Num() > 2)
+            {
+                BYTE byNum = appStrToBYTE(sArgs[2]);
+                CIndexData::DebugLinkDirichletOrDagger(byNum);
+                return;
+            }
+        }
+    }
+
+    appGeneral(_T("not recognizd cmd: %s\n supported: class, device, lattice, field [d], position [d], bond [d]\n"), command.c_str());
+}
+
 int main(int argc, char * argv[])
 {
     //Load settings
@@ -202,7 +252,7 @@ int main(int argc, char * argv[])
     ListAllTests(category);
     while (TRUE)
     {
-        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T(": (") << appVersion() << _T(") ==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  d - Device info,  i - lattice info, p - reload params\n");
+        COUT << _T("============== CLG v") << GetCLGVersion().c_str() << _T(": (") << appVersion() << _T(") ==============\nq - Quit,  l - List all,  r - Run all,  c - Check all,  p - reload params, print - print info\n");
         //ListAllTests(category);
         //inputNumber = -1;
         std::string name;
@@ -226,16 +276,6 @@ int main(int argc, char * argv[])
         if (sRes == _T("l"))
         {
             ListAllTests(category);
-            bExcuted = TRUE;
-        }
-        else if (sRes == _T("d"))
-        {
-            CCudaHelper::DeviceQuery();
-            bExcuted = TRUE;
-        }
-        else if (sRes == _T("i"))
-        {
-            appGeneral(_T("\n=======================================\n") + appGetLattice()->GetInfos(_T("")) + _T("\n=======================================\n"));
             bExcuted = TRUE;
         }
         else if (appToString(number) == sRes)
@@ -343,24 +383,10 @@ int main(int argc, char * argv[])
             }
             bExcuted = TRUE;
         }
-        else if (sRes == _T("class"))
+        else if (0 == sRes.Find(_T("print")))
         {
-            GClassGather.TraceAllClass();
-            appGeneral(_T("\n================================\n"));
-        }
-        else if (0 == sRes.Find(_T("print ")) && sRes.GetLength() > 6)
-        {
-            CCString sfieldid = sRes.Right(sRes.GetLength() - 6);
-            BYTE byNum = appStrToBYTE(sfieldid);
-            CField* field = appGetLattice()->GetFieldById(byNum);
-            if (NULL != field)
-            {
-                field->DebugPrintMe();
-            }
-            else
-            {
-                appGeneral(_T("Print field, but field not found, the command was: %s\n"), sRes.c_str());
-            }
+            Print(sRes);
+            bExcuted = TRUE;
         }
         else
         {

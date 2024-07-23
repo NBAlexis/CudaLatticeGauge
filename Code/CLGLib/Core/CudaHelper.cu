@@ -76,7 +76,11 @@ _kernelDebugFunction()
 
     deviceSU2 a = deviceSU2::makeSU2Random(0);
     a.DebugPrint("a");
-    printf("sizeof() = %d\n", sizeof(deviceSU2));
+    printf("sizeof(SU4) = %lld\n", sizeof(deviceSU4));
+    printf("sizeof(SU5) = %lld\n", sizeof(deviceSU5));
+    printf("sizeof(SU6) = %lld\n", sizeof(deviceSU6));
+    printf("sizeof(SU7) = %lld\n", sizeof(deviceSU7));
+    printf("sizeof(SU8) = %lld\n", sizeof(deviceSU8));
     //deviceSU4 b = a.Hessenberg();
     //a.DebugPrint("q");
     //b.DebugPrint("h");

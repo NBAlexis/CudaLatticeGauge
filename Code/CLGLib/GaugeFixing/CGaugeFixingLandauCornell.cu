@@ -129,7 +129,7 @@ _kernelCalculateAGradient(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (site.IsDirichlet())
     {
         return;
@@ -180,6 +180,7 @@ _kernelCalculateAGradient(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateG(
+    BYTE byFieldId,
     deviceSU3* pG,
     const DOUBLE* __restrict__ pGamma11,
     const cuDoubleComplex* __restrict__ pGamma12,
@@ -192,7 +193,7 @@ _kernelCalculateG(
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (site.IsDirichlet())
     {
@@ -257,6 +258,7 @@ _kernelGaugeTransform(
 */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateTrAGradientSq(
+    BYTE byFieldId,
     DOUBLE* pDeviceRes,
     const DOUBLE* __restrict__ pDeltaA11,
     const cuDoubleComplex* __restrict__ pDeltaA12,
@@ -267,7 +269,7 @@ _kernelCalculateTrAGradientSq(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     if (site.IsDirichlet())
     {
         pDeviceRes[uiSiteIndex] = 0.0;
@@ -485,6 +487,7 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
 
         //======= 2. Calculate Theta    =========
         _kernelCalculateTrAGradientSq << <block, threads >> > (
+            pResGauge->m_byFieldId,
             _D_RealThreadBuffer,
             m_pGamma11,
             m_pGamma12,
@@ -561,6 +564,7 @@ void CGaugeFixingLandauCornell::GaugeFixing(CFieldGauge* pResGauge)
         //======= 4. Gauge Transform    =========
         //Be careful not to use strictLog when A is really small
         _kernelCalculateG << <block, threads >> > (
+            pResGauge->m_byFieldId,
             m_pG,
             m_pGamma11,
             m_pGamma12,
@@ -633,6 +637,7 @@ Real CGaugeFixingLandauCornell::CheckRes(const CFieldGauge* pGauge)
         m_pA23);
 
     _kernelCalculateTrAGradientSq << <block, threads >> > (
+        pGaugeSU3->m_byFieldId,
         _D_RealThreadBuffer,
         m_pGamma11,
         m_pGamma12,

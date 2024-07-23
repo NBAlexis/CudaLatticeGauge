@@ -214,6 +214,7 @@ _kernelCalculateAngularMomentumS2ProjectivePlane(
  */
 __global__ void _CLG_LAUNCH_BOUND
 _kernelCalculateGaugeSpin(
+    BYTE byFieldId,
     const deviceSU3* __restrict__ pE, 
     const deviceSU3* __restrict__ piAphys,
     Real* pBuffer,
@@ -221,7 +222,7 @@ _kernelCalculateGaugeSpin(
 {
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     
     if (!site.IsDirichlet())
     {
@@ -456,7 +457,7 @@ _kernelMomemtumJGChenApprox(
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
     const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
@@ -492,7 +493,7 @@ _kernelMomemtumJGChenApprox2(
 
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const Real fmY = -static_cast<Real>(sSite4.y - _DC_Centery);
     const Real fmX = -static_cast<Real>(sSite4.x - _DC_Centerx);
 
@@ -530,7 +531,7 @@ _kernelMomemtumJGChen(
     
     //const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     Real res = F(0.0);
     if (!site.IsDirichlet())
@@ -946,6 +947,7 @@ void CMeasureAMomentumJG::OnConfigurationAcceptedSingleField(const CFieldGauge* 
 #pragma region Spin
 
             _kernelCalculateGaugeSpin << <block, threads >> > (
+                pESU3->m_byFieldId,
                 pESU3->m_pDeviceData, 
                 pAphysSU3->m_pDeviceData, 
                 m_pDeviceDataBuffer,

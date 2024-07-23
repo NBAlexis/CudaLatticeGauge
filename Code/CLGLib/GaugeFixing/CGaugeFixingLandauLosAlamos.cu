@@ -27,7 +27,7 @@ _kernelCalculateGAL(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet())
     {
@@ -66,7 +66,7 @@ _kernelCalculateGOdd(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || !sSite4.IsOdd())
     {
@@ -105,7 +105,7 @@ _kernelCalculateGEven(
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
 
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
     const deviceSU3 su3Id = deviceSU3::makeSU3Id();
     if (site.IsDirichlet() || sSite4.IsOdd())
     {
@@ -181,7 +181,7 @@ _kernelGaugeTransformOdd(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (sSite4.IsOdd())
     {
@@ -227,7 +227,7 @@ _kernelGaugeTransformEven(
     const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
     //const BYTE uiDir2 = uiDir * 2;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (!sSite4.IsOdd())
     {
@@ -323,7 +323,7 @@ _kernelCalculateLandauDivation(
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
-    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[1][uiBigIdx];
+    const SIndex site = __idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIdx];
 
     if (site.IsDirichlet())
     {

@@ -615,20 +615,20 @@ TestRotationSUNT:
     ExponentialPrecision : 0
     CacheStaple : 0
 
-    ActionListLength : 1
-    GaugeFieldCount : 1
-    MeasureListLength : 1
+    ActionListLength : 2
+    GaugeFieldCount : 2
+    MeasureListLength : 2
     FermionFieldCount : 0
 
-    SkipThermalDebug : 0
+    SkipThermalDebug : 1
     BeforeMetropolis : 15
-    BeforeMetropolisDebug : 1
+    BeforeMetropolisDebug : 3
     Metropolis : 10
     MetropolisDebug : 5
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.294244]
-    ExpectedResDebug : [0.703390, 0.170123]
+    ExpectedRes : [0.169138, 0.674041]
+    ExpectedResDebug : [0.172124, 0.751078]
 
     Updator:
 
@@ -640,7 +640,7 @@ TestRotationSUNT:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 15
+        IntegratorStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
         ReportMeasure : 0

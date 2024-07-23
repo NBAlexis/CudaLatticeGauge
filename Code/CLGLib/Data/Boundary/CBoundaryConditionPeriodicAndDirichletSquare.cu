@@ -370,11 +370,11 @@ CBoundaryConditionPeriodicAndDirichletSquare::CBoundaryConditionPeriodicAndDiric
     m_FieldBC[1].w = 1;
 }
 
-void CBoundaryConditionPeriodicAndDirichletSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
-{
-    assert(byFieldId < kMaxFieldCount);
-    m_FieldBC[byFieldId] = bc.m_sPeriodic;
-}
+//void CBoundaryConditionPeriodicAndDirichletSquare::SetFieldSpecificBc(BYTE byFieldId, const SBoundCondition& bc)
+//{
+//    assert(byFieldId < kMaxFieldCount);
+//    m_FieldBC[byFieldId] = bc.m_sPeriodic;
+//}
 
 void CBoundaryConditionPeriodicAndDirichletSquare::BakeEdgePoints(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
 {
@@ -443,7 +443,7 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeRegionTable(UINT* deviceT
     checkCudaErrors(cudaMemcpy(deviceTable, regionTable, sizeof(UINT) * 256, cudaMemcpyHostToDevice));
 }
 
-void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceBuffer) const
+void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4* deviceMappingTable, BYTE* deviceBuffer, BYTE byFieldId) const
 {
     uint4 biggerLattice;
     biggerLattice.x = _HC_Lx + 2 * CIndexData::kCacheIndexEdge;
@@ -463,7 +463,7 @@ void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondInfo(const SSmallInt4
     biggerLatticeMod.y = biggerLattice.z * biggerLattice.w;
     biggerLatticeMod.z = biggerLattice.w;
 
-    _kernalBakeBondInfoPeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[1], deviceBuffer, deviceMappingTable, biggerLatticeMod);
+    _kernalBakeBondInfoPeriodicDirichletBoundary << <blocks, threads >> > (m_FieldBC[byFieldId], deviceBuffer, deviceMappingTable, biggerLatticeMod);
 }
 
 void CBoundaryConditionPeriodicAndDirichletSquare::BakeBondGlue(BYTE byFieldId, const SSmallInt4* deviceMappingTable, SIndex* deviceBuffer) const
