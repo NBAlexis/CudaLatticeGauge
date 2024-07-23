@@ -94,7 +94,7 @@ public:
 
     virtual EFieldType GetFieldType() const = 0;
     virtual void InitialField(EFieldInitialType eInitialType) = 0;
-    virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile) = 0;
+    virtual void InitialFieldWithFile(const CCString& sFileName, EFieldFileType eFile = EFFT_CLGBin) = 0;
     virtual void InitialWithByte(BYTE* byData) = 0;
     virtual void InitialWithByteCompressed(const CCString& sFileName) { appCrucial(_T("Not implemented compressed file format!\n")); }
     virtual void InitialOtherParameters(CParameters& param) 

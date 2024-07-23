@@ -173,8 +173,6 @@ public:
             InitialWithByte(data);
             free(data);
         }
-
-        appCrucial(_T("CFieldBosonU1::InitialFieldWithFile: Not support %s File\n"), __ENUM_TO_STRING(EFieldFileType, eFieldType).c_str());
     }
 
     void InitialWithByte(BYTE* byData) override

@@ -483,6 +483,17 @@ template<> __device__ __inline__ deviceSU8 _makeRandom<deviceSU8>(UINT fatIdx)
     return deviceSU8::makeSUNRandom(fatIdx);
 }
 
+template<> __device__ __inline__ deviceSU2Vector _makeRandom<deviceSU2Vector>(UINT fatIdx) { return deviceSU2Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU3Vector _makeRandom<deviceSU3Vector>(UINT fatIdx) { return deviceSU3Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU4Vector _makeRandom<deviceSU4Vector>(UINT fatIdx) { return deviceSU4Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU5Vector _makeRandom<deviceSU5Vector>(UINT fatIdx) { return deviceSU5Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU6Vector _makeRandom<deviceSU6Vector>(UINT fatIdx) { return deviceSU6Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU7Vector _makeRandom<deviceSU7Vector>(UINT fatIdx) { return deviceSU7Vector::makeRandom(fatIdx); }
+template<> __device__ __inline__ deviceSU8Vector _makeRandom<deviceSU8Vector>(UINT fatIdx) { return deviceSU8Vector::makeRandom(fatIdx); }
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _makeRandom<deviceWilsonVectorSU3>(UINT fatIdx) { return deviceWilsonVectorSU3::makeRandom(fatIdx); }
+
+
 template<typename T> __device__ __inline__ T _makeColorVector(BYTE colorIdx) = delete;
 
 template<> __device__ __inline__ CLGComplex _makeColorVector<CLGComplex>(BYTE colorIdx)
@@ -1353,6 +1364,7 @@ template<> __device__ __host__ __inline__ void _setelement<CLGComplex>(CLGComple
     if (0 == idx)
     {
         x.x = v;
+        return;
     }
     x.y = v;
 }
@@ -1414,6 +1426,7 @@ __device__ __host__ __inline__ void _setelement(deviceSUNVector<N, NoE>& x, INT 
         if (idx & 1)
         {
             x.m_ve[idxc].y = v;
+            return;
         }
         x.m_ve[idxc].x = v;
     }
@@ -1427,6 +1440,7 @@ template<> __device__ __host__ __inline__ void _setelement<deviceSU2>(deviceSU2&
         if (idx & 1)
         {
             x.m_me[idxc].y = v;
+            return;
         }
         x.m_me[idxc].x = v;
     }
@@ -1440,6 +1454,7 @@ template<> __device__ __host__ __inline__ void _setelement<deviceSU3>(deviceSU3&
         if (idx & 1)
         {
             x.m_me[idxc].y = v;
+            return;
         }
         x.m_me[idxc].x = v;
     }
@@ -1462,6 +1477,7 @@ __device__ __host__ __inline__ void _setelement(deviceSUN<N, NoE>& x, INT idx, R
         if (idx & 1)
         {
             x.m_me[idxc].y = v;
+            return;
         }
         x.m_me[idxc].x = v;
     }
@@ -1555,7 +1571,9 @@ inline CCString appToString<deviceSU2>(const deviceSU2& v)
     CCString ret;
     ret.Format(_T("{{%f %s %f I, %f %s %f I}, {%f %s %f I, %f %s %f I}}"),
         v.m_me[0].x, v.m_me[0].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[0].y),
-        v.m_me[1].x, v.m_me[1].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[1].y)
+        v.m_me[1].x, v.m_me[1].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[1].y),
+        v.m_me[2].x, v.m_me[2].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[2].y),
+        v.m_me[3].x, v.m_me[3].y > F(0.0) ? _T("+") : _T("-"), appAbs(v.m_me[3].y)
     );
     return ret;
 }

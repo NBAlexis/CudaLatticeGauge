@@ -168,6 +168,106 @@ __REGIST_TEST(TestFileIOCLGCompressed, FileIO, TestFileIOCLGCompressed, CLGCompr
 __REGIST_TEST(TestFileDOUBLE, FileIO, TestSaveConfigurationDouble, Double);
 __REGIST_TEST(TestFileFloat, FileIO, TestSaveConfigurationFloat, Single);
 
+UINT TestFileIOConsistency(CParameters& sParam)
+{
+    UINT uiError = 0;
+    TArray<const class CField*> allFields = appGetLattice()->GetAllField();
+    TArray<DOUBLE> dots;
+    sParam.FetchValueArrayDOUBLE(_T("Expected"), dots);
+
+    if (dots.Num() != allFields.Num())
+    {
+        LastProbem(_T("expect count != field count"));
+        return 1;
+    }
+
+    for (INT i = 0; i < allFields.Num(); ++i)
+    {
+        CCString sFileName;
+        sFileName.Format(_T("../Debug/__f%d.con_"), i);
+        CField* copy = allFields[i]->GetCopy();
+
+        copy->InitialFieldWithFile(sFileName);
+        const DOUBLE amplitude = copy->Dot(copy).x / _HC_Volume;
+        if (abs(amplitude - dots[i]) > 0.00001 * amplitude)
+        {
+            ++uiError;
+            CCString sProblem;
+            sProblem.Format(_T("%s not consist: %f - %f"), copy->GetClass()->GetName(), amplitude, dots[i]);
+            appGeneral(_T("%s\n"), sProblem.c_str());
+            LastProbem(sProblem);
+        }
+    }
+    return uiError;
+}
+
+UINT TestFileIOSaveLoad(CParameters& sParam)
+{
+    UINT uiError = 0;
+    TArray<const class CField*> allFields = appGetLattice()->GetAllField();
+    TArray<DOUBLE> dot;
+
+    INT iValue = 0;
+    sParam.FetchValueINT(_T("Save"), iValue);
+    UBOOL bSave = (0 != iValue);
+
+    for (INT i = 0; i < allFields.Num(); ++i)
+    {
+        CCString sFileName;
+        sFileName.Format(_T("_f%d.con"), i);
+        allFields[i]->SaveToFile(sFileName);
+        CField* copy = allFields[i]->GetCopy();
+        CField* copy2 = allFields[i]->GetCopy();
+
+        copy->InitialField(EFIT_Random);
+        copy->Mul(allFields[i]);
+
+        copy2->InitialField(EFIT_RandomGenerator);
+        copy->Mul(copy2);
+        for (INT j = 0; j < 7; ++j)
+        {
+            copy2->InitialField(EFIT_Random);
+            copy->Mul(copy2);
+            copy2->InitialField(EFIT_RandomGenerator);
+            copy->Mul(copy2);
+            copy->ScalarMultply(F(2.0));
+        }
+        if (bSave)
+        {
+            copy->SaveToFile(_T("../Debug/_") + sFileName + _T("_"));
+        }
+
+        dot.AddItem(copy->Dot(copy).x / _HC_Volume);
+
+        copy->InitialFieldWithFile(sFileName);
+
+        copy->AxpyMinus(allFields[i]);
+        const DOUBLE amplitude = copy->Dot(copy).x;
+        CCString sProblem;
+
+        if (abs(amplitude) > 0.00001)
+        {
+            sProblem.Format(_T("%s save-load fail: %f"), copy->GetClass()->GetName(), amplitude);
+            appGeneral(_T("%s\n"), sProblem.c_str());
+            LastProbem(sProblem);
+            ++uiError;
+        }
+        else
+        {
+            sProblem.Format(_T("%s save-load good: %f"), copy->GetClass()->GetName(), amplitude);
+            appGeneral(_T("%s\n"), sProblem.c_str());
+        }
+
+        appSafeDelete(copy);
+        appSafeDelete(copy2);
+    }
+    appGeneral(_T("%s\n"), appToString(dot).c_str());
+    return uiError;
+}
+
+__REGIST_TEST(TestFileIOSaveLoad, FileIO, TestSaveLoad, SaveLoad);
+__REGIST_TEST(TestFileIOConsistency, FileIO, TestSaveLoad, Consistent);
+
 //=============================================================================
 // END OF FILE
 //=============================================================================

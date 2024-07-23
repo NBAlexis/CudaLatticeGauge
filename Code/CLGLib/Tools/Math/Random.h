@@ -180,6 +180,11 @@ public:
         return _cos(f2) * amplitude;
     }
 
+    __device__ __inline__ CLGComplex _deviceRandomC(UINT fatIndex) const
+    {
+        return _make_cuComplex(_deviceRandomF(fatIndex) * F(2.0) - F(1.0), _deviceRandomF(fatIndex) * F(2.0) - F(1.0));
+    }
+
     __device__ __inline__ CLGComplex _deviceRandomGaussC(UINT fatIndex) const
     {
         const Real f1 = _deviceRandomF(fatIndex);
@@ -292,6 +297,8 @@ __DefineRandomFuncion(Real, F)
 __DefineRandomFuncion(Real, GaussF)
 
 __DefineRandomFuncion(Real, GaussFSqrt2)
+
+__DefineRandomFuncion(CLGComplex, C)
 
 __DefineRandomFuncion(CLGComplex, GaussC)
 

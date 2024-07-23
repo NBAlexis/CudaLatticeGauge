@@ -32,7 +32,7 @@ void CMeasureBosonCond::OnConfigurationAccepted(INT gaugeNum, INT bosonNum, cons
 
     const CFieldBoson* bosonfield = pAcceptBoson[ibosonidx];
     const CLGComplex condsq = _cToRealC(bosonfield->Dot(bosonfield));
-    UpdateRealResult(_cuCabsf(condsq));
+    UpdateRealResult(_cuCabsf(condsq) / _HC_Volume / bosonfield->VectorN());
 
     m_lstElement.AddItem(bosonfield->Sum());
 }

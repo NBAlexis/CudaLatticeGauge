@@ -10,9 +10,9 @@
 #include "CLGLib.h"
 
 #define ___REGIST_TEST(functionname, catogary, paramName, showName, tag) \
-struct STestSuits##paramName : public TestList \
+struct STestSuits##functionname##paramName : public TestList \
 { \
-    STestSuits##paramName(testfunction pf) \
+    STestSuits##functionname##paramName(testfunction pf) \
     { \
         m_uiIndex = 0; \
         m_uiTag = tag; \
@@ -23,7 +23,7 @@ struct STestSuits##paramName : public TestList \
         Link(_testSuits); \
     } \
 }; \
-static STestSuits##paramName registTest##paramName(functionname);
+static STestSuits##functionname##paramName registTest##functionname##paramName(functionname);
 
 #define __REGIST_TEST(functionname, catogary, paramName, showName) ___REGIST_TEST(functionname, catogary, paramName, showName, 0)
 

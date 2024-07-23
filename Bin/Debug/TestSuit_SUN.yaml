@@ -24,7 +24,7 @@ TestSU4:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.294244]
+    ExpectedRes : [0.878774, 0.802603, 0.165529, 0.101361, 0.068469, 0.050312, 0.038658]
     ExpectedResDebug : [0.636606, 0.643125, 0.166273, 0.103867, 0.070201, 0.053004, 0.039010]
 
     Updator:
@@ -37,7 +37,7 @@ TestSU4:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 9
         Omelyan2Lambda : 0.38636665500756728
 
         ReportMeasure : 0
@@ -207,7 +207,7 @@ TestSU4D:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.294244]
+    ExpectedRes : [0.919147, 0.631860, 0.303950, 0.247870, 0.219536, 0.203825, 0.195019]
     ExpectedResDebug : [0.697512, 0.522663, 0.302223, 0.248983, 0.222101, 0.206047, 0.194497]
 
     Updator:
@@ -439,7 +439,7 @@ TestRotationSUND:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.294244]
+    ExpectedRes : [0.631026, 0.305829]
     ExpectedResDebug : [0.522527, 0.305695]
 
     Updator:
@@ -615,13 +615,13 @@ TestRotationSUNT:
     ExponentialPrecision : 0
     CacheStaple : 0
 
-    ActionListLength : 2
-    GaugeFieldCount : 2
-    MeasureListLength : 2
+    ActionListLength : 1
+    GaugeFieldCount : 1
+    MeasureListLength : 1
     FermionFieldCount : 0
 
     SkipThermalDebug : 0
-    BeforeMetropolis : 5
+    BeforeMetropolis : 15
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 5
@@ -640,7 +640,7 @@ TestRotationSUNT:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorForceGradient }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 15
         Omelyan2Lambda : 0.38636665500756728
 
         ReportMeasure : 0
@@ -648,7 +648,7 @@ TestRotationSUNT:
     Gauge:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU2
+        FieldName : CFieldGaugeSU4
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -658,7 +658,7 @@ TestRotationSUNT:
     Gauge2:
     
         ## FieldName = {CFieldGaugeSU3}
-        FieldName : CFieldGaugeSU4
+        FieldName : CFieldGaugeSU2
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Random
@@ -677,7 +677,7 @@ TestRotationSUNT:
 
     Action1:
 
-        ActionName : CActionGaugePlaquetteRotatingSU2
+        ActionName : CActionGaugePlaquetteRotatingSU4
         Beta : 5.0
         Omega : 0.1
         CloverEnergy : 1
@@ -687,7 +687,7 @@ TestRotationSUNT:
 
     Action2:
 
-        ActionName : CActionGaugePlaquetteRotatingSU4
+        ActionName : CActionGaugePlaquetteRotatingSU2
         Beta : 5.0
         Omega : 0.1
         CloverEnergy : 1

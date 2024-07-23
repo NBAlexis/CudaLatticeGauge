@@ -168,3 +168,78 @@ TestSaveConfigurationFloat:
 
         ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
         FieldInitialType : EFIT_Identity
+
+TestSaveLoad:
+
+    Dim : 4
+    Dir : 4
+    LatticeLength : [8, 8, 8, 8]
+    LatticeIndex : CIndexSquare
+    LatticeBoundary : CBoundaryConditionTorusSquare
+    RandomType : ER_Schrage
+    RandomSeed : 1234567
+    ActionListLength : 0
+    MeasureListLength : 0
+    Save : 0
+    Expected : [0.202156, 9561.642069, 2508152.599227, 59885356.226258, 780022276.249573, 5665475351.710449, 28693478010.818359, 115365692783.281250, 1.416781, 1089.885933, 772.393989, 1458.638640, 1901.037939, 2268.477049, 2401.516421, 3253.789161, 0.328688, 569.751825, 1189.146596, 1644.046414, 1272.940862, 2146.594657, 3127.594420, 3117.302010]
+
+    GaugeFieldCount : 8
+    BosonFieldCount : 8
+    FermionFieldCount : 8
+
+    Gauge:
+        FieldName : CFieldGaugeU1
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge2:
+        FieldName : CFieldGaugeSU2
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge3:
+        FieldName : CFieldGaugeSU3
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge4:
+        FieldName : CFieldGaugeSU4
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge5:
+        FieldName : CFieldGaugeSU5
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge6:
+        FieldName : CFieldGaugeSU6
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge7:
+        FieldName : CFieldGaugeSU7
+        FieldInitialType : EFIT_RandomGenerator
+    Gauge8:
+        FieldName : CFieldGaugeSU8
+        FieldInitialType : EFIT_RandomGenerator
+    BosonField1:
+        FieldName : CFieldBosonU1
+    BosonField2:
+        FieldName : CFieldBosonSU2
+    BosonField3:
+        FieldName : CFieldBosonSU3
+    BosonField4:
+        FieldName : CFieldBosonSU4
+    BosonField5:
+        FieldName : CFieldBosonSU5
+    BosonField6:
+        FieldName : CFieldBosonSU6
+    BosonField7:
+        FieldName : CFieldBosonSU7
+    BosonField8:
+        FieldName : CFieldBosonSU8
+    FermionField1:
+        FieldName : CFieldFermionKSU1
+    FermionField2:
+        FieldName : CFieldFermionKSSU2
+    FermionField3:
+        FieldName : CFieldFermionKSSU3
+    FermionField4:
+        FieldName : CFieldFermionKSSU4
+    FermionField5:
+        FieldName : CFieldFermionKSSU5
+    FermionField6:
+        FieldName : CFieldFermionKSSU6
+    FermionField7:
+        FieldName : CFieldFermionKSSU7
+    FermionField8:
+        FieldName : CFieldFermionKSSU8

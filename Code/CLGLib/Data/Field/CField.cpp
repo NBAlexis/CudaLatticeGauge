@@ -162,9 +162,19 @@ void CFieldFermionKS::InitialOtherParameters(CParameters& params)
 
     TArray<Real> coeffs;
     params.FetchValueArrayReal(_T("MD"), coeffs);
+    if (0 == coeffs.Num())
+    {
+        appCrucial(_T("no rational approximation configured for KS fermin MC!\n"));
+        coeffs.AddItem(F(1.0));
+    }
     m_rMD.Initial(coeffs);
 
     params.FetchValueArrayReal(_T("MC"), coeffs);
+    if (0 == coeffs.Num())
+    {
+        appCrucial(_T("no rational approximation configured for KS fermin MD!\n"));
+        coeffs.AddItem(F(1.0));
+    }
     m_rMC.Initial(coeffs);
 
     //params.FetchValueArrayReal(_T("EN"), coeffs);

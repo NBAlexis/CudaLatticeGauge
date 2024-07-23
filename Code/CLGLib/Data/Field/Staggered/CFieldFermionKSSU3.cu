@@ -355,6 +355,7 @@ _kernelInitialFermionKS(deviceSU3Vector* pDevicePtr, BYTE byFieldId, EFieldIniti
     }
     break;
     case EFIT_RandomGaussian:
+    case EFIT_RandomGenerator:
     {
         pDevicePtr[uiSiteIndex] = deviceSU3Vector::makeRandomGaussian(_deviceGetFatIndex(uiSiteIndex, 0));
     }
@@ -364,9 +365,14 @@ _kernelInitialFermionKS(deviceSU3Vector* pDevicePtr, BYTE byFieldId, EFieldIniti
         pDevicePtr[uiSiteIndex] = deviceSU3Vector::makeRandomZ4(_deviceGetFatIndex(uiSiteIndex, 0));
     }
     break;
+    case EFIT_Random:
+    {
+        pDevicePtr[uiSiteIndex] = deviceSU3Vector::makeRandom(_deviceGetFatIndex(uiSiteIndex, 0));
+    }
+    break;
     default:
     {
-        printf("Wilson Fermion Field cannot be initialized with this type!");
+        printf("_kernelInitialFermionKS Fermion Field cannot be initialized with this type!");
     }
     break;
     }

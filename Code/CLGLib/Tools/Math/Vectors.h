@@ -62,6 +62,14 @@ extern "C" {
             return ret;
         }
 
+        __device__ __inline__ static deviceSU2Vector makeRandom(UINT fatIndex)
+        {
+            deviceSU2Vector ret;
+            ret.m_ve[0] = _deviceRandomC(fatIndex);
+            ret.m_ve[1] = _deviceRandomC(fatIndex);
+            return ret;
+        }
+
         __device__ __inline__ static deviceSU2Vector makeRandomZ4(UINT fatIndex)
         {
             deviceSU2Vector ret;
@@ -296,6 +304,15 @@ extern "C" {
                 m_ve[2].y < 0 ? "" : "+",
                 m_ve[2].y
             );
+        }
+
+        __device__ __inline__ static deviceSU3Vector makeRandom(UINT fatIndex)
+        {
+            deviceSU3Vector ret;
+            ret.m_ve[0] = _deviceRandomC(fatIndex);
+            ret.m_ve[1] = _deviceRandomC(fatIndex);
+            ret.m_ve[2] = _deviceRandomC(fatIndex);
+            return ret;
         }
 
         __device__ __inline__ static deviceSU3Vector makeRandomGaussian(UINT fatIndex)
@@ -607,6 +624,16 @@ extern "C" {
             m_d[1].Conjugate();
             m_d[2].Conjugate();
             m_d[3].Conjugate();
+        }
+
+        __device__ __inline__ static deviceWilsonVectorSU3 makeRandom(UINT fatIndex)
+        {
+            deviceWilsonVectorSU3 ret;
+            ret.m_d[0] = deviceSU3Vector::makeRandom(fatIndex);
+            ret.m_d[1] = deviceSU3Vector::makeRandom(fatIndex);
+            ret.m_d[2] = deviceSU3Vector::makeRandom(fatIndex);
+            ret.m_d[3] = deviceSU3Vector::makeRandom(fatIndex);
+            return ret;
         }
 
         __device__ __inline__ static deviceWilsonVectorSU3 makeRandomGaussian(UINT fatIndex)

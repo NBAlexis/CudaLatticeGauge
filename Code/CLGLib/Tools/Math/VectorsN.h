@@ -56,6 +56,16 @@ public:
         printf("}\n");
     }
 
+    __device__ __inline__ static deviceSUNVector<N, NofE> makeRandom(UINT fatIndex)
+    {
+        deviceSUNVector<N, NofE> ret;
+        for (INT i = 0; i < N; ++i)
+        {
+            ret.m_ve[i] = _deviceRandomC(fatIndex);
+        }
+        return ret;
+    }
+
     __device__ __inline__ static deviceSUNVector<N, NofE> makeRandomGaussian(UINT fatIndex)
     {
         deviceSUNVector<N, NofE> ret;

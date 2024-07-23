@@ -74,33 +74,34 @@ _kernelDebugFunction()
     //    g.DebugPrint("g");
     //}
 
-    deviceSU4 a = deviceSU4::makeSUNRandom(0);
+    deviceSU2 a = deviceSU2::makeSU2Random(0);
     a.DebugPrint("a");
-    deviceSU4 b = a.Hessenberg();
-    a.DebugPrint("q");
-    b.DebugPrint("h");
+    printf("sizeof() = %d\n", sizeof(deviceSU2));
+    //deviceSU4 b = a.Hessenberg();
+    //a.DebugPrint("q");
+    //b.DebugPrint("h");
 
-    b.FrancisQRIteration();
-    b.DebugPrint("r");
+    //b.FrancisQRIteration();
+    //b.DebugPrint("r");
 
     //deviceSU4Vector ranv = deviceSU4Vector::makeRandomGaussian(0);
     //ranv.DebugPrint("v");
     //b.BackwardSubstitution(ranv);
     //ranv.DebugPrint("x");
 
-    a = deviceSU4::makeSUNRandom(0);
-    a.DebugPrint("a");
-    a.Log().DebugPrint("loga");
-    a.StrictExp().DebugPrint("expa");
+    //a = deviceSU4::makeSUNRandom(0);
+    //a.DebugPrint("a");
+    //a.Log().DebugPrint("loga");
+    //a.StrictExp().DebugPrint("expa");
 
-    CLGComplex eign[4];
-    deviceSU4 q = a.EigenSystem(eign);
-    for (INT i = 0; i < 4; ++i)
-    {
-        printf("eign %d = %f, %f\n", i, eign[i].x, eign[i].y);
-    }
+    //CLGComplex eign[4];
+    //deviceSU4 q = a.EigenSystem(eign);
+    //for (INT i = 0; i < 4; ++i)
+    //{
+    //    printf("eign %d = %f, %f\n", i, eign[i].x, eign[i].y);
+    //}
 
-    q.DebugPrint("eigenvectors");
+    //q.DebugPrint("eigenvectors");
 
     //a.Mul(b);
     //a.DebugPrint("maxmb");

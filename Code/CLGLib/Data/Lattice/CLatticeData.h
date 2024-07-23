@@ -123,12 +123,24 @@ public:
 
     friend class CCLGLibManager;
 
+    TArray<const class CField*> GetAllField() const 
+    { 
+        TArray<const class CField*> ret;
+        for (INT i = 0; i < m_pOtherFields.Num(); ++i)
+        {
+            ret.AddItem(m_pOtherFields[i]);
+        }
+        return ret; 
+    }
+
 protected:
 
     /**
     * store all fields
     * used for initial every field buffer
     * and to clean up the fields
+    * 
+    * in CLGTest, it is used to test file IO
     */
     TArray<class CField*> m_pOtherFields; 
     TArray<EFieldInitialType> m_eFieldInitialTypes;

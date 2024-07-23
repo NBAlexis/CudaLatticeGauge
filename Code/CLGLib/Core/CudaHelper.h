@@ -18,7 +18,7 @@ __BEGIN_NAMESPACE
 
 enum 
 {
-    kContentLength = 64, kMaxFieldCount = 16,
+    kContentLength = 64, kMaxFieldCount = 32,
 };
 
 extern __constant__ UINT _constIntegers[kContentLength];
@@ -151,17 +151,10 @@ public:
         return iRet;
     }
 
-#if !_CLG_DOUBLEFLOAT
     static DOUBLE ReduceReal(DOUBLE* deviceBuffer, UINT uiLength);
     DOUBLE ReduceRealWithThreadCount(DOUBLE* deviceBuffer);
     static cuDoubleComplex ReduceComplex(cuDoubleComplex* deviceBuffer, UINT uiLength);
     cuDoubleComplex ReduceComplexWithThreadCount(cuDoubleComplex* deviceBuffer);
-#else
-    static Real ReduceReal(Real* deviceBuffer, UINT uiLength);
-    Real ReduceRealWithThreadCount(Real* deviceBuffer);
-    static CLGComplex ReduceComplex(CLGComplex* deviceBuffer, UINT uiLength);
-    CLGComplex ReduceComplexWithThreadCount(CLGComplex* deviceBuffer);
-#endif
 
     void CopyConstants() const;
     void CopyRandomPointer(const class CRandom* r) const;
@@ -223,11 +216,9 @@ public:
     cuDoubleComplex ThreadBufferSum(cuDoubleComplex* pDeviceBuffer);
     DOUBLE ThreadBufferSum(DOUBLE* pDeviceBuffer);
 
-
     //struct SIndex* m_pIndexBuffer;
     cuDoubleComplex* m_pComplexBufferThreadCount;
     DOUBLE* m_pRealBufferThreadCount;
-
 
     class CField * m_deviceFieldPointers[kMaxFieldCount];
     class CFieldBoundaryParent* m_deviceBoundaryFieldPointers[kMaxFieldCount];

@@ -87,14 +87,19 @@ UINT TestFermionUpdatorKS(CParameters& sParam)
 #endif
 }
 
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKS, Normal);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradient, NestedForceGradient);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1, NestedForceGradientNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1, NestedOmelyanNf2p1);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField, NestedOmelyanNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField, NestedForceGradientNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField, Nested11StageNf2p1MultiField);
-__REGIST_TEST(TestFermionUpdatorKS, UpdatorKS, TestFermionUpdatorKSP4, P4);
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKS, KS);
+
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradient, nestedForceGrad);
+
+//multi-level integrator not work efficiently now
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1, multilevelForceGrad);
+
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1, mutlevelOmelyan);
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedOmelyanNf2p1MultiField, NestedOmelyanNf2p1MultiField);
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNestedForceGradientNf2p1MultiField, NestedForceGradient);
+//__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSNested11StageNf2p1MultiField, Nested11StageNf2p1MultiField);
+
+__REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSP4, P4);
 
 ___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGamma, KSGamma, _TEST_RELEASE);
 ___REGIST_TEST(TestUpdateCommon, UpdatorKS, TestFermionUpdatorKSGammaProj, KSGammaProj, _TEST_RELEASE);

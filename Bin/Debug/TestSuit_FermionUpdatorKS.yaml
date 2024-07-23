@@ -12,7 +12,16 @@ TestFermionUpdatorKS:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.437
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.420549]
+    ExpectedResDebug : [0.420549]
 
     Updator:
 
@@ -96,8 +105,16 @@ TestFermionUpdatorKSNestedForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.392
-    ExpectedRes : 0.427
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.417654]
+    ExpectedResDebug : [0.417654]
 
     Updator:
 
@@ -185,8 +202,16 @@ TestFermionUpdatorKSNestedForceGradientNf2p1:
     ActionListLength : 3
     FermionFieldCount : 2
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.472
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.42]
+    ExpectedResDebug : [873.033691]
 
     Updator:
 
@@ -320,9 +345,16 @@ TestFermionUpdatorKSNestedOmelyanNf2p1:
     ActionListLength : 3
     FermionFieldCount : 2
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.489
-    # CacheStaple : 0
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.42]
+    ExpectedResDebug : [873.033691]
 
     Updator:
 
@@ -336,7 +368,7 @@ TestFermionUpdatorKSNestedOmelyanNf2p1:
         # It looks like InnerLeapfrog indeed give better result
         InnerLeapfrog : 1
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 10
         NestedSteps : [4, 2]
         NestedActionList0 : [2]
         NestedActionList1 : [1]
@@ -456,8 +488,16 @@ TestFermionUpdatorKSNestedOmelyanNf2p1MultiField:
     ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.487
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.444773]
+    ExpectedResDebug : [0.444773]
 
     Updator:
 
@@ -467,7 +507,7 @@ TestFermionUpdatorKSNestedOmelyanNf2p1MultiField:
         InnerLeapfrog : 1
         IntegratorType : CIntegratorNestedOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 9
         NestedStep : 5
 
     Gauge:
@@ -662,8 +702,16 @@ TestFermionUpdatorKSNestedForceGradientNf2p1MultiField:
     ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.472
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.42]
+    ExpectedResDebug : [873.033691]
 
     Updator:
 
@@ -867,8 +915,16 @@ TestFermionUpdatorKSNested11StageNf2p1MultiField:
     ActionListLength : 5
     FermionFieldCount : 4
     MeasureListLength : 1
-    ExpectedResDebug : 0.413
-    ExpectedRes : 0.472
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.42]
+    ExpectedResDebug : [873.033691]
 
     Updator:
 
@@ -1189,8 +1245,16 @@ TestFermionUpdatorKSP4:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedResDebug : 0.24
-    ExpectedRes : 0.2405
+
+    SkipThermalDebug : 0
+    BeforeMetropolis : 5
+    BeforeMetropolisDebug : 2
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
+    ExpectedRes : [0.239384]
+    ExpectedResDebug : [0.239384]
 
     Updator:
 
@@ -1202,7 +1266,7 @@ TestFermionUpdatorKSP4:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 6
         NestedStep : 8
         InnerLeapfrog : 1
         

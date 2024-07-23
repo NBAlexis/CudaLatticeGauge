@@ -17,6 +17,15 @@
 #ifndef _CFIELDFERMIONKST_H_
 #define _CFIELDFERMIONKST_H_
 
+#define _DEFINE_KS_FIELDSUN(n) \
+__CLG_REGISTER_HELPER_HEADER(CFieldFermionKSSU##n) \
+class CLGAPI CFieldFermionKSSU##n : public CFieldFermionKST<deviceSU##n##Vector, deviceSU##n, n> \
+{ \
+    __CLGDECLARE_FIELDWITHOUTCOPYTO(CFieldFermionKSSU##n) \
+public: \
+    EFieldType GetFieldType() const override { return EFT_FermionStaggeredSU##n; } \
+};
+
 __BEGIN_NAMESPACE
 
 template<typename deviceVector, typename deviceGauge, INT vectorN>
@@ -760,6 +769,13 @@ class CLGAPI CFieldFermionKSU1 : public CFieldFermionKST<CLGComplex, CLGComplex,
 public:
     EFieldType GetFieldType() const override { return EFT_FermionStaggeredU1; }
 };
+
+_DEFINE_KS_FIELDSUN(2)
+_DEFINE_KS_FIELDSUN(4)
+_DEFINE_KS_FIELDSUN(5)
+_DEFINE_KS_FIELDSUN(6)
+_DEFINE_KS_FIELDSUN(7)
+_DEFINE_KS_FIELDSUN(8)
 
 __END_NAMESPACE
 

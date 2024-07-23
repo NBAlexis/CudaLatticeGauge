@@ -24,7 +24,7 @@ TestBosonU1NoGauge:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [873.033691]
+    ExpectedRes : [827.433182]
     ExpectedResDebug : [873.033691]
 
     Updator:
@@ -86,7 +86,7 @@ TestBosonU1:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [75.354797]
+    ExpectedRes : [97.896905]
     ExpectedResDebug : [75.354797]
 
     Updator:
@@ -165,7 +165,7 @@ TestBosonU1ExternalGaugeField:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [73.827850]
+    ExpectedRes : [92.149603]
     ExpectedResDebug : [73.827850]
 
     Updator:
@@ -237,7 +237,7 @@ TestBosonSU4:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [249.035706]
+    ExpectedRes : [358.435910]
     ExpectedResDebug : [249.035706]
 
     Updator:
@@ -250,7 +250,8 @@ TestBosonSU4:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 8
+        IntegratorStep : 5
+        IntegratorStepDebug : 8
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -316,7 +317,7 @@ TestBosonU1D:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [54.775406]
+    ExpectedRes : [73.284790]
     ExpectedResDebug : [54.775406]
 
     Updator:
@@ -403,7 +404,7 @@ TestBosonU1P:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [75.341156]
+    ExpectedRes : [99.045142]
     ExpectedResDebug : [75.341156]
 
     Updator:
@@ -573,7 +574,7 @@ TestBosonRotationD:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [448.517944]
+    ExpectedRes : [632.304413]
     ExpectedResDebug : [448.517944]
 
     Updator:
@@ -586,7 +587,8 @@ TestBosonRotationD:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 8
+        IntegratorStepDebug : 10
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -661,7 +663,7 @@ TestBosonRotationP:
     MetropolisDebug : 4
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [2644.178711]
+    ExpectedRes : [1525.036106]
     ExpectedResDebug : [2644.178711]
 
     Updator:
@@ -674,7 +676,8 @@ TestBosonRotationP:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 15
+        IntegratorStepDebug : 15
+        IntegratorStep : 10
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:

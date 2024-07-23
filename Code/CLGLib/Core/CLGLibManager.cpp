@@ -363,7 +363,7 @@ void CCLGLibManager::InitialRandom(CParameters &)
     m_pLatticeData->m_uiRandomSeed = m_InitialCache.constIntegers[ECI_RandomSeed];
 }
 
-void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
+CField* CCLGLibManager::CreateGaugeFields(class CParameters& params) const
 {
     //INT iVaules = 0;
     //CCString sValues;
@@ -428,19 +428,19 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     const EFieldInitialType eGaugeInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
 
     __FetchIntWithDefault(_T("FieldId"), 1);
-    const BYTE byFieldId = static_cast<BYTE>(iVaules);
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
     if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
-        appCrucial(_T("Unable to create the gauge field! with wrong field ID %s %d!"), sGaugeClassName.c_str(), byFieldId);
-        return;
+        appCrucial(_T("Unable to create the gauge field! with wrong field ID %s %d!, using default: %d\n"), sGaugeClassName.c_str(), byFieldId, m_byLoadingFieldId);
+        byFieldId = m_byLoadingFieldId;
     }
 
     CBase* pGaugeField = appCreate(sGaugeClassName);
     CFieldGauge* pGauge = (NULL != pGaugeField) ? (dynamic_cast<CFieldGauge*>(pGaugeField)) : NULL;
     if (NULL == pGauge)
     {
-        appCrucial(_T("Unable to create the gauge field! with name %s!"), sGaugeClassName.c_str());
-        return;
+        appCrucial(_T("Unable to create the gauge field! with name %s!\n"), sGaugeClassName.c_str());
+        return NULL;
     }
 
     pGauge->m_byFieldId = byFieldId;
@@ -481,9 +481,10 @@ void CCLGLibManager::CreateGaugeFields(class CParameters& params) const
     m_pLatticeData->CreateFieldPool(byFieldId, 0);
     checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the gauge %s (field id %d) with initial: %s\n"), sGaugeClassName.c_str(), byFieldId, sValues.c_str());
+    return pGauge;
 }
 
-void CCLGLibManager::CreateBosonFields(class CParameters& params) const
+CField* CCLGLibManager::CreateBosonFields(class CParameters& params) const
 {
     INT iVaules = 0;
     CCString sValues;
@@ -491,7 +492,7 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
     CCString sBosonClassName;
     __FetchStringWithDefault(_T("FieldName"), _T("CFieldBosonU1"));
     sBosonClassName = sValues;
-    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
     const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
     checkCudaErrors(cudaDeviceSynchronize());
     CBase* pBosonField = appCreate(sBosonClassName);
@@ -499,21 +500,15 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
     if (NULL == pBoson)
     {
         appCrucial(_T("Unable to create the boson field! with name %s!"), sBosonClassName.c_str());
-        return;
+        return NULL;
     }
 
     __FetchIntWithDefault(_T("FieldId"), -1);
-    const BYTE byFieldId = static_cast<BYTE>(iVaules);
-    assert(byFieldId < kMaxFieldCount && byFieldId > 1);
-    if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    if (byFieldId >= kMaxFieldCount || byFieldId <= 1 || m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
-        appCrucial(_T("The field Id must > 1 and < %d\n"), kMaxFieldCount);
-        _FAIL_EXIT;
-    }
-    if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
-    {
-        appCrucial(_T("Unable to create the boson field! with wrong field ID %s %d!"), sBosonClassName.c_str(), byFieldId);
-        return;
+        appCrucial(_T("Unable to create the boson field! with wrong field ID %s %d! Using default: %d\n"), sBosonClassName.c_str(), byFieldId, m_byLoadingFieldId);
+        byFieldId = m_byLoadingFieldId;
     }
 
     pBoson->m_byFieldId = byFieldId;
@@ -545,9 +540,10 @@ void CCLGLibManager::CreateBosonFields(class CParameters& params) const
     checkCudaErrors(cudaDeviceSynchronize());
     //}
     appGeneral(_T("Create the boson field %s with id %d and initial: %s\n"), sBosonClassName.c_str(), byFieldId, sValues.c_str());
+    return pBoson;
 }
 
-void CCLGLibManager::CreateFermionFields(class CParameters& params) const
+CField* CCLGLibManager::CreateFermionFields(class CParameters& params) const
 {
     INT iVaules = 0;
     CCString sValues;
@@ -555,7 +551,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
     CCString sFermionClassName;
     __FetchStringWithDefault(_T("FieldName"), _T("CFieldFermionWilsonSquareSU3"));
     sFermionClassName = sValues;
-    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_RandomGaussian"));
+    __FetchStringWithDefault(_T("FieldInitialType"), _T("EFIT_Random"));
     const EFieldInitialType eFieldInitial = __STRING_TO_ENUM(EFieldInitialType, sValues);
 
     CBase* pFermionField = appCreate(sFermionClassName);
@@ -563,21 +559,15 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
     if (NULL == pFermion)
     {
         appCrucial(_T("Unable to create the fermion field! with name %s!"), sFermionClassName.c_str());
-        return;
+        return NULL;
     }
 
     __FetchIntWithDefault(_T("FieldId"), -1);
-    const BYTE byFieldId = static_cast<BYTE>(iVaules);
-    assert(byFieldId < kMaxFieldCount && byFieldId > 1);
-    if (byFieldId >= kMaxFieldCount || byFieldId <= 1)
+    BYTE byFieldId = static_cast<BYTE>(iVaules);
+    if (byFieldId >= kMaxFieldCount || byFieldId <= 1 || m_pLatticeData->m_pFieldMap.Exist(byFieldId))
     {
-        appCrucial(_T("The field Id must > 1 and < %d\n"), kMaxFieldCount);
-        _FAIL_EXIT;
-    }
-    if (m_pLatticeData->m_pFieldMap.Exist(byFieldId))
-    {
-        appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d!"), sFermionClassName.c_str(), byFieldId);
-        return;
+        appCrucial(_T("Unable to create the fermion field! with wrong field ID %s %d! Using default: %d\n"), sFermionClassName.c_str(), byFieldId);
+        byFieldId = m_byLoadingFieldId;
     }
 
     pFermion->m_byFieldId = byFieldId;
@@ -606,6 +596,7 @@ void CCLGLibManager::CreateFermionFields(class CParameters& params) const
     //}
     checkCudaErrors(cudaDeviceSynchronize());
     appGeneral(_T("Create the fermion field %s with id %d and initial: %s\n"), sFermionClassName.c_str(), byFieldId, sValues.c_str());
+    return pFermion;
 }
 
 void CCLGLibManager::CreateBoundaryFields(class CParameters& params, const CCString& sDefaultName) const
@@ -977,6 +968,7 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     // set device
     //==================================
     m_iDeviceId = 0;
+    m_byLoadingFieldId = 1;
     if (params.FetchValueINT(_T("DeviceIndex"), m_iDeviceId))
     {
         checkCudaErrors(cudaSetDevice(m_iDeviceId));
@@ -1023,7 +1015,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     if (params.Exist(_T("Gauge")))
     {
         CParameters gauge = params.GetParameter(_T("Gauge"));
-        CreateGaugeFields(gauge);
+        const CField* pLoaded = CreateGaugeFields(gauge);
+        if (NULL != pLoaded)
+        {
+            m_byLoadingFieldId = pLoaded->m_byFieldId + 1;
+        }
     }
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
@@ -1044,7 +1040,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             if (params.Exist(sFermionSubParamName))
             {
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
-                CreateGaugeFields(fermionField);
+                const CField* pLoaded = CreateGaugeFields(fermionField);
+                if (NULL != pLoaded)
+                {
+                    m_byLoadingFieldId = pLoaded->m_byFieldId + 1;
+                }
             }
             checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
@@ -1068,7 +1068,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             if (params.Exist(sFermionSubParamName))
             {
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
-                CreateBosonFields(fermionField);
+                const CField* pLoaded = CreateBosonFields(fermionField);
+                if (NULL != pLoaded)
+                {
+                    m_byLoadingFieldId = pLoaded->m_byFieldId + 1;
+                }
             }
             checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
@@ -1092,7 +1096,11 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
             if (params.Exist(sFermionSubParamName))
             {
                 CParameters fermionField = params.GetParameter(sFermionSubParamName);
-                CreateFermionFields(fermionField);
+                const CField* pLoaded = CreateFermionFields(fermionField);
+                if (NULL != pLoaded)
+                {
+                    m_byLoadingFieldId = pLoaded->m_byFieldId + 1;
+                }
             }
             checkCudaErrors(cudaDeviceSynchronize());
             checkCudaErrors(cudaGetLastError());
@@ -1108,28 +1116,6 @@ UBOOL CCLGLibManager::InitialWithParameter(CParameters &params)
     }
     checkCudaErrors(cudaDeviceSynchronize());
     checkCudaErrors(cudaGetLastError());
-
-    //if (m_InitialCache.constIntegers[ECI_OtherGaugeField] > 0)
-    //{
-    //    for (UINT i = 1; i <= m_InitialCache.constIntegers[ECI_OtherGaugeField]; ++i)
-    //    {
-    //        CCString sOtherGaugeSubParamName;
-    //        sOtherGaugeSubParamName.Format(_T("OtherGaugeField%d"), i);
-    //        if (params.Exist(sOtherGaugeSubParamName))
-    //        {
-    //            CParameters otherGaugeField = params.GetParameter(sOtherGaugeSubParamName);
-    //            CreateOtherGaugeFields(otherGaugeField);
-    //        }
-    //        checkCudaErrors(cudaGetLastError());
-    //        sOtherGaugeSubParamName.Format(_T("OtherGaugeBoundaryField%d"), i);
-    //        if (params.Exist(sOtherGaugeSubParamName))
-    //        {
-    //            CParameters bcgaugeField = params.GetParameter(sOtherGaugeSubParamName);
-    //            CreateBoundaryFields(bcgaugeField, _T("CFieldBoundaryGaugeSU3"));
-    //        }
-    //        checkCudaErrors(cudaGetLastError());
-    //    }
-    //}
 
     //=============================================
     // at last, fill the field pointers

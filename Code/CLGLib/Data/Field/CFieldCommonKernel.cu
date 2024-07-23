@@ -265,6 +265,22 @@ _kernelInitialSite(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
         pDevicePtr[uiSiteIndex] = _makeGaussian<T>(_deviceGetFatIndex(uiSiteIndex, 0));
     }
     break;
+    case EFIT_Random:
+    {
+        if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex].IsDirichlet())
+        {
+            if (NULL != __boundaryFieldPointers[byFieldId])
+            {
+                UINT uiRegion = __idx->_devcieExchangeBoundaryFieldSiteIndexBI(byFieldId, uiBigIndex);
+                const T* buffer = ((CFieldBoundary<T>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData;
+                pDevicePtr[uiSiteIndex] = buffer[uiRegion];
+            }
+            pDevicePtr[uiSiteIndex] = _makeZero<T>();
+            return;
+        }
+        pDevicePtr[uiSiteIndex] = _makeRandom<T>(_deviceGetFatIndex(uiSiteIndex, 0));
+    }
+    break;
     case EFIT_RandomZ4:
     {
         if (__idx->m_pDeviceIndexPositionToSIndex[byFieldId][uiBigIndex].IsDirichlet())
@@ -283,7 +299,7 @@ _kernelInitialSite(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
     break;
     default:
     {
-        printf("Wilson Fermion Field cannot be initialized with this type! %d\n", eInitialType);
+        printf("_kernelInitialSite cannot be initialized with this type! %d\n", eInitialType);
     }
     break;
     }

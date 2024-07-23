@@ -35,6 +35,7 @@ public:
         , m_pBuffer(NULL)
         , m_iDeviceId(0)
         , m_InitialCache()
+        , m_byLoadingFieldId(0)
     {
     }
 
@@ -71,9 +72,9 @@ protected:
     void InitialRandom(class CParameters& params);
 
     //Optional
-    void CreateGaugeFields(class CParameters& params) const;
-    void CreateFermionFields(class CParameters& params) const;
-    void CreateBosonFields(class CParameters& params) const;
+    class CField* CreateGaugeFields(class CParameters& params) const;
+    class CField* CreateFermionFields(class CParameters& params) const;
+    class CField* CreateBosonFields(class CParameters& params) const;
 
     //other gauge fields is to be removed...
     //void CreateOtherGaugeFields(class CParameters& params) const;
@@ -95,6 +96,8 @@ protected:
     void InitialIndexBuffer() const;
 
     void InitialFieldBuffer() const;
+
+    BYTE m_byLoadingFieldId = 0;
 };
 
 extern CLGAPI CCLGLibManager GCLGManager;
