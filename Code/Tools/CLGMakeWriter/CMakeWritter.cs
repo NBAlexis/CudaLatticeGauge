@@ -146,6 +146,7 @@ set_target_properties( CLGLib
 
             sContent += "\n# To enable the double, the minimum arch is 6.0\n";
             sContent += "if (DEFINED DEBUG)\n";
+            sContent += "  add_definitions(-DDEBUG=1)\n";
             sContent += "  add_definitions(-D_DEBUG=1)\n";
             sContent += "  target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-g -Og -gencode arch=${CUDA_CMP},code=${CUDA_SM}>)\n";
             sContent += "else()\n";

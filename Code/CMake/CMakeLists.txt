@@ -361,6 +361,7 @@ target_link_libraries(CLGLib -lcufft)
 
 # To enable the double, the minimum arch is 6.0
 if (DEFINED DEBUG)
+  add_definitions(-DDEBUG=1)
   add_definitions(-D_DEBUG=1)
   target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-g -Og -gencode arch=${CUDA_CMP},code=${CUDA_SM}>)
 else()
