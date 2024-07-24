@@ -3137,6 +3137,12 @@ void CFieldFermionKSTKernel<deviceVector, deviceGauge, vectorN>::DerivateD0_R(
 
 
 template class CFieldFermionKSTKernel<CLGComplex, CLGComplex, 1>;
+template class CFieldFermionKSTKernel<deviceSU2Vector, deviceSU2, 2>;
+template class CFieldFermionKSTKernel<deviceSU4Vector, deviceSU4, 4>;
+template class CFieldFermionKSTKernel<deviceSU5Vector, deviceSU5, 5>;
+template class CFieldFermionKSTKernel<deviceSU6Vector, deviceSU6, 6>;
+template class CFieldFermionKSTKernel<deviceSU7Vector, deviceSU7, 7>;
+template class CFieldFermionKSTKernel<deviceSU8Vector, deviceSU8, 8>;
 
 __END_NAMESPACE
 
