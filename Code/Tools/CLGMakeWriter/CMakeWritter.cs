@@ -222,16 +222,16 @@ set_target_properties( CLGLib
             sContent = sContent.Replace("\r", "\n");
             sContent = sContent.Replace("\\", "/");
 
-            File.WriteAllText(sSolDir + "CMake/CMakeLists.txt", sContent);
-
-            //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
-            //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
-
             sContent += "if (DEFINED DEBUG)\n";
             sContent += "  MESSAGE(\"Will output to Bin/UbuntuDebug\")\n";
             sContent += "else()\n";
             sContent += "  MESSAGE(\"Will output to Bin/Ubuntu\")\n";
             sContent += "endif()\n";
+
+            File.WriteAllText(sSolDir + "CMake/CMakeLists.txt", sContent);
+
+            //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
+            //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
         }
 
         protected string AddApplication(CProjFile addProj)

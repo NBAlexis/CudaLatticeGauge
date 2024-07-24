@@ -490,3 +490,8 @@ add_executable(ElectricChemical
 target_compile_features(ElectricChemical PUBLIC cxx_std_14)
 target_link_libraries(ElectricChemical CLGLib)
 
+if (DEFINED DEBUG)
+  MESSAGE("Will output to Bin/UbuntuDebug")
+else()
+  MESSAGE("Will output to Bin/Ubuntu")
+endif()
