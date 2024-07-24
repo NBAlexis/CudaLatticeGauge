@@ -20,14 +20,25 @@ project(CLG LANGUAGES CXX CUDA)
 set(CMAKE_GENERATOR_PLATFORM x64)
 
 # We start from CMAKE_SOURCE_DIR which should be /Code/CMake
-set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
+if (DEFINED DEBUG)
+  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)
+  MESSAGE("Note: This is debug mode.")
+else()
+  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/Ubuntu)
+endif()
 set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})
 # This is our code file dir
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 # Flags
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess")
+if (DEFINED DEBUG)
+  add_definitions(-DDEBUG=1)
+  add_definitions(-D_DEBUG=1)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess")
+endif()
 add_definitions(-D_UBUNTU)
 # to enable double float, add the following line:
 if (DEFINED CLGDOUBLE)
@@ -360,13 +371,7 @@ target_link_libraries(CLGLib -lcurand)
 target_link_libraries(CLGLib -lcufft)
 
 # To enable the double, the minimum arch is 6.0
-if (DEFINED DEBUG)
-  add_definitions(-DDEBUG=1)
-  add_definitions(-D_DEBUG=1)
-  target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-g -Og -gencode arch=${CUDA_CMP},code=${CUDA_SM}>)
-else()
-  target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)
-endif()
+target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)
 
 
 

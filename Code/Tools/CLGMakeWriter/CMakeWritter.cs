@@ -87,7 +87,12 @@ namespace CLGMakeWriter
             sContent += "set(CMAKE_GENERATOR_PLATFORM x64)\n\n";
 
             sContent += "# We start from CMAKE_SOURCE_DIR which should be /Code/CMake\n";
-            sContent += "set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
+            sContent += "if (DEFINED DEBUG)\n";
+            sContent += "  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/UbuntuDebug)\n";
+            sContent += "  MESSAGE(\"Note: This is debug mode.\")\n";
+            sContent += "else()\n";
+            sContent += "  set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_SOURCE_DIR}/../../Bin/Ubuntu)\n";
+            sContent += "endif()\n";
             sContent += "set(EXECUTABLE_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})\n";
             sContent += "set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_BINARY_DIR})\n";
 
@@ -96,7 +101,13 @@ namespace CLGMakeWriter
 
             sContent += "# Flags\n";
             sContent += "set(CMAKE_CUDA_FLAGS \"${CMAKE_CUDA_FLAGS} -O3\")\n";
-            sContent += "set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
+            sContent += "if (DEFINED DEBUG)\n";
+            sContent += "  add_definitions(-DDEBUG=1)\n";
+            sContent += "  add_definitions(-D_DEBUG=1)\n";
+            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -g -Og -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
+            sContent += "else()\n";
+            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
+            sContent += "endif()\n";
             sContent += "add_definitions(-D_UBUNTU)\n";
             sContent += "# to enable double float, add the following line:\n";
             sContent += "if (DEFINED CLGDOUBLE)\n";
@@ -145,13 +156,7 @@ set_target_properties( CLGLib
             sContent += "target_link_libraries(CLGLib -lcufft)\n";
 
             sContent += "\n# To enable the double, the minimum arch is 6.0\n";
-            sContent += "if (DEFINED DEBUG)\n";
-            sContent += "  add_definitions(-DDEBUG=1)\n";
-            sContent += "  add_definitions(-D_DEBUG=1)\n";
-            sContent += "  target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-g -Og -gencode arch=${CUDA_CMP},code=${CUDA_SM}>)\n";
-            sContent += "else()\n";
-            sContent += "  target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)\n";
-            sContent += "endif()\n\n";
+            sContent += "target_compile_options(CLGLib PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-gencode arch=${CUDA_CMP},code=${CUDA_SM}>)\n\n";
 
             #endregion
 
