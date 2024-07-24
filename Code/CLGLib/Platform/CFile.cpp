@@ -183,7 +183,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
     }
     else
     {
-        s = (TCHAR*)file_data;
+        s = CCString((TCHAR*)file_data);
         free(file_data);
     }
 

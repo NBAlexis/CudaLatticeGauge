@@ -104,7 +104,7 @@ namespace CLGMakeWriter
             sContent += "if (DEFINED DEBUG)\n";
             sContent += "  add_definitions(-DDEBUG=1)\n";
             sContent += "  add_definitions(-D_DEBUG=1)\n";
-            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
+            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess -Wno-maybe-uninitialized\")\n";
             sContent += "else()\n";
             sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
             sContent += "endif()\n";

@@ -79,7 +79,7 @@ protected:
     {
     public:
 
-        TAssoc() : m_pNext(NULL) {}
+        //TAssoc() : m_pNext(NULL) {}
 
         friend class THashMap<KEY, ARG_KEY, VALUE, ARG_VALUE>;
         TAssoc* m_pNext;

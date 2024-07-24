@@ -216,7 +216,7 @@ __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, R
 //__REGIST_TEST(TestRigidAcceleration, Updator, TestRigidAcceleration);
 
 #if _CLG_WIN
-__REGIST_TEST(TestBoost, Updator, TestBoost, Boost);
+___REGIST_TEST(TestBoost, Updator, TestBoost, Boost, _TEST_NOCHECK);
 #else
 ___REGIST_TEST(TestBoost, Updator, TestBoost, Boost, _TEST_NOCHECK);
 #endif
