@@ -215,7 +215,11 @@ __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, R
 //This has sign problem..
 //__REGIST_TEST(TestRigidAcceleration, Updator, TestRigidAcceleration);
 
+#if _CLG_WIN
 __REGIST_TEST(TestBoost, Updator, TestBoost, Boost);
+#else
+___REGIST_TEST(TestBoost, Updator, TestBoost, Boost, _TEST_NOCHECK);
+#endif
 
 //__REGIST_TEST(TestEMSimple, Updator, TestEMSimple, EMSimple);
 

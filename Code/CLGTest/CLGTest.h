@@ -91,10 +91,14 @@ struct STestSuits
         {
             sTag = sTag + _T("S");
         }
+        if (NoCheck())
+        {
+            sTag = sTag + _T("V");
+        }
 
         if (sTag.GetLength() > 0)
         {
-            return _T("(") + sTag + _T(")") + m_sShowName;
+            return sTag + _T("_") + m_sShowName;
         }
         return m_sShowName;
     }
