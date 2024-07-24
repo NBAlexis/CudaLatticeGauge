@@ -153,7 +153,7 @@ UINT TestSeed(CParameters& sParam)
     return appGetLattice()->m_pRandom->DebugSeedTable();
 }
 
-___REGIST_TEST(TestSeed, Random, TestSeed, Seeds, _TEST_CHECK);
+__REGIST_TEST(TestSeed, Random, TestSeed, Seeds);
 
 //=============================================================================
 // END OF FILE

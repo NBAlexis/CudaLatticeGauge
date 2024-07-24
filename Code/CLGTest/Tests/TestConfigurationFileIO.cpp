@@ -37,10 +37,13 @@ UINT TestFileIO(CParameters& sParam)
     return uiError;
 }
 
+#if _CLG_WIN
 __REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPText, BridgePPText);
-
 __REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin, BridgePPBin);
-
+#else
+___REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPText, BridgePPText, _TEST_NOCHECK);
+___REGIST_TEST(TestFileIO, FileIO, TestFileIOBridgePPBin, BridgePPBin, _TEST_NOCHECK);
+#endif
 UINT TestFileIOWithUpdate(CParameters& sParam)
 {
     appGetLattice()->m_pUpdator->Update(150, TRUE);

@@ -293,6 +293,7 @@ TestEtaShift:
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ##ActionListLength : 1
+    GaugeFieldCount : 2
     ActionListLength : 0
     FermionFieldCount : 2
     MeasureListLength : 0
@@ -308,6 +309,18 @@ TestEtaShift:
         FieldInitialType : EFIT_Random
 
         Period : [1, 1, 1, 1]
+        FieldId : 1
+
+    Gauge2:
+    
+        ## FieldType = {CFieldGaugeSU3}
+        FieldName : CFieldGaugeU1
+
+        ## FieldInitialType = { EFIT_Zero, EFIT_Identity, EFIT_Random, EFIT_RandomGenerator, EFIT_ReadFromFile,}
+        FieldInitialType : EFIT_Random
+
+        Period : [1, 1, 1, 1]
+        FieldId : 4
 
     FermionField1:
 

@@ -146,14 +146,11 @@ UINT TestEtaShift(CParameters& sParam)
     CFieldFermionKSSU3* pF2 = dynamic_cast<CFieldFermionKSSU3*>(pF1->GetCopy());
     CFieldFermionKSU1* pF3 = dynamic_cast<CFieldFermionKSU1*>(appGetLattice()->GetFieldById(3));
     CFieldFermionKSU1* pF4 = dynamic_cast<CFieldFermionKSU1*>(pF3->GetCopy());
-    CFieldGaugeSU3* pSU3 = new CFieldGaugeSU3();
-    pSU3->InitialField(EFIT_Random);
-    pSU3->m_byFieldId = 1;
-    TArray<CFieldGauge*> su3;
-    su3.AddItem(pSU3);
-    CFieldGaugeU1* pU1 = new CFieldGaugeU1();
-    pU1->InitialField(EFIT_Random);
+    CFieldGaugeSU3* pSU3 = dynamic_cast<CFieldGaugeSU3*>(appGetLattice()->GetFieldById(1));
+    CFieldGaugeU1* pU1 = dynamic_cast<CFieldGaugeU1*>(appGetLattice()->GetFieldById(4));
     pU1->m_byFieldId = 1;
+    TArray<CFieldGauge*> su3;
+    su3.AddItem(pSU3);   
     TArray<CFieldGauge*> u1;
     u1.AddItem(pU1);
     pF1->TestSetEtaShift(TRUE);
@@ -181,8 +178,6 @@ UINT TestEtaShift(CParameters& sParam)
     }
     appSafeDelete(pF2);
     appSafeDelete(pF4);
-    appSafeDelete(pSU3);
-    appSafeDelete(pU1);
 
     return uiError;
 }

@@ -35,7 +35,7 @@ enum
     _TEST_DOUBLE = 0x02,
     _TEST_RELEASE = 0x04,
     _TEST_SINGLE = 0x08,
-    _TEST_CHECK = 0x10,
+    _TEST_NOCHECK = 0x10,
 };
 
 struct STestSuits
@@ -67,9 +67,9 @@ struct STestSuits
         return 0 != (m_uiTag & static_cast<UINT>(_TEST_SINGLE));
     }
 
-    UBOOL IsCheck() const
+    UBOOL NoCheck() const
     {
-        return 0 != (m_uiTag & static_cast<UINT>(_TEST_CHECK));
+        return 0 != (m_uiTag & static_cast<UINT>(_TEST_NOCHECK));
     }
 
     CCString GetName() const
