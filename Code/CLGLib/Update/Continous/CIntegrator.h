@@ -224,7 +224,7 @@ protected:
             {
                 //m_pMomentumField[i]->DebugPrintMe();
                 DOUBLE kin = m_pMomentumField[i]->CalculateKinematicEnergy();
-                appGeneral(_T("kin %d: %f\n"), i, kin);
+                appDetailed(_T("kin %d: %f\n"), i, kin);
                 ret += kin;
             }
         }

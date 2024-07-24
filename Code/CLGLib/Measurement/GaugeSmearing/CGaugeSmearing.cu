@@ -111,7 +111,7 @@ void CGaugeSmearing::CalculateSpatialFatLink(const CFieldGauge* pGauge, CFieldGa
     preparethread;
     _kernelStapleWithoutT << <block, threads >> > (
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGaugeSU3->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStapleSU3->m_pDeviceData);

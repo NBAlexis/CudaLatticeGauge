@@ -958,7 +958,7 @@ DOUBLE CActionGaugePlaquetteRotating3D::EnergySingleField(UBOOL bBeforeEvolution
         _kernelAdd4PlaqutteTermSU33D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);

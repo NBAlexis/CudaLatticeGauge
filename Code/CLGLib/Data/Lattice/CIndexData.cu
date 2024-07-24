@@ -116,14 +116,14 @@ UINT inline _GetDecompose(UINT volumn)
 //    appSafeFree(stb);
 //}
 
-void CIndexData::DebugPlaqutteTable()
+void CIndexData::DebugPlaqutteTable(BYTE byFieldId)
 {
     appPushLogDate(FALSE);
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
     SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
-    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pPlaqutteCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId], sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
 
     for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)
     {
@@ -153,14 +153,14 @@ void CIndexData::DebugPlaqutteTable()
     appPopLogDate();
 }
 
-void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
+void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite, BYTE byFieldId)
 {
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerSite = _HC_Dim * (_HC_Dim - 1) / 2;
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
 
     SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite);
-    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId], sizeof(SIndex) * uiSiteCount * uiPlaqLength * uiPlaqPerSite, cudaMemcpyDeviceToHost));
     UINT uiSite = _hostGetSiteIndex(sSite);
     appGeneral(_T("me = %d, %d, %d, %d\n"), sSite.x, sSite.y, sSite.z, sSite.w);
 
@@ -185,14 +185,14 @@ void CIndexData::DebugPlaqutteTable(const SSmallInt4& sSite)
     appSafeFree(cache);
 }
 
-void CIndexData::DebugStapleTable()
+void CIndexData::DebugStapleTable(BYTE byFieldId)
 {
     appPushLogDate(FALSE);
     const UINT uiPlaqLength = 4;
     const UINT uiPlaqPerLink = 2 * (_HC_Dim - 1);
     const UINT uiSiteCount = _HC_Lx * _HC_Ly * _HC_Lz * _HC_Lt;
     SIndex* cache = (SIndex*)malloc(sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink);
-    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache, 
+    checkCudaErrors(cudaMemcpy(cache, appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
         sizeof(SIndex) * uiSiteCount * (uiPlaqLength - 1) * uiPlaqPerLink, cudaMemcpyDeviceToHost));
 
     for (UINT uiSite = 0; uiSite < uiSiteCount; ++uiSite)

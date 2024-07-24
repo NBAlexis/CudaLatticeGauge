@@ -465,12 +465,12 @@ void CFieldGaugeSU3D::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* 
 
     preparethread;
 
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId]);
 
     _kernelStapleAtSiteSU3CacheIndex_D << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
@@ -480,13 +480,13 @@ void CFieldGaugeSU3D::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* 
 
 DOUBLE CFieldGaugeSU3D::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId]);
 
     preparethread;
     _kernelPlaqutteEnergySU3CacheIndex_D << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
@@ -519,7 +519,7 @@ void CFieldGaugeSU3D::CalculateOnlyStaple(CFieldGauge* pStaple) const
     _kernelCalculateOnlyStaple_D << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStapleSU3->m_pDeviceData);

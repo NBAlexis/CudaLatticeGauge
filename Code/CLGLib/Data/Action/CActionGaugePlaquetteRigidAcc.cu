@@ -316,7 +316,7 @@ UBOOL CActionGaugePlaquetteRigidAcc::CalculateForceOnGaugeSingleField(const CFie
 
     _kernelAddForce4PlaqutteTermSU3_RigidAcc << <block, threads >> >(
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGaugeSU3->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pForceSU3->m_pDeviceData, 
@@ -356,7 +356,7 @@ DOUBLE CActionGaugePlaquetteRigidAcc::EnergySingleField(UBOOL bBeforeEvolution, 
     _kernelEnergy_RigidAcc_Simplified << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         m_fBetaOverNR,

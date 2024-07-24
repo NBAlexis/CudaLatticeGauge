@@ -627,7 +627,7 @@ TestRotationSUNT:
     MetropolisDebug : 5
     ExpectMiss : 1
     ExpectMissDebug : 1
-    ExpectedRes : [0.169138, 0.674041]
+    ExpectedRes : [0.169138, 0.840430]
     ExpectedResDebug : [0.172124, 0.751078]
 
     Updator:

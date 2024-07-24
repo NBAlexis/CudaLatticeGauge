@@ -89,7 +89,7 @@ public:
     void BakePlaquttes(class CIndexData* pData, BYTE byFieldId) override;
     void BakeMoveIndex(class CIndexData* pData, BYTE byFieldId) override;
     void BakeEtaMuTable(class CIndexData* pData) override;
-    UINT GetPlaqutteCount() const override;
+    UINT GetPlaqutteCount(BYTE byFieldId) const override;
 
 };
 

@@ -1271,11 +1271,11 @@ void CFieldGaugeU1Real::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge
 
     preparethread;
 
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId]);
 
     _kernelStapleAtSiteU1RealCacheIndex << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
@@ -1295,24 +1295,20 @@ void CFieldGaugeU1Real::CalculateOnlyStaple(CFieldGauge* pStable) const
     preparethread;
     _kernelCalculateOnlyStapleU1Real << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStableSU3->m_pDeviceData);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeU1Real::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
-#else
-Real CFieldGaugeU1Real::CalculatePlaqutteEnergy(Real betaOverN) const
-#endif
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId]);
 
     preparethread;
     _kernelPlaqutteEnergyU1RealCacheIndex << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
@@ -1322,31 +1318,13 @@ Real CFieldGaugeU1Real::CalculatePlaqutteEnergy(Real betaOverN) const
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeU1Real::CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const
-#else
-Real CFieldGaugeU1Real::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
-#endif
 {
     appCrucial(_T("U1 CalculatePlaqutteEnergyUseClover Not supported!\n"));
     _FAIL_EXIT;
-    //assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
-
-    //preparethread;
-    //_kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
-    //    m_byFieldId,
-    //    m_pDeviceData,
-    //    betaOverN,
-    //    _D_RealThreadBuffer);
-
-    //return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeU1Real::CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge *pStable) const
-#else
-Real CFieldGaugeU1Real::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge* pStable) const
-#endif
 {
     if (NULL == pStable || EFT_GaugeU1 != pStable->GetFieldType())
     {
@@ -1365,18 +1343,10 @@ Real CFieldGaugeU1Real::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeU1Real::CalculateKinematicEnergy() const
-#else
-Real CFieldGaugeU1Real::CalculateKinematicEnergy() const
-#endif
 {
     appCrucial(_T("U1Real CalculateKinematicEnergy not supported\n"));
-#if !_CLG_DOUBLEFLOAT
     return 0.0;
-#else
-    return F(0.0);
-#endif
 }
 
 void CFieldGaugeU1Real::SetOneDirectionUnity(BYTE byDir)

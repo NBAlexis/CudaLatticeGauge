@@ -268,7 +268,7 @@ _kernelCacheEtaMu(BYTE* pCached)
 
 
 __global__ void _CLG_LAUNCH_BOUND
-_kernelPlaqutteCount(UINT* atomic)
+_kernelPlaqutteCount(UINT* atomic, BYTE byFieldId)
 {
     intokernal;
 
@@ -283,7 +283,7 @@ _kernelPlaqutteCount(UINT* atomic)
         BYTE byDirichletCount = 0;
         for (BYTE j = 0; j < plaqLength; ++j)
         {
-            if (__idx->m_pPlaqutteCache[i * plaqLength + j + uiSiteIndex * plaqCountAll].IsDirichlet())
+            if (__idx->m_pPlaqutteCache[byFieldId][i * plaqLength + j + uiSiteIndex * plaqCountAll].IsDirichlet())
             {
                 ++byDirichletCount;
             }
@@ -407,17 +407,18 @@ void CIndexSquare::BakePlaquttes(CIndexData* pData, BYTE byFieldId)
     {
         preparethread;
 
-        checkCudaErrors(cudaMalloc((void**)&pData->m_pPlaqutteCache, sizeof(SIndex) * _HC_Volume * (_HC_Dim * (_HC_Dim - 1) / 2) * 4));
-        checkCudaErrors(cudaMalloc((void**)&pData->m_pStappleCache, sizeof(SIndex) * _HC_Volume * _HC_Dim * (2 * (_HC_Dim - 1)) * 3));
+        checkCudaErrors(cudaMalloc((void**)&pData->m_pPlaqutteCache[byFieldId], sizeof(SIndex) * _HC_Volume * (_HC_Dim * (_HC_Dim - 1) / 2) * 4));
+        checkCudaErrors(cudaMalloc((void**)&pData->m_pStappleCache[byFieldId], sizeof(SIndex) * _HC_Volume * _HC_Dim * (2 * (_HC_Dim - 1)) * 3));
+        checkCudaErrors(cudaDeviceSynchronize());
 
         //bake plaqutte per site       
         _kernelBakePlaqIndexAtSite << <block, threads >> > (
-            pData->m_pPlaqutteCache, pData->m_pIndexLinkToSIndex[byFieldId], 
+            pData->m_pPlaqutteCache[byFieldId], pData->m_pIndexLinkToSIndex[byFieldId],
             pData->m_pSmallData); // , pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
         //bake plaqutte per link
         _kernelBakePlaqIndexAtLink << <block, threads >> > (
-            pData->m_pStappleCache, pData->m_pIndexLinkToSIndex[byFieldId], 
+            pData->m_pStappleCache[byFieldId], pData->m_pIndexLinkToSIndex[byFieldId],
             pData->m_pSmallData); // , pData->m_pBondInfoTable[byFieldId]);
         checkCudaErrors(cudaDeviceSynchronize());
     }
@@ -454,7 +455,7 @@ void CIndexSquare::BakeEtaMuTable(class CIndexData* pData)
     _kernelCacheEtaMu << <block, threads >> > (pData->m_pEtaMu);
 }
 
-UINT CIndexSquare::GetPlaqutteCount() const
+UINT CIndexSquare::GetPlaqutteCount(BYTE byFieldId) const
 {
     UINT res[1] = { 0 };
     UINT* deviceRes;
@@ -462,7 +463,7 @@ UINT CIndexSquare::GetPlaqutteCount() const
     checkCudaErrors(cudaMemcpy(deviceRes, res, sizeof(UINT), cudaMemcpyHostToDevice));
 
     preparethread;
-    _kernelPlaqutteCount << <block, threads >> > (deviceRes);
+    _kernelPlaqutteCount << <block, threads >> > (deviceRes, byFieldId);
 
     checkCudaErrors(cudaMemcpy(res, deviceRes, sizeof(UINT), cudaMemcpyDeviceToHost));
     checkCudaErrors(cudaFree(deviceRes));

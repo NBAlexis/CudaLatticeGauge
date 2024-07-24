@@ -1308,11 +1308,11 @@ void CFieldGaugeSU3::CalculateForceAndStaple(CFieldGauge* pForce, CFieldGauge* p
 
     preparethread;
 
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId]);
 
     _kernelStapleAtSiteSU3CacheIndex << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         NULL == pStableSU3 ? NULL : pStableSU3->m_pDeviceData,
@@ -1332,24 +1332,20 @@ void CFieldGaugeSU3::CalculateOnlyStaple(CFieldGauge* pStable) const
     preparethread;
     _kernelCalculateOnlyStaple << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStableSU3->m_pDeviceData);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergy(DOUBLE betaOverN) const
-#else
-Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
-#endif
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId]);
 
     preparethread;
     _kernelPlaqutteEnergySU3CacheIndex << <block, threads >> > (
         m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
@@ -1359,34 +1355,21 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergy(Real betaOverN) const
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(DOUBLE betaOverN) const
-#else
-Real CFieldGaugeSU3::CalculatePlaqutteEnergyUseClover(Real betaOverN) const
-#endif
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
     //appGeneral(_T("const %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite);
     preparethread;
     _kernelPlaqutteEnergySU3_UseClover << <block, threads >> > (
         m_byFieldId,
         m_pDeviceData,
-#if !_CLG_DOUBLEFLOAT
         3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
-#else
-        F(3.0) * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
-#endif
         betaOverN,
         _D_RealThreadBuffer);
 
     return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(DOUBLE betaOverN, const CFieldGauge *pStable) const
-#else
-Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CFieldGauge* pStable) const
-#endif
 {
     if (NULL == pStable || EFT_GaugeSU3 != pStable->GetFieldType())
     {
@@ -1401,11 +1384,7 @@ Real CFieldGaugeSU3::CalculatePlaqutteEnergyUsingStable(Real betaOverN, const CF
     _kernelPlaqutteEnergyUsingStableSU3 << <block, threads >> > (
         m_pDeviceData, 
         pStableSU3->m_pDeviceData,
-#if !_CLG_DOUBLEFLOAT
         3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
-#else
-        F(3.0) * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
-#endif
         betaOverN, 
         _D_RealThreadBuffer);
 

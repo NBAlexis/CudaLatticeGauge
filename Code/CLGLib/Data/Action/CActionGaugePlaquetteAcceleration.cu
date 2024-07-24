@@ -371,7 +371,7 @@ UBOOL CActionGaugePlaquetteAcceleration::CalculateForceOnGaugeSingleField(const 
 
     _kernelAddForce4PlaqutteTermSU3_Acc << <block, threads >> >(
         pGaugeSU3->m_pDeviceData, 
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGaugeSU3->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pForceSU3->m_pDeviceData, 
@@ -412,7 +412,7 @@ DOUBLE CActionGaugePlaquetteAcceleration::EnergySingleField(UBOOL bBeforeEvoluti
     _kernelAdd4PlaqutteTermSU3_Acc << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData, 
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
             m_fBetaOverNR,
             CCommonData::m_fG * CCommonData::m_fG,
             _D_RealThreadBuffer);

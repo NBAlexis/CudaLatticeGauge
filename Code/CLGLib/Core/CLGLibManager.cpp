@@ -954,18 +954,26 @@ void CCLGLibManager::InitialIndexBuffer() const
     if (m_pLatticeData->m_pOtherFields.Num() > 0)
     {
         UBOOL bHasStaggeredFermion = FALSE;
-        UBOOL bPlaqCached = FALSE;
+        //UBOOL bPlaqCached = FALSE;
         for (BYTE i = 1; i < kMaxFieldCount; ++i)
         {
             const CField* pf = m_pLatticeData->GetFieldById(i);
-            if (NULL != pf && pf->IsGaugeField() && !bPlaqCached)
+            //if (NULL != pf && pf->IsGaugeField() && !bPlaqCached)
+            //{
+            //    m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, i);
+            //    checkCudaErrors(cudaDeviceSynchronize());
+            //    checkCudaErrors(cudaGetLastError());
+            //    bPlaqCached = TRUE;
+            //}
+            //else 
+            if (NULL != pf && pf->IsGaugeField())
             {
                 m_pLatticeData->m_pIndex->BakePlaquttes(m_pLatticeData->m_pIndexCache, i);
                 checkCudaErrors(cudaDeviceSynchronize());
                 checkCudaErrors(cudaGetLastError());
-                bPlaqCached = TRUE;
             }
-            else if (NULL != pf && !pf->IsGaugeField())
+
+            if (NULL != pf && !pf->IsGaugeField())
             {
                 m_pLatticeData->m_pIndex->BakeMoveIndex(m_pLatticeData->m_pIndexCache, i);
                 checkCudaErrors(cudaDeviceSynchronize());

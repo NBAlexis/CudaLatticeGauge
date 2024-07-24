@@ -1734,127 +1734,6 @@ DOUBLE CActionGaugePlaquetteRotating::EnergySingleField(UBOOL bBeforeEvolution, 
         return m_fLastEnergy;
     }
 
-#if old_code
-
-    if (m_bCloverEnergy)
-    {
-        m_fNewEnergy = pGauge->CalculatePlaqutteEnergyUseClover(m_fBetaOverN);
-    }
-    else
-    {
-        m_fNewEnergy = pGauge->CalculatePlaqutteEnergy(m_fBetaOverN);
-    }
-    
-    const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
-    if (NULL == pGaugeSU3)
-    {
-        appCrucial(_T("CActionGaugePlaquetteRotating only work with SU3 now.\n"));
-        return m_fNewEnergy;
-    }
-
-    preparethread;
-
-    appGetCudaHelper()->ThreadBufferZero(_D_RealThreadBuffer);
-
-    if (m_bShiftHalfCoord)
-    {
-
-        _kernelAdd4PlaqutteTermSU3_Shifted << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega * m_fOmega,
-            _D_RealThreadBuffer);
-
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        
-        _kernelAddChairTermSU3_Term12_Shifted << <block, threads >> > (
-            pGaugeSU3->m_byFieldId, 
-            pGaugeSU3->m_pDeviceData, 
-            CCommonData::m_sCenter,
-            m_fBetaOverN, 
-            m_fOmega, 
-            _D_RealThreadBuffer);
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        
-        _kernelAddChairTermSU3_Term34_Shifted << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega,
-            _D_RealThreadBuffer);
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        _kernelAddChairTermSU3_Term5_Shifted << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega * m_fOmega,
-            _D_RealThreadBuffer);
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    }
-    else
-    {
-        //======== this is only for test ================
-        //_kernelAdd4PlaqutteTermSU3_Test << <block, threads >> > (
-        //    pGaugeSU3->m_byFieldId,
-        //    pGaugeSU3->m_pDeviceData,
-        //    CCommonData::m_sCenter,
-        //    m_fBetaOverN,
-        //    m_fOmega * m_fOmega,
-        //    _D_RealThreadBuffer);
-
-        _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega * m_fOmega,
-            _D_RealThreadBuffer);
-
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        _kernelAddChairTermSU3_Term12 << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega,
-            _D_RealThreadBuffer);
-
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        _kernelAddChairTermSU3_Term34 << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega,
-            _D_RealThreadBuffer);
-
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-        _kernelAddChairTermSU3_Term5 << <block, threads >> > (
-            pGaugeSU3->m_byFieldId,
-            pGaugeSU3->m_pDeviceData,
-            CCommonData::m_sCenter,
-            m_fBetaOverN,
-            m_fOmega * m_fOmega,
-            _D_RealThreadBuffer);
-
-        m_fNewEnergy += appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
-
-    }
-
-#endif
-
     const CFieldGaugeSU3* pGaugeSU3 = dynamic_cast<const CFieldGaugeSU3*>(pGauge);
     if (NULL == pGaugeSU3)
     {
@@ -1903,7 +1782,7 @@ DOUBLE CActionGaugePlaquetteRotating::XYTerm2(const class CFieldGauge* pGauge)
     _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
         m_fBetaOverN,
         m_fOmega * m_fOmega,
         _D_RealThreadBuffer);
@@ -1942,7 +1821,7 @@ void CActionGaugePlaquetteRotating::EnergyDirichlet(const class CFieldGaugeSU3* 
     _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
         m_fBetaOverN,
         m_fOmega * m_fOmega,
         _D_RealThreadBuffer);
@@ -2078,7 +1957,7 @@ void CActionGaugePlaquetteRotating::EnergyTorus(const class CFieldGaugeSU3* pGau
         _kernelAdd4PlaqutteTermSU3 << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             _D_RealThreadBuffer);

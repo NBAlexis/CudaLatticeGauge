@@ -92,7 +92,7 @@ public:
     /**
     * Call this after BakePlaquttes
     */
-    virtual UINT GetPlaqutteCount() const = 0;
+    virtual UINT GetPlaqutteCount(BYTE byFieldId) const = 0;
 
     /**
     * Because of Dirchlet boundary condition, 

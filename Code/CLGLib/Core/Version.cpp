@@ -11,6 +11,6 @@
 
 __BEGIN_NAMESPACE
 
-UINT CLGAPI appVersion() { return 13; }
+UINT CLGAPI appVersion() { return 14; }
 
 __END_NAMESPACE

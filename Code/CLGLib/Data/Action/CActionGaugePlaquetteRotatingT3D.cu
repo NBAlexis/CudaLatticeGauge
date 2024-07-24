@@ -862,7 +862,7 @@ DOUBLE CActionGaugePlaquetteRotatingT3D<deviceGauge, matrixN>::EnergySingleField
         _kernelAdd4PlaqutteTermT3D << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
             this->GetBetaOverN(),
             this->GetOmega() * this->GetOmega(),
             _D_RealThreadBuffer);

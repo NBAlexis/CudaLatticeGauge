@@ -228,13 +228,9 @@ CActionGaugePlaquetteGradient::CActionGaugePlaquetteGradient()
 {
 }
 
-#if !_CLG_DOUBLEFLOAT
 DOUBLE CActionGaugePlaquetteGradient::CalculatePlaqutteEnergyUseClover(const CFieldGaugeSU3* pGauge) const
-#else
-Real CActionGaugePlaquetteGradient::CalculatePlaqutteEnergyUseClover(const CFieldGaugeSU3* pGauge) const
-#endif
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
     //pGauge->FixBoundary();
     //pGauge->DebugPrintMe();
 
@@ -252,12 +248,12 @@ void CActionGaugePlaquetteGradient::CalculateForceAndStaple(const CFieldGaugeSU3
 {
     preparethread;
 
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId]);
 
     _kernelStapleAtSiteSU3CacheIndexGradient << <block, threads >> > (
         pGauge->m_byFieldId,
         pGauge->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[pGauge->m_byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         NULL,
@@ -276,7 +272,7 @@ void CActionGaugePlaquetteGradient::PrepareForHMCSingleField(const CFieldGauge* 
             return;
         }
 
-        assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+        assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGauge->m_byFieldId]);
         m_fLastEnergy = CalculatePlaqutteEnergyUseClover(pGaugeSU3);
     }
 }
@@ -328,15 +324,8 @@ void CActionGaugePlaquetteGradient::Initial(class CLatticeData* pOwner, const CP
 #endif
     m_uiPlaqutteCount = _HC_Volume * (_HC_Dir - 1) * (_HC_Dir - 2);
 
-#if !_CLG_DOUBLEFLOAT
     checkCudaErrors(cudaMalloc((void**)&m_pDeviceBetaArray, sizeof(DOUBLE) * _HC_Lz));
     checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(DOUBLE) * _HC_Lz, cudaMemcpyHostToDevice));
-#else
-    checkCudaErrors(cudaMalloc((void**)&m_pDeviceBetaArray, sizeof(Real) * _HC_Lz));
-    checkCudaErrors(cudaMemcpy(m_pDeviceBetaArray, m_fBetaArray.GetData(), sizeof(Real) * _HC_Lz, cudaMemcpyHostToDevice));
-#endif
-
-
 }
 
 void CActionGaugePlaquetteGradient::SetBetaList(const TArray<DOUBLE>& fBeta)

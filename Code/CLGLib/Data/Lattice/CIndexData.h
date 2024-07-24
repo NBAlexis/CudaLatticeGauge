@@ -38,8 +38,6 @@ public:
         : m_pSmallData(NULL)
         , m_byRegionTable(NULL)
         , m_pMappingTable(NULL)
-        , m_pPlaqutteCache(NULL)
-        , m_pStappleCache(NULL)
         , m_pEtaMu(NULL)
         , m_uiSiteXYZT(1)
         , m_uiSiteXYZ(1)
@@ -64,6 +62,9 @@ public:
         memset(m_pIndexPositionToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pIndexLinkToSIndex, 0, sizeof(SIndex*) * kMaxFieldCount);
 
+        memset(m_pPlaqutteCache, 0, sizeof(SIndex*) * kMaxFieldCount);
+        memset(m_pStappleCache, 0, sizeof(SIndex*) * kMaxFieldCount);
+
         memset(m_pGaugeMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
         memset(m_pMoveCache, 0, sizeof(SIndex*) * kMaxFieldCount);
 
@@ -78,15 +79,6 @@ public:
         checkCudaErrors(cudaFree(m_pMappingTable));
         checkCudaErrors(cudaFree(m_byRegionTable));
 
-        if (NULL != m_pPlaqutteCache)
-        {
-            checkCudaErrors(cudaFree(m_pPlaqutteCache));
-        }
-
-        if (NULL != m_pStappleCache)
-        {
-            checkCudaErrors(cudaFree(m_pStappleCache));
-        }
         cudaSafeFree(m_pEtaMu);
 
         for (BYTE i = 0; i < kMaxFieldCount; ++i)
@@ -96,6 +88,19 @@ public:
             //    checkCudaErrors(cudaFree(m_pBondInfoTable[i]));
             //    m_pBondInfoTable[i] = NULL;
             //}
+
+            if (NULL != m_pPlaqutteCache[i])
+            {
+                checkCudaErrors(cudaFree(m_pPlaqutteCache[i]));
+                m_pPlaqutteCache[i] = NULL;
+            }
+
+            if (NULL != m_pStappleCache[i])
+            {
+                checkCudaErrors(cudaFree(m_pStappleCache[i]));
+                m_pStappleCache[i] = NULL;
+            }
+
             if (NULL != m_pIndexPositionToSIndex[i])
             {
                 checkCudaErrors(cudaFree(m_pIndexPositionToSIndex[i]));
@@ -186,15 +191,15 @@ public:
         return NULL == m_byRegionTable ? 0 : m_byRegionTable[site.m_byReginId];
     }
 
-    static void DebugPlaqutteTable(const SSmallInt4& sSite);
+    static void DebugPlaqutteTable(const SSmallInt4& sSite, BYTE byFieldId);
 
-    static void DebugPlaqutteTable();
+    static void DebugPlaqutteTable(BYTE byFieldId);
 
     static void DebugEdgeMapping(BYTE byFieldId, const SSmallInt4& xyzt);
 
     static void DebugEdgeGlue(BYTE byFieldId, const SSmallInt4& xyzt);
 
-    static void DebugStapleTable();
+    static void DebugStapleTable(BYTE byFieldId);
 
     static void DebugLinkDirichletOrDagger(BYTE byFieldId);
 
@@ -221,10 +226,9 @@ public:
     SIndex** m_pDeviceIndexLinkToSIndex;
 
     //16*site
-    SIndex* m_pPlaqutteCache;
-
+    SIndex* m_pPlaqutteCache[kMaxFieldCount];
     //24*links
-    SIndex* m_pStappleCache;
+    SIndex* m_pStappleCache[kMaxFieldCount];
 
     SIndex* m_pGaugeMoveCache[kMaxFieldCount];
     SIndex* m_pMoveCache[kMaxFieldCount];

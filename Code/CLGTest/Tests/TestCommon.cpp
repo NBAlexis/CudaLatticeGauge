@@ -485,7 +485,7 @@ ___REGIST_TEST(TestBackgroundField, Tools, TestBackgroundField, PrintBackgroundF
 UINT TestPlaqutteTable(CParameters&)
 {
     //appGetLattice()->m_pIndexCache->DebugEdgeGlue(1, SSmallInt4(-1, -1, -1, -1));
-    appGetLattice()->m_pIndexCache->DebugStapleTable();
+    appGetLattice()->m_pIndexCache->DebugStapleTable(1);
     return 0;
 }
 

@@ -1149,7 +1149,7 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::EnergyDirichlet(const
     _kernelAdd4PlaqutteTermT << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
         m_fBetaOverN,
         m_fOmega * m_fOmega,
         matrixN,
@@ -1288,7 +1288,7 @@ void CActionGaugePlaquetteRotatingT<deviceGauge, matrixN>::EnergyTorus(const cla
         _kernelAdd4PlaqutteTermT << <block, threads >> > (
             pGaugeSU3->m_byFieldId,
             pGaugeSU3->m_pDeviceData,
-            appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+            appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
             m_fBetaOverN,
             m_fOmega * m_fOmega,
             matrixN,

@@ -517,7 +517,7 @@ void CMeasurePandChiralTalor::OnConfigurationAcceptedSingleField(const CFieldGau
     _kernelActionTalorOmegaSq << <block, threads >> > (
         pGaugeSU3->m_byFieldId,
         pGaugeSU3->m_pDeviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[pGaugeSU3->m_byFieldId],
         m_fBetaOverN,
         _D_RealThreadBuffer);
 

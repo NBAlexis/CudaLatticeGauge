@@ -410,10 +410,10 @@ template<typename deviceGauge, INT matrixN>
 void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateForceAndStaple(const deviceGauge* deviceData, BYTE byFieldId, deviceGauge* pForce, deviceGauge* pStaple, Real betaOverN)
 {
     preparethread;
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId]);
     _kernelStapleAtSiteGaugeCacheIndex << <block, threads >> > (
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStaple,
@@ -427,7 +427,7 @@ void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateOnlyStaple(const deviceGa
     preparethread;
     _kernelCalculateOnlyStapleGauge << <block, threads >> > (
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStaple);
@@ -436,12 +436,12 @@ void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateOnlyStaple(const deviceGa
 template<typename deviceGauge, INT matrixN>
 DOUBLE CFieldGaugeKernel<deviceGauge, matrixN>::CalculatePlaqutteEnergy(const deviceGauge* deviceData, BYTE byFieldId, DOUBLE betaOverN)
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId]);
 
     preparethread;
     _kernelPlaqutteEnergyGaugeCacheIndex << <block, threads >> > (
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
@@ -454,7 +454,6 @@ DOUBLE CFieldGaugeKernel<deviceGauge, matrixN>::CalculatePlaqutteEnergy(const de
 template<typename deviceGauge, INT matrixN>
 DOUBLE CFieldGaugeKernel<deviceGauge, matrixN>::CalculatePlaqutteEnergyUseClover(const deviceGauge* deviceData, BYTE byFieldId, DOUBLE betaOverN)
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
     //appGeneral(_T("const %f\n"), 3.0 * appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite);
     preparethread;
     _kernelPlaqutteEnergyGauge_UseClover << <block, threads >> > (
@@ -485,11 +484,11 @@ template<typename deviceGauge, INT matrixN>
 void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateForceAndStaple_D(const deviceGauge* deviceData, BYTE byFieldId, deviceGauge* pForce, deviceGauge* pStaple, Real betaOverN)
 {
     preparethread;
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId]);
     _kernelStapleAtSiteCacheIndexT_D << <block, threads >> > (
         byFieldId,
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStaple,
@@ -504,7 +503,7 @@ void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateOnlyStaple_D(const device
     _kernelCalculateOnlyStapleT_D << <block, threads >> > (
         byFieldId,
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pStappleCache,
+        appGetLattice()->m_pIndexCache->m_pStappleCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerLink,
         pStaple);
@@ -513,13 +512,13 @@ void CFieldGaugeKernel<deviceGauge, matrixN>::CalculateOnlyStaple_D(const device
 template<typename deviceGauge, INT matrixN>
 DOUBLE CFieldGaugeKernel<deviceGauge, matrixN>::CalculatePlaqutteEnergy_D(const deviceGauge* deviceData, BYTE byFieldId, DOUBLE betaOverN)
 {
-    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache);
+    assert(NULL != appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId]);
 
     preparethread;
     _kernelPlaqutteEnergyCacheIndexT_D << <block, threads >> > (
         byFieldId,
         deviceData,
-        appGetLattice()->m_pIndexCache->m_pPlaqutteCache,
+        appGetLattice()->m_pIndexCache->m_pPlaqutteCache[byFieldId],
         appGetLattice()->m_pIndexCache->m_uiPlaqutteLength,
         appGetLattice()->m_pIndexCache->m_uiPlaqutteCountPerSite,
         betaOverN,
