@@ -71,6 +71,7 @@ CCString CFileSystem::ReadAllText(const TCHAR* sFilename)
     }
     fseek(fp, 0, SEEK_END);
     const UINT fileSize = static_cast<UINT>(ftell(fp));
+    appParanoiac(_T("open file: %s, size = %d\n"), sFilename, fileSize);
     fseek(fp, 0, SEEK_SET);
     BYTE* file_data = (BYTE*)malloc(fileSize + sizeof(TCHAR));
 

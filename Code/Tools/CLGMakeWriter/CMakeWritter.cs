@@ -184,6 +184,8 @@ set_target_properties( CLGLib
 
             #endregion
 
+            sContent += "if (NOT DEFINED DEBUG)\n";
+
             #region Add Applications
 
             if (m_bHasWilsonDiracRotation)
@@ -215,18 +217,21 @@ set_target_properties( CLGLib
             sContent += AddApplication(excutables["BetaGradient"]);
             sContent += AddApplication(excutables["ElectricChemical"]);
 
-            #endregion
+            sContent += "endif()\n";
 
-            sContent = sContent.Replace("\r\n", "\n");
-            sContent = sContent.Replace("\n\r", "\n");
-            sContent = sContent.Replace("\r", "\n");
-            sContent = sContent.Replace("\\", "/");
+
+            #endregion
 
             sContent += "if (DEFINED DEBUG)\n";
             sContent += "  MESSAGE(\"Will output to Bin/UbuntuDebug\")\n";
             sContent += "else()\n";
             sContent += "  MESSAGE(\"Will output to Bin/Ubuntu\")\n";
             sContent += "endif()\n";
+
+            sContent = sContent.Replace("\r\n", "\n");
+            sContent = sContent.Replace("\n\r", "\n");
+            sContent = sContent.Replace("\r", "\n");
+            sContent = sContent.Replace("\\", "/");
 
             File.WriteAllText(sSolDir + "CMake/CMakeLists.txt", sContent);
 

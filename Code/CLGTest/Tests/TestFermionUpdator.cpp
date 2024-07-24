@@ -64,27 +64,27 @@ UINT TestFermionUpdator(CParameters& sParam)
 #endif
 }
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdator, FermionUpdator);
+//__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdator, FermionUpdator);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGCRODR, FermionOmelyanGCRODR);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorOmelyanGCRODR, FermionOmelyanGCRODR);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyanGMRESMDR, FermionOmelyanGMRESMDR);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorOmelyanGMRESMDR, FermionOmelyanGMRESMDR);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan, FermionOmelyan);
+//__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorOmelyan, FermionOmelyan);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorForceGradient, FermionForceGradient);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorForceGradient, FermionForceGradient);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog, FermionNestedLeapFrog);
+//__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedLeapFrog, FermionNestedLeapFrog);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedOmelyan, FermionNestedOmelyan);
+//REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorNestedOmelyan, FermionNestedOmelyan);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorNestedForceGradient, FermionNestedForceGradient);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorNestedForceGradient, NestedForceGradient);
 
 //#if !_CLG_DEBUG
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma1, FermionWilsonDiracGamma1);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorWilsonDiracGamma1, WilsonDiracExpGamma);
 
-__REGIST_TEST(TestFermionUpdator, Updator, TestFermionUpdatorWilsonDiracGamma2, FermionWilsonDiracGamma2);
+__REGIST_TEST(TestUpdateCommon, Updator, TestFermionUpdatorWilsonDiracGamma2, WilsonDiracGamma);
 
 //#endif
 

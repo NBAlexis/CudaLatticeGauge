@@ -403,6 +403,7 @@ add_executable(CLGTest
 
 target_compile_features(CLGTest PUBLIC cxx_std_14)
 target_link_libraries(CLGTest CLGLib)
+if (NOT DEFINED DEBUG)
 
 
 
@@ -490,6 +491,7 @@ add_executable(ElectricChemical
 target_compile_features(ElectricChemical PUBLIC cxx_std_14)
 target_link_libraries(ElectricChemical CLGLib)
 
+endif()
 if (DEFINED DEBUG)
   MESSAGE("Will output to Bin/UbuntuDebug")
 else()

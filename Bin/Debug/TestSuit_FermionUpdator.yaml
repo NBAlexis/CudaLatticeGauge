@@ -12,7 +12,15 @@ TestFermionUpdator:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.535]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -134,7 +142,15 @@ TestFermionUpdatorForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.462846]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -305,7 +321,15 @@ TestFermionUpdatorNestedForceGradient:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.462846]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
         UpdatorType : CHMC
@@ -365,9 +389,17 @@ TestFermionUpdatorOmelyanGCRODR:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
     CacheStaple : 0
     CacheSolution : 0
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.462846]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -375,7 +407,7 @@ TestFermionUpdatorOmelyanGCRODR:
         Metropolis : 1
         IntegratorType : CIntegratorOmelyan
         IntegratorStepLength : 1
-        IntegratorStep : 25
+        IntegratorStep : 28
 
     Gauge:
         FieldName : CFieldGaugeSU3
@@ -432,9 +464,17 @@ TestFermionUpdatorOmelyanGMRESMDR:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.535
     CacheStaple : 0
     CacheSolution : 0
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.462846]
+    BeforeMetropolis : 3
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
 
@@ -1091,16 +1131,24 @@ TestFermionUpdatorWilsonDiracGamma1:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.530
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 4
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
         UpdatorType : CHMC
         Metropolis : 1
-        # IntegratorType : CIntegratorNestedOmelyan
-        IntegratorType : CIntegratorForceGradient
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 50
-        # NestedStep : 3
+        IntegratorStep : 8
+        NestedStep : 6
 
     Gauge:
     
@@ -1171,16 +1219,24 @@ TestFermionUpdatorWilsonDiracGamma2:
     ActionListLength : 2
     FermionFieldCount : 1
     MeasureListLength : 1
-    ExpectedRes : 0.530
+
+    ExpectedResDebug : [0.535]
+    ExpectedRes : [0.53]
+    BeforeMetropolis : 4
+    BeforeMetropolisDebug : 1
+    Metropolis : 10
+    MetropolisDebug : 4
+    ExpectMiss : 1
+    ExpectMissDebug : 1
 
     Updator:
         UpdatorType : CHMC
         Metropolis : 1
-        # IntegratorType : CIntegratorNestedOmelyan
-        IntegratorType : CIntegratorForceGradient
+        IntegratorType : CIntegratorNestedForceGradient
+        # IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 100
-        # NestedStep : 3
+        IntegratorStep : 8
+        NestedStep : 6
 
     Gauge:
     

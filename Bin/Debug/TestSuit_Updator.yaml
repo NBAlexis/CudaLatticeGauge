@@ -274,11 +274,12 @@ TestUpdatorTreeImproved:
 
 
     Updator:
+
         UpdatorType : CHMC
         Metropolis : 1
         IntegratorType : CIntegratorForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 12
 
     Gauge:
     
