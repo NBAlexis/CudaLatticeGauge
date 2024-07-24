@@ -83,6 +83,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldSpin.h
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeKernel.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.h
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.h
@@ -223,8 +224,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryConditionProjectivePlaneSquare.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNKernel.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldCommonKernel.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.cu
-    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.cu
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeKernel.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3D.cu
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeSU3TreeImproved.cu
@@ -294,6 +294,7 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CAction.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionFermionKS.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Action/CActionPhi4.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Boundary/CBoundaryCondition.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVN.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Boson/CFieldBosonVNRotation.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/BoundaryField/CFieldBoundaryOne.cpp
@@ -301,6 +302,8 @@ add_library(CLGLib STATIC
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldBoson.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldFermion.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/CFieldGauge.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLink.cpp
+    ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Gauge/CFieldGaugeLinkDirichlet.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKST.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTD.cpp
     ${PROJECT_SOURCE_DIR}/CLGLib/Data/Field/Staggered/CFieldFermionKSTR.cpp

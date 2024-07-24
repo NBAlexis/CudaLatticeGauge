@@ -188,7 +188,7 @@ public:
 
     void Dagger() override
     {
-        CCommonKernelSite<deviceDataBoson>::Dagger(m_pDeviceData, m_byFieldId);
+        CCommonKernelField<deviceDataBoson>::Dagger(m_pDeviceData, m_uiSiteCount);
     }
 
     //This is Axpy(1.0f, x)
@@ -205,7 +205,7 @@ public:
             return;
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        CCommonKernelSite<deviceDataBoson>::AxpyPlus(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        CCommonKernelField<deviceDataBoson>::AxpyPlus(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
     void AxpyMinus(const CField* x) override
@@ -216,7 +216,7 @@ public:
             return;
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        CCommonKernelSite<deviceDataBoson>::AxpyMinus(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        CCommonKernelField<deviceDataBoson>::AxpyMinus(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
     void Axpy(Real a, const CField* x) override
@@ -227,7 +227,7 @@ public:
             return;
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        CCommonKernelSite<deviceDataBoson>::Axpy(m_pDeviceData, m_byFieldId, a, pField->m_pDeviceData);
+        CCommonKernelField<deviceDataBoson>::Axpy(m_pDeviceData, m_uiSiteCount, a, pField->m_pDeviceData);
     }
 
     void Axpy(const CLGComplex& a, const CField* x) override
@@ -238,7 +238,7 @@ public:
             return;
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        CCommonKernelSite<deviceDataBoson>::Axpy(m_pDeviceData, m_byFieldId, a, pField->m_pDeviceData);
+        CCommonKernelField<deviceDataBoson>::Axpy(m_pDeviceData, m_uiSiteCount, a, pField->m_pDeviceData);
     }
 
     void Mul(const CField* x, UBOOL bDagger = TRUE) override
@@ -249,17 +249,17 @@ public:
             return;
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        CCommonKernelSite<deviceDataBoson>::Mul(m_pDeviceData, m_byFieldId, pField->m_pDeviceData, bDagger);
+        CCommonKernelField<deviceDataBoson>::Mul(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData, bDagger);
     }
 
     void ScalarMultply(const CLGComplex& a) override
     {
-        CCommonKernelSite<deviceDataBoson>::ScalarMultply(m_pDeviceData, m_byFieldId, a);
+        CCommonKernelField<deviceDataBoson>::ScalarMultply(m_pDeviceData, m_uiSiteCount, a);
     }
 
     void ScalarMultply(Real a) override
     {
-        CCommonKernelSite<deviceDataBoson>::ScalarMultply(m_pDeviceData, m_byFieldId, a);
+        CCommonKernelField<deviceDataBoson>::ScalarMultply(m_pDeviceData, m_uiSiteCount, a);
     }
 
     cuDoubleComplex Dot(const CField* x) const override
@@ -270,12 +270,12 @@ public:
             return make_cuDoubleComplex(0.0, 0.0);
         }
         const CFieldBosonVN<deviceDataBoson, deviceDataGauge>* pField = dynamic_cast<const CFieldBosonVN<deviceDataBoson, deviceDataGauge>*>(x);
-        return CCommonKernelSite<deviceDataBoson>::Dot(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        return CCommonKernelField<deviceDataBoson>::Dot(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
     TArray<DOUBLE> Sum() const override
     {
-        return CCommonKernelSite<deviceDataBoson>::Sum(m_pDeviceData, m_byFieldId);
+        return CCommonKernelField<deviceDataBoson>::Sum(m_pDeviceData, m_uiSiteCount);
     }
 
     BYTE* CopyDataOut(UINT& uiSize) const override

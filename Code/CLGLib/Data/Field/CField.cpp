@@ -88,10 +88,11 @@ void CField::UpdatePooledParamters() const
 }
 
 CFieldFermion::CFieldFermion()
-: CField()
+    : CField()
+    , m_uiSiteCount(_HC_Volume)
 {
-    m_uiLinkeCount = _HC_Volume * _HC_Dir;
-    m_uiSiteCount = _HC_Volume;
+    //m_uiLinkeCount = _HC_Volume * _HC_Dir;
+    //m_uiSiteCount = _HC_Volume;
 }
 
 CFieldMatrixOperation* CFieldMatrixOperation::Create(EFieldType ef)

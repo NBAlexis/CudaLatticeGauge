@@ -614,7 +614,7 @@ TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
 }
 
 /**
-* The buffer size is NOT thread count of a block, but thread count of a grid
+* The buffer size is HC_Volume
 */
 void CCudaHelper::AllocateTemeraryBuffers(UINT uiThreadCount)
 {

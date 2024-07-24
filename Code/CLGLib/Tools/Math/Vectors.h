@@ -271,6 +271,16 @@ extern "C" {
             return _cuCaddf(m_ve[0], m_ve[1]);
         }
 
+        __device__ __inline__ void Norm()
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                len = __rcp(_sqrt(len));
+                MulReal(len);
+            }
+        }
+
         CLGComplex m_ve[2];
     };
 
@@ -546,6 +556,16 @@ extern "C" {
         __device__ __inline__ CLGComplex Sum() const
         {
             return _cuCaddf(m_ve[0], _cuCaddf(m_ve[1], m_ve[2]));
+        }
+
+        __device__ __inline__ void Norm()
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                len = __rcp(_sqrt(len));
+                MulReal(len);
+            }
         }
 
         CLGComplex m_ve[3];
@@ -837,6 +857,7 @@ extern "C" {
         __device__ __inline__ deviceWilsonVectorSU3 SubVectorC(const deviceSU3Vector& other) const { deviceWilsonVectorSU3 ret(*this); ret.SubVector(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 SubC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Sub(other); return ret; }
 
+        __device__ __inline__ deviceWilsonVectorSU3 MulC(const deviceWilsonVectorSU3& other) const { deviceWilsonVectorSU3 ret(*this); ret.Mul(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulRealC(Real other) const { deviceWilsonVectorSU3 ret(*this); ret.MulReal(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulCompC(const CLGComplex& other) const { deviceWilsonVectorSU3 ret(*this); ret.MulComp(other); return ret; }
         __device__ __inline__ deviceWilsonVectorSU3 MulZ4C(BYTE z4) const { deviceWilsonVectorSU3 ret(*this); ret.MulZ4(z4); return ret; }
@@ -844,6 +865,16 @@ extern "C" {
         __device__ __inline__ CLGComplex Sum() const
         {
             return _cuCaddf(_cuCaddf(m_d[0].Sum(), m_d[1].Sum()), _cuCaddf(m_d[2].Sum(), m_d[3].Sum()));
+        }
+
+        __device__ __inline__ void Norm()
+        {
+            Real len = ConjugateDotC(*this).x;
+            if (len > _CLG_FLT_MIN_)
+            {
+                len = __rcp(_sqrt(len));
+                MulReal(len);
+        }
         }
 
         union

@@ -230,7 +230,7 @@ TestBosonSU4:
     ##Important, do not calculate energy using staple for Dirichlet
     CacheStaple : 0 
 
-    SkipThermalDebug : 0
+    SkipThermalDebug : 1
     BeforeMetropolis : 5
     BeforeMetropolisDebug : 2
     Metropolis : 10

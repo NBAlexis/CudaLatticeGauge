@@ -320,7 +320,7 @@ protected:
 
 #pragma endregion
 
-    UINT m_uiLinkeCount;
+    //UINT m_uiLinkeCount;
     UINT m_uiSiteCount;
 };
 

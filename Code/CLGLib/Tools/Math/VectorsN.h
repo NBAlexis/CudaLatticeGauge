@@ -332,6 +332,16 @@ public:
         return res;
     }
 
+    __device__ __inline__ void Norm()
+    {
+        Real len = ConjugateDotC(*this).x;
+        if (len > _CLG_FLT_MIN_)
+        {
+            len = __rcp(_sqrt(len));
+            MulReal(len);
+        }
+    }
+
     CLGComplex m_ve[NofE];
 };
 

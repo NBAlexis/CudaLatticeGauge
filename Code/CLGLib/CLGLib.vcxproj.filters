@@ -578,6 +578,9 @@
     <ClInclude Include="Data\Field\Staggered\CFieldFermionKSTKernel.h">
       <Filter>Data\Field\Staggered</Filter>
     </ClInclude>
+    <ClInclude Include="Data\Field\Gauge\CFieldGaugeKernel.h">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tools\Tracer.cpp">
@@ -727,6 +730,12 @@
     </ClCompile>
     <ClCompile Include="Data\Boundary\CBoundaryCondition.cpp">
       <Filter>Data\Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\Gauge\CFieldGaugeLink.cpp">
+      <Filter>Data\Field\Gauge</Filter>
+    </ClCompile>
+    <ClCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cpp">
+      <Filter>Data\Field\Gauge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -946,12 +955,6 @@
     <CudaCompile Include="Measurement\CMeasurePolyakovSUN.cu">
       <Filter>Measurement</Filter>
     </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLink.cu">
-      <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeLinkDirichlet.cu">
-      <Filter>Data\Field\Gauge</Filter>
-    </CudaCompile>
     <CudaCompile Include="Data\Action\CActionGaugePlaquetteRotatingT.cu">
       <Filter>Data\Action</Filter>
     </CudaCompile>
@@ -966,6 +969,9 @@
     </CudaCompile>
     <CudaCompile Include="Data\Field\Staggered\CFieldFermionKSTKernel.cu">
       <Filter>Data\Field\Staggered</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Data\Field\Gauge\CFieldGaugeKernel.cu">
+      <Filter>Data\Field\Gauge</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>

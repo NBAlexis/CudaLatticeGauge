@@ -96,28 +96,162 @@ template<typename T>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialCommon(T* pDevicePtr, UINT count, EFieldInitialType eInitialType)
 {
-    const UINT idx = (threadIdx.x + blockIdx.x * blockDim.x);
-    if (idx < count)
-    {
-        switch (eInitialType)
+    __simplekernel(
+        const UINT idx = (threadIdx.x + blockIdx.x * blockDim.x);
+        if (idx < count)
         {
-        case EFIT_Zero:
+            switch (eInitialType)
+            {
+            case EFIT_Zero:
+            {
+                pDevicePtr[idx] = _makeZero<T>();
+            }
+            break;
+            case EFIT_Identity:
+            {
+                pDevicePtr[idx] = _makeId<T>();
+            }
+            break;
+            default:
+            {
+                printf("Field cannot be initialized with this type! %d\n", eInitialType);
+            }
+            break;
+            }
+        }
+    )
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAdd(T* pMe, const T* __restrict__ pOther, UINT count)
+{
+    __simplekernel(_add(pMe[idx], pOther[idx]))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelSub(T* pMe, const T* __restrict__ pOther, UINT count)
+{
+    __simplekernel(_sub(pMe[idx], pOther[idx]))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelMul(T* pMe, const T* __restrict__ pOther, UBOOL bConj, UINT count)
+{
+    __simplekernel(
+        if (bConj)
         {
-            pDevicePtr[idx] = _makeZero<T>();
+            _dagger(pMe[idx]);
         }
-        break;
-        case EFIT_Identity:
+        _mul(pMe[idx], pOther[idx]);
+    )
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpy(T* pMe, const T* __restrict__ pOther, CLGComplex a, UINT count)
+{
+    __simplekernel(_add(pMe[idx], _mulC(pOther[idx], a)))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelAxpyReal(T* pMe, const T* __restrict__ pOther, Real a, UINT count)
+{
+    __simplekernel(_add(pMe[idx], _mulC(pOther[idx], a)))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDot(const T* __restrict__ pMe, const T* __restrict__ pOther, cuDoubleComplex* result, UINT count)
+{
+    __simplekernel(result[idx] = _cToDouble(_dot(pMe[idx], pOther[idx])))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelDotDir(const T* __restrict__ pMe, const T* __restrict__ pOther, cuDoubleComplex* result, UINT count)
+{
+    __simplekernel(
+        const UINT uiDir = _DC_Dir;
+        result[idx] = _cToDouble(_dot(pMe[idx * uiDir], pOther[idx * uiDir]));
+        for (UINT idir = 1; idir < uiDir; ++idir)
         {
-            pDevicePtr[idx] = _makeId<T>();
+            result[idx] = cuCadd(result[idx], _cToDouble(_dot(pMe[idx * uiDir + idir], pOther[idx * uiDir + idir])));
         }
-        break;
-        default:
+    )
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelLengthSq(const T* __restrict__ pMe, DOUBLE* result, UINT count)
+{
+    __simplekernel(result[idx] = static_cast<DOUBLE>(_lensq(pMe[idx])))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelLengthSqDir(const T* __restrict__ pMe, DOUBLE* result, UINT count)
+{
+    __simplekernel(
+        const UINT uiDir = _DC_Dir;
+        result[idx] = static_cast<DOUBLE>(_lensq(pMe[idx * uiDir]));
+        for (UINT idir = 1; idir < uiDir; ++idir)
         {
-            printf("Field cannot be initialized with this type! %d\n", eInitialType);
+            result[idx] += static_cast<DOUBLE>(_lensq(pMe[idx * uiDir + idir]));
         }
-        break;
+    )
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelElement(const T* __restrict__ pMe, UINT elementidx, DOUBLE* result, UINT count)
+{
+    __simplekernel(result[idx] = static_cast<DOUBLE>(_element(pMe[idx], elementidx)))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelElementDir(const T* __restrict__ pMe, UINT elementidx, DOUBLE* result, UINT count)
+{
+    __simplekernel(
+        const UINT uiDir = _DC_Dir;
+        result[idx] = static_cast<DOUBLE>(_element(pMe[idx * uiDir], elementidx));
+        for (UINT idir = 1; idir < uiDir; ++idir)
+        {
+            result[idx] += static_cast<DOUBLE>(_element(pMe[idx * uiDir + idir], elementidx));
         }
-    }
+    )
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiply(T* pMe, CLGComplex a, UINT count)
+{
+    __simplekernel(_mul(pMe[idx], a))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelScalarMultiplyReal(T* pMe, Real a, UINT count)
+{
+    __simplekernel(_mul(pMe[idx], a))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelConjugate(T* pDeviceData, UINT count)
+{
+    __simplekernel(_dagger(pDeviceData[idx]))
+}
+
+template<typename T>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelNorm(T* pDeviceData, UINT count)
+{
+    __simplekernel(_norm(pDeviceData[idx]))
 }
 
 #pragma endregion
@@ -204,6 +338,139 @@ void CCommonKernelField<T>::InitialWithByte(T* pointer, UINT count, const BYTE* 
     }
     checkCudaErrors(cudaMemcpy(pointer, readData, sizeof(T) * count, cudaMemcpyHostToDevice));
     free(readData);
+}
+
+template<typename T>
+void CCommonKernelField<T>::Dagger(T* dest, UINT count)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelConjugate << <block, thread >> > (dest, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::AxpyPlus(T* dest, UINT count, const T* x)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelAdd << <block, thread >> > (dest, x, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::AxpyMinus(T* dest, UINT count, const T* x)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelSub << <block, thread >> > (dest, x, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::Axpy(T* dest, UINT count, Real a, const T* x)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelAxpyReal << <block, thread >> > (dest, x, a, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::Axpy(T* dest, UINT count, const CLGComplex& a, const T* x)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelAxpy << <block, thread >> > (dest, x, a, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::Mul(T* dest, UINT count, const T* x, UBOOL bDagger)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelMul << <block, thread >> > (dest, x, bDagger, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::ScalarMultply(T* dest, UINT count, const CLGComplex& a)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelScalarMultiply << <block, thread >> > (dest, a, count);
+}
+
+template<typename T>
+void CCommonKernelField<T>::ScalarMultply(T* dest, UINT count, Real a)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelScalarMultiplyReal << <block, thread >> > (dest, a, count);
+}
+
+template<typename T>
+cuDoubleComplex CCommonKernelField<T>::Dot(const T* me, UINT count, const T* other)
+{
+    if (count == _HC_Volume)
+    {
+        __SIMPLEDECOMPOSE(count);
+        _kernelDot << <block, thread >> > (me, other, _D_ComplexThreadBuffer, count);
+        return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+    }
+    else if (count == _HC_Volume * _HC_Dir)
+    {
+        count = count / _HC_Dir;
+        __SIMPLEDECOMPOSE(count);
+        _kernelDotDir << <block, thread >> > (me, other, _D_ComplexThreadBuffer, count);
+        return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+    }
+    appCrucial(_T("not supported!\n"));
+    return make_cuDoubleComplex(0.0, 0.0);
+}
+
+template<typename T>
+DOUBLE CCommonKernelField<T>::LengthSq(const T* me, UINT count)
+{
+    if (count == _HC_Volume)
+    {
+        __SIMPLEDECOMPOSE(count);
+        _kernelLengthSq << <block, thread >> > (me, _D_RealThreadBuffer, count);
+        return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    }
+    else if (count == _HC_Volume * _HC_Dir)
+    {
+        count = count / _HC_Dir;
+        __SIMPLEDECOMPOSE(count);
+        _kernelLengthSqDir << <block, thread >> > (me, _D_RealThreadBuffer, count);
+        return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
+    }
+    appCrucial(_T("not supported!\n"));
+    return 0.0;
+}
+
+template<typename T>
+TArray<DOUBLE> CCommonKernelField<T>::Sum(const T* me, UINT count)
+{
+    if (count == _HC_Volume)
+    {
+        __SIMPLEDECOMPOSE(count);
+        TArray<DOUBLE> ret;
+        for (UINT i = 0; i < _elementdim<T>(); ++i)
+        {
+            _kernelElement << <block, thread >> > (me, i, _D_RealThreadBuffer, count);
+            ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
+        }
+        return ret;
+    }
+    else if (count == _HC_Volume * _HC_Dir)
+    {
+        count = count / _HC_Dir;
+        __SIMPLEDECOMPOSE(count);
+        TArray<DOUBLE> ret;
+        for (UINT i = 0; i < _elementdim<T>(); ++i)
+        {
+            _kernelElementDir << <block, thread >> > (me, i, _D_RealThreadBuffer, count);
+            ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
+        }
+        return ret;
+    }
+    appCrucial(_T("not supported!\n"));
+    return TArray<DOUBLE>();
+}
+
+template<typename T>
+void CCommonKernelField<T>::Norm(T* dest, UINT count)
+{
+    __SIMPLEDECOMPOSE(count);
+    _kernelNorm << <block, thread >> > (dest, count);
 }
 
 template class CCommonKernelField<CLGComplex>;
@@ -307,98 +574,6 @@ _kernelInitialSite(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
 
 template<typename T>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelAddSite(T* pMe, const T* __restrict__ pOther)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelSubSite(T* pMe, const T* __restrict__ pOther)
-{
-    intokernal;
-    _sub(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMulSite(T* pMe, const T* __restrict__ pOther)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpySite(T* pMe, const T* __restrict__ pOther, CLGComplex a)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], _mulC(pOther[uiSiteIndex], a));
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMulComplexSite(T* pMe, const T* __restrict__ pOther, UBOOL bConj)
-{
-    intokernal;
-    if (bConj)
-    {
-        _dagger(pMe[uiSiteIndex]);
-    }
-    _mul(pMe[uiSiteIndex], pOther[uiSiteIndex]);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyRealSite(T* pMe, const T* __restrict__ pOther, Real a)
-{
-    intokernal;
-    _add(pMe[uiSiteIndex], _mulC(pOther[uiSiteIndex], a));
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelDotSite(const T* __restrict__ pMe, const T* __restrict__ pOther, cuDoubleComplex* result)
-{
-    intokernal;
-    result[uiSiteIndex] = _cToDouble(_dot(pMe[uiSiteIndex], pOther[uiSiteIndex]));
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelElementSite(const T* __restrict__ pMe, UINT idx, DOUBLE* result)
-{
-    intokernal;
-    result[uiSiteIndex] = static_cast<DOUBLE>(_element(pMe[uiSiteIndex], idx));
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplySite(T* pMe, CLGComplex a)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], a);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplyRealSite(T* pMe, Real a)
-{
-    intokernal;
-    _mul(pMe[uiSiteIndex], a);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelConjugateSite(T* pDeviceData)
-{
-    intokernal;
-    _dagger(pDeviceData[uiSiteIndex]);
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
 _kernelFixBoundarySite(T* pDeviceData, BYTE byFieldId)
 {
     intokernalInt4;
@@ -472,88 +647,10 @@ void CCommonKernelSite<T>::InitialBuffer(T* dest, BYTE byFieldId, EFieldInitialT
 }
 
 template<typename T>
-void CCommonKernelSite<T>::Dagger(T* dest, BYTE byFieldId)
-{
-    preparethread;
-    _kernelConjugateSite << <block, threads >> > (dest);
-}
-
-template<typename T>
 void CCommonKernelSite<T>::FixBoundary(T* dest, BYTE byFieldId)
 {
     preparethread;
     _kernelFixBoundarySite << <block, threads >> > (dest, byFieldId);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::AxpyPlus(T* dest, BYTE byFieldId, const T* x)
-{
-    preparethread;
-    _kernelAddSite << <block, threads >> > (dest, x);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::AxpyMinus(T* dest, BYTE byFieldId, const T* x)
-{
-    preparethread;
-    _kernelSubSite << <block, threads >> > (dest, x);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::Axpy(T* dest, BYTE byFieldId, Real a, const T* x)
-{
-    preparethread;
-    _kernelAxpyRealSite << <block, threads >> > (dest, x, a);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::Axpy(T* dest, BYTE byFieldId, const CLGComplex& a, const T* x)
-{
-    preparethread;
-    _kernelAxpySite << <block, threads >> > (dest, x, a);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::Mul(T* dest, BYTE byFieldId, const T* x, UBOOL bDagger)
-{
-    preparethread;
-    _kernelMulComplexSite << <block, threads >> > (dest, x, bDagger);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::ScalarMultply(T* dest, BYTE byFieldId, const CLGComplex& a)
-{
-    preparethread;
-    _kernelScalarMultiplySite << <block, threads >> > (dest, a);
-}
-
-template<typename T>
-void CCommonKernelSite<T>::ScalarMultply(T* dest, BYTE byFieldId, Real a)
-{
-    preparethread;
-    _kernelScalarMultiplyRealSite << <block, threads >> > (dest, a);
-}
-
-template<typename T>
-cuDoubleComplex CCommonKernelSite<T>::Dot(const T* me, BYTE byFieldId, const T* other)
-{
-    preparethread;
-    _kernelDotSite << <block, threads >> > (me, other, _D_ComplexThreadBuffer);
-
-    return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
-}
-
-template<typename T>
-TArray<DOUBLE> CCommonKernelSite<T>::Sum(const T* me, BYTE byFieldId)
-{
-    preparethread;
-    TArray<DOUBLE> ret;
-    for (UINT i = 0; i < _elementdim<T>(); ++i)
-    {
-        _kernelElementSite << <block, threads >> > (me, i, _D_RealThreadBuffer);
-        ret.AddItem(appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer));
-    }
-    return ret;
 }
 
 template<typename T>
@@ -630,8 +727,8 @@ template<typename T>
 __global__ void _CLG_LAUNCH_BOUND
 _kernelInitialLink(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType)
 {
-    T id = _makeId<T>();
-    T zero = _makeZero<T>();
+    const T id = _makeId<T>();
+    const T zero = _makeZero<T>();
 
     intokernalInt4;
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
@@ -663,7 +760,7 @@ _kernelInitialLink(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
                     const T* buffer = ((CFieldBoundary<T>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData;
                     pDevicePtr[uiSiteIndex] = buffer[uiRegion * uiDir + idir];
                 }
-                pDevicePtr[uiSiteIndex] = _makeZero<T>();
+                pDevicePtr[uiSiteIndex] = id;
                 continue;
             }
             pDevicePtr[uiLinkIndex] = _makeRandom<T>(_deviceGetFatIndex(uiSiteIndex, idir + 1));
@@ -673,13 +770,7 @@ _kernelInitialLink(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
         {
             if (__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
             {
-                if (NULL != __boundaryFieldPointers[byFieldId])
-                {
-                    UINT uiRegion = __idx->_devcieExchangeBoundaryFieldSiteIndexBI(byFieldId, uiBigIdx);
-                    const T* buffer = ((CFieldBoundary<T>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData;
-                    pDevicePtr[uiSiteIndex] = buffer[uiRegion * uiDir + idir];
-                }
-                pDevicePtr[uiSiteIndex] = _makeId<T>();
+                pDevicePtr[uiSiteIndex] = zero;
                 continue;
             }
             pDevicePtr[uiLinkIndex] = _makeGaussian<T>(_deviceGetFatIndex(uiSiteIndex, idir + 1));
@@ -701,107 +792,15 @@ _kernelInitialLink(T* pDevicePtr, BYTE byFieldId, EFieldInitialType eInitialType
 
 template<typename T>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelDaggerLink(T* pDevicePtr)
-{
-    gaugeLinkKernelFuncionStart
-
-        _dagger(pDevicePtr[uiLinkIndex]);
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyLink(T* pDevicePtr, const T* __restrict__ x, CLGComplex a)
-{
-    gaugeLinkKernelFuncionStart
-
-        _add(pDevicePtr[uiLinkIndex], _mulC(x[uiLinkIndex], a));
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelMulLink(T* pDevicePtr, const T* __restrict__ x, UBOOL bDagger)
-{
-    gaugeLinkKernelFuncionStart
-
-        if (bDagger)
-        {
-            _dagmul(pDevicePtr[uiLinkIndex], x[uiLinkIndex]);
-        }
-        else
-        {
-            _mul(pDevicePtr[uiLinkIndex], x[uiLinkIndex]);
-        }
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyLinkReal(T* pDevicePtr, const T* __restrict__ x, Real a)
-{
-    gaugeLinkKernelFuncionStart
-
-        _add(pDevicePtr[uiLinkIndex], _mulC(x[uiLinkIndex], a));
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyPlusLink(T* pDevicePtr, const T* __restrict__ x)
-{
-    gaugeLinkKernelFuncionStart
-
-        _add(pDevicePtr[uiLinkIndex], x[uiLinkIndex]);
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelAxpyMinusLink(T* pDevicePtr, const T* __restrict__ x)
-{
-    gaugeLinkKernelFuncionStart
-
-        _sub(pDevicePtr[uiLinkIndex], x[uiLinkIndex]);
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplyLinkComplex(T* pDevicePtr, CLGComplex a)
-{
-    gaugeLinkKernelFuncionStart
-
-        _mul(pDevicePtr[uiLinkIndex], a);
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelScalarMultiplyLinkReal(T* pDevicePtr, Real a)
-{
-    gaugeLinkKernelFuncionStart
-
-        _mul(pDevicePtr[uiLinkIndex], a);
-
-    gaugeLinkKernelFuncionEnd
-}
-
-template<typename T>
-__global__ void _CLG_LAUNCH_BOUND
-_kernelFixBoundaryLink(T* pDeviceData, BYTE byFieldId)
+_kernelFixBoundaryLink(T* pDeviceData, BYTE byFieldId, UBOOL bId)
 {
     intokernalInt4;
 
     const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
     const UINT uiDir = _DC_Dir;
+
+    const T id = _makeId<T>();
+    const T zero = _makeZero<T>();
 
     for (UINT idir = 0; idir < uiDir; ++idir)
     {
@@ -813,7 +812,7 @@ _kernelFixBoundaryLink(T* pDeviceData, BYTE byFieldId)
                 const T* buffer = ((CFieldBoundary<T>*)__boundaryFieldPointers[byFieldId])->m_pDeviceData;
                 pDeviceData[uiSiteIndex] = buffer[uiRegion * uiDir + idir];
             }
-            pDeviceData[uiSiteIndex] = _makeZero<T>();
+            pDeviceData[uiSiteIndex] = bId ? id : zero;
             return;
         }
 
@@ -822,23 +821,276 @@ _kernelFixBoundaryLink(T* pDeviceData, BYTE byFieldId)
 
 template<typename deviceGauge>
 __global__ void _CLG_LAUNCH_BOUND
-_kernelDotLink(
-    const deviceGauge* __restrict__ pMyDeviceData,
-    const deviceGauge* __restrict__ pOtherDeviceData,
-    cuDoubleComplex* result
-)
+_kernelStrictExp(deviceGauge* pDeviceData, BYTE byFieldId)
 {
-    intokernaldir;
-    cuDoubleComplex resThisThread = make_cuDoubleComplex(0, 0);
-    for (UINT idir = 0; idir < uiDir; ++idir)
+    __gaugeKernel(pDeviceData[uiLinkIndex] = _strictexp(pDeviceData[uiLinkIndex]))
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelStrictLog(deviceGauge* pDeviceData, BYTE byFieldId)
+{
+    __gaugeKernel(pDeviceData[uiLinkIndex] = _strictlog(pDeviceData[uiLinkIndex]))
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelQuickExp(deviceGauge* pDeviceData, BYTE byFieldId)
+{
+    __gaugeKernel(_expreal(pDeviceData[uiLinkIndex], F(1.0)))
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelQuickLog(deviceGauge* pDeviceData, BYTE byFieldId)
+{
+    __gaugeKernel(_ta(pDeviceData[uiLinkIndex]))
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelOneDirId(deviceGauge* pDeviceData, BYTE byFieldId, BYTE byDir)
+{
+    __gaugeKernel(
+        if (0 != ((1 << idir) & byDir))
+        {
+            pDeviceData[uiLinkIndex] = _makeId<deviceGauge>();
+        }
+    )
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelOneDirZero(deviceGauge* pDeviceData, BYTE byFieldId, BYTE byDir)
+{
+    __gaugeKernel(
+        if (0 != ((1 << idir) & byDir))
+        {
+            pDeviceData[uiLinkIndex] = _makeZero<deviceGauge>();
+        }
+    )
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelExp(deviceGauge* pTarget, const deviceGauge* __restrict__ pSource, BYTE byFieldId, Real a)
+{
+    __gaugeKernel(
+        deviceGauge expP = _expreal(pSource[uiLinkIndex], a);
+        _mul(expP, pTarget[uiLinkIndex]);
+        pTarget[uiLinkIndex] = expP;
+    )
+}
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelPolyakovLoopOfSite(
+    const deviceGauge* __restrict__ pDeviceBuffer,
+    cuDoubleComplex* res,
+    BYTE byFieldId)
+{
+    UINT uiXYZ = (threadIdx.x + blockIdx.x * blockDim.x) * _DC_Lz + (threadIdx.y + blockIdx.y * blockDim.y);
+    const UINT uiSiteIndex = uiXYZ * _DC_Lt;
+    UINT uiLinkIdx = _deviceGetLinkIndex(uiSiteIndex, _DC_Dir - 1);
+    SSmallInt4 site4 = __deviceSiteIndexToInt4(uiSiteIndex);
+    UINT uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+    deviceGauge tmp = _makeZero<deviceGauge>();
+    if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
     {
-        UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
-        resThisThread = cuCadd(resThisThread,
-            _cToDouble(_tr(_dagmulC(pMyDeviceData[linkIndex], pOtherDeviceData[linkIndex])))
-        );
+        tmp = pDeviceBuffer[uiLinkIdx];
     }
 
-    result[uiSiteIndex] = resThisThread;
+    for (UINT uiT = 1; uiT < _DC_Lt; ++uiT)
+    {
+        UINT newSiteIndex = uiSiteIndex + uiT;
+        uiLinkIdx = _deviceGetLinkIndex(newSiteIndex, _DC_Dir - 1);
+        site4 = __deviceSiteIndexToInt4(newSiteIndex);
+        uiBigIdx = __idx->_deviceGetBigIndex(site4);
+
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, _DC_Dir - 1))
+        {
+            _mul(tmp, pDeviceBuffer[uiLinkIdx]);
+        }
+    }
+
+    res[uiXYZ] = _cToDouble(_tr(tmp));
+}
+
+/**
+ * E_mu = F_{0 mu}
+ */
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelTransformToE(
+    BYTE byFieldId,
+    const deviceGauge* __restrict__ pDeviceData,
+    deviceGauge* pRes)
+{
+    intokernalInt4;
+    const BYTE uiDir = static_cast<BYTE>(_DC_Dir);
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    //we only need uiDir = 0,1,2
+    for (BYTE dir = 0; dir < uiDir; ++dir)
+    {
+        deviceGauge res = _makeZero<deviceGauge>();
+        const UINT uiLinkIndex = _deviceGetLinkIndex(uiSiteIndex, dir);
+        if (dir < uiDir - 1)
+        {
+            //find clover F
+            res = _device1PlaqutteTermPPT(pDeviceData, 3, dir, uiBigIdx, sSite4, byFieldId);
+            _ta(res);
+            _mul(res, F(-1.0));
+        }
+
+        pRes[uiLinkIndex] = res;
+    }
+}
+
+/**
+ * This is wrong! the order of the plaqutte must be considered
+ * This is to make sure gauge transform is g(x) nabla E g^+(n)
+ */
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateNablaE(
+    const deviceGauge* __restrict__ pDeviceData,
+    BYTE byFieldId, deviceGauge* pRes)
+{
+    intokernalInt4;
+
+    //i=0: 12
+    //  1: 13
+    //  2: 14
+    //  3: 23
+    //  4: 24
+    //  5: 34  
+
+    UINT uiResLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+
+    pRes[uiResLinkIdx] = _makeZero<deviceGauge>();
+    #pragma unroll
+    for (BYTE dir = 0; dir < 3; ++dir)
+    {
+        //we need 2, 4 and 5
+        //BYTE byPlaqIdx = (dir + 1) << 1;
+        //if (byPlaqIdx > 5) byPlaqIdx = 5;
+
+        INT dirs[4];
+        //deviceGauge toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+        dirs[0] = 4;
+        dirs[1] = dir + 1;
+        dirs[2] = -4;
+        dirs[3] = -static_cast<INT>(dir) - 1;
+        deviceGauge toMul(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLinkT(pDeviceData, sSite4, 4, byFieldId, dirs)
+        );
+
+        //
+        dirs[0] = 4;
+        dirs[1] = -static_cast<INT>(dir) - 1;
+        dirs[2] = -4;
+        dirs[3] = dir + 1;
+
+        _mul(toMul,
+            _deviceLinkT(pDeviceData, sSite4, 4, byFieldId, dirs)
+        );
+        //toMul.Ta();
+        _sub(pRes[uiResLinkIdx], toMul);
+    }
+    _ta(pRes[uiResLinkIdx]);
+    //pRes[uiResLinkIdx].SubReal(F(3.0));
+}
+
+/**
+ * Larger than the above
+ */
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateNablaENaive(
+    const deviceGauge* __restrict__ pDeviceData,
+    BYTE byFieldId, deviceGauge* pRes)
+{
+    intokernalInt4;
+    //const BYTE uiDir2 = static_cast<BYTE>(_DC_Dir) * 2;
+    //const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+
+    //i=0: 12
+    //  1: 13
+    //  2: 14
+    //  3: 23
+    //  4: 24
+    //  5: 34  
+
+    UINT uiResLinkIdx = _deviceGetLinkIndex(uiSiteIndex, 3);
+
+    pRes[uiResLinkIdx] = _makeZero<deviceGauge>();
+    #pragma unroll
+    for (BYTE dir = 0; dir < 3; ++dir)
+    {
+        //we need 2, 4 and 5
+        //BYTE byPlaqIdx = (dir + 1) << 1;
+        //if (byPlaqIdx > 5) byPlaqIdx = 5;
+
+        INT dirs[4];
+        //deviceGauge toMul(_devicePlaqutte(pDeviceData, pCachedPlaqutte, uiSiteIndex, byPlaqIdx, plaqLength, plaqCount));
+        dirs[0] = 4;
+        dirs[1] = dir + 1;
+        dirs[2] = -4;
+        dirs[3] = -static_cast<INT>(dir) - 1;
+
+        deviceGauge a(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLinkT(pDeviceData, sSite4, 4, byFieldId, dirs)
+            //_deviceClover(pDeviceData, sSite4, __bi(sSite4), 3, dir, byFieldId)
+        );
+
+        dirs[0] = -static_cast<INT>(dir) - 1;
+        dirs[1] = 4;
+        dirs[2] = dir + 1;
+        dirs[3] = -4;
+
+        deviceGauge b(
+            //_device1PlaqutteTermPP(pDeviceData, 3, dir, uiBigIdx)
+            _deviceLinkT(pDeviceData, sSite4, 4, byFieldId, dirs)
+            //_deviceClover(pDeviceData, sSite4_m_mu, __bi(sSite4_m_mu), 3, dir, byFieldId)
+        );
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_mu_m_t, 4, byFieldId, dirs));
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_2mu, 4, byFieldId, dirs));
+        //b.Add(_deviceLink(pDeviceData, sSite4_m_2mu_m_t, 4, byFieldId, dirs));
+
+        //b.Ta();
+        _sub(a, b);
+        _sub(pRes[uiResLinkIdx], a);
+    }
+}
+
+
+template<typename deviceGauge>
+__global__ void _CLG_LAUNCH_BOUND
+_kernelCalculateKinematicEnergyT_D(
+    BYTE byFieldId,
+    const deviceGauge * __restrict__ pDeviceData,
+    DOUBLE* results
+)
+{
+    intokernalInt4;
+    const UINT uiDir = _DC_Dir;
+    const UINT uiBigIdx = __idx->_deviceGetBigIndex(sSite4);
+
+    DOUBLE resThisThread = 0.0;
+    for (UINT idir = 0; idir < uiDir; ++idir)
+    {
+        if (!__idx->_deviceIsBondOnSurface(uiBigIdx, byFieldId, idir))
+        {
+            UINT linkIndex = _deviceGetLinkIndex(uiSiteIndex, idir);
+            resThisThread += static_cast<DOUBLE>(_retr(_dagmulC(pDeviceData[linkIndex], pDeviceData[linkIndex])));
+        }
+    }
+    results[uiSiteIndex] = resThisThread;
 }
 
 #pragma endregion
@@ -851,74 +1103,17 @@ void CCommonKernelLink<T>::InitialBuffer(T* dest, BYTE byFieldId, EFieldInitialT
 }
 
 template<typename T>
-void CCommonKernelLink<T>::Dagger(T* dest, BYTE byFieldId)
-{
-    preparethread;
-    _kernelDaggerLink << <block, threads >> > (dest);
-}
-
-template<typename T>
 void CCommonKernelLink<T>::FixBoundary(T* dest, BYTE byFieldId)
 {
     preparethread;
-    _kernelFixBoundaryLink << <block, threads >> > (dest, byFieldId);
+    _kernelFixBoundaryLink << <block, threads >> > (dest, byFieldId, TRUE);
 }
 
 template<typename T>
-void CCommonKernelLink<T>::AxpyPlus(T* dest, BYTE byFieldId, const T* x)
+void CCommonKernelLink<T>::FixBoundaryZero(T* dest, BYTE byFieldId)
 {
     preparethread;
-    _kernelAxpyPlusLink << <block, threads >> > (dest, x);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::AxpyMinus(T* dest, BYTE byFieldId, const T* x)
-{
-    preparethread;
-    _kernelAxpyMinusLink << <block, threads >> > (dest, x);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::Axpy(T* dest, BYTE byFieldId, Real a, const T* x)
-{
-    preparethread;
-    _kernelAxpyLinkReal << <block, threads >> > (dest, x, a);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::Axpy(T* dest, BYTE byFieldId, const CLGComplex& a, const T* x)
-{
-    preparethread;
-    _kernelAxpyLink << <block, threads >> > (dest, x, a);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::Mul(T* dest, BYTE byFieldId, const T* x, UBOOL bDagger)
-{
-    preparethread;
-    _kernelMulLink << <block, threads >> > (dest, x, bDagger);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::ScalarMultply(T* dest, BYTE byFieldId, const CLGComplex& a)
-{
-    preparethread;
-    _kernelScalarMultiplyLinkComplex << <block, threads >> > (dest, a);
-}
-
-template<typename T>
-void CCommonKernelLink<T>::ScalarMultply(T* dest, BYTE byFieldId, Real a)
-{
-    preparethread;
-    _kernelScalarMultiplyLinkReal << <block, threads >> > (dest, a);
-}
-
-template<typename T>
-cuDoubleComplex CCommonKernelLink<T>::Dot(const T* me, BYTE byFieldId, const T* other)
-{
-    preparethread;
-    _kernelDotLink << < block, threads >> > (me, other, _D_ComplexThreadBuffer);
-    return appGetCudaHelper()->ThreadBufferSum(_D_ComplexThreadBuffer);
+    _kernelFixBoundaryLink << <block, threads >> > (dest, byFieldId, FALSE);
 }
 
 template<typename T>
@@ -948,6 +1143,98 @@ void CCommonKernelLink<T>::DebugPrint(const T* data, UINT uiLinkCount)
     }
 
     free(pToPrint);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::ExpMul(T* other, BYTE byFieldId, const T* me, Real a)
+{
+    preparethread;
+    _kernelExp << <block, threads >> > (other, me, byFieldId, a);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::QuickLog(T* data, BYTE byFieldId)
+{
+    preparethread;
+    _kernelQuickLog << <block, threads >> > (data, byFieldId);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::QuickExp(T* data, BYTE byFieldId)
+{
+    preparethread;
+    _kernelQuickLog << <block, threads >> > (data, byFieldId);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::StrictLog(T* data, BYTE byFieldId)
+{
+    preparethread;
+    _kernelStrictLog << <block, threads >> > (data, byFieldId);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::StrictExp(T* data, BYTE byFieldId)
+{
+    preparethread;
+    _kernelStrictExp << <block, threads >> > (data, byFieldId);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::SetOneDirectionUnity(T* data, BYTE byFieldId, BYTE byDir)
+{
+    preparethread;
+    _kernelOneDirId << <block, threads >> > (data, byFieldId, byDir);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::SetOneDirectionZero(T* data, BYTE byFieldId, BYTE byDir)
+{
+    preparethread;
+    _kernelOneDirZero << <block, threads >> > (data, byFieldId, byDir);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::PolyakovOnSpatialSite(const T* data, BYTE byFieldId, cuDoubleComplex* buffer)
+{
+    dim3 block(_HC_DecompX, _HC_DecompY, 1);
+    dim3 threads(_HC_DecompLx, _HC_DecompLy, 1);
+    _kernelPolyakovLoopOfSite << <block, threads >> > (data, buffer, byFieldId);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::CalculateE_Using_U(const T* deviceData, BYTE byFieldId, T* pResoult)
+{
+    preparethread;
+    _kernelTransformToE << <block, threads >> > (byFieldId, deviceData, pResoult);
+}
+
+template<typename T>
+void CCommonKernelLink<T>::CalculateNablaE_Using_U(const T* deviceData, BYTE byFieldId, T* pResoult, UBOOL bNaive)
+{
+    preparethread;
+    if (bNaive)
+    {
+        _kernelCalculateNablaENaive << <block, threads >> > (
+            deviceData,
+            byFieldId,
+            pResoult);
+    }
+    else
+    {
+        _kernelCalculateNablaE << <block, threads >> > (
+            deviceData,
+            byFieldId,
+            pResoult);
+    }
+}
+
+template<typename T>
+DOUBLE CCommonKernelLink<T>::CalcKineticEnery(const T* me, BYTE byFieldId)
+{
+    preparethread;
+    _kernelCalculateKinematicEnergyT_D << <block, threads >> > (byFieldId, me, _D_RealThreadBuffer);
+    return appGetCudaHelper()->ThreadBufferSum(_D_RealThreadBuffer);
 }
 
 template class CCommonKernelLink<CLGComplex>;

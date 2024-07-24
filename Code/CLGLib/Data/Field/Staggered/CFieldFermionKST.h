@@ -125,7 +125,7 @@ public:
 
     void Dagger() override
     {
-        CCommonKernelSite<deviceVector>::Dagger(m_pDeviceData, m_byFieldId);
+        CCommonKernelField<deviceVector>::Dagger(m_pDeviceData, m_uiSiteCount);
     }
 
     //This is Axpy(1.0f, x)
@@ -138,7 +138,7 @@ public:
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(x);
 
-        CCommonKernelSite<deviceVector>::AxpyPlus(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        CCommonKernelField<deviceVector>::AxpyPlus(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
     void AxpyMinus(const CField* x) override
@@ -150,7 +150,7 @@ public:
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(x);
 
-        CCommonKernelSite<deviceVector>::AxpyMinus(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        CCommonKernelField<deviceVector>::AxpyMinus(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
     void Axpy(Real a, const CField* x) override
@@ -162,7 +162,7 @@ public:
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(x);
 
-        CCommonKernelSite<deviceVector>::Axpy(m_pDeviceData, m_byFieldId, a, pField->m_pDeviceData);
+        CCommonKernelField<deviceVector>::Axpy(m_pDeviceData, m_uiSiteCount, a, pField->m_pDeviceData);
     }
 
     void Axpy(const CLGComplex& a, const CField* x) override
@@ -174,7 +174,7 @@ public:
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(x);
 
-        CCommonKernelSite<deviceVector>::Axpy(m_pDeviceData, m_byFieldId, a, pField->m_pDeviceData);
+        CCommonKernelField<deviceVector>::Axpy(m_pDeviceData, m_uiSiteCount, a, pField->m_pDeviceData);
     }
 
     void Mul(const CField* other, UBOOL bDagger = TRUE) override
@@ -186,17 +186,17 @@ public:
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(other);
 
-        CCommonKernelSite<deviceVector>::Mul(m_pDeviceData, m_byFieldId, pField->m_pDeviceData, bDagger);
+        CCommonKernelField<deviceVector>::Mul(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData, bDagger);
     }
 
     void ScalarMultply(const CLGComplex& a) override
     {
-        CCommonKernelSite<deviceVector>::ScalarMultply(m_pDeviceData, m_byFieldId, a);
+        CCommonKernelField<deviceVector>::ScalarMultply(m_pDeviceData, m_uiSiteCount, a);
     }
 
     void ScalarMultply(Real a) override
     {
-        CCommonKernelSite<deviceVector>::ScalarMultply(m_pDeviceData, m_byFieldId, a);
+        CCommonKernelField<deviceVector>::ScalarMultply(m_pDeviceData, m_uiSiteCount, a);
     }
 
     cuDoubleComplex Dot(const CField* x) const override
@@ -207,7 +207,7 @@ public:
             return make_cuDoubleComplex(0, 0);
         }
         const CFieldFermionKST<deviceVector, deviceGauge, vectorN>* pField = dynamic_cast<const CFieldFermionKST<deviceVector, deviceGauge, vectorN>*>(x);
-        return CCommonKernelSite<deviceVector>::Dot(m_pDeviceData, m_byFieldId, pField->m_pDeviceData);
+        return CCommonKernelField<deviceVector>::Dot(m_pDeviceData, m_uiSiteCount, pField->m_pDeviceData);
     }
 
 protected:

@@ -602,6 +602,11 @@ template<INT N, INT NoE> __device__ __inline__ void _dagger(deviceSUN<N, NoE>& e
     element.Dagger();
 }
 
+template<> __device__ __inline__ void _dagger<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& element)
+{
+    element.Conjugate();
+}
+
 template<> __device__ __inline__ CLGComplex _daggerC<CLGComplex>(const CLGComplex& element)
 {
     return _cuConjf(element);
@@ -754,6 +759,10 @@ __DEFINE_TWO_ELEMENT_Func(deviceSU6, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU7, _add, Add)
 __DEFINE_TWO_ELEMENT_Func(deviceSU8, _add, Add)
 
+template<> __device__ __inline__ void _add<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
+{
+    left.Add(right);
+}
 
 template<typename TLeft, typename TRight> __device__ __inline__ TLeft _subC(const TLeft& left, const TRight& right) = delete;
 template<typename TLeft, typename TRight> __device__ __inline__ void _sub(TLeft& left, const TRight& right) = delete;
@@ -802,6 +811,10 @@ __DEFINE_TWO_ELEMENT_Func(deviceSU6, _sub, Sub)
 __DEFINE_TWO_ELEMENT_Func(deviceSU7, _sub, Sub)
 __DEFINE_TWO_ELEMENT_Func(deviceSU8, _sub, Sub)
 
+template<> __device__ __inline__ void _sub<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
+{
+    left.Sub(right);
+}
 
 template<typename TLeft, typename TRight> __device__ __inline__ TLeft _mulC(const TLeft& left, const TRight& right) = delete;
 template<typename TLeft, typename TRight> __device__ __inline__ void _mul(TLeft& left, const TRight& right) = delete;
@@ -868,6 +881,36 @@ __DEFINE_TWO_ELEMENT_Func(deviceSU5, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU6, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU7, _mul, Mul)
 __DEFINE_TWO_ELEMENT_Func(deviceSU8, _mul, Mul)
+
+template<> __device__ __inline__ void _mul<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
+{
+    left.Mul(right);
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _mulC<deviceWilsonVectorSU3, deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& left, const deviceWilsonVectorSU3& right)
+{
+    return left.MulC(right);
+}
+
+template<> __device__ __inline__ void _mul<deviceWilsonVectorSU3, CLGComplex>(deviceWilsonVectorSU3& left, const CLGComplex& right)
+{
+    left.MulComp(right);
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _mulC<deviceWilsonVectorSU3, CLGComplex>(const deviceWilsonVectorSU3& left, const CLGComplex& right)
+{
+    return left.MulCompC(right);
+}
+
+template<> __device__ __inline__ void _mul<deviceWilsonVectorSU3, Real>(deviceWilsonVectorSU3& left, const Real& right)
+{
+    left.MulReal(right);
+}
+
+template<> __device__ __inline__ deviceWilsonVectorSU3 _mulC<deviceWilsonVectorSU3, Real>(const deviceWilsonVectorSU3& left, const Real& right)
+{
+    return left.MulRealC(right);
+}
 
 template<typename T> __device__ __inline__ T _dagmulC(const T& left, const T& right) = delete;
 template<typename T> __device__ __inline__ void _dagmul(T& left, const T& right) = delete;
@@ -1041,6 +1084,10 @@ template<> __device__ __inline__ CLGComplex _dot<deviceSU3Vector>(const deviceSU
 {
     return x.ConjugateDotC(y);
 }
+template<> __device__ __inline__ CLGComplex _dot<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& x, const deviceWilsonVectorSU3& y)
+{
+    return x.ConjugateDotC(y);
+}
 template<INT N, INT NoE> 
 __device__ __inline__ CLGComplex _dot(const deviceSUNVector<N, NoE>& x, const deviceSUNVector<N, NoE>& y)
 {
@@ -1057,10 +1104,55 @@ template<> __device__ __inline__ CLGComplex _dot<deviceSU3>(const deviceSU3& x, 
     return x.DaggerMulC(y).Tr();
 }
 
-template<INT N, INT NoE> 
+template<INT N, INT NoE>
 __device__ __inline__ CLGComplex _dot(const deviceSUN<N, NoE>& x, const deviceSUN<N, NoE>& y)
 {
     return x.DaggerMulC(y).Tr();
+}
+
+template<typename T> __device__ __inline__ Real _lensq(const T& x) = delete;
+
+template<> __device__ __inline__ Real _lensq<Real>(const Real& x)
+{
+    return x * x;
+}
+template<> __device__ __inline__ Real _lensq<CLGComplex>(const CLGComplex& x)
+{
+    return __cuCabsSqf(x);
+}
+template<> __device__ __inline__ Real _lensq<deviceSU2Vector>(const deviceSU2Vector& x)
+{
+    return x.ConjugateDotC(x).x;
+}
+template<> __device__ __inline__ Real _lensq<deviceSU3Vector>(const deviceSU3Vector& x)
+{
+    return x.ConjugateDotC(x).x;
+}
+template<INT N, INT NoE>
+__device__ __inline__ Real _lensq(const deviceSUNVector<N, NoE>& x)
+{
+    return x.ConjugateDotC(x).x;
+}
+
+template<> __device__ __inline__ Real _lensq<deviceSU2>(const deviceSU2& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+
+template<> __device__ __inline__ Real _lensq<deviceSU3>(const deviceSU3& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+
+template<INT N, INT NoE> 
+__device__ __inline__ Real _lensq(const deviceSUN<N, NoE>& x)
+{
+    return x.DaggerMulC(x).ReTr();
+}
+
+template<> __device__ __inline__ Real _lensq<deviceWilsonVectorSU3>(const deviceWilsonVectorSU3& x)
+{
+    return x.ConjugateDotC(x).x;
 }
 
 template<typename T> __device__ __inline__  Real _retr(const T& x) = delete;
@@ -1216,6 +1308,10 @@ template<> __device__ __inline__  void _norm<CLGComplex>(CLGComplex& x)
 template<> __device__ __inline__  void _norm<deviceSU2>(deviceSU2& x) { x.Norm(); }
 template<> __device__ __inline__  void _norm<deviceSU3>(deviceSU3& x) { x.Norm(); }
 template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSUN<N, NoE>& x) { x.Norm(); }
+template<> __device__ __inline__  void _norm<deviceSU2Vector>(deviceSU2Vector& x) { x.Norm(); }
+template<> __device__ __inline__  void _norm<deviceSU3Vector>(deviceSU3Vector& x) { x.Norm(); }
+template<INT N, INT NoE> __device__ __inline__  void _norm(deviceSUNVector<N, NoE>& x) { x.Norm(); }
+template<> __device__ __inline__  void _norm<deviceWilsonVectorSU3>(deviceWilsonVectorSU3& x) { x.Norm(); }
 
 template<typename T> __device__ __host__ __inline__  Real _element(const T& x, INT idx) = delete;
 

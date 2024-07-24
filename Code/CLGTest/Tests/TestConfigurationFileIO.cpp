@@ -197,6 +197,10 @@ UINT TestFileIOConsistency(CParameters& sParam)
             appGeneral(_T("%s\n"), sProblem.c_str());
             LastProbem(sProblem);
         }
+        else
+        {
+            appGeneral(_T("%s consist: %f - %f\n"), copy->GetClass()->GetName(), amplitude, dots[i]);
+        }
     }
     return uiError;
 }
