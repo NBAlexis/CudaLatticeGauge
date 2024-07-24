@@ -133,6 +133,7 @@
 #include "Data/Field/Staggered/CFieldFermionKSSU3REM.h"
 
 #include "Data/Field/Boson/CFieldBosonVN.h"
+#include "Data/Field/Boson/CFieldBosonVNRotation.h"
 
 //=====================================================
 

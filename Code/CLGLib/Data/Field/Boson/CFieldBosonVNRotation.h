@@ -343,7 +343,7 @@ public:
 #pragma endregion
 
         //gaugeu1->DebugPrintMe();
-        checkCudaErrors(cudaDeviceSynchronize());
+        //checkCudaErrors(cudaDeviceSynchronize());
     }
 
     void SetBosonOmega(DOUBLE fOmega)
