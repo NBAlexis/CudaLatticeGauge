@@ -104,7 +104,7 @@ namespace CLGMakeWriter
             sContent += "if (DEFINED DEBUG)\n";
             sContent += "  add_definitions(-DDEBUG=1)\n";
             sContent += "  add_definitions(-D_DEBUG=1)\n";
-            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -g -Og -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
+            sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -g -O0 -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
             sContent += "else()\n";
             sContent += "  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Ofast -Wall -Wno-unknown-pragmas -Wno-strict-overflow -Wno-class-memaccess\")\n";
             sContent += "endif()\n";
@@ -226,6 +226,12 @@ set_target_properties( CLGLib
 
             //File.WriteAllText(sSolDir +"CMake/CMakeLists" 
             //    + (m_bWinOrUbuntu ? (m_bDebug ? FileSurfix[0] : FileSurfix[1]) : (m_bDebug ? FileSurfix[2] : FileSurfix[3])), sContent);1
+
+            sContent += "if (DEFINED DEBUG)\n";
+            sContent += "  MESSAGE(\"Will output to Bin/UbuntuDebug\")\n";
+            sContent += "else()\n";
+            sContent += "  MESSAGE(\"Will output to Bin/Ubuntu\")\n";
+            sContent += "endif()\n";
         }
 
         protected string AddApplication(CProjFile addProj)

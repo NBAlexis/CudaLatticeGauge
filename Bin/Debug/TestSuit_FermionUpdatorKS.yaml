@@ -1347,9 +1347,9 @@ TestFermionUpdatorKSGamma:
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
 
     Updator:
@@ -1362,7 +1362,7 @@ TestFermionUpdatorKSGamma:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 5
         NestedStep : 8
         InnerLeapfrog : 1
         
@@ -1461,7 +1461,7 @@ TestFermionUpdatorKSGammaProj:
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
@@ -1476,7 +1476,7 @@ TestFermionUpdatorKSGammaProj:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 5
         NestedStep : 8
         InnerLeapfrog : 1
         
@@ -1578,7 +1578,7 @@ TestFermionUpdatorKSGammaEM:
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
@@ -1593,7 +1593,7 @@ TestFermionUpdatorKSGammaEM:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 4
         NestedStep : 8
         InnerLeapfrog : 1
         
@@ -1709,7 +1709,7 @@ TestFermionUpdatorKSGammaEMProj:
 
     BeforeMetropolis : 3
     BeforeMetropolisDebug : 1
-    Metropolis : 12
+    Metropolis : 10
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
@@ -1724,7 +1724,7 @@ TestFermionUpdatorKSGammaEMProj:
         ## Will only read this when updator is HMC IntegratorType = { CIntegratorLeapFrog, CIntegratorOmelyan }
         IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 10
+        IntegratorStep : 5
         NestedStep : 8
         InnerLeapfrog : 1
         

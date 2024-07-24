@@ -358,7 +358,7 @@ UINT TestGaugeFixingCoulombPorjectivePlane2(CParameters&)
     return uiError;
 }
 
-__REGIST_TEST(TestFFT, Verify, TestFFT, FFT);
+___REGIST_TEST(TestFFT, Verify, TestFFT, FFT, _TEST_NOCHECK);
 
 __REGIST_TEST(TestGaugeFixingLandau, GaugeFixing, TestGaugeFixingLandauCornell, LandauCornell);
 

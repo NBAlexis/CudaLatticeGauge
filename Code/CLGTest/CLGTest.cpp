@@ -119,24 +119,6 @@ void DeleteAllLists(THashMap<CCString, TArray<TestList*>*>& category)
 void LoadParams(CParameters& params)
 {
     params.RemoveAll();
-#if _CLG_DEBUG
-    CYAMLParser::ParseFile(_T("TestSuit.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Common.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Random.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Boundary.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_FileIO.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_FermionMatrix.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_FermionUpdator.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_FermionUpdatorKS.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_GaugeFixing.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Rotation.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_MiscUpdate.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Solver.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Updator.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_Boson.yaml"), params);
-    CYAMLParser::ParseFile(_T("TestSuit_SUN.yaml"), params);
-    //CYAMLParser::ParseFile(_T("TestSuit_EvenOdd.yaml"), params);
-#else
     CYAMLParser::ParseFile(_T("../Debug/TestSuit.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Common.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Random.yaml"), params);
@@ -152,8 +134,6 @@ void LoadParams(CParameters& params)
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Updator.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_Boson.yaml"), params);
     CYAMLParser::ParseFile(_T("../Debug/TestSuit_SUN.yaml"), params);
-    //CYAMLParser::ParseFile(_T("../Debug/TestSuit_EvenOdd.yaml"), params);
-#endif
 }
 
 void Print(const CCString& command)

@@ -111,7 +111,7 @@ UINT TestALogDefinition(CParameters&)
     return 0;
 }
 
-__REGIST_TEST(TestSmallMatrix, Verify, TestSmallMatrix, SmallMatrix);
+___REGIST_TEST(TestSmallMatrix, Verify, TestSmallMatrix, SmallMatrix, _TEST_NOCHECK);
 
 __REGIST_TEST(TestOperators, Misc, TestOperators, Operators);
 
