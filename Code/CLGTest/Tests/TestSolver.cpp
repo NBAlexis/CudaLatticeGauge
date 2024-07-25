@@ -28,6 +28,9 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| D^-1 D phi - phi |^2 =%8.18f\n"), fError1);
     if (appAbs(fError1) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| D^-1 D phi - phi |^2 =%8.18f "), fError1);
+        LastProbem(sbug);
         ++uiError;
     }
     
@@ -41,6 +44,9 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| D D^-1 phi - phi |^2 =%8.18f\n"), fError2);
     if (appAbs(fError2) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| D D^-1 phi - phi |^2 =%8.18f "), fError2);
+        LastProbem(sbug);
         ++uiError;
     }
 
@@ -55,6 +61,9 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| D+^-1 D+ phi - phi |^2 =%8.18f\n"), fError3);
     if (appAbs(fError3) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| D+^-1 D+ phi - phi |^2 =%8.18f "), fError3);
+        LastProbem(sbug);
         ++uiError;
     }
 
@@ -68,6 +77,9 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| D+ D+^-1 phi - phi |^2 =%8.18f\n"), fError4);
     if (appAbs(fError4) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| D+ D+^-1 phi - phi |^2 =%8.18f "), fError4);
+        LastProbem(sbug);
         ++uiError;
     }
 
@@ -82,6 +94,9 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| (DD+)^-1 (DD+) phi - phi |^2 =%8.18f\n"), fError5);
     if (appAbs(fError5) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| (DD+)^-1 (DD+) phi - phi |^2 =%8.18f "), fError5);
+        LastProbem(sbug);
         ++uiError;
     }
 
@@ -95,20 +110,23 @@ UINT TestSolver(CParameters& params)
     appGeneral(_T("| (DD+) (DD+)^-1 phi - phi |^2 =%8.18f\n"), fError6);
     if (appAbs(fError6) > fMaxError)
     {
+        CCString sbug;
+        sbug.Format(_T("| (DD+) (DD+)^-1 phi - phi |^2 =%8.18f "), fError6);
+        LastProbem(sbug);
         ++uiError;
     }
     
     return uiError;
 }
 
-___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab, BiCGStab, _TEST_BOUND);
-___REGIST_TEST(TestSolver, Solver, TestSolverGMRES, GMRES, _TEST_BOUND);
+__REGIST_TEST(TestSolver, Solver, TestSolverBiCGStab, BiCGStab);
+__REGIST_TEST(TestSolver, Solver, TestSolverGMRES, GMRES);
 //__REGIST_TEST(TestSolver, Solver, TestSolverGCR); //slow solver not used
-___REGIST_TEST(TestSolver, Solver, TestSolverGCRODR, GCRODR, _TEST_BOUND);
+__REGIST_TEST(TestSolver, Solver, TestSolverGCRODR, GCRODR);
 //__REGIST_TEST(TestSolver, Solver, TestSolverTFQMR); //slow solver not used
-___REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode, GMRES2, _TEST_BOUND);
-___REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode, GCRODR2, _TEST_BOUND);
-___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode, BiCGStab2, _TEST_BOUND | _TEST_DOUBLE);
+__REGIST_TEST(TestSolver, Solver, TestSolverGMRESLowMode, GMRES-low);
+__REGIST_TEST(TestSolver, Solver, TestSolverGCRODRLowMode, GCRODR-low);
+___REGIST_TEST(TestSolver, Solver, TestSolverBiCGStabLowMode, BiCGStab-low, _TEST_DOUBLE);
 
 __REGIST_TEST(TestSolver, Solver, TestEOSolverBiCGStab, BiCGStabEO);
 __REGIST_TEST(TestSolver, Solver, TestEOSolverGMRES, GMRESEO);

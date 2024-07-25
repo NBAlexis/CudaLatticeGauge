@@ -572,30 +572,29 @@ void CCudaHelper::SetFieldPointers()
     checkCudaErrors(cudaMemcpyToSymbol(__boundaryFieldPointers, m_deviceBoundaryFieldPointers, sizeof(CFieldBoundaryParent*) * kMaxFieldCount));
 }
 
-TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock()
+TArray<UINT> CCudaHelper::GetMaxThreadCountAndThreadPerblock(INT deviceId)
 {
     TArray<UINT> ret;
 
-    INT deviceCount = 0;
-    const cudaError_t error_id = cudaGetDeviceCount(&deviceCount);
+    //INT deviceCount = 0;
+    //const cudaError_t error_id = cudaGetDeviceCount(&deviceCount);
 
-    if (error_id != cudaSuccess)
-    {
-        appCrucial("cudaGetDeviceCount returned %d\n-> %s\n",
-            static_cast<INT>(error_id), cudaGetErrorString(error_id));
-        appCrucial("Result = FAIL\n");
-        _FAIL_EXIT;
-    }
+    //if (error_id != cudaSuccess)
+    //{
+    //    appCrucial("cudaGetDeviceCount returned %d\n-> %s\n",
+    //        static_cast<INT>(error_id), cudaGetErrorString(error_id));
+    //    appCrucial("Result = FAIL\n");
+    //    _FAIL_EXIT;
+    //}
 
-    if (0 == deviceCount)
-    {
-        appCrucial(_T("This program need GPU but you do NOT have a GPU.\n"));
-        _FAIL_EXIT;
-    }
+    //if (0 == deviceCount)
+    //{
+    //    appCrucial(_T("This program need GPU but you do NOT have a GPU.\n"));
+    //    _FAIL_EXIT;
+    //}
 
-    cudaSetDevice(0);
     cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, 0);
+    cudaGetDeviceProperties(&deviceProp, deviceId);
 
     //We need to constrain it further for shared memeory per block
     ret.AddItem(deviceProp.maxThreadsPerBlock);

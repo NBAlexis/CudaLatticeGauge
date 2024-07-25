@@ -133,7 +133,7 @@ void CRandom::InitialStatesXORWOW(UINT )
 {
     m_uiFatIdDivide = _HC_Dir + 1;
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesXORWOW, sizeof(curandState) * _HC_Volume));
-    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock(appGetDeviceId());
     deviceConstraints[0] = 512;
     TArray<UINT> latticeDim;
     latticeDim.AddItem(_HC_Lx * _HC_Ly);
@@ -150,7 +150,7 @@ void CRandom::InitialStatesPhilox(UINT )
 {
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesPhilox, sizeof(curandStatePhilox4_32_10_t) * _HC_Volume * (_HC_Dir + 1)));
 
-    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock(appGetDeviceId());
     deviceConstraints[0] = 256;
     TArray<UINT> latticeDim;
     latticeDim.AddItem(_HC_Lx * _HC_Ly);
@@ -167,7 +167,7 @@ void CRandom::InitialStatesPhilox(UINT )
 void CRandom::InitialStatesMRG(UINT )
 {
     checkCudaErrors(__cudaMalloc((void **)&m_pDeviceRandStatesMRG, sizeof(curandStateMRG32k3a) * _HC_Volume * (_HC_Dir + 1)));
-    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock(appGetDeviceId());
     deviceConstraints[0] = 256;
     TArray<UINT> latticeDim;
     latticeDim.AddItem(_HC_Lx * _HC_Ly);

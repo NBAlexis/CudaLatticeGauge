@@ -26,8 +26,8 @@ TestAccelerationTorus:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.418724
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.418724]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 
@@ -131,8 +131,8 @@ TestAccelerationDirichletQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.420602
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.420602]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 
@@ -242,8 +242,8 @@ TestAccelerationTorusQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411030
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.411030]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 
@@ -331,8 +331,8 @@ TestAccelerationDirichletMidCenterQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.411214
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.411214]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 
@@ -441,8 +441,8 @@ TestAccelerationTorusMidCenterQ:
     MetropolisDebug : 4
     ExpectMiss : 2
     ExpectMissDebug : 1
-    ExpectedRes : 0.408805
-    ExpectedResDebug : 0.591390
+    ExpectedRes : [0.408805]
+    ExpectedResDebug : [0.591390]
 
     Updator:
 

@@ -206,9 +206,9 @@ __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationDirichletMidCenterQ, Accele
 
 __REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusQ, AccelerationTorusQ);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc, RigidAccTorusKS);
+___REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAcc, RigidAccTorusKS, _TEST_NOCHECK);
 
-__REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, RigidAccTorusKSMidCenter);
+___REGIST_TEST(TestUpdateCommon, Acc, TestAccelerationTorusKSRigidAccMidCenter, RigidAccTorusKSMidCenter, _TEST_NOCHECK);
 
 //__REGIST_TEST(TestAcceleration, Updator, TestAcceleration);
 

@@ -63,7 +63,7 @@ _kernelCalculateSiteCount(
 UINT inline _GetDecompose(UINT volumn)
 {
     TArray<UINT> factors = _getFactors(volumn);
-    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock(appGetDeviceId());
     const UINT maxThreadPerBlock = deviceConstraints[0];
 
     UINT uiMax = 1;

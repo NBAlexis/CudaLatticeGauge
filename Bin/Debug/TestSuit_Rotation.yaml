@@ -10,7 +10,7 @@ TestRotationWilsonDiracDirichlet:
     LatticeIndex : CIndexSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
-    ExponentialPrecision : 10
+    ExponentialPrecision : 0
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
@@ -18,22 +18,22 @@ TestRotationWilsonDiracDirichlet:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 5
+    BeforeMetropolis : 4
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.587613]
     ExpectedResDebug : [0.591390]
 
     Updator:
 
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 25
-        NestedStep : 4
+        IntegratorStep : 6
+        NestedStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -116,24 +116,24 @@ TestRotationWilsonDiracTorus:
     FermionFieldCount : 1
     MeasureListLength : 1
     CacheStaple : 0
-    ExponentialPrecision : 10
+    ExponentialPrecision : 0
 
-    BeforeMetropolis : 5
+    BeforeMetropolis : 4
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.445789]
     ExpectedResRelease : [0.369222]
 
     Updator:
 
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         # IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 40
-        NestedStep : 4
+        IntegratorStep : 8
+        NestedStep : 6
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -218,18 +218,18 @@ TestRotationWilsonDiracProjectivePlane:
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.538359]
     ExpectedResDebug : [0.538359]
 
     Updator:
 
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         ## IntegratorType : CIntegratorOmelyan 
         IntegratorStepLength : 1
-        IntegratorStep : 32
-        NestedStep : 4
+        IntegratorStep : 6
+        NestedStep : 8
         Omelyan2Lambda : 0.38636665500756728
 
     Gauge:
@@ -309,7 +309,7 @@ TestRotationKSDirichlet:
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     LatticeBoundary : CBoundaryConditionPeriodicAndDirichletSquare
     ThreadAutoDecompose : 1
-    ExponentialPrecision : 10
+    ExponentialPrecision : 0
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
@@ -321,7 +321,7 @@ TestRotationKSDirichlet:
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.536160]
     ExpectedResDebug : [0.413]
@@ -334,10 +334,10 @@ TestRotationKSDirichlet:
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
         # IntegratorType : CIntegratorOmelyan
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 32
-        NestedStep : 6
+        IntegratorStep : 10
+        NestedStep : 8
         # BindDir : 10
 
     Gauge:
@@ -427,7 +427,7 @@ TestRotationKSTorus:
     # LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
-    ExponentialPrecision : 10
+    ExponentialPrecision : 0
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
@@ -435,11 +435,11 @@ TestRotationKSTorus:
     MeasureListLength : 1
     CacheStaple : 0
 
-    BeforeMetropolis : 5
+    BeforeMetropolis : 6
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.480466]
     ExpectedResDebug : [0.413]
@@ -452,10 +452,10 @@ TestRotationKSTorus:
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
         # IntegratorType : CIntegratorOmelyan
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 30
-        NestedStep : 5
+        IntegratorStep : 10
+        NestedStep : 8
         # BindDir : 10
 
     Gauge:
@@ -544,7 +544,7 @@ TestRotationKSProjectivePlane:
     LatticeBoundary : CBoundaryConditionProjectivePlaneSquare
     # LatticeBoundary : CBoundaryConditionTorusSquare
     ThreadAutoDecompose : 1
-    ExponentialPrecision : 10
+    ExponentialPrecision : 0
     RandomType : ER_Schrage
     RandomSeed : 1234567
     ActionListLength : 2
@@ -556,7 +556,7 @@ TestRotationKSProjectivePlane:
     BeforeMetropolisDebug : 1
     Metropolis : 10
     MetropolisDebug : 4
-    ExpectMiss : 2
+    ExpectMiss : 1
     ExpectMissDebug : 1
     ExpectedRes : [0.414636]
     ExpectedResDebug : [0.413]
@@ -571,9 +571,9 @@ TestRotationKSProjectivePlane:
         InnerLeapfrog : 1
         # IntegratorType : CIntegratorForceGradient
         # IntegratorType : CIntegratorOmelyan
-        IntegratorType : CIntegratorNestedOmelyan
+        IntegratorType : CIntegratorNestedForceGradient
         IntegratorStepLength : 1
-        IntegratorStep : 12
+        IntegratorStep : 6
         NestedStep : 8
 
     Gauge:
@@ -1186,7 +1186,7 @@ TestRotationQuenched3D:
         # IntegratorType : CIntegratorNestedOmelyan
         IntegratorType : CIntegratorForceGradient 
         IntegratorStepLength : 1
-        IntegratorStep : 6
+        IntegratorStep : 8
         IntegratorStepDebug : 10
 
     Gauge:

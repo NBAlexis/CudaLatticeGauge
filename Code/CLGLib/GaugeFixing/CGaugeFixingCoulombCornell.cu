@@ -447,7 +447,7 @@ void CGaugeFixingCoulombCornell::Initial(class CLatticeData* pOwner, const CPara
 {
     m_pOwner = pOwner;
 
-    const TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock();
+    const TArray<UINT> deviceConstraints = CCudaHelper::GetMaxThreadCountAndThreadPerblock(appGetDeviceId());
     TArray<UINT> latticeDim;
     latticeDim.AddItem(_HC_Lx);
     latticeDim.AddItem(_HC_Ly);

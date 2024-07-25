@@ -148,6 +148,11 @@ inline CCudaBuffer* GetBuffer()
     return GCLGManager.m_pBuffer;
 }
 
+inline INT appGetDeviceId()
+{
+    return GCLGManager.m_iDeviceId;
+}
+
 /**
 * find all factors of input number
 */

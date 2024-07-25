@@ -352,7 +352,7 @@ void CNestedIntegrator::UpdatePG(Real fStep, UBOOL bCacheStaple)
 
     if (m_bDebugForce)
     {
-        appGeneral(_T(" ------ Fermion Force= %f \n"), CalcForce());
+        appGeneral(_T(" ------ Gauge Force= %f \n"), CalcForce());
     }
 }
 

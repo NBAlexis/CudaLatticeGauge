@@ -168,7 +168,7 @@ public:
     void SetFieldPointers();
 
     /**ret[0] = max thread count, ret[1,2,3] = max thread for x,y,z per block*/
-    static TArray<UINT> GetMaxThreadCountAndThreadPerblock();
+    static TArray<UINT> GetMaxThreadCountAndThreadPerblock(INT deviceId);
 
     UINT m_ConstIntegers[kContentLength];
     INT m_ConstSignedIntegers[kContentLength];
